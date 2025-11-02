@@ -244,28 +244,63 @@ const GARET_ABILITIES = {
 
 ### 2.0 Djinn Slot System
 
-**🚨 CRITICAL DESIGN DECISION:**
+**🚨 CRITICAL: GLOBAL TEAM SLOTS (Not Per-Unit!)**
 
 ```typescript
 const DJINN_SLOTS = {
-  slotsPerUnit: 3,        // Each unit has 3 Djinn slots
-  maxPerTeam: 12,         // 4 units × 3 slots = 12 total
-  canEquipToAnyUnit: true // Any Djinn can go on any unit
+  teamSlots: 3,              // Team has exactly 3 Djinn slots (GLOBAL)
+  slotsPerUnit: 0,           // NOT per-unit!
+  maxEquipped: 3,            // Can only equip 3 Djinn total across entire party
+  totalCollectable: 12,      // Can collect all 12 Djinn
+  affectsAllUnits: true      // Equipped Djinn bonuses apply to ALL party members
 };
 ```
 
-**Clarification:**
-- **Per-Unit System:** Each UNIT has 3 Djinn slots (like Golden Sun)
-- **Not Global:** NOT 3 slots for the entire team
-- **Example:** Isaac can have 3 Djinn, Garet can have 3 Djinn, etc.
-- **Total Possible:** 4 active units × 3 slots = 12 Djinn can be equipped at once
-- **Collection Limit:** 12 total Djinn exist (3 per element)
+**How It Works:**
+1. Player collects up to 12 Djinn throughout the game (3 per element)
+2. Player equips ANY 3 Djinn to the team's 3 global slots
+3. The 3 equipped Djinn provide bonuses to ALL 4 party members
+4. Synergy is calculated from the team's 3 Djinn (not individual units)
+
+**Example:**
+```
+Team collects: Flint, Granite, Bane (3 Venus) + 9 other Djinn
+
+Player equips to team slots:
+  Slot 1: Flint (Venus T1)
+  Slot 2: Granite (Venus T2)
+  Slot 3: Bane (Venus T3)
+
+Result (applies to Isaac, Garet, Mia, AND Ivan):
+  - ALL units get: +12 ATK, +8 DEF
+  - ALL units get: Class change to "Venus Adept"
+  - ALL units unlock: "Earthquake" ability
+
+This is a TEAM BUFF, not individual bonuses!
+```
+
+**Strategic Depth:**
+- With 12 Djinn collected, player chooses which 3 to use
+- All same element = specialization (e.g., all Venus = earth power)
+- Mixed elements = versatility (e.g., Venus+Mars+Mercury = balanced)
+- Harder choices than per-unit system!
 
 ---
 
 ### 2.1 Djinn Passive Synergy Formulas
 
 **🚨 CRITICAL: Synergy scales with Djinn COUNT!**
+
+**NOTE:** Synergy is calculated from the TEAM'S 3 equipped Djinn (not per-unit).
+The resulting bonuses apply to ALL party members globally.
+
+**Example:**
+- Team equips: 3 Venus Djinn
+- Synergy: +12 ATK, +8 DEF
+- Result: Isaac gets +12 ATK, Garet gets +12 ATK, Mia gets +12 ATK, Ivan gets +12 ATK
+- **ALL FOUR UNITS benefit from the same synergy!**
+
+---
 
 **1 Djinn (Any Element):**
 ```typescript
@@ -385,6 +420,43 @@ const DJINN_TIER_EFFECTS = {
 }
 ```
 
+**Activation Mechanics (Team Slots):**
+
+When a Djinn is activated (unleashed):
+1. Djinn moves from "Set" → "Standby" state
+2. **ALL party members IMMEDIATELY lose that Djinn's portion of synergy**
+3. Example:
+   - Before: 3 Venus Djinn = +12 ATK to all units
+   - Activate Flint: Now 2 Venus Djinn = +8 ATK to all units
+   - **ALL 4 units lose 4 ATK!**
+4. After 2 turns: Djinn returns to "Set", all units regain +4 ATK
+
+**Trade-off:**
+- Activation: Big burst damage (Flint deals 80 damage)
+- Penalty: **ALL units lose stats for 2 turns** (team-wide penalty!)
+- Strategic: Worth weakening entire team for burst?
+
+**Example Full Scenario:**
+```
+Turn 1 (Before Activation):
+  Team: 3 Venus Djinn (Flint, Granite, Bane) equipped
+  All units: +12 ATK, +8 DEF
+
+Turn 2 (Isaac activates Flint):
+  Flint unleashes: 80 damage to all enemies
+  Team: 2 Venus Djinn (Granite, Bane) remain
+  All units: +8 ATK, +5 DEF (-4 ATK, -3 DEF penalty!)
+
+Turn 3:
+  Flint still in Standby
+  All units still: +8 ATK, +5 DEF
+
+Turn 4 (Flint recovers):
+  Flint returns to Set state
+  Team: 3 Venus Djinn (Flint, Granite, Bane) back
+  All units: +12 ATK, +8 DEF (bonuses restored!)
+```
+
 ### 2.3 Djinn Distribution & Acquisition
 
 **12 Djinn Total:**
@@ -412,6 +484,46 @@ const DJINN_CATALOG = {
   ]
 };
 ```
+
+### 2.5 Djinn Menu UI Design
+
+**Screen Layout:**
+- **Left Panel:** 12 Djinn collection (3 Venus, 3 Mars, 3 Mercury, 3 Jupiter)
+  - Shows all collected Djinn with element badges
+  - Grayed out if not yet collected
+- **Center Panel:** 3 TEAM SLOTS (drag Djinn here to equip)
+  - Slot 1, Slot 2, Slot 3
+  - Shows currently equipped Djinn
+  - Empty slots are highlighted
+- **Right Panel:** Current synergy preview
+  - Shows bonuses ALL units will receive
+  - "All party members gain: +12 ATK, +8 DEF"
+  - Class change preview: "Venus Adept"
+  - Unlocked abilities: "Earthquake"
+
+**Equipping Process:**
+1. Player opens Djinn menu (from main menu, not during battle)
+2. Views all 12 collected Djinn (left panel)
+3. Drags/selects 3 Djinn into the team's 3 slots (center panel)
+4. Synergy recalculates based on the 3 equipped
+5. Preview shows: "All party members will receive: +X ATK, +Y DEF"
+6. Confirm → Bonuses apply to entire party
+
+**In-Battle Djinn Board:**
+- Shows team's 3 equipped Djinn with state indicators:
+  - **Set** (green): Ready to activate, passive bonus active
+  - **Standby** (yellow): Just activated, passive bonus lost
+  - **Recovery** (red): Recovering, passive bonus lost
+- Each can be activated once per battle (Set → Standby → Recovery → Set)
+- Activation button shows:
+  - Djinn name + effect (e.g., "Flint: 80 damage to all enemies")
+  - Warning: "Team will lose +4 ATK, +3 DEF for 2 turns"
+- Strategic: Coordinate activations across the team
+
+**Visual Feedback:**
+- When Djinn activated: All 4 unit portraits flash briefly (showing global effect)
+- Stat bars change color when synergy bonuses are lost
+- Recovery timer shows turns until Djinn returns to Set state
 
 ---
 
@@ -539,12 +651,16 @@ const BOOTS = {
 ### 3.2 Stat Calculation Formula
 
 ```typescript
-function calculateFinalStats(unit: Unit): Stats {
+function calculateFinalStats(unit: Unit, team: Team): Stats {
   const base = unit.baseStats;
   const levelBonus = unit.growthRates.map(stat => stat * (unit.level - 1));
   const equipment = sumEquipmentBonuses(unit.equipment);
-  const djinn = calculateDjinnSynergy(unit.djinn);
+  const djinn = calculateDjinnSynergy(team.equippedDjinn);  // Team's 3 Djinn (GLOBAL)
   const buffs = sumActiveBuffs(unit.buffs);
+
+  // Note: djinn synergy is calculated from team.equippedDjinn (the 3 team slots)
+  // This synergy bonus applies to ALL units in the party
+  // So Isaac, Garet, Mia, and Ivan all get the same Djinn bonus
 
   return {
     hp: base.hp + levelBonus.hp + equipment.hp,
@@ -556,12 +672,14 @@ function calculateFinalStats(unit: Unit): Stats {
   };
 }
 
-// Example: Isaac Level 5, Iron Sword, Iron Armor, 3 Venus Djinn
+// Example: Isaac Level 5, Iron Sword, Iron Armor, Team has 3 Venus Djinn equipped
 // Base (Lv5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
 // Iron Sword: ATK +12
 // Iron Armor: HP +20, DEF +10
-// 3 Venus Djinn: ATK +12, DEF +8
+// 3 Venus Djinn (team): ATK +12, DEF +8 (ALL units get this!)
 // FINAL: HP 200, ATK 51, DEF 36, MAG 20, SPD 16
+//
+// Note: Garet, Mia, and Ivan ALSO get +12 ATK, +8 DEF from the team's 3 Venus Djinn!
 ```
 
 ---
@@ -1180,7 +1298,19 @@ const PARTY_RULES = {
   maxTotalUnits: 10,     // Can recruit up to 10 units
   maxActiveParty: 4,     // Only 4 can be in active battle party
   minActiveParty: 1,     // Must have at least 1 active unit
-  benchSize: 6           // Remaining units (10 - 4 = 6 on bench)
+  benchSize: 6,          // Remaining units (10 - 4 = 6 on bench)
+
+  // Djinn management (GLOBAL team system)
+  djinnSlots: 3,              // Team has 3 Djinn slots (GLOBAL)
+  djinnAffectAllUnits: true,  // Equipped Djinn boost entire party
+  djinnCollectionMax: 12,     // Can collect all 12 Djinn
+  djinnEquipmentScreen: "team-based",  // One screen for team (not per-unit)
+
+  // How Djinn bonuses work:
+  // - Player equips 3 Djinn to TEAM slots (not individual units)
+  // - All 4 active party members receive the synergy bonus
+  // - Bench units do NOT receive Djinn bonuses (only active party)
+  // - When party composition changes, Djinn bonuses automatically apply to new active units
 };
 ```
 
@@ -1659,9 +1789,12 @@ function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
 - 5 abilities per unit (unlock at levels 1-5)
 
 **Djinn:**
-- 12 total (3 per element)
-- All same element: +12 ATK, +8 DEF
-- Mixed elements: Lower bonuses
+- 12 total collectible (3 per element: Venus, Mars, Mercury, Jupiter)
+- 3 team slots (GLOBAL - affects all 4 party members)
+- Choose 3 from 12 collected (strategic depth!)
+- All same element: ALL units get +12 ATK, +8 DEF
+- Mixed elements: ALL units get balanced bonuses
+- Activation: Powerful effect but team-wide stat penalty for 2 turns
 
 **Equipment:**
 - 4 slots: Weapon, Armor, Helm, Boots
