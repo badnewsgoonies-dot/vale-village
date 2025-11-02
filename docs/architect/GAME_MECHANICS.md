@@ -755,13 +755,16 @@ const DJINN_ACTIVATION_RULES = {
   // HOW MANY PER TURN
   activationsPerTurn: {
     perUnit: 1,  // Each unit can activate only 1 Djinn per turn
-    total: 4,    // Maximum 4 Djinn activations per turn (if all 4 units activate)
+    total: 3,    // ✅ Maximum 3 (limited by 3 team Djinn slots)
 
     examples: [
-      "Turn 1: Isaac activates Flint, Garet activates Forge, Ivan passes, Mia passes = 2 total",
-      "Turn 2: All 4 units activate 1 Djinn each = 4 total",
-      "Turn 3: Isaac tries to activate 2 Djinn in same turn = NOT ALLOWED"
-    ]
+      "Turn 1: Isaac activates Flint, Garet activates Granite, Ivan passes = 2 total ✅",
+      "Turn 2: Mia activates Bane = 1 activation. Now all 3 Djinn in Standby ✅",
+      "Turn 3: Isaac tries to activate but all 3 Djinn already in Standby/Recovery ❌",
+      "Turn 3: Party must wait for Djinn to recover to Set state before activating again"
+    ],
+
+    constraint: "Once all 3 team Djinn are activated (Standby state), no more activations until recovery"
   },
 
   // DAMAGE THRESHOLD
@@ -850,19 +853,20 @@ const DJINN_ACTIVATION_RULES = {
     },
 
     differentUnits: {
-      perTurn: 4,
-      reason: "Each unit can activate 1 Djinn, so max = 4 total"
+      perTurn: 3,  // ✅ Maximum 3 (limited by 3 team Djinn slots)
+      reason: "Each unit can activate 1 Djinn, but max = 3 total (team only has 3 Djinn)"
     },
 
     standbyAccumulation: {
       allowed: true,
-      reason: "Can accumulate multiple Standby Djinn for summons",
+      reason: "Can accumulate multiple Standby Djinn for summons over multiple turns",
 
       example: {
         turn1: "Isaac activates Flint (1 in Standby)",
         turn2: "Garet activates Granite (2 in Standby)",
         turn3: "Ivan activates Bane (3 in Standby)",
-        turn4: "Party can now summon Titan (3 Venus Djinn in Standby)"
+        turn4: "Party can now summon Titan (3 Venus Djinn in Standby)",
+        turn4note: "OR wait for Djinn to recover (turn 4-5) to get passive bonuses back"
       }
     }
   }
