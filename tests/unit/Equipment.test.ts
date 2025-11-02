@@ -222,6 +222,19 @@ describe('TASK 4: Legendary Equipment Special Properties', () => {
 
     // ← PROVES Oracle's Crown turns mages into battle mages!
   });
+
+  test('✅ Dragon Scales grant elemental resistance', () => {
+    const isaac = new Unit(ISAAC, 5);
+
+    isaac.equipItem('armor', DRAGON_SCALES);
+
+    // Check that equipment has elementalResist property
+    expect(isaac.equipment.armor).toBe(DRAGON_SCALES);
+    expect(isaac.equipment.armor?.elementalResist).toBe(0.2);
+
+    // ← PROVES Dragon Scales reduce elemental damage by 20%!
+    // (Actual damage reduction will be tested in Task 5: Battle System)
+  });
 });
 
 describe('CONTEXT-AWARE: Equipment Creates Strategic Choices', () => {
@@ -511,6 +524,9 @@ describe('DATA INTEGRITY: Equipment Catalog', () => {
     expect(ORACLES_CROWN.statBonus.def).toBeTruthy();
     expect(ORACLES_CROWN.statBonus.mag).toBeTruthy();
     expect(ORACLES_CROWN.statBonus.pp).toBeTruthy();
+
+    // Dragon Scales grant elemental resistance
+    expect(DRAGON_SCALES.elementalResist).toBe(0.2);
 
     // ← PROVES legendary items are special!
   });

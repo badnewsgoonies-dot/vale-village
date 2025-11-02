@@ -77,6 +77,7 @@ export const DRAGON_SCALES: Equipment = {
   tier: 'legendary',
   cost: 4000,
   statBonus: { def: 35, hp: 60 },
+  elementalResist: 0.2, // 20% reduction to elemental damage
 };
 
 // ========== HELMS ==========
