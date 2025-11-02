@@ -123,8 +123,11 @@ export class Unit {
   /**
    * Calculate final stats: base + level bonuses + equipment + Djinn synergy + buffs
    * Formula from GAME_MECHANICS.md Section 1.2 and 3.2
+   *
+   * @param team Optional team (for Djinn synergy bonuses). If provided, uses team's equipped Djinn.
+   *             If not provided, falls back to per-unit Djinn (backward compatibility).
    */
-  calculateStats(): Stats {
+  calculateStats(team?: { equippedDjinn: Djinn[], djinnStates: Map<string, DjinnState> }): Stats {
     // Base stats
     const base = { ...this.baseStats };
 
@@ -152,11 +155,22 @@ export class Unit {
     }
 
     // Djinn synergy bonuses (only count Set Djinn)
-    // TODO: After Team Djinn refactor, this will read from team.equippedDjinn instead
-    const setDjinn = this.djinn.filter(d =>
-      this.djinnStates.get(d.id) !== 'Standby' && this.djinnStates.get(d.id) !== 'Recovery'
-    );
-    const djinnSynergy = calculateDjinnSynergy(setDjinn);
+    // 🚨 REFACTORED: Now uses team.equippedDjinn if team provided
+    // From GAME_MECHANICS.md Section 2.0: Team-wide Djinn system
+    let djinnSynergy;
+    if (team) {
+      // Use team's Djinn (affects ALL units equally)
+      const setDjinn = team.equippedDjinn.filter(d =>
+        team.djinnStates.get(d.id) === 'Set'
+      );
+      djinnSynergy = calculateDjinnSynergy(setDjinn);
+    } else {
+      // Fallback to per-unit Djinn (backward compatibility)
+      const setDjinn = this.djinn.filter(d =>
+        this.djinnStates.get(d.id) !== 'Standby' && this.djinnStates.get(d.id) !== 'Recovery'
+      );
+      djinnSynergy = calculateDjinnSynergy(setDjinn);
+    }
 
     // Status effect modifiers
     let atkMultiplier = 1.0;
