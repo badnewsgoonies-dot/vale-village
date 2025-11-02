@@ -242,6 +242,27 @@ const GARET_ABILITIES = {
 
 ## 2. DJINN SYSTEM
 
+### 2.0 Djinn Slot System
+
+**🚨 CRITICAL DESIGN DECISION:**
+
+```typescript
+const DJINN_SLOTS = {
+  slotsPerUnit: 3,        // Each unit has 3 Djinn slots
+  maxPerTeam: 12,         // 4 units × 3 slots = 12 total
+  canEquipToAnyUnit: true // Any Djinn can go on any unit
+};
+```
+
+**Clarification:**
+- **Per-Unit System:** Each UNIT has 3 Djinn slots (like Golden Sun)
+- **Not Global:** NOT 3 slots for the entire team
+- **Example:** Isaac can have 3 Djinn, Garet can have 3 Djinn, etc.
+- **Total Possible:** 4 active units × 3 slots = 12 Djinn can be equipped at once
+- **Collection Limit:** 12 total Djinn exist (3 per element)
+
+---
+
 ### 2.1 Djinn Passive Synergy Formulas
 
 **🚨 CRITICAL: Synergy scales with Djinn COUNT!**
@@ -417,13 +438,13 @@ const WEAPONS = {
     name: "Steel Sword",
     atk: +20,
     unlocksAbility: null,
-    cost: 600
+    cost: 500
   },
   legendary: {
     name: "Sol Blade",
     atk: +30,
     unlocksAbility: "Megiddo",  // 150 damage, costs 25 PP
-    cost: 3000
+    cost: 10000
   }
 };
 ```
@@ -439,15 +460,15 @@ const ARMOR = {
   },
   iron: {
     name: "Iron Armor",
-    def: +14,
+    def: +10,
     hp: +20,
     cost: 300
   },
   steel: {
     name: "Steel Armor",
-    def: +22,
-    hp: +35,
-    cost: 800
+    def: +18,
+    hp: +40,
+    cost: 700
   },
   legendary: {
     name: "Dragon Scales",
@@ -469,13 +490,13 @@ const HELMS = {
   },
   iron: {
     name: "Iron Helm",
-    def: +10,
-    cost: 250
+    def: +5,
+    cost: 150
   },
   steel: {
     name: "Steel Helm",
-    def: +16,
-    cost: 700
+    def: +10,
+    cost: 400
   },
   legendary: {
     name: "Oracle's Crown",
@@ -496,9 +517,9 @@ const BOOTS = {
     cost: 70
   },
   iron: {
-    name: "Running Shoes",
-    spd: +5,
-    cost: 280
+    name: "Iron Boots",
+    spd: +3,
+    cost: 100
   },
   steel: {
     name: "Hyper Boots",
@@ -508,10 +529,9 @@ const BOOTS = {
   },
   legendary: {
     name: "Hermes' Sandals",
-    spd: +15,
-    evasion: +20,
+    spd: +10,
     alwaysFirstTurn: true,  // Always acts first in battle
-    cost: 4500
+    cost: 5000
   }
 };
 ```
@@ -539,9 +559,9 @@ function calculateFinalStats(unit: Unit): Stats {
 // Example: Isaac Level 5, Iron Sword, Iron Armor, 3 Venus Djinn
 // Base (Lv5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
 // Iron Sword: ATK +12
-// Iron Armor: HP +20, DEF +14
+// Iron Armor: HP +20, DEF +10
 // 3 Venus Djinn: ATK +12, DEF +8
-// FINAL: HP 200, ATK 51, DEF 40, MAG 20, SPD 16
+// FINAL: HP 200, ATK 51, DEF 36, MAG 20, SPD 16
 ```
 
 ---
@@ -567,6 +587,46 @@ function calculateBattleXP(enemyLevel: number, partySize: number): number {
 // Solo vs Level 5 enemy: 50 + (10 * 5) = 100 XP
 // Party of 4 vs Level 5 enemy: 100 * 0.8 = 80 XP
 ```
+
+### 4.1.5 XP Distribution
+
+**🚨 CRITICAL: How XP is distributed to party members**
+
+```typescript
+const XP_DISTRIBUTION = {
+  mode: "FULL_TO_EACH",  // Each active unit gets full XP amount
+
+  // Example: Battle rewards 80 XP
+  // Party of 4 units → Each gets 80 XP
+  // Total XP awarded: 80 × 4 = 320 XP
+
+  koUnitsGetXP: false,   // KO'd units don't gain XP
+  benchUnitsGetXP: false // Only active party members gain XP
+};
+```
+
+**Reasoning:**
+- Prevents grinding weak enemies (party penalty already applies)
+- Encourages rotating party members (everyone levels equally)
+- Standard RPG practice (Final Fantasy, Golden Sun, etc.)
+- **Not split:** Splitting would make parties level too slowly
+
+**Example:**
+```typescript
+// Battle: 4-unit party defeats Level 3 enemy
+const xp = calculateBattleXP(3, 4); // 80 XP
+
+// Distribution:
+isaac.xp += 80;  // ✅ Gets full 80
+garet.xp += 80;  // ✅ Gets full 80
+ivan.xp += 80;   // ✅ Gets full 80
+mia.xp += 80;    // ✅ Gets full 80
+
+// Felix on bench: +0 XP ❌
+// Garet (KO'd): +0 XP ❌
+```
+
+---
 
 ### 4.2 Gold Formula
 
@@ -705,6 +765,51 @@ function getElementModifier(attackElement: Element, defenseElement: Element): nu
 }
 ```
 
+### 5.2.5 AOE Damage Rule
+
+**🚨 CRITICAL: How multi-target abilities deal damage**
+
+```typescript
+const AOE_DAMAGE_RULE = {
+  mode: "FULL_TO_EACH",  // Each enemy takes full calculated damage
+
+  // Example: Quake deals 47 damage
+  // vs 3 enemies → 47 to EACH (141 total)
+  // NOT: 47 divided by 3 = 15 each ❌
+  // NOT: 47 with penalty = 35 each ❌
+
+  reasoning: "Higher PP cost balances full damage to each target"
+};
+```
+
+**Why Full Damage:**
+- AOE abilities cost more PP (Quake 5 PP vs basic attack 0 PP)
+- Battles have 1-3 enemies typically (not 10+)
+- Golden Sun model (standard JRPG practice)
+- Makes AOE abilities worth their cost
+
+**Example:**
+```typescript
+// Isaac (MAG 20) casts Quake (base 30) on 3 Goblins
+const damage = calculatePsynergyDamage(isaac, goblin1, quakeAbility);
+// = ~47 damage
+
+// Application:
+goblin1.hp -= 47;  // ✅ Full damage
+goblin2.hp -= 47;  // ✅ Full damage
+goblin3.hp -= 47;  // ✅ Full damage
+
+// Total damage dealt: 141
+// PP cost: 5 (balanced!)
+```
+
+**Balance:**
+- Single-target (Clay Spire): 60 base, 10 PP, 1 target = 60 damage/10PP = 6.0 efficiency
+- Multi-target (Quake): 30 base, 5 PP, 3 targets = 90 damage/5PP = 18.0 efficiency
+- **AOE is 3× better ONLY when hitting 3 targets** (situational advantage)
+
+---
+
 **Healing:**
 ```typescript
 function calculateHealAmount(
@@ -721,6 +826,58 @@ function calculateHealAmount(
   return healAmount;
 }
 ```
+
+### 5.2.6 PP/MP Regeneration
+
+**🚨 CRITICAL: How units regain PP**
+
+```typescript
+const PP_REGEN = {
+  afterBattle: 1.0,        // Full PP restore after battle ends
+  innRest: 1.0,            // Full PP restore at inn (costs gold)
+  perTurnInBattle: 0.0,    // NO regen during battle
+  itemRestoration: true,   // Items can restore PP
+
+  items: {
+    "Herb": { ppRestore: 0, hpRestore: 30 },
+    "Potion": { ppRestore: 20, hpRestore: 50 },
+    "Elixir": { ppRestore: 999, hpRestore: 999 }  // Full restore
+  }
+};
+```
+
+**Why No In-Battle Regen:**
+- Encourages strategic PP management
+- Makes high-PP-cost abilities risky in long battles
+- Forces choice between healing and damage dealing
+- Standard JRPG balance (Golden Sun model)
+
+**Inn Rest:**
+```typescript
+function innRest(units: Unit[], cost: number = 10): void {
+  if (game.gold < cost) return;  // Can't afford
+
+  units.forEach(unit => {
+    unit.currentHp = unit.maxHp;  // Full HP
+    unit.currentPp = unit.maxPp;  // Full PP
+    unit.statusAilments = [];     // Cure all ailments
+  });
+
+  game.gold -= cost;
+}
+```
+
+**Post-Battle:**
+```typescript
+function onBattleVictory(units: Unit[]): void {
+  units.forEach(unit => {
+    unit.currentPp = unit.maxPp;  // ✅ Restore PP
+    // HP stays as-is (must heal manually)
+  });
+}
+```
+
+---
 
 ### 5.3 Ability Costs & Powers
 
@@ -1063,17 +1220,18 @@ const RECRUITMENT_FLAGS = {
 
 ```typescript
 // Units join at specific levels based on story progression
+// 🚨 FIXED: All levels must be 1-5 (max level is 5)
 const RECRUITMENT_LEVELS = {
-  isaac: 1,   // Starter
-  garet: 1,   // Starter
-  ivan: 1,    // Starter
-  mia: 3,     // Early game
-  felix: 5,   // Mid game
-  jenna: 4,   // Mid game
-  sheba: 4,   // Mid game
-  piers: 6,   // Mid-late game
-  kraden: 7,  // Late game
-  kyle: 8     // Late game (highest)
+  isaac: 1,   // Starter (tutorial)
+  garet: 1,   // Starter (tutorial)
+  ivan: 1,    // Starter (tutorial)
+  mia: 2,     // Early game (after first boss)
+  felix: 3,   // Mid game
+  jenna: 3,   // Mid game
+  sheba: 3,   // Mid game
+  piers: 4,   // Late game
+  kraden: 4,  // Late game
+  kyle: 5     // Final recruitment (requires high level to unlock)
 };
 ```
 
@@ -1128,6 +1286,368 @@ const AUTO_SAVE_TRIGGERS = [
   "AFTER_INN_REST",
   "BEFORE_BOSS_BATTLE"  // Safety save
 ];
+```
+
+---
+
+## 9. BOSS ENCOUNTERS & FINAL BOSS
+
+### 9.1 Nox Typhon - Final Boss
+
+**🚨 CRITICAL: Complete final boss specifications**
+
+```typescript
+const NOX_TYPHON = {
+  name: "Nox Typhon, Elemental Demon",
+  level: 5,
+  isBoss: true,
+  cannotFlee: true,
+
+  stats: {
+    hp: 800,   // Requires full party + strategy to defeat
+    pp: 200,
+    atk: 35,
+    def: 30,
+    mag: 40,
+    spd: 20
+  },
+
+  element: "Neutral",  // No element advantage/disadvantage
+
+  abilities: [
+    {
+      name: "Elemental Fury",
+      basePower: 80,
+      ppCost: 20,
+      targets: "all-allies",
+      element: "Neutral"
+    },
+    {
+      name: "Void Strike",
+      basePower: 100,
+      ppCost: 25,
+      targets: "single-ally",
+      ignoresDefense: true,  // Bypasses DEF entirely!
+      element: "Neutral"
+    },
+    {
+      name: "Dark Heal",
+      heals: 150,
+      ppCost: 30,
+      targets: "self"
+    },
+    {
+      name: "Elemental Chaos",  // Ultimate
+      basePower: 150,
+      ppCost: 50,
+      targets: "all-allies",
+      element: "Neutral"
+    }
+  ],
+
+  phases: {
+    phase1: {
+      hpThreshold: [1.0, 0.51],  // 100% - 51% HP
+      abilityPool: ["Elemental Fury", "Void Strike"],
+      aiPattern: "random"
+    },
+    phase2: {
+      hpThreshold: [0.50, 0.26],  // 50% - 26% HP
+      abilityPool: ["Elemental Fury", "Void Strike", "Dark Heal"],
+      aiPattern: "heal_when_below_40"
+    },
+    phase3: {
+      hpThreshold: [0.25, 0.0],  // 25% - 0% HP
+      abilityPool: ["ALL"],      // Can use any ability
+      aiPattern: "aggressive",
+      enraged: true,             // +25% damage
+      speedBoost: 1.5            // Acts 50% more often
+    }
+  },
+
+  rewards: {
+    xp: 500,
+    gold: 2000,
+    guaranteedDrops: ["Sol Blade", "Dragon Scales"],
+    storyFlag: "defeated_nox_typhon"
+  }
+};
+```
+
+**Phase Transitions:**
+```typescript
+function checkPhaseTransition(boss: Enemy): void {
+  const hpPercent = boss.currentHp / boss.maxHp;
+
+  if (hpPercent <= 0.5 && boss.currentPhase === 1) {
+    boss.currentPhase = 2;
+    displayMessage("Nox Typhon's power surges!");
+  }
+
+  if (hpPercent <= 0.25 && boss.currentPhase === 2) {
+    boss.currentPhase = 3;
+    boss.stats.atk *= 1.25;  // +25% damage
+    boss.stats.spd *= 1.5;   // +50% speed
+    displayMessage("Nox Typhon enters a rage!");
+  }
+}
+```
+
+---
+
+## 10. STATUS EFFECTS & AILMENTS
+
+### 10.1 Status Ailments
+
+**🚨 CRITICAL: Debuff formulas**
+
+```typescript
+const STATUS_AILMENTS = {
+  poison: {
+    damagePerTurn: (targetMaxHP: number) => Math.floor(targetMaxHP * 0.08),  // 8% max HP
+    duration: 5,      // Lasts 5 turns
+    cure: ["Antidote", "Wish", "Inn Rest"],
+    tick: "START_OF_TURN"  // Damage before unit acts
+  },
+
+  burn: {
+    damagePerTurn: (targetMaxHP: number) => Math.floor(targetMaxHP * 0.10),  // 10% max HP
+    duration: 3,      // Lasts 3 turns
+    cure: ["Herb", "Ply", "Wish", "Inn Rest"],
+    tick: "START_OF_TURN"
+  },
+
+  freeze: {
+    effect: "SKIP_TURN",  // Unit cannot act
+    breakChance: 0.3,     // 30% chance to break free each turn
+    duration: 999,        // Until broken or cured
+    cure: ["Fire spell (any)", "Inn Rest"],
+    immuneWhileFrozen: true  // Takes no damage while frozen
+  },
+
+  paralyze: {
+    effect: "50% chance to fail action each turn",
+    duration: 2,          // Lasts 2 turns
+    cure: ["Elixir", "Wish", "Inn Rest"],
+    tick: "BEFORE_ACTION"  // Check before unit acts
+  }
+};
+```
+
+**Example - Poison:**
+```typescript
+function applyPoisonDamage(unit: Unit): void {
+  if (!unit.hasStatus("poison")) return;
+
+  const damage = Math.floor(unit.maxHp * 0.08);
+  unit.currentHp -= damage;
+
+  displayMessage(`${unit.name} takes ${damage} poison damage!`);
+
+  // Decrement duration
+  unit.statusEffects.poison.duration--;
+  if (unit.statusEffects.poison.duration <= 0) {
+    removeStatus(unit, "poison");
+    displayMessage(`${unit.name} recovered from poison!`);
+  }
+}
+```
+
+---
+
+### 10.2 Buff/Debuff Duration Rules
+
+**🚨 CRITICAL: How buff durations work**
+
+```typescript
+const BUFF_DURATION_RULES = {
+  decrementTiming: "END_OF_BUFFED_UNIT_TURN",
+
+  // Example: Isaac casts Blessing (duration 3)
+  // Turn order: Isaac → Garet → Enemy
+  //
+  // Isaac's turn: Casts Blessing, duration = 3
+  // Garet's turn: Blessing still active (3)
+  // Enemy's turn: Blessing still active (3)
+  // Isaac's turn END: Duration decrements to 2
+  // ...repeats until duration = 0
+
+  stacking: {
+    sameBuff: "REFRESH",        // Recasting resets duration, doesn't stack
+    differentBuffs: "STACK",    // Multiple different buffs can coexist
+    maxActiveBuffs: 5           // Can't have more than 5 buffs at once
+  },
+
+  dispel: {
+    "Dispel Magic": "REMOVES_ALL_BUFFS",
+    "Debilitate": "REMOVES_ALL_DEBUFFS",
+    "Inn Rest": "REMOVES_ALL"
+  }
+};
+```
+
+**Example - Blessing Duration:**
+```typescript
+// Isaac casts Blessing on himself (ATK +25%, MAG +25%, duration 3 turns)
+
+turn1_start: {
+  isaac.buffs = [{ name: "Blessing", atk: 1.25, mag: 1.25, duration: 3 }];
+  isaac.stats.atk = 27 * 1.25 = 34;  // Buffed!
+}
+
+turn1_end: {
+  // Isaac's turn ends → decrement duration
+  isaac.buffs[0].duration = 2;
+}
+
+turn2_start: {
+  // Blessing still active (duration 2)
+  isaac.stats.atk = 34;  // Still buffed
+}
+
+turn2_end: {
+  isaac.buffs[0].duration = 1;
+}
+
+turn3_end: {
+  isaac.buffs[0].duration = 0;  // Expires!
+  isaac.buffs = [];  // Remove buff
+  isaac.stats.atk = 27;  // Back to normal
+}
+```
+
+---
+
+### 10.3 Buff Stacking Example
+
+```typescript
+// Isaac has Blessing active (ATK ×1.25, MAG ×1.25)
+// Sheba casts Guardian Stance on Isaac (DEF ×1.5)
+
+isaac.buffs = [
+  { name: "Blessing", atk: 1.25, mag: 1.25, duration: 2 },
+  { name: "Guardian Stance", def: 1.5, duration: 1 }
+];
+
+// Final stats (both buffs active):
+isaac.stats.atk = 27 * 1.25 = 34;  // From Blessing
+isaac.stats.def = 18 * 1.5 = 27;   // From Guardian Stance
+isaac.stats.mag = 20 * 1.25 = 25;  // From Blessing
+
+// If Isaac casts Blessing again:
+// Old Blessing duration was 2 → refreshes to 3
+// Does NOT stack to ×1.5625 (1.25 × 1.25)
+```
+
+---
+
+## 11. DETERMINISTIC RNG
+
+### 11.1 SeededRNG Usage
+
+**🚨 CRITICAL: Replace all Math.random() calls**
+
+```typescript
+import { SeededRNG } from '@/utils/rng';
+
+// ❌ WRONG (non-deterministic)
+function getRandomMultiplier(): number {
+  return 0.9 + (Math.random() * 0.2);
+}
+
+// ✅ CORRECT (deterministic)
+function getRandomMultiplier(rng: SeededRNG): number {
+  return 0.9 + (rng.float() * 0.2);
+}
+
+// ❌ WRONG
+function checkCriticalHit(attacker: Unit): boolean {
+  const totalChance = 0.05 + (attacker.stats.spd * 0.002);
+  return Math.random() < totalChance;
+}
+
+// ✅ CORRECT
+function checkCriticalHit(attacker: Unit, rng: SeededRNG): boolean {
+  const totalChance = 0.05 + (attacker.stats.spd * 0.002);
+  return rng.float() < totalChance;
+}
+```
+
+**Battle RNG Seed:**
+```typescript
+class Battle {
+  rng: SeededRNG;
+
+  constructor(playerParty: Unit[], enemies: Enemy[], seed?: number) {
+    this.rng = new SeededRNG(seed || Date.now());
+    // All random events in this battle use this.rng
+  }
+
+  executeTurn(unit: Unit, action: Action): void {
+    const damage = calculatePhysicalDamage(
+      unit,
+      target,
+      ability,
+      this.rng  // ← Pass RNG instance
+    );
+  }
+}
+```
+
+---
+
+### 11.2 Critical Hit Formula Clarification
+
+**🚨 FIXED: Wording correction**
+
+```typescript
+// Critical hit formula
+const baseCritRate = 0.05;  // 5% base
+const speedBonus = attacker.stats.spd * 0.002;  // 0.2 percentage points per SPD
+
+// NOT "0.2% per SPD" ← WRONG wording
+// CORRECT: "0.2 percentage points per SPD"
+
+// Example:
+// Felix (SPD 30): 0.05 + (30 * 0.002) = 0.05 + 0.06 = 0.11 = 11% crit chance
+//                                              ↑
+//                                        6 percentage points, not 6%
+```
+
+---
+
+### 11.3 Flee System with Boss Check
+
+**🚨 FIXED: Boss battles prevent fleeing**
+
+```typescript
+function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
+  // Boss battles cannot be fled
+  if (battle.isBossBattle || battle.isRecruitmentBattle) {
+    displayMessage("You can't escape!");
+    return false;
+  }
+
+  const playerAvgSpd = calculateAverageSpeed(battle.playerParty);
+  const enemyAvgSpd = calculateAverageSpeed(battle.enemies);
+
+  const baseFleeChance = 0.5;
+  const speedRatio = playerAvgSpd / enemyAvgSpd;
+  let fleeChance = baseFleeChance * speedRatio;
+
+  // Clamp between 10% and 90%
+  fleeChance = Math.max(0.1, Math.min(0.9, fleeChance));
+
+  const success = rng.float() < fleeChance;
+
+  if (success) {
+    displayMessage("Got away safely!");
+    return true;
+  } else {
+    displayMessage("Couldn't escape!");
+    return false;  // Wasted turn
+  }
+}
 ```
 
 ---
