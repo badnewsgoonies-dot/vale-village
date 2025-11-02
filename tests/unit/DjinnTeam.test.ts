@@ -149,6 +149,9 @@ describe('TASK 5: Djinn Activation System', () => {
 
   test('✅ Can activate Set Djinn', () => {
     const isaac = new Unit(ISAAC, 5);
+    // Unit needs 30+ damage to activate Djinn
+    isaac.takeDamage(30);
+
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipped = equipDjinn(team, [FLINT, GRANITE, BANE]);
@@ -159,7 +162,7 @@ describe('TASK 5: Djinn Activation System', () => {
 
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
-        expect(result.value.djinnStates.get('flint')).toBe('Standby');
+        expect(result.value.djinnStates!.get('flint')).toBe('Standby');
       }
     }
   });
@@ -182,6 +185,9 @@ describe('TASK 5: Djinn Activation System', () => {
 
   test('✅ Cannot activate Standby Djinn', () => {
     const isaac = new Unit(ISAAC, 5);
+    // Unit needs 30+ damage to activate Djinn
+    isaac.takeDamage(30);
+
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT];
     const equipped = equipDjinn(team, [FLINT]);

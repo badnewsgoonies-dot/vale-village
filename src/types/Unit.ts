@@ -89,6 +89,10 @@ export class Unit {
   // Battle state
   statusEffects: StatusEffect[];
   actionsTaken: number;
+  battleStats: {
+    damageDealt: number;
+    damageTaken: number;
+  };
 
   constructor(definition: UnitDefinition, level: number = 1, initialXp: number = 0) {
     this.id = definition.id;
@@ -110,6 +114,10 @@ export class Unit {
     this.unlockedAbilityIds = new Set();
     this.statusEffects = [];
     this.actionsTaken = 0;
+    this.battleStats = {
+      damageDealt: 0,
+      damageTaken: 0,
+    };
 
     // Unlock abilities based on level
     this.updateUnlockedAbilities();
@@ -354,12 +362,38 @@ export class Unit {
   }
 
   /**
-   * Take damage
+   * Take damage (and track it for Djinn activation)
    */
   takeDamage(amount: number): number {
     const before = this.currentHp;
+    const actualDamage = Math.min(amount, this.currentHp);
     this.currentHp = Math.max(0, this.currentHp - amount);
-    return before - this.currentHp;
+    this.battleStats.damageTaken += actualDamage;
+    return actualDamage;
+  }
+
+  /**
+   * Record damage dealt (for Djinn activation threshold)
+   */
+  recordDamageDealt(amount: number): void {
+    this.battleStats.damageDealt += amount;
+  }
+
+  /**
+   * Check if unit can activate Djinn (30+ total damage threshold)
+   */
+  canActivateDjinn(): boolean {
+    const totalDamage = this.battleStats.damageDealt + this.battleStats.damageTaken;
+    return totalDamage >= 30;
+  }
+
+  /**
+   * Reset battle stats (at start of new battle)
+   */
+  resetBattleStats(): void {
+    this.battleStats.damageDealt = 0;
+    this.battleStats.damageTaken = 0;
+    this.actionsTaken = 0;
   }
 
   /**
@@ -391,6 +425,11 @@ export class Unit {
     clone.djinn = [...this.djinn];
     clone.djinnStates = new Map(this.djinnStates);
     clone.statusEffects = [...this.statusEffects];
+    clone.actionsTaken = this.actionsTaken;
+    clone.battleStats = {
+      damageDealt: this.battleStats.damageDealt,
+      damageTaken: this.battleStats.damageTaken,
+    };
 
     return clone;
   }
