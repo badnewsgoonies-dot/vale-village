@@ -1365,6 +1365,208 @@ const RECRUITMENT_LEVELS = {
 };
 ```
 
+### 7.5 NPC Enemy Stats
+
+**🚨 CRITICAL: Stats for recruitable units when fought as enemies**
+
+When the player battles a recruitable NPC (to recruit them), the NPC uses these enemy stats:
+
+```typescript
+const NPC_ENEMY_STATS = {
+  // STARTERS (Level 1-2) - Tutorial difficulty
+  garet_enemy: {
+    level: 2,
+    hp: 135,      // Higher than player's level 1 units
+    pp: 25,
+    atk: 22,
+    def: 9,
+    mag: 8,
+    spd: 10,
+    element: "Mars",
+    abilities: ["Cleave", "Fireball"],
+    aiPattern: "AGGRESSIVE",  // 70% attack, 30% Fireball
+    isBoss: false
+  },
+
+  ivan_enemy: {
+    level: 2,
+    hp: 110,      // Lower HP (mage archetype)
+    pp: 35,
+    atk: 15,
+    def: 7,
+    mag: 24,
+    spd: 14,
+    element: "Jupiter",
+    abilities: ["Slash", "Gust", "Ray"],
+    aiPattern: "CASTER",  // 40% attack, 60% spells
+    isBoss: false
+  },
+
+  // EARLY GAME (Level 2-3)
+  mia_enemy: {
+    level: 3,
+    hp: 120,
+    pp: 40,
+    atk: 16,
+    def: 18,
+    mag: 25,
+    spd: 12,
+    element: "Mercury",
+    abilities: ["Slash", "Ply", "Frost"],
+    aiPattern: "HEALER",  // 30% attack, 40% Frost, 30% self-heal
+    isBoss: false
+  },
+
+  // MID GAME (Level 3-4)
+  felix_enemy: {
+    level: 4,
+    hp: 137,
+    pp: 30,
+    atk: 29,
+    def: 12,
+    mag: 22,
+    spd: 18,
+    element: "Venus",
+    abilities: ["Slash", "Quake", "Clay Spire"],
+    aiPattern: "BALANCED",  // 50% attack, 50% spells
+    isBoss: false
+  },
+
+  jenna_enemy: {
+    level: 4,
+    hp: 122,
+    pp: 45,
+    atk: 20,
+    def: 10,
+    mag: 32,
+    spd: 15,
+    element: "Mars",
+    abilities: ["Slash", "Fireball", "Volcano"],
+    aiPattern: "AOE_CASTER",  // 30% attack, 70% AoE spells
+    isBoss: false
+  },
+
+  sheba_enemy: {
+    level: 4,
+    hp: 115,
+    pp: 40,
+    atk: 18,
+    def: 14,
+    mag: 28,
+    spd: 20,
+    element: "Jupiter",
+    abilities: ["Slash", "Ray", "Plasma", "Blessing"],
+    aiPattern: "SUPPORT",  // 30% attack, 40% damage spells, 30% buffs
+    isBoss: false
+  },
+
+  // LATE GAME (Level 4-5)
+  piers_enemy: {
+    level: 5,
+    hp: 158,
+    pp: 35,
+    atk: 22,
+    def: 30,
+    mag: 26,
+    spd: 12,
+    element: "Mercury",
+    abilities: ["Slash", "Frost", "Torrent", "Guardian's Stance"],
+    aiPattern: "TANK",  // 40% attack, 30% spells, 30% defensive buffs
+    isBoss: false
+  },
+
+  kraden_enemy: {
+    level: 5,
+    hp: 140,
+    pp: 50,
+    atk: 24,
+    def: 20,
+    mag: 34,
+    spd: 16,
+    element: "Neutral",
+    abilities: ["Slash", "Quake", "Frost", "Thunderclap", "Wish"],
+    aiPattern: "VERSATILE",  // Uses random abilities (neutral element = any)
+    isBoss: false
+  },
+
+  // FINAL RECRUITMENT (Level 5) - Hardest NPC battle
+  kyle_enemy: {
+    level: 5,
+    hp: 198,      // Highest HP of all NPCs
+    pp: 40,
+    atk: 28,
+    def: 22,
+    mag: 30,
+    spd: 18,
+    element: "Mars",
+    abilities: ["Cleave", "Fireball", "Guardian's Stance", "Meteor Strike"],
+    aiPattern: "WARRIOR",  // 60% strong attacks, 40% spells/buffs
+    isBoss: true,  // Treated as mini-boss fight
+    cannotFlee: true  // Cannot flee from Kyle's trial
+  }
+};
+```
+
+**AI Patterns Explained:**
+```typescript
+const AI_PATTERNS = {
+  AGGRESSIVE: {
+    basicAttack: 0.70,   // 70% chance to use physical attack
+    offensiveSpell: 0.30 // 30% chance to use damaging spell
+  },
+
+  CASTER: {
+    basicAttack: 0.40,   // 40% physical
+    offensiveSpell: 0.60 // 60% spells
+  },
+
+  HEALER: {
+    basicAttack: 0.30,
+    offensiveSpell: 0.40,
+    healSelf: 0.30       // Heals when below 50% HP
+  },
+
+  BALANCED: {
+    basicAttack: 0.50,
+    offensiveSpell: 0.50
+  },
+
+  AOE_CASTER: {
+    basicAttack: 0.30,
+    aoeSpell: 0.70       // Prefers multi-target abilities
+  },
+
+  SUPPORT: {
+    basicAttack: 0.30,
+    offensiveSpell: 0.40,
+    buff: 0.30           // Casts buffs on self
+  },
+
+  TANK: {
+    basicAttack: 0.40,
+    offensiveSpell: 0.30,
+    defensiveBuff: 0.30  // Casts defensive buffs
+  },
+
+  VERSATILE: {
+    randomAbility: 1.0   // Picks random ability each turn
+  },
+
+  WARRIOR: {
+    strongAttack: 0.60,  // Prefers physical attacks
+    spell: 0.25,
+    buff: 0.15
+  }
+};
+```
+
+**Difficulty Progression:**
+- **Starters (Lv 1-2):** Easy battles, teach basics
+- **Early (Lv 2-3):** Moderate, introduce healing/buffs
+- **Mid (Lv 3-4):** Challenging, require strategy
+- **Late (Lv 4-5):** Hard, need optimized party
+- **Kyle (Lv 5 Boss):** Hardest NPC, requires full preparation
+
 ---
 
 ## 8. SAVE SYSTEM
@@ -1778,6 +1980,597 @@ function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
     return false;  // Wasted turn
   }
 }
+```
+
+---
+
+## 12. BATTLE TRANSITION SYSTEM
+
+### 12.1 Transition Triggers
+
+**🚨 CRITICAL: How battles are initiated**
+
+```typescript
+const BATTLE_TRIGGERS = {
+  npcInteraction: {
+    method: "TALK_TO_NPC",  // Walk up and press interact button
+    npcTypes: [
+      "RECRUITABLE_UNIT",    // Isaac, Garet, etc. (battle to recruit)
+      "STORY_BOSS",          // Nox Typhon, etc.
+      "TRAINING_DUMMY"       // Practice battles
+    ]
+  },
+
+  randomEncounters: {
+    enabled: false,  // NO random encounters while walking
+    reasoning: "All battles are NPC-triggered for predictable difficulty"
+  },
+
+  forcedBattles: {
+    method: "STORY_CUTSCENE",  // Scripted story battles
+    examples: ["Tutorial battle", "Final boss cutscene"]
+  }
+};
+```
+
+### 12.2 Transition Animation Sequence
+
+**From Overworld → Battle:**
+
+```typescript
+const BATTLE_TRANSITION_IN = {
+  phase1: {
+    name: "SWIRL",
+    duration: 800,  // 800ms spiral effect
+    effect: "Spiral wipe from center outward",
+    color: "Black with white sparks",
+    skipable: true  // Hold button to skip to phase 3
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Screen fades to solid black"
+  },
+
+  phase3: {
+    name: "FADE_IN_BATTLE",
+    duration: 300,  // 300ms battle screen fades in
+    effect: "Battle background + units appear with fade-in"
+  },
+
+  totalDuration: 1300  // ~1.3 seconds total (if not skipped)
+};
+```
+
+**Skip Behavior:**
+```typescript
+const SKIP_TRANSITION = {
+  holdButton: "CONFIRM",  // Hold X/Enter/Space during transition
+  skipToPhase: "FADE_IN_BATTLE",  // Skip directly to battle appearing
+  minimumDuration: 300  // Must show at least 300ms (can't instant-skip)
+};
+```
+
+### 12.3 Victory Transition Sequence
+
+**From Battle → Overworld:**
+
+```typescript
+const BATTLE_TRANSITION_OUT = {
+  phase1: {
+    name: "VICTORY_FREEZE",
+    duration: 500,  // 500ms - enemies disappear, party strikes victory pose
+    effect: "Freeze frame + victory music starts"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Battle screen fades out"
+  },
+
+  phase3: {
+    name: "REWARDS_SCREEN",
+    duration: 0,  // Variable (player-controlled with Continue button)
+    effect: "Show rewards screen (XP, gold, items, level ups, recruitment)"
+  },
+
+  phase4: {
+    name: "FADE_BLACK_AFTER_REWARDS",
+    duration: 200,  // 200ms fade to black from rewards
+    effect: "Rewards screen fades out"
+  },
+
+  phase5: {
+    name: "FADE_IN_OVERWORLD",
+    duration: 300,  // 300ms overworld fades back in
+    effect: "Return to overworld at same position"
+  },
+
+  totalDuration: "1200 + rewardsTime"  // ~1.2s + however long player views rewards
+};
+```
+
+### 12.4 Defeat Transition Sequence
+
+**From Battle → Game Over:**
+
+```typescript
+const DEFEAT_TRANSITION = {
+  phase1: {
+    name: "DEFEAT_FREEZE",
+    duration: 1000,  // 1 second - party collapses
+    effect: "Units fall down, screen shakes, defeat sound"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 500,  // 500ms slow fade to black
+    effect: "Battle screen fades out slowly"
+  },
+
+  phase3: {
+    name: "GAME_OVER_SCREEN",
+    duration: 0,  // Variable (player-controlled)
+    effect: "Show 'GAME OVER' text + options: 'Continue from last save' or 'Return to title'"
+  },
+
+  totalDuration: "1500 + playerChoice"
+};
+```
+
+### 12.5 Flee Transition Sequence
+
+**From Battle → Overworld (Successful Flee):**
+
+```typescript
+const FLEE_TRANSITION = {
+  phase1: {
+    name: "FLEE_ANIMATION",
+    duration: 800,  // 800ms - party runs off screen
+    effect: "Units run to right side of screen, smoke cloud"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Battle screen fades out"
+  },
+
+  phase3: {
+    name: "FADE_IN_OVERWORLD",
+    duration: 300,  // 300ms overworld fades in
+    effect: "Return to overworld (no rewards, no XP)"
+  },
+
+  totalDuration: 1300  // ~1.3 seconds
+};
+```
+
+**Failed Flee:**
+```typescript
+const FAILED_FLEE = {
+  effect: "NO_TRANSITION",  // Stay in battle
+  message: "Couldn't escape!",
+  penalty: "Wasted turn"  // Enemy gets to act
+};
+```
+
+### 12.6 Battle Background Selection
+
+**🚨 CRITICAL: Which background to show**
+
+```typescript
+const BATTLE_BACKGROUNDS = {
+  default: "vale_grassland",  // Green grass + trees
+
+  locationBased: {
+    "vale-village": "vale_grassland",
+    "sol-sanctum": "temple_interior",
+    "vale-outskirts": "forest_clearing",
+    "healing-house": "house_interior",
+    "final-boss": "void_dimension"  // Special for Nox Typhon
+  },
+
+  selectionRule: "USE_OVERWORLD_LOCATION"  // Look up player's current map area
+};
+```
+
+### 12.7 Battle Music Selection
+
+```typescript
+const BATTLE_MUSIC = {
+  regular: "battle_theme.ogg",  // Standard battle music
+  boss: "boss_battle.ogg",      // For isBoss: true enemies
+  finalBoss: "final_boss.ogg",  // For Nox Typhon specifically
+  victory: "victory_fanfare.ogg"  // Plays during VICTORY_FREEZE phase
+};
+```
+
+### 12.8 Performance Optimization
+
+```typescript
+const TRANSITION_OPTIMIZATION = {
+  preloadAssets: [
+    "battleBackground",  // Load before transition starts
+    "enemySprites",
+    "battleMusic"
+  ],
+
+  unloadAfterBattle: [
+    "battleBackground",  // Unload after returning to overworld
+    "enemySprites"
+  ],
+
+  cacheForSession: [
+    "partySprites",      // Keep party sprites loaded
+    "uiElements"
+  ]
+};
+```
+
+---
+
+## 13. OVERWORLD MECHANICS
+
+### 13.1 Movement System
+
+**🚨 CRITICAL: Player movement specifications**
+
+```typescript
+const OVERWORLD_MOVEMENT = {
+  pixelsPerSecond: 120,  // Movement speed (2 pixels per frame at 60fps)
+  diagonalMovement: true, // Can move diagonally
+  diagonalSpeedCorrection: true,  // √2 correction (prevents faster diagonal)
+
+  controls: {
+    keyboard: ["WASD", "Arrow Keys"],
+    gamepad: ["Left Stick", "D-Pad"]
+  },
+
+  collisionLayers: [
+    "WALLS",      // Buildings, trees, rocks
+    "NPCS",       // Cannot walk through NPCs
+    "TRIGGERS"    // Event triggers (battles, cutscenes)
+  ]
+};
+```
+
+### 13.2 Camera System
+
+```typescript
+const CAMERA_SYSTEM = {
+  followPlayer: true,  // Camera centers on player
+  smoothing: 0.1,      // Lerp factor for smooth follow
+  boundaries: "MAP_EDGES",  // Camera stops at map boundaries
+
+  viewportSize: {
+    width: 240,   // 240px (15 tiles at 16px each)
+    height: 160   // 160px (10 tiles at 16px each)
+  },
+
+  zoomLevel: 3  // 3× scale for pixelPerfect rendering
+};
+```
+
+### 13.3 Encounter System
+
+**🚨 CRITICAL: NO RANDOM ENCOUNTERS!**
+
+```typescript
+const ENCOUNTER_SYSTEM = {
+  randomEncounters: false,  // NO random battles while walking
+
+  battleTriggers: {
+    type: "NPC_ONLY",  // All battles are triggered by talking to NPCs
+    interactButton: "CONFIRM",  // Press X/Enter/Space to initiate
+    npcIndicator: "EXCLAMATION_MARK"  // Visual indicator above battle NPCs
+  },
+
+  reasoning: "Predictable difficulty progression, player controls pacing"
+};
+```
+
+### 13.4 Save Points
+
+```typescript
+const SAVE_POINTS = {
+  type: "INN_ONLY",  // Can only save at inns
+  autoSave: {
+    triggers: [
+      "AFTER_INN_REST",
+      "AFTER_MAJOR_STORY_EVENT",
+      "AFTER_RECRUITMENT",
+      "BEFORE_BOSS_BATTLE"
+    ],
+    singleSlot: true  // Only one auto-save slot
+  }
+};
+```
+
+### 13.5 Map Regions
+
+```typescript
+const MAP_REGIONS = {
+  "vale-village": {
+    name: "Vale Village",
+    size: { width: 40, height: 30 },  // In tiles (16px each)
+    npcs: ["Isaac", "Garet", "Ivan", "Jenna (pre-recruit)"],
+    shops: ["Item Shop", "Armor Shop"],
+    inn: true,
+    battleBackground: "vale_grassland"
+  },
+
+  "vale-outskirts": {
+    name: "Vale Outskirts",
+    size: { width: 50, height: 40 },
+    npcs: ["Felix", "Training Dummy"],
+    shops: [],
+    inn: false,
+    battleBackground: "forest_clearing"
+  },
+
+  "sol-sanctum": {
+    name: "Sol Sanctum",
+    size: { width: 30, height: 50 },
+    npcs: ["Mia", "Kyle (late game)"],
+    shops: [],
+    inn: false,
+    battleBackground: "temple_interior"
+  },
+
+  // ... more regions defined in map data files
+};
+```
+
+---
+
+## 14. SHOP SYSTEM
+
+### 14.1 Shop Types
+
+```typescript
+const SHOP_TYPES = {
+  itemShop: {
+    inventory: ["Consumables only"],
+    items: ["Herb", "Potion", "Antidote", "Elixir"]
+  },
+
+  armorShop: {
+    inventory: ["Equipment only"],
+    items: ["Weapons", "Armor", "Helms", "Boots"]
+  },
+
+  specialShop: {
+    inventory: ["Rare items after story flags"],
+    unlockCondition: "STORY_PROGRESSION"
+  }
+};
+```
+
+### 14.2 Buying System
+
+**🚨 CRITICAL: Purchase mechanics**
+
+```typescript
+const BUYING_SYSTEM = {
+  priceFormula: (item) => item.baseCost,  // Fixed prices (no negotiation)
+  stock: "UNLIMITED",  // Can buy as many as affordable
+
+  requirements: {
+    goldCheck: true,  // Must have enough gold
+    inventorySpace: true  // Must have inventory space (99 max per item)
+  },
+
+  transaction: {
+    goldDeducted: "IMMEDIATELY",
+    itemAdded: "IMMEDIATELY",
+    undoable: false  // Cannot undo purchases
+  }
+};
+```
+
+**Starting Gold:**
+```typescript
+const STARTING_RESOURCES = {
+  gold: 500,  // Player starts with 500 gold
+
+  // Can afford at start:
+  // - Herb (30g) × 10 = 300g
+  // - OR Wooden Sword (50g) + Leather Vest (80g) + 370g remaining
+
+  initialInventory: []  // Starts with no items (must buy from shops)
+};
+```
+
+### 14.3 Selling System
+
+```typescript
+const SELLING_SYSTEM = {
+  enabled: true,  // Players can sell equipment
+
+  sellPriceFormula: (item) => Math.floor(item.baseCost * 0.5),  // 50% back
+
+  canSell: {
+    equipment: true,    // Can sell weapons, armor, helms, boots
+    consumables: false, // Cannot sell Herbs, Potions (use or keep)
+    keyItems: false     // Cannot sell quest items
+  },
+
+  transaction: {
+    goldAdded: "IMMEDIATELY",
+    itemRemoved: "IMMEDIATELY"
+  }
+};
+```
+
+**Example:**
+```typescript
+// Buy Iron Sword for 200g
+player.gold -= 200;
+player.inventory.push("Iron Sword");
+
+// Later, sell Iron Sword
+const sellPrice = Math.floor(200 * 0.5);  // 100g
+player.gold += 100;
+player.inventory.remove("Iron Sword");
+```
+
+### 14.4 Shop Inventory by Location
+
+```typescript
+const SHOP_INVENTORY = {
+  "vale-village-item-shop": {
+    name: "Vale Item Shop",
+    items: [
+      { id: "herb", price: 30, stock: "UNLIMITED" },
+      { id: "potion", price: 60, stock: "UNLIMITED" },
+      { id: "antidote", price: 20, stock: "UNLIMITED" }
+    ],
+    unlockCondition: "ALWAYS"
+  },
+
+  "vale-village-armor-shop": {
+    name: "Vale Armor Shop",
+    items: [
+      { id: "wooden-sword", price: 50, stock: "UNLIMITED" },
+      { id: "leather-vest", price: 80, stock: "UNLIMITED" },
+      { id: "cloth-cap", price: 60, stock: "UNLIMITED" },
+      { id: "leather-boots", price: 70, stock: "UNLIMITED" },
+      // Iron tier unlocks after first boss
+      { id: "iron-sword", price: 200, unlockFlag: "defeated_first_boss" },
+      { id: "iron-armor", price: 300, unlockFlag: "defeated_first_boss" },
+      { id: "iron-helm", price: 150, unlockFlag: "defeated_first_boss" },
+      { id: "iron-boots", price: 100, unlockFlag: "defeated_first_boss" }
+    ]
+  },
+
+  "special-shop": {
+    name: "Legendary Trader",
+    items: [
+      { id: "steel-sword", price: 500, unlockFlag: "recruited_3_units" },
+      { id: "steel-armor", price: 700, unlockFlag: "recruited_3_units" },
+      { id: "steel-helm", price: 400, unlockFlag: "recruited_3_units" },
+      { id: "hyper-boots", price: 750, unlockFlag: "recruited_3_units" },
+      // Legendary tier (very expensive)
+      { id: "sol-blade", price: 10000, unlockFlag: "defeated_kyle" },
+      { id: "dragon-scales", price: 4000, unlockFlag: "defeated_nox_typhon" },
+      { id: "oracles-crown", price: 3500, unlockFlag: "defeated_kyle" },
+      { id: "hermes-sandals", price: 5000, unlockFlag: "recruited_all_units" }
+    ]
+  }
+};
+```
+
+---
+
+## 15. INN SYSTEM
+
+### 15.1 Inn Rest Mechanics
+
+**🚨 CRITICAL: How inns work**
+
+```typescript
+const INN_SYSTEM = {
+  cost: 10,  // 10 gold per rest
+
+  effects: {
+    restoreHP: 1.0,      // Full HP restore (100%)
+    restorePP: 1.0,      // Full PP restore (100%)
+    cureStatusAilments: true,  // Remove poison, burn, freeze, paralyze
+    autoSave: true       // Triggers auto-save after rest
+  },
+
+  requirements: {
+    goldCheck: true,     // Must have at least 10 gold
+    canUseWhen: "OVERWORLD_ONLY"  // Cannot use during battle
+  },
+
+  dialogue: {
+    greeting: "Welcome to the inn! Rest is 10 gold. Would you like to stay?",
+    success: "Have a good rest! (HP/PP fully restored, game saved)",
+    insufficient: "Sorry, you need at least 10 gold to rest here."
+  }
+};
+```
+
+### 15.2 Inn Rest Implementation
+
+```typescript
+function innRest(units: Unit[], playerGold: number): { success: boolean, message: string } {
+  // Check gold requirement
+  if (playerGold < 10) {
+    return {
+      success: false,
+      message: "Insufficient gold. Need 10 gold to rest."
+    };
+  }
+
+  // Deduct cost
+  playerGold -= 10;
+
+  // Restore all units
+  units.forEach(unit => {
+    unit.currentHp = unit.maxHp;  // Full HP
+    unit.currentPp = unit.maxPp;  // Full PP
+    unit.statusAilments = [];     // Clear all status effects
+  });
+
+  // Auto-save
+  saveGame();
+
+  return {
+    success: true,
+    message: "You feel refreshed! HP/PP restored, game saved."
+  };
+}
+```
+
+### 15.3 Inn Locations
+
+```typescript
+const INN_LOCATIONS = {
+  "vale-village-inn": {
+    name: "Vale Inn",
+    location: "vale-village",
+    cost: 10,
+    npcKeeper: "Innkeeper Martha",
+    unlockCondition: "ALWAYS"
+  },
+
+  "sol-sanctum-rest-area": {
+    name: "Sanctum Rest Shrine",
+    location: "sol-sanctum",
+    cost: 10,
+    npcKeeper: "Priestess Aria",
+    unlockCondition: "AFTER_COMPLETING_FIRST_QUEST"
+  }
+
+  // More inns can be added as needed
+};
+```
+
+### 15.4 Free Healing Alternatives
+
+**For player convenience:**
+
+```typescript
+const FREE_HEALING = {
+  homeVisit: {
+    location: "Player's house in Vale Village",
+    effect: "Full HP/PP restore + auto-save",
+    cost: 0,
+    limitation: "Only available at start of game"
+  },
+
+  healerNPC: {
+    location: "Healing House (after recruiting Mia)",
+    effect: "Full HP restore only (no PP)",
+    cost: 0,
+    limitation: "Does not save game"
+  }
+};
 ```
 
 ---
