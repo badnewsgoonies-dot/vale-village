@@ -1,6 +1,6 @@
-# 🤝 CODEX HANDOFF SEQUENCE - Vale Chronicles
+# 🤝 CLAUDE CODE HANDOFF SEQUENCE - Vale Chronicles
 
-**How to execute the 6-role workflow with separate Codex chats**
+**How to execute the 6-role workflow with separate Claude Code chats in Cursor**
 
 ---
 
@@ -25,18 +25,20 @@ C:\Dev\AiGames\Zzzzzzzzz\vale-chronicles\
 
 ## 📋 WORKFLOW SEQUENCE
 
-### **You'll Create 6 Separate Codex Chats:**
+### **You'll Create 6 Separate Claude Code Sessions in Cursor:**
 
 ```
-Chat 1: 📖 Story Director
-Chat 2: 🎨 Graphics Mockup  
-Chat 3: 🏛️ Architect
-Chat 4: 💻 Coder
-Chat 5: ✨ Graphics Integration
-Chat 6: ✅ QA/Verifier
+Session 1: 📖 Story Director
+Session 2: 🎨 Graphics Mockup  
+Session 3: 🏛️ Architect
+Session 4: 💻 Coder
+Session 5: ✨ Graphics Integration
+Session 6: ✅ QA/Verifier
 ```
 
-**Each chat gets ONE role, completes their work, hands off to next chat.**
+**Each session gets ONE role, completes their work, hands off to next session.**
+
+**TIP:** Use Cursor's "New Chat" feature to start fresh sessions for each role!
 
 ---
 

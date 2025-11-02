@@ -10,13 +10,13 @@
 C:\Dev\AiGames\Zzzzzzzzz\vale-chronicles
 ```
 
-**This is your project root. All 6 Codex chats will work in this repository.**
+**This is your project root. All 6 Claude Code sessions will work in this repository.**
 
 ---
 
-## 📝 CHAT 1: STORY DIRECTOR (Copy This Now!)
+## 📝 SESSION 1: STORY DIRECTOR (Copy This Now!)
 
-**Open a NEW Codex chat and paste this EXACT prompt:**
+**In Cursor, start a NEW CHAT (Cmd/Ctrl + L) and paste this EXACT prompt:**
 
 ```markdown
 Repository: C:\Dev\AiGames\Zzzzzzzzz\vale-chronicles
@@ -74,22 +74,23 @@ Confirm you've read ROLE_1_STORY_DIRECTOR_ONBOARDING.md and are ready to begin.
 
 ## ⏭️ WHAT HAPPENS NEXT
 
-### **After Chat 1 (Story Director) Completes:**
+### **After Session 1 (Story Director) Completes:**
 
 1. **They'll create 5 files** in `docs/story/`
 2. **They'll commit** to `story-director` branch
-3. **You open Chat 2** (Graphics Mockup) with the prompt from `CODEX_HANDOFF_SEQUENCE.md`
-4. **Chat 2 receives** the story files and creates mockups
-5. **Continue** through all 6 chats
+3. **You open Session 2** (Graphics Mockup) - NEW CHAT in Cursor (Cmd/Ctrl + L)
+4. **Use prompt from** `CLAUDE_CODE_HANDOFF_SEQUENCE.md`
+5. **Session 2 receives** the story files and creates mockups
+6. **Continue** through all 6 sessions
 
-**Full sequence:** See `CODEX_HANDOFF_SEQUENCE.md`
+**Full sequence:** See `CLAUDE_CODE_HANDOFF_SEQUENCE.md`
 
 ---
 
 ## 🎯 KEY DOCUMENTS
 
-**Before Starting Any Chat:**
-- Read: `CODEX_HANDOFF_SEQUENCE.md` (master handoff guide)
+**Before Starting Any Session:**
+- Read: `CLAUDE_CODE_HANDOFF_SEQUENCE.md` (master handoff guide)
 - Read: `6_ROLE_WORKFLOW_README.md` (workflow overview)
 
 **For Each Role:**
@@ -123,11 +124,11 @@ Confirm you've read ROLE_1_STORY_DIRECTOR_ONBOARDING.md and are ready to begin.
 
 ## 🎮 READY TO START!
 
-**COPY THE PROMPT ABOVE** and paste into your first Codex chat now!
+**COPY THE PROMPT ABOVE** and paste into your first Cursor chat (Cmd/Ctrl + L) now!
 
 ---
 
-**Next Chat Prompts:** See `CODEX_HANDOFF_SEQUENCE.md` for Chats 2-6
+**Next Session Prompts:** See `CLAUDE_CODE_HANDOFF_SEQUENCE.md` for Sessions 2-6
 
 **Questions?** Read `6_ROLE_WORKFLOW_README.md`
 

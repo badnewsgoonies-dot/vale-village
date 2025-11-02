@@ -8,11 +8,11 @@ A Golden Sun-inspired RPG built using a 6-role AI workflow with context-aware te
 
 ## 🚀 QUICK START
 
-### **For Codex Users:**
+### **For Claude Code Users (Cursor):**
 
-Read: `CODEX_HANDOFF_SEQUENCE.md` for complete instructions!
+Read: `CLAUDE_CODE_HANDOFF_SEQUENCE.md` for complete instructions!
 
-**TL;DR:** Create 6 separate Codex chats (one per role), follow the handoff sequence.
+**TL;DR:** Create 6 separate Cursor chats (Cmd/Ctrl + L for new chat), one per role, follow the handoff sequence.
 
 ---
 
