@@ -8,6 +8,18 @@ import { calculateDjinnSynergy } from './Djinn';
 import { Ok, Err, type Result } from '@/utils/Result';
 
 /**
+ * XP curve from GAME_MECHANICS.md Section 1.1
+ * Maps level → cumulative XP needed to reach that level
+ */
+const XP_CURVE: Record<number, number> = {
+  1: 0,      // Starting XP
+  2: 100,    // Level 1 → 2
+  3: 350,    // Level 1 → 3  (100 + 250)
+  4: 850,    // Level 1 → 4  (100 + 250 + 500)
+  5: 1850    // Level 1 → 5  (100 + 250 + 500 + 1000)
+};
+
+/**
  * Unit role types
  */
 export type UnitRole =
@@ -352,5 +364,44 @@ export class Unit {
     clone.statusEffects = [...this.statusEffects];
 
     return clone;
+  }
+
+  /**
+   * Get XP needed to reach next level
+   * Returns 0 if already at max level
+   */
+  xpToNextLevel(): number {
+    if (this.level >= 5) {
+      return 0;
+    }
+    return XP_CURVE[this.level + 1] - this.xp;
+  }
+
+  /**
+   * Gain XP and level up if thresholds are met
+   * From GAME_MECHANICS.md Section 1.1
+   *
+   * - Handles multiple level ups from single XP gain
+   * - Caps at level 5
+   * - Fully restores HP/PP on level up
+   * - Updates unlocked abilities
+   */
+  gainXP(amount: number): void {
+    if (amount <= 0) {
+      return;
+    }
+
+    this.xp += amount;
+
+    // Check for level ups (can be multiple!)
+    while (this.level < 5 && this.xp >= XP_CURVE[this.level + 1]) {
+      this.level++;
+      this.updateUnlockedAbilities();
+
+      // Fully restore HP/PP to new max values on level up
+      const newStats = this.calculateStats();
+      this.currentHp = newStats.hp;
+      this.currentPp = newStats.pp;
+    }
   }
 }
