@@ -23,7 +23,7 @@ export const CLEAVE: Ability = {
   ppCost: 0,
   basePower: 0,
   targets: 'single-enemy',
-  unlockLevel: 1,
+  unlockLevel: 2,
   description: 'Powerful physical strike',
 };
 
@@ -285,6 +285,19 @@ export const WINDS_FAVOR: Ability = {
   description: 'Increase SPD by 40% and evasion by 20% for 3 turns',
 };
 
+// ========== LEGENDARY ABILITIES ==========
+export const MEGIDDO: Ability = {
+  id: 'megiddo',
+  name: 'Megiddo',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 25,
+  basePower: 150,
+  targets: 'single-enemy',
+  unlockLevel: 99, // Only unlocked by Sol Blade
+  description: 'Legendary sword technique unleashed by Sol Blade',
+};
+
 /**
  * All abilities indexed by ID
  */
@@ -311,4 +324,5 @@ export const ABILITIES: Record<string, Ability> = {
   BLESSING,
   GUARDIANS_STANCE,
   WINDS_FAVOR,
+  MEGIDDO,
 };

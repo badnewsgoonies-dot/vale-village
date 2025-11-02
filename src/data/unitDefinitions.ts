@@ -65,7 +65,7 @@ export const GARET: UnitDefinition = {
     spd: 1,
   },
   abilities: [
-    ABILITIES.CLEAVE,
+    ABILITIES.SLASH,
     ABILITIES.FIREBALL,
     ABILITIES.VOLCANO,
     ABILITIES.METEOR_STRIKE,
@@ -168,10 +168,10 @@ export const FELIX: UnitDefinition = {
   },
   abilities: [
     ABILITIES.SLASH,
-    ABILITIES.QUAKE,
+    ABILITIES.CLEAVE,
     ABILITIES.CLAY_SPIRE,
-    ABILITIES.RAGNAROK,
-    ABILITIES.JUDGMENT,
+    ABILITIES.METEOR_STRIKE,
+    ABILITIES.PYROCLASM,
   ],
   description: 'A fast Earth Adept specializing in quick, deadly strikes',
 };
@@ -201,7 +201,7 @@ export const JENNA: UnitDefinition = {
     spd: 2,
   },
   abilities: [
-    ABILITIES.CLEAVE,
+    ABILITIES.SLASH,
     ABILITIES.FIREBALL,
     ABILITIES.VOLCANO,
     ABILITIES.METEOR_STRIKE,
@@ -269,7 +269,7 @@ export const PIERS: UnitDefinition = {
     spd: 1,
   },
   abilities: [
-    ABILITIES.CLEAVE,
+    ABILITIES.SLASH,
     ABILITIES.FROST,
     ABILITIES.GUARDIANS_STANCE,
     ABILITIES.WISH,
@@ -284,7 +284,7 @@ export const PIERS: UnitDefinition = {
 export const KRADEN: UnitDefinition = {
   id: 'kraden',
   name: 'Kraden',
-  element: 'Venus', // Neutral in lore, but Venus for gameplay
+  element: 'Neutral',
   role: 'Versatile Scholar',
   baseStats: {
     hp: 70,
@@ -337,7 +337,7 @@ export const KYLE: UnitDefinition = {
     spd: 1,
   },
   abilities: [
-    ABILITIES.CLEAVE,
+    ABILITIES.SLASH,
     ABILITIES.FIREBALL,
     ABILITIES.GUARDIANS_STANCE,
     ABILITIES.METEOR_STRIKE,

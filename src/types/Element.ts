@@ -1,9 +1,9 @@
 /**
- * Four elemental types from Golden Sun
+ * Four elemental types from Golden Sun + Neutral
  */
-export type Element = 'Venus' | 'Mars' | 'Mercury' | 'Jupiter';
+export type Element = 'Venus' | 'Mars' | 'Mercury' | 'Jupiter' | 'Neutral';
 
-export const ELEMENTS: readonly Element[] = ['Venus', 'Mars', 'Mercury', 'Jupiter'] as const;
+export const ELEMENTS: readonly Element[] = ['Venus', 'Mars', 'Mercury', 'Jupiter', 'Neutral'] as const;
 
 /**
  * Element advantage triangle (from GAME_MECHANICS.md Section 5.2)

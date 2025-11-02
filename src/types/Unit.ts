@@ -90,7 +90,7 @@ export class Unit {
   statusEffects: StatusEffect[];
   actionsTaken: number;
 
-  constructor(definition: UnitDefinition, level: number = 1) {
+  constructor(definition: UnitDefinition, level: number = 1, initialXp: number = 0) {
     this.id = definition.id;
     this.name = definition.name;
     this.element = definition.element;
@@ -100,7 +100,7 @@ export class Unit {
     this.description = definition.description;
 
     this.level = Math.max(1, Math.min(5, level)); // Clamp to 1-5
-    this.xp = 0;
+    this.xp = initialXp;
 
     // Initialize equipment and djinn BEFORE calculating stats
     this.equipment = emptyLoadout();
@@ -189,6 +189,12 @@ export class Unit {
       }
     }
 
+    // Clamp multipliers to prevent exploits (0.0× to 3.0×)
+    atkMultiplier = Math.min(Math.max(atkMultiplier, 0.0), 3.0);
+    defMultiplier = Math.min(Math.max(defMultiplier, 0.0), 3.0);
+    magMultiplier = Math.min(Math.max(magMultiplier, 0.0), 3.0);
+    spdMultiplier = Math.min(Math.max(spdMultiplier, 0.0), 3.0);
+
     // Calculate final stats
     const finalStats: Stats = {
       hp: base.hp + levelBonuses.hp + (equipmentBonuses.hp || 0),
@@ -261,6 +267,11 @@ export class Unit {
    * Check if unit can use an ability
    */
   canUseAbility(abilityId: string): boolean {
+    // Check if unit is knocked out
+    if (this.isKO) {
+      return false;
+    }
+
     if (!this.unlockedAbilityIds.has(abilityId)) {
       return false;
     }
@@ -282,6 +293,11 @@ export class Unit {
    * Equip an item
    */
   equipItem(slot: keyof EquipmentLoadout, item: Equipment): void {
+    // Validate slot matches item type
+    if (item.slot !== slot) {
+      throw new Error(`Cannot equip ${item.slot} in ${slot} slot`);
+    }
+
     this.equipment[slot] = item;
     this.updateUnlockedAbilities();
   }
@@ -368,8 +384,7 @@ export class Unit {
       description: this.description,
     };
 
-    const clone = new Unit(definition, this.level);
-    clone.xp = this.xp;
+    const clone = new Unit(definition, this.level, this.xp);
     clone.currentHp = this.currentHp;
     clone.currentPp = this.currentPp;
     clone.equipment = { ...this.equipment };
