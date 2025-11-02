@@ -276,7 +276,7 @@ export const WINDS_FAVOR: Ability = {
   ppCost: 10,
   basePower: 0,
   targets: 'all-allies',
-  unlockLevel: 3,
+  unlockLevel: 4,
   buffEffect: {
     spd: 1.4,
     evasion: 20,

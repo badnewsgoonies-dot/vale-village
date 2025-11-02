@@ -238,7 +238,7 @@ export const SHEBA: UnitDefinition = {
     ABILITIES.SLASH,
     ABILITIES.GUST,
     ABILITIES.BLESSING,
-    ABILITIES.THUNDERCLAP,
+    ABILITIES.WINDS_FAVOR,
     ABILITIES.TEMPEST,
   ],
   description: 'A versatile Wind Adept skilled in buffing and support magic',
