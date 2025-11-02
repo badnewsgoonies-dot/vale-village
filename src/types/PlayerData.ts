@@ -40,7 +40,7 @@ export function createPlayerData(starterUnit: Unit): PlayerData {
     recruitmentFlags: {},
     djinnCollected: [],
     inventory: [],
-    gold: 0,
+    gold: 500, // Starting gold from GAME_MECHANICS.md Section 14
     storyFlags: {},
   };
 }
@@ -64,22 +64,20 @@ export function recruitUnit(
     return Err(`Unit ${unit.name} is already recruited`);
   }
 
-  // Create new PlayerData
-  const newData = { ...playerData };
-  newData.unitsCollected = [...playerData.unitsCollected, unit];
-
-  // Set recruitment flag if provided
-  if (recruitmentFlag) {
-    newData.recruitmentFlags = {
-      ...playerData.recruitmentFlags,
-      [recruitmentFlag]: true,
-    };
-  }
-
-  // Auto-add to active party if less than 4 units
-  if (newData.activePartyIds.length < 4) {
-    newData.activePartyIds = [...newData.activePartyIds, unit.id];
-  }
+  // Create new PlayerData (deep copy all arrays and objects)
+  const newData = {
+    ...playerData,
+    unitsCollected: [...playerData.unitsCollected, unit],
+    activePartyIds: playerData.activePartyIds.length < 4
+      ? [...playerData.activePartyIds, unit.id]
+      : [...playerData.activePartyIds],
+    djinnCollected: [...playerData.djinnCollected],
+    inventory: [...playerData.inventory],
+    recruitmentFlags: recruitmentFlag
+      ? { ...playerData.recruitmentFlags, [recruitmentFlag]: true }
+      : { ...playerData.recruitmentFlags },
+    storyFlags: { ...playerData.storyFlags },
+  };
 
   return Ok(newData);
 }
@@ -114,9 +112,16 @@ export function setActiveParty(
     return Err('Cannot have duplicate units in active party');
   }
 
-  // Update active party
-  const newData = { ...playerData };
-  newData.activePartyIds = [...unitIds];
+  // Update active party (deep copy all arrays and objects)
+  const newData = {
+    ...playerData,
+    unitsCollected: [...playerData.unitsCollected],
+    activePartyIds: [...unitIds],
+    djinnCollected: [...playerData.djinnCollected],
+    inventory: [...playerData.inventory],
+    recruitmentFlags: { ...playerData.recruitmentFlags },
+    storyFlags: { ...playerData.storyFlags },
+  };
 
   return Ok(newData);
 }
@@ -166,10 +171,14 @@ export function selectStarter(
 
   const playerData = createPlayerData(starter);
 
-  // Set recruitment flag for starter
-  playerData.recruitmentFlags[`starter_selected_${starter.id}`] = true;
-
-  return Ok(playerData);
+  // Set recruitment flag for starter (return new object, don't mutate)
+  return Ok({
+    ...playerData,
+    recruitmentFlags: {
+      ...playerData.recruitmentFlags,
+      [`starter_selected_${starter.id}`]: true,
+    },
+  });
 }
 
 /**
@@ -200,11 +209,18 @@ export function swapPartyMember(
     return Err('Cannot remove last unit from active party');
   }
 
-  // Swap units
-  const newData = { ...playerData };
-  newData.activePartyIds = playerData.activePartyIds.map(id =>
-    id === removeUnitId ? addUnitId : id
-  );
+  // Swap units (deep copy all arrays and objects)
+  const newData = {
+    ...playerData,
+    unitsCollected: [...playerData.unitsCollected],
+    activePartyIds: playerData.activePartyIds.map(id =>
+      id === removeUnitId ? addUnitId : id
+    ),
+    djinnCollected: [...playerData.djinnCollected],
+    inventory: [...playerData.inventory],
+    recruitmentFlags: { ...playerData.recruitmentFlags },
+    storyFlags: { ...playerData.storyFlags },
+  };
 
   return Ok(newData);
 }
@@ -226,9 +242,16 @@ export function removeFromActiveParty(
     return Err('Cannot remove last unit from active party');
   }
 
-  // Remove unit
-  const newData = { ...playerData };
-  newData.activePartyIds = playerData.activePartyIds.filter(id => id !== unitId);
+  // Remove unit (deep copy all arrays and objects)
+  const newData = {
+    ...playerData,
+    unitsCollected: [...playerData.unitsCollected],
+    activePartyIds: playerData.activePartyIds.filter(id => id !== unitId),
+    djinnCollected: [...playerData.djinnCollected],
+    inventory: [...playerData.inventory],
+    recruitmentFlags: { ...playerData.recruitmentFlags },
+    storyFlags: { ...playerData.storyFlags },
+  };
 
   return Ok(newData);
 }
@@ -255,9 +278,16 @@ export function addToActiveParty(
     return Err('Active party is full (maximum 4 units)');
   }
 
-  // Add unit
-  const newData = { ...playerData };
-  newData.activePartyIds = [...playerData.activePartyIds, unitId];
+  // Add unit (deep copy all arrays and objects)
+  const newData = {
+    ...playerData,
+    unitsCollected: [...playerData.unitsCollected],
+    activePartyIds: [...playerData.activePartyIds, unitId],
+    djinnCollected: [...playerData.djinnCollected],
+    inventory: [...playerData.inventory],
+    recruitmentFlags: { ...playerData.recruitmentFlags },
+    storyFlags: { ...playerData.storyFlags },
+  };
 
   return Ok(newData);
 }

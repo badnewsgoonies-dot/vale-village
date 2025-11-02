@@ -321,13 +321,8 @@ export class Unit {
   }
 
   /**
-   * Equip Djinn
-   *
-   * TODO (after Architect completes GAME_MECHANICS.md):
-   * - Refactor Djinn from unit.djinn to team.equippedDjinn
-   * - Djinn bonuses apply to ALL units in party
-   * - Will need Team type and GameState changes
-   * - Djinn are TEAM SLOTS, not per-unit!
+   * @deprecated Use Team.equipDjinn() instead - Djinn are now team-wide, not per-unit
+   * Kept for backward compatibility only
    */
   equipDjinn(djinnList: Djinn[]): Result<this, string> {
     if (djinnList.length > 3) {
@@ -341,7 +336,8 @@ export class Unit {
   }
 
   /**
-   * Activate Djinn (unleash in battle)
+   * @deprecated Use Team.activateDjinn() instead - Djinn activation is now team-wide
+   * Kept for backward compatibility only
    */
   activateDjinn(djinnId: string): Result<this, string> {
     const djinn = this.djinn.find(d => d.id === djinnId);
@@ -365,7 +361,6 @@ export class Unit {
    * Take damage (and track it for Djinn activation)
    */
   takeDamage(amount: number): number {
-    const before = this.currentHp;
     const actualDamage = Math.min(amount, this.currentHp);
     this.currentHp = Math.max(0, this.currentHp - amount);
     this.battleStats.damageTaken += actualDamage;
