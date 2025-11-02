@@ -46,6 +46,7 @@ export interface DjinnSynergy {
 /**
  * Calculate Djinn synergy based on elements
  * From GAME_MECHANICS.md Section 2.1
+ * 🚨 CRITICAL: Synergy scales with Djinn COUNT!
  */
 export function calculateDjinnSynergy(djinn: Djinn[]): DjinnSynergy {
   if (djinn.length === 0) {
@@ -69,8 +70,38 @@ export function calculateDjinnSynergy(djinn: Djinn[]): DjinnSynergy {
   const primaryElement = Array.from(elementCounts.entries())
     .find(([_, count]) => count === maxCount)?.[0];
 
-  // All same element (e.g., 3 Venus)
-  if (uniqueElements === 1) {
+  // 1 Djinn (any element)
+  if (djinn.length === 1) {
+    return {
+      atk: 4,
+      def: 3,
+      classChange: 'Adept',
+      abilitiesUnlocked: [],
+    };
+  }
+
+  // 2 Djinn - Same element
+  if (djinn.length === 2 && uniqueElements === 1) {
+    return {
+      atk: 8,
+      def: 5,
+      classChange: `${primaryElement} Warrior`,
+      abilitiesUnlocked: [],
+    };
+  }
+
+  // 2 Djinn - Different elements
+  if (djinn.length === 2 && uniqueElements === 2) {
+    return {
+      atk: 5,
+      def: 5,
+      classChange: 'Hybrid',
+      abilitiesUnlocked: [],
+    };
+  }
+
+  // 3 Djinn - All same element
+  if (djinn.length === 3 && uniqueElements === 1) {
     return {
       atk: 12,
       def: 8,
@@ -79,8 +110,8 @@ export function calculateDjinnSynergy(djinn: Djinn[]): DjinnSynergy {
     };
   }
 
-  // 2 same + 1 different
-  if (uniqueElements === 2 && maxCount === 2) {
+  // 3 Djinn - 2 same + 1 different
+  if (djinn.length === 3 && uniqueElements === 2 && maxCount === 2) {
     return {
       atk: 8,
       def: 6,
@@ -89,7 +120,7 @@ export function calculateDjinnSynergy(djinn: Djinn[]): DjinnSynergy {
     };
   }
 
-  // All different (3 different elements)
+  // 3 Djinn - All different elements
   return {
     atk: 4,
     def: 4,

@@ -76,9 +76,11 @@ describe('TASK 2: Stat Calculation System - Core Formula', () => {
 
     // Activate one Djinn (moves to Standby)
     isaac.activateDjinn('flint');
-    // Still 2 Venus Djinn Set → synergy based on composition, not count
-    // 2 Venus (all same element) = +12 ATK still
-    expect(isaac.stats.atk).toBe(39); // 27 + 12 (2 Set Venus)
+    // Now only 2 Venus Djinn Set → reduced synergy!
+    // 2 Venus (same element) = +8 ATK (from GAME_MECHANICS.md 2.1)
+    expect(isaac.stats.atk).toBe(35); // 27 + 8 (2 Set Venus)
+
+    // ← PROVES activating Djinn weakens passive bonuses (tactical trade-off)!
   });
 });
 
