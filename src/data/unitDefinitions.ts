@@ -238,7 +238,7 @@ export const SHEBA: UnitDefinition = {
     ABILITIES.SLASH,
     ABILITIES.GUST,
     ABILITIES.BLESSING,
-    ABILITIES.WINDS_FAVOR,
+    ABILITIES.THUNDERCLAP,
     ABILITIES.TEMPEST,
   ],
   description: 'A versatile Wind Adept skilled in buffing and support magic',
@@ -272,8 +272,8 @@ export const PIERS: UnitDefinition = {
     ABILITIES.CLEAVE,
     ABILITIES.FROST,
     ABILITIES.GUARDIANS_STANCE,
-    ABILITIES.ICE_HORN,
     ABILITIES.WISH,
+    ABILITIES.GLACIAL_BLESSING,
   ],
   description: 'A stalwart Water Adept built to withstand enemy assaults',
 };
@@ -305,9 +305,9 @@ export const KRADEN: UnitDefinition = {
   abilities: [
     ABILITIES.SLASH,
     ABILITIES.QUAKE,
-    ABILITIES.PLY,
     ABILITIES.BLESSING,
     ABILITIES.RAGNAROK,
+    ABILITIES.JUDGMENT,
   ],
   description: 'A wise scholar with diverse Psynergy abilities',
 };
