@@ -140,6 +140,7 @@ export class Unit {
     }
 
     // Djinn synergy bonuses (only count Set Djinn)
+    // TODO: After Team Djinn refactor, this will read from team.equippedDjinn instead
     const setDjinn = this.djinn.filter(d =>
       this.djinnStates.get(d.id) !== 'Standby' && this.djinnStates.get(d.id) !== 'Recovery'
     );
@@ -271,6 +272,12 @@ export class Unit {
 
   /**
    * Equip Djinn
+   *
+   * TODO (after Architect completes GAME_MECHANICS.md):
+   * - Refactor Djinn from unit.djinn to team.equippedDjinn
+   * - Djinn bonuses apply to ALL units in party
+   * - Will need Team type and GameState changes
+   * - Djinn are TEAM SLOTS, not per-unit!
    */
   equipDjinn(djinnList: Djinn[]): Result<this, string> {
     if (djinnList.length > 3) {
