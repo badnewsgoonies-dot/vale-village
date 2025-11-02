@@ -244,7 +244,36 @@ const GARET_ABILITIES = {
 
 ### 2.1 Djinn Passive Synergy Formulas
 
-**All Same Element (e.g., 3 Venus Djinn):**
+**🚨 CRITICAL: Synergy scales with Djinn COUNT!**
+
+**1 Djinn (Any Element):**
+```typescript
+const SYNERGY_ONE = {
+  statBonus: { atk: +4, def: +3 },
+  classChange: "Adept",
+  abilitiesUnlocked: []
+};
+```
+
+**2 Djinn - Same Element (e.g., 2 Venus):**
+```typescript
+const SYNERGY_TWO_SAME = {
+  statBonus: { atk: +8, def: +5 },
+  classChange: "[Element] Warrior",  // e.g., "Venus Warrior"
+  abilitiesUnlocked: []
+};
+```
+
+**2 Djinn - Different Elements (e.g., Venus + Mars):**
+```typescript
+const SYNERGY_TWO_DIFF = {
+  statBonus: { atk: +5, def: +5 },
+  classChange: "Hybrid",
+  abilitiesUnlocked: []
+};
+```
+
+**3 Djinn - All Same Element (e.g., 3 Venus Djinn):**
 ```typescript
 const SYNERGY_ALL_SAME = {
   statBonus: { atk: +12, def: +8 },
@@ -258,7 +287,7 @@ const SYNERGY_ALL_SAME = {
 // → Unlocks: "Earthquake" ability
 ```
 
-**2 Same + 1 Different (e.g., 2 Venus + 1 Mars):**
+**3 Djinn - 2 Same + 1 Different (e.g., 2 Venus + 1 Mars):**
 ```typescript
 const SYNERGY_TWO_ONE = {
   statBonus: { atk: +8, def: +6 },
@@ -266,7 +295,7 @@ const SYNERGY_TWO_ONE = {
   abilitiesUnlocked: ["Hybrid-Spell"]
 };
 
-// Example: 2 Venus + 1 Mars
+// Example: 2 Venus + 1 Mars (total 3 Djinn)
 // → ATK +8, DEF +6
 // → Class: "Venus Knight"
 // → Unlocks: "Stone Edge" (hybrid ability)
