@@ -1,0 +1,241 @@
+{
+  "screen": "unit-collection",
+  "description": "Sprite map for Unit Collection screen - party management with all 10 recruitable units",
+  "lastUpdated": "2025-11-02",
+  "sprites": {
+    "units": [
+      {
+        "id": "isaac",
+        "name": "Isaac",
+        "element": "venus",
+        "elementSymbol": "♦",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/isaac/isaac_front.gif",
+        "size": "48x48",
+        "level": 8,
+        "class": "Earth Adept",
+        "role": "Balanced Warrior (Tank/DPS)",
+        "recruitMethod": "Starter",
+        "defaultParty": true
+      },
+      {
+        "id": "garet",
+        "name": "Garet",
+        "element": "mars",
+        "elementSymbol": "▲",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/garet/garet_front.gif",
+        "size": "48x48",
+        "level": 7,
+        "class": "Flame Adept",
+        "role": "Pure DPS (Glass Cannon)",
+        "recruitMethod": "Starter",
+        "defaultParty": true
+      },
+      {
+        "id": "ivan",
+        "name": "Ivan",
+        "element": "jupiter",
+        "elementSymbol": "◆",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/ivan/ivan_front.gif",
+        "size": "48x48",
+        "level": 7,
+        "class": "Storm Adept",
+        "role": "Elemental Mage (Ranged DPS + Utility)",
+        "recruitMethod": "Starter",
+        "defaultParty": true
+      },
+      {
+        "id": "mia",
+        "name": "Mia",
+        "element": "mercury",
+        "elementSymbol": "●",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/mia/mia_front.gif",
+        "size": "48x48",
+        "level": 6,
+        "class": "Tide Adept",
+        "role": "Primary Healer + Ice Mage",
+        "recruitMethod": "Friendly Spar",
+        "defaultParty": true
+      },
+      {
+        "id": "felix",
+        "name": "Felix",
+        "element": "venus",
+        "elementSymbol": "♦",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/felix/felix_front.gif",
+        "size": "48x48",
+        "level": 6,
+        "class": "Stone Assassin",
+        "role": "Rogue/Assassin (Speed-based DPS)",
+        "recruitMethod": "Honor Duel",
+        "defaultParty": false
+      },
+      {
+        "id": "jenna",
+        "name": "Jenna",
+        "element": "mars",
+        "elementSymbol": "▲",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/jenna/jenna_front.gif",
+        "size": "48x48",
+        "level": 5,
+        "class": "Inferno Adept",
+        "role": "Elemental Mage (AoE Fire Specialist)",
+        "recruitMethod": "Rescue Quest",
+        "defaultParty": false
+      },
+      {
+        "id": "sheba",
+        "name": "Sheba",
+        "element": "jupiter",
+        "elementSymbol": "◆",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/sheba/sheba_front.gif",
+        "size": "48x48",
+        "level": 5,
+        "class": "Zephyr Adept",
+        "role": "Support Mage (Buffs + Wind Magic)",
+        "recruitMethod": "Found in Forest",
+        "defaultParty": false
+      },
+      {
+        "id": "piers",
+        "name": "Piers",
+        "element": "mercury",
+        "elementSymbol": "●",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/piers/piers_front.gif",
+        "size": "48x48",
+        "level": 7,
+        "class": "Tidal Warden",
+        "role": "Defensive Tank (HP + Water Magic)",
+        "recruitMethod": "Harbor Guardian",
+        "defaultParty": false
+      },
+      {
+        "id": "kraden",
+        "name": "Kraden",
+        "element": "neutral",
+        "elementSymbol": "◎",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/kraden/kraden_front.gif",
+        "size": "48x48",
+        "level": 8,
+        "class": "Alchemist",
+        "role": "Versatile Support (Adapts via Djinn)",
+        "recruitMethod": "Research Quest",
+        "defaultParty": false
+      },
+      {
+        "id": "kyle",
+        "name": "Kyle",
+        "element": "mars",
+        "elementSymbol": "▲",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/kyle/kyle_front.gif",
+        "size": "48x48",
+        "level": 9,
+        "class": "Blademaster",
+        "role": "Master Warrior (Balanced Elite)",
+        "recruitMethod": "Warrior's Trial",
+        "defaultParty": false
+      }
+    ],
+    "ui": {
+      "elementBadges": [
+        {
+          "id": "venus-badge",
+          "element": "venus",
+          "color": "#E8A050",
+          "symbol": "♦",
+          "size": "16x16"
+        },
+        {
+          "id": "mars-badge",
+          "element": "mars",
+          "color": "#E05050",
+          "symbol": "▲",
+          "size": "16x16"
+        },
+        {
+          "id": "mercury-badge",
+          "element": "mercury",
+          "color": "#5090D8",
+          "symbol": "●",
+          "size": "16x16"
+        },
+        {
+          "id": "jupiter-badge",
+          "element": "jupiter",
+          "color": "#A858D8",
+          "symbol": "◆",
+          "size": "16x16"
+        },
+        {
+          "id": "neutral-badge",
+          "element": "neutral",
+          "color": "gradient",
+          "symbol": "◎",
+          "size": "16x16",
+          "note": "Kraden can use any element via Djinn"
+        }
+      ],
+      "activeStarIcon": {
+        "id": "active-party-star",
+        "unicode": "★",
+        "color": "#FFD87F",
+        "usage": "Indicates active party member"
+      }
+    }
+  },
+  "layout": {
+    "resolution": "720x480+ (3x GBA scale)",
+    "gridAreas": [
+      "Header Panel (top-left): Title, party count, return button",
+      "Units Grid (left): 5x2 grid showing all 10 units",
+      "Stats Panel (right): Selected unit details, stats, actions"
+    ],
+    "unitsGrid": "5 columns x 2 rows (10 units total)",
+    "activePartyCount": "4 units highlighted with gold border + star badge",
+    "benchUnits": "6 units with dark border, no star"
+  },
+  "interactionStates": {
+    "unitCard": {
+      "default": "Dark background, dark border",
+      "hover": "Light blue background, bright border, translateY(-2px)",
+      "active": "Gold background tint, gold border, star badge, glow effect",
+      "bench": "Dark background, dark border, no star",
+      "selected": "Stats panel shows details on click"
+    },
+    "actionButtons": {
+      "addToParty": "Primary button (gold border) - adds unit to active party",
+      "removeFromParty": "Secondary button - removes unit from active party",
+      "viewEquipment": "Secondary button - navigates to equipment screen"
+    }
+  },
+  "elementDistribution": {
+    "venus": ["Isaac", "Felix"],
+    "mars": ["Garet", "Jenna", "Kyle"],
+    "mercury": ["Mia", "Piers"],
+    "jupiter": ["Ivan", "Sheba"],
+    "neutral": ["Kraden"]
+  },
+  "roleDistribution": {
+    "tank": ["Isaac", "Piers"],
+    "dps": ["Garet", "Felix", "Jenna"],
+    "healer": ["Mia"],
+    "support": ["Ivan", "Sheba", "Kraden"],
+    "balanced": ["Kyle"]
+  },
+  "accessibility": {
+    "keyboardNav": "Tab order: Units grid (left-to-right, top-to-bottom) → Action buttons → Return button",
+    "ariaLabels": "All unit cards have full descriptive labels (name, level, element, status)",
+    "focusRings": "3px gold outline on focus",
+    "contrast": "WCAG 2.1 AA compliant",
+    "ariaPressedState": "true for active party, false for bench"
+  },
+  "notes": [
+    "Mockup uses placeholder Unicode letters (I, G, Iv, etc.) - replace with actual character sprites",
+    "Element badges use Unicode symbols - replace with sprite icons if desired",
+    "Active party members have gold border + star badge for clear distinction",
+    "Clicking a unit card selects it and updates the stats panel",
+    "Action buttons toggle between Add/Remove based on unit's current status",
+    "Max 4 units can be active at once (enforced by game logic)",
+    "Stats panel shows selected unit's full details and role description",
+    "Grid layout is 5x2 to accommodate all 10 units cleanly"
+  ]
+}

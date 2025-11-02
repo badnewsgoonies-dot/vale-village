@@ -1,6 +1,6 @@
 # 🚀 START HERE - Vale Chronicles
 
-**Your first Codex chat prompt is ready to copy!**
+**Your first cursor chat prompt is ready to copy!**
 
 ---
 
