@@ -5,6 +5,7 @@ import type { Equipment, EquipmentLoadout } from './Equipment';
 import type { Djinn, DjinnState } from './Djinn';
 import { emptyLoadout } from './Equipment';
 import { calculateDjinnSynergy } from './Djinn';
+import { Ok, Err, type Result } from '@/utils/Result';
 
 /**
  * Unit role types
@@ -271,25 +272,27 @@ export class Unit {
   /**
    * Equip Djinn
    */
-  equipDjinn(djinnList: Djinn[]): void {
+  equipDjinn(djinnList: Djinn[]): Result<this, string> {
     if (djinnList.length > 3) {
-      throw new Error('Cannot equip more than 3 Djinn per unit');
+      return Err('Cannot equip more than 3 Djinn per unit');
     }
     this.djinn = djinnList;
     for (const d of djinnList) {
       this.djinnStates.set(d.id, 'Set');
     }
+    return Ok(this);
   }
 
   /**
    * Activate Djinn (unleash in battle)
    */
-  activateDjinn(djinnId: string): void {
+  activateDjinn(djinnId: string): Result<this, string> {
     const djinn = this.djinn.find(d => d.id === djinnId);
     if (!djinn) {
-      throw new Error(`Djinn ${djinnId} not equipped`);
+      return Err(`Djinn ${djinnId} not equipped`);
     }
     this.djinnStates.set(djinnId, 'Standby');
+    return Ok(this);
   }
 
   /**
