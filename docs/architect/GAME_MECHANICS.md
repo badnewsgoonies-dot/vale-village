@@ -238,422 +238,69 @@ const GARET_ABILITIES = {
 // ... (all 10 units have similar structure)
 ```
 
-### 1.5 Complete Ability Definitions (Audited from Implementation)
-
-**Source:** Audited from `src/data/abilities.ts` and `src/data/unitDefinitions.ts`
-
-#### Physical Attacks (0 PP Cost - Always Available)
-
-| Ability ID | Name   | Type     | PP Cost | Base Power | Targets        | Unlock Level | Special |
-|------------|--------|----------|---------|------------|----------------|--------------|---------|
-| slash      | Slash  | physical | 0       | 0          | single-enemy   | 1            | Uses ATK stat for damage |
-| cleave     | Cleave | physical | 0       | 0          | single-enemy   | 1            | Uses ATK stat for damage |
-
-**Implementation:**
-```typescript
-export const SLASH: Ability = {
-  id: 'slash',
-  name: 'Slash',
-  type: 'physical',
-  ppCost: 0,
-  basePower: 0,  // Damage calculated from ATK stat
-  targets: 'single-enemy',
-  unlockLevel: 1
-};
-
-export const CLEAVE: Ability = {
-  id: 'cleave',
-  name: 'Cleave',
-  type: 'physical',
-  ppCost: 0,
-  basePower: 0,  // Damage calculated from ATK stat
-  targets: 'single-enemy',
-  unlockLevel: 1
-};
-```
-
-#### Venus (Earth) Elemental Abilities
-
-| Ability ID    | Name        | Type      | PP Cost | Base Power | Targets        | Unlock Level | Special |
-|---------------|-------------|-----------|---------|------------|----------------|--------------|---------|
-| quake         | Quake       | offensive | 5       | 30         | all-enemies    | 2            | AoE earth damage |
-| clay-spire    | Clay Spire  | offensive | 10      | 60         | single-enemy   | 3            | Single-target spike |
-| ragnarok      | Ragnarok    | offensive | 15      | 100        | single-enemy   | 4            | Heavy earth blade |
-| judgment      | Judgment    | offensive | 25      | 150        | all-enemies    | 5            | Ultimate AoE |
-
-**Implementation:**
-```typescript
-export const QUAKE: Ability = {
-  id: 'quake',
-  name: 'Quake',
-  type: 'offensive',
-  element: 'Venus',
-  ppCost: 5,
-  basePower: 30,
-  targets: 'all-enemies',
-  unlockLevel: 2
-};
-
-export const CLAY_SPIRE: Ability = {
-  id: 'clay-spire',
-  name: 'Clay Spire',
-  type: 'offensive',
-  element: 'Venus',
-  ppCost: 10,
-  basePower: 60,
-  targets: 'single-enemy',
-  unlockLevel: 3
-};
-
-export const RAGNAROK: Ability = {
-  id: 'ragnarok',
-  name: 'Ragnarok',
-  type: 'offensive',
-  element: 'Venus',
-  ppCost: 15,
-  basePower: 100,
-  targets: 'single-enemy',
-  unlockLevel: 4
-};
-
-export const JUDGMENT: Ability = {
-  id: 'judgment',
-  name: 'Judgment',
-  type: 'offensive',
-  element: 'Venus',
-  ppCost: 25,
-  basePower: 150,
-  targets: 'all-enemies',
-  unlockLevel: 5
-};
-```
-
-#### Mars (Fire) Elemental Abilities
-
-| Ability ID      | Name           | Type      | PP Cost | Base Power | Targets        | Unlock Level | Special |
-|-----------------|----------------|-----------|---------|------------|----------------|--------------|---------|
-| fireball        | Fireball       | offensive | 5       | 32         | single-enemy   | 2            | Single-target burn |
-| volcano         | Volcano        | offensive | 12      | 65         | all-enemies    | 3            | AoE eruption |
-| meteor-strike   | Meteor Strike  | offensive | 18      | 110        | single-enemy   | 4            | Heavy single-hit |
-| pyroclasm       | Pyroclasm      | offensive | 30      | 170        | all-enemies    | 5            | Ultimate fire AoE |
-
-**Implementation:**
-```typescript
-export const FIREBALL: Ability = {
-  id: 'fireball',
-  name: 'Fireball',
-  type: 'offensive',
-  element: 'Mars',
-  ppCost: 5,
-  basePower: 32,
-  targets: 'single-enemy',
-  unlockLevel: 2
-};
-
-export const VOLCANO: Ability = {
-  id: 'volcano',
-  name: 'Volcano',
-  type: 'offensive',
-  element: 'Mars',
-  ppCost: 12,
-  basePower: 65,
-  targets: 'all-enemies',
-  unlockLevel: 3
-};
-
-export const METEOR_STRIKE: Ability = {
-  id: 'meteor-strike',
-  name: 'Meteor Strike',
-  type: 'offensive',
-  element: 'Mars',
-  ppCost: 18,
-  basePower: 110,
-  targets: 'single-enemy',
-  unlockLevel: 4
-};
-
-export const PYROCLASM: Ability = {
-  id: 'pyroclasm',
-  name: 'Pyroclasm',
-  type: 'offensive',
-  element: 'Mars',
-  ppCost: 30,
-  basePower: 170,
-  targets: 'all-enemies',
-  unlockLevel: 5
-};
-```
-
-#### Mercury (Water) Abilities (Healing + Damage)
-
-| Ability ID         | Name               | Type      | PP Cost | Base Power | Targets        | Unlock Level | Special |
-|--------------------|--------------------|-----------|---------|------------|----------------|--------------|---------|
-| ply                | Ply                | healing   | 4       | 40         | single-ally    | 1            | Basic heal |
-| frost              | Frost              | offensive | 6       | 28         | all-enemies    | 2            | AoE ice damage |
-| ice-horn           | Ice Horn           | offensive | 11      | 58         | single-enemy   | 3            | Single-target pierce |
-| wish               | Wish               | healing   | 15      | 70         | all-allies     | 4            | Party-wide heal |
-| glacial-blessing   | Glacial Blessing   | healing   | 35      | 120        | all-allies     | 5            | Ultimate heal + revive |
-
-**Implementation:**
-```typescript
-export const PLY: Ability = {
-  id: 'ply',
-  name: 'Ply',
-  type: 'healing',
-  element: 'Mercury',
-  ppCost: 4,
-  basePower: 40,
-  targets: 'single-ally',
-  unlockLevel: 1
-};
-
-export const FROST: Ability = {
-  id: 'frost',
-  name: 'Frost',
-  type: 'offensive',
-  element: 'Mercury',
-  ppCost: 6,
-  basePower: 28,
-  targets: 'all-enemies',
-  unlockLevel: 2
-};
-
-export const ICE_HORN: Ability = {
-  id: 'ice-horn',
-  name: 'Ice Horn',
-  type: 'offensive',
-  element: 'Mercury',
-  ppCost: 11,
-  basePower: 58,
-  targets: 'single-enemy',
-  unlockLevel: 3
-};
-
-export const WISH: Ability = {
-  id: 'wish',
-  name: 'Wish',
-  type: 'healing',
-  element: 'Mercury',
-  ppCost: 15,
-  basePower: 70,
-  targets: 'all-allies',
-  unlockLevel: 4
-};
-
-export const GLACIAL_BLESSING: Ability = {
-  id: 'glacial-blessing',
-  name: 'Glacial Blessing',
-  type: 'healing',
-  element: 'Mercury',
-  ppCost: 35,
-  basePower: 120,
-  targets: 'all-allies',
-  unlockLevel: 5,
-  revivesFallen: true  // Special: Can revive KO'd allies with 50% HP
-};
-```
-
-#### Jupiter (Wind) Elemental Abilities
-
-| Ability ID    | Name         | Type      | PP Cost | Base Power | Targets        | Unlock Level | Special |
-|---------------|--------------|-----------|---------|------------|----------------|--------------|---------|
-| gust          | Gust         | offensive | 4       | 25         | single-enemy   | 2            | Basic wind blade |
-| plasma        | Plasma       | offensive | 10      | 55         | all-enemies    | 3            | Chain damage effect |
-| thunderclap   | Thunderclap  | offensive | 16      | 95         | all-enemies    | 4            | AoE lightning |
-| tempest       | Tempest      | offensive | 28      | 160        | all-enemies    | 5            | Ultimate wind storm |
-
-**Implementation:**
-```typescript
-export const GUST: Ability = {
-  id: 'gust',
-  name: 'Gust',
-  type: 'offensive',
-  element: 'Jupiter',
-  ppCost: 4,
-  basePower: 25,
-  targets: 'single-enemy',
-  unlockLevel: 2
-};
-
-export const PLASMA: Ability = {
-  id: 'plasma',
-  name: 'Plasma',
-  type: 'offensive',
-  element: 'Jupiter',
-  ppCost: 10,
-  basePower: 55,
-  targets: 'all-enemies',
-  unlockLevel: 3,
-  chainDamage: true  // Special: 10% chance to hit twice
-};
-
-export const THUNDERCLAP: Ability = {
-  id: 'thunderclap',
-  name: 'Thunderclap',
-  type: 'offensive',
-  element: 'Jupiter',
-  ppCost: 16,
-  basePower: 95,
-  targets: 'all-enemies',
-  unlockLevel: 4
-};
-
-export const TEMPEST: Ability = {
-  id: 'tempest',
-  name: 'Tempest',
-  type: 'offensive',
-  element: 'Jupiter',
-  ppCost: 28,
-  basePower: 160,
-  targets: 'all-enemies',
-  unlockLevel: 5
-};
-```
-
-#### Buff Abilities (Support)
-
-| Ability ID         | Name               | Type | PP Cost | Buff Effect                | Duration | Unlock Level | Special |
-|--------------------|--------------------|------|---------|----------------------------|----------|--------------|---------|
-| blessing           | Blessing           | buff | 8       | ATK +25%, DEF +25%         | 3 turns  | 3            | Balanced party buff |
-| guardians-stance   | Guardian's Stance  | buff | 6       | DEF +50%                   | 2 turns  | 3            | Tank defensive boost |
-| winds-favor        | Wind's Favor       | buff | 10      | SPD +40%, Evasion +20%     | 3 turns  | 3            | Speed/dodge boost |
-
-**Implementation:**
-```typescript
-export const BLESSING: Ability = {
-  id: 'blessing',
-  name: 'Blessing',
-  type: 'buff',
-  ppCost: 8,
-  buffEffect: {
-    atk: 1.25,  // 25% ATK increase
-    def: 1.25   // 25% DEF increase
-  },
-  duration: 3,  // 3 turns
-  targets: 'single-ally',
-  unlockLevel: 3
-};
-
-export const GUARDIANS_STANCE: Ability = {
-  id: 'guardians-stance',
-  name: "Guardian's Stance",
-  type: 'buff',
-  ppCost: 6,
-  buffEffect: {
-    def: 1.5  // 50% DEF increase
-  },
-  duration: 2,  // 2 turns
-  targets: 'self',
-  unlockLevel: 3
-};
-
-export const WINDS_FAVOR: Ability = {
-  id: 'winds-favor',
-  name: "Wind's Favor",
-  type: 'buff',
-  ppCost: 10,
-  buffEffect: {
-    spd: 1.4,     // 40% SPD increase
-    evasion: 20   // +20% evasion chance
-  },
-  duration: 3,  // 3 turns
-  targets: 'single-ally',
-  unlockLevel: 3
-};
-```
-
-#### Unit Ability Assignment Matrix
-
-**All 10 Units with Their 5 Abilities:**
-
-| Unit   | Element  | Role               | Ability 1 | Ability 2 | Ability 3         | Ability 4      | Ability 5        |
-|--------|----------|--------------------|-----------|-----------|-------------------|----------------|------------------|
-| Isaac  | Venus    | Balanced Warrior   | Slash     | Quake     | Clay Spire        | Ragnarok       | Judgment         |
-| Garet  | Mars     | Pure DPS           | Cleave    | Fireball  | Volcano           | Meteor Strike  | Pyroclasm        |
-| Ivan   | Jupiter  | Elemental Mage     | Slash     | Gust      | Plasma            | Thunderclap    | Tempest          |
-| Mia    | Mercury  | Healer             | Ply       | Frost     | Ice Horn          | Wish           | Glacial Blessing |
-| Felix  | Venus    | Rogue Assassin     | Slash     | Quake     | Clay Spire        | Ragnarok       | Judgment         |
-| Jenna  | Mars     | AoE Fire Mage      | Cleave    | Fireball  | Volcano           | Meteor Strike  | Pyroclasm        |
-| Sheba  | Jupiter  | Support Buffer     | Slash     | Gust      | Blessing          | Thunderclap    | Tempest          |
-| Piers  | Mercury  | Defensive Tank     | Cleave    | Frost     | Guardian's Stance | Wish           | Glacial Blessing |
-| Kraden | Venus    | Versatile Scholar  | Slash     | Quake     | Blessing          | Ragnarok       | Judgment         |
-| Kyle   | Mars     | Master Warrior     | Cleave    | Fireball  | Guardian's Stance | Meteor Strike  | Pyroclasm        |
-
-**Ability Distribution Summary:**
-- **23 unique abilities total** (not 50 - many abilities are shared between units of same element)
-- **10 units × 5 abilities each = 50 total assignments**
-- **Elemental consistency:** Units of same element share most abilities (Isaac/Felix share Venus, Garet/Jenna share Mars)
-- **Role differentiation:** Support roles get buff abilities (Sheba/Kraden have Blessing, Piers/Kyle have Guardian's Stance)
-
-#### Balance Verification
-
-**PP Cost Progression:** ✅ VERIFIED
-- Physical attacks: 0 PP (always available)
-- Basic spells (Lv2): 4-6 PP
-- Mid-tier spells (Lv3): 10-12 PP
-- Strong spells (Lv4): 15-18 PP
-- Ultimate spells (Lv5): 25-35 PP
-
-**Base Power Progression:** ✅ VERIFIED
-- Physical attacks: 0 base power (uses ATK stat directly)
-- Basic spells: 25-32 damage
-- Mid-tier spells: 55-65 damage
-- Strong spells: 95-110 damage
-- Ultimate spells: 150-170 damage
-- Healing: 40 (basic) → 70 (party) → 120 (ultimate with revive)
-
-**Unlock Level Consistency:** ✅ VERIFIED
-- All abilities unlock at levels 1-5 (matches XP curve max level)
-- Physical attacks at Lv1 (free)
-- Basic spells at Lv2
-- Mid-tier at Lv3 (including all buff abilities)
-- Strong at Lv4
-- Ultimate at Lv5
-
-**Special Mechanics:** ✅ VERIFIED
-- `chainDamage` on Plasma (10% double-hit chance)
-- `revivesFallen` on Glacial Blessing (revives KO'd allies with 50% HP)
-- `buffEffect` on 3 buff abilities (stat multipliers + duration)
-
-**Targeting Balance:** ✅ VERIFIED
-- Single-target abilities generally have higher base power
-- AoE abilities have lower base power but hit all enemies
-- Mix ensures tactical variety (single-target burst vs AoE clear)
-
-**Element Distribution:** ✅ VERIFIED
-- **Venus (Earth):** 2 units (Isaac, Felix) + 2 hybrids with Blessing (Sheba, Kraden)
-- **Mars (Fire):** 3 units (Garet, Jenna, Kyle) - most DPS-focused element
-- **Mercury (Water):** 2 units (Mia, Piers) - only healer element
-- **Jupiter (Wind):** 2 units (Ivan, Sheba) - fastest units
-
 ---
 
 ## 2. DJINN SYSTEM
 
 ### 2.0 Djinn Slot System
 
-**🚨 CRITICAL DESIGN DECISION:**
+**🚨 CRITICAL: GLOBAL TEAM SLOTS (Not Per-Unit!)**
 
 ```typescript
 const DJINN_SLOTS = {
-  slotsPerUnit: 3,        // Each unit has 3 Djinn slots
-  maxPerTeam: 12,         // 4 units × 3 slots = 12 total
-  canEquipToAnyUnit: true // Any Djinn can go on any unit
+  teamSlots: 3,              // Team has exactly 3 Djinn slots (GLOBAL)
+  slotsPerUnit: 0,           // NOT per-unit!
+  maxEquipped: 3,            // Can only equip 3 Djinn total across entire party
+  totalCollectable: 12,      // Can collect all 12 Djinn
+  affectsAllUnits: true      // Equipped Djinn bonuses apply to ALL party members
 };
 ```
 
-**Clarification:**
-- **Per-Unit System:** Each UNIT has 3 Djinn slots (like Golden Sun)
-- **Not Global:** NOT 3 slots for the entire team
-- **Example:** Isaac can have 3 Djinn, Garet can have 3 Djinn, etc.
-- **Total Possible:** 4 active units × 3 slots = 12 Djinn can be equipped at once
-- **Collection Limit:** 12 total Djinn exist (3 per element)
+**How It Works:**
+1. Player collects up to 12 Djinn throughout the game (3 per element)
+2. Player equips ANY 3 Djinn to the team's 3 global slots
+3. The 3 equipped Djinn provide bonuses to ALL 4 party members
+4. Synergy is calculated from the team's 3 Djinn (not individual units)
+
+**Example:**
+```
+Team collects: Flint, Granite, Bane (3 Venus) + 9 other Djinn
+
+Player equips to team slots:
+  Slot 1: Flint (Venus T1)
+  Slot 2: Granite (Venus T2)
+  Slot 3: Bane (Venus T3)
+
+Result (applies to Isaac, Garet, Mia, AND Ivan):
+  - ALL units get: +12 ATK, +8 DEF
+  - ALL units get: Class change to "Venus Adept"
+  - ALL units unlock: "Earthquake" ability
+
+This is a TEAM BUFF, not individual bonuses!
+```
+
+**Strategic Depth:**
+- With 12 Djinn collected, player chooses which 3 to use
+- All same element = specialization (e.g., all Venus = earth power)
+- Mixed elements = versatility (e.g., Venus+Mars+Mercury = balanced)
+- Harder choices than per-unit system!
 
 ---
 
 ### 2.1 Djinn Passive Synergy Formulas
 
 **🚨 CRITICAL: Synergy scales with Djinn COUNT!**
+
+**NOTE:** Synergy is calculated from the TEAM'S 3 equipped Djinn (not per-unit).
+The resulting bonuses apply to ALL party members globally.
+
+**Example:**
+- Team equips: 3 Venus Djinn
+- Synergy: +12 ATK, +8 DEF
+- Result: Isaac gets +12 ATK, Garet gets +12 ATK, Mia gets +12 ATK, Ivan gets +12 ATK
+- **ALL FOUR UNITS benefit from the same synergy!**
+
+---
 
 **1 Djinn (Any Element):**
 ```typescript
@@ -730,187 +377,9 @@ const SYNERGY_ALL_DIFF = {
 ```typescript
 const DJINN_ACTIVATION = {
   requirement: "Unit must have dealt or taken 30+ cumulative damage in this battle",
-  whoCanActivate: "any-unit",  // ✅ CLARIFICATION: Any unit can activate any team Djinn
   effect: "Unleash Djinn for powerful attack/heal/buff",
-  consequence: "Djinn enters Standby state (lose passive bonus)",
-  recovery: "After 2 full turns, Djinn returns to Set state, passive restored"
-};
-```
-
-**Djinn Activation Rules - DETAILED CLARIFICATIONS:**
-
-```typescript
-const DJINN_ACTIVATION_RULES = {
-  // WHO CAN ACTIVATE
-  whoCanActivate: {
-    rule: "ANY unit in active party can activate ANY team Djinn",
-    examples: [
-      "Isaac can activate Mars Djinn (Forge) even though it's Mars element",
-      "Mia can activate Venus Djinn (Flint) to unleash earth attack",
-      "Garet can activate Mercury Djinn (Fizz) to heal the party"
-    ],
-    reasoning: "Team slots (not per-unit slots) mean all Djinn are shared resources"
-  },
-
-  // HOW MANY PER TURN
-  activationsPerTurn: {
-    perUnit: 1,  // Each unit can activate only 1 Djinn per turn
-    total: 3,    // ✅ Maximum 3 (limited by 3 team Djinn slots)
-
-    examples: [
-      "Turn 1: Isaac activates Flint, Garet activates Granite, Ivan passes = 2 total ✅",
-      "Turn 2: Mia activates Bane = 1 activation. Now all 3 Djinn in Standby ✅",
-      "Turn 3: Isaac tries to activate but all 3 Djinn already in Standby/Recovery ❌",
-      "Turn 3: Party must wait for Djinn to recover to Set state before activating again"
-    ],
-
-    constraint: "Once all 3 team Djinn are activated (Standby state), no more activations until recovery"
-  },
-
-  // DAMAGE THRESHOLD
-  damageThreshold: {
-    requirement: 30,  // 30+ cumulative damage dealt or taken
-    tracking: "per-unit",  // Each unit tracks separately
-    resetOnBattle: true,  // Counter resets when battle ends
-
-    calculation: {
-      damageDealt: "Sum of all damage this unit dealt to enemies",
-      damageTaken: "Sum of all damage this unit received from enemies",
-      total: "damageDealt + damageTaken >= 30"
-    },
-
-    examples: [
-      "Isaac deals 20 damage with Slash, then takes 15 damage → 20 + 15 = 35 ✅ Can activate",
-      "Garet deals 40 damage with Fireball → 40 ✅ Can activate",
-      "Mia heals party (no damage dealt/taken) → 0 ❌ Cannot activate yet",
-      "Ivan takes 30 damage from enemy → 30 ✅ Can activate"
-    ]
-  },
-
-  // STATE MACHINE
-  stateTransitions: {
-    Set: {
-      description: "Default state, passive bonuses active",
-      canActivate: true,
-      canSummon: false,
-      providesPassive: true,
-      nextState: "Standby (when activated)"
-    },
-
-    Standby: {
-      description: "Activated state, waiting for summon or recovery",
-      canActivate: false,  // Already activated
-      canSummon: true,     // Can be used for summons
-      providesPassive: false,  // No passive bonuses
-      nextState: "Recovery (if used for summon) OR Set (after 2 full turns if not summoned)"
-    },
-
-    Recovery: {
-      description: "Post-summon state, cannot be used",
-      canActivate: false,
-      canSummon: false,
-      providesPassive: false,
-      nextState: "Set (after 3 full turns)",
-      duration: 3  // 3 turns until return to Set
-    }
-  },
-
-  // RECOVERY TIMING
-  recoveryTiming: {
-    standbyToSet: {
-      duration: 2,  // 2 full turns
-      startTurn: "immediately",  // Counter starts at end of activation turn
-
-      example: {
-        turn1: "Isaac activates Flint (Set → Standby). Counter starts.",
-        turn2: "Flint in Standby (1 turn passed). Can be used for summon.",
-        turn3: "Flint in Standby (2 turns passed). Can still be used for summon.",
-        turn4: "Flint returns to Set (passive restored). ✅"
-      }
-    },
-
-    recoveryToSet: {
-      duration: 3,  // 3 full turns (from summon usage)
-      startTurn: "immediately",  // Counter starts at end of summon turn
-
-      example: {
-        turn1: "Party uses Flint/Granite/Bane for Titan summon. All 3 → Recovery.",
-        turn2: "All 3 Djinn in Recovery (1 turn passed).",
-        turn3: "All 3 Djinn in Recovery (2 turns passed).",
-        turn4: "All 3 Djinn in Recovery (3 turns passed).",
-        turn5: "All 3 Djinn return to Set (passives restored). ✅"
-      }
-    },
-
-    turnDefinition: "A full turn = all 4 party members + all enemies have acted"
-  },
-
-  // MULTIPLE DJINN MANAGEMENT
-  multipleActivations: {
-    sameUnit: {
-      perTurn: 1,
-      reason: "Prevents single unit from dominating Djinn usage"
-    },
-
-    differentUnits: {
-      perTurn: 3,  // ✅ Maximum 3 (limited by 3 team Djinn slots)
-      reason: "Each unit can activate 1 Djinn, but max = 3 total (team only has 3 Djinn)"
-    },
-
-    standbyAccumulation: {
-      allowed: true,
-      reason: "Can accumulate multiple Standby Djinn for summons over multiple turns",
-
-      example: {
-        turn1: "Isaac activates Flint (1 in Standby)",
-        turn2: "Garet activates Granite (2 in Standby)",
-        turn3: "Ivan activates Bane (3 in Standby)",
-        turn4: "Party can now summon Titan (3 Venus Djinn in Standby)",
-        turn4note: "OR wait for Djinn to recover (turn 4-5) to get passive bonuses back"
-      }
-    }
-  }
-};
-```
-
-**Djinn Lifecycle - Complete Flow:**
-```typescript
-const DJINN_LIFECYCLE = {
-  // PATH 1: Activation → Natural Recovery (no summon)
-  path1: [
-    "Set (passive active)",
-    "→ Unit activates Djinn (damage/heal/buff effect)",
-    "→ Standby (passive lost, can be used for summon)",
-    "→ Wait 2 full turns",
-    "→ Set (passive restored)"
-  ],
-
-  // PATH 2: Activation → Used in Summon
-  path2: [
-    "Set (passive active)",
-    "→ Unit activates Djinn",
-    "→ Standby (passive lost)",
-    "→ Used for summon (massive damage/effect)",
-    "→ Recovery (cannot be used, passive lost)",
-    "→ Wait 3 full turns",
-    "→ Set (passive restored)"
-  ],
-
-  // TOTAL COST COMPARISON
-  costComparison: {
-    activateOnly: {
-      passiveLossDuration: 2,
-      benefit: "Immediate damage/heal/buff (80-180 power)",
-      turnCost: "2 turns without 1 Djinn passive"
-    },
-
-    activateThenSummon: {
-      passiveLossDuration: 5,  // 2 turns Standby + 3 turns Recovery
-      benefit: "Ultimate summon (250-460+ damage)",
-      turnCost: "5 turns without 1 Djinn passive (×3 if using 3 Djinn)",
-      strategicNote: "15 total passive-less turns for 3 Djinn used in summon"
-    }
-  }
+  consequence: "Lose passive bonus for 2 turns",
+  recovery: "After 2 turns, Djinn returns to Set state, passive restored"
 };
 ```
 
@@ -951,6 +420,43 @@ const DJINN_TIER_EFFECTS = {
 }
 ```
 
+**Activation Mechanics (Team Slots):**
+
+When a Djinn is activated (unleashed):
+1. Djinn moves from "Set" → "Standby" state
+2. **ALL party members IMMEDIATELY lose that Djinn's portion of synergy**
+3. Example:
+   - Before: 3 Venus Djinn = +12 ATK to all units
+   - Activate Flint: Now 2 Venus Djinn = +8 ATK to all units
+   - **ALL 4 units lose 4 ATK!**
+4. After 2 turns: Djinn returns to "Set", all units regain +4 ATK
+
+**Trade-off:**
+- Activation: Big burst damage (Flint deals 80 damage)
+- Penalty: **ALL units lose stats for 2 turns** (team-wide penalty!)
+- Strategic: Worth weakening entire team for burst?
+
+**Example Full Scenario:**
+```
+Turn 1 (Before Activation):
+  Team: 3 Venus Djinn (Flint, Granite, Bane) equipped
+  All units: +12 ATK, +8 DEF
+
+Turn 2 (Isaac activates Flint):
+  Flint unleashes: 80 damage to all enemies
+  Team: 2 Venus Djinn (Granite, Bane) remain
+  All units: +8 ATK, +5 DEF (-4 ATK, -3 DEF penalty!)
+
+Turn 3:
+  Flint still in Standby
+  All units still: +8 ATK, +5 DEF
+
+Turn 4 (Flint recovers):
+  Flint returns to Set state
+  Team: 3 Venus Djinn (Flint, Granite, Bane) back
+  All units: +12 ATK, +8 DEF (bonuses restored!)
+```
+
 ### 2.3 Djinn Distribution & Acquisition
 
 **12 Djinn Total:**
@@ -979,286 +485,45 @@ const DJINN_CATALOG = {
 };
 ```
 
-### 2.4 Djinn Summon System
+### 2.5 Djinn Menu UI Design
 
-**Summon Requirements:**
-```typescript
-const SUMMON_REQUIREMENTS = {
-  djinnNeeded: 3,
-  djinnState: "Standby",  // All 3 Djinn must be in Standby (not Set, not Recovery)
-  whoCanSummon: "any-unit",  // Any unit in active party can perform summon
-  consumesDjinn: true,  // All 3 Djinn enter Recovery state after summon
-  recoveryTurns: 3  // Djinn return to Set state after 3 turns
-};
-```
+**Screen Layout:**
+- **Left Panel:** 12 Djinn collection (3 Venus, 3 Mars, 3 Mercury, 3 Jupiter)
+  - Shows all collected Djinn with element badges
+  - Grayed out if not yet collected
+- **Center Panel:** 3 TEAM SLOTS (drag Djinn here to equip)
+  - Slot 1, Slot 2, Slot 3
+  - Shows currently equipped Djinn
+  - Empty slots are highlighted
+- **Right Panel:** Current synergy preview
+  - Shows bonuses ALL units will receive
+  - "All party members gain: +12 ATK, +8 DEF"
+  - Class change preview: "Venus Adept"
+  - Unlocked abilities: "Earthquake"
 
-**Summon Types by Element Combination:**
+**Equipping Process:**
+1. Player opens Djinn menu (from main menu, not during battle)
+2. Views all 12 collected Djinn (left panel)
+3. Drags/selects 3 Djinn into the team's 3 slots (center panel)
+4. Synergy recalculates based on the 3 equipped
+5. Preview shows: "All party members will receive: +X ATK, +Y DEF"
+6. Confirm → Bonuses apply to entire party
 
-#### Single-Element Summons (3 Same Djinn)
+**In-Battle Djinn Board:**
+- Shows team's 3 equipped Djinn with state indicators:
+  - **Set** (green): Ready to activate, passive bonus active
+  - **Standby** (yellow): Just activated, passive bonus lost
+  - **Recovery** (red): Recovering, passive bonus lost
+- Each can be activated once per battle (Set → Standby → Recovery → Set)
+- Activation button shows:
+  - Djinn name + effect (e.g., "Flint: 80 damage to all enemies")
+  - Warning: "Team will lose +4 ATK, +3 DEF for 2 turns"
+- Strategic: Coordinate activations across the team
 
-**Titan (3 Venus Djinn):**
-```typescript
-const TITAN_SUMMON = {
-  name: "Titan",
-  element: "Venus",
-  requirement: "3 Venus Djinn in Standby",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 250,
-  damageFormula: (userMAG, tierSum) => {
-    // tierSum = sum of Djinn tiers (e.g., Tier1 + Tier2 + Tier3 = 6)
-    const scaledDamage = baseDamage + (tierSum * 20);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-
-  // Example: MAG = 20, Djinn tiers = 1 + 2 + 3 = 6
-  // scaledDamage = 250 + (6 * 20) = 250 + 120 = 370
-  // finalDamage = 370 * (1 + 20/100) = 370 * 1.2 = 444
-
-  animation: "Giant earth golem rises and crushes all enemies",
-  description: "Titan, the Earth Colossus, crushes foes with devastating seismic power"
-};
-```
-
-**Phoenix (3 Mars Djinn):**
-```typescript
-const PHOENIX_SUMMON = {
-  name: "Phoenix",
-  element: "Mars",
-  requirement: "3 Mars Djinn in Standby",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 280,  // Highest single-element damage
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 20);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-
-  // Example: MAG = 22, Djinn tiers = 1 + 1 + 2 = 4
-  // scaledDamage = 280 + (4 * 20) = 280 + 80 = 360
-  // finalDamage = 360 * (1 + 22/100) = 360 * 1.22 = 439
-
-  animation: "Flaming phoenix dive-bombs battlefield, exploding in inferno",
-  description: "Phoenix, the Flame Emperor, incinerates enemies in a blazing inferno"
-};
-```
-
-**Kraken (3 Mercury Djinn):**
-```typescript
-const KRAKEN_SUMMON = {
-  name: "Kraken",
-  element: "Mercury",
-  requirement: "3 Mercury Djinn in Standby",
-  type: "damage-and-heal",
-  targets: "all-enemies",
-  baseDamage: 220,  // Lower damage but includes heal
-  healAmount: 80,  // Heals all allies for fixed amount
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 20);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-  healFormula: (userMAG, tierSum) => {
-    return Math.floor(healAmount + (tierSum * 10) + (userMAG / 2));
-  },
-
-  // Example: MAG = 18, Djinn tiers = 2 + 2 + 3 = 7
-  // Damage: 220 + (7 * 20) = 220 + 140 = 360 * 1.18 = 424
-  // Heal: 80 + (7 * 10) + (18 / 2) = 80 + 70 + 9 = 159
-
-  animation: "Tidal wave crashes down, then heals party with rejuvenating mist",
-  description: "Kraken, the Tidal Beast, drowns enemies and heals allies"
-};
-```
-
-**Thunderbird (3 Jupiter Djinn):**
-```typescript
-const THUNDERBIRD_SUMMON = {
-  name: "Thunderbird",
-  element: "Jupiter",
-  requirement: "3 Jupiter Djinn in Standby",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 260,
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 20);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-  chainLightning: true,  // Special: 25% chance for double damage on low-HP enemies
-
-  // Example: MAG = 26, Djinn tiers = 1 + 2 + 2 = 5
-  // scaledDamage = 260 + (5 * 20) = 260 + 100 = 360
-  // finalDamage = 360 * (1 + 26/100) = 360 * 1.26 = 453
-
-  animation: "Lightning storm strikes all enemies from above",
-  description: "Thunderbird, the Storm Sovereign, electrocutes enemies with heavenly lightning"
-};
-```
-
-#### Mixed-Element Summons (Hybrid Combinations)
-
-**Rampage (2 Venus + 1 Mars):**
-```typescript
-const RAMPAGE_SUMMON = {
-  name: "Rampage",
-  elements: ["Venus", "Mars"],
-  requirement: "2 Venus + 1 Mars Djinn in Standby",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 180,
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 15);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-  description: "Berserker golem tramples enemies with earth and fire fury"
-};
-```
-
-**Typhoon (2 Jupiter + 1 Mercury):**
-```typescript
-const TYPHOON_SUMMON = {
-  name: "Typhoon",
-  elements: ["Jupiter", "Mercury"],
-  requirement: "2 Jupiter + 1 Mercury Djinn in Standby",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 190,
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 15);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-  description: "Hurricane of water and wind devastates battlefield"
-};
-```
-
-**Judgment (1 of Each Element):**
-```typescript
-const JUDGMENT_SUMMON = {
-  name: "Judgment",
-  elements: ["Venus", "Mars", "Mercury", "Jupiter"],
-  requirement: "1 Venus + 1 Mars + 1 Mercury Djinn in Standby (or any 1-1-1 combo)",
-  type: "damage",
-  targets: "all-enemies",
-  baseDamage: 200,
-  damageFormula: (userMAG, tierSum) => {
-    const scaledDamage = baseDamage + (tierSum * 18);
-    return Math.floor(scaledDamage * (1 + userMAG / 100));
-  },
-  specialEffect: "Ignores 20% of enemy DEF",
-  description: "Elemental harmony unleashes balanced destruction"
-};
-```
-
-**Summon Damage Scaling Summary:**
-```typescript
-const SUMMON_BALANCE = {
-  singleElement: {
-    baseDamage: "220-280",
-    scaling: "20 per tier",
-    special: "Phoenix (Mars) = highest damage, Kraken (Mercury) = damage + heal"
-  },
-  hybridElement: {
-    baseDamage: "180-200",
-    scaling: "15-18 per tier",
-    special: "Judgment ignores 20% DEF"
-  },
-  tierScaling: {
-    tier1Djinn: 1,  // +20 damage for single-element
-    tier2Djinn: 2,  // +40 damage
-    tier3Djinn: 3   // +60 damage
-  }
-};
-
-// Best case single-element: 3 Tier-3 Djinn (tier sum = 9)
-// Phoenix: 280 + (9 * 20) = 280 + 180 = 460 base (before MAG scaling)
-
-// Worst case single-element: 3 Tier-1 Djinn (tier sum = 3)
-// Titan: 250 + (3 * 20) = 250 + 60 = 310 base
-```
-
-**Post-Summon Mechanics:**
-```typescript
-const POST_SUMMON_RECOVERY = {
-  djinnState: "Recovery",  // All 3 Djinn enter Recovery state
-  recoveryDuration: 3,  // 3 turns until return to Set state
-  passiveLoss: true,  // Party loses passive bonuses during recovery
-
-  recoveryMechanic: {
-    turn1: "Djinn in Recovery (no passive, cannot use)",
-    turn2: "Djinn in Recovery (no passive, cannot use)",
-    turn3: "Djinn in Recovery (no passive, cannot use)",
-    turn4: "Djinn return to Set state, passives restored"
-  },
-
-  strategicCost: "Lose 3-Djinn passive for 3 turns (e.g., -12 ATK, -8 DEF if Venus Adept)"
-};
-```
-
-**Summon Strategic Use Cases:**
-```typescript
-const SUMMON_STRATEGY = {
-  bossKiller: {
-    summon: "Phoenix (3 Mars)",
-    reason: "Highest raw damage (280 base + 20 per tier)",
-    bestAgainst: "Single strong enemy (boss fights)",
-    example: "460 base damage with 3 Tier-3 Djinn + 30% from high MAG = ~600 damage"
-  },
-
-  sustainedFight: {
-    summon: "Kraken (3 Mercury)",
-    reason: "Damage + party heal (159 HP example)",
-    bestAgainst: "Multi-wave battles or when party is damaged",
-    example: "424 damage + 159 HP heal to all allies"
-  },
-
-  speedClear: {
-    summon: "Thunderbird (3 Jupiter)",
-    reason: "Fast damage with chain lightning bonus",
-    bestAgainst: "Multiple weak enemies",
-    example: "453 damage + 25% chance to double-hit low-HP foes"
-  },
-
-  balanced: {
-    summon: "Judgment (1 of each)",
-    reason: "Ignores 20% DEF, works with any Djinn mix",
-    bestAgainst: "Highly defensive enemies",
-    example: "Effective damage increased by DEF penetration"
-  }
-};
-```
-
-**Summon UI Flow:**
-```typescript
-const SUMMON_MENU = {
-  requirement: "At least 3 Djinn in Standby state",
-  menuAccess: "Battle menu → Djinn → Summon",
-  availableSummons: "Shows only summons with 3+ Djinn in Standby",
-
-  confirmationPrompt: {
-    message: "Summon [NAME]? This will put 3 Djinn in Recovery for 3 turns.",
-    options: ["Confirm", "Cancel"],
-    warning: "Shows passive loss (e.g., 'You will lose Venus Adept bonuses for 3 turns')"
-  },
-
-  animationSequence: {
-    duration: "2-3 seconds",
-    skipable: true,
-    phases: [
-      "Djinn rise from characters (0.5s)",
-      "Summon creature appears (1s)",
-      "Attack animation (1s)",
-      "Damage numbers (0.5s)"
-    ]
-  }
-};
-```
-
-**Summon Balance Design Notes:**
-- **Risk vs Reward:** Summons deal massive damage but cost 3-turn passive loss
-- **Tier Scaling:** Encourages collecting high-tier Djinn for stronger summons
-- **Element Variety:** Single-element summons strongest, but hybrids allow flexibility
-- **Kraken Niche:** Only summon that heals, ideal for Mercury healers like Mia/Piers
-- **Phoenix Peak DPS:** Mars element has highest damage ceiling (280 base)
-- **Judgment Utility:** Best for tanky enemies due to DEF penetration
+**Visual Feedback:**
+- When Djinn activated: All 4 unit portraits flash briefly (showing global effect)
+- Stat bars change color when synergy bonuses are lost
+- Recovery timer shows turns until Djinn returns to Set state
 
 ---
 
@@ -1386,12 +651,16 @@ const BOOTS = {
 ### 3.2 Stat Calculation Formula
 
 ```typescript
-function calculateFinalStats(unit: Unit): Stats {
+function calculateFinalStats(unit: Unit, team: Team): Stats {
   const base = unit.baseStats;
   const levelBonus = unit.growthRates.map(stat => stat * (unit.level - 1));
   const equipment = sumEquipmentBonuses(unit.equipment);
-  const djinn = calculateDjinnSynergy(unit.djinn);
+  const djinn = calculateDjinnSynergy(team.equippedDjinn);  // Team's 3 Djinn (GLOBAL)
   const buffs = sumActiveBuffs(unit.buffs);
+
+  // Note: djinn synergy is calculated from team.equippedDjinn (the 3 team slots)
+  // This synergy bonus applies to ALL units in the party
+  // So Isaac, Garet, Mia, and Ivan all get the same Djinn bonus
 
   return {
     hp: base.hp + levelBonus.hp + equipment.hp,
@@ -1403,12 +672,14 @@ function calculateFinalStats(unit: Unit): Stats {
   };
 }
 
-// Example: Isaac Level 5, Iron Sword, Iron Armor, 3 Venus Djinn
+// Example: Isaac Level 5, Iron Sword, Iron Armor, Team has 3 Venus Djinn equipped
 // Base (Lv5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
 // Iron Sword: ATK +12
 // Iron Armor: HP +20, DEF +10
-// 3 Venus Djinn: ATK +12, DEF +8
+// 3 Venus Djinn (team): ATK +12, DEF +8 (ALL units get this!)
 // FINAL: HP 200, ATK 51, DEF 36, MAG 20, SPD 16
+//
+// Note: Garet, Mia, and Ivan ALSO get +12 ATK, +8 DEF from the team's 3 Venus Djinn!
 ```
 
 ---
@@ -2016,337 +1287,6 @@ function attemptFlee(playerAverageSpd: number, enemyAverageSpd: number): boolean
 // Cannot flee from recruitment battles
 ```
 
-### 6.5 Damage Calculation Formula
-
-**Physical Damage Formula:**
-```typescript
-function calculatePhysicalDamage(
-  attacker: Unit,
-  defender: Unit,
-  ability: Ability
-): number {
-  const baseAtk = attacker.stats.atk;
-  const baseDef = defender.stats.def;
-
-  // Physical abilities use ATK stat (basePower = 0)
-  const rawDamage = Math.max(1, baseAtk - baseDef / 2);
-
-  // Apply elemental advantage (if ability has element)
-  const elementalMultiplier = getElementalAdvantage(ability.element, defender.element);
-
-  // Apply equipment bonuses (already included in stats.atk/def)
-  const finalDamage = Math.floor(rawDamage * elementalMultiplier);
-
-  return Math.max(1, finalDamage);  // Minimum 1 damage
-}
-```
-
-**Magical Damage Formula:**
-```typescript
-function calculateMagicalDamage(
-  attacker: Unit,
-  defender: Unit,
-  ability: Ability
-): number {
-  const userMAG = attacker.stats.mag;
-  const enemyDEF = defender.stats.def;
-  const basePower = ability.basePower;
-
-  // Magical abilities scale with MAG stat
-  const scaledPower = basePower * (1 + userMAG / 100);
-
-  // Defense reduces magical damage (50% effectiveness vs magic)
-  const rawDamage = Math.max(1, scaledPower - enemyDEF / 4);
-
-  // Apply elemental advantage
-  const elementalMultiplier = getElementalAdvantage(ability.element, defender.element);
-
-  // Apply elemental resistance (from armor/equipment)
-  const resistanceReduction = 1 - (defender.elementalResist || 0);
-
-  const finalDamage = Math.floor(rawDamage * elementalMultiplier * resistanceReduction);
-
-  return Math.max(1, finalDamage);  // Minimum 1 damage
-}
-
-// Example: Ivan casts Plasma (base 55) with MAG 22 against enemy with DEF 10
-// scaledPower = 55 * (1 + 22/100) = 55 * 1.22 = 67.1
-// rawDamage = 67.1 - 10/4 = 67.1 - 2.5 = 64.6
-// With 1.5x elemental advantage = 64.6 * 1.5 = 96.9 → 96 damage
-```
-
-**Elemental Advantage Table:**
-```typescript
-const ELEMENTAL_ADVANTAGES = {
-  // Venus (Earth) > Mars (Fire) > Mercury (Water) > Jupiter (Wind) > Venus
-  "Venus vs Mars": 1.5,      // Earth strong vs Fire
-  "Mars vs Mercury": 1.5,    // Fire strong vs Water
-  "Mercury vs Jupiter": 1.5, // Water strong vs Wind
-  "Jupiter vs Venus": 1.5,   // Wind strong vs Earth
-
-  "Mars vs Venus": 0.67,     // Fire weak vs Earth (1 / 1.5)
-  "Mercury vs Mars": 0.67,   // Water weak vs Fire
-  "Jupiter vs Mercury": 0.67,// Wind weak vs Water
-  "Venus vs Jupiter": 0.67,  // Earth weak vs Wind
-
-  "Same element": 1.0,       // Neutral
-  "No element": 1.0          // Physical attacks (no element)
-};
-
-function getElementalAdvantage(attackElement: string, defenderElement: string): number {
-  if (!attackElement) return 1.0;  // Physical attacks
-  if (attackElement === defenderElement) return 1.0;
-
-  const advantages = {
-    Venus: { Mars: 1.5, Jupiter: 0.67 },
-    Mars: { Mercury: 1.5, Venus: 0.67 },
-    Mercury: { Jupiter: 1.5, Mars: 0.67 },
-    Jupiter: { Venus: 1.5, Mercury: 0.67 }
-  };
-
-  return advantages[attackElement]?.[defenderElement] || 1.0;
-}
-```
-
-### 6.6 Defense and Stat Interaction
-
-**Defense Against Physical Attacks:**
-```typescript
-const DEFENSE_MECHANICS = {
-  physicalReduction: {
-    formula: "DEF / 2",
-    example: {
-      attackerATK: 30,
-      defenderDEF: 20,
-      rawDamage: "30 - (20 / 2) = 30 - 10 = 20 damage"
-    }
-  },
-
-  magicalReduction: {
-    formula: "DEF / 4",
-    reasoning: "DEF is less effective vs magic (50% effectiveness)",
-    example: {
-      spellPower: 100,
-      defenderDEF: 20,
-      rawDamage: "100 - (20 / 4) = 100 - 5 = 95 damage"
-    }
-  }
-};
-```
-
-### 6.7 Evasion Formula
-
-**Evasion Mechanics:**
-```typescript
-const EVASION_SYSTEM = {
-  baseEvasion: 0.05,  // 5% base dodge chance for all units
-
-  speedScaling: {
-    formula: (unitSPD: number, attackerSPD: number) => {
-      const speedDiff = unitSPD - attackerSPD;
-      const evasionBonus = speedDiff * 0.01;  // 1% per SPD point advantage
-      return Math.max(0, evasionBonus);
-    },
-
-    example: {
-      defenderSPD: 25,
-      attackerSPD: 15,
-      speedDiff: 10,
-      evasionBonus: "10 * 0.01 = 0.10 (10%)"
-    }
-  },
-
-  equipmentBonus: {
-    source: "Boots equipment slot",
-    examples: [
-      { item: "Iron Boots", evasion: 0 },
-      { item: "Hermes' Sandals", evasion: 0 }  // Hermes gives alwaysFirstTurn, not evasion
-    ],
-    note: "Current equipment doesn't provide evasion bonuses, but slot exists for future items"
-  },
-
-  buffBonus: {
-    source: "Wind's Favor ability",
-    bonus: 0.20,  // +20% evasion (from buffEffect in abilities.ts)
-    duration: 3   // 3 turns
-  },
-
-  totalEvasion: {
-    formula: (unit: Unit, attacker: Unit, buffs: Buff[]) => {
-      const base = 0.05;  // 5%
-      const speedBonus = Math.max(0, (unit.stats.spd - attacker.stats.spd) * 0.01);
-      const equipBonus = unit.equipment.boots?.evasionBonus || 0;
-      const buffBonus = buffs.find(b => b.id === "winds-favor")?.effect.evasion || 0;
-
-      return Math.min(0.75, base + speedBonus + equipBonus + buffBonus);  // Cap at 75%
-    },
-
-    example: {
-      defender: "Ivan (SPD 23)",
-      attacker: "Enemy (SPD 10)",
-      buffs: ["Wind's Favor (+20% evasion)"],
-      calculation: [
-        "Base: 5%",
-        "Speed: (23 - 10) * 1% = 13%",
-        "Equipment: 0%",
-        "Buff: 20%",
-        "Total: 5% + 13% + 0% + 20% = 38% evasion"
-      ]
-    }
-  },
-
-  evasionCap: 0.75  // 75% maximum evasion chance
-};
-
-function attemptEvasion(defender: Unit, attacker: Unit, buffs: Buff[]): boolean {
-  const evasionChance = EVASION_SYSTEM.totalEvasion.formula(defender, attacker, buffs);
-  return Math.random() < evasionChance;
-}
-```
-
-**Evasion Priority:**
-```typescript
-const EVASION_PRIORITY = {
-  checkOrder: [
-    "1. Roll for evasion (if evaded, skip damage calculation)",
-    "2. If not evaded, calculate damage normally",
-    "3. Apply damage to defender"
-  ],
-
-  notAffectedBy: [
-    "Critical hits still need to pass evasion check",
-    "AoE abilities check evasion separately for each target",
-    "Summons check evasion for each enemy"
-  ]
-};
-```
-
-### 6.8 Elemental Resistance Formula
-
-**Elemental Resistance Mechanics:**
-```typescript
-const ELEMENTAL_RESISTANCE_SYSTEM = {
-  sources: [
-    "Armor equipment slot (primary source)",
-    "Djinn passive synergy (future enhancement)",
-    "Elemental advantage (handled separately)"
-  ],
-
-  armorResistance: {
-    formula: (elementalDamage: number, resistPercent: number) => {
-      const reduction = 1 - resistPercent;
-      return Math.floor(elementalDamage * reduction);
-    },
-
-    examples: [
-      {
-        armor: "Dragon Scales",
-        resistance: 0.20,  // 20% elemental damage reduction
-        incomingDamage: 100,
-        finalDamage: "100 * (1 - 0.20) = 100 * 0.80 = 80 damage"
-      },
-      {
-        armor: "Celestial Armor",
-        resistance: 0.35,  // 35% elemental damage reduction
-        incomingDamage: 150,
-        finalDamage: "150 * (1 - 0.35) = 150 * 0.65 = 97 damage"
-      }
-    ]
-  },
-
-  currentEquipment: {
-    note: "No equipment in equipment.ts currently has elemental resistance",
-    futureItems: [
-      { name: "Dragon Scales", slot: "armor", resist: 0.20 },
-      { name: "Celestial Armor", slot: "armor", resist: 0.35 },
-      { name: "Phoenix Shield", slot: "armor", resist: 0.25, element: "Mars" }
-    ]
-  },
-
-  resistanceStacking: {
-    rule: "Elemental resistance is additive, up to 75% cap",
-    example: {
-      armorResist: 0.25,
-      djinnResist: 0.15,
-      totalResist: "Math.min(0.75, 0.25 + 0.15) = 0.40 (40%)"
-    }
-  },
-
-  interactionWithElementalAdvantage: {
-    order: [
-      "1. Calculate base damage with elemental advantage/disadvantage",
-      "2. Apply elemental resistance reduction",
-      "3. Final damage = base * advantage * (1 - resistance)"
-    ],
-
-    example: {
-      spellPower: 100,
-      elementalAdvantage: 1.5,  // Jupiter vs Venus
-      resistance: 0.20,         // Dragon Scales
-      calculation: [
-        "Base with advantage: 100 * 1.5 = 150",
-        "Apply resistance: 150 * (1 - 0.20) = 150 * 0.80 = 120 damage"
-      ]
-    }
-  },
-
-  resistanceCap: 0.75  // 75% maximum resistance
-};
-
-function applyElementalResistance(
-  damage: number,
-  defender: Unit,
-  ability: Ability
-): number {
-  if (!ability.element) return damage;  // Physical attacks ignore resistance
-
-  const armorResist = defender.equipment.armor?.elementalResist || 0;
-  const djinnResist = 0;  // Future: calculate from Djinn synergy
-
-  const totalResist = Math.min(0.75, armorResist + djinnResist);
-  const finalDamage = Math.floor(damage * (1 - totalResist));
-
-  return Math.max(1, finalDamage);  // Minimum 1 damage
-}
-```
-
-**Complete Damage Pipeline:**
-```typescript
-function calculateFinalDamage(
-  attacker: Unit,
-  defender: Unit,
-  ability: Ability,
-  defenderBuffs: Buff[]
-): { damage: number, evaded: boolean, critical: boolean } {
-  // Step 1: Check evasion
-  const evaded = attemptEvasion(defender, attacker, defenderBuffs);
-  if (evaded) {
-    return { damage: 0, evaded: true, critical: false };
-  }
-
-  // Step 2: Calculate base damage
-  const baseDamage = ability.type === 'physical'
-    ? calculatePhysicalDamage(attacker, defender, ability)
-    : calculateMagicalDamage(attacker, defender, ability);
-
-  // Step 3: Check critical hit
-  const isCritical = Math.random() < 0.1;  // 10% crit chance
-  const critMultiplier = isCritical ? 1.5 : 1.0;
-
-  // Step 4: Apply elemental resistance
-  const resistedDamage = applyElementalResistance(baseDamage, defender, ability);
-
-  // Step 5: Apply critical multiplier
-  const finalDamage = Math.floor(resistedDamage * critMultiplier);
-
-  return {
-    damage: Math.max(1, finalDamage),
-    evaded: false,
-    critical: isCritical
-  };
-}
-```
-
 ---
 
 ## 7. RECRUITMENT SYSTEM
@@ -2358,7 +1298,19 @@ const PARTY_RULES = {
   maxTotalUnits: 10,     // Can recruit up to 10 units
   maxActiveParty: 4,     // Only 4 can be in active battle party
   minActiveParty: 1,     // Must have at least 1 active unit
-  benchSize: 6           // Remaining units (10 - 4 = 6 on bench)
+  benchSize: 6,          // Remaining units (10 - 4 = 6 on bench)
+
+  // Djinn management (GLOBAL team system)
+  djinnSlots: 3,              // Team has 3 Djinn slots (GLOBAL)
+  djinnAffectAllUnits: true,  // Equipped Djinn boost entire party
+  djinnCollectionMax: 12,     // Can collect all 12 Djinn
+  djinnEquipmentScreen: "team-based",  // One screen for team (not per-unit)
+
+  // How Djinn bonuses work:
+  // - Player equips 3 Djinn to TEAM slots (not individual units)
+  // - All 4 active party members receive the synergy bonus
+  // - Bench units do NOT receive Djinn bonuses (only active party)
+  // - When party composition changes, Djinn bonuses automatically apply to new active units
 };
 ```
 
@@ -2412,6 +1364,208 @@ const RECRUITMENT_LEVELS = {
   kyle: 5     // Final recruitment (requires high level to unlock)
 };
 ```
+
+### 7.5 NPC Enemy Stats
+
+**🚨 CRITICAL: Stats for recruitable units when fought as enemies**
+
+When the player battles a recruitable NPC (to recruit them), the NPC uses these enemy stats:
+
+```typescript
+const NPC_ENEMY_STATS = {
+  // STARTERS (Level 1-2) - Tutorial difficulty
+  garet_enemy: {
+    level: 2,
+    hp: 135,      // Higher than player's level 1 units
+    pp: 25,
+    atk: 22,
+    def: 9,
+    mag: 8,
+    spd: 10,
+    element: "Mars",
+    abilities: ["Cleave", "Fireball"],
+    aiPattern: "AGGRESSIVE",  // 70% attack, 30% Fireball
+    isBoss: false
+  },
+
+  ivan_enemy: {
+    level: 2,
+    hp: 110,      // Lower HP (mage archetype)
+    pp: 35,
+    atk: 15,
+    def: 7,
+    mag: 24,
+    spd: 14,
+    element: "Jupiter",
+    abilities: ["Slash", "Gust", "Ray"],
+    aiPattern: "CASTER",  // 40% attack, 60% spells
+    isBoss: false
+  },
+
+  // EARLY GAME (Level 2-3)
+  mia_enemy: {
+    level: 3,
+    hp: 120,
+    pp: 40,
+    atk: 16,
+    def: 18,
+    mag: 25,
+    spd: 12,
+    element: "Mercury",
+    abilities: ["Slash", "Ply", "Frost"],
+    aiPattern: "HEALER",  // 30% attack, 40% Frost, 30% self-heal
+    isBoss: false
+  },
+
+  // MID GAME (Level 3-4)
+  felix_enemy: {
+    level: 4,
+    hp: 137,
+    pp: 30,
+    atk: 29,
+    def: 12,
+    mag: 22,
+    spd: 18,
+    element: "Venus",
+    abilities: ["Slash", "Quake", "Clay Spire"],
+    aiPattern: "BALANCED",  // 50% attack, 50% spells
+    isBoss: false
+  },
+
+  jenna_enemy: {
+    level: 4,
+    hp: 122,
+    pp: 45,
+    atk: 20,
+    def: 10,
+    mag: 32,
+    spd: 15,
+    element: "Mars",
+    abilities: ["Slash", "Fireball", "Volcano"],
+    aiPattern: "AOE_CASTER",  // 30% attack, 70% AoE spells
+    isBoss: false
+  },
+
+  sheba_enemy: {
+    level: 4,
+    hp: 115,
+    pp: 40,
+    atk: 18,
+    def: 14,
+    mag: 28,
+    spd: 20,
+    element: "Jupiter",
+    abilities: ["Slash", "Ray", "Plasma", "Blessing"],
+    aiPattern: "SUPPORT",  // 30% attack, 40% damage spells, 30% buffs
+    isBoss: false
+  },
+
+  // LATE GAME (Level 4-5)
+  piers_enemy: {
+    level: 5,
+    hp: 158,
+    pp: 35,
+    atk: 22,
+    def: 30,
+    mag: 26,
+    spd: 12,
+    element: "Mercury",
+    abilities: ["Slash", "Frost", "Torrent", "Guardian's Stance"],
+    aiPattern: "TANK",  // 40% attack, 30% spells, 30% defensive buffs
+    isBoss: false
+  },
+
+  kraden_enemy: {
+    level: 5,
+    hp: 140,
+    pp: 50,
+    atk: 24,
+    def: 20,
+    mag: 34,
+    spd: 16,
+    element: "Neutral",
+    abilities: ["Slash", "Quake", "Frost", "Thunderclap", "Wish"],
+    aiPattern: "VERSATILE",  // Uses random abilities (neutral element = any)
+    isBoss: false
+  },
+
+  // FINAL RECRUITMENT (Level 5) - Hardest NPC battle
+  kyle_enemy: {
+    level: 5,
+    hp: 198,      // Highest HP of all NPCs
+    pp: 40,
+    atk: 28,
+    def: 22,
+    mag: 30,
+    spd: 18,
+    element: "Mars",
+    abilities: ["Cleave", "Fireball", "Guardian's Stance", "Meteor Strike"],
+    aiPattern: "WARRIOR",  // 60% strong attacks, 40% spells/buffs
+    isBoss: true,  // Treated as mini-boss fight
+    cannotFlee: true  // Cannot flee from Kyle's trial
+  }
+};
+```
+
+**AI Patterns Explained:**
+```typescript
+const AI_PATTERNS = {
+  AGGRESSIVE: {
+    basicAttack: 0.70,   // 70% chance to use physical attack
+    offensiveSpell: 0.30 // 30% chance to use damaging spell
+  },
+
+  CASTER: {
+    basicAttack: 0.40,   // 40% physical
+    offensiveSpell: 0.60 // 60% spells
+  },
+
+  HEALER: {
+    basicAttack: 0.30,
+    offensiveSpell: 0.40,
+    healSelf: 0.30       // Heals when below 50% HP
+  },
+
+  BALANCED: {
+    basicAttack: 0.50,
+    offensiveSpell: 0.50
+  },
+
+  AOE_CASTER: {
+    basicAttack: 0.30,
+    aoeSpell: 0.70       // Prefers multi-target abilities
+  },
+
+  SUPPORT: {
+    basicAttack: 0.30,
+    offensiveSpell: 0.40,
+    buff: 0.30           // Casts buffs on self
+  },
+
+  TANK: {
+    basicAttack: 0.40,
+    offensiveSpell: 0.30,
+    defensiveBuff: 0.30  // Casts defensive buffs
+  },
+
+  VERSATILE: {
+    randomAbility: 1.0   // Picks random ability each turn
+  },
+
+  WARRIOR: {
+    strongAttack: 0.60,  // Prefers physical attacks
+    spell: 0.25,
+    buff: 0.15
+  }
+};
+```
+
+**Difficulty Progression:**
+- **Starters (Lv 1-2):** Easy battles, teach basics
+- **Early (Lv 2-3):** Moderate, introduce healing/buffs
+- **Mid (Lv 3-4):** Challenging, require strategy
+- **Late (Lv 4-5):** Hard, need optimized party
+- **Kyle (Lv 5 Boss):** Hardest NPC, requires full preparation
 
 ---
 
@@ -2830,6 +1984,597 @@ function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
 
 ---
 
+## 12. BATTLE TRANSITION SYSTEM
+
+### 12.1 Transition Triggers
+
+**🚨 CRITICAL: How battles are initiated**
+
+```typescript
+const BATTLE_TRIGGERS = {
+  npcInteraction: {
+    method: "TALK_TO_NPC",  // Walk up and press interact button
+    npcTypes: [
+      "RECRUITABLE_UNIT",    // Isaac, Garet, etc. (battle to recruit)
+      "STORY_BOSS",          // Nox Typhon, etc.
+      "TRAINING_DUMMY"       // Practice battles
+    ]
+  },
+
+  randomEncounters: {
+    enabled: false,  // NO random encounters while walking
+    reasoning: "All battles are NPC-triggered for predictable difficulty"
+  },
+
+  forcedBattles: {
+    method: "STORY_CUTSCENE",  // Scripted story battles
+    examples: ["Tutorial battle", "Final boss cutscene"]
+  }
+};
+```
+
+### 12.2 Transition Animation Sequence
+
+**From Overworld → Battle:**
+
+```typescript
+const BATTLE_TRANSITION_IN = {
+  phase1: {
+    name: "SWIRL",
+    duration: 800,  // 800ms spiral effect
+    effect: "Spiral wipe from center outward",
+    color: "Black with white sparks",
+    skipable: true  // Hold button to skip to phase 3
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Screen fades to solid black"
+  },
+
+  phase3: {
+    name: "FADE_IN_BATTLE",
+    duration: 300,  // 300ms battle screen fades in
+    effect: "Battle background + units appear with fade-in"
+  },
+
+  totalDuration: 1300  // ~1.3 seconds total (if not skipped)
+};
+```
+
+**Skip Behavior:**
+```typescript
+const SKIP_TRANSITION = {
+  holdButton: "CONFIRM",  // Hold X/Enter/Space during transition
+  skipToPhase: "FADE_IN_BATTLE",  // Skip directly to battle appearing
+  minimumDuration: 300  // Must show at least 300ms (can't instant-skip)
+};
+```
+
+### 12.3 Victory Transition Sequence
+
+**From Battle → Overworld:**
+
+```typescript
+const BATTLE_TRANSITION_OUT = {
+  phase1: {
+    name: "VICTORY_FREEZE",
+    duration: 500,  // 500ms - enemies disappear, party strikes victory pose
+    effect: "Freeze frame + victory music starts"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Battle screen fades out"
+  },
+
+  phase3: {
+    name: "REWARDS_SCREEN",
+    duration: 0,  // Variable (player-controlled with Continue button)
+    effect: "Show rewards screen (XP, gold, items, level ups, recruitment)"
+  },
+
+  phase4: {
+    name: "FADE_BLACK_AFTER_REWARDS",
+    duration: 200,  // 200ms fade to black from rewards
+    effect: "Rewards screen fades out"
+  },
+
+  phase5: {
+    name: "FADE_IN_OVERWORLD",
+    duration: 300,  // 300ms overworld fades back in
+    effect: "Return to overworld at same position"
+  },
+
+  totalDuration: "1200 + rewardsTime"  // ~1.2s + however long player views rewards
+};
+```
+
+### 12.4 Defeat Transition Sequence
+
+**From Battle → Game Over:**
+
+```typescript
+const DEFEAT_TRANSITION = {
+  phase1: {
+    name: "DEFEAT_FREEZE",
+    duration: 1000,  // 1 second - party collapses
+    effect: "Units fall down, screen shakes, defeat sound"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 500,  // 500ms slow fade to black
+    effect: "Battle screen fades out slowly"
+  },
+
+  phase3: {
+    name: "GAME_OVER_SCREEN",
+    duration: 0,  // Variable (player-controlled)
+    effect: "Show 'GAME OVER' text + options: 'Continue from last save' or 'Return to title'"
+  },
+
+  totalDuration: "1500 + playerChoice"
+};
+```
+
+### 12.5 Flee Transition Sequence
+
+**From Battle → Overworld (Successful Flee):**
+
+```typescript
+const FLEE_TRANSITION = {
+  phase1: {
+    name: "FLEE_ANIMATION",
+    duration: 800,  // 800ms - party runs off screen
+    effect: "Units run to right side of screen, smoke cloud"
+  },
+
+  phase2: {
+    name: "FADE_BLACK",
+    duration: 200,  // 200ms fade to black
+    effect: "Battle screen fades out"
+  },
+
+  phase3: {
+    name: "FADE_IN_OVERWORLD",
+    duration: 300,  // 300ms overworld fades in
+    effect: "Return to overworld (no rewards, no XP)"
+  },
+
+  totalDuration: 1300  // ~1.3 seconds
+};
+```
+
+**Failed Flee:**
+```typescript
+const FAILED_FLEE = {
+  effect: "NO_TRANSITION",  // Stay in battle
+  message: "Couldn't escape!",
+  penalty: "Wasted turn"  // Enemy gets to act
+};
+```
+
+### 12.6 Battle Background Selection
+
+**🚨 CRITICAL: Which background to show**
+
+```typescript
+const BATTLE_BACKGROUNDS = {
+  default: "vale_grassland",  // Green grass + trees
+
+  locationBased: {
+    "vale-village": "vale_grassland",
+    "sol-sanctum": "temple_interior",
+    "vale-outskirts": "forest_clearing",
+    "healing-house": "house_interior",
+    "final-boss": "void_dimension"  // Special for Nox Typhon
+  },
+
+  selectionRule: "USE_OVERWORLD_LOCATION"  // Look up player's current map area
+};
+```
+
+### 12.7 Battle Music Selection
+
+```typescript
+const BATTLE_MUSIC = {
+  regular: "battle_theme.ogg",  // Standard battle music
+  boss: "boss_battle.ogg",      // For isBoss: true enemies
+  finalBoss: "final_boss.ogg",  // For Nox Typhon specifically
+  victory: "victory_fanfare.ogg"  // Plays during VICTORY_FREEZE phase
+};
+```
+
+### 12.8 Performance Optimization
+
+```typescript
+const TRANSITION_OPTIMIZATION = {
+  preloadAssets: [
+    "battleBackground",  // Load before transition starts
+    "enemySprites",
+    "battleMusic"
+  ],
+
+  unloadAfterBattle: [
+    "battleBackground",  // Unload after returning to overworld
+    "enemySprites"
+  ],
+
+  cacheForSession: [
+    "partySprites",      // Keep party sprites loaded
+    "uiElements"
+  ]
+};
+```
+
+---
+
+## 13. OVERWORLD MECHANICS
+
+### 13.1 Movement System
+
+**🚨 CRITICAL: Player movement specifications**
+
+```typescript
+const OVERWORLD_MOVEMENT = {
+  pixelsPerSecond: 120,  // Movement speed (2 pixels per frame at 60fps)
+  diagonalMovement: true, // Can move diagonally
+  diagonalSpeedCorrection: true,  // √2 correction (prevents faster diagonal)
+
+  controls: {
+    keyboard: ["WASD", "Arrow Keys"],
+    gamepad: ["Left Stick", "D-Pad"]
+  },
+
+  collisionLayers: [
+    "WALLS",      // Buildings, trees, rocks
+    "NPCS",       // Cannot walk through NPCs
+    "TRIGGERS"    // Event triggers (battles, cutscenes)
+  ]
+};
+```
+
+### 13.2 Camera System
+
+```typescript
+const CAMERA_SYSTEM = {
+  followPlayer: true,  // Camera centers on player
+  smoothing: 0.1,      // Lerp factor for smooth follow
+  boundaries: "MAP_EDGES",  // Camera stops at map boundaries
+
+  viewportSize: {
+    width: 240,   // 240px (15 tiles at 16px each)
+    height: 160   // 160px (10 tiles at 16px each)
+  },
+
+  zoomLevel: 3  // 3× scale for pixelPerfect rendering
+};
+```
+
+### 13.3 Encounter System
+
+**🚨 CRITICAL: NO RANDOM ENCOUNTERS!**
+
+```typescript
+const ENCOUNTER_SYSTEM = {
+  randomEncounters: false,  // NO random battles while walking
+
+  battleTriggers: {
+    type: "NPC_ONLY",  // All battles are triggered by talking to NPCs
+    interactButton: "CONFIRM",  // Press X/Enter/Space to initiate
+    npcIndicator: "EXCLAMATION_MARK"  // Visual indicator above battle NPCs
+  },
+
+  reasoning: "Predictable difficulty progression, player controls pacing"
+};
+```
+
+### 13.4 Save Points
+
+```typescript
+const SAVE_POINTS = {
+  type: "INN_ONLY",  // Can only save at inns
+  autoSave: {
+    triggers: [
+      "AFTER_INN_REST",
+      "AFTER_MAJOR_STORY_EVENT",
+      "AFTER_RECRUITMENT",
+      "BEFORE_BOSS_BATTLE"
+    ],
+    singleSlot: true  // Only one auto-save slot
+  }
+};
+```
+
+### 13.5 Map Regions
+
+```typescript
+const MAP_REGIONS = {
+  "vale-village": {
+    name: "Vale Village",
+    size: { width: 40, height: 30 },  // In tiles (16px each)
+    npcs: ["Isaac", "Garet", "Ivan", "Jenna (pre-recruit)"],
+    shops: ["Item Shop", "Armor Shop"],
+    inn: true,
+    battleBackground: "vale_grassland"
+  },
+
+  "vale-outskirts": {
+    name: "Vale Outskirts",
+    size: { width: 50, height: 40 },
+    npcs: ["Felix", "Training Dummy"],
+    shops: [],
+    inn: false,
+    battleBackground: "forest_clearing"
+  },
+
+  "sol-sanctum": {
+    name: "Sol Sanctum",
+    size: { width: 30, height: 50 },
+    npcs: ["Mia", "Kyle (late game)"],
+    shops: [],
+    inn: false,
+    battleBackground: "temple_interior"
+  },
+
+  // ... more regions defined in map data files
+};
+```
+
+---
+
+## 14. SHOP SYSTEM
+
+### 14.1 Shop Types
+
+```typescript
+const SHOP_TYPES = {
+  itemShop: {
+    inventory: ["Consumables only"],
+    items: ["Herb", "Potion", "Antidote", "Elixir"]
+  },
+
+  armorShop: {
+    inventory: ["Equipment only"],
+    items: ["Weapons", "Armor", "Helms", "Boots"]
+  },
+
+  specialShop: {
+    inventory: ["Rare items after story flags"],
+    unlockCondition: "STORY_PROGRESSION"
+  }
+};
+```
+
+### 14.2 Buying System
+
+**🚨 CRITICAL: Purchase mechanics**
+
+```typescript
+const BUYING_SYSTEM = {
+  priceFormula: (item) => item.baseCost,  // Fixed prices (no negotiation)
+  stock: "UNLIMITED",  // Can buy as many as affordable
+
+  requirements: {
+    goldCheck: true,  // Must have enough gold
+    inventorySpace: true  // Must have inventory space (99 max per item)
+  },
+
+  transaction: {
+    goldDeducted: "IMMEDIATELY",
+    itemAdded: "IMMEDIATELY",
+    undoable: false  // Cannot undo purchases
+  }
+};
+```
+
+**Starting Gold:**
+```typescript
+const STARTING_RESOURCES = {
+  gold: 500,  // Player starts with 500 gold
+
+  // Can afford at start:
+  // - Herb (30g) × 10 = 300g
+  // - OR Wooden Sword (50g) + Leather Vest (80g) + 370g remaining
+
+  initialInventory: []  // Starts with no items (must buy from shops)
+};
+```
+
+### 14.3 Selling System
+
+```typescript
+const SELLING_SYSTEM = {
+  enabled: true,  // Players can sell equipment
+
+  sellPriceFormula: (item) => Math.floor(item.baseCost * 0.5),  // 50% back
+
+  canSell: {
+    equipment: true,    // Can sell weapons, armor, helms, boots
+    consumables: false, // Cannot sell Herbs, Potions (use or keep)
+    keyItems: false     // Cannot sell quest items
+  },
+
+  transaction: {
+    goldAdded: "IMMEDIATELY",
+    itemRemoved: "IMMEDIATELY"
+  }
+};
+```
+
+**Example:**
+```typescript
+// Buy Iron Sword for 200g
+player.gold -= 200;
+player.inventory.push("Iron Sword");
+
+// Later, sell Iron Sword
+const sellPrice = Math.floor(200 * 0.5);  // 100g
+player.gold += 100;
+player.inventory.remove("Iron Sword");
+```
+
+### 14.4 Shop Inventory by Location
+
+```typescript
+const SHOP_INVENTORY = {
+  "vale-village-item-shop": {
+    name: "Vale Item Shop",
+    items: [
+      { id: "herb", price: 30, stock: "UNLIMITED" },
+      { id: "potion", price: 60, stock: "UNLIMITED" },
+      { id: "antidote", price: 20, stock: "UNLIMITED" }
+    ],
+    unlockCondition: "ALWAYS"
+  },
+
+  "vale-village-armor-shop": {
+    name: "Vale Armor Shop",
+    items: [
+      { id: "wooden-sword", price: 50, stock: "UNLIMITED" },
+      { id: "leather-vest", price: 80, stock: "UNLIMITED" },
+      { id: "cloth-cap", price: 60, stock: "UNLIMITED" },
+      { id: "leather-boots", price: 70, stock: "UNLIMITED" },
+      // Iron tier unlocks after first boss
+      { id: "iron-sword", price: 200, unlockFlag: "defeated_first_boss" },
+      { id: "iron-armor", price: 300, unlockFlag: "defeated_first_boss" },
+      { id: "iron-helm", price: 150, unlockFlag: "defeated_first_boss" },
+      { id: "iron-boots", price: 100, unlockFlag: "defeated_first_boss" }
+    ]
+  },
+
+  "special-shop": {
+    name: "Legendary Trader",
+    items: [
+      { id: "steel-sword", price: 500, unlockFlag: "recruited_3_units" },
+      { id: "steel-armor", price: 700, unlockFlag: "recruited_3_units" },
+      { id: "steel-helm", price: 400, unlockFlag: "recruited_3_units" },
+      { id: "hyper-boots", price: 750, unlockFlag: "recruited_3_units" },
+      // Legendary tier (very expensive)
+      { id: "sol-blade", price: 10000, unlockFlag: "defeated_kyle" },
+      { id: "dragon-scales", price: 4000, unlockFlag: "defeated_nox_typhon" },
+      { id: "oracles-crown", price: 3500, unlockFlag: "defeated_kyle" },
+      { id: "hermes-sandals", price: 5000, unlockFlag: "recruited_all_units" }
+    ]
+  }
+};
+```
+
+---
+
+## 15. INN SYSTEM
+
+### 15.1 Inn Rest Mechanics
+
+**🚨 CRITICAL: How inns work**
+
+```typescript
+const INN_SYSTEM = {
+  cost: 10,  // 10 gold per rest
+
+  effects: {
+    restoreHP: 1.0,      // Full HP restore (100%)
+    restorePP: 1.0,      // Full PP restore (100%)
+    cureStatusAilments: true,  // Remove poison, burn, freeze, paralyze
+    autoSave: true       // Triggers auto-save after rest
+  },
+
+  requirements: {
+    goldCheck: true,     // Must have at least 10 gold
+    canUseWhen: "OVERWORLD_ONLY"  // Cannot use during battle
+  },
+
+  dialogue: {
+    greeting: "Welcome to the inn! Rest is 10 gold. Would you like to stay?",
+    success: "Have a good rest! (HP/PP fully restored, game saved)",
+    insufficient: "Sorry, you need at least 10 gold to rest here."
+  }
+};
+```
+
+### 15.2 Inn Rest Implementation
+
+```typescript
+function innRest(units: Unit[], playerGold: number): { success: boolean, message: string } {
+  // Check gold requirement
+  if (playerGold < 10) {
+    return {
+      success: false,
+      message: "Insufficient gold. Need 10 gold to rest."
+    };
+  }
+
+  // Deduct cost
+  playerGold -= 10;
+
+  // Restore all units
+  units.forEach(unit => {
+    unit.currentHp = unit.maxHp;  // Full HP
+    unit.currentPp = unit.maxPp;  // Full PP
+    unit.statusAilments = [];     // Clear all status effects
+  });
+
+  // Auto-save
+  saveGame();
+
+  return {
+    success: true,
+    message: "You feel refreshed! HP/PP restored, game saved."
+  };
+}
+```
+
+### 15.3 Inn Locations
+
+```typescript
+const INN_LOCATIONS = {
+  "vale-village-inn": {
+    name: "Vale Inn",
+    location: "vale-village",
+    cost: 10,
+    npcKeeper: "Innkeeper Martha",
+    unlockCondition: "ALWAYS"
+  },
+
+  "sol-sanctum-rest-area": {
+    name: "Sanctum Rest Shrine",
+    location: "sol-sanctum",
+    cost: 10,
+    npcKeeper: "Priestess Aria",
+    unlockCondition: "AFTER_COMPLETING_FIRST_QUEST"
+  }
+
+  // More inns can be added as needed
+};
+```
+
+### 15.4 Free Healing Alternatives
+
+**For player convenience:**
+
+```typescript
+const FREE_HEALING = {
+  homeVisit: {
+    location: "Player's house in Vale Village",
+    effect: "Full HP/PP restore + auto-save",
+    cost: 0,
+    limitation: "Only available at start of game"
+  },
+
+  healerNPC: {
+    location: "Healing House (after recruiting Mia)",
+    effect: "Full HP restore only (no PP)",
+    cost: 0,
+    limitation: "Does not save game"
+  }
+};
+```
+
+---
+
 ## SUMMARY: KEY NUMBERS
 
 **Leveling:**
@@ -2837,9 +2582,12 @@ function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
 - 5 abilities per unit (unlock at levels 1-5)
 
 **Djinn:**
-- 12 total (3 per element)
-- All same element: +12 ATK, +8 DEF
-- Mixed elements: Lower bonuses
+- 12 total collectible (3 per element: Venus, Mars, Mercury, Jupiter)
+- 3 team slots (GLOBAL - affects all 4 party members)
+- Choose 3 from 12 collected (strategic depth!)
+- All same element: ALL units get +12 ATK, +8 DEF
+- Mixed elements: ALL units get balanced bonuses
+- Activation: Powerful effect but team-wide stat penalty for 2 turns
 
 **Equipment:**
 - 4 slots: Weapon, Armor, Helm, Boots
