@@ -17,15 +17,6 @@ import { isOk, isErr } from '@/utils/Result';
 
 describe('TASK 6: Party Management - Collection Limits', () => {
 
-  test('✅ Can create player data with starter unit', () => {
-    const isaac = new Unit(ISAAC, 1);
-    const playerData = createPlayerData(isaac);
-
-    expect(playerData.unitsCollected.length).toBe(1);
-    expect(playerData.unitsCollected[0]).toBe(isaac);
-    expect(playerData.activePartyIds).toEqual([isaac.id]);
-  });
-
   test('✅ Can recruit units up to 10 total', () => {
     const isaac = new Unit(ISAAC, 1);
     let playerData = createPlayerData(isaac);

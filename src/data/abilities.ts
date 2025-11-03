@@ -41,7 +41,7 @@ export const QUAKE: Ability = {
 };
 
 export const CLAY_SPIRE: Ability = {
-  id: 'claySpire',
+  id: 'clay-spire',
   name: 'Clay Spire',
   type: 'psynergy',
   element: 'Venus',
@@ -102,7 +102,7 @@ export const VOLCANO: Ability = {
 };
 
 export const METEOR_STRIKE: Ability = {
-  id: 'meteorStrike',
+  id: 'meteor-strike',
   name: 'Meteor Strike',
   type: 'psynergy',
   element: 'Mars',
@@ -151,7 +151,7 @@ export const FROST: Ability = {
 };
 
 export const ICE_HORN: Ability = {
-  id: 'iceHorn',
+  id: 'ice-horn',
   name: 'Ice Horn',
   type: 'psynergy',
   element: 'Mercury',
@@ -175,7 +175,7 @@ export const WISH: Ability = {
 };
 
 export const GLACIAL_BLESSING: Ability = {
-  id: 'glacialBlessing',
+  id: 'glacial-blessing',
   name: 'Glacial Blessing',
   type: 'healing',
   element: 'Mercury',
@@ -255,7 +255,7 @@ export const BLESSING: Ability = {
 };
 
 export const GUARDIANS_STANCE: Ability = {
-  id: 'guardiansStance',
+  id: 'guardians-stance',
   name: "Guardian's Stance",
   type: 'buff',
   ppCost: 6,
@@ -270,7 +270,7 @@ export const GUARDIANS_STANCE: Ability = {
 };
 
 export const WINDS_FAVOR: Ability = {
-  id: 'windsFavor',
+  id: 'winds-favor',
   name: "Wind's Favor",
   type: 'buff',
   ppCost: 10,
@@ -302,27 +302,34 @@ export const MEGIDDO: Ability = {
  * All abilities indexed by ID
  */
 export const ABILITIES: Record<string, Ability> = {
-  SLASH,
-  CLEAVE,
-  QUAKE,
-  CLAY_SPIRE,
-  RAGNAROK,
-  JUDGMENT,
-  FIREBALL,
-  VOLCANO,
-  METEOR_STRIKE,
-  PYROCLASM,
-  PLY,
-  FROST,
-  ICE_HORN,
-  WISH,
-  GLACIAL_BLESSING,
-  GUST,
-  PLASMA,
-  THUNDERCLAP,
-  TEMPEST,
-  BLESSING,
-  GUARDIANS_STANCE,
-  WINDS_FAVOR,
-  MEGIDDO,
+  // Physical Attacks
+  'slash': SLASH,
+  'cleave': CLEAVE,
+  // Venus (Earth)
+  'quake': QUAKE,
+  'clay-spire': CLAY_SPIRE,
+  'ragnarok': RAGNAROK,
+  'judgment': JUDGMENT,
+  // Mars (Fire)
+  'fireball': FIREBALL,
+  'volcano': VOLCANO,
+  'meteor-strike': METEOR_STRIKE,
+  'pyroclasm': PYROCLASM,
+  // Mercury (Water)
+  'ply': PLY,
+  'frost': FROST,
+  'ice-horn': ICE_HORN,
+  'wish': WISH,
+  'glacial-blessing': GLACIAL_BLESSING,
+  // Jupiter (Wind)
+  'gust': GUST,
+  'plasma': PLASMA,
+  'thunderclap': THUNDERCLAP,
+  'tempest': TEMPEST,
+  // Buffs
+  'blessing': BLESSING,
+  'guardians-stance': GUARDIANS_STANCE,
+  'winds-favor': WINDS_FAVOR,
+  // Legendary
+  'megiddo': MEGIDDO,
 };

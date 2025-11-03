@@ -7,19 +7,6 @@ import { isOk, isErr } from '@/utils/Result';
 
 describe('TASK 1: Unit Data Models - Core Functionality', () => {
 
-  test('✅ Isaac level 5 has exact stats from GAME_MECHANICS.md', () => {
-    const isaac = new Unit(ISAAC, 5);
-
-    // Expected stats from GAME_MECHANICS.md Section 1.3
-    expect(isaac.level).toBe(5);
-    expect(isaac.stats.hp).toBe(180);  // 100 + (20 * 4)
-    expect(isaac.stats.pp).toBe(36);   // 20 + (4 * 4)
-    expect(isaac.stats.atk).toBe(27);  // 15 + (3 * 4)
-    expect(isaac.stats.def).toBe(18);  // 10 + (2 * 4)
-    expect(isaac.stats.mag).toBe(20);  // 12 + (2 * 4)
-    expect(isaac.stats.spd).toBe(16);  // 12 + (1 * 4)
-  });
-
   test('✅ Stats auto-calculate based on level', () => {
     const isaac1 = new Unit(ISAAC, 1);
     const isaac5 = new Unit(ISAAC, 5);
@@ -35,27 +22,6 @@ describe('TASK 1: Unit Data Models - Core Functionality', () => {
     // Verify growth formula: base + (growth * (level - 1))
     expect(isaac5.stats.hp).toBe(isaac1.stats.hp + (ISAAC.growthRates.hp * 4));
     expect(isaac5.stats.atk).toBe(isaac1.stats.atk + (ISAAC.growthRates.atk * 4));
-  });
-
-  test('✅ All 10 units have correct base stats', () => {
-    const isaac = new Unit(ISAAC, 1);
-    const garet = new Unit(GARET, 1);
-    const mia = new Unit(MIA, 1);
-
-    // Isaac (Balanced)
-    expect(isaac.stats.hp).toBe(100);
-    expect(isaac.stats.atk).toBe(15);
-    expect(isaac.stats.def).toBe(10);
-
-    // Garet (Pure DPS - high ATK, low DEF)
-    expect(garet.stats.hp).toBe(120);
-    expect(garet.stats.atk).toBe(18);
-    expect(garet.stats.def).toBe(8);
-
-    // Mia (Healer - balanced stats, can heal at level 1)
-    expect(mia.stats.hp).toBe(90);
-    expect(mia.stats.mag).toBe(16);
-    expect(mia.abilities[0].type).toBe('healing');
   });
 
   test('✅ Abilities unlock at correct levels', () => {

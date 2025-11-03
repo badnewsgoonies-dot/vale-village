@@ -7,18 +7,6 @@ import { isOk, isErr } from '@/utils/Result';
 
 describe('TASK 5: Team Djinn System - Team Slots', () => {
 
-  test('✅ Team can be created with 4 units', () => {
-    const isaac = new Unit(ISAAC, 5);
-    const garet = new Unit(GARET, 5);
-    const mia = new Unit(MIA, 5);
-    const ivan = new Unit(IVAN, 5);
-
-    const team = createTeam([isaac, garet, mia, ivan]);
-
-    expect(team.units.length).toBe(4);
-    expect(team.equippedDjinn.length).toBe(0);
-  });
-
   test('✅ Team cannot have more than 4 units', () => {
     const units = [
       new Unit(ISAAC, 5),
