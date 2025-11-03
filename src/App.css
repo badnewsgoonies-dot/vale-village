@@ -1,0 +1,60 @@
+.App {
+  text-align: center;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.mockup-nav {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.mockup-nav h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.mockup-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.mockup-buttons button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.mockup-buttons button:hover {
+  background: #357abd;
+}
+
+.mockup-buttons button.missing {
+  background: #999;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.mockup-buttons button.missing:hover {
+  background: #777;
+}
