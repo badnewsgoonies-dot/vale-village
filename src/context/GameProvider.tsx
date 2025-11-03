@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { GameContext } from './GameContext';
-import type { GameState, Screen } from './types';
+import type { GameState, Screen, StoryFlags } from './types';
 import type { PlayerData } from '@/types/PlayerData';
 import { Unit } from '@/types/Unit';
 import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
@@ -10,6 +10,8 @@ import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
+import { getAllQuests } from '@/data/quests';
+import { updateObjectiveProgress } from '@/types/Quest';
 
 // Convert Enemy to Unit for battles
 function enemyToUnit(enemy: Enemy): Unit {
@@ -39,8 +41,39 @@ function createInitialPlayerData(): PlayerData {
     recruitmentFlags: {},
     gold: 100,
     inventory: [],
+    items: {}, // Start with no consumable items
     djinnCollected: [],
     storyFlags: {},
+  };
+}
+
+function createInitialStoryFlags(): StoryFlags {
+  return {
+    intro_seen: false,
+    talked_to_elder_first_time: false,
+    quest_forest_started: false,
+    quest_forest_complete: false,
+    quest_ruins_started: false,
+    quest_ruins_complete: false,
+    defeated_alpha_wolf: false,
+    defeated_golem_king: false,
+    met_mysterious_stranger: false,
+    talked_to_shopkeeper: false,
+    used_inn: false,
+    obtained_djinn_flint: false,
+    obtained_djinn_forge: false,
+    forest_path_unlocked: false,
+    ancient_ruins_unlocked: false,
+    tutorial_battle_complete: false,
+    tutorial_shop_complete: false,
+  };
+}
+
+function createInitialAreaState() {
+  return {
+    openedChests: new Set<string>(),
+    defeatedBosses: new Set<string>(),
+    stepCounter: 0,
   };
 }
 
@@ -48,10 +81,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<GameState>({
     playerData: createInitialPlayerData(),
     currentBattle: null,
-    currentScreen: { type: 'OVERWORLD' },
+    currentScreen: { type: 'TITLE' },
     screenHistory: [],
     loading: false,
     error: null,
+    quests: getAllQuests(),
+    storyFlags: createInitialStoryFlags(),
+    currentLocation: 'vale_village',
+    playerPosition: { x: 10, y: 7 }, // Starting position in Vale Village
+    areaStates: {
+      vale_village: createInitialAreaState(),
+      forest_path: createInitialAreaState(),
+      ancient_ruins: createInitialAreaState(),
+    },
   });
 
   // Navigation
@@ -236,6 +278,311 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('unequipDjinn not yet implemented', djinnId);
   }, []);
 
+  // Quest management
+  const startQuest = useCallback((questId: string) => {
+    setState(prev => ({
+      ...prev,
+      quests: prev.quests.map(q =>
+        q.id === questId ? { ...q, status: 'active' as const } : q
+      ),
+    }));
+  }, []);
+
+  const completeQuest = useCallback((questId: string) => {
+    setState(prev => {
+      const quest = prev.quests.find(q => q.id === questId);
+      if (!quest) return prev;
+
+      // Give rewards
+      const newGold = prev.playerData.gold + quest.rewards.gold;
+      const newInventory = [...prev.playerData.inventory, ...quest.rewards.items];
+
+      // Add Djinn if reward includes one
+      const newDjinnCollected = quest.rewards.djinn
+        ? [...prev.playerData.djinnCollected, quest.rewards.djinn]
+        : prev.playerData.djinnCollected;
+
+      // Mark quest as complete
+      const updatedQuests = prev.quests.map(q =>
+        q.id === questId ? { ...q, status: 'completed' as const } : q
+      );
+
+      // Unlock next quests if any
+      const questsToUnlock = quest.unlocksQuestIds || [];
+      const finalQuests = updatedQuests.map(q =>
+        questsToUnlock.includes(q.id) ? { ...q, status: 'active' as const } : q
+      );
+
+      return {
+        ...prev,
+        quests: finalQuests,
+        playerData: {
+          ...prev.playerData,
+          gold: newGold,
+          inventory: newInventory,
+          djinnCollected: newDjinnCollected,
+        },
+      };
+    });
+  }, []);
+
+  const updateQuestObjective = useCallback(
+    (questId: string, objectiveId: string, increment: number = 1) => {
+      setState(prev => {
+        const quest = prev.quests.find(q => q.id === questId);
+        if (!quest || quest.status !== 'active') return prev;
+
+        const updatedQuests = prev.quests.map(q => {
+          if (q.id !== questId) return q;
+
+          const updatedObjectives = q.objectives.map(obj =>
+            obj.id === objectiveId ? updateObjectiveProgress(obj, increment) : obj
+          );
+
+          // Auto-complete quest if all objectives done
+          const allComplete = updatedObjectives.every(obj => obj.completed);
+
+          return {
+            ...q,
+            objectives: updatedObjectives,
+            status: allComplete ? ('completed' as const) : q.status,
+          };
+        });
+
+        return { ...prev, quests: updatedQuests };
+      });
+    },
+    []
+  );
+
+  // Story flags management
+  const setStoryFlag = useCallback((flag: keyof StoryFlags, value: boolean) => {
+    setState(prev => ({
+      ...prev,
+      storyFlags: {
+        ...prev.storyFlags,
+        [flag]: value,
+      },
+    }));
+  }, []);
+
+  // Location management
+  const setLocation = useCallback((location: string) => {
+    setState(prev => ({
+      ...prev,
+      currentLocation: location,
+    }));
+  }, []);
+
+  // Area management
+  const setPlayerPosition = useCallback((x: number, y: number) => {
+    setState(prev => ({
+      ...prev,
+      playerPosition: { x, y },
+    }));
+  }, []);
+
+  const movePlayer = useCallback((deltaX: number, deltaY: number) => {
+    setState(prev => ({
+      ...prev,
+      playerPosition: {
+        x: prev.playerPosition.x + deltaX,
+        y: prev.playerPosition.y + deltaY,
+      },
+    }));
+  }, []);
+
+  const incrementStepCounter = useCallback(() => {
+    setState(prev => {
+      const areaState = prev.areaStates[prev.currentLocation];
+      if (!areaState) return prev;
+
+      return {
+        ...prev,
+        areaStates: {
+          ...prev.areaStates,
+          [prev.currentLocation]: {
+            ...areaState,
+            stepCounter: areaState.stepCounter + 1,
+          },
+        },
+      };
+    });
+  }, []);
+
+  const openTreasureChest = useCallback((chestId: string) => {
+    setState(prev => {
+      const areaState = prev.areaStates[prev.currentLocation];
+      if (!areaState) return prev;
+
+      const newOpenedChests = new Set(areaState.openedChests);
+      newOpenedChests.add(chestId);
+
+      return {
+        ...prev,
+        areaStates: {
+          ...prev.areaStates,
+          [prev.currentLocation]: {
+            ...areaState,
+            openedChests: newOpenedChests,
+          },
+        },
+      };
+    });
+  }, []);
+
+  const defeatBoss = useCallback((bossId: string) => {
+    setState(prev => {
+      const areaState = prev.areaStates[prev.currentLocation];
+      if (!areaState) return prev;
+
+      const newDefeatedBosses = new Set(areaState.defeatedBosses);
+      newDefeatedBosses.add(bossId);
+
+      return {
+        ...prev,
+        areaStates: {
+          ...prev.areaStates,
+          [prev.currentLocation]: {
+            ...areaState,
+            defeatedBosses: newDefeatedBosses,
+          },
+        },
+      };
+    });
+  }, []);
+
+  const changeArea = useCallback((areaId: string, spawnPosition: { x: number; y: number }) => {
+    setState(prev => ({
+      ...prev,
+      currentLocation: areaId,
+      playerPosition: spawnPosition,
+    }));
+  }, []);
+
+  // Shop actions
+  const buyItem = useCallback((itemId: string, quantity: number, cost: number) => {
+    setState(prev => {
+      const totalCost = cost * quantity;
+      if (prev.playerData.gold < totalCost) {
+        return { ...prev, error: 'Not enough gold!' };
+      }
+
+      const currentQuantity = prev.playerData.items[itemId] || 0;
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          gold: prev.playerData.gold - totalCost,
+          items: {
+            ...prev.playerData.items,
+            [itemId]: currentQuantity + quantity,
+          },
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const sellItem = useCallback((itemId: string, quantity: number, sellPrice: number) => {
+    setState(prev => {
+      const currentQuantity = prev.playerData.items[itemId] || 0;
+      if (currentQuantity < quantity) {
+        return { ...prev, error: 'Not enough items to sell!' };
+      }
+
+      const totalEarned = sellPrice * quantity;
+      const newQuantity = currentQuantity - quantity;
+      const newItems = { ...prev.playerData.items };
+
+      if (newQuantity === 0) {
+        delete newItems[itemId];
+      } else {
+        newItems[itemId] = newQuantity;
+      }
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          gold: prev.playerData.gold + totalEarned,
+          items: newItems,
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const buyEquipment = useCallback((equipment: Equipment) => {
+    setState(prev => {
+      if (prev.playerData.gold < equipment.cost) {
+        return { ...prev, error: 'Not enough gold!' };
+      }
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          gold: prev.playerData.gold - equipment.cost,
+          inventory: [...prev.playerData.inventory, equipment],
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const sellEquipment = useCallback((equipmentId: string, sellPrice: number) => {
+    setState(prev => {
+      const equipmentIndex = prev.playerData.inventory.findIndex(e => e.id === equipmentId);
+      if (equipmentIndex === -1) {
+        return { ...prev, error: 'Equipment not found in inventory!' };
+      }
+
+      const newInventory = [...prev.playerData.inventory];
+      newInventory.splice(equipmentIndex, 1);
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          gold: prev.playerData.gold + sellPrice,
+          inventory: newInventory,
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const useItem = useCallback((itemId: string, _targetUnitId: string) => {
+    setState(prev => {
+      const quantity = prev.playerData.items[itemId] || 0;
+      if (quantity === 0) {
+        return { ...prev, error: 'No items to use!' };
+      }
+
+      // Decrease item count
+      const newQuantity = quantity - 1;
+      const newItems = { ...prev.playerData.items };
+
+      if (newQuantity === 0) {
+        delete newItems[itemId];
+      } else {
+        newItems[itemId] = newQuantity;
+      }
+
+      // Apply item effect to target unit (handled by caller in the future)
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          items: newItems,
+        },
+        error: null,
+      };
+    });
+  }, []);
+
   const actions = {
     navigate,
     goBack,
@@ -247,6 +594,27 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     endBattle,
     equipDjinn,
     unequipDjinn,
+    // Quest actions
+    startQuest,
+    completeQuest,
+    updateQuestObjective,
+    // Story flags
+    setStoryFlag,
+    // Location
+    setLocation,
+    // Area management
+    setPlayerPosition,
+    movePlayer,
+    incrementStepCounter,
+    openTreasureChest,
+    defeatBoss,
+    changeArea,
+    // Shop
+    buyItem,
+    sellItem,
+    buyEquipment,
+    sellEquipment,
+    useItem,
   };
 
   return (

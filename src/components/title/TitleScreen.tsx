@@ -24,7 +24,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   const handleNewGame = () => {
-    onNavigate({ type: 'OVERWORLD' });
+    onNavigate({ type: 'INTRO' });
   };
 
   const handleContinue = () => {

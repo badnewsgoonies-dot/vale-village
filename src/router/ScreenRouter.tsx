@@ -5,7 +5,10 @@ import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
-import { OverworldScreen } from '@/components/overworld';
+import { NewOverworldScreen } from '@/components/overworld/NewOverworldScreen';
+import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
+import { ShopScreen } from '@/components/shop/ShopScreen';
+import { IntroScreen } from '@/components/intro/IntroScreen';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -21,6 +24,9 @@ export const ScreenRouter: React.FC = () => {
           onStartBattle={actions.startBattle}
         />
       );
+
+    case 'INTRO':
+      return <IntroScreen />;
 
     case 'UNIT_COLLECTION': {
       // Get actual Unit instances
@@ -82,23 +88,22 @@ export const ScreenRouter: React.FC = () => {
     case 'BATTLE':
       return <BattleScreen />;
 
-    case 'OVERWORLD': {
-      const playerParty = state.playerData.unitsCollected.filter(
-        unit => state.playerData.activePartyIds.includes(unit.id)
-      );
-
-      return (
-        <OverworldScreen
-          playerParty={playerParty}
-          onNavigate={actions.navigate}
-          onStartBattle={actions.startBattle}
-        />
-      );
-    }
+    case 'OVERWORLD':
+      return <NewOverworldScreen />;
 
     case 'DJINN_MENU':
       // TODO: Djinn menu (not yet implemented)
       return <div className="placeholder-screen">Djinn Menu - Coming Soon</div>;
+
+    case 'QUEST_LOG':
+      return <QuestLogScreen />;
+
+    case 'SHOP':
+      return <ShopScreen />;
+
+    case 'DIALOGUE':
+      // TODO: Dialogue screen (not yet implemented)
+      return <div className="placeholder-screen">Dialogue - Coming Soon</div>;
 
     default:
       return <div className="error-screen">Unknown screen: {JSON.stringify(screen)}</div>;

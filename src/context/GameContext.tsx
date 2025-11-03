@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { GameState, Screen } from './types';
+import type { GameState, Screen, StoryFlags } from './types';
 import type { Equipment } from '@/types/Equipment';
 import type { Djinn } from '@/types/Djinn';
 
@@ -23,6 +23,32 @@ export interface GameActions {
   startBattle: (enemyIds: string[]) => void;
   executeTurn: (abilityId: string, targetId: string) => void;
   endBattle: () => void;
+
+  // Quests
+  startQuest: (questId: string) => void;
+  completeQuest: (questId: string) => void;
+  updateQuestObjective: (questId: string, objectiveId: string, increment?: number) => void;
+
+  // Story flags
+  setStoryFlag: (flag: keyof StoryFlags, value: boolean) => void;
+
+  // Location
+  setLocation: (location: string) => void;
+
+  // Area management
+  setPlayerPosition: (x: number, y: number) => void;
+  movePlayer: (deltaX: number, deltaY: number) => void;
+  incrementStepCounter: () => void;
+  openTreasureChest: (chestId: string) => void;
+  defeatBoss: (bossId: string) => void;
+  changeArea: (areaId: string, spawnPosition: { x: number; y: number }) => void;
+
+  // Shop
+  buyItem: (itemId: string, quantity: number, cost: number) => void;
+  sellItem: (itemId: string, quantity: number, sellPrice: number) => void;
+  buyEquipment: (equipment: Equipment) => void;
+  sellEquipment: (equipmentId: string, sellPrice: number) => void;
+  useItem: (itemId: string, targetUnitId: string) => void;
 }
 
 export interface GameContextValue {
