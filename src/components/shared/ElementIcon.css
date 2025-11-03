@@ -1,0 +1,64 @@
+.element-icon {
+  border-radius: 50%;
+  border: 2px solid var(--color-border-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  flex-shrink: 0;
+}
+
+.element-icon-tiny {
+  width: 12px;
+  height: 12px;
+  font-size: 6px;
+  border-width: 1px;
+}
+
+.element-icon-small {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+}
+
+.element-icon-medium {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.element-icon-large {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.element-venus {
+  background: var(--color-venus);
+  color: #000;
+}
+
+.element-mars {
+  background: var(--color-mars);
+  color: var(--color-text-primary);
+}
+
+.element-mercury {
+  background: var(--color-mercury);
+  color: var(--color-text-primary);
+}
+
+.element-jupiter {
+  background: var(--color-jupiter);
+  color: var(--color-text-primary);
+}
+
+.element-neutral {
+  background: linear-gradient(45deg,
+    var(--color-venus) 0%,
+    var(--color-mars) 25%,
+    var(--color-mercury) 50%,
+    var(--color-jupiter) 75%,
+    var(--color-venus) 100%);
+  color: var(--color-text-primary);
+}

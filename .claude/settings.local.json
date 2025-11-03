@@ -11,7 +11,13 @@
       "Bash(npx vitest:*)",
       "Bash(powershell -Command \"Get-Content tests\\unit\\Unit.test.ts | Measure-Object -Line\")",
       "Bash(cat:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(/tmp/unit-collection-fixed.html)",
+      "Bash(/tmp/role5-fixed.md)",
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(xargs -I {} sh -c 'count=$(find {} -type f 2>/dev/null | wc -l); echo \"\"\"\"$(basename {}): $count\"\"\"\"')"
     ],
     "deny": [],
     "ask": []
