@@ -30,7 +30,7 @@ import {
 
 /**
  * Isaac (Venus - Balanced Warrior)
- * From GAME_MECHANICS.md Section 1.3
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const ISAAC: UnitDefinition = {
   id: 'isaac',
@@ -39,7 +39,7 @@ export const ISAAC: UnitDefinition = {
   role: 'Balanced Warrior',
   baseStats: {
     hp: 100,
-    pp: 20,
+    pp: 24,
     atk: 15,
     def: 10,
     mag: 12,
@@ -47,7 +47,7 @@ export const ISAAC: UnitDefinition = {
   },
   growthRates: {
     hp: 20,
-    pp: 4,
+    pp: 3,
     atk: 3,
     def: 2,
     mag: 2,
@@ -65,6 +65,7 @@ export const ISAAC: UnitDefinition = {
 
 /**
  * Garet (Mars - Pure DPS)
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const GARET: UnitDefinition = {
   id: 'garet',
@@ -167,6 +168,7 @@ export const MIA: UnitDefinition = {
 
 /**
  * Felix (Venus - Rogue Assassin)
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const FELIX: UnitDefinition = {
   id: 'felix',
@@ -201,6 +203,7 @@ export const FELIX: UnitDefinition = {
 
 /**
  * Jenna (Mars - AoE Fire Mage)
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const JENNA: UnitDefinition = {
   id: 'jenna',
@@ -269,6 +272,7 @@ export const SHEBA: UnitDefinition = {
 
 /**
  * Piers (Mercury - Defensive Tank)
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const PIERS: UnitDefinition = {
   id: 'piers',
@@ -303,6 +307,7 @@ export const PIERS: UnitDefinition = {
 
 /**
  * Kraden (Neutral - Versatile Scholar)
+ * Stats from GAME_MECHANICS.md Section 1.3
  */
 export const KRADEN: UnitDefinition = {
   id: 'kraden',
