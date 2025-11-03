@@ -79,8 +79,8 @@ describe('🎯 INTEGRATION: Full System Integration', () => {
     // Then Djinn don't add to HP in the stat calculation (only ATK/DEF/etc)
     expect(stats.hp).toBe(200); // 180 base + 20 armor (Djinn don't add HP)
 
-    // Base ATK 27 + Iron Sword 12 + (3 Venus Djinn × 4 ATK/Djinn) = 51 ATK
-    expect(stats.atk).toBe(51);
+    // Base ATK 26 + Iron Sword 12 + (3 Venus Djinn × 4 ATK/Djinn) = 50 ATK (BALANCE: 51→50)
+    expect(stats.atk).toBe(50); // BALANCE: Isaac base ATK 27→26
 
     // Base DEF 18 + Iron Armor 10 + (3 Venus Djinn × 3 DEF/Djinn but actually +8 for 3) = 36 DEF
     // Actually: Venus gives +4 ATK, +3 DEF per Djinn when same element
@@ -164,12 +164,12 @@ describe('🎯 INTEGRATION: Full System Integration', () => {
 
     const stats = isaac.calculateStats(updatedTeam);
 
-    // Base stats (L5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
+    // Base stats (L5): HP 180, ATK 26, DEF 18, MAG 20, SPD 16 (BALANCE: ATK 27→26)
     // Equipment: +12 ATK, +15 DEF (+10 armor +5 helm), +10 SPD, +20 HP
     // Djinn (3 Venus, all same element): +12 ATK, +8 DEF (from calculateDjinnSynergy)
 
     expect(stats.hp).toBe(200);  // 180 + 20 (Djinn don't add HP)
-    expect(stats.atk).toBe(51);  // 27 + 12 + 12
+    expect(stats.atk).toBe(50);  // 26 + 12 + 12 (BALANCE: 51→50)
     expect(stats.def).toBe(41);  // 18 + 15 + 8
     expect(stats.spd).toBe(26);  // 16 + 10 + 0 (3 same element Djinn don't add SPD)
 

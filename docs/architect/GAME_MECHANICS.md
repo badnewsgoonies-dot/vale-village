@@ -49,18 +49,18 @@ newStat = baseStat + (growthRate × (level - 1))
 #### Isaac (Venus - Balanced Warrior)
 ```typescript
 const ISAAC_STATS = {
-  base: { hp: 100, pp: 20, atk: 14, def: 10, mag: 12, spd: 12 },
-  growth: { hp: 20, pp: 4, atk: 3, def: 2, mag: 2, spd: 1 },
+  base: { hp: 100, pp: 24, atk: 14, def: 10, mag: 12, spd: 12 },
+  growth: { hp: 20, pp: 3, atk: 3, def: 2, mag: 2, spd: 1 },
 
   byLevel: {
-    1: { hp: 100, pp: 20, atk: 14, def: 10, mag: 12, spd: 12 },
-    2: { hp: 120, pp: 24, atk: 17, def: 12, mag: 14, spd: 13 },
-    3: { hp: 140, pp: 28, atk: 20, def: 14, mag: 16, spd: 14 },
-    4: { hp: 160, pp: 32, atk: 23, def: 16, mag: 18, spd: 15 },
+    1: { hp: 100, pp: 24, atk: 14, def: 10, mag: 12, spd: 12 },
+    2: { hp: 120, pp: 27, atk: 17, def: 12, mag: 14, spd: 13 },
+    3: { hp: 140, pp: 30, atk: 20, def: 14, mag: 16, spd: 14 },
+    4: { hp: 160, pp: 33, atk: 23, def: 16, mag: 18, spd: 15 },
     5: { hp: 180, pp: 36, atk: 26, def: 18, mag: 20, spd: 16 }
   }
 };
-// BALANCE CHANGE: ATK base reduced from 15 to 14 to create unit identity vs Garet
+// BALANCE CHANGES: ATK base 15→14, PP base 20→24, PP growth 4→3 (same L5 PP, better early game)
 ```
 
 #### Garet (Mars - Pure DPS)
@@ -679,11 +679,11 @@ function calculateFinalStats(unit: Unit, team: Team): Stats {
 }
 
 // Example: Isaac Level 5, Iron Sword, Iron Armor, Team has 3 Venus Djinn equipped
-// Base (Lv5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
+// Base (Lv5): HP 180, ATK 26, DEF 18, MAG 20, SPD 16
 // Iron Sword: ATK +12
 // Iron Armor: HP +20, DEF +10
 // 3 Venus Djinn (team): ATK +12, DEF +8 (ALL units get this!)
-// FINAL: HP 200, ATK 51, DEF 36, MAG 20, SPD 16
+// FINAL: HP 200, ATK 50, DEF 36, MAG 20, SPD 16
 //
 // Note: Garet, Mia, and Ivan ALSO get +12 ATK, +8 DEF from the team's 3 Venus Djinn!
 ```

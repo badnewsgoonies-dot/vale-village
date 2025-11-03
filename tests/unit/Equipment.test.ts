@@ -15,7 +15,7 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
 
     isaac.equipItem('weapon', IRON_SWORD);
 
-    expect(isaac.stats.atk).toBe(39); // 27 + 12
+    expect(isaac.stats.atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
   });
 
   test('✅ Armor increases DEF and HP stats', () => {
@@ -45,7 +45,7 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
 
   test('✅ Multiple equipment slots stack bonuses', () => {
     const isaac = new Unit(ISAAC, 5);
-    // Base: HP 180, ATK 27, DEF 18, SPD 16
+    // Base: HP 180, ATK 26, DEF 18, SPD 16 (BALANCE: 27→26)
 
     isaac.equipItem('weapon', IRON_SWORD);  // +12 ATK
     isaac.equipItem('armor', IRON_ARMOR);    // +10 DEF, +20 HP
@@ -53,7 +53,7 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
     isaac.equipItem('boots', IRON_BOOTS);    // +3 SPD
 
     expect(isaac.stats.hp).toBe(200);  // 180 + 20
-    expect(isaac.stats.atk).toBe(39);  // 27 + 12
+    expect(isaac.stats.atk).toBe(38);  // 26 + 12 (BALANCE: 27→26)
     expect(isaac.stats.def).toBe(33);  // 18 + 10 + 5
     expect(isaac.stats.spd).toBe(19);  // 16 + 3
 
@@ -64,24 +64,24 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
     const isaac = new Unit(ISAAC, 5); // ATK 27
 
     isaac.equipItem('weapon', IRON_SWORD);
-    expect(isaac.stats.atk).toBe(39); // 27 + 12
+    expect(isaac.stats.atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
     isaac.unequipItem('weapon');
-    expect(isaac.stats.atk).toBe(27); // Back to base
+    expect(isaac.stats.atk).toBe(26); // Back to base (BALANCE: 27→26)
 
     // ← PROVES unequip works!
   });
 
   test('✅ Replacing equipment swaps bonuses', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Equip Iron Sword
     isaac.equipItem('weapon', IRON_SWORD);
-    expect(isaac.stats.atk).toBe(39); // 27 + 12
+    expect(isaac.stats.atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
     // Replace with Steel Sword
     isaac.equipItem('weapon', STEEL_SWORD);
-    expect(isaac.stats.atk).toBe(47); // 27 + 20
+    expect(isaac.stats.atk).toBe(46); // 26 + 20 (BALANCE: 27→26)
 
     // ← PROVES replacing works!
   });
@@ -251,8 +251,8 @@ describe('CONTEXT-AWARE: Equipment Creates Strategic Choices', () => {
     isaac1.equipItem('boots', IRON_BOOTS);   // +3 SPD
 
     // Compare ATK
-    expect(isaac1.stats.atk).toBe(27);  // 15 + 12
-    expect(isaac5.stats.atk).toBe(27);  // Same!
+    expect(isaac1.stats.atk).toBe(26);  // 14 + 12 (BALANCE: 15→14)
+    expect(isaac5.stats.atk).toBe(26);  // Same!
 
     // Compare DEF
     expect(isaac1.stats.def).toBe(25);  // 10 + 10 + 5
@@ -272,11 +272,11 @@ describe('CONTEXT-AWARE: Equipment Creates Strategic Choices', () => {
     isaac1.equipItem('boots', HERMES_SANDALS);   // +10 SPD
 
     // Lv1 Isaac with legendary gear > Lv5 Garet naked!
-    expect(isaac1.stats.atk).toBe(45);  // 15 + 30
-    expect(garet5.stats.atk).toBe(34);  // Lv5 Pure DPS
+    expect(isaac1.stats.atk).toBe(44);  // 14 + 30 (BALANCE: 15→14)
+    expect(garet5.stats.atk).toBe(31);  // Lv5 Pure DPS (BALANCE: 34→31)
 
     expect(isaac1.stats.def).toBe(70);  // 10 + 35 + 25
-    expect(garet5.stats.def).toBe(12);  // Lv5 Pure DPS
+    expect(garet5.stats.def).toBe(11);  // Lv5 Pure DPS (BALANCE: 12→11)
 
     // ← PROVES legendary equipment breaks power curve!
   });
@@ -298,8 +298,8 @@ describe('CONTEXT-AWARE: Equipment Creates Strategic Choices', () => {
     isaac2.equipItem('boots', IRON_BOOTS);       // +3 SPD (minimal)
 
     // DPS has way more ATK
-    expect(isaac1.stats.atk).toBe(57);  // 27 + 30
-    expect(isaac2.stats.atk).toBe(32);  // 27 + 5
+    expect(isaac1.stats.atk).toBe(56);  // 26 + 30 (BALANCE: 27→26)
+    expect(isaac2.stats.atk).toBe(31);  // 26 + 5 (BALANCE: 27→26)
 
     // Tank has way more DEF
     expect(isaac1.stats.def).toBe(28);  // 18 + 6 + 4
@@ -350,16 +350,16 @@ describe('CONTEXT-AWARE: Equipment Synergy with Other Systems', () => {
   });
 
   test('🎯 Equipment changes affect battle stats immediately', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Simulate mid-battle equipment swap
-    const beforeATK = isaac.stats.atk; // 27
+    const beforeATK = isaac.stats.atk; // 26 (BALANCE: 27→26)
 
     isaac.equipItem('weapon', IRON_SWORD);
-    const midBattleATK = isaac.stats.atk; // 39
+    const midBattleATK = isaac.stats.atk; // 38 (BALANCE: 39→38)
 
     expect(midBattleATK).toBeGreaterThan(beforeATK);
-    expect(midBattleATK).toBe(39);
+    expect(midBattleATK).toBe(38);
 
     // ← PROVES equipment changes are immediate!
   });
@@ -385,12 +385,12 @@ describe('CONTEXT-AWARE: Equipment Synergy with Other Systems', () => {
 describe('EDGE CASES: Equipment System', () => {
 
   test('Empty equipment slots contribute 0', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // All slots empty
     expect(isaac.equipment.weapon).toBeNull();
     expect(isaac.equipment.armor).toBeNull();
-    expect(isaac.stats.atk).toBe(27); // No crash, just base
+    expect(isaac.stats.atk).toBe(26); // No crash, just base (BALANCE: 27→26)
 
     // ← PROVES null safety!
   });
