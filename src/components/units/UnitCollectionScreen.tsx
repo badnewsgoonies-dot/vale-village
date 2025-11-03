@@ -1,44 +1,43 @@
 import React, { useState } from 'react';
 import { Button, ElementIcon, StatBar } from '../shared';
+import { BattleUnit } from '@/sprites/components/BattleUnit';
+import type { Unit } from '@/types/Unit';
 import './UnitCollectionScreen.css';
-
-type Element = 'venus' | 'mars' | 'mercury' | 'jupiter' | 'neutral';
-
-interface Unit {
-  id: string;
-  name: string;
-  level: number;
-  element: Element;
-  class: string;
-  isActive: boolean;
-  stats: {
-    hp: number;
-    pp: number;
-    atk: number;
-    def: number;
-    mag: number;
-    spd: number;
-  };
-  role: string;
-}
 
 interface UnitCollectionScreenProps {
   units: Unit[];
-  onToggleActive?: (unitId: string) => void;
-  onViewEquipment?: (unitId: string) => void;
-  onReturn?: () => void;
+  activeParty: Unit[];
+  onSetActiveParty: (unitIds: string[]) => void;
+  onViewEquipment: (unit: Unit) => void;
+  onReturn: () => void;
 }
 
 export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
   units,
-  onToggleActive,
+  activeParty,
+  onSetActiveParty,
   onViewEquipment,
   onReturn
 }) => {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(units[0] || null);
 
-  const activeCount = units.filter(u => u.isActive).length;
+  const activeCount = activeParty.length;
   const totalCount = units.length;
+
+  const isUnitActive = (unit: Unit) => activeParty.some(u => u.id === unit.id);
+
+  const handleToggleActive = (unit: Unit) => {
+    const isActive = isUnitActive(unit);
+    if (isActive) {
+      // Remove from active party
+      onSetActiveParty(activeParty.filter(u => u.id !== unit.id).map(u => u.id));
+    } else {
+      // Add to active party (max 4)
+      if (activeParty.length < 4) {
+        onSetActiveParty([...activeParty.map(u => u.id), unit.id]);
+      }
+    }
+  };
 
   return (
     <div className="collection-container">
@@ -79,16 +78,16 @@ export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
           {units.map((unit) => (
             <div
               key={unit.id}
-              className={`unit-card ${unit.isActive ? 'active' : ''} ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
+              className={`unit-card ${isUnitActive(unit) ? 'active' : ''} ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
               tabIndex={0}
               role="button"
               aria-pressed={selectedUnit?.id === unit.id}
-              aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element, ${unit.isActive ? 'Active party member' : 'Bench'}`}
+              aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element, ${isUnitActive(unit) ? 'Active party member' : 'Bench'}`}
               onClick={() => setSelectedUnit(unit)}
             >
               <div className="unit-sprite">
                 <ElementIcon element={unit.element} size="small" className="element-badge-positioned" />
-                {unit.name.charAt(0)}
+                <BattleUnit unit={unit} animation="Front" />
               </div>
               <div className="unit-name">{unit.name}</div>
               <div className="unit-level">Lv {unit.level}</div>
@@ -107,7 +106,8 @@ export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
             <div className="selected-unit-preview">
               <div className="preview-sprite">
                 <ElementIcon element={selectedUnit.element} size="small" className="element-badge-positioned" />
-                {selectedUnit.name.charAt(0)}
+                {/* TODO: Remove cast when GameContext provides real Unit types */}
+                <BattleUnit unit={selectedUnit as any} animation="Front" />
               </div>
               <div className="preview-name">{selectedUnit.name}</div>
               <div className="preview-class">{selectedUnit.class}</div>

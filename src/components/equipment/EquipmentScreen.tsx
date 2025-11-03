@@ -1,112 +1,62 @@
 import React, { useState } from 'react';
 import { Button, ElementIcon } from '../shared';
+import { BattleUnit } from '@/sprites/components/BattleUnit';
+import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
+import type { Unit } from '@/types/Unit';
+import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import './EquipmentScreen.css';
-
-type Element = 'venus' | 'mars' | 'mercury' | 'jupiter' | 'neutral';
-
-type EquipmentSlot = 'weapon' | 'armor' | 'helm' | 'boots';
-
-interface Unit {
-  id: string;
-  name: string;
-  level: number;
-  element: Element;
-}
-
-interface EquipmentItem {
-  id: string;
-  name: string;
-  slot: EquipmentSlot;
-  icon: string;
-  stats: {
-    atk?: number;
-    def?: number;
-    spd?: number;
-  };
-}
-
-interface EquippedItems {
-  weapon?: EquipmentItem;
-  armor?: EquipmentItem;
-  helm?: EquipmentItem;
-  boots?: EquipmentItem;
-}
-
-interface UnitEquipment {
-  [unitId: string]: EquippedItems;
-}
 
 interface EquipmentScreenProps {
   units: Unit[];
-  equipment: UnitEquipment;
-  inventory: EquipmentItem[];
-  onEquipItem?: (unitId: string, slot: EquipmentSlot, itemId: string) => void;
-  onUnequipItem?: (unitId: string, slot: EquipmentSlot) => void;
-  onReturn?: () => void;
+  selectedUnit: Unit;
+  inventory: Equipment[];
+  onEquipItem: (unitId: string, slot: EquipmentSlot, equipment: Equipment) => void;
+  onUnequipItem: (unitId: string, slot: EquipmentSlot) => void;
+  onReturn: () => void;
 }
 
 export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   units,
-  equipment,
+  selectedUnit: initialSelectedUnit,
   inventory,
   onEquipItem,
   onUnequipItem,
   onReturn
 }) => {
-  const [selectedUnit, setSelectedUnit] = useState<Unit>(units[0] || null);
-  const [selectedItem, setSelectedItem] = useState<EquipmentItem | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit>(initialSelectedUnit);
+  const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
 
-  const currentEquipment = selectedUnit ? equipment[selectedUnit.id] || {} : {};
+  const currentEquipment = selectedUnit.equipment;
 
   // Calculate stat changes when hovering over an item
-  const calculateStatChange = (item: EquipmentItem | null): { atk: number; def: number; spd: number } => {
-    if (!item || !selectedUnit) {
+  const calculateStatChange = (item: Equipment | null): { atk: number; def: number; spd: number } => {
+    if (!item) {
       return { atk: 0, def: 0, spd: 0 };
     }
 
     const currentItem = currentEquipment[item.slot];
-    const currentStats = currentItem?.stats || { atk: 0, def: 0, spd: 0 };
-    const newStats = item.stats || { atk: 0, def: 0, spd: 0 };
+    const currentBonus = currentItem?.statBonus || {};
+    const newBonus = item.statBonus || {};
 
     return {
-      atk: (newStats.atk || 0) - (currentStats.atk || 0),
-      def: (newStats.def || 0) - (currentStats.def || 0),
-      spd: (newStats.spd || 0) - (currentStats.spd || 0)
+      atk: (newBonus.atk || 0) - (currentBonus.atk || 0),
+      def: (newBonus.def || 0) - (currentBonus.def || 0),
+      spd: (newBonus.spd || 0) - (currentBonus.spd || 0)
     };
   };
 
   const statChanges = calculateStatChange(selectedItem);
 
-  // Calculate current total stats
-  const getCurrentStats = () => {
-    let totalAtk = 45; // Base stats
-    let totalDef = 32;
-    let totalSpd = 28;
+  // Use Unit's calculateStats method
+  const currentStats = selectedUnit.calculateStats();
 
-    Object.values(currentEquipment).forEach(item => {
-      if (item) {
-        totalAtk += item.stats.atk || 0;
-        totalDef += item.stats.def || 0;
-        totalSpd += item.stats.spd || 0;
-      }
-    });
-
-    return { atk: totalAtk, def: totalDef, spd: totalSpd };
-  };
-
-  const currentStats = getCurrentStats();
-
-  const handleEquipItem = (item: EquipmentItem) => {
-    if (selectedUnit) {
-      onEquipItem?.(selectedUnit.id, item.slot, item.id);
-      setSelectedItem(null);
-    }
+  const handleEquipItem = (item: Equipment) => {
+    onEquipItem(selectedUnit.id, item.slot, item);
+    setSelectedItem(null);
   };
 
   const handleUnequipItem = (slot: EquipmentSlot) => {
-    if (selectedUnit) {
-      onUnequipItem?.(selectedUnit.id, slot);
-    }
+    onUnequipItem(selectedUnit.id, slot);
   };
 
   const renderSlot = (slot: EquipmentSlot, label: string) => {
@@ -122,9 +72,11 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
       >
         <div className="slot-label">{label}</div>
         <div className="slot-item">
-          <div className="item-icon" aria-hidden="true">
-            {item ? item.icon : '-'}
-          </div>
+          {item ? (
+            <EquipmentIcon equipment={item} size="medium" className="item-icon" />
+          ) : (
+            <div className="item-icon empty" aria-hidden="true">-</div>
+          )}
           <div className={`item-name ${!item ? 'empty-slot' : ''}`}>
             {item ? item.name : 'Empty'}
           </div>
@@ -152,9 +104,7 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
                 setSelectedItem(null);
               }}
             >
-              <div className="unit-sprite" aria-hidden="true">
-                {unit.name.charAt(0)}
-              </div>
+              <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
               <div className="unit-info">
                 <div className="unit-name">
                   {unit.name}
@@ -250,9 +200,7 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
               onClick={() => setSelectedItem(item)}
               onDoubleClick={() => handleEquipItem(item)}
             >
-              <div className="item-icon" aria-hidden="true">
-                {item.icon}
-              </div>
+              <EquipmentIcon equipment={item} size="medium" className="item-icon" />
               <div className="item-name">{item.name}</div>
             </div>
           ))}

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Button } from '../shared';
+import { BattleUnit } from '@/sprites/components/BattleUnit';
+import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
 import './RewardsScreen.css';
 
 interface RewardItem {
@@ -75,7 +77,8 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
           <div className="items-grid">
             {items.map(item => (
               <div key={item.id} className="item-card">
-                <div className="item-icon" aria-hidden="true">{item.icon}</div>
+                {/* TODO: Replace with real Equipment type when GameContext is ready */}
+                <EquipmentIcon equipment={item as any} size="small" className="item-icon" />
                 <div className="item-name">{item.name}</div>
                 <div className="item-quantity">x{item.quantity}</div>
               </div>
@@ -93,7 +96,8 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
             <div className="sparkle"></div>
             <div className="sparkle"></div>
             <div className="sparkle"></div>
-            {recruitedUnit.sprite}
+            {/* TODO: Replace with real Unit type when GameContext is ready */}
+            <BattleUnit unit={recruitedUnit as any} animation="Front" />
           </div>
           <div className="recruitment-name">{recruitedUnit.name}</div>
           <div className="recruitment-class">{recruitedUnit.class} has joined your party!</div>
@@ -107,7 +111,10 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
           <div className="level-up-units">
             {levelUpUnits.map((unit, index) => (
               <div key={unit.id} className="level-up-unit" style={{ animationDelay: `${0.6 + index * 0.1}s` }}>
-                <div className="level-up-sprite">{unit.sprite}</div>
+                <div className="level-up-sprite">
+                  {/* TODO: Replace with real Unit type when GameContext is ready */}
+                  <BattleUnit unit={unit as any} animation="Front" />
+                </div>
                 <div className="level-up-name">{unit.name}</div>
                 <div className="level-up-arrow">Lv {unit.oldLevel} → Lv {unit.newLevel}</div>
               </div>

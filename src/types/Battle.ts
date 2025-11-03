@@ -1,6 +1,7 @@
 import type { Unit } from './Unit';
 import type { Team } from './Team';
 import type { Ability } from './Ability';
+import type { Stats } from './Stats';
 import { getElementModifier } from './Element';
 import { Ok, Err, type Result } from '@/utils/Result';
 import type { RNG } from '@/utils/SeededRNG';
@@ -325,11 +326,13 @@ export function executeAbility(
       for (const target of targets) {
         if (ability.buffEffect) {
           // Add status effect for each stat modifier
+          // Only include stats that are in the Stats type (filter out 'evasion' etc.)
+          const validStats: Array<keyof Stats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
           for (const [stat, modifier] of Object.entries(ability.buffEffect)) {
-            if (typeof modifier === 'number') {
+            if (typeof modifier === 'number' && validStats.includes(stat as keyof Stats)) {
               target.statusEffects.push({
                 type: ability.type === 'buff' ? 'buff' : 'debuff',
-                stat: stat as keyof typeof ability.buffEffect,
+                stat: stat as keyof Stats,
                 modifier,
                 duration: ability.duration || 3,
               });

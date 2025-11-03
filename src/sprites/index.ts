@@ -14,7 +14,7 @@ export type {
   AnimationState,
   UnitSpriteMapping,
   BattleSprite,
-  EquipmentIcon,
+  EquipmentIcon as EquipmentIconType,
   AbilityIcon
 } from './types';
 

@@ -175,6 +175,66 @@ p {
   font-weight: bold;
 }
 
+/* App Container */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+  overflow: hidden;
+}
+
+/* Title screen styles */
+.title-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 2rem;
+  background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+}
+
+.title-screen h1 {
+  font-size: 3rem;
+  color: var(--color-text-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.title-screen button {
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+  background: var(--color-border-highlight);
+  color: var(--color-text-light);
+  border: 2px solid var(--color-border-light);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.title-screen button:hover {
+  background: var(--color-bg-panel);
+  border-color: var(--color-border-highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Placeholder and error screens */
+.placeholder-screen,
+.error-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 2rem;
+  color: var(--color-text-light);
+  background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+}
+
+.error-screen {
+  color: #ff6b6b;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .App {
@@ -183,6 +243,15 @@ p {
 
   h1 {
     font-size: 1.8rem;
+  }
+
+  .title-screen h1 {
+    font-size: 2rem;
+  }
+
+  .title-screen button {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.5rem;
   }
 
   .mockup-buttons button {
