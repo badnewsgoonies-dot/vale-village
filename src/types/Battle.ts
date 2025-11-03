@@ -3,6 +3,14 @@ import type { Team } from './Team';
 import type { Ability } from './Ability';
 import { getElementModifier } from './Element';
 import { Ok, Err, type Result } from '@/utils/Result';
+import type { RNG } from '@/utils/SeededRNG';
+import { globalRNG } from '@/utils/SeededRNG';
+import {
+  calculateBattleRewards,
+  distributeRewards,
+  type EnemyReward,
+  type RewardDistribution,
+} from './BattleRewards';
 
 /**
  * Battle result types
@@ -60,9 +68,9 @@ export interface BattleState {
 /**
  * Create initial battle state
  */
-export function createBattleState(playerTeam: Team, enemies: Unit[]): BattleState {
+export function createBattleState(playerTeam: Team, enemies: Unit[], rng: RNG = globalRNG): BattleState {
   const allUnits = [...playerTeam.units, ...enemies];
-  const turnOrder = calculateTurnOrder(allUnits);
+  const turnOrder = calculateTurnOrder(allUnits, rng);
 
   return {
     playerTeam,
@@ -82,7 +90,7 @@ export function createBattleState(playerTeam: Team, enemies: Unit[]): BattleStat
  * Highest SPD goes first, with tiebreaker randomization
  * Special case: Hermes' Sandals always go first
  */
-export function calculateTurnOrder(units: Unit[]): Unit[] {
+export function calculateTurnOrder(units: Unit[], rng: RNG = globalRNG): Unit[] {
   // Filter out KO'd units
   const aliveUnits = units.filter(u => !u.isKO);
 
@@ -100,7 +108,7 @@ export function calculateTurnOrder(units: Unit[]): Unit[] {
     const spdDiff = b.stats.spd - a.stats.spd;
     // Tiebreaker: random
     if (spdDiff === 0) {
-      return Math.random() - 0.5;
+      return rng.next() - 0.5;
     }
     return spdDiff;
   });
@@ -113,8 +121,8 @@ export function calculateTurnOrder(units: Unit[]): Unit[] {
  * Get random damage multiplier (±10% variance)
  * From GAME_MECHANICS.md Section 5.2
  */
-export function getRandomMultiplier(): number {
-  return 0.9 + (Math.random() * 0.2);
+export function getRandomMultiplier(rng: RNG = globalRNG): number {
+  return 0.9 + (rng.next() * 0.2);
 }
 
 /**
@@ -124,13 +132,13 @@ export function getRandomMultiplier(): number {
  * Base 5% + 0.2% per SPD point
  * Critical hits deal 2.0x damage
  */
-export function checkCriticalHit(attacker: Unit): boolean {
+export function checkCriticalHit(attacker: Unit, rng: RNG = globalRNG): boolean {
   const BASE_CRIT_CHANCE = 0.05;
   const SPEED_BONUS = attacker.stats.spd * 0.002;
 
   const totalChance = BASE_CRIT_CHANCE + SPEED_BONUS;
 
-  return Math.random() < totalChance;
+  return rng.next() < totalChance;
 }
 
 /**
@@ -142,14 +150,15 @@ export function checkCriticalHit(attacker: Unit): boolean {
 export function calculatePhysicalDamage(
   attacker: Unit,
   defender: Unit,
-  ability: Ability
+  ability: Ability,
+  rng: RNG = globalRNG
 ): number {
   const baseDamage = ability.basePower || attacker.stats.atk;
   const attackPower = attacker.stats.atk;
   const defense = defender.stats.def;
 
   const damage = Math.floor(
-    (baseDamage + attackPower - (defense * 0.5)) * getRandomMultiplier()
+    (baseDamage + attackPower - (defense * 0.5)) * getRandomMultiplier(rng)
   );
 
   return Math.max(1, damage);
@@ -165,7 +174,8 @@ export function calculatePhysicalDamage(
 export function calculatePsynergyDamage(
   attacker: Unit,
   defender: Unit,
-  ability: Ability
+  ability: Ability,
+  rng: RNG = globalRNG
 ): number {
   const basePower = ability.basePower || 0;
   const magicPower = attacker.stats.mag;
@@ -177,30 +187,39 @@ export function calculatePsynergyDamage(
     : 1.0;
 
   const damage = Math.floor(
-    (basePower + magicPower - magicDefense) * elementModifier * getRandomMultiplier()
+    (basePower + magicPower - magicDefense) * elementModifier * getRandomMultiplier(rng)
   );
 
   return Math.max(1, damage);
 }
 
 /**
- * Calculate healing amount
+ * Calculate healing amount (Bug #13 fix)
  * From GAME_MECHANICS.md Section 5.2
  *
  * Formula: (basePower + MAG) × randomMultiplier
  */
 export function calculateHealAmount(
   caster: Unit,
-  ability: Ability
+  ability: Ability,
+  rng: RNG = globalRNG
 ): number {
   const baseHeal = ability.basePower || 0;
+
+  // CRITICAL: Validate healing abilities have non-negative power
+  if (baseHeal < 0) {
+    console.error(`Healing ability ${ability.name} has negative basePower: ${baseHeal}`);
+    return 0; // Clamp to 0 (safer than throwing error)
+  }
+
   const magicPower = caster.stats.mag;
 
   const healAmount = Math.floor(
-    (baseHeal + magicPower) * getRandomMultiplier()
+    (baseHeal + magicPower) * getRandomMultiplier(rng)
   );
 
-  return healAmount;
+  // ALWAYS clamp final result to minimum 0
+  return Math.max(0, healAmount);
 }
 
 /**
@@ -213,10 +232,19 @@ export function calculateHealAmount(
 export function executeAbility(
   caster: Unit,
   ability: Ability,
-  targets: Unit[]
+  targets: Unit[],
+  rng: RNG = globalRNG
 ): ActionResult {
   const targetIds = targets.map(t => t.id);
   let message = `${caster.name} uses ${ability.name}!`;
+
+  // CRITICAL: Validate PP cost is non-negative (Bug #12 fix)
+  if (ability.ppCost < 0) {
+    return {
+      message: `Invalid ability: ${ability.name} has negative PP cost ${ability.ppCost}`,
+      targetIds: [],
+    };
+  }
 
   // Check PP cost
   if (ability.ppCost > caster.currentPp) {
@@ -226,12 +254,12 @@ export function executeAbility(
     };
   }
 
-  // Deduct PP cost
-  caster.currentPp = Math.max(0, caster.currentPp - ability.ppCost);
+  // Deduct PP cost (safe now - we validated ppCost >= 0)
+  caster.currentPp -= ability.ppCost;
 
   // Check for critical hit (physical and psynergy only)
   const isCritical = (ability.type === 'physical' || ability.type === 'psynergy')
-    && checkCriticalHit(caster);
+    && checkCriticalHit(caster, rng);
 
   // Execute based on ability type
   switch (ability.type) {
@@ -241,8 +269,8 @@ export function executeAbility(
 
       for (const target of targets) {
         let damage = ability.type === 'physical'
-          ? calculatePhysicalDamage(caster, target, ability)
-          : calculatePsynergyDamage(caster, target, ability);
+          ? calculatePhysicalDamage(caster, target, ability, rng)
+          : calculatePsynergyDamage(caster, target, ability, rng);
 
         // Apply critical hit multiplier
         if (isCritical) {
@@ -269,13 +297,16 @@ export function executeAbility(
       let totalHealing = 0;
 
       for (const target of targets) {
-        const healAmount = calculateHealAmount(caster, ability);
-        const actualHealing = target.heal(healAmount);
-        totalHealing += actualHealing;
-
-        // Check if ability revives fallen allies
+        // CRITICAL: Handle revival separately (Bug #16 fix)
         if (ability.revivesFallen && target.isKO) {
+          // Revival ONLY sets to 50% HP (doesn't add healing on top)
           target.currentHp = Math.floor(target.maxHp * 0.5);
+          totalHealing += target.currentHp; // Count revival healing
+        } else {
+          // Normal healing (only works on alive units after Bug #6 fix)
+          const healAmount = calculateHealAmount(caster, ability, rng);
+          const actualHealing = target.heal(healAmount);
+          totalHealing += actualHealing;
         }
       }
 
@@ -347,7 +378,8 @@ export function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleR
 export function attemptFlee(
   playerUnits: Unit[],
   enemyUnits: Unit[],
-  isBossBattle: boolean = false
+  isBossBattle: boolean = false,
+  rng: RNG = globalRNG
 ): Result<boolean, string> {
   // Cannot flee from boss battles
   if (isBossBattle) {
@@ -372,7 +404,7 @@ export function attemptFlee(
   // Clamp between 10% and 90%
   const finalChance = Math.max(0.1, Math.min(0.9, fleeChance));
 
-  const success = Math.random() < finalChance;
+  const success = rng.next() < finalChance;
 
   return Ok(success);
 }
@@ -381,7 +413,7 @@ export function attemptFlee(
  * Advance to next turn
  * Updates turn order, processes status effects, and checks for battle end
  */
-export function advanceBattleTurn(state: BattleState): BattleState {
+export function advanceBattleTurn(state: BattleState, rng: RNG = globalRNG): BattleState {
   // Move to next actor
   let nextIndex = state.currentActorIndex + 1;
 
@@ -391,7 +423,7 @@ export function advanceBattleTurn(state: BattleState): BattleState {
 
     // Recalculate turn order (some units may be KO'd)
     const allUnits = [...state.playerTeam.units, ...state.enemies];
-    const newTurnOrder = calculateTurnOrder(allUnits);
+    const newTurnOrder = calculateTurnOrder(allUnits, rng);
 
     // Increment turn counter
     const newTurn = state.currentTurn + 1;
@@ -439,4 +471,59 @@ export function restorePPAfterBattle(units: Unit[]): void {
   for (const unit of units) {
     unit.currentPp = unit.maxPp;
   }
+}
+
+/**
+ * Process battle victory and calculate rewards
+ *
+ * Called when battle ends with PLAYER_VICTORY result.
+ * This function integrates the Battle system with the Battle Rewards system.
+ *
+ * Process:
+ * 1. Convert defeated enemies to EnemyReward data
+ * 2. Check if all party members survived
+ * 3. Calculate XP and Gold rewards
+ * 4. Distribute rewards to party
+ * 5. Restore PP after battle
+ *
+ * @param battle - Current battle state (must have ended with victory)
+ * @param rng - RNG instance for deterministic testing
+ * @returns Distribution result with level-up events and rewards
+ */
+export function processBattleVictory(
+  battle: BattleState,
+  rng: RNG = globalRNG
+): RewardDistribution {
+  // Verify battle is actually won
+  if (battle.status !== BattleResult.PLAYER_VICTORY && battle.status !== 'ongoing') {
+    throw new Error('Can only process rewards for player victory');
+  }
+
+  // Convert enemies to reward data
+  const enemyRewards: EnemyReward[] = battle.enemies.map(enemy => ({
+    baseXp: 20, // Default values - in real game, would come from enemy definition
+    baseGold: 15,
+    level: enemy.level,
+  }));
+
+  // Check survival status
+  const alivePlayerUnits = battle.playerTeam.units.filter(u => !u.isKO);
+  const allSurvived = alivePlayerUnits.length === battle.playerTeam.units.length;
+  const survivorCount = alivePlayerUnits.length;
+
+  // Calculate rewards
+  const rewards = calculateBattleRewards(
+    enemyRewards,
+    allSurvived,
+    survivorCount,
+    rng
+  );
+
+  // Distribute rewards
+  const distribution = distributeRewards(battle.playerTeam, rewards);
+
+  // Restore PP after battle
+  restorePPAfterBattle(battle.playerTeam.units);
+
+  return distribution;
 }
