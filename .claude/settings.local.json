@@ -26,7 +26,8 @@
       "Bash(git push:*)",
       "Bash(git config:*)",
       "Bash(lsof:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(gh --version:*)"
     ],
     "deny": [],
     "ask": []
