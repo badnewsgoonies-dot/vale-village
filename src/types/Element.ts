@@ -1,7 +1,10 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 <<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 /**
  * Four elemental types from Golden Sun + Neutral
@@ -38,7 +41,10 @@ export function getElementModifier(attackElement: Element, defenseElement: Eleme
 }
 =======
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD
 /**
  * Four elemental types from Golden Sun + Neutral
@@ -73,6 +79,9 @@ export function getElementModifier(attackElement: Element, defenseElement: Eleme
 
   return 1.0; // Neutral
 }
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 /**
@@ -110,6 +119,9 @@ export function getElementModifier(attackElement: Element, defenseElement: Eleme
 }
 >>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 >>>>>>> Stashed changes
