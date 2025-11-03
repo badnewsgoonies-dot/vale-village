@@ -203,6 +203,37 @@ describe('TASK 6: Active Party Selection', () => {
     }
   });
 
+<<<<<<< HEAD
+=======
+  test('✅ getActiveParty returns correct units', () => {
+    const isaac = new Unit(ISAAC, 1);
+    let playerData = createPlayerData(isaac);
+    playerData = recruitUnit(playerData, new Unit(GARET, 1)).value as typeof playerData;
+    playerData = recruitUnit(playerData, new Unit(MIA, 2)).value as typeof playerData;
+
+    playerData = setActiveParty(playerData, [isaac.id, 'garet']).value as typeof playerData;
+
+    const activeParty = getActiveParty(playerData);
+    expect(activeParty.length).toBe(2);
+    expect(activeParty[0].id).toBe(isaac.id);
+    expect(activeParty[1].id).toBe('garet');
+  });
+
+  test('✅ getBenchUnits returns units not in active party', () => {
+    const isaac = new Unit(ISAAC, 1);
+    let playerData = createPlayerData(isaac);
+    playerData = recruitUnit(playerData, new Unit(GARET, 1)).value as typeof playerData;
+    playerData = recruitUnit(playerData, new Unit(MIA, 2)).value as typeof playerData;
+    playerData = recruitUnit(playerData, new Unit(IVAN, 1)).value as typeof playerData;
+
+    playerData = setActiveParty(playerData, [isaac.id, 'garet']).value as typeof playerData;
+
+    const benchUnits = getBenchUnits(playerData);
+    expect(benchUnits.length).toBe(2);
+    expect(benchUnits.some(u => u.id === 'mia')).toBe(true);
+    expect(benchUnits.some(u => u.id === 'ivan')).toBe(true);
+  });
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
 });
 
 describe('TASK 6: Starter Selection', () => {

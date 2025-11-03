@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "screen": "equipment-screen",
   "description": "Sprite map for Equipment Management screen - gear slots, inventory, and stat comparison",
@@ -258,3 +259,265 @@
     "Color coding matches element types (Venus=orange, Mars=red, Jupiter=purple)"
   ]
 }
+=======
+{
+  "screen": "equipment-screen",
+  "description": "Sprite map for Equipment Management screen - gear slots, inventory, and stat comparison",
+  "lastUpdated": "2025-11-02",
+  "sprites": {
+    "characters": [
+      {
+        "id": "isaac-portrait",
+        "name": "Isaac",
+        "element": "venus",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/isaac/isaac_front.gif",
+        "size": "32x32",
+        "usage": "Unit selector portrait",
+        "notes": "Earth element adept, starter choice A"
+      },
+      {
+        "id": "garet-portrait",
+        "name": "Garet",
+        "element": "mars",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/garet/garet_front.gif",
+        "size": "32x32",
+        "usage": "Unit selector portrait",
+        "notes": "Fire element adept, starter choice B"
+      },
+      {
+        "id": "ivan-portrait",
+        "name": "Ivan",
+        "element": "jupiter",
+        "path": "NextEraGame/public/sprites/golden-sun/overworld/ivan/ivan_front.gif",
+        "size": "32x32",
+        "usage": "Unit selector portrait",
+        "notes": "Wind element adept, starter choice C"
+      }
+    ],
+    "equipment": {
+      "weapons": [
+        {
+          "id": "longsword",
+          "name": "Longsword",
+          "type": "weapon",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/longsword.png",
+          "size": "24x24",
+          "usage": "Isaac's starting weapon",
+          "stats": {
+            "atk": "+12"
+          }
+        },
+        {
+          "id": "broad-sword",
+          "name": "Broad Sword",
+          "type": "weapon",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/broad_sword.png",
+          "size": "24x24",
+          "usage": "Inventory item (upgrade option)",
+          "stats": {
+            "atk": "+19"
+          }
+        },
+        {
+          "id": "battle-axe",
+          "name": "Battle Axe",
+          "type": "weapon",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/battle_axe.png",
+          "size": "24x24",
+          "usage": "Garet's weapon type",
+          "stats": {
+            "atk": "+25"
+          }
+        },
+        {
+          "id": "wooden-staff",
+          "name": "Wooden Staff",
+          "type": "weapon",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/wooden_staff.png",
+          "size": "24x24",
+          "usage": "Ivan's weapon type",
+          "stats": {
+            "atk": "+8",
+            "psy": "+5"
+          }
+        }
+      ],
+      "armor": [
+        {
+          "id": "leather-vest",
+          "name": "Leather Vest",
+          "type": "armor",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/leather_vest.png",
+          "size": "24x24",
+          "usage": "Isaac's starting armor",
+          "stats": {
+            "def": "+8"
+          }
+        },
+        {
+          "id": "steel-armor",
+          "name": "Steel Armor",
+          "type": "armor",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/steel_armor.png",
+          "size": "24x24",
+          "usage": "Inventory item (upgrade)",
+          "stats": {
+            "def": "+18"
+          }
+        },
+        {
+          "id": "chain-mail",
+          "name": "Chain Mail",
+          "type": "armor",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/chain_mail.png",
+          "size": "24x24",
+          "usage": "Inventory item",
+          "stats": {
+            "def": "+14"
+          }
+        }
+      ],
+      "helms": [
+        {
+          "id": "iron-helm",
+          "name": "Iron Helm",
+          "type": "helm",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/helms/iron_helm.png",
+          "size": "24x24",
+          "usage": "Inventory item",
+          "stats": {
+            "def": "+6"
+          }
+        },
+        {
+          "id": "leather-cap",
+          "name": "Leather Cap",
+          "type": "helm",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/helms/leather_cap.png",
+          "size": "24x24",
+          "usage": "Inventory item",
+          "stats": {
+            "def": "+3"
+          }
+        }
+      ],
+      "boots": [
+        {
+          "id": "hermes-boots",
+          "name": "Hermes Boots",
+          "type": "boots",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/boots/hermes_boots.png",
+          "size": "24x24",
+          "usage": "Inventory item (speed boost)",
+          "stats": {
+            "spd": "+10",
+            "def": "+2"
+          }
+        }
+      ]
+    },
+    "ui": {
+      "icons": [
+        {
+          "id": "weapon-slot-icon",
+          "name": "Weapon Slot",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/weapon_slot.png",
+          "size": "16x16",
+          "usage": "Equipment slot indicator"
+        },
+        {
+          "id": "armor-slot-icon",
+          "name": "Armor Slot",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/armor_slot.png",
+          "size": "16x16",
+          "usage": "Equipment slot indicator"
+        },
+        {
+          "id": "helm-slot-icon",
+          "name": "Helm Slot",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/helm_slot.png",
+          "size": "16x16",
+          "usage": "Equipment slot indicator"
+        },
+        {
+          "id": "boots-slot-icon",
+          "name": "Boots Slot",
+          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/boots_slot.png",
+          "size": "16x16",
+          "usage": "Equipment slot indicator"
+        }
+      ],
+      "elementSymbols": [
+        {
+          "id": "venus-symbol",
+          "element": "venus",
+          "unicode": "♦",
+          "color": "#E8A050",
+          "usage": "Earth element indicator (Isaac)"
+        },
+        {
+          "id": "mars-symbol",
+          "element": "mars",
+          "unicode": "▲",
+          "color": "#E05050",
+          "usage": "Fire element indicator (Garet)"
+        },
+        {
+          "id": "jupiter-symbol",
+          "element": "jupiter",
+          "unicode": "◆",
+          "color": "#A858D8",
+          "usage": "Wind element indicator (Ivan)"
+        },
+        {
+          "id": "mercury-symbol",
+          "element": "mercury",
+          "unicode": "●",
+          "color": "#5090D8",
+          "usage": "Water element indicator (Mia - future unit)"
+        }
+      ]
+    }
+  },
+  "layout": {
+    "resolution": "720x480 (3x GBA scale)",
+    "gridAreas": [
+      "Unit Selector (left column): 200px width",
+      "Header Panel (top-right): Full width minus unit selector",
+      "Equipped Items (middle-right): 4 equipment slots in 2x2 grid",
+      "Stat Comparison: Below equipped items",
+      "Inventory Panel (bottom-right): Scrollable grid of available items"
+    ]
+  },
+  "accessibility": {
+    "keyboardNav": "Tab order: Unit selector → Equipment slots → Inventory items → Return button",
+    "ariaLabels": "All interactive elements have descriptive ARIA labels",
+    "focusRings": "3px gold outline on focus",
+    "contrast": "WCAG 2.1 AA compliant (text 4.5:1, UI 3:1)"
+  },
+  "interactionStates": {
+    "unitCard": {
+      "default": "Transparent background, dark border",
+      "hover": "Light blue background, bright border",
+      "selected": "Blue background, gold border, glow effect"
+    },
+    "equipmentSlot": {
+      "default": "Dark background",
+      "hover": "Light blue background",
+      "empty": "Gray text, italic style"
+    },
+    "inventoryItem": {
+      "default": "Dark background",
+      "hover": "Light blue background, translateY(-2px)"
+    }
+  },
+  "notes": [
+    "Mockup uses placeholder Unicode symbols (🗡, 🛡, etc.) - replace with actual sprite icons",
+    "Stat comparison shows live preview when hovering inventory items",
+    "Equipment slots can be clicked to unequip items",
+    "Inventory items can be dragged or clicked to equip",
+    "Unit selector switches context for equipment display",
+    "Color coding matches element types (Venus=orange, Mars=red, Jupiter=purple)"
+  ]
+}
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf

@@ -1,5 +1,6 @@
 import type { Ability } from '@/types/Ability';
 import type { Element } from '@/types/Element';
+<<<<<<< HEAD
 import type { Stats } from '@/types/Stats';
 import {
   SLASH,
@@ -12,6 +13,10 @@ import {
   QUAKE,
   CLAY_SPIRE,
 } from './abilities';
+=======
+import type { Stats } from '@/types/Unit';
+import { SLASH, FIREBALL, VOLCANO, FROST, ICE_HORN, GUST, PLASMA, QUAKE, CLAY_SPIRE } from './abilities';
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
 
 /**
  * Enemy Definition
@@ -231,6 +236,7 @@ export const STORM_LORD: Enemy = {
  * All enemies indexed by ID
  */
 export const ENEMIES: Record<string, Enemy> = {
+<<<<<<< HEAD
   // Tier 1: Early Game
   'goblin': GOBLIN,
   'wild-wolf': WILD_WOLF,
@@ -242,6 +248,14 @@ export const ENEMIES: Record<string, Enemy> = {
   'wind-wisp': WIND_WISP,
 
   // Tier 3: Late Game
+=======
+  'goblin': GOBLIN,
+  'wild-wolf': WILD_WOLF,
+  'slime': SLIME,
+  'fire-sprite': FIRE_SPRITE,
+  'earth-golem': EARTH_GOLEM,
+  'wind-wisp': WIND_WISP,
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   'fire-elemental': FIRE_ELEMENTAL,
   'ice-guardian': ICE_GUARDIAN,
   'stone-titan': STONE_TITAN,

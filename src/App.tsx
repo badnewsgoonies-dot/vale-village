@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import './App.css'
 
 function App() {
@@ -39,3 +40,17 @@ function App() {
 }
 
 export default App
+=======
+import './App.css'
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Vale Chronicles</h1>
+      <p>Golden Sun-inspired tactical RPG - In Development</p>
+    </div>
+  )
+}
+
+export default App
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf

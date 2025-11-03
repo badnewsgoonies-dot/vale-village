@@ -66,6 +66,18 @@ describe('TASK 7: Damage Calculation Formulas', () => {
     expect(healing).toBeLessThanOrEqual(76);
   });
 
+<<<<<<< HEAD
+=======
+  test('✅ Random multiplier is between 0.9 and 1.1', () => {
+    // Test 100 times to ensure range
+    for (let i = 0; i < 100; i++) {
+      const multiplier = getRandomMultiplier();
+      expect(multiplier).toBeGreaterThanOrEqual(0.9);
+      expect(multiplier).toBeLessThanOrEqual(1.1);
+    }
+  });
+
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('✅ Minimum damage is 1 (even with high DEF)', () => {
     const weakUnit = new Unit(ISAAC, 1);
     weakUnit.equipment.weapon = null; // Remove weapon

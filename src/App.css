@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .App {
   text-align: center;
   padding: 2rem;
@@ -58,3 +59,19 @@ p {
 .mockup-buttons button.missing:hover {
   background: #777;
 }
+=======
+.App {
+  text-align: center;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.2rem;
+  color: #666;
+}
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf

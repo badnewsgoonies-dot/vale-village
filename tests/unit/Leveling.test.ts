@@ -46,6 +46,24 @@ describe('TASK 3: Leveling System - XP Curve', () => {
     // ← PROVES total XP requirement is correct!
   });
 
+<<<<<<< HEAD
+=======
+  test('✅ XP accumulates without leveling up', () => {
+    const isaac = new Unit(ISAAC, 1);
+
+    // Gain partial XP (not enough to level)
+    isaac.gainXP(50);
+    expect(isaac.level).toBe(1);
+    expect(isaac.xp).toBe(50);
+
+    isaac.gainXP(30);
+    expect(isaac.level).toBe(1);
+    expect(isaac.xp).toBe(80);
+
+    // ← PROVES XP accumulates correctly!
+  });
+
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('✅ Excess XP carries over to next level', () => {
     const isaac = new Unit(ISAAC, 1);
 

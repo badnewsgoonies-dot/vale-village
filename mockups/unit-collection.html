@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -659,3 +660,666 @@
   </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Collection Screen - Vale Chronicles</title>
+
+  <!-- Google Font: Press Start 2P (GBA-style) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+      font-family: var(--font-primary), var(--font-fallback);
+      color: var(--color-text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--space-lg);
+    }
+
+    .collection-container {
+      width: var(--scale-3x);
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: var(--space-lg);
+      grid-template-areas:
+        "header stats"
+        "units stats";
+    }
+
+    /* ===== HEADER PANEL ===== */
+    .header-panel {
+      grid-area: header;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .header-panel h1 {
+      font-size: var(--font-size-md);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .party-indicator {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .party-count {
+      color: var(--color-text-gold);
+    }
+
+    .return-btn {
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: var(--font-size-xs);
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+    }
+
+    .return-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .return-btn:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    /* ===== UNITS GRID PANEL ===== */
+    .units-panel {
+      grid-area: units;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+    }
+
+    .units-grid-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .units-grid-header h2 {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .units-count {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .legend {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 8px;
+      margin-bottom: var(--space-md);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .legend-badge {
+      width: 12px;
+      height: 12px;
+      border: 2px solid;
+    }
+
+    .legend-badge.active {
+      border-color: var(--color-border-highlight);
+      background: rgba(255, 215, 127, 0.3);
+    }
+
+    .legend-badge.bench {
+      border-color: var(--color-border-dark);
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    /* ===== UNITS GRID ===== */
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .unit-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+      position: relative;
+    }
+
+    .unit-card:hover {
+      background: rgba(74, 122, 184, 0.2);
+      border-color: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .unit-card.active {
+      background: rgba(255, 215, 127, 0.2);
+      border: 2px solid var(--color-border-highlight);
+      box-shadow: var(--glow-focus);
+    }
+
+    .unit-card.active::before {
+      content: "★";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 16px;
+      color: var(--color-text-gold);
+      text-shadow: 0 0 8px var(--color-text-gold);
+    }
+
+    .unit-card:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .unit-sprite {
+      width: 48px;
+      height: 48px;
+      background: #666;
+      border: 2px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      position: relative;
+    }
+
+    .element-badge {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+    }
+
+    .element-badge.venus {
+      background: var(--color-venus);
+    }
+
+    .element-badge.mars {
+      background: var(--color-mars);
+    }
+
+    .element-badge.mercury {
+      background: var(--color-mercury);
+    }
+
+    .element-badge.jupiter {
+      background: var(--color-jupiter);
+    }
+
+    .element-badge.neutral {
+      background: linear-gradient(45deg,
+        var(--color-venus) 0%,
+        var(--color-mars) 25%,
+        var(--color-mercury) 50%,
+        var(--color-jupiter) 75%,
+        var(--color-venus) 100%);
+    }
+
+    .unit-name {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .unit-level {
+      font-size: 8px;
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    /* ===== STATS PANEL ===== */
+    .stats-panel {
+      grid-area: stats;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .stats-panel h2 {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      text-align: center;
+    }
+
+    .selected-unit-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--color-border-dark);
+    }
+
+    .preview-sprite {
+      width: 64px;
+      height: 64px;
+      background: #666;
+      border: 2px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-lg);
+      position: relative;
+    }
+
+    .preview-name {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .preview-class {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .preview-element {
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-shadow: var(--shadow-text);
+    }
+
+    .preview-element.venus {
+      background: var(--color-venus);
+      color: #000;
+    }
+
+    .preview-element.mars {
+      background: var(--color-mars);
+    }
+
+    .preview-element.mercury {
+      background: var(--color-mercury);
+    }
+
+    .preview-element.jupiter {
+      background: var(--color-jupiter);
+    }
+
+    .preview-element.neutral {
+      background: linear-gradient(90deg,
+        var(--color-venus) 0%,
+        var(--color-mars) 33%,
+        var(--color-mercury) 66%,
+        var(--color-jupiter) 100%);
+      color: var(--color-text-primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--color-border-dark);
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 8px;
+      padding: 2px 0;
+    }
+
+    .stat-label {
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .stat-value {
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .unit-role {
+      padding: var(--space-sm);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--color-border-dark);
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin-top: auto;
+    }
+
+    .action-btn {
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 8px;
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .action-btn:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .action-btn.primary {
+      border-color: var(--color-text-gold);
+      color: var(--color-text-gold);
+    }
+
+    /* ===== RESPONSIVE LAYOUT ===== */
+    @media (max-width: 768px) {
+      .collection-container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "units"
+          "stats";
+      }
+
+      .units-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="collection-container">
+
+    <!-- HEADER PANEL -->
+    <header class="header-panel">
+      <div class="header-content">
+        <h1>PARTY MANAGEMENT</h1>
+        <div class="party-indicator">
+          Active Party: <span class="party-count">4 / 10 units</span>
+        </div>
+      </div>
+      <button class="return-btn" aria-label="Return to previous menu">RETURN</button>
+    </header>
+
+    <!-- UNITS GRID PANEL -->
+    <section class="units-panel" aria-label="Unit collection grid">
+
+      <div class="units-grid-header">
+        <h2>COLLECTED UNITS</h2>
+        <div class="units-count">10 / 10</div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-badge active"></div>
+          <span>Active Party</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-badge bench"></div>
+          <span>Bench</span>
+        </div>
+      </div>
+
+      <!-- Units Grid -->
+      <div class="units-grid">
+
+        <!-- Unit 1: Isaac (Active) -->
+        <div class="unit-card active" tabindex="0" role="button" aria-pressed="true" aria-label="Isaac, Level 8, Venus element, Active party member">
+          <div class="unit-sprite">
+            <div class="element-badge venus" aria-hidden="true">♦</div>
+            I
+          </div>
+          <div class="unit-name">Isaac</div>
+          <div class="unit-level">Lv 8</div>
+        </div>
+
+        <!-- Unit 2: Garet (Active) -->
+        <div class="unit-card active" tabindex="0" role="button" aria-pressed="true" aria-label="Garet, Level 7, Mars element, Active party member">
+          <div class="unit-sprite">
+            <div class="element-badge mars" aria-hidden="true">▲</div>
+            G
+          </div>
+          <div class="unit-name">Garet</div>
+          <div class="unit-level">Lv 7</div>
+        </div>
+
+        <!-- Unit 3: Ivan (Active) -->
+        <div class="unit-card active" tabindex="0" role="button" aria-pressed="true" aria-label="Ivan, Level 7, Jupiter element, Active party member">
+          <div class="unit-sprite">
+            <div class="element-badge jupiter" aria-hidden="true">◆</div>
+            Iv
+          </div>
+          <div class="unit-name">Ivan</div>
+          <div class="unit-level">Lv 7</div>
+        </div>
+
+        <!-- Unit 4: Mia (Active) -->
+        <div class="unit-card active" tabindex="0" role="button" aria-pressed="true" aria-label="Mia, Level 6, Mercury element, Active party member">
+          <div class="unit-sprite">
+            <div class="element-badge mercury" aria-hidden="true">●</div>
+            M
+          </div>
+          <div class="unit-name">Mia</div>
+          <div class="unit-level">Lv 6</div>
+        </div>
+
+        <!-- Unit 5: Felix (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Felix, Level 6, Venus element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge venus" aria-hidden="true">♦</div>
+            F
+          </div>
+          <div class="unit-name">Felix</div>
+          <div class="unit-level">Lv 6</div>
+        </div>
+
+        <!-- Unit 6: Jenna (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Jenna, Level 5, Mars element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge mars" aria-hidden="true">▲</div>
+            J
+          </div>
+          <div class="unit-name">Jenna</div>
+          <div class="unit-level">Lv 5</div>
+        </div>
+
+        <!-- Unit 7: Sheba (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Sheba, Level 5, Jupiter element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge jupiter" aria-hidden="true">◆</div>
+            S
+          </div>
+          <div class="unit-name">Sheba</div>
+          <div class="unit-level">Lv 5</div>
+        </div>
+
+        <!-- Unit 8: Piers (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Piers, Level 7, Mercury element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge mercury" aria-hidden="true">●</div>
+            P
+          </div>
+          <div class="unit-name">Piers</div>
+          <div class="unit-level">Lv 7</div>
+        </div>
+
+        <!-- Unit 9: Kraden (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Kraden, Level 8, Neutral element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge neutral" aria-hidden="true">◎</div>
+            K
+          </div>
+          <div class="unit-name">Kraden</div>
+          <div class="unit-level">Lv 8</div>
+        </div>
+
+        <!-- Unit 10: Kyle (Bench) -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Kyle, Level 9, Mars element, Bench">
+          <div class="unit-sprite">
+            <div class="element-badge mars" aria-hidden="true">▲</div>
+            Ky
+          </div>
+          <div class="unit-name">Kyle</div>
+          <div class="unit-level">Lv 9</div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- STATS PANEL -->
+    <aside class="stats-panel" aria-label="Selected unit details">
+      <h2>UNIT DETAILS</h2>
+
+      <!-- Selected Unit Preview -->
+      <div class="selected-unit-preview">
+        <div class="preview-sprite">
+          <div class="element-badge venus" aria-hidden="true">♦</div>
+          I
+        </div>
+        <div class="preview-name">Isaac</div>
+        <div class="preview-class">Earth Adept</div>
+        <div class="preview-element venus">VENUS</div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">HP:</span>
+          <span class="stat-value">245</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">PP:</span>
+          <span class="stat-value">85</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ATK:</span>
+          <span class="stat-value">62</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">DEF:</span>
+          <span class="stat-value">48</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">MAG:</span>
+          <span class="stat-value">38</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">SPD:</span>
+          <span class="stat-value">35</span>
+        </div>
+      </div>
+
+      <!-- Role Description -->
+      <div class="unit-role">
+        <strong>Role:</strong> Balanced Warrior<br>
+        Tank/DPS hybrid with earth Psynergy
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="action-btn primary" aria-label="Add Isaac to active party">
+          ADD TO PARTY
+        </button>
+        <button class="action-btn" aria-label="Remove Isaac from active party">
+          REMOVE FROM PARTY
+        </button>
+        <button class="action-btn" aria-label="View Isaac's equipment">
+          VIEW EQUIPMENT
+        </button>
+      </div>
+
+    </aside>
+
+  </div>
+</body>
+</html>
+>>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
