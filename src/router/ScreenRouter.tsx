@@ -10,6 +10,7 @@ import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
+import { MainMenu } from '@/components/menu/MainMenu';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -94,6 +95,20 @@ export const ScreenRouter: React.FC = () => {
 
     case 'DJINN_MENU':
       return <DjinnScreen />;
+
+    case 'MAIN_MENU':
+      return (
+        <MainMenu
+          onNavigateToDjinn={() => actions.navigate({ type: 'DJINN_MENU' })}
+          onNavigateToEquipment={() => {
+            const firstUnitId = state.playerData.activePartyIds[0];
+            actions.navigate({ type: 'EQUIPMENT', unitId: firstUnitId });
+          }}
+          onNavigateToParty={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
+          onNavigateToQuestLog={() => actions.navigate({ type: 'QUEST_LOG' })}
+          onResume={() => actions.navigate({ type: 'OVERWORLD' })}
+        />
+      );
 
     case 'QUEST_LOG':
       return <QuestLogScreen />;

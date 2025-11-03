@@ -196,7 +196,10 @@ export const BattleScreen: React.FC = () => {
   };
 
   return (
-    <div className="battle-screen">
+    <div 
+      className="battle-screen"
+      data-area={state.currentLocation || 'vale_village'}
+    >
       {/* Top Status Bar */}
       <StatusBar units={battle.playerTeam.units} />
 

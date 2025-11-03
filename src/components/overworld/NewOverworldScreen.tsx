@@ -202,6 +202,8 @@ export const NewOverworldScreen: React.FC = () => {
         case 'Escape':
           if (showDialogue) {
             closeDialogue();
+          } else {
+            actions.navigate({ type: 'MAIN_MENU' });
           }
           break;
       }

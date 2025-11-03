@@ -7,12 +7,64 @@
     #88C070 0%,
     #70A858 40%,
     #609048 100%);
+  background-size: cover;
+  background-position: center;
   overflow: hidden;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   font-size: 8px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+}
+
+/* Area-specific battle backgrounds using authentic GBA sprites */
+.battle-screen[data-area="vale_village"] {
+  background-image: url('/sprites/backgrounds/gs1/Overworld.gif');
+}
+
+.battle-screen[data-area="forest_path"] {
+  background-image: url('/sprites/backgrounds/gs1/Kolima_Forest.gif');
+}
+
+.battle-screen[data-area="ancient_ruins"] {
+  background-image: url('/sprites/backgrounds/gs1/Sol_Sanctum.gif');
+}
+
+.battle-screen[data-area="cave"] {
+  background-image: url('/sprites/backgrounds/gs1/Cave.gif');
+}
+
+.battle-screen[data-area="desert"] {
+  background-image: url('/sprites/backgrounds/gs1/Desert.gif');
+}
+
+.battle-screen[data-area="mountain"] {
+  background-image: url('/sprites/backgrounds/gs1/Altin_Peak.gif');
+}
+
+.battle-screen[data-area="lighthouse"] {
+  background-image: url('/sprites/backgrounds/gs1/Mercury_Lighthouse.gif');
+}
+
+.battle-screen[data-area="boss_battle"] {
+  background-image: url('/sprites/backgrounds/gs1/Final_Battle.gif');
+}
+
+/* Fallback gradient overlay for authentic GBA look */
+.battle-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, 
+    rgba(0, 0, 0, 0.1) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Top Status Bar */

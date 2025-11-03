@@ -10,6 +10,7 @@ export type Screen =
   | { type: 'BATTLE' }
   | { type: 'REWARDS' }
   | { type: 'DJINN_MENU' }
+  | { type: 'MAIN_MENU' }
   | { type: 'OVERWORLD'; location?: string }
   | { type: 'SHOP'; shopType: 'item' | 'equipment' | 'inn' }
   | { type: 'DIALOGUE'; npcId: string; dialogueKey?: string }
