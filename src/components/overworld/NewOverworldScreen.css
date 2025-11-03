@@ -1,0 +1,442 @@
+/* Overworld Screen - Complete Styling */
+
+.overworld-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+}
+
+/* HUD - Top Bar */
+.overworld-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: linear-gradient(180deg, rgba(15, 37, 80, 0.95) 0%, rgba(15, 37, 80, 0.85) 100%);
+  border-bottom: 2px solid #4A7AB8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.area-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #F5F7FF;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.player-gold {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFD87F;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Map Container */
+.map-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 48px;
+  margin-bottom: 80px;
+}
+
+.map {
+  position: relative;
+  background: linear-gradient(135deg, #4a7c3a 0%, #5a9e3d 50%, #6db054 100%);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
+  border: 2px solid #2a4a1a;
+}
+
+/* Grid */
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tile {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+/* Entities */
+.player,
+.npc,
+.treasure,
+.exit {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  image-rendering: pixelated;
+  transition: left 0.15s ease-out, top 0.15s ease-out;
+}
+
+/* Sprite images */
+.player-sprite,
+.npc-sprite,
+.treasure-sprite {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+}
+
+/* Fallback text styling */
+.player-fallback,
+.npc-fallback,
+.treasure-fallback {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.player {
+  color: #FFD700;
+  text-shadow: 
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.player-sprite {
+  animation: playerBob 0.6s ease-in-out infinite;
+}
+
+@keyframes playerBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.npc {
+  color: #5090D8;
+  text-shadow: 
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  z-index: 5;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.npc-sprite {
+  animation: npcIdle 2s ease-in-out infinite;
+}
+
+@keyframes npcIdle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.treasure {
+  color: #FFD700;
+  text-shadow: 
+    1px 1px 0 #8B4513,
+    -1px -1px 0 #8B4513,
+    1px -1px 0 #8B4513,
+    -1px 1px 0 #8B4513;
+  z-index: 3;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.treasure-sprite {
+  animation: treasureSparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes treasureSparkle {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
+  }
+}
+
+.exit {
+  background: radial-gradient(circle, rgba(80, 144, 216, 0.4) 0%, rgba(80, 144, 216, 0.1) 70%, transparent 100%);
+  border: 2px dashed rgba(80, 144, 216, 0.6);
+  border-radius: 8px;
+  z-index: 1;
+  font-size: 16px;
+  color: rgba(80, 144, 216, 0.8);
+  animation: exitPulse 2s ease-in-out infinite;
+}
+
+@keyframes exitPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Dialogue Box */
+.dialogue-box {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  max-width: 90vw;
+  background: linear-gradient(135deg, rgba(26, 58, 107, 0.95) 0%, rgba(26, 58, 107, 0.98) 100%);
+  border: 3px solid #4A7AB8;
+  border-radius: 12px;
+  padding: 20px 24px;
+  z-index: 200;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  animation: dialogueAppear 0.2s ease-out;
+}
+
+@keyframes dialogueAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.dialogue-content {
+  margin-bottom: 12px;
+}
+
+.dialogue-speaker {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFD87F;
+  text-shadow: 1px 1px 0 #000;
+  margin-bottom: 8px;
+}
+
+.dialogue-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #F5F7FF;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+.dialogue-prompt {
+  font-size: 11px;
+  color: #C8CBEA;
+  text-align: right;
+  font-style: italic;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Controls HUD - Bottom */
+.controls-hud {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(15, 37, 80, 0.85) 0%, rgba(15, 37, 80, 0.95) 100%);
+  border-top: 2px solid #4A7AB8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.controls-hud p {
+  font-size: 12px;
+  color: #C8CBEA;
+  text-shadow: 1px 1px 0 #000;
+  margin: 0;
+}
+
+/* Active Quests Display */
+.active-quests {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 280px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-quest {
+  background: rgba(26, 58, 107, 0.9);
+  border: 2px solid #4A7AB8;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  animation: questSlideIn 0.3s ease-out;
+}
+
+@keyframes questSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mini-quest strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFD87F;
+  text-shadow: 1px 1px 0 #000;
+  margin-bottom: 6px;
+}
+
+.mini-objectives {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-objectives div {
+  font-size: 11px;
+  color: #F5F7FF;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.mini-objectives div.completed {
+  color: #44FF44;
+  text-decoration: line-through;
+}
+
+/* Scrollbar for quest list */
+.active-quests::-webkit-scrollbar {
+  width: 6px;
+}
+
+.active-quests::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.active-quests::-webkit-scrollbar-thumb {
+  background: rgba(74, 122, 184, 0.6);
+  border-radius: 3px;
+}
+
+.active-quests::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 122, 184, 0.8);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .active-quests {
+    width: 220px;
+    right: 10px;
+  }
+
+  .dialogue-box {
+    width: 90vw;
+    padding: 16px 20px;
+  }
+
+  .overworld-hud {
+    padding: 0 12px;
+  }
+
+  .area-name {
+    font-size: 16px;
+  }
+
+  .player-gold {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .active-quests {
+    display: none; /* Hide on very small screens */
+  }
+
+  .map-container {
+    margin-bottom: 100px; /* More space for dialogue */
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .player,
+  .npc,
+  .treasure,
+  .exit {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .dialogue-box,
+  .mini-quest {
+    animation: none !important;
+  }
+}
+
+/* Loading State */
+.overworld-screen.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0F2550;
+}
+
+.overworld-screen.loading::after {
+  content: 'Loading Area...';
+  font-size: 24px;
+  color: #F5F7FF;
+  text-shadow: 2px 2px 0 #000;
+  animation: loadingPulse 1s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

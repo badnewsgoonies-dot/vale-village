@@ -9,7 +9,7 @@ import {
   getRandomEnemyGroup,
   type NPC,
 } from '@/types/Area';
-import './OverworldScreen.css';
+import './NewOverworldScreen.css';
 
 export const NewOverworldScreen: React.FC = () => {
   const { state, actions } = useGame();
@@ -255,7 +255,20 @@ export const NewOverworldScreen: React.FC = () => {
                 top: `${npc.position.y * 32}px`,
               }}
             >
-              {npc.name[0]}
+              <img
+                src={`/sprites/overworld/minornpcs/${npc.id}.gif`}
+                alt={npc.name}
+                className="npc-sprite"
+                onError={(e) => {
+                  // Fallback to text if sprite not found
+                  e.currentTarget.style.display = 'none';
+                  const textNode = e.currentTarget.nextSibling;
+                  if (textNode) (textNode as HTMLElement).style.display = 'block';
+                }}
+              />
+              <span className="npc-fallback" style={{ display: 'none' }}>
+                {npc.name[0]}
+              </span>
             </div>
           ))}
 
@@ -271,7 +284,19 @@ export const NewOverworldScreen: React.FC = () => {
                   top: `${treasure.position.y * 32}px`,
                 }}
               >
-                $
+                <img
+                  src="/sprites/scenery/chest.gif"
+                  alt="Treasure Chest"
+                  className="treasure-sprite"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const textNode = e.currentTarget.nextSibling;
+                    if (textNode) (textNode as HTMLElement).style.display = 'block';
+                  }}
+                />
+                <span className="treasure-fallback" style={{ display: 'none' }}>
+                  💰
+                </span>
               </div>
             ))}
 
@@ -297,7 +322,19 @@ export const NewOverworldScreen: React.FC = () => {
               top: `${playerPos.y * 32}px`,
             }}
           >
-            @
+            <img
+              src="/sprites/overworld/protagonists/Isaac.gif"
+              alt="Player"
+              className="player-sprite"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const textNode = e.currentTarget.nextSibling;
+                if (textNode) (textNode as HTMLElement).style.display = 'block';
+              }}
+            />
+            <span className="player-fallback" style={{ display: 'none' }}>
+              @
+            </span>
           </div>
         </div>
       </div>
