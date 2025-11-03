@@ -1,0 +1,42 @@
+{
+  "screen": "djinn-menu",
+  "background": "linear-gradient(180deg, #0F2550, #1A3560)",
+  "characters": [
+    "./assets/Isaac_Overworld.gif",
+    "./assets/Garet_Overworld.gif",
+    "./assets/Ivan_Overworld.gif",
+    "./assets/Mia_Overworld.gif"
+  ],
+  "djinn": [
+    {
+      "name": "Flint",
+      "element": "Venus",
+      "sprite": "./assets/Venus_Djinn.gif",
+      "psynergy": ["Granite", "Quartz", "Vine", "Sap", "Ground"]
+    },
+    {
+      "name": "Fizz",
+      "element": "Mercury",
+      "sprite": "./assets/Mercury_Djinn.gif",
+      "psynergy": ["Sleet", "Mist", "Spritz", "Hail", "Tonic", "Dew"]
+    },
+    {
+      "name": "Forge",
+      "element": "Mars",
+      "sprite": "./assets/Mars_Djinn.gif",
+      "psynergy": ["Fever", "Corona", "Scorch", "Ember", "Flash", "Torch"]
+    },
+    {
+      "name": "Gust",
+      "element": "Jupiter",
+      "sprite": "./assets/Jupiter_Djinn.gif",
+      "psynergy": ["Breeze", "Zephyr", "Smog", "Squall", "Luff"]
+    }
+  ],
+  "stats": {
+    "total_sprites": 8,
+    "character_sprites": 4,
+    "djinn_sprites": 4,
+    "psynergy_abilities": 23
+  }
+}

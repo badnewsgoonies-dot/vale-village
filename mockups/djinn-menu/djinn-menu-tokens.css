@@ -1,0 +1,60 @@
+:root{
+  /* base logical canvas - GBA 240×160 at 2× */
+  --scene-w: 480px;
+  --scene-h: 320px;
+
+  /* default scale (2× already baked into size); we'll "zoom" to 3×/4× */
+  --scale: 1;
+
+  /* z-layers */
+  --z-bg: 0;
+  --z-panels: 10;
+  --z-ui: 100;
+
+  /* spacing */
+  --unit: 8px;
+  --gap: 8px;
+  --radius: 4px;
+  --panel-padding: 6px;
+
+  /* panel dimensions */
+  --char-panel-w: 120px;
+  --char-panel-h: 80px;
+  --return-panel-w: 200px;
+  --return-panel-h: 44px;
+  --djinn-panel-h: 210px;
+  --footer-h: 24px;
+
+  /* colors (Golden Sun menu style - darker blues) */
+  --ink-hi: #F5F7FF;
+  --ink-lo: #C8CBEA;
+  --panel-bg: #1A3A6B;
+  --panel-border: #4A7AB8;
+  --panel-border-dark: #0F2550;
+  --accent: #F4C04E;
+  --bg-gradient-start: #0F2550;
+  --bg-gradient-end: #1A3560;
+
+  /* element colors */
+  --venus-color: #E8A050;   /* orange/brown */
+  --mercury-color: #5090D8; /* blue */
+  --mars-color: #E05050;    /* red */
+  --jupiter-color: #A858D8;  /* purple */
+
+  /* motion tokens (placeholders only; mock has no JS) */
+  --transition-fast: 0.15s;
+}
+
+/* Responsive integer scale (no JS) - perfect nearest-neighbor scaling */
+@media (min-width: 1440px) and (min-height: 960px){
+  :root{ --scale: 1.5; }  /* 480×320 * 1.5 = 720×480 (3× effective) */
+}
+
+@media (min-width: 1920px) and (min-height: 1080px){
+  :root{ --scale: 2; }    /* 480×320 * 2 = 960×640 (4× effective) */
+}
+
+/* Motion: Reduced motion support (CRITICAL for accessibility) */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}

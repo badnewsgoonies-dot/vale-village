@@ -1,0 +1,72 @@
+*{ margin: 0; padding: 0; box-sizing: border-box; }
+
+body{
+  font-family: 'Courier New', Courier, monospace;
+  background: #000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+  padding-top: 24px;
+}
+
+/* Stage wrapper with scaling */
+.stage{
+  transform: scale(var(--scale));
+  transform-origin: top center;
+  image-rendering: pixelated;
+}
+
+/* Scene container */
+.scene{
+  position: relative;
+  width: var(--scene-w);
+  height: var(--scene-h);
+  margin: 0;
+  background: linear-gradient(135deg, var(--grass-light) 0%, var(--grass-dark) 100%);
+  image-rendering: pixelated;
+  border: 2px solid #000;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Background layer */
+.bg{
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-bg);
+  background-size: cover;
+  background-position: center;
+}
+
+/* Tile pattern overlay for grass texture */
+.bg::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  opacity: 0.5;
+}
+
+/* Scenery layer (trees, arch, etc) */
+.scenery{
+  position: absolute;
+  z-index: var(--z-scenery);
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 3px 2px rgba(0,0,0,0.25));
+}
+
+/* Character sprites */
+.entity{
+  position: absolute;
+  z-index: var(--z-entities);
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}
