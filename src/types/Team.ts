@@ -136,13 +136,8 @@ export function activateDjinn(
     return Err(`Unit must deal/take 30+ total damage to activate Djinn (current: ${totalDamage})`);
   }
 
-  // Check per-unit limit (1 activation per turn)
-  const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
-  if (unitActivations >= 1) {
-    return Err('Unit can only activate 1 Djinn per turn');
-  }
-
   // Check team limit (3 activations per turn)
+  // NOTE: No per-unit limit to allow units to activate multiple Djinn for summons
   const totalActivations = Array.from(team.activationsThisTurn.values())
     .reduce((sum, count) => sum + count, 0);
   if (totalActivations >= 3) {
@@ -167,6 +162,7 @@ export function activateDjinn(
   });
 
   // Update activation count
+  const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
   newTeam.activationsThisTurn.set(activatingUnit.id, unitActivations + 1);
 
   // Backward compatibility
@@ -223,11 +219,14 @@ export function updateDjinnRecovery(team: Team, currentTurn: number): Team {
  * Advance to next turn (resets activation limits)
  */
 export function advanceTurn(team: Team): Team {
-  return {
+  const newTeam = {
     ...team,
     currentTurn: team.currentTurn + 1,
     activationsThisTurn: new Map(),  // Reset activation counts
   };
+
+  // Update Djinn recovery states
+  return updateDjinnRecovery(newTeam, newTeam.currentTurn);
 }
 
 /**
