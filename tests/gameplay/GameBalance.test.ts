@@ -320,9 +320,12 @@ describe('😴 GRIND CHECK: Is progression fun or tedious?', () => {
   test('GRIND: Does each level feel like progress? (unlock new abilities)', () => {
     const isaac = new Unit(ISAAC, 1);
 
+    // XP needed for each level-up (from XP_CURVE in Unit.ts)
+    const xpPerLevel = [100, 250, 500, 1000]; // L1→L2, L2→L3, L3→L4, L4→L5
+
     // Every level should unlock something new
     for (let level = 2; level <= 5; level++) {
-      isaac.gainXP(10000); // Level up
+      isaac.gainXP(xpPerLevel[level - 2]); // Give exact XP for this level
 
       const abilities = isaac.getUnlockedAbilities();
 
