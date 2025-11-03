@@ -45,7 +45,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
 
     // Verify exact values from GAME_MECHANICS.md example
     expect(stats.hp).toBe(200);   // 180 + 20 (armor)
-    expect(stats.atk).toBe(51);   // 27 + 12 (sword) + 12 (3 Venus Djinn)
+    expect(stats.atk).toBe(50);   // 26 + 12 (sword) + 12 (3 Venus Djinn) (BALANCE: 51→50)
     expect(stats.def).toBe(36);   // 18 + 10 (armor) + 8 (3 Venus Djinn)
     expect(stats.mag).toBe(20);   // No change
     expect(stats.spd).toBe(16);   // No change
@@ -303,7 +303,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     // Isaac L5 from table
     const isaac = new Unit(ISAAC, 5);
     expect(isaac.stats.hp).toBe(180);
-    expect(isaac.stats.atk).toBe(27);
+    expect(isaac.stats.atk).toBe(26);  // BALANCE: 27→26
     expect(isaac.stats.def).toBe(18);
     expect(isaac.stats.mag).toBe(20);
     expect(isaac.stats.spd).toBe(16);
@@ -312,10 +312,10 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     // Garet L5 from table
     const garet = new Unit(GARET, 5);
     expect(garet.stats.hp).toBe(180);  // 120 + (15 × 4)
-    expect(garet.stats.atk).toBe(34);  // 18 + (4 × 4)
-    expect(garet.stats.def).toBe(12);  // 8 + (1 × 4)
+    expect(garet.stats.atk).toBe(31);  // 19 + (3 × 4) (BALANCE: 34→31)
+    expect(garet.stats.def).toBe(11);  // 7 + (1 × 4) (BALANCE: 12→11)
     expect(garet.stats.mag).toBe(18);  // 10 + (2 × 4)
-    expect(garet.stats.spd).toBe(14);  // 10 + (1 × 4)
+    expect(garet.stats.spd).toBe(12);  // 8 + (1 × 4) (BALANCE: 14→12)
     expect(garet.stats.pp).toBe(27);   // 15 + (3 × 4)
 
     // Ivan L5 from table

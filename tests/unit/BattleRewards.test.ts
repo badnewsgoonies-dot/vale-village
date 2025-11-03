@@ -184,11 +184,11 @@ describe('TASK 8: Battle Rewards Calculation', () => {
   test('✅ Stat gains: Track HP/PP/ATK/DEF/MAG/SPD increases', () => {
     const isaac = new Unit(ISAAC, 1);
 
-    // Isaac growth rates: HP +20, PP +4, ATK +3, DEF +2, MAG +2, SPD +1
+    // Isaac growth rates: HP +20, PP +3, ATK +3, DEF +2, MAG +2, SPD +1 (BALANCE: PP 4→3)
     const statGains = calculateStatGains(isaac, 1, 2);
 
     expect(statGains.hp).toBe(20);
-    expect(statGains.pp).toBe(4);
+    expect(statGains.pp).toBe(3); // BALANCE: 4→3
     expect(statGains.atk).toBe(3);
     expect(statGains.def).toBe(2);
     expect(statGains.mag).toBe(2);
@@ -310,7 +310,7 @@ describe('TASK 8: Battle Rewards Edge Cases', () => {
 
     // Isaac growth rates × 3
     expect(statGains.hp).toBe(60);  // 20 × 3
-    expect(statGains.pp).toBe(12);  // 4 × 3
+    expect(statGains.pp).toBe(9);   // 3 × 3 (BALANCE: 4→3 growth)
     expect(statGains.atk).toBe(9);  // 3 × 3
     expect(statGains.def).toBe(6);  // 2 × 3
     expect(statGains.mag).toBe(6);  // 2 × 3

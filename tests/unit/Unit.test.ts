@@ -13,11 +13,11 @@ describe('TASK 1: Unit Data Models - Core Functionality', () => {
 
     // Level 1 base stats
     expect(isaac1.stats.hp).toBe(100);
-    expect(isaac1.stats.atk).toBe(15);
+    expect(isaac1.stats.atk).toBe(14); // BALANCE: 15→14
 
     // Level 5 should have grown
     expect(isaac5.stats.hp).toBe(180);
-    expect(isaac5.stats.atk).toBe(27);
+    expect(isaac5.stats.atk).toBe(26); // BALANCE: 27→26
 
     // Verify growth formula: base + (growth * (level - 1))
     expect(isaac5.stats.hp).toBe(isaac1.stats.hp + (ISAAC.growthRates.hp * 4));
@@ -47,16 +47,16 @@ describe('CONTEXT-AWARE: Progression Proves Leveling Matters', () => {
     const enemyDEF = 20;
     const defReduction = enemyDEF / 2; // 10
 
-    // Level 1: (15 ATK - 10) = 5 damage
+    // Level 1: (14 ATK - 10) = 4 damage (BALANCE: 15→14)
     const damage1 = Math.max(1, isaac1.stats.atk - defReduction);
 
-    // Level 5: (27 ATK - 10) = 17 damage
+    // Level 5: (26 ATK - 10) = 16 damage (BALANCE: 27→26)
     const damage5 = Math.max(1, isaac5.stats.atk - defReduction);
 
-    // ← PROVES leveling makes you 3.4× stronger!
+    // ← PROVES leveling makes you 4× stronger! (BALANCE: 3.4→4.0)
     expect(damage5).toBeGreaterThan(damage1 * 3);
-    expect(damage5).toBe(17);
-    expect(damage1).toBe(5);
+    expect(damage5).toBe(16);
+    expect(damage1).toBe(4);
   });
 
   test('🎯 High-level survives hits that would nearly KO low-level', () => {
@@ -108,15 +108,15 @@ describe('CONTEXT-AWARE: Progression Proves Leveling Matters', () => {
 describe('CONTEXT-AWARE: Unit Variety Creates Strategy', () => {
 
   test('🎯 Garet (DPS) hits 25% harder than Isaac (Balanced)', () => {
-    const isaac = new Unit(ISAAC, 5); // Balanced: 27 ATK
-    const garet = new Unit(GARET, 5); // Pure DPS: 34 ATK
+    const isaac = new Unit(ISAAC, 5); // Balanced: 26 ATK (BALANCE: 27→26)
+    const garet = new Unit(GARET, 5); // Pure DPS: 31 ATK (BALANCE: 34→31, base 18→19, growth 4→3)
 
     expect(garet.stats.atk).toBeGreaterThan(isaac.stats.atk);
-    expect(garet.stats.atk).toBe(34); // 18 + (4 × 4)
-    expect(isaac.stats.atk).toBe(27); // 15 + (3 × 4)
+    expect(garet.stats.atk).toBe(31); // 19 + (3 × 4) (BALANCE: 18→19, growth 4→3)
+    expect(isaac.stats.atk).toBe(26); // 14 + (3 × 4) (BALANCE: 15→14)
 
-    // Garet deals 25% more damage
-    expect(garet.stats.atk / isaac.stats.atk).toBeGreaterThan(1.25);
+    // Garet deals 19% more damage (BALANCE: 25→19%)
+    expect(garet.stats.atk / isaac.stats.atk).toBeGreaterThan(1.15);
 
     // ← PROVES unit choice matters for DPS!
   });
@@ -177,23 +177,23 @@ describe('CONTEXT-AWARE: Equipment System Works', () => {
 
   test('🎯 Iron Sword increases damage by 70%', () => {
     const isaac = new Unit(ISAAC, 5);
-    const baseATK = isaac.stats.atk; // 27
+    const baseATK = isaac.stats.atk; // 26 (BALANCE: 27→26)
 
     // Equip weapon
     isaac.equipItem('weapon', IRON_SWORD);
 
     // ATK should increase
     const newATK = isaac.stats.atk;
-    expect(newATK).toBe(baseATK + 12); // 27 + 12 = 39
-    expect(newATK).toBe(39);
+    expect(newATK).toBe(baseATK + 12); // 26 + 12 = 38 (BALANCE: 27→26)
+    expect(newATK).toBe(38);
 
     // Against enemy DEF 20, damage increases:
-    const damageWithoutSword = Math.max(1, baseATK - 10); // 17
-    const damageWithSword = Math.max(1, newATK - 10);     // 29
+    const damageWithoutSword = Math.max(1, baseATK - 10); // 16 (BALANCE: 17→16)
+    const damageWithSword = Math.max(1, newATK - 10);     // 28 (BALANCE: 29→28)
 
     expect(damageWithSword).toBeGreaterThan(damageWithoutSword * 1.7);
 
-    // ← PROVES equipment makes you 70% stronger!
+    // ← PROVES equipment makes you 75% stronger! (BALANCE: 70→75%)
   });
 
   test('🎯 Legendary weapon unlocks new ability', () => {
@@ -216,7 +216,7 @@ describe('CONTEXT-AWARE: Equipment System Works', () => {
     const isaac = new Unit(ISAAC, 1); // Lv1: Weak
 
     // Base stats (naked)
-    expect(isaac.stats.atk).toBe(15);
+    expect(isaac.stats.atk).toBe(14); // BALANCE: 15→14
     expect(isaac.stats.def).toBe(10);
     expect(isaac.stats.hp).toBe(100);
 
@@ -227,7 +227,7 @@ describe('CONTEXT-AWARE: Equipment System Works', () => {
     isaac.equipItem('boots', IRON_BOOTS);    // +3 SPD
 
     // Stats with equipment
-    expect(isaac.stats.atk).toBe(27);  // 15 + 12 = 27 (like Lv5!)
+    expect(isaac.stats.atk).toBe(26);  // 14 + 12 = 26 (like Lv5!) (BALANCE: 15→14)
     expect(isaac.stats.def).toBe(25);  // 10 + 10 + 5 = 25
     expect(isaac.stats.hp).toBe(120);  // 100 + 20 = 120
 
@@ -240,20 +240,20 @@ describe('CONTEXT-AWARE: Djinn System Works', () => {
 
   test('🎯 3 Venus Djinn boost damage by 70%', () => {
     const isaac = new Unit(ISAAC, 5);
-    const baseATK = isaac.stats.atk; // 27
+    const baseATK = isaac.stats.atk; // 26 (BALANCE: 27→26)
     const baseDEF = isaac.stats.def; // 18
 
     const result = isaac.equipDjinn([FLINT, GRANITE, BANE]);
     expect(isOk(result)).toBe(true);
 
     // Stats should increase (synergy: +12 ATK, +8 DEF from GAME_MECHANICS.md)
-    expect(isaac.stats.atk).toBe(baseATK + 12); // 27 + 12 = 39
+    expect(isaac.stats.atk).toBe(baseATK + 12); // 26 + 12 = 38 (BALANCE: 27→26)
     expect(isaac.stats.def).toBe(baseDEF + 8);  // 18 + 8 = 26
 
     // Against enemy DEF 20:
-    // Without Djinn: (27 - 10) = 17 damage
-    // With Djinn: (39 - 10) = 29 damage
-    // ← 70% damage increase from Djinn!
+    // Without Djinn: (26 - 10) = 16 damage (BALANCE: 27→26)
+    // With Djinn: (38 - 10) = 28 damage (BALANCE: 39→38)
+    // ← 75% damage increase from Djinn! (BALANCE: 70→75%)
 
     const damageWithout = baseATK - 10;
     const damageWith = (baseATK + 12) - 10;
@@ -265,15 +265,15 @@ describe('CONTEXT-AWARE: Djinn System Works', () => {
   test('🎯 Mixed element Djinn give smaller bonus', () => {
     const isaac1 = new Unit(ISAAC, 5);
     const isaac2 = new Unit(ISAAC, 5);
-    const baseATK = isaac1.stats.atk; // 27
+    const baseATK = isaac1.stats.atk; // 26 (BALANCE: 27→26)
 
     // All same (3 Venus): +12 ATK
     isaac1.equipDjinn([FLINT, GRANITE, BANE]);
-    expect(isaac1.stats.atk).toBe(39); // 27 + 12
+    expect(isaac1.stats.atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
     // Mixed (Venus, Mars, Mercury): +4 ATK
     isaac2.equipDjinn([FLINT, FORGE, FIZZ]);
-    expect(isaac2.stats.atk).toBe(31); // 27 + 4
+    expect(isaac2.stats.atk).toBe(30); // 26 + 4 (BALANCE: 27→26)
 
     // All same gives 3× more ATK bonus!
     expect((isaac1.stats.atk - baseATK) / (isaac2.stats.atk - baseATK)).toBe(3);

@@ -40,7 +40,7 @@ export const ISAAC: UnitDefinition = {
   baseStats: {
     hp: 100,
     pp: 24,
-    atk: 15,
+    atk: 14, // BALANCE: 15→14 (unit identity vs Garet)
     def: 10,
     mag: 12,
     spd: 12,
@@ -75,15 +75,15 @@ export const GARET: UnitDefinition = {
   baseStats: {
     hp: 120,
     pp: 15,
-    atk: 18,
-    def: 8,
+    atk: 19, // BALANCE: 18→19 (glass cannon)
+    def: 7,  // BALANCE: 8→7 (glass cannon fragility)
     mag: 10,
-    spd: 10,
+    spd: 8,  // BALANCE: 10→8 (unit identity)
   },
   growthRates: {
     hp: 15,
     pp: 3,
-    atk: 4,
+    atk: 3, // BALANCE: 4→3 (reduce power gap)
     def: 1,
     mag: 2,
     spd: 1,
@@ -186,7 +186,7 @@ export const FELIX: UnitDefinition = {
   growthRates: {
     hp: 14,
     pp: 3,
-    atk: 4,
+    atk: 3, // BALANCE: 4→3 (reduce power gap)
     def: 1,
     mag: 2,
     spd: 3,
@@ -213,9 +213,9 @@ export const JENNA: UnitDefinition = {
   baseStats: {
     hp: 75,
     pp: 28,
-    atk: 9,
+    atk: 11, // BALANCE: 9→11 (glass cannon versatility)
     def: 5,
-    mag: 20,
+    mag: 28, // BALANCE: 20→28 (glass cannon high damage)
     spd: 13,
   },
   growthRates: {
@@ -282,15 +282,15 @@ export const PIERS: UnitDefinition = {
   baseStats: {
     hp: 140,
     pp: 20,
-    atk: 14,
+    atk: 10, // BALANCE: 14→10 (tank trades damage for survivability)
     def: 16,
-    mag: 13,
+    mag: 9,  // BALANCE: 13→9 (reduce magical damage)
     spd: 8,
   },
   growthRates: {
     hp: 18,
     pp: 4,
-    atk: 2,
+    atk: 1, // BALANCE: 2→1 (tanks don't scale ATK)
     def: 3,
     mag: 2,
     spd: 1,
@@ -325,7 +325,7 @@ export const KRADEN: UnitDefinition = {
   growthRates: {
     hp: 10,
     pp: 7,
-    atk: 1,
+    atk: 2, // BALANCE: 1→2 (improve scholar viability)
     def: 2,
     mag: 3,
     spd: 1,

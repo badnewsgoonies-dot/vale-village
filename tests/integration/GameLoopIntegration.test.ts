@@ -381,8 +381,8 @@ describe('INTEGRATION: Edge Cases', () => {
     const team = createTeam([isaac]);
     const stats = isaac.calculateStats(team);
 
-    // Base: 27 ATK, Equipment: +12 ATK
-    expect(stats.atk).toBe(39);
+    // Base: 26 ATK, Equipment: +12 ATK (BALANCE: 27→26)
+    expect(stats.atk).toBe(38); // BALANCE: 39→38
 
     // Base: 180 HP, Equipment: +20 HP
     expect(stats.hp).toBe(200);
