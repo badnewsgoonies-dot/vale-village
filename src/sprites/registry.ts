@@ -144,11 +144,6 @@ class SpriteRegistry {
     });
   }
 
-  private getPlaceholderSprite(): string {
-    // TODO: Create a generic placeholder sprite
-    return `${this.baseUrl}/placeholder.gif`;
-  }
-
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
