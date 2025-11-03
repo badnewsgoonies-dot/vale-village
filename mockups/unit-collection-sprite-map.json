@@ -1,7 +1,8 @@
 {
   "screen": "unit-collection",
   "description": "Sprite map for Unit Collection screen - party management with all 10 recruitable units",
-  "lastUpdated": "2025-11-02",
+  "lastUpdated": "2025-11-03",
+  "spriteRoot": "../Sprites!",
   "sprites": {
     "units": [
       {
@@ -9,7 +10,9 @@
         "name": "Isaac",
         "element": "venus",
         "elementSymbol": "♦",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/isaac/isaac_front.gif",
+        "path": "Sprites!/icons/characters/Isaac1.gif",
+        "localPath": "../Sprites!/icons/characters/Isaac1.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Isaac.gif",
         "size": "48x48",
         "level": 8,
         "class": "Earth Adept",
@@ -22,7 +25,9 @@
         "name": "Garet",
         "element": "mars",
         "elementSymbol": "▲",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/garet/garet_front.gif",
+        "path": "Sprites!/icons/characters/Garet1.gif",
+        "localPath": "../Sprites!/icons/characters/Garet1.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Garet.gif",
         "size": "48x48",
         "level": 7,
         "class": "Flame Adept",
@@ -35,7 +40,9 @@
         "name": "Ivan",
         "element": "jupiter",
         "elementSymbol": "◆",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/ivan/ivan_front.gif",
+        "path": "Sprites!/icons/characters/Ivan.gif",
+        "localPath": "../Sprites!/icons/characters/Ivan.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Ivan.gif",
         "size": "48x48",
         "level": 7,
         "class": "Storm Adept",
@@ -48,7 +55,9 @@
         "name": "Mia",
         "element": "mercury",
         "elementSymbol": "●",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/mia/mia_front.gif",
+        "path": "Sprites!/icons/characters/Mia.gif",
+        "localPath": "../Sprites!/icons/characters/Mia.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Mia.gif",
         "size": "48x48",
         "level": 6,
         "class": "Tide Adept",
@@ -61,7 +70,9 @@
         "name": "Felix",
         "element": "venus",
         "elementSymbol": "♦",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/felix/felix_front.gif",
+        "path": "Sprites!/icons/characters/Felix1.gif",
+        "localPath": "../Sprites!/icons/characters/Felix1.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Felix.gif",
         "size": "48x48",
         "level": 6,
         "class": "Stone Assassin",
@@ -74,7 +85,9 @@
         "name": "Jenna",
         "element": "mars",
         "elementSymbol": "▲",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/jenna/jenna_front.gif",
+        "path": "Sprites!/icons/characters/Jenna1.gif",
+        "localPath": "../Sprites!/icons/characters/Jenna1.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Jenna.gif",
         "size": "48x48",
         "level": 5,
         "class": "Inferno Adept",
@@ -87,7 +100,9 @@
         "name": "Sheba",
         "element": "jupiter",
         "elementSymbol": "◆",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/sheba/sheba_front.gif",
+        "path": "Sprites!/icons/characters/Sheba.gif",
+        "localPath": "../Sprites!/icons/characters/Sheba.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Sheba.gif",
         "size": "48x48",
         "level": 5,
         "class": "Zephyr Adept",
@@ -100,7 +115,9 @@
         "name": "Piers",
         "element": "mercury",
         "elementSymbol": "●",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/piers/piers_front.gif",
+        "path": "Sprites!/icons/characters/Piers.gif",
+        "localPath": "../Sprites!/icons/characters/Piers.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Piers.gif",
         "size": "48x48",
         "level": 7,
         "class": "Tidal Warden",
@@ -113,7 +130,9 @@
         "name": "Kraden",
         "element": "neutral",
         "elementSymbol": "◎",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/kraden/kraden_front.gif",
+        "path": "Sprites!/icons/characters/Kraden.gif",
+        "localPath": "../Sprites!/icons/characters/Kraden.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Kraden.gif",
         "size": "48x48",
         "level": 8,
         "class": "Alchemist",
@@ -126,13 +145,16 @@
         "name": "Kyle",
         "element": "mars",
         "elementSymbol": "▲",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/kyle/kyle_front.gif",
+        "path": "Sprites!/icons/characters/Kyle.gif",
+        "localPath": "../Sprites!/icons/characters/Kyle.gif",
+        "overworldPath": "Sprites!/overworld/protagonists/Young_Garet.gif",
         "size": "48x48",
         "level": 9,
         "class": "Blademaster",
         "role": "Master Warrior (Balanced Elite)",
         "recruitMethod": "Warrior's Trial",
-        "defaultParty": false
+        "defaultParty": false,
+        "note": "Kyle portrait exists, using as placeholder until custom sprite created"
       }
     ],
     "ui": {
@@ -140,6 +162,8 @@
         {
           "id": "venus-badge",
           "element": "venus",
+          "path": "Sprites!/icons/misc/Venus_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Venus_Star.gif",
           "color": "#E8A050",
           "symbol": "♦",
           "size": "16x16"
@@ -147,6 +171,8 @@
         {
           "id": "mars-badge",
           "element": "mars",
+          "path": "Sprites!/icons/misc/Mars_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Mars_Star.gif",
           "color": "#E05050",
           "symbol": "▲",
           "size": "16x16"
@@ -154,6 +180,8 @@
         {
           "id": "mercury-badge",
           "element": "mercury",
+          "path": "Sprites!/icons/misc/Mercury_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Mercury_Star.gif",
           "color": "#5090D8",
           "symbol": "●",
           "size": "16x16"
@@ -161,24 +189,19 @@
         {
           "id": "jupiter-badge",
           "element": "jupiter",
+          "path": "Sprites!/icons/misc/Jupiter_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Jupiter_Star.gif",
           "color": "#A858D8",
           "symbol": "◆",
           "size": "16x16"
-        },
-        {
-          "id": "neutral-badge",
-          "element": "neutral",
-          "color": "gradient",
-          "symbol": "◎",
-          "size": "16x16",
-          "note": "Kraden can use any element via Djinn"
         }
       ],
       "activeStarIcon": {
         "id": "active-party-star",
         "unicode": "★",
         "color": "#FFD87F",
-        "usage": "Indicates active party member"
+        "usage": "Indicates active party member",
+        "note": "Uses Unicode star, can replace with sprite if desired"
       }
     }
   },
@@ -192,20 +215,6 @@
     "unitsGrid": "5 columns x 2 rows (10 units total)",
     "activePartyCount": "4 units highlighted with gold border + star badge",
     "benchUnits": "6 units with dark border, no star"
-  },
-  "interactionStates": {
-    "unitCard": {
-      "default": "Dark background, dark border",
-      "hover": "Light blue background, bright border, translateY(-2px)",
-      "active": "Gold background tint, gold border, star badge, glow effect",
-      "bench": "Dark background, dark border, no star",
-      "selected": "Stats panel shows details on click"
-    },
-    "actionButtons": {
-      "addToParty": "Primary button (gold border) - adds unit to active party",
-      "removeFromParty": "Secondary button - removes unit from active party",
-      "viewEquipment": "Secondary button - navigates to equipment screen"
-    }
   },
   "elementDistribution": {
     "venus": ["Isaac", "Felix"],
@@ -229,13 +238,11 @@
     "ariaPressedState": "true for active party, false for bench"
   },
   "notes": [
-    "Mockup uses placeholder Unicode letters (I, G, Iv, etc.) - replace with actual character sprites",
-    "Element badges use Unicode symbols - replace with sprite icons if desired",
-    "Active party members have gold border + star badge for clear distinction",
-    "Clicking a unit card selects it and updates the stats panel",
-    "Action buttons toggle between Add/Remove based on unit's current status",
-    "Max 4 units can be active at once (enforced by game logic)",
-    "Stats panel shows selected unit's full details and role description",
-    "Grid layout is 5x2 to accommodate all 10 units cleanly"
+    "✅ Updated with actual Sprites! directory paths (Nov 3, 2025)",
+    "All 10 unit portraits confirmed available in Sprites!/icons/characters/",
+    "Element stars available as GIF files in Sprites!/icons/misc/",
+    "Overworld sprites available for animation reference",
+    "Active party stars use Unicode ★ (can be replaced with sprite)",
+    "Kyle uses existing portrait sprite as placeholder"
   ]
 }
