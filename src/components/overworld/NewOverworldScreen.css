@@ -1,23 +1,24 @@
-/* Overworld Screen - Complete Styling */
-
+/* Overworld Screen - Authentic Golden Sun Style */
 .overworld-screen {
-  position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace, system-ui;
+  image-rendering: pixelated;
+  background: #1a3a1a; /* Dark green fallback */
 }
 
-/* HUD - Top Bar */
+/* HUD - Top bar */
 .overworld-hud {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 48px;
-  background: linear-gradient(180deg, rgba(15, 37, 80, 0.95) 0%, rgba(15, 37, 80, 0.85) 100%);
+  height: 40px;
+  background: rgba(12, 16, 40, 0.95);
   border-bottom: 2px solid #4A7AB8;
   display: flex;
   justify-content: space-between;
@@ -28,110 +29,180 @@
 }
 
 .area-name {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
-  color: #F5F7FF;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  color: #FFD87F;
+  text-shadow: 2px 2px 0 #000;
+  letter-spacing: 1px;
 }
 
 .player-gold {
-  font-size: 16px;
-  font-weight: 600;
-  color: #FFD87F;
+  font-size: 12px;
+  color: #F5F7FF;
   text-shadow: 1px 1px 0 #000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Map Container */
+.player-gold::before {
+  content: '💰';
+  font-size: 16px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+/* Map Container - Centered viewport */
 .map-container {
-  position: relative;
-  flex: 1;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  margin-top: 48px;
-  margin-bottom: 80px;
+  /* Sky gradient background */
+  background: linear-gradient(180deg, 
+    #87CEEB 0%,      /* Sky blue top */
+    #B0E0E6 40%,     /* Lighter blue */
+    #E0F6FF 60%,     /* Horizon */
+    #8FBC8F 100%     /* Ground green */
+  );
 }
 
+/* Map - Scrollable world with authentic terrain styling */
 .map {
   position: relative;
-  background: linear-gradient(135deg, #4a7c3a 0%, #5a9e3d 50%, #6db054 100%);
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
-  border: 2px solid #2a4a1a;
+  /* Use authentic Golden Sun green grass colors */
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      #4a7c4e 0px,
+      #4a7c4e 8px,
+      #5a8c5e 8px,
+      #5a8c5e 16px
+    ),
+    linear-gradient(
+      135deg,
+      #3d6b41 0%,
+      #4a7c4e 25%,
+      #5a8c5e 50%,
+      #4a7c4e 75%,
+      #3d6b41 100%
+    );
+  background-size: 16px 16px, 100% 100%;
+  box-shadow: 
+    inset 0 8px 20px rgba(0, 0, 0, 0.2),
+    inset 0 -8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Grid */
+/* Area-specific terrain patterns */
+.overworld-screen[data-area="vale_village"] .map {
+  /* Lush village grass */
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      #4a7c4e 0px,
+      #4a7c4e 8px,
+      #5a8c5e 8px,
+      #5a8c5e 16px
+    ),
+    linear-gradient(
+      135deg,
+      #3d6b41 0%,
+      #4a7c4e 25%,
+      #5a8c5e 50%,
+      #4a7c4e 75%,
+      #3d6b41 100%
+    );
+  background-size: 16px 16px, 100% 100%;
+}
+
+.overworld-screen[data-area="forest_path"] .map {
+  /* Darker forest floor */
+  background: 
+    repeating-linear-gradient(
+      60deg,
+      #2d4a2e 0px,
+      #2d4a2e 8px,
+      #3a5f3b 8px,
+      #3a5f3b 16px
+    ),
+    linear-gradient(
+      120deg,
+      #1a3a1a 0%,
+      #2d4a2e 25%,
+      #3a5f3b 50%,
+      #2d4a2e 75%,
+      #1a3a1a 100%
+    );
+  background-size: 16px 16px, 100% 100%;
+}
+
+.overworld-screen[data-area="ancient_ruins"] .map {
+  /* Stone/rocky terrain */
+  background: 
+    repeating-linear-gradient(
+      30deg,
+      #6b7280 0px,
+      #6b7280 8px,
+      #7a8491 8px,
+      #7a8491 16px
+    ),
+    linear-gradient(
+      150deg,
+      #525d6b 0%,
+      #6b7280 25%,
+      #7a8491 50%,
+      #6b7280 75%,
+      #525d6b 100%
+    );
+  background-size: 16px 16px, 100% 100%;
+}
+
+/* Terrain Grid (Optional - for debug/alignment) */
 .grid {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
+  opacity: 0; /* Hidden by default */
 }
 
 .tile {
   position: absolute;
   width: 32px;
   height: 32px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-sizing: border-box;
 }
 
-/* Entities */
-.player,
-.npc,
-.treasure,
-.exit {
+/* Show grid on debug mode */
+.overworld-screen.debug .grid {
+  opacity: 1;
+}
+
+/* Player Character */
+.player {
   position: absolute;
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  image-rendering: pixelated;
+  z-index: 50;
   transition: left 0.15s ease-out, top 0.15s ease-out;
 }
 
-/* Sprite images */
-.player-sprite,
-.npc-sprite,
-.treasure-sprite {
+.player-sprite {
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  animation: playerBounce 0.6s ease-in-out infinite;
 }
 
-/* Fallback text styling */
-.player-fallback,
-.npc-fallback,
-.treasure-fallback {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.player {
-  color: #FFD700;
-  text-shadow: 
-    2px 2px 0 #000,
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000;
-  z-index: 10;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-.player-sprite {
-  animation: playerBob 0.6s ease-in-out infinite;
-}
-
-@keyframes playerBob {
+@keyframes playerBounce {
   0%, 100% {
     transform: translateY(0);
   }
@@ -140,98 +211,137 @@
   }
 }
 
+.player-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 20px;
+  color: #FFD87F;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* NPCs */
 .npc {
-  color: #5090D8;
-  text-shadow: 
-    1px 1px 0 #000,
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000;
-  z-index: 5;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  z-index: 40;
+  transition: transform 0.2s;
+}
+
+.npc:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 .npc-sprite {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
   animation: npcIdle 2s ease-in-out infinite;
 }
 
 @keyframes npcIdle {
   0%, 100% {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: translateY(-1px) scale(1.02);
   }
 }
 
+.npc-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 18px;
+  color: #5090D8;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Treasure Chests */
 .treasure {
-  color: #FFD700;
-  text-shadow: 
-    1px 1px 0 #8B4513,
-    -1px -1px 0 #8B4513,
-    1px -1px 0 #8B4513,
-    -1px 1px 0 #8B4513;
-  z-index: 3;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  z-index: 35;
+  animation: treasureGlow 2s ease-in-out infinite;
+}
+
+@keyframes treasureGlow {
+  0%, 100% {
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 127, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 2px 8px rgba(255, 215, 127, 0.8));
+  }
 }
 
 .treasure-sprite {
-  animation: treasureSparkle 1.5s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 
-@keyframes treasureSparkle {
-  0%, 100% {
-    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
-  }
-  50% {
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
-  }
+.treasure-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 24px;
 }
 
+/* Exit Zones (Visual indicators) */
 .exit {
-  background: radial-gradient(circle, rgba(80, 144, 216, 0.4) 0%, rgba(80, 144, 216, 0.1) 70%, transparent 100%);
-  border: 2px dashed rgba(80, 144, 216, 0.6);
-  border-radius: 8px;
-  z-index: 1;
-  font-size: 16px;
-  color: rgba(80, 144, 216, 0.8);
+  position: absolute;
+  z-index: 30;
+  background: radial-gradient(circle, rgba(80, 144, 216, 0.2) 0%, transparent 70%);
+  border: 2px dashed rgba(80, 144, 216, 0.4);
+  border-radius: 4px;
+  pointer-events: none;
   animation: exitPulse 2s ease-in-out infinite;
 }
 
 @keyframes exitPulse {
   0%, 100% {
-    opacity: 0.6;
+    opacity: 0.3;
   }
   50% {
-    opacity: 1;
+    opacity: 0.6;
   }
 }
 
-/* Dialogue Box */
+/* Dialogue Box - Golden Sun style */
 .dialogue-box {
-  position: fixed;
-  bottom: 20px;
+  position: absolute;
+  bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  max-width: 90vw;
-  background: linear-gradient(135deg, rgba(26, 58, 107, 0.95) 0%, rgba(26, 58, 107, 0.98) 100%);
+  width: 90%;
+  max-width: 640px;
+  background: rgba(12, 16, 40, 0.95);
   border: 3px solid #4A7AB8;
-  border-radius: 12px;
-  padding: 20px 24px;
+  border-radius: 8px;
+  padding: 16px 20px;
   z-index: 200;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-  animation: dialogueAppear 0.2s ease-out;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  animation: dialogueSlideUp 0.3s ease-out;
 }
 
-@keyframes dialogueAppear {
+@keyframes dialogueSlideUp {
   from {
-    opacity: 0;
     transform: translateX(-50%) translateY(20px);
+    opacity: 0;
   }
   to {
-    opacity: 1;
     transform: translateX(-50%) translateY(0);
+    opacity: 1;
   }
 }
 
@@ -240,60 +350,71 @@
 }
 
 .dialogue-speaker {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 700;
   color: #FFD87F;
   text-shadow: 1px 1px 0 #000;
   margin-bottom: 8px;
+  letter-spacing: 1px;
 }
 
 .dialogue-content p {
-  font-size: 14px;
+  font-size: 11px;
   line-height: 1.6;
   color: #F5F7FF;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  text-shadow: 1px 1px 0 #000;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 .dialogue-prompt {
-  font-size: 11px;
+  font-size: 9px;
   color: #C8CBEA;
+  text-shadow: 1px 1px 0 #000;
   text-align: right;
-  font-style: italic;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  animation: promptBlink 1.5s ease-in-out infinite;
 }
 
-/* Controls HUD - Bottom */
+@keyframes promptBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Controls HUD - Bottom bar */
 .controls-hud {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 40px;
-  background: linear-gradient(180deg, rgba(15, 37, 80, 0.85) 0%, rgba(15, 37, 80, 0.95) 100%);
+  height: 32px;
+  background: rgba(12, 16, 40, 0.9);
   border-top: 2px solid #4A7AB8;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
   z-index: 100;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .controls-hud p {
-  font-size: 12px;
+  font-size: 9px;
   color: #C8CBEA;
   text-shadow: 1px 1px 0 #000;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
-/* Active Quests Display */
+/* Active Quests Mini-Display */
 .active-quests {
-  position: fixed;
-  top: 60px;
-  right: 20px;
-  width: 280px;
-  max-height: 200px;
-  overflow-y: auto;
+  position: absolute;
+  top: 50px;
+  right: 16px;
+  max-width: 280px;
   z-index: 90;
   display: flex;
   flex-direction: column;
@@ -301,32 +422,20 @@
 }
 
 .mini-quest {
-  background: rgba(26, 58, 107, 0.9);
+  background: rgba(12, 16, 40, 0.9);
   border: 2px solid #4A7AB8;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  animation: questSlideIn 0.3s ease-out;
-}
-
-@keyframes questSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .mini-quest strong {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 10px;
   color: #FFD87F;
   text-shadow: 1px 1px 0 #000;
   margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
 .mini-objectives {
@@ -336,107 +445,169 @@
 }
 
 .mini-objectives div {
-  font-size: 11px;
+  font-size: 9px;
   color: #F5F7FF;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.4;
 }
 
 .mini-objectives div.completed {
   color: #44FF44;
   text-decoration: line-through;
+  opacity: 0.7;
 }
 
-/* Scrollbar for quest list */
-.active-quests::-webkit-scrollbar {
-  width: 6px;
+/* Scenery Decorations - Trees, Mountains, Buildings */
+.scenery {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  image-rendering: pixelated;
 }
 
-.active-quests::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
+.scenery-tree {
+  width: 48px;
+  height: 64px;
+  background: url('/sprites/scenery/plants/Tree1.gif') no-repeat center;
+  background-size: contain;
+  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
 }
 
-.active-quests::-webkit-scrollbar-thumb {
-  background: rgba(74, 122, 184, 0.6);
-  border-radius: 3px;
+.scenery-building {
+  width: 96px;
+  height: 96px;
+  background: url('/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif') no-repeat center;
+  background-size: contain;
+  filter: drop-shadow(3px 5px 6px rgba(0,0,0,0.4));
 }
 
-.active-quests::-webkit-scrollbar-thumb:hover {
-  background: rgba(74, 122, 184, 0.8);
+.scenery-rock {
+  width: 32px;
+  height: 32px;
+  background: url('/sprites/scenery/outdoor/lg/big_stone.gif') no-repeat center;
+  background-size: contain;
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
 }
 
-/* Responsive Design */
+/* Mountains in background (parallax effect) */
+.map::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: -100px;
+  right: -100px;
+  height: 300px;
+  background: 
+    linear-gradient(180deg, 
+      rgba(135, 206, 235, 0.4) 0%,    /* Sky blue */
+      rgba(100, 149, 237, 0.3) 40%,   /* Cornflower blue */
+      rgba(176, 224, 230, 0.2) 70%,   /* Powder blue */
+      transparent 100%
+    );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Vale Village - Add village buildings */
+.overworld-screen[data-area="vale_village"] .map::after {
+  content: '';
+  position: absolute;
+  top: 100px;
+  left: 200px;
+  width: 120px;
+  height: 120px;
+  background: url('/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif') no-repeat center;
+  background-size: contain;
+  z-index: 25;
+  pointer-events: none;
+  filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.5));
+}
+
+/* Forest Path - Dense trees */
+.overworld-screen[data-area="forest_path"] .map::before {
+  background: 
+    linear-gradient(180deg, 
+      rgba(34, 139, 34, 0.3) 0%,     /* Forest green */
+      rgba(46, 125, 50, 0.2) 50%,    /* Darker green */
+      transparent 100%
+    );
+}
+
+/* Ancient Ruins - Stone structures */
+.overworld-screen[data-area="ancient_ruins"] .map::before {
+  background: 
+    linear-gradient(180deg, 
+      rgba(105, 105, 105, 0.3) 0%,   /* Dim gray */
+      rgba(119, 136, 153, 0.2) 50%,  /* Light slate gray */
+      transparent 100%
+    );
+}
+
+/* Responsive scaling */
 @media (max-width: 768px) {
-  .active-quests {
-    width: 220px;
-    right: 10px;
-  }
-
-  .dialogue-box {
-    width: 90vw;
-    padding: 16px 20px;
-  }
-
   .overworld-hud {
+    height: 36px;
     padding: 0 12px;
   }
 
   .area-name {
-    font-size: 16px;
+    font-size: 12px;
   }
 
   .player-gold {
-    font-size: 14px;
+    font-size: 10px;
   }
-}
 
-@media (max-width: 480px) {
+  .dialogue-box {
+    width: 95%;
+    padding: 12px 16px;
+  }
+
   .active-quests {
-    display: none; /* Hide on very small screens */
+    max-width: 200px;
+    right: 8px;
   }
 
-  .map-container {
-    margin-bottom: 100px; /* More space for dialogue */
+  .controls-hud {
+    height: 28px;
+  }
+
+  .controls-hud p {
+    font-size: 8px;
   }
 }
 
-/* Accessibility */
+/* Accessibility: Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .player,
-  .npc,
+  .player-sprite,
+  .npc-sprite,
   .treasure,
-  .exit {
-    animation: none !important;
-    transition: none !important;
-  }
-
+  .exit,
   .dialogue-box,
-  .mini-quest {
+  .dialogue-prompt {
     animation: none !important;
   }
-}
 
-/* Loading State */
-.overworld-screen.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0F2550;
-}
-
-.overworld-screen.loading::after {
-  content: 'Loading Area...';
-  font-size: 24px;
-  color: #F5F7FF;
-  text-shadow: 2px 2px 0 #000;
-  animation: loadingPulse 1s ease-in-out infinite;
-}
-
-@keyframes loadingPulse {
-  0%, 100% {
-    opacity: 0.5;
+  .player,
+  .npc {
+    transition: none;
   }
-  50% {
-    opacity: 1;
-  }
+}
+
+/* Debug mode visual helpers */
+.overworld-screen.debug .player {
+  border: 2px solid red;
+}
+
+.overworld-screen.debug .npc {
+  border: 2px solid blue;
+}
+
+.overworld-screen.debug .treasure {
+  border: 2px solid gold;
+}
+
+.overworld-screen.debug .exit {
+  border: 2px solid green;
+  opacity: 0.8;
 }

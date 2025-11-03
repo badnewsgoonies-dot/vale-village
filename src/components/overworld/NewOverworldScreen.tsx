@@ -214,6 +214,7 @@ export const NewOverworldScreen: React.FC = () => {
   return (
     <div
       className="overworld-screen"
+      data-area={state.currentLocation}
       style={{ backgroundColor: area.backgroundColor || '#4a7c4e' }}
     >
       <div className="overworld-hud">
