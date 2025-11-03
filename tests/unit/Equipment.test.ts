@@ -10,8 +10,6 @@ import {
 
 describe('TASK 4: Equipment System - Basic Functionality', () => {
 
-<<<<<<< HEAD
-=======
   test('✅ Weapon increases ATK stat', () => {
     const isaac = new Unit(ISAAC, 5); // Base ATK 27
 
@@ -45,7 +43,6 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
     expect(isaac.stats.spd).toBe(19); // 16 + 3
   });
 
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('✅ Multiple equipment slots stack bonuses', () => {
     const isaac = new Unit(ISAAC, 5);
     // Base: HP 180, ATK 27, DEF 18, SPD 16
@@ -92,31 +89,6 @@ describe('TASK 4: Equipment System - Basic Functionality', () => {
 
 describe('TASK 4: Equipment Progression Paths', () => {
 
-<<<<<<< HEAD
-=======
-  test('✅ Weapon progression: Basic → Iron → Steel → Legendary', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
-
-    // Basic: Wooden Sword
-    isaac.equipItem('weapon', WOODEN_SWORD);
-    expect(isaac.stats.atk).toBe(32); // 27 + 5
-
-    // Iron: Iron Sword
-    isaac.equipItem('weapon', IRON_SWORD);
-    expect(isaac.stats.atk).toBe(39); // 27 + 12
-
-    // Steel: Steel Sword
-    isaac.equipItem('weapon', STEEL_SWORD);
-    expect(isaac.stats.atk).toBe(47); // 27 + 20
-
-    // Legendary: Sol Blade
-    isaac.equipItem('weapon', SOL_BLADE);
-    expect(isaac.stats.atk).toBe(57); // 27 + 30
-
-    // ← PROVES 6× damage increase from Basic to Legendary!
-  });
-
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('✅ Armor progression: Basic → Iron → Steel → Legendary', () => {
     const isaac = new Unit(ISAAC, 5); // HP 180, DEF 18
 
@@ -412,8 +384,6 @@ describe('CONTEXT-AWARE: Equipment Synergy with Other Systems', () => {
 
 describe('EDGE CASES: Equipment System', () => {
 
-<<<<<<< HEAD
-=======
   test('Empty equipment slots contribute 0', () => {
     const isaac = new Unit(ISAAC, 5); // ATK 27
 
@@ -433,7 +403,6 @@ describe('EDGE CASES: Equipment System', () => {
     expect(result).toBeNull();
   });
 
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('Unequipping returns the previous item', () => {
     const isaac = new Unit(ISAAC, 5);
 
@@ -443,21 +412,6 @@ describe('EDGE CASES: Equipment System', () => {
     expect(unequipped).toBe(IRON_SWORD);
   });
 
-<<<<<<< HEAD
-=======
-  test('Replacing equipment returns no error', () => {
-    const isaac = new Unit(ISAAC, 5);
-
-    // Equip Iron Sword
-    isaac.equipItem('weapon', IRON_SWORD);
-
-    // Replace with Steel Sword (should work)
-    isaac.equipItem('weapon', STEEL_SWORD);
-    expect(isaac.equipment.weapon).toBe(STEEL_SWORD);
-
-    // ← PROVES replacing works without unequipping first!
-  });
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
 });
 
 describe('DATA INTEGRITY: Equipment Catalog', () => {

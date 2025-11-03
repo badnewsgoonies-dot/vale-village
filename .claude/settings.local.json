@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(dir /s /b tests*.test.ts 2)",
+      "Bash(nul)",
+      "Bash(dir:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(findstr:*)",
+      "Bash(npx vitest:*)",
+      "Bash(powershell -Command \"Get-Content tests\\unit\\Unit.test.ts | Measure-Object -Line\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

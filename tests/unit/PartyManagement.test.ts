@@ -203,8 +203,6 @@ describe('TASK 6: Active Party Selection', () => {
     }
   });
 
-<<<<<<< HEAD
-=======
   test('✅ getActiveParty returns correct units', () => {
     const isaac = new Unit(ISAAC, 1);
     let playerData = createPlayerData(isaac);
@@ -233,7 +231,6 @@ describe('TASK 6: Active Party Selection', () => {
     expect(benchUnits.some(u => u.id === 'mia')).toBe(true);
     expect(benchUnits.some(u => u.id === 'ivan')).toBe(true);
   });
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
 });
 
 describe('TASK 6: Starter Selection', () => {

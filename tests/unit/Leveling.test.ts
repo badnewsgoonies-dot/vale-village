@@ -46,8 +46,6 @@ describe('TASK 3: Leveling System - XP Curve', () => {
     // ← PROVES total XP requirement is correct!
   });
 
-<<<<<<< HEAD
-=======
   test('✅ XP accumulates without leveling up', () => {
     const isaac = new Unit(ISAAC, 1);
 
@@ -63,7 +61,6 @@ describe('TASK 3: Leveling System - XP Curve', () => {
     // ← PROVES XP accumulates correctly!
   });
 
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf
   test('✅ Excess XP carries over to next level', () => {
     const isaac = new Unit(ISAAC, 1);
 
