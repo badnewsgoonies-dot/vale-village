@@ -1,0 +1,266 @@
+/* Recruitment Celebration Styling */
+.recruitment-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.recruitment-container {
+  position: relative;
+  width: 400px;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 32px;
+}
+
+/* Unit sprite */
+.recruitment-unit {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.recruitment-unit.enter {
+  animation: unitEnter 0.5s ease-out;
+}
+
+.recruitment-unit.sparkle {
+  animation: unitFloat 2s ease-in-out infinite;
+}
+
+.unit-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 16px rgba(255, 215, 127, 0.8));
+}
+
+@keyframes unitEnter {
+  from {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes unitFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+/* Sparkle particles */
+.sparkles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #FFD87F 0%, #F4C04E 50%, transparent 100%);
+  border-radius: 50%;
+  animation: sparkleFloat 1.5s ease-out infinite;
+  animation-delay: var(--delay, 0s);
+  animation-duration: var(--duration, 1.5s);
+  transform: rotate(var(--angle, 0deg)) translateX(0);
+  opacity: 0;
+  box-shadow: 0 0 8px #FFD87F;
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: rotate(var(--angle, 0deg)) translateX(0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle, 0deg)) translateX(var(--distance, 100px)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Text content */
+.recruitment-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: textAppear 0.5s ease-out 0.5s backwards;
+  z-index: 2;
+}
+
+.unit-name {
+  font-size: 32px;
+  font-weight: 900;
+  color: #FFD87F;
+  text-shadow: 
+    3px 3px 0 #8B4513,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    0 0 16px #FFD87F;
+  letter-spacing: 2px;
+}
+
+.joined-message {
+  font-size: 18px;
+  font-weight: 700;
+  color: #F5F7FF;
+  text-shadow: 
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+}
+
+@keyframes textAppear {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Unit info badge */
+.unit-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background: rgba(26, 58, 107, 0.9);
+  border: 2px solid #4A7AB8;
+  border-radius: 8px;
+  animation: infoSlideUp 0.5s ease-out 0.8s backwards;
+  z-index: 2;
+}
+
+@keyframes infoSlideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.element-badge {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFD87F;
+  text-shadow: 1px 1px 0 #000;
+  padding: 4px 12px;
+  background: rgba(244, 192, 78, 0.2);
+  border-radius: 12px;
+  border: 1px solid #FFD87F;
+}
+
+.unit-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #F5F7FF;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.separator {
+  color: #4A7AB8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Add rotation/shimmer to sparkles */
+.sparkle::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, #FFD87F, transparent);
+  border-radius: 50%;
+  animation: sparkleRotate 1s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes sparkleRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Accessibility: Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .recruitment-unit,
+  .unit-sprite,
+  .sparkle,
+  .recruitment-text,
+  .unit-info {
+    animation: none !important;
+  }
+  
+  .recruitment-overlay {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .recruitment-unit,
+  .recruitment-text,
+  .unit-info {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .sparkle {
+    display: none;
+  }
+}

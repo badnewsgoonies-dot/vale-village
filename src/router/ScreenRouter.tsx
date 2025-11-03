@@ -9,6 +9,7 @@ import { NewOverworldScreen } from '@/components/overworld/NewOverworldScreen';
 import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
+import { DjinnScreen } from '@/components/djinn/DjinnScreen';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -92,8 +93,7 @@ export const ScreenRouter: React.FC = () => {
       return <NewOverworldScreen />;
 
     case 'DJINN_MENU':
-      // TODO: Djinn menu (not yet implemented)
-      return <div className="placeholder-screen">Djinn Menu - Coming Soon</div>;
+      return <DjinnScreen />;
 
     case 'QUEST_LOG':
       return <QuestLogScreen />;

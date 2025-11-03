@@ -1,0 +1,238 @@
+/* Djinn Activation Effect Styling */
+.djinn-activation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.djinn-activation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.djinn-sprite-container {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.djinn-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+
+/* Stage: Grow (0-400ms) */
+.djinn-activation.grow .djinn-sprite {
+  animation: djinnGrow 0.4s ease-out forwards;
+}
+
+@keyframes djinnGrow {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Stage: Glow (400-900ms) */
+.djinn-activation.glow .djinn-sprite {
+  transform: scale(1.5);
+  animation: djinnGlow 0.5s ease-in-out infinite;
+}
+
+@keyframes djinnGlow {
+  0%, 100% {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 4px 16px rgba(255,255,255,0.8)) brightness(1.5);
+  }
+}
+
+/* Stage: Explode (900-1500ms) */
+.djinn-activation.explode .djinn-sprite {
+  animation: djinnExplode 0.6s ease-out forwards;
+}
+
+@keyframes djinnExplode {
+  0% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* Element flash overlay */
+.element-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  animation: flashPulse 0.6s ease-out;
+  opacity: 0;
+}
+
+@keyframes flashPulse {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.element-flash.venus {
+  background: radial-gradient(circle, rgba(232, 160, 80, 0.8) 0%, transparent 70%);
+}
+
+.element-flash.mars {
+  background: radial-gradient(circle, rgba(224, 80, 80, 0.8) 0%, transparent 70%);
+}
+
+.element-flash.mercury {
+  background: radial-gradient(circle, rgba(80, 144, 216, 0.8) 0%, transparent 70%);
+}
+
+.element-flash.jupiter {
+  background: radial-gradient(circle, rgba(168, 88, 216, 0.8) 0%, transparent 70%);
+}
+
+/* Particles explosion */
+.particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: particleExplode 0.6s ease-out forwards;
+  animation-delay: var(--delay, 0s);
+  transform: rotate(var(--angle, 0deg)) translateX(0);
+}
+
+@keyframes particleExplode {
+  from {
+    transform: rotate(var(--angle, 0deg)) translateX(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--angle, 0deg)) translateX(120px) scale(0);
+    opacity: 0;
+  }
+}
+
+.particle.venus {
+  background: radial-gradient(circle, #E8A050 0%, #B87030 100%);
+  box-shadow: 0 0 8px #E8A050;
+}
+
+.particle.mars {
+  background: radial-gradient(circle, #E05050 0%, #B03030 100%);
+  box-shadow: 0 0 8px #E05050;
+}
+
+.particle.mercury {
+  background: radial-gradient(circle, #5090D8 0%, #3070B8 100%);
+  box-shadow: 0 0 8px #5090D8;
+}
+
+.particle.jupiter {
+  background: radial-gradient(circle, #A858D8 0%, #8838B8 100%);
+  box-shadow: 0 0 8px #A858D8;
+}
+
+/* Djinn name display */
+.djinn-name-display {
+  font-size: 24px;
+  font-weight: 700;
+  color: #F5F7FF;
+  text-shadow: 
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  animation: nameAppear 0.3s ease-out 0.2s backwards;
+  z-index: 10;
+}
+
+@keyframes nameAppear {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Accessibility: Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .djinn-activation-overlay,
+  .djinn-sprite,
+  .element-flash,
+  .particle,
+  .djinn-name-display {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .djinn-activation.grow .djinn-sprite,
+  .djinn-activation.glow .djinn-sprite {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  
+  .djinn-activation.explode .djinn-sprite {
+    opacity: 0;
+  }
+}
