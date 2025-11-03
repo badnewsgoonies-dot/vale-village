@@ -126,3 +126,88 @@
 .overworld-entity {
   animation: sprite-walk 0.3s infinite;
 }
+
+/* Dialogue Box */
+.dialogue-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.dialogue-box {
+  background: linear-gradient(135deg, #2a2a4a 0%, #3a3a5a 100%);
+  border: 3px solid #5a5a8a;
+  border-radius: 10px;
+  padding: 20px 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  animation: dialogue-appear 0.2s ease-out;
+}
+
+@keyframes dialogue-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialogue-speaker {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dialogue-text {
+  color: white;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.dialogue-prompt {
+  color: #aaaacc;
+  font-size: 11px;
+  text-align: right;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Battle Zone Markers */
+.battle-zone-marker {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(255, 0, 0, 0.1) 70%, transparent 100%);
+  border: 2px dashed rgba(255, 50, 50, 0.6);
+  border-radius: 50%;
+  animation: pulse-battle-zone 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes pulse-battle-zone {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}

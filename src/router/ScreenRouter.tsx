@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGame } from '@/context';
+import { TitleScreen } from '@/components/title';
 import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
@@ -15,28 +16,10 @@ export const ScreenRouter: React.FC = () => {
     switch (screen.type) {
     case 'TITLE':
       return (
-        <div className="title-screen">
-          <h1>Vale Chronicles</h1>
-          <button onClick={() => actions.navigate({ type: 'OVERWORLD' })}>
-            Start Game
-          </button>
-          <button
-            onClick={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
-            style={{ marginTop: '10px' }}
-          >
-            Unit Collection
-          </button>
-          <button
-            onClick={() => {
-              // Start a test battle with 3 enemies
-              actions.startBattle(['goblin', 'wild_wolf', 'slime']);
-              actions.navigate({ type: 'BATTLE' });
-            }}
-            style={{ marginTop: '10px' }}
-          >
-            Test Battle
-          </button>
-        </div>
+        <TitleScreen
+          onNavigate={actions.navigate}
+          onStartBattle={actions.startBattle}
+        />
       );
 
     case 'UNIT_COLLECTION': {
@@ -92,7 +75,7 @@ export const ScreenRouter: React.FC = () => {
           gold={50}
           items={[]}
           levelUps={[]}
-          onContinue={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
+          onContinue={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );
 
@@ -108,6 +91,7 @@ export const ScreenRouter: React.FC = () => {
         <OverworldScreen
           playerParty={playerParty}
           onNavigate={actions.navigate}
+          onStartBattle={actions.startBattle}
         />
       );
     }

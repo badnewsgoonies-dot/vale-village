@@ -24,11 +24,16 @@ class SpriteRegistry {
     const unitId = unit.id.toLowerCase();
     const mapping = UNIT_SPRITE_MAPPING[unitId];
 
+    // Check if this is an enemy (no mapping = enemy)
     if (!mapping) {
-      console.warn(`No sprite mapping for unit: ${unitId}`);
-      return this.getPlaceholderSprite();
+      // Enemy sprites are simple: just the enemy name as a single GIF
+      // Convert ID format: "wild-wolf" or "goblin" → "Wild_Wolf.gif" or "Goblin.gif"
+      const enemyName = unit.name.replace(/ /g, '_');
+      const path = `${this.baseUrl}/battle/enemies/${enemyName}.gif`;
+      return path;
     }
 
+    // Party member sprite logic
     // Determine weapon type from equipped weapon
     let weapon = normalizeWeaponType(unit.equipment.weapon);
 

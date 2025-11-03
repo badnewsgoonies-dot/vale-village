@@ -6,6 +6,25 @@ import { Unit } from '@/types/Unit';
 import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
 import type { Equipment, EquipmentLoadout } from '@/types/Equipment';
 import type { Djinn } from '@/types/Djinn';
+import { ENEMIES, type Enemy } from '@/data/enemies';
+import { createBattleState } from '@/types/Battle';
+import type { UnitDefinition } from '@/types/Unit';
+import { createTeam } from '@/types/Team';
+
+// Convert Enemy to Unit for battles
+function enemyToUnit(enemy: Enemy): Unit {
+  const unitDef: UnitDefinition = {
+    id: enemy.id,
+    name: enemy.name,
+    role: enemy.name as any, // Use name as role for enemies
+    description: `A ${enemy.name} enemy`,
+    element: enemy.element,
+    baseStats: enemy.stats,
+    growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies
+    abilities: enemy.abilities,
+  };
+  return new Unit(unitDef, enemy.level);
+}
 
 function createInitialPlayerData(): PlayerData {
   // Create starter party: Isaac, Garet, Ivan, Mia
@@ -29,7 +48,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<GameState>({
     playerData: createInitialPlayerData(),
     currentBattle: null,
-    currentScreen: { type: 'UNIT_COLLECTION' },
+    currentScreen: { type: 'OVERWORLD' },
     screenHistory: [],
     loading: false,
     error: null,
@@ -154,9 +173,50 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  // Battle actions (placeholder implementations)
+  // Battle actions
   const startBattle = useCallback((enemyIds: string[]) => {
-    console.log('startBattle not yet implemented', enemyIds);
+    console.log('Starting battle with enemies:', enemyIds);
+
+    setState(prev => {
+      // Get active party units
+      const activeParty = prev.playerData.unitsCollected.filter(
+        unit => prev.playerData.activePartyIds.includes(unit.id)
+      );
+
+      // Create player team
+      const playerTeam = createTeam(activeParty);
+
+      // Create enemy units from IDs
+      const enemies = enemyIds
+        .map(id => {
+          const enemy = ENEMIES[id];
+          if (!enemy) {
+            console.error(`Enemy not found: ${id}`);
+            return null;
+          }
+          return enemyToUnit(enemy);
+        })
+        .filter((u): u is Unit => u !== null);
+
+      if (enemies.length === 0) {
+        console.error('No valid enemies found!');
+        return prev;
+      }
+
+      // Create battle state
+      const battleState = createBattleState(playerTeam, enemies);
+
+      console.log('Battle initialized:', {
+        playerUnits: playerTeam.units.length,
+        enemyUnits: enemies.length,
+        turnOrder: battleState.turnOrder.map(u => u.name),
+      });
+
+      return {
+        ...prev,
+        currentBattle: battleState,
+      };
+    });
   }, []);
 
   const executeTurn = useCallback((abilityId: string, targetId: string) => {
