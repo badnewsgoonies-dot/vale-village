@@ -100,55 +100,59 @@ export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
       <aside className="stats-panel" aria-label="Selected unit details">
         <h2>UNIT DETAILS</h2>
 
-        {selectedUnit && (
-          <>
-            {/* Selected Unit Preview */}
-            <div className="selected-unit-preview">
-              <div className="preview-sprite">
-                <ElementIcon element={selectedUnit.element} size="small" className="element-badge-positioned" />
-                {/* TODO: Remove cast when GameContext provides real Unit types */}
-                <BattleUnit unit={selectedUnit as any} animation="Front" />
+        {selectedUnit && (() => {
+          const stats = selectedUnit.calculateStats();
+          const isActive = isUnitActive(selectedUnit);
+
+          return (
+            <>
+              {/* Selected Unit Preview */}
+              <div className="selected-unit-preview">
+                <div className="preview-sprite">
+                  <ElementIcon element={selectedUnit.element} size="small" className="element-badge-positioned" />
+                  <BattleUnit unit={selectedUnit} animation="Front" />
+                </div>
+                <div className="preview-name">{selectedUnit.name}</div>
+                <div className="preview-class">{selectedUnit.role}</div>
+                <div className={`preview-element element-${selectedUnit.element.toLowerCase()}`}>
+                  {selectedUnit.element.toUpperCase()}
+                </div>
               </div>
-              <div className="preview-name">{selectedUnit.name}</div>
-              <div className="preview-class">{selectedUnit.class}</div>
-              <div className={`preview-element element-${selectedUnit.element}`}>
-                {selectedUnit.element.toUpperCase()}
+
+              {/* Stats Grid */}
+              <div className="stats-grid">
+                <StatBar label="HP" value={stats.hp} />
+                <StatBar label="PP" value={stats.pp} />
+                <StatBar label="ATK" value={stats.atk} />
+                <StatBar label="DEF" value={stats.def} />
+                <StatBar label="MAG" value={stats.mag} />
+                <StatBar label="SPD" value={stats.spd} />
               </div>
-            </div>
 
-            {/* Stats Grid */}
-            <div className="stats-grid">
-              <StatBar label="HP" value={selectedUnit.stats.hp} />
-              <StatBar label="PP" value={selectedUnit.stats.pp} />
-              <StatBar label="ATK" value={selectedUnit.stats.atk} />
-              <StatBar label="DEF" value={selectedUnit.stats.def} />
-              <StatBar label="MAG" value={selectedUnit.stats.mag} />
-              <StatBar label="SPD" value={selectedUnit.stats.spd} />
-            </div>
+              {/* Role Description */}
+              <div className="unit-role">
+                <strong>Role:</strong> {selectedUnit.role}
+              </div>
 
-            {/* Role Description */}
-            <div className="unit-role">
-              <strong>Role:</strong> {selectedUnit.role}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <Button
-                variant="primary"
-                onClick={() => onToggleActive?.(selectedUnit.id)}
-                ariaLabel={selectedUnit.isActive ? `Remove ${selectedUnit.name} from active party` : `Add ${selectedUnit.name} to active party`}
-              >
-                {selectedUnit.isActive ? 'REMOVE FROM PARTY' : 'ADD TO PARTY'}
-              </Button>
-              <Button
-                onClick={() => onViewEquipment?.(selectedUnit.id)}
-                ariaLabel={`View ${selectedUnit.name}'s equipment`}
-              >
-                VIEW EQUIPMENT
-              </Button>
-            </div>
-          </>
-        )}
+              {/* Action Buttons */}
+              <div className="action-buttons">
+                <Button
+                  variant="primary"
+                  onClick={() => handleToggleActive(selectedUnit)}
+                  ariaLabel={isActive ? `Remove ${selectedUnit.name} from active party` : `Add ${selectedUnit.name} to active party`}
+                >
+                  {isActive ? 'REMOVE FROM PARTY' : 'ADD TO PARTY'}
+                </Button>
+                <Button
+                  onClick={() => onViewEquipment(selectedUnit)}
+                  ariaLabel={`View ${selectedUnit.name}'s equipment`}
+                >
+                  VIEW EQUIPMENT
+                </Button>
+              </div>
+            </>
+          );
+        })()}
       </aside>
     </div>
   );

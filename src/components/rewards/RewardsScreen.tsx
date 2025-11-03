@@ -2,35 +2,15 @@ import React from 'react';
 import { Button } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
+import type { Unit } from '@/types/Unit';
+import type { Equipment } from '@/types/Equipment';
 import './RewardsScreen.css';
-
-interface RewardItem {
-  id: string;
-  name: string;
-  icon: string;
-  quantity: number;
-}
-
-interface LevelUpUnit {
-  id: string;
-  name: string;
-  oldLevel: number;
-  newLevel: number;
-  sprite: string;
-}
-
-interface RecruitedUnit {
-  name: string;
-  class: string;
-  sprite: string;
-}
 
 interface RewardsScreenProps {
   xp: number;
   gold: number;
-  items: RewardItem[];
-  levelUpUnits?: LevelUpUnit[];
-  recruitedUnit?: RecruitedUnit;
+  items: Equipment[];
+  levelUps: Array<{ unit: Unit; oldLevel: number; newLevel: number }>;
   onContinue: () => void;
 }
 
@@ -38,8 +18,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
   xp,
   gold,
   items,
-  levelUpUnits = [],
-  recruitedUnit,
+  levelUps,
   onContinue
 }) => {
   return (
@@ -77,46 +56,27 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
           <div className="items-grid">
             {items.map(item => (
               <div key={item.id} className="item-card">
-                {/* TODO: Replace with real Equipment type when GameContext is ready */}
-                <EquipmentIcon equipment={item as any} size="small" className="item-icon" />
+                <EquipmentIcon equipment={item} size="small" className="item-icon" />
                 <div className="item-name">{item.name}</div>
-                <div className="item-quantity">x{item.quantity}</div>
+                <div className="item-quantity">x1</div>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Unit Recruitment (Special Event) */}
-      {recruitedUnit && (
-        <section className="recruitment-panel" role="alert" aria-label={`${recruitedUnit.name} has joined your party`}>
-          <div className="recruitment-badge">★ NEW RECRUIT ★</div>
-          <div className="recruitment-sprite">
-            <div className="sparkle"></div>
-            <div className="sparkle"></div>
-            <div className="sparkle"></div>
-            <div className="sparkle"></div>
-            {/* TODO: Replace with real Unit type when GameContext is ready */}
-            <BattleUnit unit={recruitedUnit as any} animation="Front" />
-          </div>
-          <div className="recruitment-name">{recruitedUnit.name}</div>
-          <div className="recruitment-class">{recruitedUnit.class} has joined your party!</div>
-        </section>
-      )}
-
       {/* Level Up Notification */}
-      {levelUpUnits.length > 0 && (
-        <section className="level-up-panel" role="alert" aria-label={`${levelUpUnits.length} units leveled up`}>
+      {levelUps.length > 0 && (
+        <section className="level-up-panel" role="alert" aria-label={`${levelUps.length} units leveled up`}>
           <h2>LEVEL UP!</h2>
           <div className="level-up-units">
-            {levelUpUnits.map((unit, index) => (
-              <div key={unit.id} className="level-up-unit" style={{ animationDelay: `${0.6 + index * 0.1}s` }}>
+            {levelUps.map((levelUp, index) => (
+              <div key={levelUp.unit.id} className="level-up-unit" style={{ animationDelay: `${0.6 + index * 0.1}s` }}>
                 <div className="level-up-sprite">
-                  {/* TODO: Replace with real Unit type when GameContext is ready */}
-                  <BattleUnit unit={unit as any} animation="Front" />
+                  <BattleUnit unit={levelUp.unit} animation="Front" />
                 </div>
-                <div className="level-up-name">{unit.name}</div>
-                <div className="level-up-arrow">Lv {unit.oldLevel} → Lv {unit.newLevel}</div>
+                <div className="level-up-name">{levelUp.unit.name}</div>
+                <div className="level-up-arrow">Lv {levelUp.oldLevel} → Lv {levelUp.newLevel}</div>
               </div>
             ))}
           </div>

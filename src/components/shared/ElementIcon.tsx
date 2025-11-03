@@ -1,7 +1,6 @@
 import React from 'react';
+import type { Element } from '@/types/Element';
 import './ElementIcon.css';
-
-type Element = 'venus' | 'mars' | 'mercury' | 'jupiter' | 'neutral';
 
 interface ElementIconProps {
   element: Element;
@@ -10,11 +9,11 @@ interface ElementIconProps {
 }
 
 const elementSymbols: Record<Element, string> = {
-  venus: '♦',
-  mars: '▲',
-  mercury: '●',
-  jupiter: '◆',
-  neutral: '◎'
+  Venus: '♦',
+  Mars: '▲',
+  Mercury: '●',
+  Jupiter: '◆',
+  Neutral: '◎'
 };
 
 export const ElementIcon: React.FC<ElementIconProps> = ({
@@ -24,7 +23,7 @@ export const ElementIcon: React.FC<ElementIconProps> = ({
 }) => {
   return (
     <div
-      className={`element-icon element-icon-${size} element-${element} ${className}`}
+      className={`element-icon element-icon-${size} element-${element.toLowerCase()} ${className}`}
       aria-hidden="true"
     >
       {elementSymbols[element]}

@@ -7,7 +7,8 @@ export type Screen =
   | { type: 'EQUIPMENT'; unitId: string }
   | { type: 'BATTLE' }
   | { type: 'REWARDS' }
-  | { type: 'DJINN_MENU' };
+  | { type: 'DJINN_MENU' }
+  | { type: 'OVERWORLD' };
 
 export interface GameState {
   playerData: PlayerData;

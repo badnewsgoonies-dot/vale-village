@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
+import type { Unit } from '@/types/Unit';
 import './BattleTransition.css';
 
-interface Enemy {
-  id: string;
-  name: string;
-}
-
 interface BattleTransitionProps {
-  enemies?: Enemy[];
-  onComplete?: () => void;
+  enemies: Unit[];
+  onComplete: () => void;
 }
 
-export const BattleTransition: React.FC<BattleTransitionProps> = ({ enemies = [], onComplete }) => {
+export const BattleTransition: React.FC<BattleTransitionProps> = ({ enemies, onComplete }) => {
   const [stage, setStage] = useState<'overworld' | 'swirl' | 'fade' | 'battle'>('overworld');
 
   useEffect(() => {
@@ -20,7 +16,7 @@ export const BattleTransition: React.FC<BattleTransitionProps> = ({ enemies = []
       setTimeout(() => setStage('swirl'), 700),
       setTimeout(() => setStage('fade'), 1700),
       setTimeout(() => setStage('battle'), 1800),
-      setTimeout(() => onComplete?.(), 2300)
+      setTimeout(() => onComplete(), 2300)
     ];
 
     return () => timers.forEach(clearTimeout);
@@ -51,21 +47,11 @@ export const BattleTransition: React.FC<BattleTransitionProps> = ({ enemies = []
         <div className="transition-battle">
           <div className="battle-title">BATTLE START!</div>
           <div className="battle-enemies" role="img" aria-label={`${enemies.length} enemies appear`}>
-            {enemies.length > 0 ? (
-              enemies.map((enemy) => (
-                <div key={enemy.id} className="enemy-sprite">
-                  {/* TODO: Replace with real Unit type when GameContext is ready */}
-                  <BattleUnit unit={enemy as any} animation="Front" />
-                </div>
-              ))
-            ) : (
-              // Fallback placeholders if no enemies provided
-              <>
-                <div className="enemy-sprite">E1</div>
-                <div className="enemy-sprite">E2</div>
-                <div className="enemy-sprite">E3</div>
-              </>
-            )}
+            {enemies.map((enemy) => (
+              <div key={enemy.id} className="enemy-sprite">
+                <BattleUnit unit={enemy} animation="Front" />
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -3,6 +3,8 @@ import { useGame } from '@/context';
 import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
+import { BattleScreen } from '@/components/battle';
+import { OverworldScreen } from '@/components/overworld';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -15,104 +17,64 @@ export const ScreenRouter: React.FC = () => {
       return (
         <div className="title-screen">
           <h1>Vale Chronicles</h1>
-          <button onClick={() => actions.navigate({ type: 'UNIT_COLLECTION' })}>
+          <button onClick={() => actions.navigate({ type: 'OVERWORLD' })}>
             Start Game
+          </button>
+          <button
+            onClick={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
+            style={{ marginTop: '10px' }}
+          >
+            Unit Collection
+          </button>
+          <button
+            onClick={() => {
+              // Start a test battle with 3 enemies
+              actions.startBattle(['goblin', 'wild_wolf', 'slime']);
+              actions.navigate({ type: 'BATTLE' });
+            }}
+            style={{ marginTop: '10px' }}
+          >
+            Test Battle
           </button>
         </div>
       );
 
     case 'UNIT_COLLECTION': {
-      // Map Unit instances to the format expected by UnitCollectionScreen
-      const units = state.playerData.unitsCollected.map(unit => ({
-        id: unit.id,
-        name: unit.name,
-        level: unit.level,
-        element: unit.element.toLowerCase() as 'venus' | 'mars' | 'mercury' | 'jupiter' | 'neutral',
-        class: unit.role,
-        isActive: state.playerData.activePartyIds.includes(unit.id),
-        stats: {
-          hp: unit.maxHp,
-          pp: unit.maxPp,
-          atk: unit.stats.atk,
-          def: unit.stats.def,
-          mag: unit.stats.mag,
-          spd: unit.stats.spd,
-        },
-        role: getRoleDescription(unit.role),
-      }));
+      // Get actual Unit instances
+      const units = state.playerData.unitsCollected;
+      const activeParty = units.filter(u => state.playerData.activePartyIds.includes(u.id));
 
       return (
         <UnitCollectionScreen
           units={units}
-          onToggleActive={(unitId) => {
-            const currentIds = state.playerData.activePartyIds;
-            const newIds = currentIds.includes(unitId)
-              ? currentIds.filter(id => id !== unitId)
-              : [...currentIds, unitId];
-
-            // Ensure we have exactly 4 units (pad with available units if needed)
-            if (newIds.length < 4) {
-              const availableUnits = state.playerData.unitsCollected
-                .filter(u => !newIds.includes(u.id))
-                .map(u => u.id);
-              while (newIds.length < 4 && availableUnits.length > 0) {
-                newIds.push(availableUnits.shift()!);
-              }
-            } else if (newIds.length > 4) {
-              newIds.splice(4);
-            }
-
-            actions.setActiveParty(newIds);
+          activeParty={activeParty}
+          onSetActiveParty={(unitIds: string[]) => {
+            actions.setActiveParty(unitIds);
           }}
-          onViewEquipment={(unitId) => actions.navigate({ type: 'EQUIPMENT', unitId })}
-          onReturn={() => actions.navigate({ type: 'TITLE' })}
+          onViewEquipment={(unit) => actions.navigate({ type: 'EQUIPMENT', unitId: unit.id })}
+          onReturn={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );
     }
 
     case 'EQUIPMENT': {
-      // Map units to format expected by EquipmentScreen
-      const units = state.playerData.unitsCollected.map(unit => ({
-        id: unit.id,
-        name: unit.name,
-        level: unit.level,
-        element: unit.element.toLowerCase() as 'venus' | 'mars' | 'mercury' | 'jupiter' | 'neutral',
-      }));
+      // Get actual Unit instances
+      const units = state.playerData.unitsCollected;
 
-      // Build equipment mapping
-      const equipment = state.playerData.unitsCollected.reduce((acc, unit) => {
-        acc[unit.id] = {
-          weapon: unit.equipment.weapon,
-          armor: unit.equipment.armor,
-          helm: unit.equipment.helm,
-          boots: unit.equipment.boots,
-        };
-        return acc;
-      }, {} as Record<string, any>);
+      // Get selected unit from screen state
+      const unitId = (screen as any).unitId || state.playerData.activePartyIds[0];
+      const selectedUnit = units.find(u => u.id === unitId) || units[0];
 
-      // Map inventory to format expected by EquipmentScreen
-      const inventoryItems = state.playerData.inventory.map(item => ({
-        id: item.id,
-        name: item.name,
-        slot: item.slot,
-        icon: 'placeholder', // TODO: Get icon from sprite registry
-        stats: {
-          atk: item.statBonus.atk,
-          def: item.statBonus.def,
-          spd: item.statBonus.spd,
-        },
-      }));
+      // Get inventory as Equipment instances
+      const inventory = state.playerData.inventory;
 
       return (
         <EquipmentScreen
           units={units}
-          equipment={equipment}
-          inventory={inventoryItems}
-          onEquipItem={(unitId, slot, itemId) => {
-            const item = state.playerData.inventory.find(i => i.id === itemId);
-            if (item) {
-              actions.equipItem(unitId, slot, item);
-            }
+          selectedUnit={selectedUnit}
+          inventory={inventory}
+          onEquipItem={(unitId, slot, equipment) => {
+            actions.equipItem(unitId, slot, equipment);
           }}
           onUnequipItem={(unitId, slot) => {
             actions.unequipItem(unitId, slot);
@@ -129,14 +91,26 @@ export const ScreenRouter: React.FC = () => {
           xp={100}
           gold={50}
           items={[]}
-          levelUpUnits={[]}
+          levelUps={[]}
           onContinue={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
         />
       );
 
     case 'BATTLE':
-      // TODO: Battle screen (not yet implemented)
-      return <div className="placeholder-screen">Battle Screen - Coming Soon</div>;
+      return <BattleScreen />;
+
+    case 'OVERWORLD': {
+      const playerParty = state.playerData.unitsCollected.filter(
+        unit => state.playerData.activePartyIds.includes(unit.id)
+      );
+
+      return (
+        <OverworldScreen
+          playerParty={playerParty}
+          onNavigate={actions.navigate}
+        />
+      );
+    }
 
     case 'DJINN_MENU':
       // TODO: Djinn menu (not yet implemented)
@@ -153,20 +127,3 @@ export const ScreenRouter: React.FC = () => {
     </ScreenTransition>
   );
 };
-
-/**
- * Helper function to get role description from class name
- */
-function getRoleDescription(className: string): string {
-  const roleMap: Record<string, string> = {
-    'Squire': 'Balanced Warrior - Tank/DPS hybrid with earth Psynergy',
-    'Guard': 'Tank - High HP and defense with fire attacks',
-    'Wind Seer': 'Mage - High magic damage and speed with wind Psynergy',
-    'Water Seer': 'Healer - Support specialist with water healing magic',
-    'Brute': 'Tank - High HP and defense with earth attacks',
-    'Flame User': 'Offensive Mage - Fire magic specialist',
-    'Pilgrim': 'Support - Healing and defensive magic',
-  };
-
-  return roleMap[className] || 'Versatile adventurer';
-}

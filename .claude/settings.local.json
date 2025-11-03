@@ -23,7 +23,10 @@
       "Bash(python3 -m http.server:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
