@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Screen - Vale Chronicles</title>
+
+  <!-- Google Font: Press Start 2P (GBA-style) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+      font-family: var(--font-primary), var(--font-fallback);
+      color: var(--color-text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--space-lg);
+    }
+
+    .equipment-container {
+      width: var(--scale-3x);
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-rows: auto 1fr auto;
+      gap: var(--space-lg);
+      grid-template-areas:
+        "units header"
+        "units equipped"
+        "units inventory";
+    }
+
+    /* ===== UNIT SELECTOR PANEL ===== */
+    .unit-selector {
+      grid-area: units;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+    }
+
+    .unit-selector h2 {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+
+    .unit-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .unit-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .unit-card:hover {
+      background: rgba(74, 122, 184, 0.2);
+      border-color: var(--color-border-light);
+    }
+
+    .unit-card.selected {
+      background: rgba(74, 122, 184, 0.4);
+      border: 2px solid var(--color-border-highlight);
+      box-shadow: var(--glow-focus);
+    }
+
+    .unit-card:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .unit-sprite {
+      width: 32px;
+      height: 32px;
+      background: #666;
+      border: 1px solid var(--color-border-light);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+    }
+
+    .unit-info {
+      flex: 1;
+    }
+
+    .unit-name {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      margin-bottom: 2px;
+    }
+
+    .unit-level {
+      font-size: 8px;
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .unit-element {
+      font-size: 8px;
+      margin-left: var(--space-xs);
+    }
+
+    /* ===== HEADER PANEL ===== */
+    .header-panel {
+      grid-area: header;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-panel h1 {
+      font-size: var(--font-size-md);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .return-btn {
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: var(--font-size-xs);
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+    }
+
+    .return-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .return-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ===== EQUIPPED ITEMS PANEL ===== */
+    .equipped-panel {
+      grid-area: equipped;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+    }
+
+    .equipped-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .equipped-header h2 {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .equipped-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .equipment-slot {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .equipment-slot:hover {
+      background: rgba(74, 122, 184, 0.2);
+      border-color: var(--color-border-light);
+    }
+
+    .equipment-slot:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .slot-label {
+      font-size: 8px;
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+      text-transform: uppercase;
+    }
+
+    .slot-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .item-icon {
+      width: 24px;
+      height: 24px;
+      background: #888;
+      border: 1px solid var(--color-border-light);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .item-name {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .empty-slot {
+      color: #666;
+      font-style: italic;
+    }
+
+    /* ===== STAT COMPARISON ===== */
+    .stat-comparison {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--color-border-dark);
+      padding: var(--space-sm);
+    }
+
+    .stat-comparison h3 {
+      font-size: 8px;
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-xs);
+      font-size: 8px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 0;
+    }
+
+    .stat-label {
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .stat-value {
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .stat-arrow {
+      color: var(--color-text-gold);
+      text-align: center;
+    }
+
+    .stat-increase {
+      color: #50D850;
+    }
+
+    .stat-decrease {
+      color: #D85050;
+    }
+
+    /* ===== INVENTORY PANEL ===== */
+    .inventory-panel {
+      grid-area: inventory;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .inventory-panel h2 {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-md);
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .inventory-item {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .inventory-item:hover {
+      background: rgba(74, 122, 184, 0.2);
+      border-color: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .inventory-item:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .inventory-item .item-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .inventory-item .item-name {
+      font-size: 8px;
+    }
+
+    /* ===== SCROLLBAR STYLING ===== */
+    .inventory-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .inventory-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .inventory-panel::-webkit-scrollbar-thumb {
+      background: var(--color-border-light);
+      border-radius: 4px;
+    }
+
+    .inventory-panel::-webkit-scrollbar-thumb:hover {
+      background: var(--color-border-highlight);
+    }
+
+    /* ===== RESPONSIVE LAYOUT ===== */
+    @media (max-width: 768px) {
+      .equipment-container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "units"
+          "equipped"
+          "inventory";
+      }
+
+      .equipped-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="equipment-container">
+
+    <!-- UNIT SELECTOR PANEL -->
+    <aside class="unit-selector" role="navigation" aria-label="Unit selection">
+      <h2>PARTY</h2>
+      <div class="unit-list">
+
+        <!-- Isaac (Selected) -->
+        <div class="unit-card selected" tabindex="0" role="button" aria-pressed="true" aria-label="Isaac, Level 5, Venus element">
+          <div class="unit-sprite" aria-hidden="true">I</div>
+          <div class="unit-info">
+            <div class="unit-name">
+              Isaac
+              <span class="unit-element element-venus">♦</span>
+            </div>
+            <div class="unit-level">Lv 5</div>
+          </div>
+        </div>
+
+        <!-- Garet -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Garet, Level 4, Mars element">
+          <div class="unit-sprite" aria-hidden="true">G</div>
+          <div class="unit-info">
+            <div class="unit-name">
+              Garet
+              <span class="unit-element element-mars">▲</span>
+            </div>
+            <div class="unit-level">Lv 4</div>
+          </div>
+        </div>
+
+        <!-- Ivan -->
+        <div class="unit-card" tabindex="0" role="button" aria-pressed="false" aria-label="Ivan, Level 4, Jupiter element">
+          <div class="unit-sprite" aria-hidden="true">Iv</div>
+          <div class="unit-info">
+            <div class="unit-name">
+              Ivan
+              <span class="unit-element element-jupiter">◆</span>
+            </div>
+            <div class="unit-level">Lv 4</div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- HEADER PANEL -->
+    <header class="header-panel">
+      <h1>EQUIPMENT</h1>
+      <button class="return-btn" aria-label="Return to previous menu">RETURN</button>
+    </header>
+
+    <!-- EQUIPPED ITEMS PANEL -->
+    <section class="equipped-panel" aria-label="Currently equipped items">
+      <div class="equipped-header">
+        <h2>EQUIPPED: Isaac</h2>
+      </div>
+
+      <!-- Equipment Slots -->
+      <div class="equipped-grid">
+
+        <!-- Weapon Slot -->
+        <div class="equipment-slot" tabindex="0" role="button" aria-label="Weapon slot: Longsword equipped">
+          <div class="slot-label">Weapon</div>
+          <div class="slot-item">
+            <div class="item-icon" aria-hidden="true">🗡</div>
+            <div class="item-name">Longsword</div>
+          </div>
+        </div>
+
+        <!-- Armor Slot -->
+        <div class="equipment-slot" tabindex="0" role="button" aria-label="Armor slot: Leather Vest equipped">
+          <div class="slot-label">Armor</div>
+          <div class="slot-item">
+            <div class="item-icon" aria-hidden="true">🛡</div>
+            <div class="item-name">Leather Vest</div>
+          </div>
+        </div>
+
+        <!-- Helm Slot -->
+        <div class="equipment-slot" tabindex="0" role="button" aria-label="Helm slot: Empty">
+          <div class="slot-label">Helm</div>
+          <div class="slot-item">
+            <div class="item-icon" aria-hidden="true">-</div>
+            <div class="item-name empty-slot">Empty</div>
+          </div>
+        </div>
+
+        <!-- Boots Slot -->
+        <div class="equipment-slot" tabindex="0" role="button" aria-label="Boots slot: Empty">
+          <div class="slot-label">Boots</div>
+          <div class="slot-item">
+            <div class="item-icon" aria-hidden="true">-</div>
+            <div class="item-name empty-slot">Empty</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stat Comparison -->
+      <div class="stat-comparison">
+        <h3>STATS (Current → With Selection)</h3>
+        <div class="stats-grid">
+
+          <div class="stat-row">
+            <span class="stat-label">ATK:</span>
+            <span class="stat-value">45</span>
+          </div>
+          <div class="stat-row stat-arrow">
+            →
+          </div>
+          <div class="stat-row">
+            <span class="stat-value stat-increase">52 (+7)</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-label">DEF:</span>
+            <span class="stat-value">32</span>
+          </div>
+          <div class="stat-row stat-arrow">
+            →
+          </div>
+          <div class="stat-row">
+            <span class="stat-value">32 (--)</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-label">SPD:</span>
+            <span class="stat-value">28</span>
+          </div>
+          <div class="stat-row stat-arrow">
+            →
+          </div>
+          <div class="stat-row">
+            <span class="stat-value stat-decrease">25 (-3)</span>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- INVENTORY PANEL -->
+    <section class="inventory-panel" aria-label="Equipment inventory">
+      <h2>INVENTORY</h2>
+      <div class="inventory-grid">
+
+        <!-- Sample Inventory Items -->
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Broad Sword">
+          <div class="item-icon" aria-hidden="true">⚔</div>
+          <div class="item-name">Broad Sword</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Steel Armor">
+          <div class="item-icon" aria-hidden="true">🛡</div>
+          <div class="item-name">Steel Armor</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Iron Helm">
+          <div class="item-icon" aria-hidden="true">⛑</div>
+          <div class="item-name">Iron Helm</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Hermes Boots">
+          <div class="item-icon" aria-hidden="true">👢</div>
+          <div class="item-name">Hermes Boots</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Battle Axe">
+          <div class="item-icon" aria-hidden="true">🪓</div>
+          <div class="item-name">Battle Axe</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Wooden Staff">
+          <div class="item-icon" aria-hidden="true">🪵</div>
+          <div class="item-name">Wooden Staff</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Chain Mail">
+          <div class="item-icon" aria-hidden="true">⛓</div>
+          <div class="item-name">Chain Mail</div>
+        </div>
+
+        <div class="inventory-item" tabindex="0" role="button" aria-label="Leather Cap">
+          <div class="item-icon" aria-hidden="true">🧢</div>
+          <div class="item-name">Leather Cap</div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
