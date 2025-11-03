@@ -75,9 +75,9 @@ export class Unit {
   level: number;
   xp: number;
 
-  // Current state
-  currentHp: number;
-  currentPp: number;
+  // Current state (private with validated setters)
+  private _currentHp: number;
+  private _currentPp: number;
 
   // Equipment and abilities
   equipment: EquipmentLoadout;
@@ -123,9 +123,10 @@ export class Unit {
     this.updateUnlockedAbilities();
 
     // Calculate max HP/PP and set current to max
+    // Initialize private fields directly (before setters are available)
     const stats = this.calculateStats();
-    this.currentHp = stats.hp;
-    this.currentPp = stats.pp;
+    this._currentHp = stats.hp;
+    this._currentPp = stats.pp;
   }
 
   /**
@@ -246,6 +247,32 @@ export class Unit {
   }
 
   /**
+   * Get/Set current HP with validation (Bug #3, #4 fix)
+   * Clamps between 0 and maxHp to prevent exploits
+   */
+  get currentHp(): number {
+    return this._currentHp;
+  }
+
+  set currentHp(value: number) {
+    // Clamp between 0 and maxHp
+    this._currentHp = Math.max(0, Math.min(value, this.maxHp));
+  }
+
+  /**
+   * Get/Set current PP with validation (Bug #3, #4 fix)
+   * Clamps between 0 and maxPp to prevent exploits
+   */
+  get currentPp(): number {
+    return this._currentPp;
+  }
+
+  set currentPp(value: number) {
+    // Clamp between 0 and maxPp
+    this._currentPp = Math.max(0, Math.min(value, this.maxPp));
+  }
+
+  /**
    * Update unlocked abilities based on current level
    */
   private updateUnlockedAbilities(): void {
@@ -349,9 +376,21 @@ export class Unit {
   }
 
   /**
-   * Restore HP
+   * Restore HP (Bug #6 fix)
+   * Dead units cannot be healed - need revival first
    */
   heal(amount: number): number {
+    // CRITICAL: Dead units can't be healed (need revival first)
+    if (this.isKO) {
+      return 0;
+    }
+
+    // Negative healing should not damage
+    if (amount < 0) {
+      console.warn(`heal() called with negative amount: ${amount}`);
+      amount = 0;
+    }
+
     const before = this.currentHp;
     this.currentHp = Math.min(this.maxHp, this.currentHp + amount);
     return this.currentHp - before;
@@ -414,8 +453,8 @@ export class Unit {
     };
 
     const clone = new Unit(definition, this.level, this.xp);
-    clone.currentHp = this.currentHp;
-    clone.currentPp = this.currentPp;
+    clone._currentHp = this._currentHp;
+    clone._currentPp = this._currentPp;
     clone.equipment = { ...this.equipment };
     clone.djinn = [...this.djinn];
     clone.djinnStates = new Map(this.djinnStates);
@@ -463,8 +502,8 @@ export class Unit {
 
       // Fully restore HP/PP to new max values on level up
       const newStats = this.calculateStats();
-      this.currentHp = newStats.hp;
-      this.currentPp = newStats.pp;
+      this._currentHp = newStats.hp;
+      this._currentPp = newStats.pp;
     }
   }
 }
