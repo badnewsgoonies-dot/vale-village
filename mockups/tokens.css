@@ -64,8 +64,11 @@
   --z-entity-shadow: 9;
   --z-entity: 10;
   --z-ui: 50;
+  --z-panels: 60;
   --z-dialogue: 60;
   --z-modal: 100;
+  --z-overlay: 150;
+  --z-effects: 200;
 
   /* ===== TYPOGRAPHY ===== */
   --font-primary: 'Press Start 2P', monospace;  /* GBA-style pixel font */
@@ -89,6 +92,9 @@
   --scale-2x: 480px;               /* 2x scale width */
   --scale-3x: 720px;               /* 3x scale width */
   --scale-4x: 960px;               /* 4x scale width */
+  --scale-height-2x: 320px;        /* 2x scale height (160 × 2) */
+  --scale-height-3x: 480px;        /* 3x scale height (160 × 3) */
+  --scale-height-4x: 640px;        /* 4x scale height (160 × 4) */
 
   /* ===== EFFECTS ===== */
   --shadow-text: 2px 2px 0 var(--color-text-shadow);

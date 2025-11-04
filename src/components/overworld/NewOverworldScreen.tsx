@@ -68,9 +68,11 @@ export const NewOverworldScreen: React.FC = () => {
           setTimeout(() => {
             setShowDialogue(null);
             actions.startBattle(boss.enemyIds);
+            actions.navigate({ type: 'BATTLE' });
           }, 3000);
         } else {
           actions.startBattle(boss.enemyIds);
+          actions.navigate({ type: 'BATTLE' });
         }
         return;
       }
@@ -83,6 +85,7 @@ export const NewOverworldScreen: React.FC = () => {
         if (newStepCount >= area.encounterRate && Math.random() < 0.3) {
           const enemyGroup = getRandomEnemyGroup(area.enemyPools);
           actions.startBattle(enemyGroup);
+          actions.navigate({ type: 'BATTLE' });
           // Reset step counter (will be done in game provider)
           // actions.resetStepCounter(); // TODO: Add this action if needed
         }
@@ -132,6 +135,7 @@ export const NewOverworldScreen: React.FC = () => {
           
           // Start battle with NPC's enemies
           actions.startBattle(npc.battleOnInteract);
+          actions.navigate({ type: 'BATTLE' });
           
           // Mark as battled if battleOnlyOnce
           if (npc.battleOnlyOnce) {

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Transition - Spiral Swirl</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .transition-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: linear-gradient(180deg, #88C070 0%, #70A858 40%, #609048 100%);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== OVERWORLD SNAPSHOT (Before transition) ===== */
+    .overworld-snapshot {
+      position: absolute;
+      inset: 0;
+      z-index: var(--z-background);
+      animation: freeze 0.1s ease-out forwards;
+    }
+
+    .grass-bg {
+      position: absolute;
+      inset: 0;
+      background-color: var(--color-grass-mid);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px),
+        repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px);
+    }
+
+    .player-sprite {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    @keyframes freeze {
+      to {
+        filter: blur(2px) brightness(0.8);
+      }
+    }
+
+    /* ===== SWIRL CIRCLES ===== */
+    .swirl-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: var(--z-effects);
+    }
+
+    .swirl-circle {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      border-style: solid;
+      opacity: 0;
+    }
+
+    /* Circle 1: White */
+    .swirl-circle-1 {
+      border-width: 8px;
+      border-color: rgba(255, 255, 255, 0.9);
+      animation: swirl-expand 800ms ease-out 0ms forwards;
+    }
+
+    /* Circle 2: Gold */
+    .swirl-circle-2 {
+      border-width: 6px;
+      border-color: rgba(255, 215, 127, 0.8);
+      animation: swirl-expand 800ms ease-out 100ms forwards;
+    }
+
+    /* Circle 3: Blue */
+    .swirl-circle-3 {
+      border-width: 4px;
+      border-color: rgba(80, 144, 216, 0.7);
+      animation: swirl-expand 800ms ease-out 200ms forwards;
+    }
+
+    /* Circle 4: Orange */
+    .swirl-circle-4 {
+      border-width: 2px;
+      border-color: rgba(232, 160, 80, 0.6);
+      animation: swirl-expand 800ms ease-out 300ms forwards;
+    }
+
+    @keyframes swirl-expand {
+      0% {
+        width: 0;
+        height: 0;
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+        border-width: 8px;
+      }
+      60% {
+        opacity: 0.8;
+        border-width: 4px;
+      }
+      80% {
+        opacity: 0.5;
+        border-width: 2px;
+      }
+      100% {
+        width: 2000px;
+        height: 2000px;
+        transform: scale(10) rotate(1080deg); /* 3 full rotations */
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    /* ===== FADE TO BLACK ===== */
+    .fade-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      z-index: calc(var(--z-effects) + 1);
+      animation: fade-in 200ms ease-in 800ms forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fade-in {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ===== ENCOUNTER TEXT ===== */
+    .encounter-text {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: var(--space-md) var(--space-xl);
+      z-index: calc(var(--z-effects) + 2);
+      box-shadow: var(--shadow-panel);
+      opacity: 0;
+      animation: text-appear 300ms ease-out 100ms forwards, text-disappear 200ms ease-in 700ms forwards;
+    }
+
+    .encounter-message {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .enemy-name {
+      color: var(--color-mars);
+      text-shadow: var(--shadow-text), 0 0 8px rgba(224, 80, 80, 0.8);
+    }
+
+    @keyframes text-appear {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes text-disappear {
+      to {
+        opacity: 0;
+      }
+    }
+
+    /* ===== INSTRUCTIONS ===== */
+    .instructions {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--color-border-light);
+      padding: var(--space-md) var(--space-lg);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    .instruction-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .replay-btn {
+      margin-top: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 8px;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .replay-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    /* ===== ANIMATION STAGE INDICATOR ===== */
+    .stage-indicator {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-text-gold);
+      padding: var(--space-sm);
+      z-index: 1000;
+      font-size: 7px;
+      color: var(--color-text-gold);
+      min-width: 200px;
+    }
+
+    .stage-item {
+      padding: 4px 0;
+      opacity: 0.4;
+      transition: opacity var(--timing-fast);
+    }
+
+    .stage-item.active {
+      opacity: 1;
+      color: var(--color-hp-green);
+      font-weight: bold;
+    }
+
+    .stage-item.completed {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <div class="transition-container">
+    <!-- Overworld Snapshot -->
+    <div class="overworld-snapshot">
+      <div class="grass-bg"></div>
+      <div class="player-sprite">🧍</div>
+    </div>
+
+    <!-- Swirl Circles -->
+    <div class="swirl-container">
+      <div class="swirl-circle swirl-circle-1"></div>
+      <div class="swirl-circle swirl-circle-2"></div>
+      <div class="swirl-circle swirl-circle-3"></div>
+      <div class="swirl-circle swirl-circle-4"></div>
+    </div>
+
+    <!-- Encounter Text -->
+    <div class="encounter-text">
+      <div class="encounter-message">
+        A wild <span class="enemy-name">GOBLIN</span> appeared!
+      </div>
+    </div>
+
+    <!-- Fade to Black -->
+    <div class="fade-overlay"></div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <div class="instruction-text">GOLDEN SUN BATTLE TRANSITION</div>
+      <div class="instruction-text">4-Circle Spiral Animation</div>
+      <button class="replay-btn" onclick="location.reload()">▶️ REPLAY</button>
+    </div>
+
+    <!-- Animation Stage Indicator -->
+    <div class="stage-indicator">
+      <div class="stage-item stage-1">Stage 1: Freeze overworld</div>
+      <div class="stage-item stage-2">Stage 2: Encounter text (0-100ms)</div>
+      <div class="stage-item stage-3">Stage 3: Circle 1 - White (0-800ms)</div>
+      <div class="stage-item stage-4">Stage 4: Circle 2 - Gold (100-900ms)</div>
+      <div class="stage-item stage-5">Stage 5: Circle 3 - Blue (200-1000ms)</div>
+      <div class="stage-item stage-6">Stage 6: Circle 4 - Orange (300-1100ms)</div>
+      <div class="stage-item stage-7">Stage 7: Fade to black (800-1000ms)</div>
+      <div class="stage-item stage-8">Stage 8: Load battle screen</div>
+    </div>
+  </div>
+
+  <script>
+    // Animate stage indicators
+    const stages = [
+      { selector: '.stage-1', delay: 0 },
+      { selector: '.stage-2', delay: 100 },
+      { selector: '.stage-3', delay: 100 },
+      { selector: '.stage-4', delay: 200 },
+      { selector: '.stage-5', delay: 300 },
+      { selector: '.stage-6', delay: 400 },
+      { selector: '.stage-7', delay: 900 },
+      { selector: '.stage-8', delay: 1100 }
+    ];
+
+    let totalDelay = 0;
+    stages.forEach(stage => {
+      totalDelay += stage.delay;
+      setTimeout(() => {
+        // Mark previous stages as completed
+        stages.forEach(s => {
+          if (s.delay < stage.delay) {
+            document.querySelector(s.selector).classList.remove('active');
+            document.querySelector(s.selector).classList.add('completed');
+          }
+        });
+        // Activate current stage
+        document.querySelector(stage.selector).classList.add('active');
+      }, totalDelay);
+    });
+
+    // Auto-replay every 3 seconds for demonstration
+    setInterval(() => {
+      location.reload();
+    }, 3000);
+  </script>
+</body>
+</html>

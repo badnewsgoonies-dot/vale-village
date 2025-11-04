@@ -33,7 +33,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   const handleTestBattle = () => {
-    onStartBattle(['goblin', 'wild_wolf', 'slime']);
+    onStartBattle(['goblin', 'wild-wolf', 'slime']);
     onNavigate({ type: 'BATTLE' });
   };
 

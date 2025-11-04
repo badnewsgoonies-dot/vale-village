@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Village Overworld - Golden Sun Authentic</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Overworld container - GBA resolution 240x160 @4x */
+    .overworld-container {
+      width: var(--scale-4x);
+      height: var(--scale-height-4x);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== TILED GRASS BACKGROUND ===== */
+    .grass-terrain {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px),
+        repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px);
+      background-color: var(--color-grass-mid);
+      background-size: 16px 16px;
+      z-index: var(--z-ground);
+    }
+
+    /* Grass variations for depth */
+    .grass-patch {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(136, 192, 112, 0.4), transparent);
+      border-radius: 50%;
+      z-index: calc(var(--z-ground) + 1);
+    }
+
+    /* ===== PATHS ===== */
+    .path {
+      position: absolute;
+      background: var(--color-path);
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0, 0, 0, 0.05) 4px, rgba(0, 0, 0, 0.05) 8px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: calc(var(--z-ground) + 2);
+    }
+
+    .path-horizontal {
+      height: 60px;
+      left: 0;
+      right: 0;
+    }
+
+    .path-vertical {
+      width: 60px;
+      top: 0;
+      bottom: 0;
+    }
+
+    /* ===== BUILDINGS ===== */
+    .building {
+      position: absolute;
+      z-index: var(--z-scenery);
+    }
+
+    .house {
+      width: 120px;
+      height: 100px;
+      background: linear-gradient(180deg, #8B6F47 0%, #6B5537 100%);
+      border: 2px solid #4A3520;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .roof {
+      position: absolute;
+      top: -30px;
+      left: -10px;
+      right: -10px;
+      height: 40px;
+      background: linear-gradient(180deg, #B8505D 0%, #983D4A 100%);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      border: 2px solid #7A2A35;
+    }
+
+    .door {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 45px;
+      background: #2A1A0A;
+      border: 2px solid #1A0A00;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .window {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 200, 0.6);
+      border: 2px solid #4A3520;
+    }
+
+    /* ===== ENTITIES (NPCs + Player) ===== */
+    .entity {
+      position: absolute;
+      text-align: center;
+      z-index: var(--z-entity);
+      transition: transform var(--timing-fast);
+    }
+
+    .entity-sprite {
+      font-size: 32px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+      position: relative;
+      z-index: var(--z-entity);
+    }
+
+    .entity-shadow {
+      width: 24px;
+      height: 8px;
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5), transparent);
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: var(--z-entity-shadow);
+    }
+
+    .entity-label {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      text-shadow: 1px 1px 2px #000;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .player {
+      animation: bob 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* ===== DIALOGUE BOX ===== */
+    .dialogue-box {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: var(--space-md);
+      z-index: var(--z-dialogue);
+      box-shadow: var(--shadow-panel);
+    }
+
+    .dialogue-speaker {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .dialogue-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      line-height: 1.6;
+    }
+
+    .dialogue-prompt {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 6px;
+      color: var(--color-text-gold);
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ===== HUD ===== */
+    .hud {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid var(--color-border-light);
+      padding: 6px 10px;
+      z-index: var(--z-ui);
+    }
+
+    .hud-item {
+      font-size: 7px;
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: 2px;
+    }
+
+    /* ===== MINIMAP ===== */
+    .minimap {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 100px;
+      height: 100px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--color-border-light);
+      z-index: var(--z-ui);
+      padding: 4px;
+    }
+
+    .minimap-title {
+      font-size: 6px;
+      color: var(--color-text-gold);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .minimap-grid {
+      width: 100%;
+      height: 80px;
+      background: var(--color-grass-dark);
+      border: 1px solid #000;
+      position: relative;
+    }
+
+    .minimap-player {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--color-text-gold);
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 6px var(--color-text-gold);
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="overworld-container">
+    <!-- Grass Terrain -->
+    <div class="grass-terrain">
+      <!-- Grass variation patches -->
+      <div class="grass-patch" style="top: 50px; left: 100px;"></div>
+      <div class="grass-patch" style="top: 200px; left: 400px;"></div>
+      <div class="grass-patch" style="top: 350px; left: 600px;"></div>
+      <div class="grass-patch" style="top: 450px; left: 200px;"></div>
+    </div>
+
+    <!-- Paths -->
+    <div class="path path-horizontal" style="top: 280px;"></div>
+    <div class="path path-vertical" style="left: 450px;"></div>
+
+    <!-- Buildings -->
+    <div class="building" style="top: 80px; left: 100px;">
+      <div class="house">
+        <div class="roof"></div>
+        <div class="window" style="top: 30px; left: 15px;"></div>
+        <div class="window" style="top: 30px; right: 15px;"></div>
+        <div class="door"></div>
+      </div>
+    </div>
+
+    <div class="building" style="top: 80px; left: 600px;">
+      <div class="house">
+        <div class="roof"></div>
+        <div class="window" style="top: 30px; left: 15px;"></div>
+        <div class="window" style="top: 30px; right: 15px;"></div>
+        <div class="door"></div>
+      </div>
+    </div>
+
+    <div class="building" style="top: 400px; left: 350px;">
+      <div class="house">
+        <div class="roof"></div>
+        <div class="window" style="top: 30px; left: 15px;"></div>
+        <div class="window" style="top: 30px; right: 15px;"></div>
+        <div class="door"></div>
+      </div>
+    </div>
+
+    <!-- NPCs -->
+    <div class="entity" style="top: 240px; left: 300px;">
+      <div class="entity-sprite">👨</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Village Elder</div>
+    </div>
+
+    <div class="entity" style="top: 320px; left: 550px;">
+      <div class="entity-sprite">👩</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Shopkeeper</div>
+    </div>
+
+    <div class="entity" style="top: 180px; left: 650px;">
+      <div class="entity-sprite">🧓</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Old Man</div>
+    </div>
+
+    <div class="entity" style="top: 450px; left: 200px;">
+      <div class="entity-sprite">🧒</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Kid</div>
+    </div>
+
+    <div class="entity" style="top: 280px; left: 150px;">
+      <div class="entity-sprite">🐕</div>
+      <div class="entity-shadow"></div>
+    </div>
+
+    <!-- Player (Isaac) -->
+    <div class="entity player" style="top: 300px; left: 400px;">
+      <div class="entity-sprite">🧍</div>
+      <div class="entity-shadow"></div>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-item">Location: Vale Village</div>
+      <div class="hud-item">💰 Gold: 350</div>
+      <div class="hud-item">⭐ Level: 3</div>
+    </div>
+
+    <!-- Minimap -->
+    <div class="minimap">
+      <div class="minimap-title">VALE VILLAGE</div>
+      <div class="minimap-grid">
+        <div class="minimap-player"></div>
+      </div>
+    </div>
+
+    <!-- Dialogue Box (appears when talking to NPC) -->
+    <div class="dialogue-box">
+      <div class="dialogue-speaker">Village Elder:</div>
+      <div class="dialogue-text">
+        Welcome to Vale Village, Isaac!<br>
+        Have you heard about the strange<br>
+        Djinn sightings near Mt. Aleph?
+      </div>
+      <div class="dialogue-prompt">▼ Press A to continue</div>
+    </div>
+  </div>
+
+  <script>
+    // Simple WASD movement demonstration
+    const player = document.querySelector('.player');
+    let x = 400, y = 300;
+
+    document.addEventListener('keydown', (e) => {
+      const speed = 8;
+      switch(e.key.toLowerCase()) {
+        case 'w': case 'arrowup': y = Math.max(80, y - speed); break;
+        case 's': case 'arrowdown': y = Math.min(560, y + speed); break;
+        case 'a': case 'arrowleft': x = Math.max(20, x - speed); break;
+        case 'd': case 'arrowright': x = Math.min(920, x + speed); break;
+      }
+      player.style.top = y + 'px';
+      player.style.left = x + 'px';
+    });
+  </script>
+</body>
+</html>
