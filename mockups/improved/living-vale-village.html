@@ -418,18 +418,19 @@
 
         // Add sprite-based buildings
         const buildingSprites = [
-          { src: './sprites/buildings/Vale_Isaacs_House.gif', x: 150, y: 420, w: 120, h: 100 },
-          { src: './sprites/buildings/Vale_Inn.gif', x: 650, y: 450, w: 120, h: 100 },
-          { src: './sprites/buildings/Vale_Elder_House.gif', x: 380, y: 240, w: 140, h: 120 },
-          { src: './sprites/buildings/Vale_Item_Shop.gif', x: 500, y: 380, w: 100, h: 90 }
+          { src: './sprites/buildings/Vale/Vale_Isaacs_House.gif', x: 150, y: 420, w: 120, h: 100 },
+          { src: './sprites/buildings/Vale/Vale_Inn.gif', x: 650, y: 450, w: 120, h: 100 },
+          { src: './sprites/buildings/Vale/Vale_Kradens_House.gif', x: 380, y: 240, w: 140, h: 120 },
+          { src: './sprites/buildings/Vale/Vale_WepArm_Shop.gif', x: 500, y: 380, w: 100, h: 90 }
         ];
 
         this.buildings = [];
         buildingSprites.forEach(b => {
           const img = new Image();
           img.src = b.src;
-          this.buildings.push({ img, x: b.x, y: b.y, w: b.w, h: b.h, loaded: false });
-          img.onload = () => { this.buildings[this.buildings.length - 1].loaded = true; };
+          const building = { img, x: b.x, y: b.y, w: b.w, h: b.h, loaded: false };
+          this.buildings.push(building);
+          img.onload = () => { building.loaded = true; };
         });
 
         // Add sprite-based characters
@@ -460,22 +461,66 @@
           this.characters.push(char);
         });
 
-        // Add trees and foliage
-        this.trees = [
-          { x: 80, y: 360, size: 60, sway: 0 },
-          { x: 720, y: 320, size: 70, sway: 0.5 },
-          { x: 200, y: 520, size: 50, sway: 1.2 },
-          { x: 850, y: 480, size: 55, sway: 0.8 },
-          { x: 450, y: 340, size: 65, sway: 1.5 }
+        // Add sprite-based trees
+        const treeSprites = [
+          { src: './sprites/scenery/plants/Tree1.gif', x: 80, y: 330, w: 60, h: 80, sway: 0 },
+          { src: './sprites/scenery/plants/Tree3.gif', x: 720, y: 290, w: 70, h: 90, sway: 0.5 },
+          { src: './sprites/scenery/plants/Small_Tree2.gif', x: 200, y: 490, w: 50, h: 60, sway: 1.2 },
+          { src: './sprites/scenery/plants/Tree5.gif', x: 850, y: 450, w: 60, h: 80, sway: 0.8 },
+          { src: './sprites/scenery/plants/Tree2.gif', x: 450, y: 310, w: 70, h: 90, sway: 1.5 }
         ];
 
-        // Add rocks and decorations
-        this.decorations = [
-          { x: 120, y: 550, type: 'rock', size: 20 },
-          { x: 700, y: 570, type: 'rock', size: 25 },
-          { x: 350, y: 490, type: 'rock', size: 18 },
-          { x: 550, y: 530, type: 'rock', size: 22 }
+        this.trees = [];
+        treeSprites.forEach(t => {
+          const img = new Image();
+          img.src = t.src;
+          const tree = { img, x: t.x, y: t.y, w: t.w, h: t.h, sway: t.sway, loaded: false };
+          this.trees.push(tree);
+          img.onload = () => { tree.loaded = true; };
+        });
+
+        // Add sprite-based rocks and decorations
+        const decorSprites = [
+          { src: './sprites/scenery/outdoor/sm/boulder.gif', x: 120, y: 540, w: 40, h: 30, type: 'rock' },
+          { src: './sprites/scenery/outdoor/sm/stone3.gif', x: 700, y: 560, w: 30, h: 25, type: 'rock' },
+          { src: './sprites/scenery/outdoor/sm/stone5.gif', x: 350, y: 480, w: 35, h: 30, type: 'rock' },
+          { src: './sprites/scenery/outdoor/lg/big_stone.gif', x: 550, y: 520, w: 50, h: 40, type: 'rock' },
+          { src: './sprites/scenery/plants/Bush.gif', x: 280, y: 450, w: 40, h: 35, type: 'bush' },
+          { src: './sprites/scenery/plants/Shrub2.gif', x: 580, y: 480, w: 35, h: 30, type: 'bush' },
+          { src: './sprites/scenery/plants/Flowers.gif', x: 420, y: 520, w: 30, h: 25, type: 'flowers' }
         ];
+
+        this.decorations = [];
+        decorSprites.forEach(d => {
+          const img = new Image();
+          img.src = d.src;
+          const decor = { img, x: d.x, y: d.y, w: d.w, h: d.h, type: d.type, loaded: false };
+          this.decorations.push(decor);
+          img.onload = () => { decor.loaded = true; };
+        });
+
+        // Add pathway stones/tiles
+        const pathwaySprites = [
+          { src: './sprites/scenery/outdoor/sm/stone6.gif', x: 170, y: 470, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone7.gif', x: 200, y: 465, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone8.gif', x: 230, y: 460, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone9.gif', x: 400, y: 350, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone10.gif', x: 430, y: 345, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone11.gif', x: 460, y: 340, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone12.gif', x: 620, y: 490, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone13.gif', x: 650, y: 485, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone1.gif', x: 520, y: 430, w: 30, h: 25 },
+          { src: './sprites/scenery/outdoor/sm/stone2.gif', x: 550, y: 425, w: 30, h: 25 }
+        ];
+
+        this.pathways = [];
+        pathwaySprites.forEach(p => {
+          const img = new Image();
+          img.src = p.src;
+          const pathway = { img, x: p.x, y: p.y, w: p.w, h: p.h, loaded: false };
+          this.pathways.push(pathway);
+          img.onload = () => { pathway.loaded = true; };
+        });
 
         // If no assets to load, just start immediately
         if (this.assetsToLoad === 0) {
@@ -669,45 +714,65 @@
           }
         });
 
-        // Draw decorations (rocks)
-        this.decorations.forEach(dec => {
-          if (dec.type === 'rock') {
-            this.ctx.fillStyle = '#6a6a6a';
-            this.ctx.beginPath();
-            this.ctx.ellipse(dec.x, dec.y, dec.size, dec.size * 0.6, 0, 0, Math.PI * 2);
-            this.ctx.fill();
+        // Draw pathway stones
+        if (this.pathways) {
+          this.pathways.forEach(path => {
+            if (path.loaded && path.img) {
+              this.ctx.drawImage(path.img, path.x, path.y, path.w, path.h);
+            } else {
+              // Fallback pathway
+              this.ctx.fillStyle = 'rgba(120, 110, 100, 0.6)';
+              this.ctx.fillRect(path.x, path.y, path.w, path.h);
+            }
+          });
+        }
 
-            // Highlight
-            this.ctx.fillStyle = '#8a8a8a';
+        // Draw decorations (rocks, bushes, flowers)
+        this.decorations.forEach(dec => {
+          // Draw shadow
+          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          this.ctx.beginPath();
+          this.ctx.ellipse(dec.x + dec.w * 0.5, dec.y + dec.h + 3, dec.w * 0.5, 5, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          // Draw sprite
+          if (dec.loaded && dec.img) {
+            this.ctx.drawImage(dec.img, dec.x, dec.y, dec.w, dec.h);
+          } else {
+            // Fallback
+            this.ctx.fillStyle = dec.type === 'rock' ? '#6a6a6a' : '#5a7850';
             this.ctx.beginPath();
-            this.ctx.ellipse(dec.x - dec.size * 0.3, dec.y - dec.size * 0.2, dec.size * 0.4, dec.size * 0.2, 0, 0, Math.PI * 2);
+            this.ctx.ellipse(dec.x + dec.w * 0.5, dec.y + dec.h * 0.5, dec.w * 0.4, dec.h * 0.4, 0, 0, Math.PI * 2);
             this.ctx.fill();
           }
         });
 
-        // Draw trees
+        // Draw trees with sprite images
         this.trees.forEach(tree => {
           const swayOffset = Math.sin(this.time * 0.5 + tree.sway) * 3;
 
-          // Tree trunk
-          this.ctx.fillStyle = '#6a5840';
-          this.ctx.fillRect(tree.x - tree.size * 0.1, tree.y - tree.size * 0.3, tree.size * 0.2, tree.size * 0.5);
-
-          // Tree foliage (3 layers for depth)
-          this.ctx.fillStyle = '#5a7850';
+          // Draw shadow
+          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
           this.ctx.beginPath();
-          this.ctx.arc(tree.x + swayOffset, tree.y - tree.size * 0.5, tree.size * 0.4, 0, Math.PI * 2);
+          this.ctx.ellipse(tree.x + tree.w * 0.5, tree.y + tree.h + 5, tree.w * 0.6, 8, 0, 0, Math.PI * 2);
           this.ctx.fill();
 
-          this.ctx.fillStyle = '#6a8860';
-          this.ctx.beginPath();
-          this.ctx.arc(tree.x + swayOffset * 0.8, tree.y - tree.size * 0.6, tree.size * 0.35, 0, Math.PI * 2);
-          this.ctx.fill();
-
-          this.ctx.fillStyle = '#7a9870';
-          this.ctx.beginPath();
-          this.ctx.arc(tree.x + swayOffset * 0.5, tree.y - tree.size * 0.7, tree.size * 0.25, 0, Math.PI * 2);
-          this.ctx.fill();
+          // Draw tree sprite with sway effect
+          if (tree.loaded && tree.img) {
+            this.ctx.save();
+            this.ctx.translate(tree.x + tree.w * 0.5, tree.y);
+            this.ctx.translate(swayOffset, 0);
+            this.ctx.drawImage(tree.img, -tree.w * 0.5, 0, tree.w, tree.h);
+            this.ctx.restore();
+          } else {
+            // Fallback to simple tree shape
+            this.ctx.fillStyle = '#6a5840';
+            this.ctx.fillRect(tree.x - 5 + swayOffset, tree.y + tree.h * 0.6, 10, tree.h * 0.4);
+            this.ctx.fillStyle = '#5a7850';
+            this.ctx.beginPath();
+            this.ctx.arc(tree.x + swayOffset, tree.y + tree.h * 0.3, tree.w * 0.4, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
         });
 
         // Draw buildings with shadows
