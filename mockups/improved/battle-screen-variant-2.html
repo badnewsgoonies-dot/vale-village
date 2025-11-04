@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Expanded Info Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      display: flex;
+    }
+
+    /* Left Side: Battle View */
+    .battle-view {
+      flex: 1;
+      position: relative;
+      background: url('/sprites/backgrounds/gs1/Forest.gif') center/cover;
+    }
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 40px;
+      z-index: 10;
+    }
+
+    .enemy-sprite {
+      position: relative;
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 140px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7));
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Party Area */
+    .party-area {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      height: 160px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 60px;
+      gap: 30px;
+      z-index: 20;
+    }
+
+    .party-sprite img {
+      width: auto;
+      height: 100px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+    }
+
+    /* Right Side: Info Panel */
+    .info-panel {
+      width: 320px;
+      background: linear-gradient(180deg, #0a0a1a 0%, #050510 100%);
+      border-left: 4px solid #d4af37;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Turn Order Timeline */
+    .turn-order-section {
+      background: rgba(0,0,0,0.6);
+      border-bottom: 2px solid #d4af37;
+      padding: 12px;
+    }
+
+    .section-title {
+      font-size: 8px;
+      color: #d4af37;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .turn-timeline {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .turn-slot {
+      min-width: 48px;
+      height: 56px;
+      background: rgba(20,20,40,0.8);
+      border: 2px solid #4a4a6a;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .turn-slot.active {
+      border-color: #d4af37;
+      box-shadow: 0 0 12px rgba(212,175,55,0.6);
+    }
+
+    .turn-portrait {
+      width: 32px;
+      height: 32px;
+      border-radius: 3px;
+      border: 1px solid #666;
+      background-size: cover;
+    }
+
+    .turn-name {
+      font-size: 5px;
+      color: #ccc;
+      text-align: center;
+    }
+
+    /* Party Status - Detailed */
+    .party-status-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .party-card {
+      background: rgba(20,20,40,0.6);
+      border: 2px solid #5090d8;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .party-card.active {
+      border-color: #d4af37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.4);
+    }
+
+    .party-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .party-portrait {
+      width: 40px;
+      height: 40px;
+      background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;
+      border: 2px solid #5090d8;
+      border-radius: 4px;
+    }
+
+    .party-info {
+      flex: 1;
+    }
+
+    .party-card-name {
+      font-size: 9px;
+      color: #5090d8;
+      margin-bottom: 2px;
+    }
+
+    .party-level {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 6px;
+    }
+
+    .stat-label {
+      color: #888;
+    }
+
+    .stat-value {
+      color: #fff;
+    }
+
+    .hp-pp-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bar-label {
+      font-size: 6px;
+      color: #888;
+      width: 16px;
+    }
+
+    .stat-bar {
+      flex: 1;
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid #666;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+    }
+
+    .pp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #5090d8 0%, #2060a8 100%);
+    }
+
+    .bar-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .status-effects {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .status-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid #666;
+      font-size: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-boost { background: rgba(80,144,216,0.3); border-color: #5090d8; }
+    .status-buff { background: rgba(232,160,80,0.3); border-color: #e8a050; }
+
+    /* Enemy Status Section */
+    .enemy-status-section {
+      background: rgba(0,0,0,0.6);
+      border-top: 2px solid #d4af37;
+      padding: 12px;
+    }
+
+    .enemy-card {
+      background: rgba(40,20,20,0.6);
+      border: 2px solid #e05050;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 6px;
+    }
+
+    .enemy-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .enemy-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .enemy-card-name {
+      font-size: 8px;
+      color: #e05050;
+    }
+
+    .enemy-level {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .enemy-hp-display {
+      margin-bottom: 4px;
+    }
+
+    .enemy-hp-bar {
+      width: 100%;
+      height: 10px;
+      background: #2a1810;
+      border: 1px solid #e05050;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+      transition: width 0.3s ease;
+    }
+
+    .enemy-weakness {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .weakness-label {
+      font-size: 5px;
+      color: #888;
+    }
+
+    .element-icon {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid #666;
+    }
+
+    .element-venus { background: radial-gradient(circle, #e8a050 0%, #b87020 100%); }
+    .element-mars { background: radial-gradient(circle, #e05050 0%, #a03030 100%); }
+    .element-mercury { background: radial-gradient(circle, #5090d8 0%, #2060a8 100%); }
+    .element-jupiter { background: radial-gradient(circle, #a858d8 0%, #7030a0 100%); }
+
+    /* Command Section */
+    .command-section {
+      background: rgba(0,0,0,0.8);
+      border-top: 2px solid #d4af37;
+      padding: 10px;
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .command-btn {
+      background: linear-gradient(180deg, #3a3a5a 0%, #1a1a3a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .command-btn:hover {
+      background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
+      border-color: #d4af37;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Left: Battle View -->
+    <div class="battle-view">
+      <!-- Enemy Area -->
+      <div class="enemy-area">
+        <div class="enemy-sprite">
+          <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+        </div>
+        <div class="enemy-sprite" style="animation-delay: -1s;">
+          <img src="/sprites/battle/enemies/Goblin.gif" alt="Goblin">
+        </div>
+      </div>
+
+      <!-- Party Area -->
+      <div class="party-area">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        </div>
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        </div>
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        </div>
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Info Panel -->
+    <div class="info-panel">
+      <!-- Turn Order -->
+      <div class="turn-order-section">
+        <div class="section-title">TURN ORDER</div>
+        <div class="turn-timeline">
+          <div class="turn-slot active">
+            <div class="turn-portrait" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+            <div class="turn-name">ISAAC</div>
+          </div>
+          <div class="turn-slot">
+            <div class="turn-portrait" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+            <div class="turn-name">IVAN</div>
+          </div>
+          <div class="turn-slot">
+            <div class="turn-portrait" style="background: #e05050;"></div>
+            <div class="turn-name">ORC</div>
+          </div>
+          <div class="turn-slot">
+            <div class="turn-portrait" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+            <div class="turn-name">GARET</div>
+          </div>
+          <div class="turn-slot">
+            <div class="turn-portrait" style="background: #e05050;"></div>
+            <div class="turn-name">GOBLIN</div>
+          </div>
+          <div class="turn-slot">
+            <div class="turn-portrait" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+            <div class="turn-name">MIA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Party Status -->
+      <div class="party-status-section">
+        <div class="section-title">YOUR PARTY</div>
+
+        <div class="party-card active">
+          <div class="party-header">
+            <div class="party-portrait"></div>
+            <div class="party-info">
+              <div class="party-card-name">ISAAC</div>
+              <div class="party-level">LV 12 • VENUS</div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-row">
+              <span class="stat-label">ATK</span>
+              <span class="stat-value">124</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">DEF</span>
+              <span class="stat-value">98</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">AGI</span>
+              <span class="stat-value">87</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">LCK</span>
+              <span class="stat-value">52</span>
+            </div>
+          </div>
+
+          <div class="hp-pp-bars">
+            <div class="bar-row">
+              <div class="bar-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 85%;"></div>
+                <div class="bar-text">204/240</div>
+              </div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 60%;"></div>
+                <div class="bar-text">36/60</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="status-effects">
+            <div class="status-icon status-boost">↑</div>
+            <div class="status-icon status-buff">🛡️</div>
+          </div>
+        </div>
+
+        <div class="party-card">
+          <div class="party-header">
+            <div class="party-portrait" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+            <div class="party-info">
+              <div class="party-card-name">GARET</div>
+              <div class="party-level">LV 11 • MARS</div>
+            </div>
+          </div>
+
+          <div class="hp-pp-bars">
+            <div class="bar-row">
+              <div class="bar-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 70%;"></div>
+                <div class="bar-text">175/250</div>
+              </div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 42%;"></div>
+                <div class="bar-text">21/50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-card">
+          <div class="party-header">
+            <div class="party-portrait" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+            <div class="party-info">
+              <div class="party-card-name">IVAN</div>
+              <div class="party-level">LV 12 • JUPITER</div>
+            </div>
+          </div>
+
+          <div class="hp-pp-bars">
+            <div class="bar-row">
+              <div class="bar-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 92%;"></div>
+                <div class="bar-text">184/200</div>
+              </div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 75%;"></div>
+                <div class="bar-text">60/80</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-card">
+          <div class="party-header">
+            <div class="party-portrait" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+            <div class="party-info">
+              <div class="party-card-name">MIA</div>
+              <div class="party-level">LV 11 • MERCURY</div>
+            </div>
+          </div>
+
+          <div class="hp-pp-bars">
+            <div class="bar-row">
+              <div class="bar-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 88%;"></div>
+                <div class="bar-text">176/200</div>
+              </div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 55%;"></div>
+                <div class="bar-text">49/90</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enemy Status -->
+      <div class="enemy-status-section">
+        <div class="section-title">ENEMIES</div>
+
+        <div class="enemy-card">
+          <div class="enemy-card-header">
+            <div class="enemy-card-name">ORC</div>
+            <div class="enemy-level">LV 10</div>
+          </div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 58%;"></div>
+            <div class="bar-text">232/400</div>
+          </div>
+          <div class="enemy-weakness">
+            <span class="weakness-label">WEAK:</span>
+            <div class="element-icon element-mercury"></div>
+            <div class="element-icon element-jupiter"></div>
+          </div>
+        </div>
+
+        <div class="enemy-card">
+          <div class="enemy-card-header">
+            <div class="enemy-card-name">GOBLIN</div>
+            <div class="enemy-level">LV 8</div>
+          </div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 35%;"></div>
+            <div class="bar-text">70/200</div>
+          </div>
+          <div class="enemy-weakness">
+            <span class="weakness-label">WEAK:</span>
+            <div class="element-icon element-mars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commands -->
+      <div class="command-section">
+        <div class="command-grid">
+          <button class="command-btn">⚔️ ATTACK</button>
+          <button class="command-btn">✨ PSYNERGY</button>
+          <button class="command-btn">🔮 DJINN</button>
+          <button class="command-btn">🛡️ DEFEND</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

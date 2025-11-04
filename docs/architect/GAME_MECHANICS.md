@@ -770,19 +770,21 @@ function calculateBattleGold(enemyLevel: number): number {
 
 ### 4.3 Drop Rates
 
+**🚨 DESIGN NOTE:** Enemies drop equipment only (no consumable items).
+
 ```typescript
 const DROP_RATES = {
   common: {
     chance: 0.30,  // 30%
-    items: ["Herb", "Antidote", "Potion"]
+    items: ["Iron Sword", "Iron Armor", "Cloth Cap", "Leather Boots"]
   },
   rare: {
     chance: 0.10,  // 10%
-    items: ["Iron Sword", "Iron Armor", "Steel Helm"]
+    items: ["Steel Sword", "Steel Armor", "Steel Helm", "Hyper Boots"]
   },
   legendary: {
     chance: 0.02,  // 2%
-    items: ["Sol Blade", "Dragon Scales", "Hermes' Sandals"]
+    items: ["Sol Blade", "Dragon Scales", "Oracle's Crown", "Hermes' Sandals"]
   }
 };
 
@@ -802,7 +804,7 @@ const RECRUITMENT_REWARDS = {
   unitRecruitment: true,
   bonusXP: 200,     // Flat bonus
   bonusGold: 500,   // Flat bonus
-  guaranteedDrop: "rare"  // Always drops rare item
+  guaranteedDrop: "rare"  // Always drops rare equipment
 };
 ```
 
@@ -960,13 +962,7 @@ const PP_REGEN = {
   afterBattle: 1.0,        // Full PP restore after battle ends
   innRest: 1.0,            // Full PP restore at inn (costs gold)
   perTurnInBattle: 0.0,    // NO regen during battle
-  itemRestoration: true,   // Items can restore PP
-
-  items: {
-    "Herb": { ppRestore: 0, hpRestore: 30 },
-    "Potion": { ppRestore: 20, hpRestore: 50 },
-    "Elixir": { ppRestore: 999, hpRestore: 999 }  // Full restore
-  }
+  abilityRestoration: true // Healing abilities can restore PP (e.g., Wish, Glacial Blessing)
 };
 ```
 
@@ -1744,14 +1740,14 @@ const STATUS_AILMENTS = {
   poison: {
     damagePerTurn: (targetMaxHP: number) => Math.floor(targetMaxHP * 0.08),  // 8% max HP
     duration: 5,      // Lasts 5 turns
-    cure: ["Antidote", "Wish", "Inn Rest"],
+    cure: ["Cure (ability)", "Wish", "Inn Rest"],
     tick: "START_OF_TURN"  // Damage before unit acts
   },
 
   burn: {
     damagePerTurn: (targetMaxHP: number) => Math.floor(targetMaxHP * 0.10),  // 10% max HP
     duration: 3,      // Lasts 3 turns
-    cure: ["Herb", "Ply", "Wish", "Inn Rest"],
+    cure: ["Ply", "Wish", "Inn Rest"],
     tick: "START_OF_TURN"
   },
 
@@ -1766,7 +1762,7 @@ const STATUS_AILMENTS = {
   paralyze: {
     effect: "50% chance to fail action each turn",
     duration: 2,          // Lasts 2 turns
-    cure: ["Elixir", "Wish", "Inn Rest"],
+    cure: ["Restore (ability)", "Wish", "Inn Rest"],
     tick: "BEFORE_ACTION"  // Check before unit acts
   }
 };
@@ -2303,7 +2299,7 @@ const MAP_REGIONS = {
     name: "Vale Village",
     size: { width: 40, height: 30 },  // In tiles (16px each)
     npcs: ["Isaac", "Garet", "Ivan", "Jenna (pre-recruit)"],
-    shops: ["Item Shop", "Armor Shop"],
+    shops: ["Equipment Shop"],
     inn: true,
     battleBackground: "vale_grassland"
   },
@@ -2334,22 +2330,19 @@ const MAP_REGIONS = {
 
 ## 14. SHOP SYSTEM
 
+**🚨 DESIGN NOTE:** No consumable items in this game. Healing/buffs handled by abilities (Ply, Wish, etc.). Shops sell equipment only.
+
 ### 14.1 Shop Types
 
 ```typescript
 const SHOP_TYPES = {
-  itemShop: {
-    inventory: ["Consumables only"],
-    items: ["Herb", "Potion", "Antidote", "Elixir"]
-  },
-
-  armorShop: {
+  equipmentShop: {
     inventory: ["Equipment only"],
     items: ["Weapons", "Armor", "Helms", "Boots"]
   },
 
   specialShop: {
-    inventory: ["Rare items after story flags"],
+    inventory: ["Rare equipment after story flags"],
     unlockCondition: "STORY_PROGRESSION"
   }
 };
@@ -2366,7 +2359,7 @@ const BUYING_SYSTEM = {
 
   requirements: {
     goldCheck: true,  // Must have enough gold
-    inventorySpace: true  // Must have inventory space (99 max per item)
+    inventorySpace: true  // Must have equipment space (unlimited)
   },
 
   transaction: {
@@ -2383,10 +2376,10 @@ const STARTING_RESOURCES = {
   gold: 500,  // Player starts with 500 gold
 
   // Can afford at start:
-  // - Herb (30g) × 10 = 300g
-  // - OR Wooden Sword (50g) + Leather Vest (80g) + 370g remaining
+  // - Wooden Sword (50g) + Leather Vest (80g) = 130g
+  // - 370g remaining for other equipment
 
-  initialInventory: []  // Starts with no items (must buy from shops)
+  initialInventory: []  // Starts with no equipment (must buy from shops)
 };
 ```
 
@@ -2400,7 +2393,6 @@ const SELLING_SYSTEM = {
 
   canSell: {
     equipment: true,    // Can sell weapons, armor, helms, boots
-    consumables: false, // Cannot sell Herbs, Potions (use or keep)
     keyItems: false     // Cannot sell quest items
   },
 
@@ -2415,30 +2407,20 @@ const SELLING_SYSTEM = {
 ```typescript
 // Buy Iron Sword for 200g
 player.gold -= 200;
-player.inventory.push("Iron Sword");
+player.equipment.push({ type: "weapon", id: "iron-sword" });
 
 // Later, sell Iron Sword
 const sellPrice = Math.floor(200 * 0.5);  // 100g
 player.gold += 100;
-player.inventory.remove("Iron Sword");
+player.equipment.remove("iron-sword");
 ```
 
 ### 14.4 Shop Inventory by Location
 
 ```typescript
 const SHOP_INVENTORY = {
-  "vale-village-item-shop": {
-    name: "Vale Item Shop",
-    items: [
-      { id: "herb", price: 30, stock: "UNLIMITED" },
-      { id: "potion", price: 60, stock: "UNLIMITED" },
-      { id: "antidote", price: 20, stock: "UNLIMITED" }
-    ],
-    unlockCondition: "ALWAYS"
-  },
-
-  "vale-village-armor-shop": {
-    name: "Vale Armor Shop",
+  "vale-village-equipment-shop": {
+    name: "Vale Equipment Shop",
     items: [
       { id: "wooden-sword", price: 50, stock: "UNLIMITED" },
       { id: "leather-vest", price: 80, stock: "UNLIMITED" },

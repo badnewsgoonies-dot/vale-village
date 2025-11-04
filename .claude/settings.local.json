@@ -30,7 +30,9 @@
       "Bash(gh --version:*)",
       "Bash(git rev-parse:*)",
       "Bash(wc:*)",
-      "Bash(xdg-open:*)"
+      "Bash(xdg-open:*)",
+      "Bash(ROLE_2_GRAPHICS_MOCKUP_ONBOARDING_FIXED.md)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

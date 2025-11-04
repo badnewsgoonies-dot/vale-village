@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Portrait + Element Hybrid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Venus Element Theme - Medieval */
+      --element-primary: #d4a574;
+      --element-secondary: #8a6840;
+      --element-border: #8a6840;
+      --stone-dark: #3a3a3a;
+      --stone-light: #6a6a6a;
+      --parchment: #e8d8c0;
+      --wood: #5a4030;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: var(--stone-dark);
+      overflow: hidden;
+      border: 6px solid var(--wood);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* Medieval Header Banner */
+    .element-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--wood) 0px,
+        var(--wood) 40px,
+        #4a3020 40px,
+        #4a3020 42px
+      );
+      border-bottom: 4px solid var(--element-border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    .element-emblem {
+      width: 40px;
+      height: 40px;
+      background: var(--element-primary);
+      border: 3px solid var(--element-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .battle-title {
+      flex: 1;
+      text-align: center;
+      font-size: 10px;
+      color: var(--parchment);
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .turn-badge {
+      background: var(--parchment);
+      border: 3px solid var(--element-border);
+      padding: 6px 12px;
+      font-size: 8px;
+      color: var(--wood);
+    }
+
+    /* Battle Background - Center */
+    .battle-background {
+      position: absolute;
+      top: 0;
+      left: 220px;
+      right: 220px;
+      bottom: 0;
+      background: url('/sprites/backgrounds/gs1/Mountain.gif') center/cover;
+      z-index: 0;
+    }
+
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      top: 100px;
+      left: 220px;
+      right: 220px;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 60px;
+      z-index: 10;
+    }
+
+    .enemy-sprite {
+      position: relative;
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 120px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7));
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .enemy-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      color: #e05050;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #e05050;
+      white-space: nowrap;
+    }
+
+    /* Party Battle Sprites */
+    .party-battle-area {
+      position: absolute;
+      bottom: 200px;
+      left: 220px;
+      right: 220px;
+      height: 120px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 40px;
+      gap: 30px;
+      z-index: 20;
+    }
+
+    .party-battle-sprite img {
+      width: auto;
+      height: 80px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+    }
+
+    /* Left: Party Portraits - Medieval Parchment */
+    .party-portraits {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background: linear-gradient(90deg, var(--parchment) 0%, rgba(232,216,192,0.95) 90%, transparent 100%);
+      border-right: 6px solid var(--wood);
+      box-shadow: 4px 0 12px rgba(0,0,0,0.4);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      padding: 60px 12px 12px 12px;
+      gap: 10px;
+    }
+
+    .portrait-card {
+      background: rgba(210,190,160,0.9);
+      border: 3px solid var(--element-border);
+      padding: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .portrait-card.active {
+      border-color: var(--wood);
+      box-shadow: 0 0 0 2px var(--element-primary), 2px 2px 6px rgba(0,0,0,0.4);
+      background: rgba(220,200,170,0.95);
+    }
+
+    .portrait-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .portrait-large {
+      width: 56px;
+      height: 56px;
+      border: 3px solid var(--wood);
+      background-size: cover;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    .portrait-card.active .portrait-large {
+      border-color: var(--element-primary);
+    }
+
+    .portrait-name-info {
+      flex: 1;
+    }
+
+    .portrait-name {
+      font-size: 8px;
+      color: var(--wood);
+      margin-bottom: 3px;
+    }
+
+    .portrait-card.active .portrait-name {
+      color: var(--element-primary);
+    }
+
+    .portrait-level {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .portrait-element {
+      font-size: 5px;
+      color: var(--element-primary);
+      margin-top: 2px;
+    }
+
+    .portrait-hp-pp {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .portrait-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .portrait-bar-label {
+      font-size: 6px;
+      color: #888;
+      width: 14px;
+    }
+
+    .portrait-stat-bar {
+      flex: 1;
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid var(--element-primary);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+    }
+
+    .pp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, var(--element-primary) 0%, var(--element-secondary) 100%);
+    }
+
+    .portrait-bar-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* Right: Enemy Info - Medieval Parchment */
+    .enemy-portraits {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 220px;
+      height: 100%;
+      background: linear-gradient(270deg, var(--parchment) 0%, rgba(232,216,192,0.95) 90%, transparent 100%);
+      border-left: 6px solid var(--wood);
+      box-shadow: -4px 0 12px rgba(0,0,0,0.4);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      padding: 60px 12px 12px 12px;
+      gap: 16px;
+    }
+
+    .enemy-portrait-card {
+      background: rgba(210,190,160,0.9);
+      border: 3px solid var(--element-border);
+      padding: 10px;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .enemy-portrait-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .enemy-portrait-name {
+      font-size: 8px;
+      color: #e05050;
+    }
+
+    .enemy-portrait-level {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .enemy-portrait-sprite {
+      width: 100%;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+    }
+
+    .enemy-portrait-sprite img {
+      width: auto;
+      height: 80px;
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-portrait-hp {
+      margin-bottom: 6px;
+    }
+
+    .enemy-hp-label {
+      font-size: 6px;
+      color: #888;
+      margin-bottom: 3px;
+    }
+
+    .enemy-hp-bar {
+      width: 100%;
+      height: 10px;
+      background: #2a1810;
+      border: 1px solid #e05050;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+      transition: width 0.3s ease;
+    }
+
+    .enemy-weakness {
+      font-size: 5px;
+      color: #888;
+      margin-bottom: 3px;
+    }
+
+    .element-icons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .element-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #666;
+    }
+
+    .element-venus { background: radial-gradient(circle, #e8a050 0%, #b87020 100%); }
+    .element-mars { background: radial-gradient(circle, #e05050 0%, #a03030 100%); }
+    .element-mercury { background: radial-gradient(circle, #5090d8 0%, #2060a8 100%); }
+    .element-jupiter { background: radial-gradient(circle, #a858d8 0%, #7030a0 100%); }
+
+    /* Bottom: Command Panel - Medieval Stone */
+    .command-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(180deg, transparent 0%, var(--stone-light) 20%, var(--stone-dark) 100%);
+      border-top: 6px solid var(--wood);
+      box-shadow: 0 -6px 12px rgba(0,0,0,0.5);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px 40px;
+    }
+
+    .combat-log-element {
+      font-size: 7px;
+      color: var(--parchment);
+      margin-bottom: 12px;
+      text-align: center;
+      line-height: 1.5;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .current-turn-banner {
+      text-align: center;
+      font-size: 9px;
+      color: var(--element-primary);
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .command-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .element-btn {
+      background: linear-gradient(180deg, var(--stone-light) 0%, var(--stone-dark) 100%);
+      border: 3px solid var(--element-border);
+      color: var(--parchment);
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .element-btn:hover {
+      background: linear-gradient(180deg, #7a7a7a 0%, var(--stone-light) 100%);
+      border-color: var(--element-primary);
+      transform: translateY(-2px);
+      box-shadow: 3px 3px 6px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .element-btn-icon {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Element-Themed Header -->
+    <div class="element-header">
+      <div class="element-emblem">♁</div>
+      <div class="battle-title">⚔ VENUS BATTLE ⚔</div>
+      <div class="turn-badge">TURN 10</div>
+    </div>
+
+    <!-- Battle Background -->
+    <div class="battle-background"></div>
+
+    <!-- Enemy Area -->
+    <div class="enemy-area">
+      <div class="enemy-sprite">
+        <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        <div class="enemy-label">DIRE WOLF</div>
+      </div>
+      <div class="enemy-sprite" style="animation-delay: -1s;">
+        <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+        <div class="enemy-label">ORC</div>
+      </div>
+    </div>
+
+    <!-- Party Battle Sprites -->
+    <div class="party-battle-area">
+      <div class="party-battle-sprite">
+        <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+      </div>
+      <div class="party-battle-sprite">
+        <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+      </div>
+      <div class="party-battle-sprite">
+        <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+      </div>
+      <div class="party-battle-sprite">
+        <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+      </div>
+    </div>
+
+    <!-- Left: Party Portraits -->
+    <div class="party-portraits">
+      <div class="portrait-card active">
+        <div class="portrait-header">
+          <div class="portrait-large" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+          <div class="portrait-name-info">
+            <div class="portrait-name">ISAAC</div>
+            <div class="portrait-level">LV 12</div>
+            <div class="portrait-element">♁ VENUS</div>
+          </div>
+        </div>
+        <div class="portrait-hp-pp">
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">HP</div>
+            <div class="portrait-stat-bar">
+              <div class="hp-fill" style="width: 85%;"></div>
+              <div class="portrait-bar-text">204/240</div>
+            </div>
+          </div>
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">PP</div>
+            <div class="portrait-stat-bar">
+              <div class="pp-fill" style="width: 55%;"></div>
+              <div class="portrait-bar-text">33/60</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-large" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+          <div class="portrait-name-info">
+            <div class="portrait-name">GARET</div>
+            <div class="portrait-level">LV 11</div>
+            <div class="portrait-element">♂ MARS</div>
+          </div>
+        </div>
+        <div class="portrait-hp-pp">
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">HP</div>
+            <div class="portrait-stat-bar">
+              <div class="hp-fill" style="width: 70%;"></div>
+              <div class="portrait-bar-text">175/250</div>
+            </div>
+          </div>
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">PP</div>
+            <div class="portrait-stat-bar">
+              <div class="pp-fill" style="width: 40%;"></div>
+              <div class="portrait-bar-text">20/50</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-large" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+          <div class="portrait-name-info">
+            <div class="portrait-name">IVAN</div>
+            <div class="portrait-level">LV 12</div>
+            <div class="portrait-element">♃ JUPITER</div>
+          </div>
+        </div>
+        <div class="portrait-hp-pp">
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">HP</div>
+            <div class="portrait-stat-bar">
+              <div class="hp-fill" style="width: 92%;"></div>
+              <div class="portrait-bar-text">184/200</div>
+            </div>
+          </div>
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">PP</div>
+            <div class="portrait-stat-bar">
+              <div class="pp-fill" style="width: 75%;"></div>
+              <div class="portrait-bar-text">60/80</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-large" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="portrait-name-info">
+            <div class="portrait-name">MIA</div>
+            <div class="portrait-level">LV 11</div>
+            <div class="portrait-element">♀ MERCURY</div>
+          </div>
+        </div>
+        <div class="portrait-hp-pp">
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">HP</div>
+            <div class="portrait-stat-bar">
+              <div class="hp-fill" style="width: 88%;"></div>
+              <div class="portrait-bar-text">176/200</div>
+            </div>
+          </div>
+          <div class="portrait-bar-row">
+            <div class="portrait-bar-label">PP</div>
+            <div class="portrait-stat-bar">
+              <div class="pp-fill" style="width: 54%;"></div>
+              <div class="portrait-bar-text">49/90</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Enemy Info -->
+    <div class="enemy-portraits">
+      <div class="enemy-portrait-card">
+        <div class="enemy-portrait-header">
+          <div class="enemy-portrait-name">DIRE WOLF</div>
+          <div class="enemy-portrait-level">LV 10</div>
+        </div>
+        <div class="enemy-portrait-sprite">
+          <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        </div>
+        <div class="enemy-portrait-hp">
+          <div class="enemy-hp-label">HP</div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 65%;"></div>
+            <div class="portrait-bar-text">195/300</div>
+          </div>
+        </div>
+        <div class="enemy-weakness">WEAK TO:</div>
+        <div class="element-icons">
+          <div class="element-icon element-mars"></div>
+          <div class="element-icon element-jupiter"></div>
+        </div>
+      </div>
+
+      <div class="enemy-portrait-card">
+        <div class="enemy-portrait-header">
+          <div class="enemy-portrait-name">ORC</div>
+          <div class="enemy-portrait-level">LV 9</div>
+        </div>
+        <div class="enemy-portrait-sprite">
+          <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+        </div>
+        <div class="enemy-portrait-hp">
+          <div class="enemy-hp-label">HP</div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 48%;"></div>
+            <div class="portrait-bar-text">144/300</div>
+          </div>
+        </div>
+        <div class="enemy-weakness">WEAK TO:</div>
+        <div class="element-icons">
+          <div class="element-icon element-venus"></div>
+          <div class="element-icon element-mercury"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Command Panel -->
+    <div class="command-panel">
+      <div class="combat-log-element">
+        Isaac channels earth power • Quake is ready • Orc's defense is weakened!
+      </div>
+
+      <div class="current-turn-banner">⚔ ISAAC'S TURN ⚔</div>
+
+      <div class="command-buttons">
+        <button class="element-btn">
+          <div class="element-btn-icon">⚔️</div>
+          <div>ATTACK</div>
+        </button>
+        <button class="element-btn">
+          <div class="element-btn-icon">✨</div>
+          <div>PSYNERGY</div>
+        </button>
+        <button class="element-btn">
+          <div class="element-btn-icon">🔮</div>
+          <div>DJINN</div>
+        </button>
+        <button class="element-btn">
+          <div class="element-btn-icon">🛡️</div>
+          <div>DEFEND</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

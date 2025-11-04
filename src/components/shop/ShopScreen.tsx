@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { Panel } from '@/components/shared/Panel';
 import { Button } from '@/components/shared/Button';
-import type { Item } from '@/types/Item';
 import type { Equipment } from '@/types/Equipment';
 import {
-  getItemById,
   getEquipmentById,
   getShopItems,
-  VALE_VILLAGE_ITEM_SHOP,
   VALE_VILLAGE_EQUIPMENT_SHOP,
   type ShopInventory,
 } from '@/data/shops';

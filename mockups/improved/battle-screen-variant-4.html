@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Minimalist Clean</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: url('/sprites/backgrounds/gs1/Desert.gif') center/cover;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 80px;
+      z-index: 10;
+    }
+
+    .enemy-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .enemy-sprite {
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 150px;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Minimal HP indicator below enemy */
+    .enemy-hp-minimal {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .enemy-name-minimal {
+      font-size: 7px;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      padding: 2px 6px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 3px;
+    }
+
+    .hp-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .hp-dot {
+      width: 10px;
+      height: 10px;
+      background: #50d850;
+      border: 1px solid #2a7a2a;
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(80,216,80,0.6), inset 0 1px 2px rgba(255,255,255,0.3);
+    }
+
+    .hp-dot.empty {
+      background: #2a1810;
+      border-color: #666;
+      box-shadow: none;
+    }
+
+    /* Party Area */
+    .party-area {
+      position: absolute;
+      bottom: 140px;
+      left: 0;
+      right: 0;
+      height: 180px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 100px;
+      gap: 50px;
+      z-index: 20;
+    }
+
+    .party-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .party-sprite img {
+      width: auto;
+      height: 120px;
+      filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.8));
+    }
+
+    /* Minimal party status */
+    .party-status-minimal {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .party-name-minimal {
+      font-size: 7px;
+      color: #5090d8;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      padding: 2px 6px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 3px;
+      border: 1px solid rgba(80,144,216,0.3);
+    }
+
+    .party-name-minimal.active {
+      color: #d4af37;
+      border-color: rgba(212,175,55,0.5);
+      box-shadow: 0 0 8px rgba(212,175,55,0.4);
+    }
+
+    .mini-bars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mini-bar {
+      width: 30px;
+      height: 6px;
+      background: #2a1810;
+      border: 1px solid #666;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+    }
+
+    .mini-pp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5090d8 0%, #2060a8 100%);
+    }
+
+    /* Ultra-minimal command bar at bottom */
+    .command-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.95) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px 40px;
+      z-index: 100;
+    }
+
+    .active-unit-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .active-portrait-small {
+      width: 48px;
+      height: 48px;
+      background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      box-shadow: 0 0 12px rgba(212,175,55,0.4);
+    }
+
+    .active-info {
+      flex: 1;
+    }
+
+    .active-name-display {
+      font-size: 10px;
+      color: #d4af37;
+      margin-bottom: 4px;
+    }
+
+    .active-hp-pp-row {
+      display: flex;
+      gap: 8px;
+      font-size: 6px;
+      color: #ccc;
+    }
+
+    .commands-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .cmd-btn {
+      background: rgba(20,20,40,0.8);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 12px 24px;
+      min-width: 140px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .cmd-btn:hover {
+      background: rgba(40,40,60,0.9);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+    }
+
+    /* Minimal turn indicator */
+    .turn-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #d4af37;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 8px;
+      color: #d4af37;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    /* Combat message - minimal */
+    .combat-message {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #666;
+      border-radius: 6px;
+      padding: 8px 20px;
+      font-size: 8px;
+      color: #fff;
+      text-align: center;
+      z-index: 50;
+      max-width: 400px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Combat Message -->
+    <div class="combat-message">
+      Thunder Lizard is preparing an attack...
+    </div>
+
+    <!-- Turn Badge -->
+    <div class="turn-badge">
+      TURN 5
+    </div>
+
+    <!-- Enemy Area -->
+    <div class="enemy-area">
+      <div class="enemy-container">
+        <div class="enemy-sprite">
+          <img src="/sprites/battle/enemies/Thunder_Lizard.gif" alt="Thunder Lizard">
+        </div>
+        <div class="enemy-hp-minimal">
+          <div class="enemy-name-minimal">THUNDER LIZARD</div>
+          <div class="hp-dots">
+            <div class="hp-dot"></div>
+            <div class="hp-dot"></div>
+            <div class="hp-dot"></div>
+            <div class="hp-dot"></div>
+            <div class="hp-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enemy-container">
+        <div class="enemy-sprite" style="animation-delay: -1.5s;">
+          <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+        </div>
+        <div class="enemy-hp-minimal">
+          <div class="enemy-name-minimal">ORC</div>
+          <div class="hp-dots">
+            <div class="hp-dot"></div>
+            <div class="hp-dot"></div>
+            <div class="hp-dot empty"></div>
+            <div class="hp-dot empty"></div>
+            <div class="hp-dot empty"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Party Area -->
+    <div class="party-area">
+      <div class="party-container">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        </div>
+        <div class="party-status-minimal">
+          <div class="party-name-minimal active">ISAAC</div>
+          <div class="mini-bars">
+            <div class="mini-bar">
+              <div class="mini-hp-fill" style="width: 85%;"></div>
+            </div>
+            <div class="mini-bar">
+              <div class="mini-pp-fill" style="width: 60%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-container">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        </div>
+        <div class="party-status-minimal">
+          <div class="party-name-minimal">GARET</div>
+          <div class="mini-bars">
+            <div class="mini-bar">
+              <div class="mini-hp-fill" style="width: 72%;"></div>
+            </div>
+            <div class="mini-bar">
+              <div class="mini-pp-fill" style="width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-container">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        </div>
+        <div class="party-status-minimal">
+          <div class="party-name-minimal">IVAN</div>
+          <div class="mini-bars">
+            <div class="mini-bar">
+              <div class="mini-hp-fill" style="width: 95%;"></div>
+            </div>
+            <div class="mini-bar">
+              <div class="mini-pp-fill" style="width: 78%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-container">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+        </div>
+        <div class="party-status-minimal">
+          <div class="party-name-minimal">MIA</div>
+          <div class="mini-bars">
+            <div class="mini-bar">
+              <div class="mini-hp-fill" style="width: 88%;"></div>
+            </div>
+            <div class="mini-bar">
+              <div class="mini-pp-fill" style="width: 54%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Bar -->
+    <div class="command-bar">
+      <div class="active-unit-display">
+        <div class="active-portrait-small"></div>
+        <div class="active-info">
+          <div class="active-name-display">ISAAC</div>
+          <div class="active-hp-pp-row">
+            <span>HP 204/240</span>
+            <span>•</span>
+            <span>PP 36/60</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="commands-row">
+        <button class="cmd-btn">⚔️ ATTACK</button>
+        <button class="cmd-btn">✨ PSYNERGY</button>
+        <button class="cmd-btn">🔮 DJINN</button>
+        <button class="cmd-btn">🛡️ DEFEND</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -58,7 +58,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 48px;
+      width: 48px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
     }
 
@@ -356,7 +360,7 @@
     <!-- STAGE 1-2: Overworld -->
     <div class="overworld">
       <div class="grass-bg"></div>
-      <div class="player">🧍</div>
+      <img src="../../public/sprites/overworld/protagonists/Isaac.gif" alt="Isaac" class="player">
     </div>
 
     <!-- STAGE 2: Flash -->

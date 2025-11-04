@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Hub - Ground Level Focus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .overworld-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #5a8860;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Ground level terrain */
+    .ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 400px;
+      background: linear-gradient(180deg, #6a9870 0%, #5a8860 50%, #4a7850 100%);
+      z-index: 1;
+    }
+
+    /* Grass patches */
+    .grass-patch {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, #7aa880 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    .grass-1 { bottom: 100px; left: 150px; z-index: 2; }
+    .grass-2 { bottom: 180px; right: 200px; z-index: 2; width: 80px; height: 80px; }
+    .grass-3 { bottom: 250px; left: 50%; transform: translateX(-50%); z-index: 2; }
+
+    /* River */
+    .river {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #3070b0 0px,
+          #4080c0 20px,
+          #3070b0 40px
+        );
+      z-index: 3;
+      animation: riverFlow 6s linear infinite;
+      opacity: 0.85;
+    }
+
+    @keyframes riverFlow {
+      from { background-position: 0 0; }
+      to { background-position: 80px 0; }
+    }
+
+    /* Bridge over river */
+    .bridge {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 50px;
+      background: linear-gradient(180deg, #a08060 0%, #806040 100%);
+      border: 3px solid #5a4830;
+      border-radius: 8px;
+      z-index: 4;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    .bridge-rail {
+      position: absolute;
+      top: 4px;
+      left: 8px;
+      right: 8px;
+      height: 6px;
+      background: repeating-linear-gradient(
+        90deg,
+        #6a5840 0px,
+        #6a5840 12px,
+        transparent 12px,
+        transparent 20px
+      );
+    }
+
+    /* Buildings - Ground level */
+    .building {
+      position: absolute;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));
+    }
+
+    .isaacs-house {
+      bottom: 120px;
+      left: 120px;
+      width: 160px;
+      height: 140px;
+      background: url('/sprites/buildings/Vale_Isaacs_House.gif') center/contain no-repeat;
+      z-index: 10;
+    }
+
+    .inn {
+      bottom: 120px;
+      right: 120px;
+      width: 160px;
+      height: 140px;
+      background: url('/sprites/buildings/Vale_Inn.gif') center/contain no-repeat;
+      z-index: 10;
+    }
+
+    .shop {
+      bottom: 300px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 120px;
+      background: url('/sprites/buildings/Vale_Item_Shop.gif') center/contain no-repeat;
+      z-index: 10;
+    }
+
+    /* Large stairs to upper level */
+    .stairs-main {
+      position: absolute;
+      bottom: 380px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 100px;
+      background: repeating-linear-gradient(
+        180deg,
+        #9a8870 0px,
+        #9a8870 10px,
+        #7a6850 10px,
+        #7a6850 20px
+      );
+      border: 3px solid #5a4830;
+      border-radius: 8px;
+      z-index: 15;
+      box-shadow: 0 -4px 8px rgba(0,0,0,0.4);
+    }
+
+    .stairs-label {
+      position: absolute;
+      bottom: 500px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 7px;
+      color: #d4af37;
+      z-index: 16;
+      white-space: nowrap;
+    }
+
+    /* Side stairs */
+    .stairs-side {
+      position: absolute;
+      width: 60px;
+      height: 80px;
+      background: repeating-linear-gradient(
+        180deg,
+        #9a8870 0px,
+        #9a8870 8px,
+        #7a6850 8px,
+        #7a6850 16px
+      );
+      border: 2px solid #5a4830;
+      border-radius: 6px;
+      z-index: 12;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.3);
+    }
+
+    .stairs-left {
+      bottom: 340px;
+      left: 80px;
+    }
+
+    .stairs-right {
+      bottom: 340px;
+      right: 80px;
+    }
+
+    /* Upper terrace visible at top */
+    .upper-terrace {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 160px;
+      background: linear-gradient(180deg, #7aa880 0%, #6a9870 100%);
+      border-bottom: 3px solid #5a8860;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Building on upper terrace (partially visible) */
+    .upper-building {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 100px;
+      background: url('/sprites/buildings/Vale_Elder_House.gif') center/contain no-repeat;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+      z-index: 21;
+    }
+
+    /* NPCs */
+    .npc {
+      position: absolute;
+      width: auto;
+      height: 48px;
+      z-index: 30;
+    }
+
+    .npc img {
+      width: auto;
+      height: 48px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+      animation: npcIdle 3s ease-in-out infinite;
+    }
+
+    @keyframes npcIdle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    .npc-1 {
+      bottom: 200px;
+      left: 40%;
+    }
+
+    .npc-2 {
+      bottom: 150px;
+      right: 35%;
+    }
+
+    .npc-3 {
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Player on ground level */
+    .player {
+      position: absolute;
+      bottom: 240px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      height: 56px;
+      z-index: 100;
+    }
+
+    .player img {
+      width: auto;
+      height: 56px;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.8));
+    }
+
+    /* HUD */
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+      border-bottom: 3px solid #d4af37;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .location-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .location-name {
+      font-size: 11px;
+      color: #d4af37;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .location-sub {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .elevation-badge {
+      background: rgba(80,144,216,0.3);
+      border: 2px solid #5090d8;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 8px;
+      color: #5090d8;
+      text-align: center;
+    }
+
+    .elevation-level {
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    /* Direction hints */
+    .hint {
+      position: absolute;
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 6px;
+      color: #d4af37;
+      z-index: 150;
+      animation: hintPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .hint-stairs {
+      bottom: 510px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Trees/Foliage */
+    .tree {
+      position: absolute;
+      width: 60px;
+      height: 80px;
+      background: url('/sprites/overworld/objects/Tree.gif') center/contain no-repeat;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+    }
+
+    .tree-1 {
+      bottom: 160px;
+      left: 40px;
+      z-index: 8;
+    }
+
+    .tree-2 {
+      bottom: 280px;
+      right: 60px;
+      z-index: 8;
+    }
+
+    .tree-3 {
+      bottom: 100px;
+      right: 40px;
+      z-index: 8;
+    }
+  </style>
+</head>
+<body>
+  <div class="overworld-container">
+    <!-- Upper terrace (visible at top) -->
+    <div class="upper-terrace">
+      <div class="upper-building"></div>
+    </div>
+
+    <!-- Ground terrain -->
+    <div class="ground"></div>
+
+    <!-- Grass patches -->
+    <div class="grass-patch grass-1"></div>
+    <div class="grass-patch grass-2"></div>
+    <div class="grass-patch grass-3"></div>
+
+    <!-- Trees -->
+    <div class="tree tree-1"></div>
+    <div class="tree tree-2"></div>
+    <div class="tree tree-3"></div>
+
+    <!-- River -->
+    <div class="river"></div>
+
+    <!-- Bridge -->
+    <div class="bridge">
+      <div class="bridge-rail"></div>
+    </div>
+
+    <!-- Buildings -->
+    <div class="building isaacs-house"></div>
+    <div class="building inn"></div>
+    <div class="building shop"></div>
+
+    <!-- Stairs -->
+    <div class="stairs-side stairs-left"></div>
+    <div class="stairs-side stairs-right"></div>
+    <div class="stairs-main"></div>
+    <div class="stairs-label">↑ TO UPPER TERRACES ↑</div>
+
+    <!-- NPCs -->
+    <div class="npc npc-1">
+      <img src="/sprites/overworld/npc/Vale_Villager_M.gif" alt="Villager">
+    </div>
+    <div class="npc npc-2">
+      <img src="/sprites/overworld/npc/Vale_Villager_F.gif" alt="Villager">
+    </div>
+    <div class="npc npc-3">
+      <img src="/sprites/overworld/npc/Vale_Elder.gif" alt="Elder">
+    </div>
+
+    <!-- Player -->
+    <div class="player">
+      <img src="/sprites/overworld/Isaac.gif" alt="Isaac">
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="location-info">
+        <div class="location-name">VALE VILLAGE</div>
+        <div class="location-sub">GROUND LEVEL • RIVERSIDE DISTRICT</div>
+      </div>
+
+      <div class="elevation-badge">
+        <div class="elevation-level">LV 0</div>
+        <div>GROUND</div>
+      </div>
+    </div>
+
+    <!-- Hint -->
+    <div class="hint hint-stairs">
+      ⬆ PRESS UP TO CLIMB STAIRS ⬆
+    </div>
+  </div>
+</body>
+</html>

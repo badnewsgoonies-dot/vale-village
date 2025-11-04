@@ -32,9 +32,13 @@
       width: 960px;   /* GBA 240px × 4 */
       height: 640px;  /* GBA 160px × 4 */
       position: relative;
-      background: linear-gradient(180deg, #3A2A1A 0%, #2A1A0A 50%, #1A0A00 100%);
+      background: url('../../public/sprites/backgrounds/gs1/Cave.gif') center/cover no-repeat,
+                  linear-gradient(180deg, #3A2A1A 0%, #2A1A0A 50%, #1A0A00 100%);
       overflow: hidden;
       box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
     }
 
     /* ===== TURN INDICATOR (Top) ===== */
@@ -91,7 +95,11 @@
     }
 
     .enemy-sprite {
-      font-size: 64px;
+      width: 80px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
       animation: float 3s ease-in-out infinite;
     }
@@ -160,7 +168,11 @@
     }
 
     .party-sprite {
-      font-size: 48px;
+      width: 64px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
       filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
     }
 
@@ -385,7 +397,7 @@
     <!-- Enemy Area -->
     <div class="enemy-area">
       <div class="enemy">
-        <div class="enemy-sprite">🐺</div>
+        <img src="../../public/sprites/battle/enemies/Dire_Wolf.gif" alt="Wolf" class="enemy-sprite">
         <div class="enemy-name">Wolf</div>
         <div class="enemy-hp-dots">
           <div class="hp-dot full"></div>
@@ -396,7 +408,7 @@
       </div>
 
       <div class="enemy">
-        <div class="enemy-sprite">🐺</div>
+        <img src="../../public/sprites/battle/enemies/Dire_Wolf.gif" alt="Wolf" class="enemy-sprite">
         <div class="enemy-name">Wolf</div>
         <div class="enemy-hp-dots">
           <div class="hp-dot full"></div>
@@ -410,7 +422,7 @@
     <!-- Party Area -->
     <div class="party-area">
       <div class="party-member">
-        <div class="party-sprite">🧙‍♂️</div>
+        <img src="../../public/sprites/battle/party/Isaac/Isaac_Long Sword_Front.gif" alt="Isaac" class="party-sprite">
         <div class="party-name">Isaac</div>
         <div class="party-hp-dots">
           <div class="hp-dot full"></div>
@@ -422,7 +434,7 @@
       </div>
 
       <div class="party-member">
-        <div class="party-sprite">⚔️</div>
+        <img src="../../public/sprites/battle/party/Garet/Garet_Axe_Front.gif" alt="Garet" class="party-sprite">
         <div class="party-name">Garet</div>
         <div class="party-hp-dots">
           <div class="hp-dot full"></div>
@@ -434,7 +446,7 @@
       </div>
 
       <div class="party-member">
-        <div class="party-sprite">🌟</div>
+        <img src="../../public/sprites/battle/party/Ivan/Ivan_Staff_Front.gif" alt="Ivan" class="party-sprite">
         <div class="party-name">Ivan</div>
         <div class="party-hp-dots">
           <div class="hp-dot full"></div>
@@ -446,7 +458,7 @@
       </div>
 
       <div class="party-member">
-        <div class="party-sprite">💧</div>
+        <img src="../../public/sprites/battle/party/Mia/Mia_Staff_Front.gif" alt="Mia" class="party-sprite">
         <div class="party-name">Mia</div>
         <div class="party-hp-dots">
           <div class="hp-dot full"></div>

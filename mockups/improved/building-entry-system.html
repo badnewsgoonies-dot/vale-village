@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Entry System - Vale Village</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== OVERWORLD SCENE ===== */
+    .scene {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .overworld {
+      background: var(--color-grass-mid);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px),
+        repeating-linear-gradient(90deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px);
+    }
+
+    .world {
+      position: absolute;
+      width: 1920px;
+      height: 1920px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    /* Buildings */
+    .building {
+      position: absolute;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    #isaacs-house {
+      width: 160px;
+      height: auto;
+      left: 850px;
+      top: 700px;
+    }
+
+    #garets-house {
+      width: 128px;
+      height: auto;
+      left: 1050px;
+      top: 720px;
+    }
+
+    #inn {
+      width: 144px;
+      height: auto;
+      left: 700px;
+      top: 900px;
+    }
+
+    /* Player */
+    .player {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+      z-index: 100;
+    }
+
+    /* Door Markers */
+    .door-marker {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      background: radial-gradient(circle, rgba(255, 215, 127, 0.6) 0%, transparent 70%);
+      border: 2px solid rgba(255, 215, 127, 0.8);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+      animation: pulse-marker 1.5s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .door-marker.visible {
+      opacity: 1;
+    }
+
+    @keyframes pulse-marker {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    #door-isaacs {
+      left: 920px;
+      top: 810px;
+    }
+
+    #door-garets {
+      left: 1100px;
+      top: 830px;
+    }
+
+    #door-inn {
+      left: 760px;
+      top: 1010px;
+    }
+
+    /* Interaction Prompt */
+    .interaction-prompt {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 12px 24px;
+      font-size: 10px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      transition: opacity var(--timing-fast);
+    }
+
+    .interaction-prompt.visible {
+      opacity: 1;
+    }
+
+    /* ===== TRANSITION OVERLAY ===== */
+    .transition-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    .transition-overlay.fade-in {
+      animation: fade-in 400ms ease-in forwards;
+    }
+
+    .transition-overlay.fade-out {
+      animation: fade-out 400ms ease-out forwards;
+    }
+
+    @keyframes fade-in {
+      to { opacity: 1; }
+    }
+
+    @keyframes fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* ===== INTERIOR SCENE ===== */
+    .interior {
+      background: linear-gradient(180deg, #4A3A2A 0%, #3A2A1A 100%);
+    }
+
+    .interior-room {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .room-title {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      background: rgba(15, 37, 80, 0.9);
+      padding: 8px 24px;
+      border: 2px solid var(--color-border-light);
+    }
+
+    /* Floor Grid */
+    .floor-grid {
+      position: absolute;
+      inset: 60px 40px 40px 40px;
+      background-color: #6A5A4A;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 32px, rgba(80, 60, 40, 0.5) 32px, rgba(80, 60, 40, 0.5) 33px),
+        repeating-linear-gradient(90deg, transparent, transparent 32px, rgba(80, 60, 40, 0.5) 32px, rgba(80, 60, 40, 0.5) 33px);
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Furniture */
+    .furniture {
+      position: absolute;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    }
+
+    .furniture.bed {
+      width: 96px;
+      height: auto;
+      left: 120px;
+      top: 150px;
+    }
+
+    .furniture.table {
+      width: 64px;
+      height: auto;
+      left: 420px;
+      top: 300px;
+    }
+
+    .furniture.jar1 {
+      width: 32px;
+      height: auto;
+      left: 720px;
+      top: 200px;
+    }
+
+    .furniture.jar2 {
+      width: 32px;
+      height: auto;
+      left: 780px;
+      top: 200px;
+    }
+
+    .furniture.desk {
+      width: 96px;
+      height: auto;
+      left: 680px;
+      top: 450px;
+    }
+
+    /* Interior Player */
+    .interior .player {
+      width: 48px;
+      left: 480px;
+      top: 400px;
+      transform: none;
+    }
+
+    /* Exit Door Marker */
+    .exit-marker {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle, rgba(255, 215, 127, 0.6) 0%, transparent 70%);
+      border: 2px solid rgba(255, 215, 127, 0.8);
+      border-radius: 50%;
+      animation: pulse-marker 1.5s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 100;
+    }
+
+    /* ===== CONTROLS OVERLAY ===== */
+    .controls-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-border-light);
+      padding: 12px;
+      font-size: 7px;
+      color: var(--color-text-secondary);
+      z-index: 1000;
+      line-height: 1.6;
+    }
+
+    .controls-info .key {
+      display: inline-block;
+      background: var(--color-bg-dark);
+      border: 1px solid var(--color-border-light);
+      padding: 2px 6px;
+      margin: 0 2px;
+      color: var(--color-text-gold);
+      font-weight: bold;
+    }
+
+    .controls-info .section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--color-border-dark);
+    }
+
+    .controls-info .section:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    /* Location Indicator */
+    .location-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-border-light);
+      padding: 8px 16px;
+      font-size: 8px;
+      color: var(--color-text-gold);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <!-- OVERWORLD SCENE -->
+    <div class="scene overworld active" id="overworld-scene">
+      <div class="world" id="world">
+        <!-- Buildings -->
+        <img
+          src="../../public/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif"
+          alt="Isaac's House"
+          class="building"
+          id="isaacs-house"
+        >
+        <img
+          src="../../public/sprites/scenery/buildings/Vale/Vale_Garets_House.gif"
+          alt="Garet's House"
+          class="building"
+          id="garets-house"
+        >
+        <img
+          src="../../public/sprites/scenery/buildings/Vale/Vale_Inn.gif"
+          alt="Inn"
+          class="building"
+          id="inn"
+        >
+
+        <!-- Door Markers -->
+        <div class="door-marker" id="door-isaacs">🚪</div>
+        <div class="door-marker" id="door-garets">🚪</div>
+        <div class="door-marker" id="door-inn">🚪</div>
+
+        <!-- Player -->
+        <img
+          src="../../public/sprites/overworld/protagonists/Isaac.gif"
+          alt="Isaac"
+          class="player"
+          id="player-overworld"
+        >
+      </div>
+
+      <!-- Interaction Prompt -->
+      <div class="interaction-prompt" id="interaction-prompt">
+        Press <strong>SPACE</strong> to enter
+      </div>
+    </div>
+
+    <!-- INTERIOR SCENE -->
+    <div class="scene interior" id="interior-scene">
+      <div class="room-title" id="room-title">ISAAC'S HOUSE</div>
+
+      <div class="floor-grid"></div>
+
+      <!-- Furniture -->
+      <img
+        src="../../public/sprites/scenery/indoor/lg/bed1.gif"
+        alt="Bed"
+        class="furniture bed"
+      >
+      <img
+        src="../../public/sprites/scenery/indoor/lg/small_table.gif"
+        alt="Table"
+        class="furniture table"
+      >
+      <img
+        src="../../public/sprites/scenery/indoor/sm/jar10.gif"
+        alt="Jar"
+        class="furniture jar1"
+      >
+      <img
+        src="../../public/sprites/scenery/indoor/sm/jar11.gif"
+        alt="Jar"
+        class="furniture jar2"
+      >
+      <img
+        src="../../public/sprites/scenery/indoor/lg/wpnshop_desk.gif"
+        alt="Desk"
+        class="furniture desk"
+      >
+
+      <!-- Interior Player -->
+      <img
+        src="../../public/sprites/overworld/protagonists/Isaac.gif"
+        alt="Isaac"
+        class="player"
+        id="player-interior"
+      >
+
+      <!-- Exit Door -->
+      <div class="exit-marker">🚪</div>
+
+      <!-- Exit Prompt -->
+      <div class="interaction-prompt visible" style="bottom: 20px;">
+        Press <strong>SPACE</strong> to exit
+      </div>
+    </div>
+
+    <!-- Transition Overlay -->
+    <div class="transition-overlay" id="transition-overlay"></div>
+
+    <!-- Controls Info -->
+    <div class="controls-info">
+      <div class="section">
+        <strong>OVERWORLD:</strong><br>
+        <span class="key">1</span> Near Isaac's House<br>
+        <span class="key">2</span> Near Garet's House<br>
+        <span class="key">3</span> Near Inn<br>
+        <span class="key">SPACE</span> Enter Building
+      </div>
+      <div class="section">
+        <strong>INTERIOR:</strong><br>
+        <span class="key">SPACE</span> Exit to Overworld
+      </div>
+      <div class="section">
+        <strong>TIP:</strong> Watch for glowing door markers!
+      </div>
+    </div>
+
+    <!-- Location Indicator -->
+    <div class="location-indicator" id="location-indicator">
+      📍 VALE VILLAGE - OVERWORLD
+    </div>
+  </div>
+
+  <script>
+    // Scene management
+    let currentScene = 'overworld';
+    let currentDoor = null;
+
+    const scenes = {
+      overworld: document.getElementById('overworld-scene'),
+      interior: document.getElementById('interior-scene')
+    };
+
+    const transitionOverlay = document.getElementById('transition-overlay');
+    const interactionPrompt = document.getElementById('interaction-prompt');
+    const locationIndicator = document.getElementById('location-indicator');
+    const roomTitle = document.getElementById('room-title');
+
+    // Door positions (player positions to show door markers)
+    const doors = {
+      isaacs: { marker: document.getElementById('door-isaacs'), name: "Isaac's House" },
+      garets: { marker: document.getElementById('door-garets'), name: "Garet's House" },
+      inn: { marker: document.getElementById('door-inn'), name: "Inn" }
+    };
+
+    // Position player near a door
+    function movePlayerToDoor(doorKey) {
+      const world = document.getElementById('world');
+      const positions = {
+        isaacs: { x: -850, y: -750 },
+        garets: { x: -1050, y: -770 },
+        inn: { x: -700, y: -950 }
+      };
+
+      const pos = positions[doorKey];
+      world.style.transform = `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`;
+
+      // Show door marker
+      currentDoor = doorKey;
+      showDoorMarker(doorKey);
+    }
+
+    function showDoorMarker(doorKey) {
+      // Hide all markers
+      Object.values(doors).forEach(door => {
+        door.marker.classList.remove('visible');
+      });
+
+      // Show current marker
+      if (doorKey && doors[doorKey]) {
+        doors[doorKey].marker.classList.add('visible');
+        interactionPrompt.classList.add('visible');
+      } else {
+        interactionPrompt.classList.remove('visible');
+      }
+    }
+
+    // Transition between scenes
+    async function transitionToScene(targetScene, buildingName = '') {
+      // Fade to black
+      transitionOverlay.classList.add('fade-in');
+
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      // Switch scenes
+      scenes[currentScene].classList.remove('active');
+      scenes[targetScene].classList.add('active');
+      currentScene = targetScene;
+
+      // Update location indicator
+      if (targetScene === 'overworld') {
+        locationIndicator.textContent = '📍 VALE VILLAGE - OVERWORLD';
+      } else {
+        locationIndicator.textContent = `📍 ${buildingName.toUpperCase()}`;
+        roomTitle.textContent = buildingName.toUpperCase();
+      }
+
+      // Fade in
+      transitionOverlay.classList.remove('fade-in');
+      transitionOverlay.classList.add('fade-out');
+
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      transitionOverlay.classList.remove('fade-out');
+    }
+
+    // Enter building
+    async function enterBuilding() {
+      if (currentScene === 'overworld' && currentDoor) {
+        const buildingName = doors[currentDoor].name;
+        await transitionToScene('interior', buildingName);
+      }
+    }
+
+    // Exit building
+    async function exitBuilding() {
+      if (currentScene === 'interior') {
+        await transitionToScene('overworld');
+        // Return to last door position
+        if (currentDoor) {
+          movePlayerToDoor(currentDoor);
+        }
+      }
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      switch(e.key) {
+        case '1':
+          if (currentScene === 'overworld') {
+            movePlayerToDoor('isaacs');
+          }
+          break;
+        case '2':
+          if (currentScene === 'overworld') {
+            movePlayerToDoor('garets');
+          }
+          break;
+        case '3':
+          if (currentScene === 'overworld') {
+            movePlayerToDoor('inn');
+          }
+          break;
+        case ' ':
+          e.preventDefault();
+          if (currentScene === 'overworld') {
+            enterBuilding();
+          } else if (currentScene === 'interior') {
+            exitBuilding();
+          }
+          break;
+      }
+    });
+
+    // Initialize - start at Isaac's house
+    movePlayerToDoor('isaacs');
+  </script>
+</body>
+</html>

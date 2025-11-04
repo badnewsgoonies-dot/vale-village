@@ -267,11 +267,17 @@ export function executeAbility(
     case 'physical':
     case 'psynergy': {
       let totalDamage = 0;
+      let elementModifier = 1.0;
 
       for (const target of targets) {
         let damage = ability.type === 'physical'
           ? calculatePhysicalDamage(caster, target, ability, rng)
           : calculatePsynergyDamage(caster, target, ability, rng);
+
+        // Capture element modifier for psynergy attacks (for messaging)
+        if (ability.type === 'psynergy' && ability.element) {
+          elementModifier = getElementModifier(ability.element, target.element);
+        }
 
         // Apply critical hit multiplier
         if (isCritical) {
@@ -285,6 +291,15 @@ export function executeAbility(
 
       message += isCritical ? ' Critical hit!' : '';
       message += ` Deals ${totalDamage} damage!`;
+      
+      // Add element effectiveness message
+      if (ability.type === 'psynergy' && ability.element && elementModifier !== 1.0) {
+        if (elementModifier > 1.0) {
+          message += ' Super effective!';
+        } else if (elementModifier < 1.0) {
+          message += ' Not very effective...';
+        }
+      }
 
       return {
         damage: totalDamage,

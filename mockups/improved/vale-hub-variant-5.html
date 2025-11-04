@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Hub - Cross-Section View</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .overworld-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #2a2a3a;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Cross-section layers - side view */
+    /* Sky */
+    .sky-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 140px;
+      background: linear-gradient(180deg, #5a8aa8 0%, #7aa8c8 100%);
+      z-index: 1;
+    }
+
+    /* Layer 3: Upper Lookout */
+    .section-upper {
+      position: absolute;
+      top: 120px;
+      left: 300px;
+      right: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #8ab890 0%, #7aa880 100%);
+      border: 3px solid #6a9870;
+      border-radius: 12px;
+      z-index: 20;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .upper-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 6px;
+      color: #5a8860;
+      background: rgba(255,255,255,0.3);
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    /* Layer 2: Mid Terrace */
+    .section-mid {
+      position: absolute;
+      top: 230px;
+      left: 200px;
+      right: 80px;
+      height: 140px;
+      background: linear-gradient(135deg, #7aa880 0%, #6a9870 100%);
+      border: 3px solid #5a8860;
+      border-radius: 12px;
+      z-index: 15;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .mid-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 6px;
+      color: #5a8860;
+      background: rgba(255,255,255,0.3);
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    /* Layer 1: Lower Terrace */
+    .section-lower {
+      position: absolute;
+      top: 360px;
+      left: 120px;
+      right: 40px;
+      height: 140px;
+      background: linear-gradient(135deg, #6a9870 0%, #5a8860 100%);
+      border: 3px solid #4a7850;
+      border-radius: 12px;
+      z-index: 10;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .lower-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 6px;
+      color: #4a7850;
+      background: rgba(255,255,255,0.3);
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    /* Layer 0: Ground / River */
+    .section-ground {
+      position: absolute;
+      top: 490px;
+      left: 40px;
+      right: 0;
+      height: 150px;
+      background: linear-gradient(135deg, #5a8860 0%, #3a6840 100%);
+      border: 3px solid #2a5830;
+      border-radius: 12px 0 0 0;
+      z-index: 5;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .ground-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 6px;
+      color: #2a5830;
+      background: rgba(255,255,255,0.3);
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    /* River at ground level */
+    .river-section {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(90deg, #3070b0 0%, #4080c0 50%, #3070b0 100%);
+      opacity: 0.8;
+      animation: waterFlow 4s linear infinite;
+    }
+
+    @keyframes waterFlow {
+      from { background-position: 0 0; }
+      to { background-position: 100px 0; }
+    }
+
+    /* Buildings on each level */
+    .building-marker {
+      position: absolute;
+      width: 60px;
+      height: 50px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+    }
+
+    /* Upper level building */
+    .building-upper {
+      top: 140px;
+      right: 200px;
+      background: url('/sprites/buildings/Vale_Sanctum.gif') center/contain no-repeat;
+      z-index: 21;
+    }
+
+    /* Mid level buildings */
+    .building-mid-1 {
+      top: 250px;
+      right: 200px;
+      background: url('/sprites/buildings/Vale_Elder_House.gif') center/contain no-repeat;
+      z-index: 16;
+    }
+
+    .building-mid-2 {
+      top: 250px;
+      right: 350px;
+      background: url('/sprites/buildings/Vale_Weapon_Shop.gif') center/contain no-repeat;
+      z-index: 16;
+    }
+
+    /* Lower level buildings */
+    .building-lower-1 {
+      top: 380px;
+      right: 300px;
+      background: url('/sprites/buildings/Vale_Item_Shop.gif') center/contain no-repeat;
+      z-index: 11;
+    }
+
+    .building-lower-2 {
+      top: 380px;
+      right: 450px;
+      background: url('/sprites/buildings/Vale_Inn.gif') center/contain no-repeat;
+      z-index: 11;
+    }
+
+    /* Ground level buildings */
+    .building-ground {
+      top: 500px;
+      right: 400px;
+      background: url('/sprites/buildings/Vale_Isaacs_House.gif') center/contain no-repeat;
+      z-index: 6;
+    }
+
+    /* Connecting stairs between levels */
+    .stairs-connector {
+      position: absolute;
+      width: 80px;
+      height: 100px;
+      background: repeating-linear-gradient(
+        135deg,
+        #9a8870 0px,
+        #9a8870 10px,
+        #7a6850 10px,
+        #7a6850 20px
+      );
+      border: 2px solid #5a4830;
+      z-index: 25;
+      opacity: 0.8;
+    }
+
+    .stairs-3-to-2 {
+      top: 230px;
+      left: 380px;
+    }
+
+    .stairs-2-to-1 {
+      top: 360px;
+      left: 280px;
+    }
+
+    .stairs-1-to-0 {
+      top: 490px;
+      left: 180px;
+    }
+
+    /* Player character */
+    .player {
+      position: absolute;
+      top: 270px;
+      right: 280px;
+      width: auto;
+      height: 40px;
+      z-index: 100;
+    }
+
+    .player img {
+      width: auto;
+      height: 40px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+    }
+
+    .player-indicator {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(212,175,55,0.9);
+      color: #000;
+      font-size: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* HUD */
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+      border-bottom: 3px solid #d4af37;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .location-name {
+      font-size: 10px;
+      color: #d4af37;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .view-mode {
+      font-size: 7px;
+      color: #5090d8;
+      background: rgba(80,144,216,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 2px solid #5090d8;
+    }
+
+    /* Left sidebar - elevation guide */
+    .elevation-guide {
+      position: absolute;
+      left: 16px;
+      top: 120px;
+      width: 100px;
+      background: rgba(0,0,0,0.9);
+      border: 3px solid #d4af37;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 150;
+    }
+
+    .guide-title {
+      font-size: 6px;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .guide-level {
+      font-size: 5px;
+      color: #ccc;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guide-level.active {
+      color: #d4af37;
+      font-size: 6px;
+    }
+
+    .guide-color {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #666;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .guide-level.active .guide-color {
+      border-color: #d4af37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.6);
+    }
+
+    /* Measurement lines */
+    .measurement {
+      position: absolute;
+      left: 10px;
+      width: 30px;
+      border-left: 2px dashed #888;
+      border-right: 2px dashed #888;
+      z-index: 30;
+    }
+
+    .measure-label {
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 5px;
+      color: #888;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 4px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .measure-3 {
+      top: 120px;
+      height: 120px;
+    }
+
+    .measure-2 {
+      top: 230px;
+      height: 140px;
+    }
+
+    .measure-1 {
+      top: 360px;
+      height: 140px;
+    }
+
+    .measure-0 {
+      top: 490px;
+      height: 150px;
+    }
+
+    /* Legend */
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      padding: 10px;
+      z-index: 200;
+      min-width: 200px;
+    }
+
+    .legend-title {
+      font-size: 7px;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 5px;
+      color: #ccc;
+    }
+
+    .legend-icon {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="overworld-container">
+    <!-- Sky -->
+    <div class="sky-layer"></div>
+
+    <!-- Elevation sections -->
+    <!-- Layer 3: Upper -->
+    <div class="section-upper">
+      <div class="upper-label">LEVEL 3 • UPPER LOOKOUT</div>
+    </div>
+
+    <!-- Layer 2: Mid -->
+    <div class="section-mid">
+      <div class="mid-label">LEVEL 2 • MID TERRACE</div>
+    </div>
+
+    <!-- Layer 1: Lower -->
+    <div class="section-lower">
+      <div class="lower-label">LEVEL 1 • LOWER TERRACE</div>
+    </div>
+
+    <!-- Layer 0: Ground -->
+    <div class="section-ground">
+      <div class="ground-label">LEVEL 0 • GROUND/RIVER</div>
+      <div class="river-section"></div>
+    </div>
+
+    <!-- Buildings -->
+    <div class="building-marker building-upper"></div>
+    <div class="building-marker building-mid-1"></div>
+    <div class="building-marker building-mid-2"></div>
+    <div class="building-marker building-lower-1"></div>
+    <div class="building-marker building-lower-2"></div>
+    <div class="building-marker building-ground"></div>
+
+    <!-- Stairs connectors -->
+    <div class="stairs-connector stairs-3-to-2"></div>
+    <div class="stairs-connector stairs-2-to-1"></div>
+    <div class="stairs-connector stairs-1-to-0"></div>
+
+    <!-- Measurements -->
+    <div class="measurement measure-3">
+      <div class="measure-label">120px</div>
+    </div>
+    <div class="measurement measure-2">
+      <div class="measure-label">140px</div>
+    </div>
+    <div class="measurement measure-1">
+      <div class="measure-label">140px</div>
+    </div>
+    <div class="measurement measure-0">
+      <div class="measure-label">150px</div>
+    </div>
+
+    <!-- Player -->
+    <div class="player">
+      <img src="/sprites/overworld/Isaac.gif" alt="Isaac">
+      <div class="player-indicator">YOU ARE HERE</div>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="location-name">VALE VILLAGE - CROSS-SECTION</div>
+      <div class="view-mode">ARCHITECTURAL VIEW</div>
+    </div>
+
+    <!-- Elevation Guide -->
+    <div class="elevation-guide">
+      <div class="guide-title">ELEVATIONS</div>
+
+      <div class="guide-level">
+        <div class="guide-color" style="background: #8ab890;"></div>
+        <div>LV3 UPPER</div>
+      </div>
+
+      <div class="guide-level active">
+        <div class="guide-color" style="background: #7aa880;"></div>
+        <div>LV2 MID ⬅</div>
+      </div>
+
+      <div class="guide-level">
+        <div class="guide-color" style="background: #6a9870;"></div>
+        <div>LV1 LOWER</div>
+      </div>
+
+      <div class="guide-level">
+        <div class="guide-color" style="background: #5a8860;"></div>
+        <div>LV0 GROUND</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-title">CROSS-SECTION KEY</div>
+
+      <div class="legend-row">
+        <div class="legend-icon" style="background: repeating-linear-gradient(135deg, #9a8870 0px, #9a8870 4px, #7a6850 4px, #7a6850 8px); border: 1px solid #5a4830;"></div>
+        <div>STAIRS</div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-icon" style="background: linear-gradient(90deg, #3070b0 0%, #4080c0 100%); border: 1px solid #2060a0;"></div>
+        <div>WATER/RIVER</div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-icon" style="background: url('/sprites/buildings/Vale_Isaacs_House.gif') center/contain no-repeat; border: 1px solid #666;"></div>
+        <div>BUILDINGS</div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-icon" style="background: rgba(212,175,55,0.9); border: 1px solid #d4af37;"></div>
+        <div>PLAYER LOCATION</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

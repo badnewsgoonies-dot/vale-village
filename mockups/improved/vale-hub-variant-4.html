@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Hub - Upper Level Lookout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .overworld-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: linear-gradient(180deg, #5a8aa8 0%, #7aa880 100%);
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Sky background */
+    .sky {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 300px;
+      background: linear-gradient(180deg, #5a8aa8 0%, #7aa8c8 100%);
+      z-index: 0;
+    }
+
+    /* Clouds */
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50px;
+      filter: blur(1px);
+      z-index: 1;
+      animation: cloudDrift 60s linear infinite;
+    }
+
+    .cloud-1 {
+      top: 40px;
+      left: -100px;
+      width: 120px;
+      height: 40px;
+    }
+
+    .cloud-2 {
+      top: 100px;
+      left: -200px;
+      width: 160px;
+      height: 50px;
+      animation-delay: -20s;
+    }
+
+    .cloud-3 {
+      top: 160px;
+      left: -300px;
+      width: 100px;
+      height: 35px;
+      animation-delay: -40s;
+    }
+
+    @keyframes cloudDrift {
+      from { transform: translateX(0); }
+      to { transform: translateX(1200px); }
+    }
+
+    /* Upper lookout platform */
+    .upper-platform {
+      position: absolute;
+      bottom: 200px;
+      left: 100px;
+      right: 100px;
+      height: 400px;
+      background: linear-gradient(135deg, #8ab890 0%, #7aa880 100%);
+      border: 3px solid #6a9870;
+      border-radius: 12px 12px 0 0;
+      z-index: 10;
+      box-shadow: 0 -6px 16px rgba(0,0,0,0.4);
+    }
+
+    /* Mountain view (background) */
+    .mountain-bg {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: 240px;
+      background: url('/sprites/backgrounds/gs1/Mountain.gif') center/cover;
+      opacity: 0.6;
+      z-index: 2;
+    }
+
+    /* Sanctum building */
+    .sanctum {
+      position: absolute;
+      bottom: 320px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 200px;
+      background: url('/sprites/buildings/Vale_Sanctum.gif') center/contain no-repeat;
+      filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.6));
+      z-index: 20;
+    }
+
+    /* Lookout railings */
+    .railing {
+      position: absolute;
+      height: 40px;
+      background: repeating-linear-gradient(
+        90deg,
+        #8a7860 0px,
+        #8a7860 15px,
+        transparent 15px,
+        transparent 20px
+      );
+      border-top: 4px solid #6a5840;
+      z-index: 15;
+    }
+
+    .railing-left {
+      bottom: 300px;
+      left: 100px;
+      width: 200px;
+    }
+
+    .railing-right {
+      bottom: 300px;
+      right: 100px;
+      width: 200px;
+    }
+
+    .railing-front {
+      bottom: 200px;
+      left: 100px;
+      right: 100px;
+    }
+
+    /* Stone benches on lookout */
+    .stone-bench {
+      position: absolute;
+      width: 60px;
+      height: 30px;
+      background: linear-gradient(180deg, #9a9a8a 0%, #7a7a6a 100%);
+      border: 3px solid #6a6a5a;
+      border-radius: 6px;
+      z-index: 18;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .bench-1 {
+      bottom: 360px;
+      left: 200px;
+    }
+
+    .bench-2 {
+      bottom: 360px;
+      right: 200px;
+    }
+
+    /* Observation telescope */
+    .telescope {
+      position: absolute;
+      bottom: 360px;
+      right: 300px;
+      width: 40px;
+      height: 60px;
+      background: linear-gradient(135deg, #6a6a7a 0%, #4a4a5a 100%);
+      border: 2px solid #3a3a4a;
+      border-radius: 4px;
+      z-index: 19;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .telescope-lens {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #5a8aa8 0%, #3a6a88 100%);
+      border: 2px solid #2a5a78;
+      border-radius: 50%;
+    }
+
+    /* Lower terraces visible below */
+    .lower-view {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 210px;
+      background: linear-gradient(180deg, #6a9870 0%, #5a8860 50%, #4a7850 100%);
+      border-top: 3px solid #8ab890;
+      z-index: 1;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Miniature buildings visible far below */
+    .distant-building {
+      position: absolute;
+      opacity: 0.5;
+      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
+    }
+
+    .distant-1 {
+      bottom: 40px;
+      left: 200px;
+      width: 60px;
+      height: 50px;
+      background: url('/sprites/buildings/Vale_Isaacs_House.gif') center/contain no-repeat;
+      z-index: 2;
+    }
+
+    .distant-2 {
+      bottom: 40px;
+      right: 200px;
+      width: 60px;
+      height: 50px;
+      background: url('/sprites/buildings/Vale_Inn.gif') center/contain no-repeat;
+      z-index: 2;
+    }
+
+    .distant-3 {
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 60px;
+      background: url('/sprites/buildings/Vale_Elder_House.gif') center/contain no-repeat;
+      z-index: 2;
+    }
+
+    /* Stairs down */
+    .stairs-down-large {
+      position: absolute;
+      bottom: 190px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 80px;
+      background: repeating-linear-gradient(
+        0deg,
+        #7a6850 0px,
+        #7a6850 8px,
+        #9a8870 8px,
+        #9a8870 16px
+      );
+      border: 3px solid #5a4830;
+      border-radius: 12px;
+      z-index: 12;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+    }
+
+    .stairs-label {
+      position: absolute;
+      bottom: 170px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #e05050;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 7px;
+      color: #e05050;
+      z-index: 13;
+    }
+
+    /* NPCs */
+    .npc {
+      position: absolute;
+      width: auto;
+      height: 48px;
+      z-index: 30;
+    }
+
+    .npc img {
+      width: auto;
+      height: 48px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+    }
+
+    .npc-elder {
+      bottom: 340px;
+      left: 50%;
+      transform: translateX(-80px);
+    }
+
+    .npc-villager {
+      bottom: 260px;
+      right: 220px;
+    }
+
+    /* Player */
+    .player {
+      position: absolute;
+      bottom: 430px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      height: 56px;
+      z-index: 100;
+    }
+
+    .player img {
+      width: auto;
+      height: 56px;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.8));
+    }
+
+    /* HUD */
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+      border-bottom: 3px solid #d4af37;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .location-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .location-name {
+      font-size: 11px;
+      color: #d4af37;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .location-sub {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .elevation-badge {
+      background: rgba(138,184,144,0.4);
+      border: 2px solid #8ab890;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 8px;
+      color: #8ab890;
+      text-align: center;
+    }
+
+    .elevation-level {
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    /* Scenic view indicator */
+    .scenic-view {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #5a8aa8;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 7px;
+      color: #5a8aa8;
+      text-align: center;
+      z-index: 150;
+    }
+
+    .scenic-icon {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* Compass rose */
+    .compass-rose {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 80px;
+      height: 80px;
+      background: rgba(0,0,0,0.9);
+      border: 3px solid #d4af37;
+      border-radius: 50%;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(212,175,55,0.4);
+    }
+
+    .compass-directions {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .compass-point {
+      position: absolute;
+      font-size: 10px;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    .compass-n {
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e05050;
+      font-size: 12px;
+    }
+
+    .compass-s {
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .compass-e {
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .compass-w {
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .compass-needle {
+      position: absolute;
+      width: 2px;
+      height: 28px;
+      background: linear-gradient(180deg, #e05050 0%, #d4af37 100%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px rgba(224,80,80,0.8);
+    }
+
+    /* Weather effect - light wind */
+    .wind-particle {
+      position: absolute;
+      width: 20px;
+      height: 2px;
+      background: rgba(255,255,255,0.3);
+      z-index: 5;
+      animation: windBlow 4s linear infinite;
+    }
+
+    @keyframes windBlow {
+      from { transform: translateX(0); opacity: 0; }
+      10% { opacity: 0.3; }
+      90% { opacity: 0.3; }
+      to { transform: translateX(200px); opacity: 0; }
+    }
+
+    .wind-1 {
+      top: 120px;
+      left: 100px;
+    }
+
+    .wind-2 {
+      top: 180px;
+      left: 200px;
+      animation-delay: -1s;
+    }
+
+    .wind-3 {
+      top: 140px;
+      left: 300px;
+      animation-delay: -2s;
+    }
+  </style>
+</head>
+<body>
+  <div class="overworld-container">
+    <!-- Sky and clouds -->
+    <div class="sky"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+
+    <!-- Mountain background -->
+    <div class="mountain-bg"></div>
+
+    <!-- Wind particles -->
+    <div class="wind-particle wind-1"></div>
+    <div class="wind-particle wind-2"></div>
+    <div class="wind-particle wind-3"></div>
+
+    <!-- Lower terraces (distant view) -->
+    <div class="lower-view">
+      <div class="distant-building distant-1"></div>
+      <div class="distant-building distant-2"></div>
+      <div class="distant-building distant-3"></div>
+    </div>
+
+    <!-- Upper platform -->
+    <div class="upper-platform"></div>
+
+    <!-- Railings -->
+    <div class="railing railing-left"></div>
+    <div class="railing railing-right"></div>
+    <div class="railing railing-front"></div>
+
+    <!-- Sanctum -->
+    <div class="sanctum"></div>
+
+    <!-- Benches -->
+    <div class="stone-bench bench-1"></div>
+    <div class="stone-bench bench-2"></div>
+
+    <!-- Telescope -->
+    <div class="telescope">
+      <div class="telescope-lens"></div>
+    </div>
+
+    <!-- Stairs down -->
+    <div class="stairs-down-large"></div>
+    <div class="stairs-label">↓ DESCEND TO MID TERRACE ↓</div>
+
+    <!-- NPCs -->
+    <div class="npc npc-elder">
+      <img src="/sprites/overworld/npc/Vale_Elder.gif" alt="Elder">
+    </div>
+    <div class="npc npc-villager">
+      <img src="/sprites/overworld/npc/Vale_Villager_F.gif" alt="Villager">
+    </div>
+
+    <!-- Player -->
+    <div class="player">
+      <img src="/sprites/overworld/Isaac.gif" alt="Isaac">
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="location-info">
+        <div class="location-name">VALE VILLAGE</div>
+        <div class="location-sub">UPPER LOOKOUT • SANCTUM</div>
+      </div>
+
+      <div class="elevation-badge">
+        <div class="elevation-level">LV 3</div>
+        <div>UPPER</div>
+      </div>
+    </div>
+
+    <!-- Scenic view indicator -->
+    <div class="scenic-view">
+      <div class="scenic-icon">🏔️</div>
+      <div>SCENIC OVERLOOK</div>
+      <div>MT. ALEPH VISIBLE</div>
+    </div>
+
+    <!-- Compass rose -->
+    <div class="compass-rose">
+      <div class="compass-directions">
+        <div class="compass-needle"></div>
+        <div class="compass-point compass-n">N</div>
+        <div class="compass-point compass-s">S</div>
+        <div class="compass-point compass-e">E</div>
+        <div class="compass-point compass-w">W</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Turn Order Focus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: linear-gradient(180deg, #1a1a2a 0%, #0a0a0a 100%);
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Battle Background - Smaller central area */
+    .battle-viewport {
+      position: absolute;
+      top: 120px;
+      left: 80px;
+      right: 80px;
+      bottom: 200px;
+      background: url('/sprites/backgrounds/gs1/Forest.gif') center/cover;
+      border: 3px solid #d4af37;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+
+    /* Enemy sprites in viewport */
+    .viewport-enemies {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 60px;
+      z-index: 5;
+    }
+
+    .viewport-enemy img {
+      width: auto;
+      height: 100px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7));
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Party sprites in viewport */
+    .viewport-party {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      height: 100px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 60px;
+      gap: 40px;
+      z-index: 5;
+    }
+
+    .viewport-party img {
+      width: auto;
+      height: 80px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+    }
+
+    /* Large Turn Order Timeline */
+    .turn-order-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 110px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.85) 100%);
+      border-bottom: 4px solid #d4af37;
+      z-index: 100;
+      padding: 12px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+
+    .turn-order-title {
+      font-size: 9px;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .turn-timeline {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .turn-slot {
+      width: 80px;
+      height: 72px;
+      background: linear-gradient(135deg, #2a2a4a 0%, #1a1a2a 100%);
+      border: 3px solid #4a4a6a;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .turn-slot.active {
+      border-color: #d4af37;
+      background: linear-gradient(135deg, #3a3a5a 0%, #2a2a3a 100%);
+      box-shadow: 0 0 20px rgba(212,175,55,0.6);
+      transform: scale(1.15);
+    }
+
+    .turn-slot.next {
+      border-color: #888;
+      opacity: 0.9;
+    }
+
+    .turn-slot.future {
+      opacity: 0.6;
+    }
+
+    .turn-portrait-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      border: 2px solid #666;
+      background-size: cover;
+    }
+
+    .turn-slot.active .turn-portrait-large {
+      border-color: #d4af37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.6);
+    }
+
+    .turn-unit-name {
+      font-size: 6px;
+      color: #ccc;
+      text-align: center;
+    }
+
+    .turn-slot.active .turn-unit-name {
+      color: #d4af37;
+      font-size: 7px;
+    }
+
+    .turn-arrow {
+      font-size: 16px;
+      color: #d4af37;
+      opacity: 0.5;
+    }
+
+    /* Bottom Status Panel */
+    .status-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 190px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%);
+      border-top: 4px solid #d4af37;
+      z-index: 100;
+      padding: 12px 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.6);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* Party status cards */
+    .party-status-card {
+      background: rgba(20,20,40,0.6);
+      border: 2px solid #5090d8;
+      border-radius: 6px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .status-portrait {
+      width: 48px;
+      height: 48px;
+      background-size: cover;
+      border: 2px solid #5090d8;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .status-info {
+      flex: 1;
+    }
+
+    .status-name {
+      font-size: 8px;
+      color: #5090d8;
+      margin-bottom: 3px;
+    }
+
+    .status-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .status-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-bar-label {
+      font-size: 6px;
+      color: #888;
+      width: 16px;
+    }
+
+    .status-bar {
+      flex: 1;
+      height: 7px;
+      background: #2a1810;
+      border: 1px solid #666;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+    }
+
+    .pp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5090d8 0%, #2060a8 100%);
+    }
+
+    .bar-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* Enemy status */
+    .enemy-status-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .enemy-status-card {
+      flex: 1;
+      background: rgba(40,20,20,0.6);
+      border: 2px solid #e05050;
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+
+    .enemy-status-name {
+      font-size: 7px;
+      color: #e05050;
+      margin-bottom: 3px;
+    }
+
+    .enemy-status-hp {
+      font-size: 5px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .enemy-status-bar {
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid #e05050;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+    }
+
+    /* Command buttons */
+    .command-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .cmd-btn {
+      background: linear-gradient(180deg, #3a3a5a 0%, #1a1a3a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .cmd-btn:hover {
+      background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212,175,55,0.3);
+    }
+
+    .cmd-icon {
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Turn Order Panel -->
+    <div class="turn-order-panel">
+      <div class="turn-order-title">⚔ TURN ORDER TIMELINE ⚔</div>
+      <div class="turn-timeline">
+        <!-- Past turn (dimmed) -->
+        <div class="turn-slot future">
+          <div class="turn-portrait-large" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="turn-unit-name">MIA</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <!-- Active turn -->
+        <div class="turn-slot active">
+          <div class="turn-portrait-large" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+          <div class="turn-unit-name">ISAAC</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <!-- Next turns -->
+        <div class="turn-slot next">
+          <div class="turn-portrait-large" style="background: rgba(224,80,80,0.8);"></div>
+          <div class="turn-unit-name">WOLF</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <div class="turn-slot next">
+          <div class="turn-portrait-large" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+          <div class="turn-unit-name">GARET</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <div class="turn-slot future">
+          <div class="turn-portrait-large" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+          <div class="turn-unit-name">IVAN</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <div class="turn-slot future">
+          <div class="turn-portrait-large" style="background: rgba(224,80,80,0.8);"></div>
+          <div class="turn-unit-name">ORC</div>
+        </div>
+
+        <div class="turn-arrow">→</div>
+
+        <div class="turn-slot future">
+          <div class="turn-portrait-large" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="turn-unit-name">MIA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battle Viewport -->
+    <div class="battle-viewport">
+      <div class="viewport-enemies">
+        <div class="viewport-enemy">
+          <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        </div>
+        <div class="viewport-enemy">
+          <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+        </div>
+      </div>
+
+      <div class="viewport-party">
+        <div><img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac"></div>
+        <div><img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet"></div>
+        <div><img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan"></div>
+        <div><img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia"></div>
+      </div>
+    </div>
+
+    <!-- Status Panel -->
+    <div class="status-panel">
+      <!-- Enemy Status -->
+      <div class="enemy-status-row">
+        <div class="enemy-status-card">
+          <div class="enemy-status-name">DIRE WOLF</div>
+          <div class="enemy-status-hp">HP 180/300 • LV 10</div>
+          <div class="enemy-status-bar">
+            <div class="enemy-hp-fill" style="width: 60%;"></div>
+          </div>
+        </div>
+        <div class="enemy-status-card">
+          <div class="enemy-status-name">ORC</div>
+          <div class="enemy-status-hp">HP 232/350 • LV 11</div>
+          <div class="enemy-status-bar">
+            <div class="enemy-hp-fill" style="width: 66%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Party Status -->
+      <div class="status-grid">
+        <div class="party-status-card">
+          <div class="status-portrait" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+          <div class="status-info">
+            <div class="status-name">ISAAC</div>
+            <div class="status-bars">
+              <div class="status-bar-row">
+                <div class="status-bar-label">HP</div>
+                <div class="status-bar">
+                  <div class="hp-fill" style="width: 85%;"></div>
+                  <div class="bar-text">204/240</div>
+                </div>
+              </div>
+              <div class="status-bar-row">
+                <div class="status-bar-label">PP</div>
+                <div class="status-bar">
+                  <div class="pp-fill" style="width: 60%;"></div>
+                  <div class="bar-text">36/60</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-status-card">
+          <div class="status-portrait" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+          <div class="status-info">
+            <div class="status-name">GARET</div>
+            <div class="status-bars">
+              <div class="status-bar-row">
+                <div class="status-bar-label">HP</div>
+                <div class="status-bar">
+                  <div class="hp-fill" style="width: 70%;"></div>
+                  <div class="bar-text">175/250</div>
+                </div>
+              </div>
+              <div class="status-bar-row">
+                <div class="status-bar-label">PP</div>
+                <div class="status-bar">
+                  <div class="pp-fill" style="width: 42%;"></div>
+                  <div class="bar-text">21/50</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-status-card">
+          <div class="status-portrait" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+          <div class="status-info">
+            <div class="status-name">IVAN</div>
+            <div class="status-bars">
+              <div class="status-bar-row">
+                <div class="status-bar-label">HP</div>
+                <div class="status-bar">
+                  <div class="hp-fill" style="width: 92%;"></div>
+                  <div class="bar-text">184/200</div>
+                </div>
+              </div>
+              <div class="status-bar-row">
+                <div class="status-bar-label">PP</div>
+                <div class="status-bar">
+                  <div class="pp-fill" style="width: 75%;"></div>
+                  <div class="bar-text">60/80</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-status-card">
+          <div class="status-portrait" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="status-info">
+            <div class="status-name">MIA</div>
+            <div class="status-bars">
+              <div class="status-bar-row">
+                <div class="status-bar-label">HP</div>
+                <div class="status-bar">
+                  <div class="hp-fill" style="width: 88%;"></div>
+                  <div class="bar-text">176/200</div>
+                </div>
+              </div>
+              <div class="status-bar-row">
+                <div class="status-bar-label">PP</div>
+                <div class="status-bar">
+                  <div class="pp-fill" style="width: 54%;"></div>
+                  <div class="bar-text">49/90</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Command Buttons -->
+      <div class="command-row">
+        <button class="cmd-btn">
+          <div class="cmd-icon">⚔️</div>
+          <div>ATTACK</div>
+        </button>
+        <button class="cmd-btn">
+          <div class="cmd-icon">✨</div>
+          <div>PSYNERGY</div>
+        </button>
+        <button class="cmd-btn">
+          <div class="cmd-icon">🔮</div>
+          <div>DJINN</div>
+        </button>
+        <button class="cmd-btn">
+          <div class="cmd-icon">🛡️</div>
+          <div>DEFEND</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

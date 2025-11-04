@@ -125,7 +125,7 @@ From `VALE_CHRONICLES_ARCHITECTURE.md`:
 
 ✅ **NPCs trigger battles** - 100% implemented  
 🔄 **NextEraGame battle system** - Need to verify flow alignment  
-🔄 **NO items in battle** - Exists but marked for removal  
+✅ **NO items in game** - Design decision: Abilities handle healing/buffs (items are redundant)  
 🔄 **Djinn system** - Not yet implemented (12 Djinn, 3 slots)  
 🔄 **4 equipment slots** - Need to verify implementation  
 

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Djinn Info Screen - Collection</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .djinn-screen {
+      width: 960px;
+      height: 640px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* ===== LEFT COLUMN: COLLECTION GRID ===== */
+    .left-column {
+      flex: 0 0 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .collection-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+      flex: 1;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .collection-progress {
+      font-size: 8px;
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .collection-progress .collected {
+      color: var(--color-hp-green);
+      font-weight: bold;
+    }
+
+    /* Element Sections */
+    .element-section {
+      margin-bottom: 16px;
+    }
+
+    .element-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 4px solid;
+    }
+
+    .element-header.venus {
+      border-left-color: var(--color-venus);
+    }
+
+    .element-header.mars {
+      border-left-color: var(--color-mars);
+    }
+
+    .element-header.mercury {
+      border-left-color: var(--color-mercury);
+    }
+
+    .element-header.jupiter {
+      border-left-color: var(--color-jupiter);
+    }
+
+    .element-icon {
+      font-size: 16px;
+    }
+
+    .element-name {
+      font-size: 9px;
+      color: var(--color-text-gold);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+      flex: 1;
+    }
+
+    .element-count {
+      font-size: 7px;
+      color: var(--color-text-secondary);
+    }
+
+    /* Djinn Grid */
+    .djinn-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .djinn-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      position: relative;
+    }
+
+    .djinn-card:hover {
+      border-color: var(--color-border-light);
+      background: rgba(255, 215, 127, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .djinn-card.selected {
+      border-color: var(--color-text-gold);
+      background: rgba(255, 215, 127, 0.2);
+      box-shadow: 0 0 12px rgba(255, 215, 127, 0.5);
+    }
+
+    .djinn-card.locked {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .djinn-card.locked:hover {
+      transform: none;
+      border-color: var(--color-border-dark);
+    }
+
+    .team-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #FFD87F 0%, #E8A050 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: #000;
+      box-shadow: 0 2px 6px rgba(255, 215, 127, 0.8);
+    }
+
+    .djinn-sprite {
+      width: 48px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+    }
+
+    .djinn-name {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+      text-align: center;
+    }
+
+    .djinn-status {
+      font-size: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .djinn-status.set {
+      background: var(--color-hp-green);
+      color: #000;
+    }
+
+    .djinn-status.standby {
+      background: var(--color-pp-blue);
+      color: #FFF;
+    }
+
+    .djinn-status.recovery {
+      background: var(--color-mars);
+      color: #FFF;
+      animation: pulse-recovery 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-recovery {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* ===== RIGHT COLUMN: DETAILED INFO ===== */
+    .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .djinn-detail-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .detail-sprite-container {
+      position: relative;
+      margin: 12px 0;
+    }
+
+    .detail-sprite {
+      width: 80px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.8));
+    }
+
+    .detail-element-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #FFD87F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .detail-element-badge.venus {
+      background: linear-gradient(135deg, var(--color-venus) 0%, #C88040 100%);
+    }
+
+    .detail-element-badge.mars {
+      background: linear-gradient(135deg, var(--color-mars) 0%, #C84040 100%);
+    }
+
+    .detail-element-badge.mercury {
+      background: linear-gradient(135deg, var(--color-mercury) 0%, #4078C8 100%);
+    }
+
+    .detail-element-badge.jupiter {
+      background: linear-gradient(135deg, var(--color-jupiter) 0%, #9048C8 100%);
+    }
+
+    .detail-name {
+      font-size: 14px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+    }
+
+    .detail-description {
+      font-size: 8px;
+      color: var(--color-text-secondary);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    /* Effects Panel */
+    .effects-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+      flex: 1;
+    }
+
+    .effect-section {
+      margin-bottom: 16px;
+    }
+
+    .effect-title {
+      font-size: 9px;
+      color: var(--color-text-gold);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .effect-content {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: 10px;
+      font-size: 8px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+    }
+
+    .effect-stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+    }
+
+    .stat-label {
+      color: var(--color-text-secondary);
+    }
+
+    .stat-value {
+      color: var(--color-text-gold);
+      font-weight: bold;
+    }
+
+    /* Team Slots Panel */
+    .team-slots-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+    }
+
+    .team-slots-title {
+      font-size: 9px;
+      color: var(--color-text-gold);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .team-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .team-slot {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-height: 80px;
+      justify-content: center;
+    }
+
+    .team-slot.active {
+      border-color: var(--color-text-gold);
+      background: rgba(255, 215, 127, 0.15);
+    }
+
+    .team-slot.empty {
+      opacity: 0.5;
+    }
+
+    .slot-number {
+      font-size: 6px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+    }
+
+    .slot-djinn-sprite {
+      width: 32px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    }
+
+    .slot-djinn-name {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      text-align: center;
+    }
+
+    .empty-slot-icon {
+      font-size: 24px;
+      opacity: 0.3;
+    }
+
+    /* ===== FOOTER ===== */
+    .screen-footer {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .footer-btn {
+      padding: 8px 16px;
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 8px;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    .footer-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="djinn-screen">
+    <!-- LEFT COLUMN: COLLECTION -->
+    <div class="left-column">
+      <div class="collection-panel">
+        <div class="panel-title">✨ DJINN COLLECTION</div>
+        <div class="collection-progress">
+          <span class="collected">9</span> / 12 Collected
+        </div>
+
+        <!-- VENUS DJINN -->
+        <div class="element-section">
+          <div class="element-header venus">
+            <span class="element-icon">🪨</span>
+            <span class="element-name">VENUS</span>
+            <span class="element-count">3 / 3</span>
+          </div>
+          <div class="djinn-grid">
+            <div class="djinn-card selected" data-djinn="flint" data-element="venus">
+              <div class="team-badge">1</div>
+              <img
+                src="../../public/sprites/battle/djinn/Venus_Djinn_Front.gif"
+                alt="Flint"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Flint</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card" data-djinn="granite" data-element="venus">
+              <img
+                src="../../public/sprites/battle/djinn/Venus_Djinn_Front.gif"
+                alt="Granite"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Granite</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card" data-djinn="quartz" data-element="venus">
+              <img
+                src="../../public/sprites/battle/djinn/Venus_Djinn_Front.gif"
+                alt="Quartz"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Quartz</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MARS DJINN -->
+        <div class="element-section">
+          <div class="element-header mars">
+            <span class="element-icon">🔥</span>
+            <span class="element-name">MARS</span>
+            <span class="element-count">3 / 3</span>
+          </div>
+          <div class="djinn-grid">
+            <div class="djinn-card" data-djinn="forge" data-element="mars">
+              <div class="team-badge">2</div>
+              <img
+                src="../../public/sprites/battle/djinn/Mars_Djinn_Front.gif"
+                alt="Forge"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Forge</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card" data-djinn="fever" data-element="mars">
+              <img
+                src="../../public/sprites/battle/djinn/Mars_Djinn_Front.gif"
+                alt="Fever"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Fever</div>
+              <div class="djinn-status standby">Standby</div>
+            </div>
+
+            <div class="djinn-card" data-djinn="corona" data-element="mars">
+              <img
+                src="../../public/sprites/battle/djinn/Mars_Djinn_Front.gif"
+                alt="Corona"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Corona</div>
+              <div class="djinn-status recovery">Recovery</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MERCURY DJINN -->
+        <div class="element-section">
+          <div class="element-header mercury">
+            <span class="element-icon">💧</span>
+            <span class="element-name">MERCURY</span>
+            <span class="element-count">2 / 3</span>
+          </div>
+          <div class="djinn-grid">
+            <div class="djinn-card" data-djinn="fizz" data-element="mercury">
+              <img
+                src="../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif"
+                alt="Fizz"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Fizz</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card" data-djinn="sleet" data-element="mercury">
+              <div class="team-badge">3</div>
+              <img
+                src="../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif"
+                alt="Sleet"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Sleet</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card locked" data-djinn="mist" data-element="mercury">
+              <img
+                src="../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif"
+                alt="???"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">???</div>
+              <div class="djinn-status">Locked</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- JUPITER DJINN -->
+        <div class="element-section">
+          <div class="element-header jupiter">
+            <span class="element-icon">⚡</span>
+            <span class="element-name">JUPITER</span>
+            <span class="element-count">1 / 3</span>
+          </div>
+          <div class="djinn-grid">
+            <div class="djinn-card" data-djinn="gust" data-element="jupiter">
+              <img
+                src="../../public/sprites/battle/djinn/Jupiter_Djinn_Front.gif"
+                alt="Gust"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">Gust</div>
+              <div class="djinn-status set">Set</div>
+            </div>
+
+            <div class="djinn-card locked" data-djinn="breeze" data-element="jupiter">
+              <img
+                src="../../public/sprites/battle/djinn/Jupiter_Djinn_Front.gif"
+                alt="???"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">???</div>
+              <div class="djinn-status">Locked</div>
+            </div>
+
+            <div class="djinn-card locked" data-djinn="zephyr" data-element="jupiter">
+              <img
+                src="../../public/sprites/battle/djinn/Jupiter_Djinn_Front.gif"
+                alt="???"
+                class="djinn-sprite"
+              >
+              <div class="djinn-name">???</div>
+              <div class="djinn-status">Locked</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: DETAILS -->
+    <div class="right-column">
+      <!-- Djinn Detail -->
+      <div class="djinn-detail-panel">
+        <div class="detail-sprite-container">
+          <img
+            src="../../public/sprites/battle/djinn/Venus_Djinn_Front.gif"
+            alt="Flint"
+            class="detail-sprite"
+            id="detailSprite"
+          >
+          <div class="detail-element-badge venus" id="detailBadge">🪨</div>
+        </div>
+        <div class="detail-name" id="detailName">FLINT</div>
+        <div class="detail-description" id="detailDesc">
+          A Venus Djinni that unleashes the power of the earth. Increases party's defense when Set.
+        </div>
+      </div>
+
+      <!-- Effects -->
+      <div class="effects-panel">
+        <div class="effect-section">
+          <div class="effect-title">⚔️ Unleash Effect</div>
+          <div class="effect-content" id="unleashEffect">
+            <strong>Flint Strike</strong><br>
+            Deals Venus damage to a single enemy and increases party's defense by 25% for 3 turns.
+          </div>
+        </div>
+
+        <div class="effect-section">
+          <div class="effect-title">✨ Passive Bonus (When Set)</div>
+          <div class="effect-content" id="passiveBonus">
+            <div class="effect-stat">
+              <span class="stat-label">HP:</span>
+              <span class="stat-value">+10</span>
+            </div>
+            <div class="effect-stat">
+              <span class="stat-label">Defense:</span>
+              <span class="stat-value">+3</span>
+            </div>
+            <div class="effect-stat">
+              <span class="stat-label">Venus Power:</span>
+              <span class="stat-value">+5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Slots -->
+      <div class="team-slots-panel">
+        <div class="team-slots-title">🎯 ACTIVE TEAM SLOTS (3 MAX)</div>
+        <div class="team-slots-grid">
+          <div class="team-slot active">
+            <div class="slot-number">Slot 1</div>
+            <img
+              src="../../public/sprites/battle/djinn/Venus_Djinn_Front.gif"
+              alt="Flint"
+              class="slot-djinn-sprite"
+            >
+            <div class="slot-djinn-name">Flint</div>
+          </div>
+
+          <div class="team-slot active">
+            <div class="slot-number">Slot 2</div>
+            <img
+              src="../../public/sprites/battle/djinn/Mars_Djinn_Front.gif"
+              alt="Forge"
+              class="slot-djinn-sprite"
+            >
+            <div class="slot-djinn-name">Forge</div>
+          </div>
+
+          <div class="team-slot active">
+            <div class="slot-number">Slot 3</div>
+            <img
+              src="../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif"
+              alt="Sleet"
+              class="slot-djinn-sprite"
+            >
+            <div class="slot-djinn-name">Sleet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="screen-footer">
+      <button class="footer-btn">🔄 SET/STANDBY</button>
+      <button class="footer-btn">⚡ SUMMON</button>
+      <button class="footer-btn">✕ CLOSE</button>
+    </div>
+  </div>
+
+  <script>
+    // Djinn data
+    const djinnData = {
+      flint: {
+        name: 'FLINT',
+        element: 'venus',
+        elementIcon: '🪨',
+        sprite: '../../public/sprites/battle/djinn/Venus_Djinn_Front.gif',
+        description: 'A Venus Djinni that unleashes the power of the earth. Increases party\'s defense when Set.',
+        unleash: '<strong>Flint Strike</strong><br>Deals Venus damage to a single enemy and increases party\'s defense by 25% for 3 turns.',
+        passive: {
+          'HP': '+10',
+          'Defense': '+3',
+          'Venus Power': '+5'
+        }
+      },
+      granite: {
+        name: 'GRANITE',
+        element: 'venus',
+        elementIcon: '🪨',
+        sprite: '../../public/sprites/battle/djinn/Venus_Djinn_Front.gif',
+        description: 'A Venus Djinni with incredible defensive power. Greatly boosts HP when Set.',
+        unleash: '<strong>Granite Shield</strong><br>Creates a protective barrier that reduces all damage by 40% for 2 turns.',
+        passive: {
+          'HP': '+15',
+          'Defense': '+5',
+          'Venus Power': '+3'
+        }
+      },
+      quartz: {
+        name: 'QUARTZ',
+        element: 'venus',
+        elementIcon: '🪨',
+        sprite: '../../public/sprites/battle/djinn/Venus_Djinn_Front.gif',
+        description: 'A Venus Djinni that channels crystal energy. Enhances attack power when Set.',
+        unleash: '<strong>Crystal Strike</strong><br>Deals heavy Venus damage to a single enemy with a chance to stun.',
+        passive: {
+          'HP': '+8',
+          'Attack': '+4',
+          'Venus Power': '+5'
+        }
+      },
+      forge: {
+        name: 'FORGE',
+        element: 'mars',
+        elementIcon: '🔥',
+        sprite: '../../public/sprites/battle/djinn/Mars_Djinn_Front.gif',
+        description: 'A Mars Djinni that burns with intense flames. Boosts attack power when Set.',
+        unleash: '<strong>Forge Blast</strong><br>Deals Mars damage to all enemies and raises party\'s attack by 20% for 3 turns.',
+        passive: {
+          'HP': '+8',
+          'Attack': '+5',
+          'Mars Power': '+5'
+        }
+      },
+      fever: {
+        name: 'FEVER',
+        element: 'mars',
+        elementIcon: '🔥',
+        sprite: '../../public/sprites/battle/djinn/Mars_Djinn_Front.gif',
+        description: 'A Mars Djinni that spreads searing heat. Currently on Standby for summoning.',
+        unleash: '<strong>Fever Wave</strong><br>Deals moderate Mars damage to all enemies and may inflict burns.',
+        passive: {
+          'HP': '+10',
+          'Attack': '+3',
+          'Mars Power': '+6'
+        }
+      },
+      corona: {
+        name: 'CORONA',
+        element: 'mars',
+        elementIcon: '🔥',
+        sprite: '../../public/sprites/battle/djinn/Mars_Djinn_Front.gif',
+        description: 'A Mars Djinni with solar fury. Currently recovering from unleash.',
+        unleash: '<strong>Corona Flare</strong><br>Deals heavy Mars damage to a single enemy and removes all buffs.',
+        passive: {
+          'HP': '+12',
+          'Attack': '+4',
+          'Mars Power': '+4'
+        }
+      },
+      fizz: {
+        name: 'FIZZ',
+        element: 'mercury',
+        elementIcon: '💧',
+        sprite: '../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif',
+        description: 'A Mercury Djinni that manipulates water. Boosts HP recovery when Set.',
+        unleash: '<strong>Fizz Splash</strong><br>Restores HP to all party members and removes status ailments.',
+        passive: {
+          'HP': '+12',
+          'Defense': '+2',
+          'Mercury Power': '+5'
+        }
+      },
+      sleet: {
+        name: 'SLEET',
+        element: 'mercury',
+        elementIcon: '💧',
+        sprite: '../../public/sprites/battle/djinn/Mercury_Djinn_Front.gif',
+        description: 'A Mercury Djinni with freezing power. Increases agility when Set.',
+        unleash: '<strong>Sleet Storm</strong><br>Deals Mercury damage to all enemies and may freeze them.',
+        passive: {
+          'HP': '+10',
+          'Agility': '+4',
+          'Mercury Power': '+5'
+        }
+      },
+      gust: {
+        name: 'GUST',
+        element: 'jupiter',
+        elementIcon: '⚡',
+        sprite: '../../public/sprites/battle/djinn/Jupiter_Djinn_Front.gif',
+        description: 'A Jupiter Djinni that commands the wind. Greatly boosts agility when Set.',
+        unleash: '<strong>Gust Blade</strong><br>Deals Jupiter damage to a single enemy with increased critical chance.',
+        passive: {
+          'HP': '+9',
+          'Agility': '+5',
+          'Jupiter Power': '+5'
+        }
+      }
+    };
+
+    // Handle djinn card clicks
+    document.querySelectorAll('.djinn-card:not(.locked)').forEach(card => {
+      card.addEventListener('click', () => {
+        // Remove previous selection
+        document.querySelectorAll('.djinn-card').forEach(c => c.classList.remove('selected'));
+
+        // Add selection to clicked card
+        card.classList.add('selected');
+
+        // Get djinn data
+        const djinnKey = card.dataset.djinn;
+        const data = djinnData[djinnKey];
+
+        if (data) {
+          // Update detail panel
+          document.getElementById('detailSprite').src = data.sprite;
+          document.getElementById('detailName').textContent = data.name;
+          document.getElementById('detailDesc').textContent = data.description;
+          document.getElementById('unleashEffect').innerHTML = data.unleash;
+
+          // Update badge
+          const badge = document.getElementById('detailBadge');
+          badge.textContent = data.elementIcon;
+          badge.className = `detail-element-badge ${data.element}`;
+
+          // Update passive bonuses
+          const passiveHTML = Object.entries(data.passive)
+            .map(([stat, value]) => `
+              <div class="effect-stat">
+                <span class="stat-label">${stat}:</span>
+                <span class="stat-value">${value}</span>
+              </div>
+            `)
+            .join('');
+          document.getElementById('passiveBonus').innerHTML = passiveHTML;
+        }
+      });
+    });
+
+    // Button interactions
+    document.querySelectorAll('.footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        console.log('Button clicked:', btn.textContent);
+      });
+    });
+  </script>
+</body>
+</html>
