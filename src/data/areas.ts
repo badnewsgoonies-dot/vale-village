@@ -47,6 +47,8 @@ export const VALE_VILLAGE: Area = {
         quest_ruins_complete: 'You have saved us all. Vale Village is in your debt.',
       },
       questId: 'quest_clear_forest',
+      battleOnInteract: ['earth-golem'],
+      battleOnlyOnce: true,
     },
     {
       id: 'Cook',
@@ -55,6 +57,8 @@ export const VALE_VILLAGE: Area = {
       blocking: true,
       dialogue: 'Welcome to my shop! Buy items before you go adventuring.',
       shopType: 'item',
+      battleOnInteract: ['slime'],
+      battleOnlyOnce: true,
     },
     {
       id: 'Soldier',
@@ -63,6 +67,8 @@ export const VALE_VILLAGE: Area = {
       blocking: true,
       dialogue: 'Need equipment? I have the finest weapons and armor!',
       shopType: 'equipment',
+      battleOnInteract: ['goblin'],
+      battleOnlyOnce: true,
     },
     {
       id: 'Cook2',
@@ -71,6 +77,8 @@ export const VALE_VILLAGE: Area = {
       blocking: true,
       dialogue: 'Rest at my inn to restore your health and energy. Only 10 gold!',
       shopType: 'inn',
+      battleOnInteract: ['slime'],
+      battleOnlyOnce: true,
     },
 
     // === VILLAGERS (Town Atmosphere) ===
@@ -84,7 +92,7 @@ export const VALE_VILLAGE: Area = {
         quest_forest_active: 'Those monsters appeared after that earthquake... Be careful out there!',
         quest_forest_complete: 'The forest is safe again. Thank you, brave warrior!',
       },
-      battleOnInteract: ['wild_wolf'],
+      battleOnInteract: ['wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -114,7 +122,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 12, y: 3 },
       blocking: true,
       dialogue: 'My scarecrows came to life! Help me fight them off!',
-      battleOnInteract: ['wind_wisp', 'wild_wolf'],
+      battleOnInteract: ['wind-wisp', 'wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -132,7 +140,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 16, y: 4 },
       blocking: true,
       dialogue: 'Bandits stole my goods! These wolves are trained to guard me!',
-      battleOnInteract: ['wild_wolf', 'wild_wolf'],
+      battleOnInteract: ['wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -141,7 +149,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 6, y: 9 },
       blocking: false,
       dialogue: 'I forged these metal golems for practice! Fight them!',
-      battleOnInteract: ['earth_golem'],
+      battleOnInteract: ['earth-golem'],
       battleOnlyOnce: true,
     },
     {
@@ -150,16 +158,16 @@ export const VALE_VILLAGE: Area = {
       position: { x: 9, y: 1 },
       blocking: true,
       dialogue: 'Show me your combat skills! Every adventurer must pass my test!',
-      battleOnInteract: ['goblin', 'wild_wolf', 'goblin'],
+      battleOnInteract: ['goblin', 'wild-wolf', 'goblin'],
       battleOnlyOnce: true,
     },
     {
       id: 'Villager-9',
       name: 'Fisherman Pete',
       position: { x: 1, y: 7 },
-      blocking: false,
-      dialogue: 'I caught some angry water spirits! Help me calm them down!',
-      battleOnInteract: ['wind_wisp', 'wind_wisp'],
+      blocking: true,
+      dialogue: 'The wind spirits answer my call! Can you handle them?',
+      battleOnInteract: ['wind-wisp', 'wind-wisp'],
       battleOnlyOnce: true,
     },
     {
@@ -168,7 +176,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 18, y: 10 },
       blocking: true,
       dialogue: 'These healing herbs attracted nature spirits! Battle them!',
-      battleOnInteract: ['fire_sprite', 'slime'],
+      battleOnInteract: ['fire-sprite', 'slime'],
       battleOnlyOnce: true,
     },
 
@@ -197,7 +205,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 14, y: 3 },
       blocking: false,
       dialogue: 'That shiny rock was actually a fire sprite! Help!',
-      battleOnInteract: ['fire_sprite'],
+      battleOnInteract: ['fire-sprite'],
       battleOnlyOnce: true,
     },
 
@@ -208,7 +216,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 2, y: 5 },
       blocking: true,
       dialogue: 'Let me test your knowledge of elemental combat! Face my summons!',
-      battleOnInteract: ['fire_sprite', 'wind_wisp'],
+      battleOnInteract: ['fire-sprite', 'wind-wisp'],
       battleOnlyOnce: true,
     },
     {
@@ -220,7 +228,7 @@ export const VALE_VILLAGE: Area = {
         default: 'The four elements challenge you! Prove your worth!',
         quest_ruins_active: 'The ancient ruins are protected by elemental guardians. Use their weaknesses!',
       },
-      battleOnInteract: ['fire_sprite', 'earth_golem', 'wind_wisp'],
+      battleOnInteract: ['fire-sprite', 'earth-golem', 'wind-wisp'],
       battleOnlyOnce: true,
     },
 
@@ -231,7 +239,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 11, y: 9 },
       blocking: true,
       dialogue: 'Road bandits trained these beasts! Help me fight them off!',
-      battleOnInteract: ['goblin', 'wild_wolf', 'wild_wolf'],
+      battleOnInteract: ['goblin', 'wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -240,7 +248,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 13, y: 7 },
       blocking: false,
       dialogue: 'My music attracts spirits! Let\'s see if you can handle them!',
-      battleOnInteract: ['wind_wisp', 'fire_sprite'],
+      battleOnInteract: ['wind-wisp', 'fire-sprite'],
       battleOnlyOnce: true,
     },
 
@@ -251,7 +259,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 1, y: 13 },
       blocking: false,
       dialogue: '*SNAP SNAP* (It attacks!)',
-      battleOnInteract: ['slime', 'wild_wolf'],
+      battleOnInteract: ['slime', 'wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -269,7 +277,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 19, y: 1 },
       blocking: false,
       dialogue: '*demonic squawk* (Dark energy radiates from it!)',
-      battleOnInteract: ['wind_wisp', 'wind_wisp', 'wind_wisp'],
+      battleOnInteract: ['wind-wisp', 'wind-wisp', 'wind-wisp'],
       battleOnlyOnce: true,
     },
   ],
@@ -295,15 +303,15 @@ export const FOREST_PATH: Area = {
   hasRandomEncounters: true,
   encounterRate: 15, // Battle every ~15 steps
   enemyPools: [
-    { weight: 50, enemyIds: ['wild_wolf'] },
+    { weight: 50, enemyIds: ['wild-wolf'] },
     { weight: 30, enemyIds: ['goblin', 'goblin'] },
-    { weight: 20, enemyIds: ['slime', 'wild_wolf'] },
+    { weight: 20, enemyIds: ['slime', 'wild-wolf'] },
   ],
   bosses: [
     {
       id: 'alpha_wolf_boss',
       position: { x: 10, y: 28 },
-      enemyIds: ['wild_wolf', 'wild_wolf', 'wild_wolf'], // 3 wolves for a tougher fight
+      enemyIds: ['wild-wolf', 'wild-wolf', 'wild-wolf'], // 3 wolves for a tougher fight
       dialogue: {
         before: 'A pack of fierce wolves blocks your path! Their alpha leader growls menacingly...',
         after: 'The wolves whimper and flee into the forest...',
@@ -378,7 +386,7 @@ export const FOREST_PATH: Area = {
         default: 'Monsters are chasing me! Please help fight them off!',
         quest_forest_complete: 'Thank you for clearing the monsters! I can finally go home!',
       },
-      battleOnInteract: ['wild_wolf', 'goblin'],
+      battleOnInteract: ['wild-wolf', 'goblin'],
       battleOnlyOnce: true,
     },
     {
@@ -387,7 +395,7 @@ export const FOREST_PATH: Area = {
       position: { x: 14, y: 15 },
       blocking: true,
       dialogue: 'The wolves that attacked me are still nearby! Finish them!',
-      battleOnInteract: ['wild_wolf', 'wild_wolf', 'wild_wolf'],
+      battleOnInteract: ['wild-wolf', 'wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
     {
@@ -432,14 +440,14 @@ export const ANCIENT_RUINS: Area = {
   encounterRate: 12, // More frequent encounters
   enemyPools: [
     { weight: 40, enemyIds: ['goblin', 'goblin'] },
-    { weight: 35, enemyIds: ['wild_wolf', 'goblin'] },
+    { weight: 35, enemyIds: ['wild-wolf', 'goblin'] },
     { weight: 25, enemyIds: ['slime', 'slime', 'goblin'] },
   ],
   bosses: [
     {
       id: 'golem_king_boss',
       position: { x: 12, y: 32 },
-      enemyIds: ['goblin', 'wild_wolf', 'goblin'], // Multi-enemy boss fight
+      enemyIds: ['goblin', 'wild-wolf', 'goblin'], // Multi-enemy boss fight
       dialogue: {
         before:
           'The ancient Golem King awakens! Stone begins to crumble as it rises to face you...',
@@ -532,7 +540,7 @@ export const ANCIENT_RUINS: Area = {
         default: 'You must prove yourself worthy! Face my shadow guardians!',
         quest_ruins_complete: 'You have proven yourself worthy. The power of the Djinn is yours.',
       },
-      battleOnInteract: ['earth_golem', 'fire_sprite', 'wind_wisp'],
+      battleOnInteract: ['earth-golem', 'fire-sprite', 'wind-wisp'],
       battleOnlyOnce: true,
     },
     {
@@ -541,7 +549,7 @@ export const ANCIENT_RUINS: Area = {
       position: { x: 7, y: 22 },
       blocking: true,
       dialogue: 'Test your enlightenment against these ancient spirits!',
-      battleOnInteract: ['storm_lord'],
+      battleOnInteract: ['storm-lord'],
       battleOnlyOnce: true,
     },
     {
@@ -553,7 +561,7 @@ export const ANCIENT_RUINS: Area = {
         default: 'The monsters that captured me are coming back! Fight them!',
         quest_ruins_complete: 'You saved me! I can finally escape this cursed place!',
       },
-      battleOnInteract: ['goblin', 'goblin', 'wild_wolf', 'wild_wolf'],
+      battleOnInteract: ['goblin', 'goblin', 'wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
   ],

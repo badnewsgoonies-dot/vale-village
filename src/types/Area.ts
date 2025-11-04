@@ -6,6 +6,22 @@ import type { Item } from './Item';
  * Defines maps, encounters, treasures, and NPCs
  */
 
+/**
+ * Valid enemy IDs - matches enemies.ts ENEMIES registry
+ * Adding type safety to prevent runtime errors from invalid enemy IDs
+ */
+export type EnemyId =
+  | 'goblin'
+  | 'wild-wolf'
+  | 'slime'
+  | 'fire-sprite'
+  | 'earth-golem'
+  | 'wind-wisp'
+  | 'fire-elemental'
+  | 'ice-guardian'
+  | 'stone-titan'
+  | 'storm-lord';
+
 export type AreaType = 'town' | 'dungeon' | 'overworld';
 
 export interface Position {
@@ -15,13 +31,13 @@ export interface Position {
 
 export interface EnemyPool {
   weight: number; // Probability weight
-  enemyIds: string[]; // Enemy IDs to spawn
+  enemyIds: EnemyId[]; // Enemy IDs to spawn (now type-safe!)
 }
 
 export interface BossEncounter {
   id: string;
   position: Position;
-  enemyIds: string[];
+  enemyIds: EnemyId[]; // Enemy IDs (now type-safe!)
   dialogue?: {
     before?: string;
     after?: string;
@@ -50,7 +66,7 @@ export interface NPC {
   dialogue: string | Record<string, string>; // Simple string or keyed by story flags
   questId?: string; // Quest giver
   shopType?: 'item' | 'equipment' | 'inn'; // Opens shop when talked to
-  battleOnInteract?: string[]; // Enemy IDs to battle when interacting with this NPC
+  battleOnInteract?: EnemyId[]; // Enemy IDs to battle when interacting with this NPC (now type-safe!)
   battleOnlyOnce?: boolean; // If true, only battle once then show dialogue
 }
 

@@ -29,6 +29,20 @@
   --color-border-dark: #0F2550;    /* 3D border dark edge (bottom/right) */
   --color-border-highlight: #FFD87F; /* Selected/focused border */
 
+  /* ===== STATUS/STAT COLORS ===== */
+  --color-hp-green: #57E2A6;       /* HP bar fill */
+  --color-hp-dark: #46C77A;        /* HP bar gradient bottom */
+  --color-hp-bg: #2A2A2A;          /* HP bar background */
+
+  --color-pp-blue: #5090D8;        /* PP bar fill */
+  --color-pp-dark: #3D73B8;        /* PP bar gradient bottom */
+  --color-pp-bg: #2A2A2A;          /* PP bar background */
+
+  --color-damage-red: #FF4444;     /* Damage numbers */
+  --color-heal-green: #44FF44;     /* Heal numbers */
+  --color-critical-gold: #FFD700;  /* Critical hits */
+  --color-ko-red: #FF3030;         /* K.O. indicator */
+
   /* ===== OVERWORLD COLORS ===== */
   --color-grass-light: #88C070;
   --color-grass-mid: #68A050;
@@ -172,4 +186,91 @@ a:focus {
   border-left-color: var(--color-border-dark);
   border-right-color: var(--color-border-light);
   border-bottom-color: var(--color-border-light);
+}
+
+/* ===== HP/PP BAR COMPONENTS ===== */
+.hp-bar, .pp-bar {
+  height: 8px;
+  background: var(--color-hp-bg);
+  border: 1px solid var(--color-border-dark);
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.hp-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--color-hp-green) 0%, var(--color-hp-dark) 100%);
+  transition: width var(--timing-normal);
+}
+
+.pp-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--color-pp-blue) 0%, var(--color-pp-dark) 100%);
+  transition: width var(--timing-normal);
+}
+
+/* ===== ELEMENT BADGES ===== */
+.element-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+  border: 2px solid;
+}
+
+.element-badge.venus {
+  background: var(--color-venus);
+  border-color: #B8753D;
+  color: #000;
+}
+
+.element-badge.mars {
+  background: var(--color-mars);
+  border-color: #B83D3D;
+  color: #FFF;
+}
+
+.element-badge.mercury {
+  background: var(--color-mercury);
+  border-color: #3D73B8;
+  color: #FFF;
+}
+
+.element-badge.jupiter {
+  background: var(--color-jupiter);
+  border-color: #8340B8;
+  color: #FFF;
+}
+
+/* ===== SPRITE RENDERING ===== */
+.sprite {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 127, 1));
+  }
+}
+
+.glow-text {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
