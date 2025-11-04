@@ -104,6 +104,42 @@ export const NewOverworldScreen: React.FC = () => {
     for (const pos of adjacentPositions) {
       const npc = area.npcs.find((n) => isNPCAtPosition(pos, n));
       if (npc) {
+        // Check if this NPC should trigger a battle
+        if (npc.battleOnInteract && npc.battleOnInteract.length > 0) {
+          // Check if already battled (if battleOnlyOnce is true)
+          const battleKey = `npc_battle_${npc.id}`;
+          if (npc.battleOnlyOnce && areaState.openedChests.has(battleKey)) {
+            // Already battled, show dialogue instead
+            let dialogue = '';
+            if (typeof npc.dialogue === 'string') {
+              dialogue = npc.dialogue;
+            } else {
+              const flagKeys = Object.keys(state.storyFlags);
+              for (const key of flagKeys) {
+                if (state.storyFlags[key as keyof typeof state.storyFlags] && npc.dialogue[key]) {
+                  dialogue = npc.dialogue[key];
+                  break;
+                }
+              }
+              if (!dialogue) {
+                dialogue = npc.dialogue.default || 'Thanks for the battle!';
+              }
+            }
+            setCurrentNPC(npc);
+            setShowDialogue(dialogue);
+            return;
+          }
+          
+          // Start battle with NPC's enemies
+          actions.startBattle(npc.battleOnInteract);
+          
+          // Mark as battled if battleOnlyOnce
+          if (npc.battleOnlyOnce) {
+            actions.openTreasureChest(battleKey); // Reuse chest system for tracking
+          }
+          return;
+        }
+
         // Get dynamic dialogue based on story flags
         let dialogue = '';
         if (typeof npc.dialogue === 'string') {

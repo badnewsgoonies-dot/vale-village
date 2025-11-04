@@ -50,6 +50,8 @@ export interface NPC {
   dialogue: string | Record<string, string>; // Simple string or keyed by story flags
   questId?: string; // Quest giver
   shopType?: 'item' | 'equipment' | 'inn'; // Opens shop when talked to
+  battleOnInteract?: string[]; // Enemy IDs to battle when interacting with this NPC
+  battleOnlyOnce?: boolean; // If true, only battle once then show dialogue
 }
 
 export interface AreaExit {
