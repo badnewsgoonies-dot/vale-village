@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGame } from '@/context';
+import type { Unit } from '@/types/Unit';
 import { TitleScreen } from '@/components/title';
 import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
@@ -76,13 +77,23 @@ export const ScreenRouter: React.FC = () => {
     }
 
     case 'REWARDS':
-      // TODO: Get rewards from battle result
+      // Get rewards from last battle
+      const battleRewards = state.lastBattleRewards;
+      const partyUnits = state.playerData.unitsCollected;
       return (
         <RewardsScreen
-          xp={100}
-          gold={50}
-          items={[]}
-          levelUps={[]}
+          xp={battleRewards?.rewards.totalXp || 0}
+          gold={battleRewards?.rewards.totalGold || 0}
+          items={battleRewards?.rewards.equipmentDrops || []}
+          levelUps={battleRewards?.levelUps.map(lu => {
+            // Find the unit from party
+            const unit = partyUnits.find((u: Unit) => u.id === lu.unitId);
+            return unit ? {
+              unit,
+              oldLevel: lu.oldLevel,
+              newLevel: lu.newLevel,
+            } : null;
+          }).filter(Boolean) as Array<{ unit: Unit; oldLevel: number; newLevel: number; }> || []}
           onContinue={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );

@@ -7,7 +7,7 @@ import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
 import type { Equipment, EquipmentLoadout } from '@/types/Equipment';
 import type { Djinn } from '@/types/Djinn';
 import { ENEMIES, type Enemy } from '@/data/enemies';
-import { createBattleState } from '@/types/Battle';
+import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
 import { getAllQuests } from '@/data/quests';
@@ -82,6 +82,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<GameState>({
     playerData: createInitialPlayerData(),
     currentBattle: null,
+    lastBattleRewards: null,
     currentScreen: { type: 'TITLE' },
     screenHistory: [],
     loading: false,
@@ -267,7 +268,41 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const endBattle = useCallback(() => {
-    console.log('endBattle not yet implemented');
+    setState(prev => {
+      if (!prev.currentBattle) {
+        console.warn('No active battle to end');
+        return prev;
+      }
+      
+      // Calculate rewards if player won
+      let rewards = null;
+      if (prev.currentBattle.status === BattleResult.PLAYER_VICTORY) {
+        rewards = processBattleVictory(prev.currentBattle);
+        
+        // Add equipment drops to inventory and gold
+        const updatedPlayerData = {
+          ...prev.playerData,
+          gold: prev.playerData.gold + rewards.goldEarned,
+          inventory: [
+            ...prev.playerData.inventory,
+            ...rewards.rewards.equipmentDrops
+          ],
+        };
+        
+        return {
+          ...prev,
+          playerData: updatedPlayerData,
+          currentBattle: null,
+          lastBattleRewards: rewards,
+        };
+      }
+
+      return {
+        ...prev,
+        currentBattle: null,
+        lastBattleRewards: rewards,
+      };
+    });
   }, []);
 
   // Djinn actions (placeholder implementations)

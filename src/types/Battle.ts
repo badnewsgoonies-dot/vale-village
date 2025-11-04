@@ -9,9 +9,9 @@ import { globalRNG } from '@/utils/SeededRNG';
 import {
   calculateBattleRewards,
   distributeRewards,
-  type EnemyReward,
   type RewardDistribution,
 } from './BattleRewards';
+import { ENEMIES } from '@/data/enemies';
 
 /**
  * Battle result types
@@ -636,21 +636,34 @@ export function processBattleVictory(
     throw new Error('Can only process rewards for player victory');
   }
 
-  // Convert enemies to reward data
-  const enemyRewards: EnemyReward[] = battle.enemies.map(enemy => ({
-    baseXp: 20, // Default values - in real game, would come from enemy definition
-    baseGold: 15,
-    level: enemy.level,
-  }));
+  // Get Enemy definitions from defeated enemy units
+  const defeatedEnemies = battle.enemies.map(enemyUnit => {
+    const enemyDef = ENEMIES[enemyUnit.id];
+    if (!enemyDef) {
+      // Fallback for unknown enemies
+      console.warn(`Unknown enemy ID: ${enemyUnit.id}, using default rewards`);
+      return {
+        id: enemyUnit.id,
+        name: enemyUnit.name,
+        level: enemyUnit.level,
+        stats: enemyUnit.baseStats,
+        abilities: enemyUnit.abilities,
+        element: enemyUnit.element,
+        baseXp: 20,
+        baseGold: 15,
+      };
+    }
+    return enemyDef;
+  });
 
   // Check survival status
   const alivePlayerUnits = battle.playerTeam.units.filter(u => !u.isKO);
   const allSurvived = alivePlayerUnits.length === battle.playerTeam.units.length;
   const survivorCount = alivePlayerUnits.length;
 
-  // Calculate rewards
+  // Calculate rewards (including equipment drops)
   const rewards = calculateBattleRewards(
-    enemyRewards,
+    defeatedEnemies,
     allSurvived,
     survivorCount,
     rng

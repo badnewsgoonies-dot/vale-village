@@ -2,6 +2,7 @@ import type { PlayerData } from '@/types/PlayerData';
 import type { BattleState } from '@/types/Battle';
 import type { Quest } from '@/types/Quest';
 import type { AreaId, BossId, ChestId } from '@/types/Area';
+import type { RewardDistribution } from '@/types/BattleRewards';
 
 export type Screen =
   | { type: 'TITLE' }
@@ -67,6 +68,7 @@ export interface AreaState {
 export interface GameState {
   playerData: PlayerData;
   currentBattle: BattleState | null;
+  lastBattleRewards: RewardDistribution | null;
   currentScreen: Screen;
   screenHistory: Screen[];
   loading: boolean;
