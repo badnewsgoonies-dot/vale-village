@@ -86,7 +86,8 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   };
 
   return (
-    <div className="equipment-container">
+    <div className="equipment-screen">
+      <div className="equipment-container">
       {/* Unit Selector Panel */}
       <aside className="unit-selector" role="navigation" aria-label="Unit selection">
         <h2>PARTY</h2>
@@ -206,6 +207,7 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 };

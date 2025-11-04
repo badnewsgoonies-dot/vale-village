@@ -22,7 +22,8 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
   onContinue
 }) => {
   return (
-    <div className="rewards-container">
+    <div className="rewards-screen">
+      <div className="rewards-container">
       {/* Victory Banner */}
       <div className="victory-banner" role="banner">
         <h1>VICTORY!</h1>
@@ -93,6 +94,7 @@ export const RewardsScreen: React.FC<RewardsScreenProps> = ({
         >
           CONTINUE
         </Button>
+      </div>
       </div>
     </div>
   );

@@ -40,7 +40,8 @@ export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
   };
 
   return (
-    <div className="collection-container">
+    <div className="unit-collection-screen">
+      <div className="collection-container">
       {/* Header Panel */}
       <header className="header-panel">
         <div className="header-content">
@@ -154,6 +155,7 @@ export const UnitCollectionScreen: React.FC<UnitCollectionScreenProps> = ({
           );
         })()}
       </aside>
+      </div>
     </div>
   );
 };
