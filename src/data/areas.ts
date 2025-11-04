@@ -13,15 +13,33 @@ export const VALE_VILLAGE: Area = {
   height: 15,
   hasRandomEncounters: false,
   bosses: [],
-  treasures: [],
-  npcs: [
+  treasures: [
     {
-      id: 'elder',
-      name: 'Elder',
+      id: 'village_starter_chest',
+      position: { x: 2, y: 2 },
+      contents: {
+        gold: 100,
+      },
+      opened: false,
+    },
+    {
+      id: 'village_hidden_chest',
+      position: { x: 18, y: 13 },
+      contents: {
+        gold: 50,
+      },
+      opened: false,
+    },
+  ],
+  npcs: [
+    // === KEY NPCs (Quest Givers & Shops) ===
+    {
+      id: 'Mayor',
+      name: 'Mayor',
       position: { x: 10, y: 5 },
       blocking: true,
       dialogue: {
-        default: 'Welcome to Vale Village, traveler.',
+        default: 'Welcome to Vale Village, traveler. We are a peaceful town... for now.',
         intro: 'Monsters have been spotted near the forest. Can you investigate?',
         quest_forest_active: 'Have you cleared the forest yet?',
         quest_forest_complete: 'Thank you! But there\'s more trouble ahead...',
@@ -31,50 +49,188 @@ export const VALE_VILLAGE: Area = {
       questId: 'quest_clear_forest',
     },
     {
-      id: 'shopkeeper',
-      name: 'Dora',
+      id: 'Cook',
+      name: 'Dora the Shopkeeper',
       position: { x: 15, y: 8 },
       blocking: true,
       dialogue: 'Welcome to my shop! Buy items before you go adventuring.',
       shopType: 'item',
     },
     {
-      id: 'blacksmith',
-      name: 'Brock',
+      id: 'Soldier',
+      name: 'Brock the Blacksmith',
       position: { x: 5, y: 8 },
       blocking: true,
       dialogue: 'Need equipment? I have the finest weapons and armor!',
       shopType: 'equipment',
     },
     {
-      id: 'innkeeper',
-      name: 'Martha',
+      id: 'Cook2',
+      name: 'Martha the Innkeeper',
       position: { x: 10, y: 12 },
       blocking: true,
-      dialogue: 'Rest at my inn to restore your health and energy.',
+      dialogue: 'Rest at my inn to restore your health and energy. Only 10 gold!',
       shopType: 'inn',
     },
+
+    // === VILLAGERS (Town Atmosphere) ===
     {
-      id: 'villager_1',
-      name: 'Villager',
+      id: 'Villager-1',
+      name: 'Tom',
       position: { x: 3, y: 10 },
       blocking: true,
       dialogue: {
-        default: 'Beautiful day, isn\'t it?',
-        quest_forest_active:
-          'Those monsters appeared after that earthquake... Be careful out there!',
+        default: 'Beautiful day, isn\'t it? Perfect for farming!',
+        quest_forest_active: 'Those monsters appeared after that earthquake... Be careful out there!',
         quest_forest_complete: 'The forest is safe again. Thank you, brave warrior!',
       },
     },
     {
-      id: 'villager_2',
-      name: 'Child',
+      id: 'Villager-2',
+      name: 'Young Sarah',
       position: { x: 17, y: 6 },
       blocking: true,
       dialogue: {
         default: 'I want to be an adventurer like you when I grow up!',
         quest_ruins_complete: 'Wow! You defeated the Golem King! You\'re amazing!',
       },
+    },
+    {
+      id: 'Villager-3',
+      name: 'Old Martha',
+      position: { x: 7, y: 3 },
+      blocking: true,
+      dialogue: 'In my day, we didn\'t have all these fancy Psynergy powers. We worked the land with our hands!',
+    },
+    {
+      id: 'Villager-4',
+      name: 'Farmer Jack',
+      position: { x: 12, y: 3 },
+      blocking: true,
+      dialogue: 'My crops aren\'t growing as well this year. Something feels... off.',
+    },
+    {
+      id: 'Villager-5',
+      name: 'Young Tim',
+      position: { x: 4, y: 6 },
+      blocking: false,
+      dialogue: 'Did you know there are Djinn hidden all over Weyard? I want to find one!',
+    },
+    {
+      id: 'Villager-6',
+      name: 'Merchant',
+      position: { x: 16, y: 4 },
+      blocking: true,
+      dialogue: 'I travel between towns selling goods. Vale is the safest village in the region.',
+    },
+    {
+      id: 'Villager-7',
+      name: 'Apprentice',
+      position: { x: 6, y: 9 },
+      blocking: false,
+      dialogue: 'I\'m learning to be a blacksmith! One day I\'ll forge legendary weapons!',
+    },
+    {
+      id: 'Villager-8',
+      name: 'Town Guard',
+      position: { x: 9, y: 1 },
+      blocking: true,
+      dialogue: 'I keep watch over Vale. It\'s usually quiet, but lately... I\'ve seen strange lights in the forest.',
+    },
+    {
+      id: 'Villager-9',
+      name: 'Fisherman Pete',
+      position: { x: 1, y: 7 },
+      blocking: false,
+      dialogue: 'The fish aren\'t biting today. Maybe the earthquake scared them off?',
+    },
+    {
+      id: 'Villager-10',
+      name: 'Herbalist',
+      position: { x: 18, y: 10 },
+      blocking: true,
+      dialogue: 'Healing herbs grow in the forest. But with those monsters around, it\'s too dangerous to gather them.',
+    },
+
+    // === CHILDREN (Playing around town) ===
+    {
+      id: 'Villager-11',
+      name: 'Billy',
+      position: { x: 8, y: 11 },
+      blocking: false,
+      dialogue: 'Tag! You\'re it! ...Oh wait, you\'re an adult. Never mind.',
+    },
+    {
+      id: 'Villager-12',
+      name: 'Lucy',
+      position: { x: 13, y: 11 },
+      blocking: false,
+      dialogue: 'My dad says there are monsters in the forest. Is that true?',
+    },
+    {
+      id: 'Villager-13',
+      name: 'Tommy',
+      position: { x: 14, y: 3 },
+      blocking: false,
+      dialogue: 'I found a shiny rock by the river! Do you think it\'s magic?',
+    },
+
+    // === SCHOLARS & MYSTICS ===
+    {
+      id: 'Scholar-1',
+      name: 'Scholar Elric',
+      position: { x: 2, y: 5 },
+      blocking: true,
+      dialogue: 'I study ancient Psynergy texts. The power of Alchemy once ruled this world...',
+    },
+    {
+      id: 'Scholar-2',
+      name: 'Sage Aldric',
+      position: { x: 18, y: 2 },
+      blocking: true,
+      dialogue: {
+        default: 'The four elements must remain in balance, or catastrophe will strike.',
+        quest_ruins_active: 'The ancient ruins are protected by elemental guardians. Use their weaknesses!',
+      },
+    },
+
+    // === MERCHANTS & TRAVELERS ===
+    {
+      id: 'Villager-14',
+      name: 'Traveling Merchant',
+      position: { x: 11, y: 9 },
+      blocking: true,
+      dialogue: 'I came from the northern towns. The roads are getting more dangerous every day.',
+    },
+    {
+      id: 'Villager-15',
+      name: 'Bard',
+      position: { x: 13, y: 7 },
+      blocking: false,
+      dialogue: '♪ In Vale Village, where the grass grows green... ♪ (He\'s practicing his song)',
+    },
+
+    // === ANIMALS & AMBIANCE ===
+    {
+      id: 'Crab-1',
+      name: 'Crab',
+      position: { x: 1, y: 13 },
+      blocking: false,
+      dialogue: '*click click* (It\'s just a crab)',
+    },
+    {
+      id: 'Crab-2',
+      name: 'Crab',
+      position: { x: 2, y: 14 },
+      blocking: false,
+      dialogue: '*scuttles away*',
+    },
+    {
+      id: 'seagull',
+      name: 'Seagull',
+      position: { x: 19, y: 1 },
+      blocking: false,
+      dialogue: '*squawk* (The seagull ignores you)',
     },
   ],
   exits: [
@@ -147,17 +303,55 @@ export const FOREST_PATH: Area = {
       },
       opened: false,
     },
+    {
+      id: 'forest_chest_4',
+      position: { x: 3, y: 8 },
+      contents: {
+        gold: 15,
+      },
+      opened: false,
+    },
+    {
+      id: 'forest_chest_5',
+      position: { x: 17, y: 12 },
+      contents: {
+        gold: 25,
+      },
+      opened: false,
+    },
+    {
+      id: 'forest_chest_6',
+      position: { x: 12, y: 22 },
+      contents: {
+        gold: 40,
+      },
+      opened: false,
+    },
   ],
   npcs: [
     {
-      id: 'lost_traveler',
+      id: 'Villager-16',
       name: 'Lost Traveler',
-      position: { x: 10, y: 15 },
+      position: { x: 7, y: 5 },
       blocking: true,
       dialogue: {
-        default: 'I got lost in these woods... Can you help me find my way out?',
-        quest_forest_complete: 'Thank you for clearing the path! I can finally go home.',
+        default: 'I got separated from my group! The forest is too dangerous...',
+        quest_forest_complete: 'Thank you for clearing the monsters! I can finally go home!',
       },
+    },
+    {
+      id: 'Villager-17',
+      name: 'Injured Hunter',
+      position: { x: 14, y: 15 },
+      blocking: true,
+      dialogue: 'I was hunting when wolves attacked me... *cough* Please, defeat the alpha wolf!',
+    },
+    {
+      id: 'Cursed_Tree',
+      name: 'Strange Tree',
+      position: { x: 10, y: 20 },
+      blocking: false,
+      dialogue: 'This tree has an eerie glow... It must be cursed by dark magic.',
     },
   ],
   exits: [
@@ -241,20 +435,74 @@ export const ANCIENT_RUINS: Area = {
       },
       opened: false,
     },
+    {
+      id: 'ruins_chest_4',
+      position: { x: 5, y: 8 },
+      contents: {
+        gold: 60,
+      },
+      opened: false,
+    },
+    {
+      id: 'ruins_chest_5',
+      position: { x: 20, y: 15 },
+      contents: {
+        gold: 80,
+      },
+      opened: false,
+    },
+    {
+      id: 'ruins_chest_6',
+      position: { x: 10, y: 18 },
+      contents: {
+        gold: 120,
+      },
+      opened: false,
+    },
+    {
+      id: 'ruins_chest_7',
+      position: { x: 15, y: 25 },
+      contents: {
+        gold: 200,
+      },
+      opened: false,
+    },
+    {
+      id: 'ruins_hidden_chest',
+      position: { x: 22, y: 30 },
+      contents: {
+        gold: 300,
+      },
+      opened: false,
+    },
   ],
   npcs: [
     {
-      id: 'mysterious_stranger',
-      name: '???',
+      id: 'Thief',
+      name: 'Mysterious Stranger',
       position: { x: 12, y: 10 },
       blocking: true,
       dialogue: {
-        default:
-          'So you\'ve made it this far... Impressive. But the real challenge lies ahead.',
-        quest_ruins_complete:
-          'You have proven yourself worthy. The power of the Djinn is yours.',
+        default: 'So you\'ve made it this far... Impressive. But the real challenge lies ahead.',
+        quest_ruins_complete: 'You have proven yourself worthy. The power of the Djinn is yours.',
       },
-      questId: 'quest_mysterious_stranger',
+    },
+    {
+      id: 'Monk_sitting',
+      name: 'Ancient Monk',
+      position: { x: 7, y: 22 },
+      blocking: true,
+      dialogue: 'I have meditated here for decades... These ruins hold ancient power.',
+    },
+    {
+      id: 'tiedup_villager',
+      name: 'Captured Explorer',
+      position: { x: 18, y: 12 },
+      blocking: false,
+      dialogue: {
+        default: 'Help! The monsters captured me! Please defeat the Golem King!',
+        quest_ruins_complete: 'You saved me! I can finally escape this cursed place!',
+      },
     },
   ],
   exits: [
