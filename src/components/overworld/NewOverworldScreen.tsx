@@ -140,7 +140,7 @@ export const NewOverworldScreen: React.FC = () => {
           
           // Mark as battled if battleOnlyOnce
           if (npc.battleOnlyOnce) {
-            actions.openTreasureChest(battleKey as any); // Reuse chest system for tracking
+            actions.openTreasureChest(battleKey as any, {}); // Reuse chest system for tracking (no rewards)
           }
           return;
         }
@@ -179,18 +179,13 @@ export const NewOverworldScreen: React.FC = () => {
 
       if (treasure.contents.gold) {
         rewards.push(`${treasure.contents.gold} Gold`);
-        // Add gold to player (needs action)
-        // actions.addGold(treasure.contents.gold);
-      }
-      if (treasure.contents.items) {
-        rewards.push(...treasure.contents.items.map((i) => i.name));
       }
       if (treasure.contents.equipment) {
         rewards.push(...treasure.contents.equipment.map((e) => e.name));
       }
 
       setShowDialogue(message + rewards.join(', '));
-      actions.openTreasureChest(treasure.id);
+      actions.openTreasureChest(treasure.id, treasure.contents);
       return;
     }
   }, [playerPos, area, areaState, actions, state.storyFlags]);

@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 import type { GameState, Screen, StoryFlags } from './types';
 import type { Equipment } from '@/types/Equipment';
 import type { Djinn } from '@/types/Djinn';
-import type { AreaId, ChestId, BossId } from '@/types/Area';
+import type { AreaId, ChestId, BossId, TreasureChest } from '@/types/Area';
 
 export interface GameActions {
   // Navigation
@@ -40,7 +40,7 @@ export interface GameActions {
   setPlayerPosition: (x: number, y: number) => void;
   movePlayer: (deltaX: number, deltaY: number) => void;
   incrementStepCounter: () => void;
-  openTreasureChest: (chestId: ChestId) => void;
+  openTreasureChest: (chestId: ChestId, contents: TreasureChest['contents']) => void;
   defeatBoss: (bossId: BossId) => void;
   changeArea: (areaId: AreaId, spawnPosition: { x: number; y: number }) => void;
 

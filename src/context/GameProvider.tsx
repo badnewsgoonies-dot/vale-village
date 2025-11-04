@@ -411,7 +411,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const openTreasureChest = useCallback((chestId: ChestId) => {
+  const openTreasureChest = useCallback((chestId: ChestId, contents: { gold?: number; items?: any[]; equipment?: Equipment[] }) => {
     setState(prev => {
       const areaState = prev.areaStates[prev.currentLocation];
       if (!areaState) return prev;
@@ -419,8 +419,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newOpenedChests = new Set(areaState.openedChests);
       newOpenedChests.add(chestId);
 
+      // Add gold to player
+      const newGold = prev.playerData.gold + (contents.gold || 0);
+
+      // Add equipment to inventory
+      const newInventory = [...prev.playerData.inventory];
+      if (contents.equipment) {
+        newInventory.push(...contents.equipment);
+      }
+
       return {
         ...prev,
+        playerData: {
+          ...prev.playerData,
+          gold: newGold,
+          inventory: newInventory,
+        },
         areaStates: {
           ...prev.areaStates,
           [prev.currentLocation]: {

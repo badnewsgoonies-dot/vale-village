@@ -1,4 +1,5 @@
 import type { Area } from '@/types/Area';
+import { LEATHER_VEST, CLOTH_CAP, IRON_SWORD, LEATHER_BOOTS, IRON_ARMOR, IRON_HELM, STEEL_SWORD, STEEL_HELM, HYPER_BOOTS } from './equipment';
 
 /**
  * Area Definitions - Vale Chronicles
@@ -26,6 +27,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 2, y: 2 },
       contents: {
         gold: 100,
+        equipment: [LEATHER_VEST], // Starting armor
       },
       opened: false,
     },
@@ -34,6 +36,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 18, y: 13 },
       contents: {
         gold: 50,
+        equipment: [CLOTH_CAP], // Starting helm
       },
       opened: false,
     },
@@ -332,10 +335,8 @@ export const FOREST_PATH: Area = {
       id: 'forest_chest_1',
       position: { x: 5, y: 10 },
       contents: {
-        items: [
-          // Healing Herbs would go here
-        ],
-        gold: 20,
+        gold: 75,
+        equipment: [IRON_SWORD], // Better weapon
       },
       opened: false,
     },
@@ -344,6 +345,7 @@ export const FOREST_PATH: Area = {
       position: { x: 15, y: 18 },
       contents: {
         gold: 50,
+        equipment: [LEATHER_BOOTS], // Speed boost
       },
       opened: false,
     },
@@ -470,7 +472,8 @@ export const ANCIENT_RUINS: Area = {
       id: 'ruins_chest_1',
       position: { x: 8, y: 12 },
       contents: {
-        gold: 100,
+        gold: 150,
+        equipment: [IRON_ARMOR], // Better defense
       },
       opened: false,
     },
@@ -478,10 +481,8 @@ export const ANCIENT_RUINS: Area = {
       id: 'ruins_chest_2',
       position: { x: 18, y: 20 },
       contents: {
-        equipment: [
-          // Silver equipment would go here
-        ],
-        gold: 75,
+        gold: 100,
+        equipment: [IRON_HELM, STEEL_SWORD], // Good helm + weapon
       },
       opened: false,
     },
@@ -489,10 +490,8 @@ export const ANCIENT_RUINS: Area = {
       id: 'ruins_chest_3',
       position: { x: 12, y: 28 },
       contents: {
-        items: [
-          // Rare items
-        ],
-        gold: 150,
+        gold: 200,
+        equipment: [HYPER_BOOTS], // Best speed boots
       },
       opened: false,
     },
@@ -500,7 +499,8 @@ export const ANCIENT_RUINS: Area = {
       id: 'ruins_chest_4',
       position: { x: 5, y: 8 },
       contents: {
-        gold: 60,
+        gold: 80,
+        equipment: [STEEL_HELM], // Best helm
       },
       opened: false,
     },
@@ -508,7 +508,7 @@ export const ANCIENT_RUINS: Area = {
       id: 'ruins_chest_5',
       position: { x: 20, y: 15 },
       contents: {
-        gold: 80,
+        gold: 120,
       },
       opened: false,
     },
