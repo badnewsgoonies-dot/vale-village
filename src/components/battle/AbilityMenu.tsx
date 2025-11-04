@@ -20,7 +20,7 @@ export const AbilityMenu: React.FC<AbilityMenuProps> = ({
         <h3 className="menu-title">Select Psynergy</h3>
       </div>
       <div className="ability-list">
-        {unit.abilities.map(ability => {
+        {unit.getAvailableAbilities().map(ability => {
           const canUse = unit.canUseAbility(ability.id);
           return (
             <button

@@ -319,6 +319,12 @@
   }
 }
 
+/* Miss/Dodge Styling */
+.log-entry.miss {
+  color: #A8A8A8;
+  font-style: italic;
+}
+
 /* Element Effectiveness Styling */
 .log-entry.super-effective {
   color: #4ADE80;
@@ -464,6 +470,21 @@
 .action-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Flee button styling */
+.flee-button {
+  background: linear-gradient(180deg, #6B2A2A, #501E1E);
+  border-color: #904040;
+}
+
+.flee-button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #853535, #602525);
+  border-color: #A04B4B;
+}
+
+.flee-button:disabled {
+  opacity: 0.4;
 }
 
 /* Ability Menu */

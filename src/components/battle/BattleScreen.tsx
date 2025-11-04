@@ -8,7 +8,7 @@ import { CommandMenu } from './CommandMenu';
 import { AbilityMenu } from './AbilityMenu';
 import { CombatLog } from './CombatLog';
 import { PartyPortraits } from './PartyPortraits';
-import { executeAbility, calculateTurnOrder } from '@/types/Battle';
+import { executeAbility, calculateTurnOrder, attemptFlee, processStatusEffectTick, checkParalyzeFailure } from '@/types/Battle';
 import './BattleScreen.css';
 
 type BattlePhase =
@@ -52,6 +52,20 @@ export const BattleScreen: React.FC = () => {
       return;
     }
 
+    // Process status effects at start of turn
+    const statusResult = processStatusEffectTick(currentActor);
+    if (statusResult.messages.length > 0) {
+      setCombatLog(prev => [...prev, ...statusResult.messages]);
+    }
+
+    // Check if unit is frozen (skip turn)
+    const isFrozen = currentActor.statusEffects.some(e => e.type === 'freeze' && e.duration > 0);
+    if (isFrozen) {
+      // Skip turn if frozen
+      setTimeout(() => advanceTurn(), 1500);
+      return;
+    }
+
     if (isPlayerUnit && phase === 'idle') {
       setPhase('selectCommand');
     } else if (!isPlayerUnit && phase === 'idle') {
@@ -61,7 +75,7 @@ export const BattleScreen: React.FC = () => {
   }, [currentActorIndex, phase, currentActor, isPlayerUnit]);
 
   // Handle command selection
-  const handleCommandSelect = useCallback((command: 'attack' | 'psynergy' | 'djinn' | 'defend') => {
+  const handleCommandSelect = useCallback((command: 'attack' | 'psynergy' | 'djinn' | 'defend' | 'flee') => {
     setSelectedCommand(command);
 
     if (command === 'attack') {
@@ -74,6 +88,9 @@ export const BattleScreen: React.FC = () => {
       // Defend = apply buff, advance turn
       applyDefendBuff();
       advanceTurn();
+    } else if (command === 'flee') {
+      // Attempt to flee from battle
+      handleFlee();
     }
   }, []);
 
@@ -94,11 +111,19 @@ export const BattleScreen: React.FC = () => {
   const executePlayerTurn = async (target: Unit) => {
     setPhase('animating');
 
+    // Check paralyze before action
+    if (checkParalyzeFailure(currentActor)) {
+      setCombatLog(prev => [...prev, `${currentActor.name} is paralyzed and cannot move!`]);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      advanceTurn();
+      return;
+    }
+
     // Determine ability
     let ability: Ability;
     if (selectedCommand === 'attack') {
       // Use basic attack (first physical ability)
-      ability = currentActor.abilities.find(a => a.type === 'physical') || currentActor.abilities[0];
+      ability = currentActor.getAvailableAbilities().find(a => a.type === 'physical') || currentActor.getAvailableAbilities()[0];
     } else {
       ability = selectedAbility!;
     }
@@ -117,6 +142,19 @@ export const BattleScreen: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
+      
+      // Regenerate PP for all alive units
+      let totalPPRestored = 0;
+      battle.playerTeam.units.forEach(unit => {
+        if (!unit.isKO) {
+          totalPPRestored += unit.regeneratePP();
+        }
+      });
+      
+      if (totalPPRestored > 0) {
+        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
+      }
+      
       setTimeout(() => actions.navigate({ type: 'REWARDS' }), 2000);
       return;
     } else if (battleEnd === 'defeat') {
@@ -134,12 +172,20 @@ export const BattleScreen: React.FC = () => {
   const executeAITurn = async () => {
     setPhase('animating');
 
+    // Check paralyze before action
+    if (checkParalyzeFailure(currentActor)) {
+      setCombatLog(prev => [...prev, `${currentActor.name} is paralyzed and cannot move!`]);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      advanceTurn();
+      return;
+    }
+
     // Simple AI: attack random player unit
     const targets = battle.playerTeam.units.filter(u => u.currentHp > 0);
     if (targets.length === 0) return;
 
     const target = targets[Math.floor(Math.random() * targets.length)];
-    const ability = currentActor.abilities[0] || currentActor.abilities.find(a => a.type === 'physical');
+    const ability = currentActor.getAvailableAbilities()[0] || currentActor.getAvailableAbilities().find(a => a.type === 'physical');
 
     if (!ability) {
       advanceTurn();
@@ -159,6 +205,19 @@ export const BattleScreen: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
+      
+      // Regenerate PP for all alive units
+      let totalPPRestored = 0;
+      battle.playerTeam.units.forEach(unit => {
+        if (!unit.isKO) {
+          totalPPRestored += unit.regeneratePP();
+        }
+      });
+      
+      if (totalPPRestored > 0) {
+        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
+      }
+      
       setTimeout(() => actions.navigate({ type: 'REWARDS' }), 2000);
       return;
     } else if (battleEnd === 'defeat') {
@@ -187,6 +246,34 @@ export const BattleScreen: React.FC = () => {
     if (!enemiesAlive) return 'victory';
     if (!playersAlive) return 'defeat';
     return null;
+  };
+
+  // Attempt to flee from battle
+  const handleFlee = () => {
+    const fleeResult = attemptFlee(
+      battle.playerTeam.units,
+      battle.enemies,
+      battle.isBossBattle || false
+    );
+
+    if (!fleeResult.ok) {
+      // Error (e.g., boss battle)
+      setCombatLog(prev => [...prev, fleeResult.error]);
+      return;
+    }
+
+    const success = fleeResult.value;
+
+    if (success) {
+      // Flee succeeded - return to overworld
+      setCombatLog(prev => [...prev, 'The party fled from battle!']);
+      setPhase('victory');
+      setTimeout(() => actions.navigate({ type: 'OVERWORLD' }), 1500);
+    } else {
+      // Flee failed - advance turn (enemies get a turn)
+      setCombatLog(prev => [...prev, 'Could not escape!']);
+      advanceTurn();
+    }
   };
 
   // Apply defend buff (placeholder)
@@ -256,6 +343,7 @@ export const BattleScreen: React.FC = () => {
             <CommandMenu
               unit={currentActor}
               onSelectCommand={handleCommandSelect}
+              isBossBattle={battle.isBossBattle}
             />
           )}
 

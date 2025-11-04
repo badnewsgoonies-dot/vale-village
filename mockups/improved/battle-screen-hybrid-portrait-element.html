@@ -76,7 +76,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      padding: 4px;
+    }
+
+    .element-emblem img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
     }
 
     .battle-title {
@@ -103,7 +109,7 @@
       left: 220px;
       right: 220px;
       bottom: 0;
-      background: url('/sprites/backgrounds/gs1/Mountain.gif') center/cover;
+      background: url('./sprites/backgrounds/gs1/Mountain.gif') center/cover;
       z-index: 0;
     }
 
@@ -397,16 +403,10 @@
     }
 
     .element-icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid #666;
+      width: 16px;
+      height: 16px;
+      image-rendering: pixelated;
     }
-
-    .element-venus { background: radial-gradient(circle, #e8a050 0%, #b87020 100%); }
-    .element-mars { background: radial-gradient(circle, #e05050 0%, #a03030 100%); }
-    .element-mercury { background: radial-gradient(circle, #5090d8 0%, #2060a8 100%); }
-    .element-jupiter { background: radial-gradient(circle, #a858d8 0%, #7030a0 100%); }
 
     /* Bottom: Command Panel - Medieval Stone */
     .command-panel {
@@ -470,8 +470,10 @@
     }
 
     .element-btn-icon {
-      font-size: 14px;
-      margin-bottom: 4px;
+      width: 20px;
+      height: 20px;
+      margin: 0 auto 4px auto;
+      image-rendering: pixelated;
     }
   </style>
 </head>
@@ -479,7 +481,9 @@
   <div class="battle-container">
     <!-- Element-Themed Header -->
     <div class="element-header">
-      <div class="element-emblem">♁</div>
+      <div class="element-emblem">
+        <img src="./sprites/icons/misc/Venus_Star.gif" alt="Venus">
+      </div>
       <div class="battle-title">⚔ VENUS BATTLE ⚔</div>
       <div class="turn-badge">TURN 10</div>
     </div>
@@ -490,28 +494,28 @@
     <!-- Enemy Area -->
     <div class="enemy-area">
       <div class="enemy-sprite">
-        <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
-        <div class="enemy-label">DIRE WOLF</div>
+        <img src="./sprites/battle/enemies/Wild_Wolf.gif" alt="Wild Wolf">
+        <div class="enemy-label">WILD WOLF</div>
       </div>
       <div class="enemy-sprite" style="animation-delay: -1s;">
-        <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
-        <div class="enemy-label">ORC</div>
+        <img src="./sprites/battle/enemies/Orc_Captain.gif" alt="Orc Captain">
+        <div class="enemy-label">ORC CAPTAIN</div>
       </div>
     </div>
 
     <!-- Party Battle Sprites -->
     <div class="party-battle-area">
       <div class="party-battle-sprite">
-        <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        <img src="./sprites/battle/party/isaac/Isaac_lSword_Front.gif" alt="Isaac">
       </div>
       <div class="party-battle-sprite">
-        <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        <img src="./sprites/battle/party/garet/Garet_Axe_Front.gif" alt="Garet">
       </div>
       <div class="party-battle-sprite">
-        <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        <img src="./sprites/battle/party/ivan/Ivan_lBlade_Front.gif" alt="Ivan">
       </div>
       <div class="party-battle-sprite">
-        <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+        <img src="./sprites/battle/party/mia/Mia_Staff_Front.gif" alt="Mia">
       </div>
     </div>
 
@@ -519,7 +523,7 @@
     <div class="party-portraits">
       <div class="portrait-card active">
         <div class="portrait-header">
-          <div class="portrait-large" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+          <div class="portrait-large" style="background: url('./sprites/icons/characters/Isaac1.gif') center/cover;"></div>
           <div class="portrait-name-info">
             <div class="portrait-name">ISAAC</div>
             <div class="portrait-level">LV 12</div>
@@ -546,7 +550,7 @@
 
       <div class="portrait-card">
         <div class="portrait-header">
-          <div class="portrait-large" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+          <div class="portrait-large" style="background: url('./sprites/icons/characters/Garet1.gif') center/cover;"></div>
           <div class="portrait-name-info">
             <div class="portrait-name">GARET</div>
             <div class="portrait-level">LV 11</div>
@@ -573,7 +577,7 @@
 
       <div class="portrait-card">
         <div class="portrait-header">
-          <div class="portrait-large" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+          <div class="portrait-large" style="background: url('./sprites/icons/characters/Ivan.gif') center/cover;"></div>
           <div class="portrait-name-info">
             <div class="portrait-name">IVAN</div>
             <div class="portrait-level">LV 12</div>
@@ -600,7 +604,7 @@
 
       <div class="portrait-card">
         <div class="portrait-header">
-          <div class="portrait-large" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="portrait-large" style="background: url('./sprites/icons/characters/Mia.gif') center/cover;"></div>
           <div class="portrait-name-info">
             <div class="portrait-name">MIA</div>
             <div class="portrait-level">LV 11</div>
@@ -630,11 +634,11 @@
     <div class="enemy-portraits">
       <div class="enemy-portrait-card">
         <div class="enemy-portrait-header">
-          <div class="enemy-portrait-name">DIRE WOLF</div>
+          <div class="enemy-portrait-name">WILD WOLF</div>
           <div class="enemy-portrait-level">LV 10</div>
         </div>
         <div class="enemy-portrait-sprite">
-          <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+          <img src="./sprites/battle/enemies/Wild_Wolf.gif" alt="Wild Wolf">
         </div>
         <div class="enemy-portrait-hp">
           <div class="enemy-hp-label">HP</div>
@@ -645,18 +649,18 @@
         </div>
         <div class="enemy-weakness">WEAK TO:</div>
         <div class="element-icons">
-          <div class="element-icon element-mars"></div>
-          <div class="element-icon element-jupiter"></div>
+          <img class="element-icon" src="./sprites/icons/misc/Mars_Star.gif" alt="Mars">
+          <img class="element-icon" src="./sprites/icons/misc/Jupiter_Star.gif" alt="Jupiter">
         </div>
       </div>
 
       <div class="enemy-portrait-card">
         <div class="enemy-portrait-header">
-          <div class="enemy-portrait-name">ORC</div>
+          <div class="enemy-portrait-name">ORC CAPTAIN</div>
           <div class="enemy-portrait-level">LV 9</div>
         </div>
         <div class="enemy-portrait-sprite">
-          <img src="/sprites/battle/enemies/Orc.gif" alt="Orc">
+          <img src="./sprites/battle/enemies/Orc_Captain.gif" alt="Orc Captain">
         </div>
         <div class="enemy-portrait-hp">
           <div class="enemy-hp-label">HP</div>
@@ -667,8 +671,8 @@
         </div>
         <div class="enemy-weakness">WEAK TO:</div>
         <div class="element-icons">
-          <div class="element-icon element-venus"></div>
-          <div class="element-icon element-mercury"></div>
+          <img class="element-icon" src="./sprites/icons/misc/Venus_Star.gif" alt="Venus">
+          <img class="element-icon" src="./sprites/icons/misc/Mercury_Star.gif" alt="Mercury">
         </div>
       </div>
     </div>
@@ -683,19 +687,19 @@
 
       <div class="command-buttons">
         <button class="element-btn">
-          <div class="element-btn-icon">⚔️</div>
+          <img class="element-btn-icon" src="./sprites/icons/buttons/Attack.gif" alt="Attack">
           <div>ATTACK</div>
         </button>
         <button class="element-btn">
-          <div class="element-btn-icon">✨</div>
+          <img class="element-btn-icon" src="./sprites/icons/buttons/Psynergy.gif" alt="Psynergy">
           <div>PSYNERGY</div>
         </button>
         <button class="element-btn">
-          <div class="element-btn-icon">🔮</div>
+          <img class="element-btn-icon" src="./sprites/icons/buttons/Djinni.gif" alt="Djinn">
           <div>DJINN</div>
         </button>
         <button class="element-btn">
-          <div class="element-btn-icon">🛡️</div>
+          <img class="element-btn-icon" src="./sprites/icons/buttons/Defend.gif" alt="Defend">
           <div>DEFEND</div>
         </button>
       </div>

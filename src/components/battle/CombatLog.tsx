@@ -14,6 +14,11 @@ const formatMessage = (msg: string): { text: string; className: string } => {
     return { text: msg, className: 'log-entry critical-hit' };
   }
   
+  // Check for miss/dodge
+  if (msg.includes('Miss!')) {
+    return { text: msg, className: 'log-entry miss' };
+  }
+  
   // Check for element advantage
   if (msg.includes('Super effective!')) {
     return { text: msg, className: 'log-entry super-effective' };

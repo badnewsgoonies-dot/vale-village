@@ -35,6 +35,7 @@ export interface ActionResult {
   damage?: number;
   healing?: number;
   critical?: boolean;
+  dodged?: boolean;
   message: string;
   targetIds: string[];
 }
@@ -64,6 +65,9 @@ export interface BattleState {
 
   /** Battle log (for UI display) */
   log: string[];
+
+  /** Is this a boss battle? (cannot flee) */
+  isBossBattle?: boolean;
 }
 
 /**
@@ -187,9 +191,15 @@ export function calculatePsynergyDamage(
     ? getElementModifier(ability.element, defender.element)
     : 1.0;
 
-  const damage = Math.floor(
+  let damage = Math.floor(
     (basePower + magicPower - magicDefense) * elementModifier * getRandomMultiplier(rng)
   );
+
+  // Apply elemental resist from armor (e.g., Dragon Scales)
+  const resist = defender.equipment.armor?.elementalResist || 0;
+  if (ability.element && resist > 0) {
+    damage = Math.floor(damage * (1 - resist));
+  }
 
   return Math.max(1, damage);
 }
@@ -221,6 +231,29 @@ export function calculateHealAmount(
 
   // ALWAYS clamp final result to minimum 0
   return Math.max(0, healAmount);
+}
+
+/**
+ * Check if defender dodges attacker's ability
+ * From GAME_MECHANICS.md Section 5.1.4
+ * 
+ * Formula: baseEvasion (5%) + equipmentEvasion + speedBonus
+ * Speed bonus = 1% per SPD difference in defender's favor
+ * Final evasion capped at 75%
+ */
+export function checkDodge(
+  attacker: Unit,
+  defender: Unit,
+  rng: RNG = globalRNG
+): boolean {
+  const BASE_EVASION = 0.05; // 5% base
+  const equipmentEvasion = defender.equipment.boots?.evasion || 0;
+  const speedBonus = (defender.stats.spd - attacker.stats.spd) * 0.01; // 1% per SPD point
+  
+  const totalEvasion = BASE_EVASION + (equipmentEvasion / 100) + speedBonus;
+  const finalEvasion = Math.max(0, Math.min(0.75, totalEvasion)); // Clamp to 0-75%
+  
+  return rng.next() < finalEvasion;
 }
 
 /**
@@ -268,8 +301,17 @@ export function executeAbility(
     case 'psynergy': {
       let totalDamage = 0;
       let elementModifier = 1.0;
+      let anyDodged = false;
 
       for (const target of targets) {
+        // Check for dodge BEFORE calculating damage
+        const dodged = checkDodge(caster, target, rng);
+        
+        if (dodged) {
+          anyDodged = true;
+          continue; // Skip damage for this target
+        }
+
         let damage = ability.type === 'physical'
           ? calculatePhysicalDamage(caster, target, ability, rng)
           : calculatePsynergyDamage(caster, target, ability, rng);
@@ -289,8 +331,27 @@ export function executeAbility(
         totalDamage += actualDamage;
       }
 
-      message += isCritical ? ' Critical hit!' : '';
-      message += ` Deals ${totalDamage} damage!`;
+      // Build message based on what happened
+      if (anyDodged && totalDamage === 0) {
+        // All attacks dodged
+        message += ' Miss!';
+        return {
+          message,
+          targetIds,
+          dodged: true,
+          damage: 0,
+        };
+      }
+
+      if (anyDodged && totalDamage > 0) {
+        // Some dodged, some hit
+        message += isCritical ? ' Critical hit!' : '';
+        message += ` Deals ${totalDamage} damage! (Some attacks missed)`;
+      } else {
+        // None dodged
+        message += isCritical ? ' Critical hit!' : '';
+        message += ` Deals ${totalDamage} damage!`;
+      }
       
       // Add element effectiveness message
       if (ability.type === 'psynergy' && ability.element && elementModifier !== 1.0) {
@@ -384,6 +445,64 @@ export function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleR
   if (allPlayerKO) return BattleResult.PLAYER_DEFEAT;
 
   return null;
+}
+
+/**
+ * Process status effect tick at start of unit's turn
+ * From GAME_MECHANICS.md Section 5.3
+ * 
+ * Poison: 8% max HP damage per turn
+ * Burn: 10% max HP damage per turn
+ * Freeze: Skip turn, 30% break chance per turn
+ * Paralyze: Checked separately before action execution
+ */
+export function processStatusEffectTick(
+  unit: Unit,
+  rng: RNG = globalRNG
+): { damage: number; messages: string[] } {
+  let totalDamage = 0;
+  const messages: string[] = [];
+
+  for (const effect of unit.statusEffects) {
+    if (effect.type === 'poison') {
+      const damage = Math.floor(unit.maxHp * 0.08);
+      const actualDamage = unit.takeDamage(damage);
+      totalDamage += actualDamage;
+      messages.push(`${unit.name} takes ${actualDamage} poison damage!`);
+    } else if (effect.type === 'burn') {
+      const damage = Math.floor(unit.maxHp * 0.10);
+      const actualDamage = unit.takeDamage(damage);
+      totalDamage += actualDamage;
+      messages.push(`${unit.name} takes ${actualDamage} burn damage!`);
+    } else if (effect.type === 'freeze') {
+      const breakChance = 0.3; // 30% chance to break free
+      if (rng.next() < breakChance) {
+        messages.push(`${unit.name} broke free from freeze!`);
+        effect.duration = 0; // Mark for removal
+      } else {
+        messages.push(`${unit.name} is frozen and cannot act!`);
+      }
+    }
+  }
+
+  return { damage: totalDamage, messages };
+}
+
+/**
+ * Check if unit's action fails due to paralyze
+ * From GAME_MECHANICS.md Section 5.3
+ * 
+ * Paralyze: 50% chance action fails
+ */
+export function checkParalyzeFailure(
+  unit: Unit,
+  rng: RNG = globalRNG
+): boolean {
+  const paralyzed = unit.statusEffects.find(e => e.type === 'paralyze');
+  if (paralyzed && rng.next() < 0.5) {
+    return true; // Action fails (50% chance)
+  }
+  return false;
 }
 
 /**

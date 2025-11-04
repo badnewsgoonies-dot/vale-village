@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Vale Village - Interactive Overworld</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      overflow: hidden;
+    }
+
+    .game-container {
+      position: relative;
+      width: 960px;
+      height: 640px;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      cursor: crosshair;
+    }
+
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+      border-bottom: 2px solid #d4af37;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+
+    .location-name {
+      font-size: 10px;
+      color: #d4af37;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .time-weather {
+      display: flex;
+      gap: 16px;
+      font-size: 6px;
+      color: #ccc;
+    }
+
+    .mini-map {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 150px;
+      height: 150px;
+      background: rgba(0,0,0,0.8);
+      border: 3px solid #d4af37;
+      border-radius: 8px;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      padding: 12px;
+      z-index: 100;
+      font-size: 6px;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .controls-title {
+      color: #d4af37;
+      margin-bottom: 6px;
+      font-size: 7px;
+    }
+
+    .fps-counter {
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #5090d8;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 6px;
+      color: #5090d8;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      color: #d4af37;
+      text-align: center;
+      z-index: 200;
+    }
+
+    .loading-bar {
+      width: 300px;
+      height: 20px;
+      background: #2a2a2a;
+      border: 2px solid #d4af37;
+      border-radius: 10px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .loading-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #d4af37 0%, #e8c060 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="loading" id="loading">
+      <div>LOADING VALE VILLAGE...</div>
+      <div class="loading-bar">
+        <div class="loading-fill" id="loadingFill"></div>
+      </div>
+    </div>
+
+    <canvas id="gameCanvas" width="960" height="640"></canvas>
+
+    <div class="hud">
+      <div class="location-name">VALE VILLAGE</div>
+      <div class="time-weather">
+        <div id="timeDisplay">TIME: 14:30</div>
+        <div id="weatherDisplay">WEATHER: CLEAR</div>
+        <div id="seasonDisplay">SEASON: SPRING</div>
+      </div>
+    </div>
+
+    <div class="fps-counter">
+      FPS: <span id="fpsDisplay">60</span>
+    </div>
+
+    <div class="controls">
+      <div class="controls-title">CONTROLS</div>
+      <div>CLICK: Change time of day</div>
+      <div>W: Toggle weather</div>
+      <div>SPACE: Toggle particles</div>
+      <div>MOUSE: Interactive hover</div>
+    </div>
+
+    <div class="mini-map">
+      <canvas id="miniMapCanvas" width="150" height="150"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // TypeScript-style code (will run as JavaScript)
+
+    class Sprite {
+      constructor(src, x, y, width, height) {
+        this.image = new Image();
+        this.image.src = src;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.loaded = false;
+        this.image.onload = () => { this.loaded = true; };
+      }
+
+      draw(ctx, offsetX = 0, offsetY = 0) {
+        if (this.loaded) {
+          ctx.drawImage(this.image, this.x + offsetX, this.y + offsetY, this.width, this.height);
+        }
+      }
+    }
+
+    class AnimatedSprite extends Sprite {
+      constructor(src, x, y, width, height, animSpeed = 0) {
+        super(src, x, y, width, height);
+        this.baseY = y;
+        this.animSpeed = animSpeed;
+        this.animOffset = Math.random() * Math.PI * 2;
+      }
+
+      update(time) {
+        if (this.animSpeed > 0) {
+          this.y = this.baseY + Math.sin(time * this.animSpeed + this.animOffset) * 2;
+        }
+      }
+    }
+
+    class Character {
+      constructor(src, x, y, speed = 0.5) {
+        this.sprite = new Sprite(src, x, y, 40, 40);
+        this.speed = speed;
+        this.targetX = x;
+        this.targetY = y;
+        this.baseX = x;
+        this.baseY = y;
+        this.pathIndex = 0;
+        this.path = [];
+        this.direction = 1;
+      }
+
+      setPath(path) {
+        this.path = path;
+        this.pathIndex = 0;
+        if (path.length > 0) {
+          this.targetX = this.baseX + path[0].x;
+          this.targetY = this.baseY + path[0].y;
+        }
+      }
+
+      update() {
+        if (this.path.length === 0) return;
+
+        const dx = this.targetX - this.sprite.x;
+        const dy = this.targetY - this.sprite.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 2) {
+          this.pathIndex = (this.pathIndex + 1) % this.path.length;
+          this.targetX = this.baseX + this.path[this.pathIndex].x;
+          this.targetY = this.baseY + this.path[this.pathIndex].y;
+        } else {
+          this.sprite.x += (dx / dist) * this.speed;
+          this.sprite.y += (dy / dist) * this.speed;
+        }
+      }
+
+      draw(ctx) {
+        this.sprite.draw(ctx);
+      }
+    }
+
+    class Particle {
+      constructor(x, y, type = 'rain') {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.alpha = 1;
+        this.speed = Math.random() * 2 + 1;
+        this.lifetime = 1;
+
+        if (type === 'rain') {
+          this.vx = -1;
+          this.vy = 5 + Math.random() * 3;
+          this.length = 10 + Math.random() * 5;
+        } else if (type === 'snow') {
+          this.vx = Math.random() * 0.5 - 0.25;
+          this.vy = 0.5 + Math.random() * 1;
+          this.size = 2 + Math.random() * 2;
+        } else if (type === 'leaf') {
+          this.vx = Math.random() * 2 - 1;
+          this.vy = 0.5 + Math.random() * 0.5;
+          this.size = 3 + Math.random() * 3;
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+        }
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.lifetime -= 0.001;
+
+        if (this.type === 'leaf') {
+          this.rotation += this.rotationSpeed;
+          this.vx += (Math.random() - 0.5) * 0.1;
+        }
+
+        return this.y < 640 && this.lifetime > 0;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha * this.lifetime;
+
+        if (this.type === 'rain') {
+          ctx.strokeStyle = '#5090d8';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(this.x - this.vx * 2, this.y - this.vy);
+          ctx.stroke();
+        } else if (this.type === 'snow') {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (this.type === 'leaf') {
+          ctx.fillStyle = '#7aa880';
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+          ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    class GameEngine {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.miniMapCanvas = document.getElementById('miniMapCanvas');
+        this.miniMapCtx = this.miniMapCanvas.getContext('2d');
+
+        this.layers = {
+          sky: [],
+          background: [],
+          midground: [],
+          foreground: [],
+          characters: [],
+          ui: []
+        };
+
+        this.particles = [];
+        this.characters = [];
+        this.buildings = [];
+
+        this.time = 0;
+        this.timeOfDay = 0.5; // 0 = midnight, 0.5 = noon, 1 = midnight
+        this.weather = 'clear'; // clear, rain, snow
+        this.particlesEnabled = true;
+
+        this.fps = 60;
+        this.lastFrameTime = 0;
+        this.frameCount = 0;
+
+        this.loading = true;
+        this.loadProgress = 0;
+        this.assetsToLoad = 0;
+        this.assetsLoaded = 0;
+
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.canvas.addEventListener('click', () => {
+          this.timeOfDay = (this.timeOfDay + 0.1) % 1;
+          this.updateTimeDisplay();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'w' || e.key === 'W') {
+            const weathers = ['clear', 'rain', 'snow'];
+            const idx = weathers.indexOf(this.weather);
+            this.weather = weathers[(idx + 1) % weathers.length];
+            document.getElementById('weatherDisplay').textContent =
+              `WEATHER: ${this.weather.toUpperCase()}`;
+          } else if (e.key === ' ') {
+            this.particlesEnabled = !this.particlesEnabled;
+          }
+        });
+      }
+
+      loadAssets() {
+        // Sky layer
+        this.layers.sky.push({
+          color: '#5a8aa8',
+          height: 300
+        });
+
+        // Ground layers
+        for (let i = 0; i < 4; i++) {
+          this.layers.midground.push({
+            y: 300 + i * 100,
+            height: 100,
+            color: `hsl(${130 - i * 10}, 30%, ${40 - i * 5}%)`
+          });
+        }
+
+        // Add sprite-based buildings
+        const buildingSprites = [
+          { src: './sprites/buildings/Vale_Isaacs_House.gif', x: 150, y: 420, w: 120, h: 100 },
+          { src: './sprites/buildings/Vale_Inn.gif', x: 650, y: 450, w: 120, h: 100 },
+          { src: './sprites/buildings/Vale_Elder_House.gif', x: 380, y: 240, w: 140, h: 120 },
+          { src: './sprites/buildings/Vale_Item_Shop.gif', x: 500, y: 380, w: 100, h: 90 }
+        ];
+
+        this.buildings = [];
+        buildingSprites.forEach(b => {
+          const img = new Image();
+          img.src = b.src;
+          this.buildings.push({ img, x: b.x, y: b.y, w: b.w, h: b.h, loaded: false });
+          img.onload = () => { this.buildings[this.buildings.length - 1].loaded = true; };
+        });
+
+        // Add sprite-based characters
+        const characterSprites = [
+          { src: './sprites/overworld/Isaac.gif', x: 200, y: 350, path: [{x:0,y:0}, {x:100,y:0}, {x:100,y:50}, {x:0,y:50}] },
+          { src: './sprites/overworld/npc/Vale_Kraden.gif', x: 400, y: 300, path: [{x:0,y:0}, {x:-80,y:40}, {x:0,y:0}] },
+          { src: './sprites/overworld/npc/Vale_Elder.gif', x: 600, y: 400, path: [{x:0,y:0}, {x:50,y:-30}, {x:50,y:30}, {x:0,y:0}] },
+          { src: './sprites/overworld/npc/Vale_Mayor_1.gif', x: 300, y: 500, path: [{x:0,y:0}, {x:30,y:0}, {x:0,y:0}, {x:-30,y:0}] }
+        ];
+
+        this.characters = [];
+        characterSprites.forEach(c => {
+          const img = new Image();
+          img.src = c.src;
+          const char = {
+            img,
+            x: c.x,
+            y: c.y,
+            baseX: c.x,
+            baseY: c.y,
+            path: c.path,
+            pathIndex: 0,
+            targetX: c.x + c.path[0].x,
+            targetY: c.y + c.path[0].y,
+            loaded: false
+          };
+          img.onload = () => { char.loaded = true; };
+          this.characters.push(char);
+        });
+
+        // If no assets to load, just start immediately
+        if (this.assetsToLoad === 0) {
+          setTimeout(() => {
+            this.loading = false;
+            document.getElementById('loading').style.display = 'none';
+          }, 500);
+        }
+
+        this.updateLoadingBar();
+      }
+
+      assetLoaded() {
+        this.assetsLoaded++;
+        this.loadProgress = this.assetsLoaded / this.assetsToLoad;
+        this.updateLoadingBar();
+
+        if (this.assetsLoaded >= this.assetsToLoad) {
+          setTimeout(() => {
+            this.loading = false;
+            document.getElementById('loading').style.display = 'none';
+          }, 500);
+        }
+      }
+
+      updateLoadingBar() {
+        const fill = document.getElementById('loadingFill');
+        if (fill) {
+          fill.style.width = `${this.loadProgress * 100}%`;
+        }
+      }
+
+      updateTimeDisplay() {
+        const hour = Math.floor(this.timeOfDay * 24);
+        const minute = Math.floor((this.timeOfDay * 24 * 60) % 60);
+        document.getElementById('timeDisplay').textContent =
+          `TIME: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      }
+
+      spawnParticles() {
+        if (!this.particlesEnabled) return;
+
+        if (this.weather === 'rain' && Math.random() < 0.3) {
+          this.particles.push(new Particle(Math.random() * 960, -10, 'rain'));
+        } else if (this.weather === 'snow' && Math.random() < 0.15) {
+          this.particles.push(new Particle(Math.random() * 960, -10, 'snow'));
+        } else if (this.weather === 'clear' && Math.random() < 0.02) {
+          this.particles.push(new Particle(Math.random() * 960, -10, 'leaf'));
+        }
+      }
+
+      update(deltaTime) {
+        if (this.loading) return;
+
+        this.time += deltaTime * 0.001;
+
+        // Update characters
+        this.characters.forEach(char => {
+          const dx = char.targetX - char.x;
+          const dy = char.targetY - char.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 2) {
+            char.pathIndex = (char.pathIndex + 1) % char.path.length;
+            char.targetX = char.baseX + char.path[char.pathIndex].x;
+            char.targetY = char.baseY + char.path[char.pathIndex].y;
+          } else {
+            char.x += (dx / dist) * 0.5;
+            char.y += (dy / dist) * 0.5;
+          }
+        });
+
+        // Update particles
+        this.spawnParticles();
+        this.particles = this.particles.filter(p => p.update());
+
+        // Limit particles
+        if (this.particles.length > 500) {
+          this.particles = this.particles.slice(-500);
+        }
+      }
+
+      getSkyColor() {
+        // Calculate sky color based on time of day
+        if (this.timeOfDay < 0.25) { // Night
+          return '#1a1a2a';
+        } else if (this.timeOfDay < 0.35) { // Dawn
+          const t = (this.timeOfDay - 0.25) / 0.1;
+          return this.lerpColor('#1a1a2a', '#e8a050', t);
+        } else if (this.timeOfDay < 0.45) { // Morning
+          const t = (this.timeOfDay - 0.35) / 0.1;
+          return this.lerpColor('#e8a050', '#5a8aa8', t);
+        } else if (this.timeOfDay < 0.65) { // Day
+          return '#5a8aa8';
+        } else if (this.timeOfDay < 0.75) { // Dusk
+          const t = (this.timeOfDay - 0.65) / 0.1;
+          return this.lerpColor('#5a8aa8', '#d85050', t);
+        } else if (this.timeOfDay < 0.85) { // Evening
+          const t = (this.timeOfDay - 0.75) / 0.1;
+          return this.lerpColor('#d85050', '#1a1a2a', t);
+        } else { // Night
+          return '#1a1a2a';
+        }
+      }
+
+      lerpColor(color1, color2, t) {
+        const hex1 = color1.replace('#', '');
+        const hex2 = color2.replace('#', '');
+        const r1 = parseInt(hex1.substring(0, 2), 16);
+        const g1 = parseInt(hex1.substring(2, 4), 16);
+        const b1 = parseInt(hex1.substring(4, 6), 16);
+        const r2 = parseInt(hex2.substring(0, 2), 16);
+        const g2 = parseInt(hex2.substring(2, 4), 16);
+        const b2 = parseInt(hex2.substring(4, 6), 16);
+
+        const r = Math.round(r1 + (r2 - r1) * t);
+        const g = Math.round(g1 + (g2 - g1) * t);
+        const b = Math.round(b1 + (b2 - b1) * t);
+
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+      }
+
+      render() {
+        if (this.loading) return;
+
+        // Clear canvas
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(0, 0, 960, 640);
+
+        // Draw sky
+        const skyColor = this.getSkyColor();
+        this.ctx.fillStyle = skyColor;
+        this.ctx.fillRect(0, 0, 960, 300);
+
+        // Draw background mountains
+        this.ctx.globalAlpha = 0.8;
+        this.layers.background.forEach(sprite => {
+          if (sprite.draw) sprite.draw(this.ctx);
+        });
+        this.ctx.globalAlpha = 1;
+
+        // Draw ground layers
+        this.layers.midground.forEach(item => {
+          if (item.color && item.height) {
+            this.ctx.fillStyle = item.color;
+            this.ctx.fillRect(0, item.y, 960, item.height);
+          }
+        });
+
+        // Draw buildings
+        this.buildings.forEach(building => {
+          if (building.loaded && building.img) {
+            this.ctx.drawImage(building.img, building.x, building.y, building.w, building.h);
+          } else {
+            // Fallback to drawn building
+            this.ctx.fillStyle = '#8a6840';
+            this.ctx.fillRect(building.x, building.y, building.w, building.h);
+            this.ctx.strokeStyle = '#000';
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeRect(building.x, building.y, building.w, building.h);
+          }
+        });
+
+        // Draw characters
+        this.characters.forEach(char => {
+          if (char.loaded && char.img) {
+            this.ctx.drawImage(char.img, char.x - 20, char.y - 35, 40, 40);
+          } else {
+            // Fallback to drawn character
+            this.ctx.fillStyle = '#d4af37';
+            this.ctx.beginPath();
+            this.ctx.arc(char.x, char.y, 8, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.strokeStyle = '#000';
+            this.ctx.lineWidth = 1;
+            this.ctx.stroke();
+          }
+        });
+
+        // Draw particles
+        this.particles.forEach(p => p.draw(this.ctx));
+
+        // Apply time of day lighting overlay
+        const nightAlpha = this.timeOfDay < 0.25 || this.timeOfDay > 0.85 ? 0.4 :
+                          this.timeOfDay < 0.35 || this.timeOfDay > 0.75 ? 0.2 : 0;
+        if (nightAlpha > 0) {
+          this.ctx.fillStyle = `rgba(0, 0, 20, ${nightAlpha})`;
+          this.ctx.fillRect(0, 0, 960, 640);
+        }
+
+        // Draw mini-map
+        this.drawMiniMap();
+      }
+
+      drawMiniMap() {
+        this.miniMapCtx.fillStyle = '#1a1a1a';
+        this.miniMapCtx.fillRect(0, 0, 150, 150);
+
+        // Draw simplified buildings
+        this.miniMapCtx.fillStyle = '#8a6840';
+        this.buildings.forEach(b => {
+          const mx = (b.x / 960) * 150;
+          const my = (b.y / 640) * 150;
+          this.miniMapCtx.fillRect(mx, my, 8, 8);
+        });
+
+        // Draw characters
+        this.characters.forEach((char, idx) => {
+          const mx = (char.x / 960) * 150;
+          const my = (char.y / 640) * 150;
+
+          if (idx === 0) {
+            // Player - gold with outline
+            this.miniMapCtx.fillStyle = '#d4af37';
+            this.miniMapCtx.beginPath();
+            this.miniMapCtx.arc(mx, my, 3, 0, Math.PI * 2);
+            this.miniMapCtx.fill();
+            this.miniMapCtx.strokeStyle = '#fff';
+            this.miniMapCtx.lineWidth = 1;
+            this.miniMapCtx.stroke();
+          } else {
+            // NPCs - green dots
+            this.miniMapCtx.fillStyle = '#50d850';
+            this.miniMapCtx.beginPath();
+            this.miniMapCtx.arc(mx, my, 2, 0, Math.PI * 2);
+            this.miniMapCtx.fill();
+          }
+        });
+      }
+
+      gameLoop(timestamp) {
+        const deltaTime = timestamp - this.lastFrameTime;
+        this.lastFrameTime = timestamp;
+
+        // Update FPS counter
+        this.frameCount++;
+        if (this.frameCount % 60 === 0) {
+          this.fps = Math.round(1000 / deltaTime);
+          document.getElementById('fpsDisplay').textContent = this.fps;
+        }
+
+        this.update(deltaTime);
+        this.render();
+
+        requestAnimationFrame((ts) => this.gameLoop(ts));
+      }
+
+      start() {
+        this.loadAssets();
+        this.updateTimeDisplay();
+        requestAnimationFrame((ts) => this.gameLoop(ts));
+      }
+    }
+
+    // Initialize and start the game
+    const game = new GameEngine();
+    game.start();
+  </script>
+</body>
+</html>
