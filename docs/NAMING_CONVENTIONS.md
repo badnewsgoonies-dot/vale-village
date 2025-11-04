@@ -203,6 +203,126 @@ import type { Unit, UnitDefinition } from '@/types/Unit';
 
 ## Special Cases
 
+### Game World Naming Exception
+
+**Areas, Quests, and Story Flags use `snake_case` instead of `kebab-case`.**
+
+This exception exists for technical reasons:
+
+#### 1. Object Keys
+Area IDs are used as JavaScript object keys throughout the codebase:
+
+```typescript
+// GameState.areaStates uses area IDs as keys
+areaStates: {
+  vale_village: { openedChests: Set(), ... },    // ✓ Clean, no quotes needed
+  forest_path: { openedChests: Set(), ... },
+  ancient_ruins: { openedChests: Set(), ... },
+}
+
+// AREAS lookup object
+export const AREAS: Record<AreaId, Area> = {
+  vale_village: VALE_VILLAGE,    // ✓ Works as object key
+  forest_path: FOREST_PATH,
+  ancient_ruins: ANCIENT_RUINS,
+};
+
+// vs kebab-case (would require quotes):
+areaStates: {
+  'vale-village': { ... },    // ⚠️ Must quote keys
+  'forest-path': { ... },
+}
+```
+
+#### 2. Story Flags Are Interface Properties
+Story flags are TypeScript interface properties and must be valid JavaScript identifiers:
+
+```typescript
+export interface StoryFlags {
+  intro_seen: boolean;              // ✓ Valid property name
+  quest_forest_complete: boolean;   // ✓ Dot notation works
+  forest_path_unlocked: boolean;
+}
+
+// Accessed naturally with dot notation:
+if (state.storyFlags.intro_seen) { ... }           // ✓ Clean
+if (state.storyFlags.quest_forest_complete) { ... } // ✓ Clean
+
+// vs kebab-case (would break):
+export interface StoryFlags {
+  'intro-seen': boolean;           // ⚠️ Must quote
+  'quest-forest-complete': boolean;
+}
+
+// Requires ugly bracket notation:
+if (state.storyFlags['intro-seen']) { ... }          // ⚠️ Verbose
+if (state.storyFlags['quest-forest-complete']) { ... }
+```
+
+#### 3. Type Safety
+All game world IDs are strongly typed with TypeScript string literal unions:
+
+```typescript
+// Type definitions in src/types/Area.ts
+export type AreaId = 'vale_village' | 'forest_path' | 'ancient_ruins';
+export type QuestId = 'quest_clear_forest' | 'quest_ancient_ruins' | ...;
+export type BossId = 'alpha_wolf_boss' | 'golem_king_boss';
+export type ChestId = `forest_chest_${1 | 2 | 3}` | 'village_starter_chest' | ...;
+
+// Used in interfaces:
+export interface Area {
+  id: AreaId;  // ✓ Compile-time type checking
+}
+
+export interface Quest {
+  id: QuestId;
+  startsInLocation?: AreaId;
+  completesInLocation?: AreaId;
+}
+
+export interface GameState {
+  currentLocation: AreaId;           // ✓ Type-safe
+  areaStates: Record<AreaId, AreaState>;  // ✓ Type-safe keys
+}
+```
+
+**TypeScript catches typos at compile time:**
+```typescript
+// This will cause a TypeScript error:
+const area = AREAS['vale_vilage'];  // ✗ Typo caught at compile time!
+//                    ^^^^^^ Type '"vale_vilage"' is not assignable to type 'AreaId'
+```
+
+#### Examples
+
+**Game World IDs (snake_case):**
+- ✓ Area IDs: `vale_village`, `forest_path`, `ancient_ruins`
+- ✓ Quest IDs: `quest_clear_forest`, `quest_ancient_ruins`
+- ✓ Story Flags: `intro_seen`, `quest_forest_complete`, `forest_path_unlocked`
+- ✓ Boss IDs: `alpha_wolf_boss`, `golem_king_boss`
+- ✓ Chest IDs: `forest_chest_1`, `ruins_chest_2`, `village_starter_chest`
+
+**Battle System IDs (kebab-case):**
+- ✓ Equipment: `iron-sword`, `dragon-scales`, `hermes-sandals`
+- ✓ Enemies: `wild-wolf`, `fire-sprite`, `earth-golem`
+- ✓ Abilities: `slash`, `clay-spire`, `fireball`
+- ✓ Djinn: `flint`, `granite`, `forge`
+
+#### Rationale Summary
+
+| Use Case | Pattern | Why |
+|----------|---------|-----|
+| **Battle IDs** | `kebab-case` | String literals, user-facing, never object keys |
+| **Game World IDs** | `snake_case` | Object keys, interface properties, internal use |
+
+Both are type-safe via TypeScript string literal unions, preventing typos at compile time.
+
+**References:**
+- Type definitions: [src/types/Area.ts](../src/types/Area.ts)
+- Area data: [src/data/areas.ts](../src/data/areas.ts)
+- Game state types: [src/context/types.ts](../src/context/types.ts)
+- Quest data: [src/data/quests.ts](../src/data/quests.ts)
+
 ### "ID" vs "Id"
 Use `Id` as a camelCase continuation (not `ID`):
 

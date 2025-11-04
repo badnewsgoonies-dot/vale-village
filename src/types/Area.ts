@@ -22,6 +22,44 @@ export type EnemyId =
   | 'stone-titan'
   | 'storm-lord';
 
+/**
+ * Game World IDs - Use snake_case for technical reasons
+ * 
+ * Note: Game world identifiers use snake_case (not kebab-case) because:
+ * 1. Used as JavaScript object keys (areaStates, AREAS lookup)
+ * 2. Story flags are interface properties (can't use hyphens without bracket notation)
+ * 3. CSS attribute selectors depend on exact string matching
+ * 
+ * See docs/NAMING_CONVENTIONS.md "Game World Naming Exception" section
+ */
+
+/** Valid area IDs - matches areas.ts AREAS registry */
+export type AreaId = 'vale_village' | 'forest_path' | 'ancient_ruins';
+
+/** Valid quest IDs - matches quests.ts quest registry */
+export type QuestId =
+  | 'tutorial_welcome'
+  | 'quest_clear_forest'
+  | 'quest_ancient_ruins'
+  | 'quest_defeat_wolves'
+  | 'quest_find_djinn'
+  | 'quest_explore_ruins'
+  | 'quest_mysterious_stranger'
+  | 'side_buy_equipment'
+  | 'side_find_treasure'
+  | 'side_level_up';
+
+/** Valid boss IDs - matches boss encounters in areas.ts */
+export type BossId = 'alpha_wolf_boss' | 'stone_titan_boss' | 'golem_king_boss';
+
+/** Valid chest IDs - template literal type for forest/ruins chests */
+export type ChestId =
+  | `forest_chest_${1 | 2 | 3 | 4 | 5 | 6}`
+  | `ruins_chest_${1 | 2 | 3 | 4 | 5 | 6 | 7}`
+  | 'village_starter_chest'
+  | 'village_hidden_chest'
+  | 'ruins_hidden_chest';
+
 export type AreaType = 'town' | 'dungeon' | 'overworld';
 
 export interface Position {
@@ -35,7 +73,7 @@ export interface EnemyPool {
 }
 
 export interface BossEncounter {
-  id: string;
+  id: BossId;
   position: Position;
   enemyIds: EnemyId[]; // Enemy IDs (now type-safe!)
   dialogue?: {
@@ -43,11 +81,11 @@ export interface BossEncounter {
     after?: string;
   };
   defeated: boolean; // Track if boss has been defeated
-  questId?: string; // Quest associated with this boss
+  questId?: QuestId; // Quest associated with this boss (now type-safe!)
 }
 
 export interface TreasureChest {
-  id: string;
+  id: ChestId;
   position: Position;
   contents: {
     gold?: number;
@@ -64,7 +102,7 @@ export interface NPC {
   sprite?: string;
   blocking: boolean; // Can player walk through?
   dialogue: string | Record<string, string>; // Simple string or keyed by story flags
-  questId?: string; // Quest giver
+  questId?: QuestId; // Quest giver (now type-safe!)
   shopType?: 'item' | 'equipment' | 'inn'; // Opens shop when talked to
   battleOnInteract?: EnemyId[]; // Enemy IDs to battle when interacting with this NPC (now type-safe!)
   battleOnlyOnce?: boolean; // If true, only battle once then show dialogue
@@ -75,13 +113,13 @@ export interface AreaExit {
   position: Position;
   width: number; // Exit zone width
   height: number; // Exit zone height
-  targetArea: string; // Area ID to transition to
+  targetArea: AreaId; // Area ID to transition to (now type-safe!)
   targetPosition: Position; // Where player spawns in target area
   requiredFlag?: string; // Story flag required to use this exit
 }
 
 export interface Area {
-  id: string;
+  id: AreaId; // Area ID (now type-safe!)
   name: string;
   type: AreaType;
   width: number; // Map width in tiles

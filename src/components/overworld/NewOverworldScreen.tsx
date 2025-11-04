@@ -110,8 +110,8 @@ export const NewOverworldScreen: React.FC = () => {
         // Check if this NPC should trigger a battle
         if (npc.battleOnInteract && npc.battleOnInteract.length > 0) {
           // Check if already battled (if battleOnlyOnce is true)
-          const battleKey = `npc_battle_${npc.id}`;
-          if (npc.battleOnlyOnce && areaState.openedChests.has(battleKey)) {
+          const battleKey = `npc_battle_${npc.id}` as const;
+          if (npc.battleOnlyOnce && areaState.openedChests.has(battleKey as any)) {
             // Already battled, show dialogue instead
             let dialogue = '';
             if (typeof npc.dialogue === 'string') {
@@ -139,7 +139,7 @@ export const NewOverworldScreen: React.FC = () => {
           
           // Mark as battled if battleOnlyOnce
           if (npc.battleOnlyOnce) {
-            actions.openTreasureChest(battleKey); // Reuse chest system for tracking
+            actions.openTreasureChest(battleKey as any); // Reuse chest system for tracking
           }
           return;
         }

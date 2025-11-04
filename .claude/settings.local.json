@@ -29,7 +29,8 @@
       "Bash(xargs:*)",
       "Bash(gh --version:*)",
       "Bash(git rev-parse:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(xdg-open:*)"
     ],
     "deny": [],
     "ask": []

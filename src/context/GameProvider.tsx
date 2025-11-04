@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { GameContext } from './GameContext';
-import type { GameState, Screen, StoryFlags } from './types';
+import type { GameState, Screen, StoryFlags, AreaState } from './types';
 import type { PlayerData } from '@/types/PlayerData';
 import { Unit } from '@/types/Unit';
 import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
@@ -12,6 +12,7 @@ import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
 import { getAllQuests } from '@/data/quests';
 import { updateObjectiveProgress } from '@/types/Quest';
+import type { AreaId, ChestId, BossId } from '@/types/Area';
 
 // Convert Enemy to Unit for battles
 function enemyToUnit(enemy: Enemy): Unit {
@@ -69,10 +70,10 @@ function createInitialStoryFlags(): StoryFlags {
   };
 }
 
-function createInitialAreaState() {
+function createInitialAreaState(): AreaState {
   return {
-    openedChests: new Set<string>(),
-    defeatedBosses: new Set<string>(),
+    openedChests: new Set(),
+    defeatedBosses: new Set(),
     stepCounter: 0,
   };
 }
@@ -367,7 +368,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Location management
-  const setLocation = useCallback((location: string) => {
+  const setLocation = useCallback((location: AreaId) => {
     setState(prev => ({
       ...prev,
       currentLocation: location,
@@ -410,7 +411,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const openTreasureChest = useCallback((chestId: string) => {
+  const openTreasureChest = useCallback((chestId: ChestId) => {
     setState(prev => {
       const areaState = prev.areaStates[prev.currentLocation];
       if (!areaState) return prev;
@@ -431,7 +432,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const defeatBoss = useCallback((bossId: string) => {
+  const defeatBoss = useCallback((bossId: BossId) => {
     setState(prev => {
       const areaState = prev.areaStates[prev.currentLocation];
       if (!areaState) return prev;
@@ -452,7 +453,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const changeArea = useCallback((areaId: string, spawnPosition: { x: number; y: number }) => {
+  const changeArea = useCallback((areaId: AreaId, spawnPosition: { x: number; y: number }) => {
     setState(prev => ({
       ...prev,
       currentLocation: areaId,

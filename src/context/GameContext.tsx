@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import type { GameState, Screen, StoryFlags } from './types';
 import type { Equipment } from '@/types/Equipment';
 import type { Djinn } from '@/types/Djinn';
+import type { AreaId, ChestId, BossId } from '@/types/Area';
 
 export interface GameActions {
   // Navigation
@@ -32,16 +33,16 @@ export interface GameActions {
   // Story flags
   setStoryFlag: (flag: keyof StoryFlags, value: boolean) => void;
 
-  // Location
-  setLocation: (location: string) => void;
+  // Location (now type-safe!)
+  setLocation: (location: AreaId) => void;
 
-  // Area management
+  // Area management (now type-safe!)
   setPlayerPosition: (x: number, y: number) => void;
   movePlayer: (deltaX: number, deltaY: number) => void;
   incrementStepCounter: () => void;
-  openTreasureChest: (chestId: string) => void;
-  defeatBoss: (bossId: string) => void;
-  changeArea: (areaId: string, spawnPosition: { x: number; y: number }) => void;
+  openTreasureChest: (chestId: ChestId) => void;
+  defeatBoss: (bossId: BossId) => void;
+  changeArea: (areaId: AreaId, spawnPosition: { x: number; y: number }) => void;
 
   // Shop
   buyItem: (itemId: string, quantity: number, cost: number) => void;

@@ -1,5 +1,6 @@
 import type { Equipment } from './Equipment';
 import type { Djinn } from './Djinn';
+import type { AreaId, QuestId } from './Area';
 
 export type QuestStatus = 'locked' | 'active' | 'completed' | 'failed';
 
@@ -22,18 +23,18 @@ export interface QuestReward {
 }
 
 export interface Quest {
-  id: string;
+  id: QuestId; // Now type-safe!
   title: string;
   description: string;
   status: QuestStatus;
   objectives: QuestObjective[];
   rewards: QuestReward;
   // Quest chaining
-  prerequisiteQuestIds?: string[];
-  unlocksQuestIds?: string[];
+  prerequisiteQuestIds?: QuestId[]; // Now type-safe!
+  unlocksQuestIds?: QuestId[]; // Now type-safe!
   // Story integration
-  startsInLocation?: string;
-  completesInLocation?: string;
+  startsInLocation?: AreaId; // Now type-safe!
+  completesInLocation?: AreaId; // Now type-safe!
   // Display
   isMainQuest: boolean;
   questGiver?: string; // NPC name

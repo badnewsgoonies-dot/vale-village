@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Village - Authentic Golden Sun</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-container {
+      width: var(--scale-4x);
+      height: var(--scale-height-4x);
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      border: 4px solid var(--color-border-dark);
+    }
+
+    /* ===== VIEWPORT (Camera window) ===== */
+    .viewport {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ===== WORLD (Scrollable map) ===== */
+    .world {
+      position: absolute;
+      width: 1920px;  /* 120 tiles × 16px */
+      height: 1920px; /* 120 tiles × 16px */
+      background-color: var(--color-grass-mid);
+      transition: transform 0.1s linear;
+    }
+
+    /* ===== TERRAIN LAYER ===== */
+    .terrain-layer {
+      position: absolute;
+      inset: 0;
+      z-index: var(--z-ground);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px),
+        repeating-linear-gradient(90deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px);
+    }
+
+    /* ===== GRASS VARIATIONS ===== */
+    .grass-patch {
+      position: absolute;
+      background: var(--color-grass-light);
+      border-radius: 50%;
+      opacity: 0.4;
+    }
+
+    /* ===== DIRT PATHS ===== */
+    .path {
+      position: absolute;
+      background: var(--color-path);
+      z-index: var(--z-ground);
+    }
+
+    .path.horizontal {
+      height: 48px;
+    }
+
+    .path.vertical {
+      width: 48px;
+    }
+
+    /* ===== RIVER ===== */
+    .river {
+      position: absolute;
+      background: linear-gradient(135deg, #4A90D8 0%, #3070B8 50%, #4A90D8 100%);
+      z-index: var(--z-ground);
+      animation: water-flow 3s linear infinite;
+    }
+
+    @keyframes water-flow {
+      0% { background-position: 0 0; }
+      100% { background-position: 32px 32px; }
+    }
+
+    /* ===== BUILDINGS ===== */
+    .building {
+      position: absolute;
+      z-index: var(--z-scenery);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .building img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ===== DECORATIONS (Trees, rocks, etc.) ===== */
+    .decoration {
+      position: absolute;
+      z-index: var(--z-scenery);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .decoration img {
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+
+    /* ===== ENTITIES (NPCs, Player) ===== */
+    .entity {
+      position: absolute;
+      z-index: var(--z-entity);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .entity img {
+      display: block;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+    }
+
+    .entity.player {
+      width: 32px;
+      height: 48px;
+    }
+
+    .entity.npc {
+      width: 32px;
+      height: 48px;
+    }
+
+    /* Shadow under entities */
+    .entity::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 8px;
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5), transparent);
+      z-index: var(--z-entity-shadow);
+    }
+
+    /* ===== INTERACTIVE OBJECTS ===== */
+    .interactive {
+      position: absolute;
+      z-index: var(--z-scenery);
+      cursor: pointer;
+      image-rendering: pixelated;
+    }
+
+    .interactive img {
+      display: block;
+    }
+
+    .interactive:hover {
+      filter: brightness(1.2);
+    }
+
+    /* ===== BRIDGES ===== */
+    .bridge {
+      position: absolute;
+      z-index: calc(var(--z-ground) + 1);
+      image-rendering: pixelated;
+    }
+
+    .bridge img {
+      display: block;
+    }
+
+    /* ===== HUD ===== */
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: var(--space-md);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+      z-index: var(--z-ui);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .location {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .stats {
+      display: flex;
+      gap: var(--space-lg);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    /* ===== DIALOGUE BOX ===== */
+    .dialogue-box {
+      position: absolute;
+      bottom: var(--space-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 64px);
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: var(--space-md);
+      z-index: var(--z-dialogue);
+      box-shadow: var(--shadow-panel);
+      display: none;
+    }
+
+    .dialogue-box.active {
+      display: block;
+    }
+
+    .dialogue-speaker {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .dialogue-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      line-height: 1.6;
+    }
+
+    /* ===== MINIMAP ===== */
+    .minimap {
+      position: absolute;
+      bottom: var(--space-lg);
+      right: var(--space-lg);
+      width: 120px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--color-border-light);
+      z-index: var(--z-ui);
+      overflow: hidden;
+    }
+
+    .minimap-world {
+      width: 100%;
+      height: 100%;
+      background: var(--color-grass-dark);
+      position: relative;
+    }
+
+    .minimap-player {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--color-text-gold);
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* ===== CONTROLS INFO ===== */
+    .controls {
+      position: absolute;
+      top: var(--space-lg);
+      right: var(--space-lg);
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-border-light);
+      padding: var(--space-sm);
+      z-index: 1000;
+      font-size: 7px;
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .controls div {
+      margin-bottom: 4px;
+    }
+
+    .controls .key {
+      display: inline-block;
+      background: var(--color-bg-dark);
+      border: 1px solid var(--color-border-light);
+      padding: 2px 4px;
+      margin: 0 2px;
+      color: var(--color-text-gold);
+    }
+
+    /* ===== LOCATION LABEL ===== */
+    .location-label {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid var(--color-text-gold);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      z-index: calc(var(--z-ui) + 1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.5);
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="viewport">
+      <!-- World container (scrolls with camera) -->
+      <div class="world" id="world">
+        <!-- Terrain base layer -->
+        <div class="terrain-layer"></div>
+
+        <!-- Grass variations for depth -->
+        <div class="grass-patch" style="left: 200px; top: 150px; width: 80px; height: 60px;"></div>
+        <div class="grass-patch" style="left: 600px; top: 300px; width: 100px; height: 80px;"></div>
+        <div class="grass-patch" style="left: 1200px; top: 450px; width: 90px; height: 70px;"></div>
+        <div class="grass-patch" style="left: 400px; top: 800px; width: 120px; height: 90px;"></div>
+        <div class="grass-patch" style="left: 1400px; top: 1100px; width: 110px; height: 85px;"></div>
+
+        <!-- River flowing through village (diagonal) -->
+        <div class="river" style="left: 600px; top: 0; width: 96px; height: 800px; transform: rotate(15deg);"></div>
+
+        <!-- Bridges over river -->
+        <div class="bridge" style="left: 620px; top: 250px;">
+          <img src="../../public/sprites/scenery/outdoor/lg/log_bridge.gif" alt="Bridge" width="64" height="32">
+        </div>
+        <div class="bridge" style="left: 650px; top: 500px;">
+          <img src="../../public/sprites/scenery/outdoor/lg/log_bridge.gif" alt="Bridge" width="64" height="32">
+        </div>
+
+        <!-- Dirt paths connecting areas -->
+        <div class="path horizontal" style="left: 400px; top: 400px; width: 600px;"></div>
+        <div class="path vertical" style="left: 700px; top: 200px; height: 400px;"></div>
+        <div class="path horizontal" style="left: 800px; top: 800px; width: 400px;"></div>
+        <div class="path horizontal" style="left: 300px; top: 1200px; width: 800px;"></div>
+
+        <!-- ===== TOP AREA: SOL SANCTUM ===== -->
+        <div class="building" style="left: 850px; top: 100px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Sanctum.gif" alt="Sanctum" width="128" height="96">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -30px;">Sol Sanctum</div>
+        </div>
+
+        <!-- Psynergy Stone (sacred) -->
+        <div class="interactive" style="left: 920px; top: 230px;" title="Psynergy Stone - Restores all PP">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Psynergy_Stone.gif" alt="Psynergy Stone" width="48" height="64">
+        </div>
+
+        <!-- ===== UPPER RESIDENTIAL AREA ===== -->
+
+        <!-- Kraden's House -->
+        <div class="building" style="left: 450px; top: 250px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Kradens_House.gif" alt="Kraden's House" width="96" height="80">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Kraden's Cottage</div>
+        </div>
+
+        <!-- Isaac's House -->
+        <div class="building" style="left: 1100px; top: 380px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif" alt="Isaac's House" width="96" height="80">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Isaac's House</div>
+        </div>
+
+        <!-- Garet's House -->
+        <div class="building" style="left: 350px; top: 550px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Garets_House.gif" alt="Garet's House" width="96" height="80">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Garet's House</div>
+        </div>
+
+        <!-- Jenna's House -->
+        <div class="building" style="left: 750px; top: 650px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Jennas_House.gif" alt="Jenna's House" width="96" height="80">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Jenna's House</div>
+        </div>
+
+        <!-- ===== CENTRAL PLAZA AREA ===== -->
+
+        <!-- Large Psynergy Stone (main plaza feature) -->
+        <div class="interactive" style="left: 900px; top: 700px;" title="Great Psynergy Stone">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Psynergy_Stone.gif" alt="Great Psynergy Stone" width="64" height="80">
+        </div>
+
+        <!-- Generic Vale buildings -->
+        <div class="building" style="left: 500px; top: 900px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building1.gif" alt="House" width="80" height="72">
+        </div>
+        <div class="building" style="left: 1200px; top: 850px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building2.gif" alt="House" width="80" height="72">
+        </div>
+        <div class="building" style="left: 300px; top: 1100px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building3.gif" alt="House" width="80" height="72">
+        </div>
+
+        <!-- ===== COMMERCIAL DISTRICT ===== -->
+
+        <!-- Weapon & Armor Shop -->
+        <div class="building" style="left: 1350px; top: 1150px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_WepArm_Shop.gif" alt="Weapon & Armor Shop" width="112" height="88">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Weapon & Armor Shop</div>
+        </div>
+
+        <!-- Shop sign -->
+        <div class="decoration" style="left: 1420px; top: 1120px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/WepShop_Sign.gif" alt="Shop Sign" width="24" height="32">
+        </div>
+
+        <!-- Inn (lower-right area) -->
+        <div class="building" style="left: 1450px; top: 650px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Inn.gif" alt="Inn" width="96" height="80">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Vale Inn</div>
+        </div>
+
+        <!-- Inn sign -->
+        <div class="decoration" style="left: 1500px; top: 620px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/Inn_Sign.gif" alt="Inn Sign" width="24" height="32">
+        </div>
+
+        <!-- Blacksmith house (lower-left) -->
+        <div class="building" style="left: 200px; top: 1400px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building4.gif" alt="Blacksmith" width="80" height="72">
+          <div class="location-label" style="left: 50%; transform: translateX(-50%); top: -25px;">Blacksmith</div>
+        </div>
+
+        <!-- Additional residential buildings -->
+        <div class="building" style="left: 800px; top: 1300px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building5.gif" alt="House" width="80" height="72">
+        </div>
+        <div class="building" style="left: 1100px; top: 1400px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Building6.gif" alt="House" width="80" height="72">
+        </div>
+
+        <!-- Vale Bridge -->
+        <div class="building" style="left: 450px; top: 1600px;">
+          <img src="../../public/sprites/scenery/buildings/Vale/Vale_Bridge.gif" alt="Vale Bridge" width="96" height="48">
+        </div>
+
+        <!-- ===== DECORATIONS & SCENERY ===== -->
+
+        <!-- Trees scattered around -->
+        <div class="decoration" style="left: 250px; top: 200px;">
+          <img src="../../public/sprites/scenery/plants/Tree1.gif" alt="Tree" width="48" height="64">
+        </div>
+        <div class="decoration" style="left: 1500px; top: 300px;">
+          <img src="../../public/sprites/scenery/plants/Tree2.gif" alt="Tree" width="48" height="64">
+        </div>
+        <div class="decoration" style="left: 550px; top: 450px;">
+          <img src="../../public/sprites/scenery/plants/Tree3.gif" alt="Tree" width="48" height="64">
+        </div>
+        <div class="decoration" style="left: 1300px; top: 600px;">
+          <img src="../../public/sprites/scenery/plants/Tree4.gif" alt="Tree" width="48" height="64">
+        </div>
+        <div class="decoration" style="left: 400px; top: 1300px;">
+          <img src="../../public/sprites/scenery/plants/Tree5.gif" alt="Tree" width="48" height="64">
+        </div>
+        <div class="decoration" style="left: 1000px; top: 1100px;">
+          <img src="../../public/sprites/scenery/plants/Tree6.gif" alt="Tree" width="48" height="64">
+        </div>
+
+        <!-- Small trees and bushes -->
+        <div class="decoration" style="left: 850px; top: 450px;">
+          <img src="../../public/sprites/scenery/plants/Small_Tree1.gif" alt="Small Tree" width="32" height="48">
+        </div>
+        <div class="decoration" style="left: 1200px; top: 1000px;">
+          <img src="../../public/sprites/scenery/plants/Bush.gif" alt="Bush" width="24" height="24">
+        </div>
+        <div class="decoration" style="left: 650px; top: 1150px;">
+          <img src="../../public/sprites/scenery/plants/Bush2.gif" alt="Bush" width="24" height="24">
+        </div>
+
+        <!-- Rocks and stones -->
+        <div class="decoration" style="left: 300px; top: 350px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/stone1.gif" alt="Stone" width="16" height="16">
+        </div>
+        <div class="decoration" style="left: 1400px; top: 450px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/stone2.gif" alt="Stone" width="16" height="16">
+        </div>
+        <div class="decoration" style="left: 700px; top: 1000px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/stone3.gif" alt="Stone" width="16" height="16">
+        </div>
+
+        <!-- Fences -->
+        <div class="decoration" style="left: 420px; top: 320px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/Fence_HorizSeg.gif" alt="Fence" width="32" height="16">
+        </div>
+        <div class="decoration" style="left: 1050px; top: 450px;">
+          <img src="../../public/sprites/scenery/outdoor/sm/Fence_VertSeg.gif" alt="Fence" width="16" height="32">
+        </div>
+
+        <!-- Wells -->
+        <div class="interactive" style="left: 800px; top: 950px;" title="Well">
+          <img src="../../public/sprites/scenery/outdoor/sm/well.gif" alt="Well" width="32" height="32">
+        </div>
+
+        <!-- Signs -->
+        <div class="interactive" style="left: 900px; top: 350px;" title="Sign: Welcome to Vale">
+          <img src="../../public/sprites/scenery/outdoor/sm/sign.gif" alt="Sign" width="16" height="24">
+        </div>
+        <div class="interactive" style="left: 1300px; top: 1250px;" title="Sign: Weapon Shop">
+          <img src="../../public/sprites/scenery/outdoor/sm/sign1.gif" alt="Sign" width="16" height="24">
+        </div>
+
+        <!-- Barrels and crates (interactive) -->
+        <div class="interactive" style="left: 480px; top: 980px;" title="Barrel (A to search)">
+          <img src="../../public/sprites/scenery/outdoor/sm/stone1.gif" alt="Barrel" width="20" height="20">
+        </div>
+
+        <!-- Flowers -->
+        <div class="decoration" style="left: 1150px; top: 420px;">
+          <img src="../../public/sprites/scenery/plants/Flowers.gif" alt="Flowers" width="24" height="16">
+        </div>
+
+        <!-- ===== NPCs (Villagers) ===== -->
+
+        <!-- Innkeeper (outside inn) -->
+        <div class="entity npc" style="left: 1500px; top: 740px;">
+          <img src="../../public/sprites/overworld/majornpcs/Innkeeper.gif" alt="Innkeeper" width="32" height="48">
+        </div>
+
+        <!-- Weapon shop owner -->
+        <div class="entity npc" style="left: 1400px; top: 1250px;">
+          <img src="../../public/sprites/overworld/majornpcs/Weaponshop_Owner.gif" alt="Shopkeeper" width="32" height="48">
+        </div>
+
+        <!-- Elder (near sanctum) -->
+        <div class="entity npc" style="left: 900px; top: 280px;">
+          <img src="../../public/sprites/overworld/majornpcs/Elder.gif" alt="Elder" width="32" height="48">
+        </div>
+
+        <!-- Generic villagers -->
+        <div class="entity npc" style="left: 750px; top: 850px;">
+          <img src="../../public/sprites/overworld/minornpcs/Villager-1.gif" alt="Villager" width="32" height="48">
+        </div>
+        <div class="entity npc" style="left: 550px; top: 650px;">
+          <img src="../../public/sprites/overworld/minornpcs/Villager-2.gif" alt="Villager" width="32" height="48">
+        </div>
+        <div class="entity npc" style="left: 1150px; top: 950px;">
+          <img src="../../public/sprites/overworld/minornpcs/Villager-3.gif" alt="Villager" width="32" height="48">
+        </div>
+        <div class="entity npc" style="left: 350px; top: 1200px;">
+          <img src="../../public/sprites/overworld/minornpcs/Villager-4.gif" alt="Villager" width="32" height="48">
+        </div>
+        <div class="entity npc" style="left: 1250px; top: 750px;">
+          <img src="../../public/sprites/overworld/minornpcs/Villager-5.gif" alt="Villager" width="32" height="48">
+        </div>
+
+        <!-- Garet (walking around town) -->
+        <div class="entity npc" style="left: 400px; top: 620px;">
+          <img src="../../public/sprites/overworld/protagonists/Garet.gif" alt="Garet" width="32" height="48">
+        </div>
+
+        <!-- Jenna (near her house) -->
+        <div class="entity npc" style="left: 820px; top: 710px;">
+          <img src="../../public/sprites/overworld/protagonists/Jenna.gif" alt="Jenna" width="32" height="48">
+        </div>
+
+        <!-- Kraden (outside his cottage) -->
+        <div class="entity npc" style="left: 500px; top: 310px;">
+          <img src="../../public/sprites/overworld/protagonists/Kraden.gif" alt="Kraden" width="32" height="48">
+        </div>
+
+        <!-- ===== PLAYER (Isaac) ===== -->
+        <div class="entity player" id="player" style="left: 960px; top: 960px;">
+          <img id="player-sprite" src="../../public/sprites/overworld/protagonists/Isaac.gif" alt="Isaac" width="32" height="48">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="location">VALE VILLAGE</div>
+      <div class="stats">
+        <div>COINS: 250</div>
+        <div>LV: 5</div>
+      </div>
+    </div>
+
+    <!-- Dialogue Box (hidden by default) -->
+    <div class="dialogue-box" id="dialogue">
+      <div class="dialogue-speaker" id="speaker">Elder</div>
+      <div class="dialogue-text" id="dialogue-text">
+        Welcome to Vale, Isaac. The Psynergy Stone will restore your energy.
+      </div>
+    </div>
+
+    <!-- Minimap -->
+    <div class="minimap">
+      <div class="minimap-world">
+        <div class="minimap-player" id="minimap-marker"></div>
+      </div>
+    </div>
+
+    <!-- Controls Info -->
+    <div class="controls">
+      <div><span class="key">WASD</span> / <span class="key">↑↓←→</span> Move</div>
+      <div><span class="key">SHIFT</span> Run</div>
+      <div><span class="key">E</span> Interact</div>
+      <div><span class="key">M</span> Menu</div>
+    </div>
+  </div>
+
+  <script>
+    // Game state
+    const player = {
+      x: 960,
+      y: 960,
+      speed: 2,
+      runSpeed: 4,
+      direction: 'down'
+    };
+
+    const keys = {};
+    const playerElement = document.getElementById('player');
+    const playerSprite = document.getElementById('player-sprite');
+    const world = document.getElementById('world');
+    const minimapMarker = document.getElementById('minimap-marker');
+    const dialogue = document.getElementById('dialogue');
+
+    // Sprite paths for directions
+    const sprites = {
+      down: '../../public/sprites/overworld/protagonists/Isaac.gif',
+      up: '../../public/sprites/overworld/protagonists/Isaac_Back.gif',
+      left: '../../public/sprites/overworld/protagonists/Isaac_Left.gif',
+      right: '../../public/sprites/overworld/protagonists/Isaac_Right.gif',
+      walk_down: '../../public/sprites/overworld/protagonists/Isaac_Walk.gif',
+      walk_up: '../../public/sprites/overworld/protagonists/Isaac_Walk_Up.gif',
+      walk_left: '../../public/sprites/overworld/protagonists/Isaac_Walk_Left.gif',
+      walk_right: '../../public/sprites/overworld/protagonists/Isaac_Walk_Right.gif',
+      run_down: '../../public/sprites/overworld/protagonists/Isaac_Run.gif',
+      run_up: '../../public/sprites/overworld/protagonists/Isaac_Run_Up.gif',
+      run_left: '../../public/sprites/overworld/protagonists/Isaac_Run_Left.gif',
+      run_right: '../../public/sprites/overworld/protagonists/Isaac_Run_Right.gif'
+    };
+
+    // Keyboard input
+    document.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+
+      // Interact key
+      if (e.key.toLowerCase() === 'e') {
+        checkInteraction();
+      }
+
+      // Menu key
+      if (e.key.toLowerCase() === 'm') {
+        alert('Menu opened (not implemented in mockup)');
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = true;
+    });
+
+    // Check for nearby interactive objects
+    function checkInteraction() {
+      const interactives = document.querySelectorAll('.interactive');
+      interactives.forEach(obj => {
+        const rect = obj.getBoundingClientRect();
+        const playerRect = playerElement.getBoundingClientRect();
+        const distance = Math.hypot(
+          rect.left - playerRect.left,
+          rect.top - playerRect.top
+        );
+
+        if (distance < 60) {
+          const title = obj.getAttribute('title');
+          showDialogue('System', title || 'An object');
+        }
+      });
+
+      // Check NPCs
+      const npcs = document.querySelectorAll('.entity.npc');
+      npcs.forEach(npc => {
+        const rect = npc.getBoundingClientRect();
+        const playerRect = playerElement.getBoundingClientRect();
+        const distance = Math.hypot(
+          rect.left - playerRect.left,
+          rect.top - playerRect.top
+        );
+
+        if (distance < 60) {
+          const name = npc.querySelector('img').alt;
+          showDialogue(name, getRandomDialogue(name));
+        }
+      });
+    }
+
+    function showDialogue(speaker, text) {
+      document.getElementById('speaker').textContent = speaker;
+      document.getElementById('dialogue-text').textContent = text;
+      dialogue.classList.add('active');
+
+      setTimeout(() => {
+        dialogue.classList.remove('active');
+      }, 3000);
+    }
+
+    function getRandomDialogue(npc) {
+      const dialogues = {
+        'Innkeeper': 'Welcome to the Vale Inn! Rest costs 10 coins.',
+        'Shopkeeper': 'Fine weapons and armor for sale!',
+        'Elder': 'The Sanctum holds ancient secrets, young one.',
+        'Garet': 'Hey Isaac! Want to explore Sol Sanctum later?',
+        'Jenna': 'Be careful out there, Isaac!',
+        'Kraden': 'The Psynergy Stones are fascinating relics...',
+        'Villager': 'Beautiful day in Vale, isn\'t it?'
+      };
+
+      return dialogues[npc] || 'Hello there!';
+    }
+
+    // Game loop
+    function update() {
+      let moving = false;
+      let running = keys['shift'];
+      let speed = running ? player.runSpeed : player.speed;
+
+      let dx = 0;
+      let dy = 0;
+
+      if (keys['w'] || keys['arrowup']) {
+        dy -= speed;
+        player.direction = 'up';
+        moving = true;
+      }
+      if (keys['s'] || keys['arrowdown']) {
+        dy += speed;
+        player.direction = 'down';
+        moving = true;
+      }
+      if (keys['a'] || keys['arrowleft']) {
+        dx -= speed;
+        player.direction = 'left';
+        moving = true;
+      }
+      if (keys['d'] || keys['arrowright']) {
+        dx += speed;
+        player.direction = 'right';
+        moving = true;
+      }
+
+      // Update position
+      player.x += dx;
+      player.y += dy;
+
+      // Boundary checks (keep within world)
+      player.x = Math.max(100, Math.min(1820, player.x));
+      player.y = Math.max(100, Math.min(1820, player.y));
+
+      // Update sprite
+      if (moving) {
+        const prefix = running ? 'run' : 'walk';
+        playerSprite.src = sprites[`${prefix}_${player.direction}`];
+      } else {
+        playerSprite.src = sprites[player.direction];
+      }
+
+      // Update player position
+      playerElement.style.left = player.x + 'px';
+      playerElement.style.top = player.y + 'px';
+
+      // Camera follows player (centered)
+      const viewportWidth = 960;
+      const viewportHeight = 640;
+      const worldWidth = 1920;
+      const worldHeight = 1920;
+
+      let cameraX = player.x - viewportWidth / 2;
+      let cameraY = player.y - viewportHeight / 2;
+
+      // Clamp camera to world bounds
+      cameraX = Math.max(0, Math.min(worldWidth - viewportWidth, cameraX));
+      cameraY = Math.max(0, Math.min(worldHeight - viewportHeight, cameraY));
+
+      world.style.transform = `translate(-${cameraX}px, -${cameraY}px)`;
+
+      // Update minimap marker
+      const minimapX = (player.x / worldWidth) * 120;
+      const minimapY = (player.y / worldHeight) * 120;
+      minimapMarker.style.left = minimapX + 'px';
+      minimapMarker.style.top = minimapY + 'px';
+
+      requestAnimationFrame(update);
+    }
+
+    // Start game loop
+    update();
+
+    // Initial message
+    setTimeout(() => {
+      showDialogue('System', 'Welcome to Vale Village! Use WASD to explore.');
+    }, 500);
+  </script>
+</body>
+</html>

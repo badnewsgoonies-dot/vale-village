@@ -1,8 +1,15 @@
 import type { Area } from '@/types/Area';
 
 /**
- * All areas/locations in Vale Chronicles
- * Based on the realistic game flow design document
+ * Area Definitions - Vale Chronicles
+ * 
+ * NOTE: Area IDs use snake_case (e.g., 'vale_village') for technical reasons:
+ * - Used as object keys in GameState.areaStates
+ * - Used in CSS attribute selectors [data-area="..."]
+ * - Strongly typed via AreaId type (see types/Area.ts)
+ * 
+ * This differs from battle system IDs (equipment, enemies) which use kebab-case.
+ * See docs/NAMING_CONVENTIONS.md "Game World Naming Exception" for full explanation.
  */
 
 export const VALE_VILLAGE: Area = {

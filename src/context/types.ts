@@ -1,6 +1,7 @@
 import type { PlayerData } from '@/types/PlayerData';
 import type { BattleState } from '@/types/Battle';
 import type { Quest } from '@/types/Quest';
+import type { AreaId, BossId, ChestId } from '@/types/Area';
 
 export type Screen =
   | { type: 'TITLE' }
@@ -11,11 +12,19 @@ export type Screen =
   | { type: 'REWARDS' }
   | { type: 'DJINN_MENU' }
   | { type: 'MAIN_MENU' }
-  | { type: 'OVERWORLD'; location?: string }
+  | { type: 'OVERWORLD'; location?: AreaId }
   | { type: 'SHOP'; shopType: 'item' | 'equipment' | 'inn' }
   | { type: 'DIALOGUE'; npcId: string; dialogueKey?: string }
   | { type: 'QUEST_LOG' };
 
+/**
+ * Story flags use snake_case as they are interface properties.
+ * JavaScript property names cannot contain hyphens without bracket notation.
+ * 
+ * Example: storyFlags.intro_seen ✅  vs  storyFlags['intro-seen'] ⚠️
+ * 
+ * See docs/NAMING_CONVENTIONS.md "Game World Naming Exception" section
+ */
 export interface StoryFlags {
   // Tutorial
   intro_seen: boolean;
@@ -50,8 +59,8 @@ export interface StoryFlags {
 }
 
 export interface AreaState {
-  openedChests: Set<string>; // Chest IDs that have been opened
-  defeatedBosses: Set<string>; // Boss IDs that have been defeated
+  openedChests: Set<ChestId>; // Chest IDs that have been opened (now type-safe!)
+  defeatedBosses: Set<BossId>; // Boss IDs that have been defeated (now type-safe!)
   stepCounter: number; // Steps taken in this area (for random encounters)
 }
 
@@ -66,7 +75,7 @@ export interface GameState {
   // New systems
   quests: Quest[];
   storyFlags: StoryFlags;
-  currentLocation: string; // 'vale_village', 'forest_path', 'ancient_ruins'
+  currentLocation: AreaId; // Now type-safe! 'vale_village', 'forest_path', 'ancient_ruins'
   playerPosition: { x: number; y: number }; // Player position on current map
-  areaStates: Record<string, AreaState>; // Track state per area
+  areaStates: Record<AreaId, AreaState>; // Track state per area (now type-safe!)
 }
