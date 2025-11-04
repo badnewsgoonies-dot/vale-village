@@ -1,0 +1,171 @@
+/* DialogueBox - Golden Sun GBA Style */
+
+.dialogue-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dialogue-box-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px 40px;
+  pointer-events: auto;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dialogue-box {
+  background: linear-gradient(135deg, #1a2a4a 0%, #0f1a30 100%);
+  border: 4px solid #d4af37; /* Golden border */
+  border-radius: 8px;
+  box-shadow: 
+    0 0 20px rgba(212, 175, 55, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.6);
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  position: relative;
+}
+
+/* Portrait Section */
+.dialogue-portrait {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border: 3px solid #d4af37;
+  border-radius: 4px;
+  background: #0a0f1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 
+    0 0 10px rgba(212, 175, 55, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dialogue-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Content Section */
+.dialogue-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+}
+
+.dialogue-speaker {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffd700; /* Gold text */
+  text-shadow: 
+    2px 2px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dialogue-text {
+  flex: 1;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #ffffff;
+  text-shadow: 
+    1px 1px 2px #000,
+    -1px -1px 0 #000;
+  word-wrap: break-word;
+  padding: 8px 0;
+}
+
+/* Prompt Section */
+.dialogue-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 14px;
+  color: #a0a0a0;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.prompt-arrow {
+  font-size: 16px;
+  color: #ffd700;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.prompt-text {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #888;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .dialogue-box-container {
+    padding: 0 10px 20px;
+  }
+
+  .dialogue-box {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .dialogue-portrait {
+    width: 60px;
+    height: 60px;
+  }
+
+  .dialogue-speaker {
+    font-size: 16px;
+  }
+
+  .dialogue-text {
+    font-size: 14px;
+  }
+}
+
+/* Hide portrait on very small screens */
+@media (max-width: 400px) {
+  .dialogue-portrait {
+    display: none;
+  }
+}

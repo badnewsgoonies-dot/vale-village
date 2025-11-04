@@ -9,6 +9,7 @@ import {
   getRandomEnemyGroup,
   type NPC,
 } from '@/types/Area';
+import { DialogueBox } from '@/components/dialogue/DialogueBox';
 import './NewOverworldScreen.css';
 
 export const NewOverworldScreen: React.FC = () => {
@@ -384,13 +385,12 @@ export const NewOverworldScreen: React.FC = () => {
 
       {/* Dialogue box */}
       {showDialogue && (
-        <div className="dialogue-box">
-          <div className="dialogue-content">
-            {currentNPC && <div className="dialogue-speaker">{currentNPC.name}:</div>}
-            <p>{showDialogue}</p>
-          </div>
-          <div className="dialogue-prompt">Press Space or Enter to continue...</div>
-        </div>
+        <DialogueBox
+          npcName={currentNPC?.name}
+          dialogue={showDialogue}
+          portrait={currentNPC ? `/sprites/overworld/minornpcs/${currentNPC.id}.gif` : undefined}
+          onClose={closeDialogue}
+        />
       )}
 
       {/* Controls */}
