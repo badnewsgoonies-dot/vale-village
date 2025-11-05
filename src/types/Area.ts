@@ -20,7 +20,8 @@ export type EnemyId =
   | 'fire-elemental'
   | 'ice-guardian'
   | 'stone-titan'
-  | 'storm-lord';
+  | 'storm-lord'
+  | 'nox-typhon';
 
 /**
  * Game World IDs - Use snake_case for technical reasons
@@ -50,7 +51,7 @@ export type QuestId =
   | 'side_level_up';
 
 /** Valid boss IDs - matches boss encounters in areas.ts */
-export type BossId = 'alpha_wolf_boss' | 'stone_titan_boss' | 'golem_king_boss';
+export type BossId = 'alpha_wolf_boss' | 'stone_titan_boss' | 'golem_king_boss' | 'nox_typhon_boss';
 
 /** Valid chest IDs - template literal type for forest/ruins chests */
 export type ChestId =
