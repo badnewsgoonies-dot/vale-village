@@ -31,3 +31,52 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ============================================
+ * Battle Animations
+ * ============================================ */
+
+/* Float-up animation for damage/heal numbers */
+@keyframes float-up {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
+
+/* Fade-out animation */
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1.5s ease-out, fade-out 1.5s ease-out;
+}
+
+/* Accessibility: Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes float-up {
+    0%, 100% {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float-up {
+    animation: fade-out 1.5s ease-out;
+  }
+}
