@@ -33,7 +33,6 @@ export const ValeVillageOverworld: React.FC = () => {
   const [showDialogue, setShowDialogue] = useState(false);
   const [dialogueSpeaker, setDialogueSpeaker] = useState('');
   const [dialogueText, setDialogueText] = useState('');
-  const [currentNPC, setCurrentNPC] = useState<MapEntity | null>(null);
 
   // Vale Village map entities (based on vale-village-authentic.html)
   const mapEntities: MapEntity[] = useMemo(() => [
@@ -183,7 +182,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'elder') || null);
+        
         setDialogueSpeaker('Elder');
         setDialogueText('Welcome to Vale, young warrior. The Sanctum holds ancient secrets...');
         setShowDialogue(true);
@@ -199,7 +198,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'innkeeper') || null);
+        
         setDialogueSpeaker('Innkeeper');
         setDialogueText('Welcome to the Vale Inn! Would you like to rest? It costs 10 gold.');
         setShowDialogue(true);
@@ -215,7 +214,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'weaponshop-owner') || null);
+        
         setDialogueSpeaker('Shopkeeper');
         setDialogueText('Fine weapons and armor for sale! Would you like to battle first?');
         setShowDialogue(true);
@@ -231,7 +230,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'garet') || null);
+        
         setDialogueSpeaker('Garet');
         setDialogueText('Hey Isaac! Want to explore Sol Sanctum later? Or maybe a quick battle?');
         setShowDialogue(true);
@@ -247,7 +246,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'jenna') || null);
+        
         setDialogueSpeaker('Jenna');
         setDialogueText('Be careful out there, Isaac! The world can be dangerous.');
         setShowDialogue(true);
@@ -263,7 +262,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'kraden') || null);
+        
         setDialogueSpeaker('Kraden');
         setDialogueText('The Psynergy Stones are fascinating relics of ancient Alchemy...');
         setShowDialogue(true);
@@ -279,7 +278,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'villager-1') || null);
+        
         setDialogueSpeaker('Villager');
         setDialogueText('Beautiful day in Vale, isn\'t it?');
         setShowDialogue(true);
@@ -293,7 +292,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        setCurrentNPC(mapEntities.find(e => e.id === 'villager-2') || null);
+        
         setDialogueSpeaker('Villager');
         setDialogueText('I heard there are monsters near the forest. Be careful!');
         setShowDialogue(true);
@@ -346,7 +345,7 @@ export const ValeVillageOverworld: React.FC = () => {
   // Close dialogue
   const closeDialogue = useCallback(() => {
     setShowDialogue(false);
-    setCurrentNPC(null);
+    
   }, []);
 
   // Keyboard controls
