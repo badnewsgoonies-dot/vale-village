@@ -8,7 +8,7 @@
 ## 🎯 CORE VISION
 
 **Elevator Pitch:**
-A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit allies, collect elemental Djinn for class changes, and defeat an ancient demon sealed beneath Sol Sanctum.
+A Golden Sun-inspired RPG where you explore Vale Village (one big map), battle NPCs for XP/gold, unlock allies through story progression, collect elemental Djinn for class changes, and defeat an ancient demon sealed beneath Sol Sanctum.
 
 **Inspiration:**
 - **Golden Sun** - Overworld exploration, Djinn system, elemental Psynergy
@@ -23,19 +23,21 @@ A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit
 ## 🎭 CORE GAMEPLAY LOOP
 
 ```
-1. EXPLORE Vale Village Overworld
+1. EXPLORE Vale Village (one big town map)
    ↓
-2. TALK to NPCs → Trigger Battles
+2. TALK to NPCs → Dialogue → Choose to Battle (optional)
    ↓
-3. WIN Battle → Recruit Unit OR Earn Rewards
+3. WIN Battle → Earn XP/Gold
    ↓
 4. EQUIP Gear & Djinn
    ↓
-5. LEVEL UP Units (1-5)
+5. LEVEL UP Units (1-20/30, unlock spells)
    ↓
-6. REPEAT until strong enough
+6. UNLOCK new units through story progression
    ↓
-7. DEFEAT Nox Typhon (Final Boss)
+7. REPEAT until strong enough
+   ↓
+8. DEFEAT Nox Typhon (Final Boss)
 ```
 
 ---
@@ -43,16 +45,19 @@ A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit
 ## 🔑 CORE SYSTEMS
 
 ### 1. **Overworld Exploration**
-- **Style:** Golden Sun top-down view
+- **Style:** Pseudo-3D with depth and layered heights (like Golden Sun's perspective)
 - **Movement:** WASD/Arrow keys, 8-directional
-- **Interaction:** Space key to talk to NPCs, open chests, enter buildings
-- **Areas:** Vale Village, Forest Path, Ancient Ruins
-- **NPCs:** 29 total (all can trigger battles!)
+- **Interaction:** Space key to talk to NPCs, enter buildings
+- **Areas:** **ONE BIG MAP - Vale Village only** (no separate areas)
+- **NPCs:** 29 total positioned around town
+- **NO treasure chests** - Gameplay is purely town exploration + NPC battles
 
 ### 2. **NPC Battle System** ⭐ KEY FEATURE
-- **29 NPCs** each have unique battle encounters
-- Press **Space** near NPC → Start Battle
-- Defeat them → Optional recruitment or rewards
+- **29 NPCs** each have dialogue + optional battle encounters
+- Press **Space** near NPC → Dialogue opens → **NPC ASKS if you want to fight**
+  - Choose YES → Start Battle
+  - Choose NO → Continue dialogue (plot/lore content)
+- Battles are for XP/gold, **NOT recruitment**
 - Examples:
   - **Mayor** → 3 Goblins (boss-level)
   - **Young Sarah** → 1 Slime (tutorial-level)
@@ -64,15 +69,20 @@ A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit
 - **Actions:** Attack, Psynergy (abilities), Djinn, Defend
 - **Win Condition:** Defeat all enemies
 - **Lose Condition:** All party members KO'd
-- **Backgrounds:** Authentic GBA battle backgrounds per location
+- **Backgrounds:** Authentic GBA backgrounds **behind** the battlefield
+  - ⚠️ **CURRENT ISSUE:** Backgrounds cover entire screen, looks awkward
+  - **CORRECT:** Background should be layered behind battle units, not full-screen
 
 ### 4. **Unit System**
-- **10 Total Recruitable Units**
-- **3 Starters:** Isaac (Earth), Garet (Fire), Ivan (Wind)
-- **7 Recruitable:** Mia (Water), Felix (Earth), Jenna (Fire), Sheba (Wind), Piers (Water), Kraden (Support), Kyle (Fire)
-- **Levels:** 1-5 (ability unlocks each level)
+- **10 Total Units**
+- **1 Starter:** Choose Isaac, Garet, OR Ivan at game start
+- **9 Unlockable:** Unlock through story progression at key moments
+  - The other 2 starters (if not chosen)
+  - Mia (Water), Felix (Earth), Jenna (Fire), Sheba (Wind), Piers (Water), Kraden (Support), Kyle (Fire)
+- **Levels:** 1-20 or 1-30 (many spell unlocks as you progress)
 - **Party Size:** Max 4 active, rest on bench
 - **Bench System:** Swap units between battles
+- **Recruitment:** Story-driven unlocks at key moments, **NOT "defeat NPC to recruit"**
 
 ### 5. **Djinn System** ⭐ UNIQUE MECHANIC
 - **12 Djinn Total:** 3 Venus, 3 Mars, 3 Mercury, 3 Jupiter
@@ -87,19 +97,22 @@ A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit
 ### 6. **Equipment System**
 - **4 Slots:** Weapon, Armor, Helm, Boots
 - **Effects:** Stat boosts (ATK, DEF, SPD), some unlock abilities
-- **Acquisition:** Buy from shops, find in treasure chests, battle drops
+- **Acquisition:** Buy from shops, earn from battles (drops)
 - **NO ITEMS:** Design decision - no consumables (potions, herbs, etc.)
+- **NO Treasure Chests:** Simplified loot system - shops and battle rewards only
 
 ### 7. **Progression**
 - **XP System:** Gain XP from battles → Level up
-- **Level 1 → 5:** Each level unlocks 1 new ability
+- **Level 1 → 20-30:** Many spell unlocks as you progress
+- **Abilities:** Unlock new Psynergy spells at various levels
 - **Example (Garet):**
   - Lv1: Basic Attack
-  - Lv2: Flame Burst
-  - Lv3: Fire Shield
-  - Lv4: Blazing Strike
-  - Lv5: Volcano (Ultimate)
-- **Impact:** Level 1 loses to boss, Level 5 wins
+  - Lv3: Flame Burst
+  - Lv7: Fire Shield
+  - Lv12: Blazing Strike
+  - Lv18: Volcano
+  - Lv25: [Ultimate Fire Spell]
+- **Impact:** Early levels lose to late-game encounters, progression matters
 
 ### 8. **Healing & Resources**
 - **NO Consumable Items** (key design decision!)
@@ -108,6 +121,22 @@ A Golden Sun-inspired RPG where you explore Vale Village, battle NPCs to recruit
   - Auto-restore PP (magic) after each battle
   - Inn: 10 gold for full HP/PP restore
 - **Why:** Makes healers essential, PP management strategic
+
+---
+
+## ⚠️ CRITICAL CORRECTIONS TO OLD DOCS
+
+**The following have changed from original planning docs:**
+
+1. ✅ **ONE BIG MAP** - Vale Village only (no Forest Path, Ancient Ruins as separate areas)
+2. ✅ **NO Treasure Chests** - Shops and battle rewards only
+3. ✅ **1 Starter Unit** - Pick one of Isaac/Garet/Ivan (not all 3)
+4. ✅ **Level 1-20/30** - NOT 1-5 as in old docs
+5. ✅ **Story-driven recruitment** - NOT "defeat NPC to recruit"
+6. ✅ **Battle backgrounds issue** - Currently full-screen, should be layered behind
+7. ✅ **NPC dialogue choice** - Ask if player wants to fight (not instant battle)
+
+**Always prioritize THIS document over old planning docs!**
 
 ---
 
@@ -141,15 +170,20 @@ OVERWORLD ←──┐ (Main Hub)
 ### Screen Details
 
 **1. Overworld** (Main Hub)
-- Top-down Vale Village view
+- **Pseudo-3D perspective** with depth and layered heights
+- **One big town map** - Vale Village only
 - Player character sprite
 - 29 NPCs positioned around village
 - Buildings, trees, scenery (all authentic GS sprites)
 - Dialogue box at bottom when talking
 - Controls overlay (can toggle)
+- **NO treasure chests** on map
 
 **2. Battle Screen**
 - **Background:** Location-specific (Cave.gif, Forest.gif, etc.)
+  - ⚠️ **CRITICAL ISSUE:** Background should be BEHIND units, not full-screen
+  - Current implementation covers entire screen - looks awkward
+  - Need to layer: Background → Units → UI
 - **Enemy Row:** Top of screen (animated sprites)
 - **Party Row:** Bottom of screen (4 slots max)
 - **Command Menu:** Attack / Psynergy / Djinn / Defend
@@ -172,11 +206,13 @@ OVERWORLD ←──┐ (Main Hub)
 - **Element Color Coding:** Brown/Red/Blue/Purple
 
 **5. Unit Collection (Party Management)
+- **Total Units:** 10 (1 starter + 9 unlockable through story)
 - **Active Party (4 max):** Top row with checkmarks
 - **Bench (6):** Bottom row
 - **Click to Toggle:** Active ↔ Bench
-- **Unit Cards:** Portrait, name, level, element
+- **Unit Cards:** Portrait, name, level (up to 20-30), element
 - **View Equipment Button:** Opens Equipment for selected unit
+- **Unlock System:** Units unlock at key story moments (not by defeating NPCs)
 
 **6. Main Menu** (NEW - ESC key)
 - **Options:**
@@ -203,11 +239,12 @@ OVERWORLD ←──┐ (Main Hub)
 **9. Rewards Screen**
 - **Gold Earned:** Animation counting up
 - **XP Earned:** Animation counting up
-- **Items Found:** Equipment drops
+- **Equipment Drops:** Show any equipment earned (no items/consumables)
 - **Level Up:** Special celebration if leveled
   - Show new stats
-  - Show new ability unlocked
+  - Show new Psynergy spell unlocked (if any at this level)
   - Sparkle effects
+  - Multiple level-ups possible (level range 1-20/30)
 - **Continue Button:** Return to overworld
 
 **10. Battle Transition**
@@ -223,28 +260,32 @@ OVERWORLD ←──┐ (Main Hub)
 ### Three Acts
 
 **Act 1: The Proving Ground** (2-3 hours)
-- Start in Vale Village
-- Complete tutorial battle
-- Recruit initial party (4 units)
+- Start in Vale Village (one big map)
+- Choose starter: Isaac, Garet, OR Ivan
+- Complete tutorial battles with NPCs
+- Unlock first few story units
 - Learn about weakening seal at Sol Sanctum
 - Complete Elder's trials
-- Collect first 2 Djinn
+- Collect first 2-3 Djinn
+- Level up to ~8-10
 
 **Act 2: The Gathering Storm** (4-5 hours)
-- Investigate Sol Sanctum
+- Investigate Sol Sanctum (within Vale map)
 - Discover Nox Typhon (ancient demon)
-- Explore new areas (Forest, Harbor, Ruins)
-- Recruit mid-game units
+- Battle tougher NPCs in Vale Village
+- Unlock mid-game units through story events
 - Collect 6-8 Djinn total
 - Learn true nature of threat
+- Level up to ~15-20
 
 **Act 3: The Final Stand** (2-3 hours)
-- Final preparations
-- Recruit remaining units (optional)
+- Final preparations (battle endgame NPCs)
+- Unlock remaining units through story (optional)
 - Collect final Djinn (optional)
 - Seal breaks - Nox Typhon escapes!
 - Final boss battle (3 phases)
 - Ending (Standard or True based on completion)
+- Max level: 20-30
 
 ### Character Arcs
 - **Isaac:** Living up to father's legacy
@@ -315,12 +356,17 @@ OVERWORLD ←──┐ (Main Hub)
 ## 🚫 WHAT'S NOT IN THE GAME
 
 **Explicitly Removed/Not Included:**
-- ❌ Consumable Items (potions, herbs) - healing via abilities only
+- ❌ **Consumable Items** (potions, herbs) - healing via abilities only
+- ❌ **Treasure Chests** - simplified loot (shops + battle drops only)
+- ❌ **Multiple Areas** - one big Vale Village map only
+- ❌ **3 Starting Characters** - pick 1 starter, unlock the rest
+- ❌ **Low Level Cap** - NOT 1-5, game has 20-30 levels
+- ❌ **Defeat-to-Recruit** - story unlocks units, not NPC battles
+- ❌ **Instant Battle Triggers** - NPCs ask if you want to fight
 - ❌ Item menu in battle
-- ❌ Random encounters - all battles are NPC-triggered
+- ❌ Random encounters (all battles are NPC-triggered)
 - ❌ Multiplayer/PvP
 - ❌ Complex crafting system
-- ❌ Open world (linear story with optional content)
 - ❌ Voice acting (text only)
 - ❌ Real-time combat (turn-based only)
 
@@ -366,39 +412,54 @@ OVERWORLD ←──┐ (Main Hub)
 
 **What Needs Attention:**
 
-1. **Battle Backgrounds**
+### 🔥 **PRIORITY #1: Fix Battle Background Layering**
+   - ⚠️ **CRITICAL BUG:** Backgrounds currently cover entire screen (looks awkward)
+   - **Correct Behavior:** Background should be BEHIND battle units
+   - **Layering:** Background layer → Unit sprites → UI elements
+   - **Reference:** Look at actual Golden Sun battles - background is behind, not full-screen
    - ✅ Already have 72 authentic GBA backgrounds
-   - ✅ CSS integration complete
+   - ❓ Need to fix CSS/component structure to layer properly
+
+### 2. **Battle Backgrounds (after layering fix)**
    - ❓ Verify all load correctly
    - ❓ Add fallback for missing backgrounds
 
-2. **Unit Sprites in Battle**
+3. **Unit Sprites in Battle**
    - ✅ Sprite paths defined
    - ✅ Animation system exists
-   - ❓ Verify all 10 units have complete sprite sets
-   - ❓ Test animation transitions
+   - ❓ Verify 1 starter + 9 unlockable units have complete sprite sets
+   - ❓ Test animation transitions (7 animations per unit)
    - ❓ Add sprite error handling
+   - ❓ Ensure sprites render properly with new background layering
 
-3. **Enemy Sprites**
+4. **Enemy Sprites**
    - ✅ Enemy sprites exist (Slime, Wolf, Goblin)
    - ❓ Need Nox Typhon boss sprite
-   - ❓ Verify enemy positioning looks correct
+   - ❓ Verify enemy positioning looks correct with new background layering
 
-4. **UI Polish**
+5. **UI Polish**
    - Command menu styling (authentic GS look)
    - Combat log readability
    - Damage numbers (size, color, animation)
    - Turn order indicator clarity
    - Status effect icons
+   - Level up celebration (for levels 1-20/30)
 
-5. **Effects & Juice**
+6. **Effects & Juice**
    - Screen shake on hits (exists but tune intensity)
    - Flash effect (exists but verify)
    - Djinn activation sparkles
    - Psynergy cast animations (fire, water, earth, wind)
    - Victory fanfare animation
+   - Unit unlock celebration (story-driven unlocks)
 
-6. **Responsive Testing**
+7. **Overworld Polish**
+   - Ensure pseudo-3D depth/layering looks correct
+   - Verify NPC positioning in one big Vale map
+   - Remove any treasure chest UI elements
+   - Polish dialogue boxes (choice UI for "Want to fight?")
+
+8. **Responsive Testing**
    - Test on different screen sizes
    - Verify sprite scaling
    - Check touch targets (future mobile)
@@ -504,9 +565,12 @@ OVERWORLD ←──┐ (Main Hub)
 
 **Vale Chronicles is:**
 - A focused, 8-15 hour RPG
-- Golden Sun aesthetic and mechanics
+- Golden Sun aesthetic and mechanics (pseudo-3D overworld)
 - Turn-based tactical combat
-- NPC-driven battles (no random encounters)
+- **One big town map** (Vale Village only)
+- NPC-driven battles with dialogue choices (no random encounters, no treasure chests)
+- **1 starter + 9 story unlocks** (not 3 starters)
+- **Levels 1-20/30** with many spell unlocks
 - Djinn collection & class changes
 - Equipment-based progression (NO consumables)
 - Story-driven with optional content
