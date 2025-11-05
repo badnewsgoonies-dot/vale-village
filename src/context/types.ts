@@ -16,7 +16,8 @@ export type Screen =
   | { type: 'OVERWORLD'; location?: AreaId }
   | { type: 'SHOP'; shopType: 'item' | 'equipment' | 'inn' }
   | { type: 'DIALOGUE'; npcId: string; dialogueKey?: string }
-  | { type: 'QUEST_LOG' };
+  | { type: 'QUEST_LOG' }
+  | { type: 'DEMO' };
 
 /**
  * Story flags use snake_case as they are interface properties.

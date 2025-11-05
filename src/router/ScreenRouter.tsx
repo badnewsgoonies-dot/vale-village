@@ -6,12 +6,13 @@ import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
-import { NewOverworldScreen } from '@/components/overworld/NewOverworldScreen';
+import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
 import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
+import { GameDemo } from '@/components/demo/GameDemo';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -102,7 +103,7 @@ export const ScreenRouter: React.FC = () => {
       return <BattleScreen />;
 
     case 'OVERWORLD':
-      return <NewOverworldScreen />;
+      return <ValeVillageOverworld />;
 
     case 'DJINN_MENU':
       return <DjinnScreen />;
@@ -130,6 +131,9 @@ export const ScreenRouter: React.FC = () => {
     case 'DIALOGUE':
       // TODO: Dialogue screen (not yet implemented)
       return <div className="placeholder-screen">Dialogue - Coming Soon</div>;
+
+    case 'DEMO':
+      return <GameDemo />;
 
     default:
       return <div className="error-screen">Unknown screen: {JSON.stringify(screen)}</div>;
