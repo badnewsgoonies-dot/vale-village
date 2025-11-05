@@ -6,7 +6,7 @@ import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
-import { NewOverworldScreen } from '@/components/overworld/NewOverworldScreen';
+import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
 import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
@@ -102,7 +102,7 @@ export const ScreenRouter: React.FC = () => {
       return <BattleScreen />;
 
     case 'OVERWORLD':
-      return <NewOverworldScreen />;
+      return <ValeVillageOverworld />;
 
     case 'DJINN_MENU':
       return <DjinnScreen />;
