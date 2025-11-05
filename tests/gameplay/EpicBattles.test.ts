@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { Unit } from '@/types/Unit';
 import { createTeam, equipDjinn } from '@/types/Team';
 import { createBattleState, executeAbility, advanceBattleTurn, getCurrentActor, isPlayerUnit, checkBattleEnd, BattleResult } from '@/types/Battle';
-import { ISAAC, GARET, MIA, IVAN, KYLE } from '@/data/unitDefinitions';
+import { ISAAC, GARET, MIA, IVAN, KYLE, PIERS, JENNA } from '@/data/unitDefinitions';
 import { SOL_BLADE, DRAGON_SCALES, ORACLES_CROWN, HERMES_SANDALS, STEEL_SWORD, IRON_ARMOR } from '@/data/equipment';
 import { FLINT, GRANITE, BANE, FORGE, FIZZ, SQUALL } from '@/data/djinn';
 import { SLASH, RAGNAROK, PLY, JUDGMENT } from '@/data/abilities';

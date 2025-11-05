@@ -327,9 +327,12 @@ export function executeAbility(
           // Add status effect for each stat modifier
           for (const [stat, modifier] of Object.entries(ability.buffEffect)) {
             if (typeof modifier === 'number') {
+              // Skip evasion as it's not part of core Stats type (handled separately)
+              if (stat === 'evasion') continue;
+
               target.statusEffects.push({
                 type: ability.type === 'buff' ? 'buff' : 'debuff',
-                stat: stat as keyof typeof ability.buffEffect,
+                stat: stat as 'atk' | 'def' | 'mag' | 'spd',
                 modifier,
                 duration: ability.duration || 3,
               });

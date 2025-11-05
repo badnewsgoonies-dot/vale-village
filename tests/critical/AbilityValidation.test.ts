@@ -23,6 +23,8 @@ describe('CRITICAL: Ability Type Validation', () => {
     const psynergyResult = executeAbility(isaac, QUAKE, [enemy]);
     expect(psynergyResult.damage).toBeGreaterThan(0);
 
+    // Damage Isaac first so healing has an effect
+    isaac.takeDamage(50);
     const healingResult = executeAbility(isaac, PLY, [isaac]);
     expect(healingResult.healing).toBeGreaterThan(0);
   });
@@ -476,12 +478,12 @@ describe('CRITICAL: Revival Edge Cases', () => {
 
     const result = executeAbility(isaac, PLY, [ally]); // No revivesFallen
 
-    // BUG #6: Dead units can be healed
-    expect(result.healing).toBeGreaterThan(0);
+    // BUG #6 FIXED: Dead units can no longer be healed
+    expect(result.healing).toBe(0);
 
-    // But they don't get the 50% HP revival
-    // So they stay dead but with HP?
-    console.log(`Dead unit healed: HP=${ally.currentHp}, isKO=${ally.isKO}`);
+    // Dead unit should remain dead
+    expect(ally.isKO).toBe(true);
+    expect(ally.currentHp).toBe(0);
   });
 });
 
