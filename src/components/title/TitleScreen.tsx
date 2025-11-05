@@ -41,6 +41,10 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
     onNavigate({ type: 'UNIT_COLLECTION' });
   };
 
+  const handleDemo = () => {
+    onNavigate({ type: 'DEMO' });
+  };
+
   if (!menuVisible) {
     return (
       <div className="title-screen" onClick={handleStart}>
@@ -86,6 +90,10 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
           <button className="title-menu-item secondary" onClick={handleUnitCollection}>
             <span className="menu-icon">★</span>
             <span className="menu-text">Unit Collection</span>
+          </button>
+          <button className="title-menu-item highlight" onClick={handleDemo}>
+            <span className="menu-icon">🎮</span>
+            <span className="menu-text">Game Demo</span>
           </button>
           <button className="title-menu-item debug" onClick={handleTestBattle}>
             <span className="menu-icon">⚔</span>
