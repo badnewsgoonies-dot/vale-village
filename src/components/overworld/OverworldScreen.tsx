@@ -1,0 +1,454 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import type { Unit } from '@/types/Unit';
+import type { Screen } from '@/context/types';
+import './OverworldScreen.css';
+
+interface OverworldScreenProps {
+  playerParty: Unit[];
+  onNavigate: (screen: Screen) => void;
+  onStartBattle?: (enemyIds: string[]) => void;
+}
+
+interface Dialogue {
+  speaker: string;
+  text: string;
+}
+
+type Direction = 'N' | 'S' | 'E' | 'W' | 'NE' | 'NW' | 'SE' | 'SW';
+
+interface MapEntity {
+  id: string;
+  x: number;
+  y: number;
+  sprite: string;
+  type: 'npc' | 'scenery' | 'trigger';
+  blocking: boolean;
+  interactable?: boolean;
+  onInteract?: () => void;
+  onCollide?: () => void;
+}
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+const TILE_SIZE = 32;
+const MAP_WIDTH = 20;
+const MAP_HEIGHT = 15;
+
+// Direction to sprite suffix mapping
+const directionToSpriteMap: Record<Direction, string> = {
+  'N': 'Up',
+  'S': '',  // Default walk down (no suffix)
+  'E': 'Right',
+  'W': 'Left',
+  'NE': 'NE',
+  'NW': 'NW',
+  'SE': 'SE',
+  'SW': 'SW',
+};
+
+// NPC dialogue data
+const NPC_DIALOGUES: Record<string, string> = {
+  elder: "Welcome to Vale Village, young warrior! The world of Weyard needs heroes like you.",
+  dora: "The shop is open if you need supplies. We have the finest potions in all of Vale!",
+  villager1: "I heard there are monsters near the forest to the south. Be careful out there!",
+  villager2: "The elders say the Elemental Stars hold great power. I wonder if it's true...",
+};
+
+const getNpcDialogue = (npcId: string): string => {
+  return NPC_DIALOGUES[npcId] || "...";
+};
+
+// Get tile in front of player based on direction
+const getFacingTile = (x: number, y: number, direction: Direction): Position => {
+  switch (direction) {
+  case 'N': return { x, y: y - 1 };
+  case 'S': return { x, y: y + 1 };
+  case 'E': return { x: x + 1, y };
+  case 'W': return { x: x - 1, y };
+  case 'NE': return { x: x + 1, y: y - 1 };
+  case 'NW': return { x: x - 1, y: y - 1 };
+  case 'SE': return { x: x + 1, y: y + 1 };
+  case 'SW': return { x: x - 1, y: y + 1 };
+  default: return { x, y };
+  }
+};
+
+export const OverworldScreen: React.FC<OverworldScreenProps> = ({
+  playerParty,
+  onNavigate,
+  onStartBattle,
+}) => {
+  // Player state
+  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 10, y: 10 });
+  const [playerDirection, setPlayerDirection] = useState<Direction>('S');
+  const [isRunning, setIsRunning] = useState(false);
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [dialogue, setDialogue] = useState<Dialogue | null>(null);
+
+  // Map entities (NPCs, scenery, triggers)
+  const mapEntities: MapEntity[] = useMemo(() => [
+    // Major NPCs
+    {
+      id: 'elder',
+      x: 8,
+      y: 5,
+      sprite: '/sprites/overworld/majornpcs/Elder.gif',
+      type: 'npc',
+      blocking: true,
+      interactable: true,
+    },
+    {
+      id: 'dora',
+      x: 12,
+      y: 5,
+      sprite: '/sprites/overworld/majornpcs/Dora.gif',
+      type: 'npc',
+      blocking: true,
+      interactable: true,
+    },
+    // Minor NPCs
+    {
+      id: 'villager1',
+      x: 6,
+      y: 8,
+      sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
+      type: 'npc',
+      blocking: true,
+      interactable: true,
+    },
+    {
+      id: 'villager2',
+      x: 14,
+      y: 8,
+      sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
+      type: 'npc',
+      blocking: true,
+      interactable: true,
+    },
+    // Battle trigger zones (with visual markers for debugging)
+    {
+      id: 'battle_zone_1',
+      x: 10,
+      y: 12,
+      sprite: '', // Will render a red marker via CSS
+      type: 'trigger',
+      blocking: false,
+      onCollide: () => {
+        console.log('Battle trigger hit at (10, 12)!');
+        // Initialize battle with random enemies
+        if (onStartBattle) {
+          onStartBattle(['goblin', 'wild-wolf']);
+        }
+        onNavigate({ type: 'BATTLE' });
+      },
+    },
+    {
+      id: 'battle_zone_2',
+      x: 15,
+      y: 10,
+      sprite: '', // Will render a red marker via CSS
+      type: 'trigger',
+      blocking: false,
+      onCollide: () => {
+        console.log('Battle trigger hit at (15, 10)!');
+        // Initialize battle with different enemies
+        if (onStartBattle) {
+          onStartBattle(['slime', 'goblin', 'goblin']);
+        }
+        onNavigate({ type: 'BATTLE' });
+      },
+    },
+  ], [onNavigate, onStartBattle]);
+
+  // Get player sprite based on direction and running state
+  const getPlayerSprite = useCallback((direction: Direction, running: boolean): string => {
+    const action = running ? 'Run' : 'Walk';
+    const dirSuffix = directionToSpriteMap[direction];
+    const separator = dirSuffix ? '_' : '';
+
+    // Use first party member's name, or default to Isaac
+    const characterName = playerParty.length > 0 ? playerParty[0].name : 'Isaac';
+    return `/sprites/overworld/protagonists/${characterName}_${action}${separator}${dirSuffix}.gif`;
+  }, [playerParty]);
+
+  // Check if a position is walkable
+  const canMoveTo = useCallback((x: number, y: number): boolean => {
+    // Check map bounds
+    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) {
+      return false;
+    }
+
+    // Check entity collisions
+    return !mapEntities.some(entity =>
+      entity.blocking && entity.x === x && entity.y === y
+    );
+  }, [mapEntities]);
+
+  // Handle player movement
+  const handleMove = useCallback((newX: number, newY: number, newDirection: Direction) => {
+    // Update direction even if we can't move
+    setPlayerDirection(newDirection);
+
+    // Check if we can move to the new position
+    if (canMoveTo(newX, newY)) {
+      setPlayerPosition({ x: newX, y: newY });
+
+      // Check for trigger collisions
+      const trigger = mapEntities.find(
+        e => e.type === 'trigger' && e.x === newX && e.y === newY
+      );
+
+      if (trigger?.onCollide) {
+        trigger.onCollide();
+      }
+    }
+  }, [canMoveTo, mapEntities]);
+
+  // Calculate camera offset to center on player
+  const cameraOffset = useMemo(() => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const centerX = screenWidth / 2;
+    const centerY = screenHeight / 2;
+
+    return {
+      x: centerX - (playerPosition.x * TILE_SIZE) - TILE_SIZE / 2,
+      y: centerY - (playerPosition.y * TILE_SIZE) - TILE_SIZE / 2,
+    };
+  }, [playerPosition]);
+
+  // Handle NPC interaction
+  const handleInteract = useCallback(() => {
+    // Check if player is facing an NPC
+    const facingTile = getFacingTile(playerPosition.x, playerPosition.y, playerDirection);
+    const npc = mapEntities.find(e =>
+      e.type === 'npc' && e.x === facingTile.x && e.y === facingTile.y && e.interactable
+    );
+
+    if (npc) {
+      console.log('Interacting with NPC:', npc.id);
+      const npcName = npc.id.charAt(0).toUpperCase() + npc.id.slice(1);
+      setDialogue({
+        speaker: npcName,
+        text: getNpcDialogue(npc.id),
+      });
+
+      // Call onInteract if defined
+      if (npc.onInteract) {
+        npc.onInteract();
+      }
+    }
+  }, [playerPosition, playerDirection, mapEntities]);
+
+  // Keyboard input handling
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't process movement if dialogue is open
+      if (dialogue && e.key !== 'Escape') {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          setDialogue(null); // Close dialogue
+        }
+        return;
+      }
+
+      // Prevent default for game controls
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Shift', 'Escape', ' ', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+      }
+
+      // Handle interaction
+      if (e.key === ' ' || e.key === 'Enter') {
+        handleInteract();
+        return;
+      }
+
+      // Handle menu/escape
+      if (e.key === 'Escape') {
+        if (dialogue) {
+          setDialogue(null); // Close dialogue
+        } else {
+          onNavigate({ type: 'UNIT_COLLECTION' });
+        }
+        return;
+      }
+
+      // Update running state
+      if (e.key === 'Shift') {
+        setIsRunning(true);
+      }
+
+      // Add key to pressed keys
+      setPressedKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') {
+        setIsRunning(false);
+      }
+
+      // Remove key from pressed keys
+      setPressedKeys(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(e.key.toLowerCase());
+        return newSet;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [onNavigate, handleInteract, dialogue]);
+
+  // Movement loop based on pressed keys
+  useEffect(() => {
+    // Don't move if dialogue is open
+    if (dialogue) return;
+
+    const moveInterval = setInterval(() => {
+      if (pressedKeys.size === 0) return;
+
+      let newX = playerPosition.x;
+      let newY = playerPosition.y;
+      let newDirection = playerDirection;
+
+      // Check for diagonal movement first
+      const up = pressedKeys.has('arrowup') || pressedKeys.has('w');
+      const down = pressedKeys.has('arrowdown') || pressedKeys.has('s');
+      const left = pressedKeys.has('arrowleft') || pressedKeys.has('a');
+      const right = pressedKeys.has('arrowright') || pressedKeys.has('d');
+
+      // Diagonal movements
+      if (up && right) {
+        newY -= 1;
+        newX += 1;
+        newDirection = 'NE';
+      } else if (up && left) {
+        newY -= 1;
+        newX -= 1;
+        newDirection = 'NW';
+      } else if (down && right) {
+        newY += 1;
+        newX += 1;
+        newDirection = 'SE';
+      } else if (down && left) {
+        newY += 1;
+        newX -= 1;
+        newDirection = 'SW';
+      }
+      // Cardinal directions
+      else if (up) {
+        newY -= 1;
+        newDirection = 'N';
+      } else if (down) {
+        newY += 1;
+        newDirection = 'S';
+      } else if (left) {
+        newX -= 1;
+        newDirection = 'W';
+      } else if (right) {
+        newX += 1;
+        newDirection = 'E';
+      }
+
+      // Only move if position changed
+      if (newX !== playerPosition.x || newY !== playerPosition.y) {
+        handleMove(newX, newY, newDirection);
+      }
+    }, isRunning ? 100 : 200); // Faster movement when running
+
+    return () => clearInterval(moveInterval);
+  }, [pressedKeys, playerPosition, playerDirection, isRunning, handleMove, dialogue]);
+
+  // Sort entities by Y position for proper depth rendering
+  const sortedEntities = useMemo(() => {
+    return [...mapEntities]
+      .filter(e => e.sprite) // Filter out invisible triggers
+      .sort((a, b) => a.y - b.y);
+  }, [mapEntities]);
+
+  const playerSprite = getPlayerSprite(playerDirection, isRunning);
+
+  return (
+    <div className="overworld-container">
+      {/* Map viewport */}
+      <div
+        className="overworld-viewport"
+        style={{
+          transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
+        }}
+      >
+        {/* Background layer */}
+        <div className="overworld-background" />
+
+        {/* Entities and player layer (combined and sorted by Y) */}
+        <div className="overworld-entities">
+          {/* Render battle zone markers */}
+          {mapEntities
+            .filter(e => e.type === 'trigger')
+            .map(trigger => (
+              <div
+                key={trigger.id}
+                className="battle-zone-marker"
+                style={{
+                  left: `${trigger.x * TILE_SIZE}px`,
+                  top: `${trigger.y * TILE_SIZE}px`,
+                }}
+                title={`Battle Zone at (${trigger.x}, ${trigger.y})`}
+              />
+            ))}
+
+          {/* Render all entities and player sorted by Y position */}
+          {[...sortedEntities, { id: 'player', x: playerPosition.x, y: playerPosition.y, sprite: playerSprite, type: 'player' as const }]
+            .sort((a, b) => a.y - b.y)
+            .map(entity => (
+              <img
+                key={entity.id}
+                src={entity.sprite}
+                className={entity.id === 'player' ? 'overworld-player' : 'overworld-entity'}
+                style={{
+                  left: `${entity.x * TILE_SIZE}px`,
+                  top: `${entity.y * TILE_SIZE}px`,
+                }}
+                alt={entity.id}
+              />
+            ))}
+        </div>
+      </div>
+
+      {/* UI Overlay */}
+      <div className="overworld-ui">
+        <button className="menu-button" onClick={() => onNavigate({ type: 'UNIT_COLLECTION' })}>
+          Menu (ESC)
+        </button>
+        <div className="controls-hint">
+          <div>WASD / Arrows: Move</div>
+          <div>Shift: Run</div>
+          <div>Space: Interact</div>
+          <div>ESC: Menu</div>
+          <div style={{ marginTop: '10px', color: '#ffff00', fontWeight: 'bold' }}>
+            Position: ({playerPosition.x}, {playerPosition.y})
+          </div>
+        </div>
+      </div>
+
+      {/* Dialogue Box */}
+      {dialogue && (
+        <div className="dialogue-overlay">
+          <div className="dialogue-box">
+            <div className="dialogue-speaker">{dialogue.speaker}</div>
+            <div className="dialogue-text">{dialogue.text}</div>
+            <div className="dialogue-prompt">Press Space or Enter to close</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

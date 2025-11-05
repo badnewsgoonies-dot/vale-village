@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * VALE CHRONICLES - DESIGN TOKENS
  *
@@ -30,6 +29,20 @@
   --color-border-dark: #0F2550;    /* 3D border dark edge (bottom/right) */
   --color-border-highlight: #FFD87F; /* Selected/focused border */
 
+  /* ===== STATUS/STAT COLORS ===== */
+  --color-hp-green: #57E2A6;       /* HP bar fill */
+  --color-hp-dark: #46C77A;        /* HP bar gradient bottom */
+  --color-hp-bg: #2A2A2A;          /* HP bar background */
+
+  --color-pp-blue: #5090D8;        /* PP bar fill */
+  --color-pp-dark: #3D73B8;        /* PP bar gradient bottom */
+  --color-pp-bg: #2A2A2A;          /* PP bar background */
+
+  --color-damage-red: #FF4444;     /* Damage numbers */
+  --color-heal-green: #44FF44;     /* Heal numbers */
+  --color-critical-gold: #FFD700;  /* Critical hits */
+  --color-ko-red: #FF3030;         /* K.O. indicator */
+
   /* ===== OVERWORLD COLORS ===== */
   --color-grass-light: #88C070;
   --color-grass-mid: #68A050;
@@ -51,8 +64,11 @@
   --z-entity-shadow: 9;
   --z-entity: 10;
   --z-ui: 50;
+  --z-panels: 60;
   --z-dialogue: 60;
   --z-modal: 100;
+  --z-overlay: 150;
+  --z-effects: 200;
 
   /* ===== TYPOGRAPHY ===== */
   --font-primary: 'Press Start 2P', monospace;  /* GBA-style pixel font */
@@ -76,6 +92,9 @@
   --scale-2x: 480px;               /* 2x scale width */
   --scale-3x: 720px;               /* 3x scale width */
   --scale-4x: 960px;               /* 4x scale width */
+  --scale-height-2x: 320px;        /* 2x scale height (160 × 2) */
+  --scale-height-3x: 480px;        /* 3x scale height (160 × 3) */
+  --scale-height-4x: 640px;        /* 4x scale height (160 × 4) */
 
   /* ===== EFFECTS ===== */
   --shadow-text: 2px 2px 0 var(--color-text-shadow);
@@ -174,180 +193,90 @@ a:focus {
   border-right-color: var(--color-border-light);
   border-bottom-color: var(--color-border-light);
 }
-=======
-/**
- * VALE CHRONICLES - DESIGN TOKENS
- *
- * Extracted from approved mockups:
- * - Vale Village (overworld)
- * - Djinn Menu
- * - Battle Screen
- *
- * Use these CSS variables across all mockups for consistency
- */
 
-:root {
-  /* ===== ELEMENT COLORS ===== */
-  --color-venus: #E8A050;      /* Earth/Orange */
-  --color-mars: #E05050;       /* Fire/Red */
-  --color-mercury: #5090D8;    /* Water/Blue */
-  --color-jupiter: #A858D8;    /* Wind/Purple */
-
-  /* ===== UI COLORS ===== */
-  --color-text-primary: #F8F8F0;   /* White text */
-  --color-text-gold: #FFD87F;      /* Gold accent text */
-  --color-text-shadow: #0F2550;    /* Text shadow */
-
-  --color-bg-dark: #0F2550;        /* Dark blue background */
-  --color-bg-panel: rgba(12, 16, 40, 0.85);  /* Semi-transparent panel */
-  --color-bg-modal: rgba(0, 0, 0, 0.7);      /* Modal overlay */
-
-  --color-border-light: #4A7AB8;   /* 3D border light edge (top/left) */
-  --color-border-dark: #0F2550;    /* 3D border dark edge (bottom/right) */
-  --color-border-highlight: #FFD87F; /* Selected/focused border */
-
-  /* ===== OVERWORLD COLORS ===== */
-  --color-grass-light: #88C070;
-  --color-grass-mid: #68A050;
-  --color-grass-dark: #48A038;
-  --color-path: #D4B896;           /* Yellow dirt paths */
-
-  /* ===== SPACING SYSTEM ===== */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-  --space-xxl: 32px;
-
-  /* ===== Z-INDEX LAYERS ===== */
-  --z-background: 0;
-  --z-ground: 1;
-  --z-scenery: 5;
-  --z-entity-shadow: 9;
-  --z-entity: 10;
-  --z-ui: 50;
-  --z-dialogue: 60;
-  --z-modal: 100;
-
-  /* ===== TYPOGRAPHY ===== */
-  --font-primary: 'Press Start 2P', monospace;  /* GBA-style pixel font */
-  --font-fallback: 'Courier New', monospace;    /* Fallback if Google Font fails */
-
-  --font-size-xs: 8px;
-  --font-size-sm: 10px;
-  --font-size-md: 12px;
-  --font-size-lg: 14px;
-  --font-size-xl: 16px;
-
-  /* ===== TIMING/ANIMATION ===== */
-  --timing-fast: 150ms;
-  --timing-normal: 300ms;
-  --timing-slow: 500ms;
-  --timing-dialog: 50ms;           /* Text reveal speed */
-
-  /* ===== LAYOUT DIMENSIONS ===== */
-  --gba-width: 240px;              /* Original GBA resolution width */
-  --gba-height: 160px;             /* Original GBA resolution height */
-  --scale-2x: 480px;               /* 2x scale width */
-  --scale-3x: 720px;               /* 3x scale width */
-  --scale-4x: 960px;               /* 4x scale width */
-
-  /* ===== EFFECTS ===== */
-  --shadow-text: 2px 2px 0 var(--color-text-shadow);
-  --shadow-entity: 0 4px 8px rgba(0, 0, 0, 0.5);
-  --shadow-panel: 0 8px 16px rgba(0, 0, 0, 0.8);
-
-  --glow-focus: 0 0 0 3px var(--color-border-highlight);
-  --glow-venus: 0 0 12px var(--color-venus);
-  --glow-mars: 0 0 12px var(--color-mars);
-  --glow-mercury: 0 0 12px var(--color-mercury);
-  --glow-jupiter: 0 0 12px var(--color-jupiter);
+/* ===== HP/PP BAR COMPONENTS ===== */
+.hp-bar, .pp-bar {
+  height: 8px;
+  background: var(--color-hp-bg);
+  border: 1px solid var(--color-border-dark);
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
 }
 
-/* ===== ACCESSIBILITY - REDUCED MOTION ===== */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --timing-fast: 0ms;
-    --timing-normal: 0ms;
-    --timing-slow: 0ms;
-    --timing-dialog: 0ms;
-  }
+.hp-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--color-hp-green) 0%, var(--color-hp-dark) 100%);
+  transition: width var(--timing-normal);
+}
 
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+.pp-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--color-pp-blue) 0%, var(--color-pp-dark) 100%);
+  transition: width var(--timing-normal);
+}
+
+/* ===== ELEMENT BADGES ===== */
+.element-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+  border: 2px solid;
+}
+
+.element-badge.venus {
+  background: var(--color-venus);
+  border-color: #B8753D;
+  color: #000;
+}
+
+.element-badge.mars {
+  background: var(--color-mars);
+  border-color: #B83D3D;
+  color: #FFF;
+}
+
+.element-badge.mercury {
+  background: var(--color-mercury);
+  border-color: #3D73B8;
+  color: #FFF;
+}
+
+.element-badge.jupiter {
+  background: var(--color-jupiter);
+  border-color: #8340B8;
+  color: #FFF;
+}
+
+/* ===== SPRITE RENDERING ===== */
+.sprite {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 127, 1));
   }
 }
 
-/* ===== UTILITY CLASSES ===== */
-
-/* Panel styling (reusable across all menus) */
-.panel {
-  background: var(--color-bg-panel);
-  border: 2px solid var(--color-border-light);
-  border-right-color: var(--color-border-dark);
-  border-bottom-color: var(--color-border-dark);
-  box-shadow: var(--shadow-panel);
-  padding: var(--space-md);
+.glow-text {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
-
-/* Text styling */
-.text-primary {
-  color: var(--color-text-primary);
-  font-family: var(--font-primary), var(--font-fallback);
-  text-shadow: var(--shadow-text);
-}
-
-.text-gold {
-  color: var(--color-text-gold);
-  font-family: var(--font-primary), var(--font-fallback);
-  text-shadow: var(--shadow-text);
-}
-
-/* Element color classes */
-.element-venus { color: var(--color-venus); }
-.element-mars { color: var(--color-mars); }
-.element-mercury { color: var(--color-mercury); }
-.element-jupiter { color: var(--color-jupiter); }
-
-/* Focus states for accessibility */
-.focusable:focus {
-  outline: none;
-  box-shadow: var(--glow-focus);
-}
-
-button:focus,
-a:focus {
-  outline: 3px solid var(--color-border-highlight);
-  outline-offset: 2px;
-}
-
-/* Button base style */
-.btn {
-  background: var(--color-bg-panel);
-  border: 2px solid var(--color-border-light);
-  border-right-color: var(--color-border-dark);
-  border-bottom-color: var(--color-border-dark);
-  color: var(--color-text-primary);
-  font-family: var(--font-primary), var(--font-fallback);
-  font-size: var(--font-size-sm);
-  padding: var(--space-sm) var(--space-md);
-  cursor: pointer;
-  transition: all var(--timing-fast);
-}
-
-.btn:hover {
-  background: var(--color-border-light);
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  transform: translateY(0);
-  border-top-color: var(--color-border-dark);
-  border-left-color: var(--color-border-dark);
-  border-right-color: var(--color-border-light);
-  border-bottom-color: var(--color-border-light);
-}
->>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Weapon & Armor Shop - Authentic</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .shop-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: linear-gradient(180deg, #1A2A3A 0%, #0F1A2A 100%);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== HEADER ===== */
+    .shop-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(15, 37, 80, 0.95) 0%, rgba(10, 25, 55, 0.95) 100%);
+      border-bottom: 3px solid #FFD87F;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .shop-title {
+      font-size: 18px;
+      color: #FFD87F;
+      text-shadow: 3px 3px 0 #000;
+    }
+
+    .shop-gold {
+      font-size: 14px;
+      color: #FFD87F;
+      text-shadow: 2px 2px 0 #000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gold-icon {
+      width: 20px;
+      height: 20px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    /* ===== TABS ===== */
+    .shop-tabs {
+      position: absolute;
+      top: 80px;
+      left: 32px;
+      right: 32px;
+      display: flex;
+      gap: 16px;
+      z-index: 90;
+    }
+
+    .tab {
+      background: rgba(15, 37, 80, 0.7);
+      border: 2px solid var(--color-border-light);
+      border-bottom: none;
+      padding: 12px 24px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      text-shadow: 2px 2px 0 #000;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .tab:hover {
+      background: rgba(15, 37, 80, 0.85);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .tab.active {
+      background: rgba(15, 37, 80, 0.95);
+      border-color: #FFD87F;
+      color: #FFD87F;
+      transform: translateY(-2px);
+    }
+
+    /* ===== ITEM GRID ===== */
+    .items-container {
+      position: absolute;
+      top: 140px;
+      left: 32px;
+      right: 32px;
+      bottom: 180px;
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      border-radius: 0 8px 8px 8px;
+      padding: 24px;
+      overflow-y: auto;
+      box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .item-card {
+      background: rgba(20, 40, 70, 0.8);
+      border: 2px solid rgba(74, 122, 184, 0.5);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .item-card:hover {
+      border-color: #FFD87F;
+      background: rgba(30, 50, 80, 0.9);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(255, 215, 127, 0.3);
+    }
+
+    .item-card.selected {
+      border-color: #FFD87F;
+      background: rgba(40, 60, 90, 0.95);
+      box-shadow: 0 0 0 3px rgba(255, 215, 127, 0.3);
+    }
+
+    .item-icon {
+      width: 48px;
+      height: 48px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 11px;
+      color: #F8F8F0;
+      text-shadow: 2px 2px 0 #000;
+      margin-bottom: 6px;
+    }
+
+    .item-stats {
+      font-size: 8px;
+      color: #57E2A6;
+      text-shadow: 1px 1px 0 #000;
+      margin-bottom: 4px;
+    }
+
+    .item-price {
+      font-size: 10px;
+      color: #FFD87F;
+      text-shadow: 2px 2px 0 #000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price-icon {
+      width: 14px;
+      height: 14px;
+      image-rendering: pixelated;
+    }
+
+    /* ===== DETAILS PANEL ===== */
+    .details-panel {
+      position: absolute;
+      bottom: 32px;
+      left: 32px;
+      right: 32px;
+      height: 120px;
+      background: linear-gradient(135deg, rgba(15, 37, 80, 0.98) 0%, rgba(10, 25, 55, 0.98) 100%);
+      border: 3px solid #FFD87F;
+      border-radius: 8px;
+      padding: 16px 24px;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6);
+      display: flex;
+      gap: 24px;
+    }
+
+    .details-left {
+      flex: 1;
+    }
+
+    .details-item-name {
+      font-size: 14px;
+      color: #FFD87F;
+      text-shadow: 3px 3px 0 #000;
+      margin-bottom: 8px;
+    }
+
+    .details-description {
+      font-size: 8px;
+      color: #F8F8F0;
+      text-shadow: 1px 1px 0 #000;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .details-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .stat-comparison {
+      display: flex;
+      gap: 16px;
+      font-size: 10px;
+    }
+
+    .stat-change {
+      color: #57E2A6;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    .stat-change.positive::before {
+      content: '↑ +';
+    }
+
+    .stat-change.negative::before {
+      content: '↓ ';
+    }
+
+    .buy-button {
+      background: linear-gradient(135deg, #E8A050 0%, #D08040 100%);
+      border: 2px solid #FFD87F;
+      border-radius: 6px;
+      padding: 10px 28px;
+      font-size: 11px;
+      color: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .buy-button:hover {
+      background: linear-gradient(135deg, #FFD87F 0%, #E8A050 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(255, 215, 127, 0.6);
+    }
+
+    .buy-button:active {
+      transform: translateY(0);
+    }
+
+    /* ===== SCROLLBAR ===== */
+    .items-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .items-container::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    .items-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 215, 127, 0.5);
+      border-radius: 4px;
+    }
+
+    .items-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 215, 127, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="shop-container">
+    <!-- Header -->
+    <div class="shop-header">
+      <div class="shop-title">⚔️ VALE WEAPON & ARMOR SHOP</div>
+      <div class="shop-gold">
+        <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="gold-icon">
+        <span>850g</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="shop-tabs">
+      <div class="tab active">WEAPONS</div>
+      <div class="tab">ARMOR</div>
+      <div class="tab">SELL</div>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="items-container">
+      <div class="items-grid">
+        <!-- Broad Sword -->
+        <div class="item-card selected">
+          <img src="../../public/sprites/icons/items/long-swords/Broad_Sword.gif" alt="Broad Sword" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Broad Sword</div>
+            <div class="item-stats">ATK +22</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              200g
+            </div>
+          </div>
+        </div>
+
+        <!-- Claymore -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/long-swords/Claymore.gif" alt="Claymore" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Claymore</div>
+            <div class="item-stats">ATK +30</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              350g
+            </div>
+          </div>
+        </div>
+
+        <!-- Great Sword -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/long-swords/Great_Sword.gif" alt="Great Sword" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Great Sword</div>
+            <div class="item-stats">ATK +38</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              550g
+            </div>
+          </div>
+        </div>
+
+        <!-- Battle Axe -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/axes/Battle_Axe.gif" alt="Battle Axe" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Battle Axe</div>
+            <div class="item-stats">ATK +32</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              400g
+            </div>
+          </div>
+        </div>
+
+        <!-- Broad Axe -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/axes/Broad_Axe.gif" alt="Broad Axe" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Broad Axe</div>
+            <div class="item-stats">ATK +26</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              280g
+            </div>
+          </div>
+        </div>
+
+        <!-- Burning Axe -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/axes/Burning_Axe.gif" alt="Burning Axe" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Burning Axe</div>
+            <div class="item-stats">ATK +35, Fire Element</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              620g
+            </div>
+          </div>
+        </div>
+
+        <!-- Chain Mail -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/armor/Chain_Mail.gif" alt="Chain Mail" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Chain Mail</div>
+            <div class="item-stats">DEF +20</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              240g
+            </div>
+          </div>
+        </div>
+
+        <!-- Leather Armor -->
+        <div class="item-card">
+          <img src="../../public/sprites/icons/items/armor/Leather_Armor.gif" alt="Leather Armor" class="item-icon">
+          <div class="item-info">
+            <div class="item-name">Leather Armor</div>
+            <div class="item-stats">DEF +15</div>
+            <div class="item-price">
+              <img src="../../public/sprites/icons/items/single-use/other/Coin.gif" alt="Gold" class="price-icon">
+              150g
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Panel -->
+    <div class="details-panel">
+      <div class="details-left">
+        <div class="details-item-name">Broad Sword</div>
+        <div class="details-description">
+          A sturdy blade forged for balanced combat. Increases physical attack power significantly.
+          Equippable by Isaac and Felix.
+        </div>
+      </div>
+      <div class="details-right">
+        <div class="stat-comparison">
+          <div class="stat-change positive">8 ATK</div>
+        </div>
+        <button class="buy-button">BUY</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo: Handle item selection
+    const items = document.querySelectorAll('.item-card');
+    const detailsName = document.querySelector('.details-item-name');
+    const detailsDesc = document.querySelector('.details-description');
+    const statChange = document.querySelector('.stat-change');
+
+    const itemData = {
+      'Broad Sword': {
+        desc: 'A sturdy blade forged for balanced combat. Increases physical attack power significantly. Equippable by Isaac and Felix.',
+        stat: '+8 ATK'
+      },
+      'Claymore': {
+        desc: 'A massive two-handed sword. Delivers devastating blows but requires great strength to wield effectively.',
+        stat: '+16 ATK'
+      },
+      'Great Sword': {
+        desc: 'An impressive weapon of legendary craftsmanship. Its balanced design makes it a favorite among warriors.',
+        stat: '+24 ATK'
+      },
+      'Battle Axe': {
+        desc: 'A powerful axe designed for heavy combat. Its weight delivers crushing blows to enemies.',
+        stat: '+18 ATK'
+      },
+      'Broad Axe': {
+        desc: 'A wide-bladed axe favored by Garet. Effective against armored foes.',
+        stat: '+12 ATK'
+      },
+      'Burning Axe': {
+        desc: 'An axe imbued with the element of fire. Unleashes flames when swung in battle.',
+        stat: '+21 ATK'
+      },
+      'Chain Mail': {
+        desc: 'Interlocking metal rings provide solid protection. Standard issue for Vale soldiers.',
+        stat: '+10 DEF'
+      },
+      'Leather Armor': {
+        desc: 'Light armor made from cured leather. Offers basic protection without hindering movement.',
+        stat: '+5 DEF'
+      }
+    };
+
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        items.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+
+        const name = item.querySelector('.item-name').textContent;
+        const data = itemData[name];
+
+        if (data) {
+          detailsName.textContent = name;
+          detailsDesc.textContent = data.desc;
+          statChange.textContent = data.stat;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

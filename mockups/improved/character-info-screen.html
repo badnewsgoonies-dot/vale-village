@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Info Screen - Isaac</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .character-screen {
+      width: 960px;
+      height: 640px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* ===== LEFT COLUMN: CHARACTER DISPLAY ===== */
+    .left-column {
+      flex: 0 0 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .character-portrait-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .element-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-venus) 0%, #C88040 100%);
+      border: 2px solid #FFD87F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(232, 160, 80, 0.6);
+    }
+
+    .character-sprite {
+      width: 96px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
+      margin: 16px 0;
+    }
+
+    .character-name {
+      font-size: 16px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      margin-bottom: 4px;
+    }
+
+    .character-class {
+      font-size: 10px;
+      color: var(--color-text-secondary);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    .level-display {
+      font-size: 12px;
+      color: var(--color-text-primary);
+      margin-top: 8px;
+    }
+
+    .xp-bar-container {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .xp-label {
+      font-size: 7px;
+      color: var(--color-text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .xp-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid var(--color-border-dark);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4A9BFF 0%, #2E7DD8 100%);
+      width: 67%;
+      transition: width 0.5s ease-out;
+      box-shadow: 0 0 8px rgba(74, 155, 255, 0.8);
+    }
+
+    /* ===== STATS PANEL ===== */
+    .stats-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+      flex: 1;
+    }
+
+    .stats-title {
+      font-size: 10px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 8px;
+      color: var(--color-text-secondary);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    .stat-value {
+      font-size: 12px;
+      color: var(--color-text-primary);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+    }
+
+    .stat-value.hp {
+      color: var(--color-hp-green);
+    }
+
+    .stat-value.pp {
+      color: var(--color-pp-blue);
+    }
+
+    /* ===== RIGHT COLUMN: EQUIPMENT & ABILITIES ===== */
+    .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .equipment-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-size: 10px;
+      color: var(--color-text-gold);
+      text-shadow: 2px 2px 0 var(--color-text-shadow);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .equipment-slot {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--timing-fast);
+    }
+
+    .equipment-slot:hover {
+      border-color: var(--color-border-light);
+      background: rgba(255, 215, 127, 0.1);
+    }
+
+    .equipment-icon {
+      width: 24px;
+      height: 24px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    }
+
+    .equipment-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .equipment-label {
+      font-size: 6px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+    }
+
+    .equipment-name {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    /* ===== ABILITIES PANEL ===== */
+    .abilities-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .abilities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .ability-item {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-dark);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--timing-fast);
+      cursor: pointer;
+    }
+
+    .ability-item:hover {
+      border-color: var(--color-border-light);
+      background: rgba(255, 215, 127, 0.1);
+      transform: translateX(2px);
+    }
+
+    .ability-icon {
+      width: 20px;
+      height: 20px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    }
+
+    .ability-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ability-name {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    .ability-cost {
+      font-size: 6px;
+      color: var(--color-pp-blue);
+    }
+
+    /* ===== FOOTER ===== */
+    .screen-footer {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .footer-btn {
+      padding: 8px 16px;
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 8px;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: 1px 1px 0 var(--color-text-shadow);
+    }
+
+    .footer-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    /* ===== SCROLLBAR ===== */
+    .abilities-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .abilities-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .abilities-panel::-webkit-scrollbar-thumb {
+      background: var(--color-border-light);
+      border-radius: 4px;
+    }
+
+    .abilities-panel::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="character-screen">
+    <!-- LEFT COLUMN -->
+    <div class="left-column">
+      <!-- Character Portrait Panel -->
+      <div class="character-portrait-panel">
+        <div class="element-badge" title="Venus Element">🪨</div>
+
+        <img
+          src="../../public/sprites/battle/party/isaac/Isaac_Long Sword_Front.gif"
+          alt="Isaac"
+          class="character-sprite"
+        >
+
+        <div class="character-name">ISAAC</div>
+        <div class="character-class">Squire</div>
+        <div class="level-display">Level 8</div>
+
+        <div class="xp-bar-container">
+          <div class="xp-label">
+            <span>XP TO NEXT</span>
+            <span>203 / 300</span>
+          </div>
+          <div class="xp-bar">
+            <div class="xp-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Panel -->
+      <div class="stats-panel">
+        <div class="stats-title">⚔️ ATTRIBUTES</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">HP</div>
+            <div class="stat-value hp">142 / 142</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">PP</div>
+            <div class="stat-value pp">68 / 68</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">ATTACK</div>
+            <div class="stat-value">78</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">DEFENSE</div>
+            <div class="stat-value">52</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">AGILITY</div>
+            <div class="stat-value">64</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">LUCK</div>
+            <div class="stat-value">18</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-column">
+      <!-- Equipment Panel -->
+      <div class="equipment-panel">
+        <div class="panel-title">⚔️ EQUIPMENT</div>
+        <div class="equipment-grid">
+          <div class="equipment-slot">
+            <img
+              src="../../public/sprites/icons/items/long-swords/Broad_Sword.gif"
+              alt="Broad Sword"
+              class="equipment-icon"
+            >
+            <div class="equipment-info">
+              <div class="equipment-label">Weapon</div>
+              <div class="equipment-name">Broad Sword</div>
+            </div>
+          </div>
+
+          <div class="equipment-slot">
+            <img
+              src="../../public/sprites/icons/items/armor/Chain_Mail.gif"
+              alt="Chain Mail"
+              class="equipment-icon"
+            >
+            <div class="equipment-info">
+              <div class="equipment-label">Armor</div>
+              <div class="equipment-name">Chain Mail</div>
+            </div>
+          </div>
+
+          <div class="equipment-slot">
+            <img
+              src="../../public/sprites/icons/items/helmets/Bronze_Helm.gif"
+              alt="Bronze Helm"
+              class="equipment-icon"
+            >
+            <div class="equipment-info">
+              <div class="equipment-label">Helmet</div>
+              <div class="equipment-name">Bronze Helm</div>
+            </div>
+          </div>
+
+          <div class="equipment-slot">
+            <img
+              src="../../public/sprites/icons/items/shields/Wooden_Shield.gif"
+              alt="Wooden Shield"
+              class="equipment-icon"
+            >
+            <div class="equipment-info">
+              <div class="equipment-label">Shield</div>
+              <div class="equipment-name">Wooden Shield</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abilities Panel -->
+      <div class="abilities-panel">
+        <div class="panel-title">✨ PSYNERGY</div>
+        <div class="abilities-grid">
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Move.gif"
+              alt="Move"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Move</div>
+              <div class="ability-cost">2 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Quake.gif"
+              alt="Quake"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Quake</div>
+              <div class="ability-cost">4 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Cure.gif"
+              alt="Cure"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Cure</div>
+              <div class="ability-cost">7 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Ragnarok.gif"
+              alt="Ragnarok"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Ragnarok</div>
+              <div class="ability-cost">9 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Growth.gif"
+              alt="Growth"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Growth</div>
+              <div class="ability-cost">4 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Quake_Sphere.gif"
+              alt="Quake Sphere"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Quake Sphere</div>
+              <div class="ability-cost">15 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Potent_Cure.gif"
+              alt="Potent Cure"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Potent Cure</div>
+              <div class="ability-cost">12 PP</div>
+            </div>
+          </div>
+
+          <div class="ability-item">
+            <img
+              src="../../public/sprites/icons/psynergy/Mad_Growth.gif"
+              alt="Mad Growth"
+              class="ability-icon"
+            >
+            <div class="ability-info">
+              <div class="ability-name">Mad Growth</div>
+              <div class="ability-cost">10 PP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="screen-footer">
+      <button class="footer-btn">◀ PREVIOUS</button>
+      <button class="footer-btn">NEXT ▶</button>
+      <button class="footer-btn">✕ CLOSE</button>
+    </div>
+  </div>
+
+  <script>
+    // XP bar animation on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const xpFill = document.querySelector('.xp-fill');
+      setTimeout(() => {
+        xpFill.style.width = '67%';
+      }, 300);
+    });
+
+    // Ability hover tooltips could be added here
+    document.querySelectorAll('.ability-item').forEach(item => {
+      item.addEventListener('click', () => {
+        console.log('Ability clicked:', item.querySelector('.ability-name').textContent);
+      });
+    });
+
+    // Equipment hover effects
+    document.querySelectorAll('.equipment-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        console.log('Equipment clicked:', slot.querySelector('.equipment-name').textContent);
+      });
+    });
+  </script>
+</body>
+</html>

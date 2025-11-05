@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Classic GBA Layout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Battle Background */
+    .battle-background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('/sprites/backgrounds/gs1/Cave.gif') center/cover;
+      filter: brightness(0.9);
+      z-index: 0;
+    }
+
+    /* Enemy Area - Top Half */
+    .enemy-area {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      height: 240px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 60px;
+      z-index: 10;
+    }
+
+    .enemy-sprite {
+      position: relative;
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 160px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+    }
+
+    .enemy-hp-container {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #d4af37;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .enemy-name {
+      font-size: 8px;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .enemy-hp-bar {
+      width: 80px;
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid #d4af37;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+      transition: width 0.3s ease;
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Party Area - Bottom Half */
+    .party-area {
+      position: absolute;
+      bottom: 160px;
+      left: 0;
+      right: 0;
+      height: 180px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 80px;
+      gap: 40px;
+      z-index: 20;
+    }
+
+    .party-member {
+      position: relative;
+    }
+
+    .party-sprite img {
+      width: auto;
+      height: 120px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));
+    }
+
+    .party-status {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #5090d8;
+      padding: 4px 8px;
+      border-radius: 4px;
+      min-width: 100px;
+    }
+
+    .party-name {
+      font-size: 8px;
+      color: #5090d8;
+      margin-bottom: 3px;
+    }
+
+    .hp-pp-row {
+      display: flex;
+      gap: 8px;
+      font-size: 7px;
+      color: #fff;
+    }
+
+    .stat-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      color: #888;
+    }
+
+    .stat-bar {
+      width: 40px;
+      height: 6px;
+      background: #2a1810;
+      border: 1px solid #666;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+    }
+
+    .pp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #5090d8 0%, #2060a8 100%);
+    }
+
+    /* Command Window - Classic GS1 Style */
+    .command-window {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      height: 120px;
+      background: rgba(10,10,30,0.95);
+      border: 3px solid #d4af37;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.8), inset 0 0 40px rgba(212,175,55,0.1);
+      z-index: 100;
+      display: flex;
+    }
+
+    /* Left: Active Character Portrait */
+    .active-character {
+      width: 120px;
+      background: rgba(0,0,0,0.4);
+      border-right: 2px solid #d4af37;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .active-portrait {
+      width: 64px;
+      height: 64px;
+      background: url('/sprites/portraits/Isaac_Portrait.gif') center/contain no-repeat;
+      border: 2px solid #5090d8;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .active-name {
+      font-size: 9px;
+      color: #5090d8;
+      text-align: center;
+    }
+
+    /* Center: Command Menu */
+    .command-menu {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .command-btn {
+      background: linear-gradient(180deg, #3a3a5a 0%, #1a1a3a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      padding: 12px;
+      text-align: center;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+    }
+
+    .command-btn:hover {
+      background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212,175,55,0.3), inset 0 1px 2px rgba(255,255,255,0.2);
+    }
+
+    .command-btn:active {
+      transform: translateY(0);
+    }
+
+    .command-icon {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    /* Right: Target Info */
+    .target-info {
+      width: 180px;
+      background: rgba(0,0,0,0.4);
+      border-left: 2px solid #d4af37;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .target-label {
+      font-size: 7px;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .target-name {
+      font-size: 10px;
+      color: #e05050;
+      margin-bottom: 4px;
+    }
+
+    .target-hp {
+      font-size: 7px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .target-hp-bar {
+      width: 100%;
+      height: 10px;
+      background: #2a1810;
+      border: 1px solid #d4af37;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .target-hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+      width: 65%;
+    }
+
+    .target-weakness {
+      font-size: 7px;
+      color: #a858d8;
+      margin-top: 6px;
+    }
+
+    .element-icons {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .element-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid #666;
+    }
+
+    .element-mars { background: radial-gradient(circle, #e05050 0%, #a03030 100%); }
+    .element-jupiter { background: radial-gradient(circle, #a858d8 0%, #7030a0 100%); }
+
+    /* Turn Indicator */
+    .turn-indicator {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #d4af37;
+      border-radius: 6px;
+      padding: 8px 12px;
+      z-index: 50;
+    }
+
+    .turn-text {
+      font-size: 8px;
+      color: #d4af37;
+      text-align: center;
+    }
+
+    .turn-number {
+      font-size: 12px;
+      color: #fff;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Combat Log */
+    .combat-log {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 300px;
+      background: rgba(0,0,0,0.75);
+      border: 2px solid #666;
+      border-radius: 4px;
+      padding: 8px;
+      z-index: 50;
+    }
+
+    .log-message {
+      font-size: 7px;
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 4px;
+    }
+
+    .log-message:last-child {
+      color: #fff;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Battle Background -->
+    <div class="battle-background"></div>
+
+    <!-- Combat Log -->
+    <div class="combat-log">
+      <div class="log-message">Isaac unleashed Ragnarok!</div>
+      <div class="log-message">Dire Wolf took 127 damage!</div>
+      <div class="log-message">Dire Wolf is preparing to attack...</div>
+    </div>
+
+    <!-- Turn Indicator -->
+    <div class="turn-indicator">
+      <div class="turn-text">TURN</div>
+      <div class="turn-number">3</div>
+    </div>
+
+    <!-- Enemy Area -->
+    <div class="enemy-area">
+      <div class="enemy-sprite">
+        <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        <div class="enemy-hp-container">
+          <div class="enemy-name">DIRE WOLF</div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 65%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enemy-sprite" style="animation-delay: -1s;">
+        <img src="/sprites/battle/enemies/Goblin.gif" alt="Goblin">
+        <div class="enemy-hp-container">
+          <div class="enemy-name">GOBLIN</div>
+          <div class="enemy-hp-bar">
+            <div class="enemy-hp-fill" style="width: 42%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Party Area -->
+    <div class="party-area">
+      <div class="party-member">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        </div>
+        <div class="party-status">
+          <div class="party-name">ISAAC</div>
+          <div class="hp-pp-row">
+            <div class="stat-group">
+              <div class="stat-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 85%;"></div>
+              </div>
+            </div>
+            <div class="stat-group">
+              <div class="stat-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 60%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-member">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        </div>
+        <div class="party-status">
+          <div class="party-name">GARET</div>
+          <div class="hp-pp-row">
+            <div class="stat-group">
+              <div class="stat-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 72%;"></div>
+              </div>
+            </div>
+            <div class="stat-group">
+              <div class="stat-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 45%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-member">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        </div>
+        <div class="party-status">
+          <div class="party-name">IVAN</div>
+          <div class="hp-pp-row">
+            <div class="stat-group">
+              <div class="stat-label">HP</div>
+              <div class="stat-bar">
+                <div class="hp-fill" style="width: 95%;"></div>
+              </div>
+            </div>
+            <div class="stat-group">
+              <div class="stat-label">PP</div>
+              <div class="stat-bar">
+                <div class="pp-fill" style="width: 78%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Window -->
+    <div class="command-window">
+      <!-- Active Character Portrait -->
+      <div class="active-character">
+        <div class="active-portrait"></div>
+        <div class="active-name">ISAAC</div>
+      </div>
+
+      <!-- Command Menu -->
+      <div class="command-menu">
+        <button class="command-btn">
+          <div class="command-icon">⚔️</div>
+          <div>ATTACK</div>
+        </button>
+        <button class="command-btn">
+          <div class="command-icon">✨</div>
+          <div>PSYNERGY</div>
+        </button>
+        <button class="command-btn">
+          <div class="command-icon">🔮</div>
+          <div>DJINN</div>
+        </button>
+        <button class="command-btn">
+          <div class="command-icon">🛡️</div>
+          <div>DEFEND</div>
+        </button>
+      </div>
+
+      <!-- Target Info -->
+      <div class="target-info">
+        <div class="target-label">TARGET</div>
+        <div class="target-name">DIRE WOLF</div>
+        <div class="target-hp">HP: 195/300</div>
+        <div class="target-hp-bar">
+          <div class="target-hp-fill"></div>
+        </div>
+        <div class="target-weakness">WEAK TO:</div>
+        <div class="element-icons">
+          <div class="element-icon element-mars"></div>
+          <div class="element-icon element-jupiter"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

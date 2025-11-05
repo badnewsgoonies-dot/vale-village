@@ -1,0 +1,95 @@
+/* Defeat Overlay - Battle Lost */
+
+.defeat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.defeat-dim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  animation: defeatDim 1s ease-out forwards;
+}
+
+@keyframes defeatDim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.defeat-text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: defeatAppear 1s ease-out forwards;
+}
+
+@keyframes defeatAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.defeat-title {
+  font-size: 64px;
+  font-weight: 900;
+  color: #888;
+  text-shadow: 
+    3px 3px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  letter-spacing: 6px;
+  margin: 0 0 20px 0;
+  animation: defeatFade 2s ease-in-out;
+}
+
+@keyframes defeatFade {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.defeat-subtitle {
+  font-size: 20px;
+  color: #AAA;
+  text-shadow: 2px 2px 0 #000;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .defeat-title {
+    font-size: 42px;
+    letter-spacing: 3px;
+  }
+
+  .defeat-subtitle {
+    font-size: 16px;
+  }
+}

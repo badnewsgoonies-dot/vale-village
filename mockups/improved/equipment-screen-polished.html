@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Screen - Polished</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+
+    .equipment-container {
+      width: 1200px;
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: 200px 1fr 320px;
+      grid-template-rows: auto 1fr auto;
+      gap: var(--space-lg);
+      grid-template-areas:
+        "units header header"
+        "units equipment stats"
+        "units actions actions";
+    }
+
+    /* ===== UNIT SELECTOR ===== */
+    .unit-selector {
+      grid-area: units;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+    }
+
+    .unit-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+
+    .unit-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .unit-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .unit-card:hover {
+      background: rgba(74, 122, 184, 0.2);
+      border-color: var(--color-border-light);
+    }
+
+    .unit-card.selected {
+      background: rgba(74, 122, 184, 0.4);
+      border: 2px solid var(--color-border-highlight);
+      box-shadow: var(--glow-focus);
+    }
+
+    .unit-sprite {
+      font-size: 40px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .unit-name {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .unit-level {
+      font-size: 7px;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      grid-area: header;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .header-title {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    /* ===== EQUIPMENT PANEL ===== */
+    .equipment-panel {
+      grid-area: equipment;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-lg);
+    }
+
+    .equipment-slots {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .equipment-slot {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-md);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .equipment-slot:hover {
+      border-color: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .equipment-slot.equipped {
+      border-color: var(--color-border-highlight);
+      box-shadow: var(--glow-focus);
+    }
+
+    .slot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .slot-type {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .slot-icon {
+      font-size: 24px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .item-equipped {
+      margin-bottom: var(--space-sm);
+    }
+
+    .item-name {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .item-stats {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+    }
+
+    .stat-change {
+      color: var(--color-hp-green);
+      font-weight: bold;
+    }
+
+    .stat-change.positive::before {
+      content: "▲ +";
+    }
+
+    .ability-unlock {
+      margin-top: var(--space-xs);
+      padding: 4px 8px;
+      background: rgba(255, 215, 127, 0.2);
+      border: 1px solid var(--color-text-gold);
+      border-radius: 3px;
+    }
+
+    .ability-unlock-label {
+      font-size: 6px;
+      color: var(--color-text-gold);
+      font-weight: bold;
+    }
+
+    .ability-name {
+      font-size: 7px;
+      color: var(--color-text-gold);
+      margin-top: 2px;
+    }
+
+    .empty-slot {
+      font-size: 7px;
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: var(--space-md) 0;
+    }
+
+    /* ===== STATS PREVIEW ===== */
+    .stats-panel {
+      grid-area: stats;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-lg);
+    }
+
+    .stats-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+
+    .char-preview {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .char-sprite-large {
+      font-size: 64px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .char-info {
+      margin-top: var(--space-sm);
+    }
+
+    .char-name {
+      font-size: var(--font-size-md);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .char-class {
+      font-size: 8px;
+      color: var(--color-venus);
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-xs) var(--space-sm);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--color-border-dark);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      min-width: 60px;
+    }
+
+    .stat-value {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .stat-boost {
+      font-size: 8px;
+      color: var(--color-hp-green);
+      margin-left: var(--space-xs);
+    }
+
+    .abilities-section {
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 2px solid var(--color-border-light);
+    }
+
+    .abilities-title {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .ability-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .ability-item {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid;
+    }
+
+    .ability-item.venus { border-left-color: var(--color-venus); }
+    .ability-item.new {
+      border-left-color: var(--color-text-gold);
+      background: rgba(255, 215, 127, 0.1);
+    }
+
+    .new-badge {
+      display: inline-block;
+      background: var(--color-text-gold);
+      color: #000;
+      font-size: 6px;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-left: 4px;
+      font-weight: bold;
+    }
+
+    /* ===== ACTIONS ===== */
+    .actions-panel {
+      grid-area: actions;
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-md);
+      display: flex;
+      justify-content: center;
+      gap: var(--space-lg);
+    }
+
+    .action-btn {
+      padding: var(--space-sm) var(--space-xl);
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+    }
+
+    .action-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .action-btn:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+
+    .action-btn.primary {
+      color: var(--color-text-gold);
+      border-color: var(--color-text-gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="equipment-container">
+    <!-- Unit Selector -->
+    <div class="unit-selector">
+      <h2 class="unit-title">UNITS</h2>
+      <div class="unit-list">
+        <div class="unit-card selected">
+          <div class="unit-sprite">🧍</div>
+          <div class="unit-name">Isaac</div>
+          <div class="unit-level">Lv 3</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-sprite">🧍‍♂️</div>
+          <div class="unit-name">Garet</div>
+          <div class="unit-level">Lv 3</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-sprite">🧙</div>
+          <div class="unit-name">Ivan</div>
+          <div class="unit-level">Lv 2</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-sprite">🧙‍♀️</div>
+          <div class="unit-name">Mia</div>
+          <div class="unit-level">Lv 2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <h1 class="header-title">EQUIPMENT MANAGEMENT</h1>
+    </div>
+
+    <!-- Equipment Slots -->
+    <div class="equipment-panel">
+      <div class="equipment-slots">
+        <!-- Weapon Slot -->
+        <div class="equipment-slot equipped">
+          <div class="slot-header">
+            <span class="slot-type">WEAPON</span>
+            <span class="slot-icon">⚔️</span>
+          </div>
+          <div class="item-equipped">
+            <div class="item-name">Long Sword</div>
+            <div class="item-stats">
+              <span class="stat-change positive">15 ATK</span>
+            </div>
+            <div class="ability-unlock">
+              <div class="ability-unlock-label">🆕 ABILITY UNLOCK</div>
+              <div class="ability-name">Ragnarok</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Armor Slot -->
+        <div class="equipment-slot equipped">
+          <div class="slot-header">
+            <span class="slot-type">ARMOR</span>
+            <span class="slot-icon">🛡️</span>
+          </div>
+          <div class="item-equipped">
+            <div class="item-name">Iron Armor</div>
+            <div class="item-stats">
+              <span class="stat-change positive">8 DEF</span><br>
+              <span class="stat-change positive">15 HP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Helm Slot -->
+        <div class="equipment-slot equipped">
+          <div class="slot-header">
+            <span class="slot-type">HELM</span>
+            <span class="slot-icon">⛑️</span>
+          </div>
+          <div class="item-equipped">
+            <div class="item-name">Steel Helm</div>
+            <div class="item-stats">
+              <span class="stat-change positive">5 DEF</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boots Slot -->
+        <div class="equipment-slot">
+          <div class="slot-header">
+            <span class="slot-type">BOOTS</span>
+            <span class="slot-icon">👢</span>
+          </div>
+          <div class="empty-slot">
+            No boots equipped<br>
+            (Tap to equip)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Preview -->
+    <div class="stats-panel">
+      <h3 class="stats-title">STATS PREVIEW</h3>
+
+      <div class="char-preview">
+        <div class="char-sprite-large">🧍</div>
+        <div class="char-info">
+          <div class="char-name">Isaac</div>
+          <div class="char-class">Venus Adept • Lv 3</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-row">
+          <span class="stat-label">HP:</span>
+          <span class="stat-value">135 <span class="stat-boost">▲+15</span></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">ATK:</span>
+          <span class="stat-value">50 <span class="stat-boost">▲+15</span></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">DEF:</span>
+          <span class="stat-value">33 <span class="stat-boost">▲+13</span></span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">SPD:</span>
+          <span class="stat-value">12</span>
+        </div>
+      </div>
+
+      <div class="abilities-section">
+        <h4 class="abilities-title">ABILITIES</h4>
+        <div class="ability-list">
+          <div class="ability-item venus">Attack (Physical)</div>
+          <div class="ability-item venus new">
+            Ragnarok (15 PP) <span class="new-badge">NEW!</span>
+          </div>
+          <div class="ability-item venus">Cure (7 PP)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-panel">
+      <button class="action-btn primary">OPTIMIZE</button>
+      <button class="action-btn">UNEQUIP ALL</button>
+      <button class="action-btn">← BACK</button>
+    </div>
+  </div>
+</body>
+</html>

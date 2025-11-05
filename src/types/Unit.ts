@@ -6,6 +6,7 @@ import type { Djinn, DjinnState } from './Djinn';
 import { emptyLoadout } from './Equipment';
 import { calculateDjinnSynergy } from './Djinn';
 import { Ok, Err, type Result } from '@/utils/Result';
+import { ABILITIES } from '@/data/abilities';
 
 /**
  * XP curve from GAME_MECHANICS.md Section 1.1
@@ -411,6 +412,44 @@ export class Unit {
    */
   recordDamageDealt(amount: number): void {
     this.battleStats.damageDealt += amount;
+  }
+
+  /**
+   * Regenerate PP after battle
+   * From GAME_MECHANICS.md Section 6.6
+   * Restores 10% of max PP (minimum 1 PP)
+   */
+  regeneratePP(): number {
+    if (this.isKO) {
+      return 0; // Dead units don't regenerate PP
+    }
+
+    const regenAmount = Math.max(1, Math.floor(this.maxPp * 0.1));
+    const before = this.currentPp;
+    this.currentPp = Math.min(this.maxPp, this.currentPp + regenAmount);
+    return this.currentPp - before;
+  }
+
+  /**
+   * Get available abilities including equipment-granted abilities
+   * From GAME_MECHANICS.md Section 7.2 (Equipment Special Effects)
+   * Equipment like Sol Blade unlocks special abilities (e.g., Megiddo)
+   */
+  getAvailableAbilities(): Ability[] {
+    const baseAbilities = [...this.abilities];
+    const equipmentAbilities: Ability[] = [];
+
+    // Check all equipment slots for ability unlocks
+    for (const item of Object.values(this.equipment)) {
+      if (item?.unlocksAbility) {
+        const ability = ABILITIES[item.unlocksAbility];
+        if (ability) {
+          equipmentAbilities.push(ability);
+        }
+      }
+    }
+
+    return [...baseAbilities, ...equipmentAbilities];
   }
 
   /**

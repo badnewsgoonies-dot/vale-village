@@ -12,36 +12,36 @@ describe('TASK 2: Stat Calculation System - Core Formula', () => {
     const isaac5 = new Unit(ISAAC, 5);
 
     // Verify growth formula
-    // Isaac growth: HP +20, PP +4, ATK +3, DEF +2, MAG +2, SPD +1 per level
+    // Isaac growth: HP +20, PP +3, ATK +3, DEF +2, MAG +2, SPD +1 per level
     expect(isaac5.stats.hp).toBe(100 + (20 * 4)); // 180
-    expect(isaac5.stats.pp).toBe(20 + (4 * 4));   // 36
-    expect(isaac5.stats.atk).toBe(15 + (3 * 4));  // 27
+    expect(isaac5.stats.pp).toBe(24 + (3 * 4));   // 36
+    expect(isaac5.stats.atk).toBe(14 + (3 * 4));  // 26 (BALANCE: 15→14)
     expect(isaac5.stats.def).toBe(10 + (2 * 4));  // 18
     expect(isaac5.stats.mag).toBe(12 + (2 * 4));  // 20
     expect(isaac5.stats.spd).toBe(12 + (1 * 4));  // 16
   });
 
   test('✅ Djinn synergy adds stat bonuses', () => {
-    const isaac = new Unit(ISAAC, 5); // Base ATK 27, DEF 18
+    const isaac = new Unit(ISAAC, 5); // Base ATK 26, DEF 18
 
     // 3 Venus Djinn: +12 ATK, +8 DEF (from GAME_MECHANICS.md Section 3.2)
     isaac.equipDjinn([FLINT, GRANITE, BANE]);
 
-    expect(isaac.stats.atk).toBe(39); // 27 + 12
+    expect(isaac.stats.atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
     expect(isaac.stats.def).toBe(26); // 18 + 8
   });
 
   test('✅ Only Set Djinn count for synergy (not Standby)', () => {
-    const isaac = new Unit(ISAAC, 5); // Base ATK 27
+    const isaac = new Unit(ISAAC, 5); // Base ATK 26
 
     isaac.equipDjinn([FLINT, GRANITE, BANE]);
-    expect(isaac.stats.atk).toBe(39); // 27 + 12 (all 3 Set, all Venus)
+    expect(isaac.stats.atk).toBe(38); // 26 + 12 (all 3 Set, all Venus) (BALANCE: 27→26)
 
     // Activate one Djinn (moves to Standby)
     isaac.activateDjinn('flint');
     // Now only 2 Venus Djinn Set → reduced synergy!
     // 2 Venus (same element) = +8 ATK (from GAME_MECHANICS.md 2.1)
-    expect(isaac.stats.atk).toBe(35); // 27 + 8 (2 Set Venus)
+    expect(isaac.stats.atk).toBe(34); // 26 + 8 (2 Set Venus) (BALANCE: 27→26)
 
     // ← PROVES activating Djinn weakens passive bonuses (tactical trade-off)!
   });
@@ -50,7 +50,7 @@ describe('TASK 2: Stat Calculation System - Core Formula', () => {
 describe('TASK 2: Status Effect Multipliers', () => {
 
   test('✅ Buff multiplies final stats', () => {
-    const isaac = new Unit(ISAAC, 5); // Base ATK 27
+    const isaac = new Unit(ISAAC, 5); // Base ATK 26 (BALANCE: 27→26)
 
     // Apply Blessing buff: ATK ×1.25, DEF ×1.25
     isaac.statusEffects.push({
@@ -60,12 +60,12 @@ describe('TASK 2: Status Effect Multipliers', () => {
       duration: 3,
     });
 
-    // 27 × 1.25 = 33.75 → floor = 33
-    expect(isaac.stats.atk).toBe(33);
+    // 26 × 1.25 = 32.5 → floor = 32 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(32);
   });
 
   test('✅ Debuff reduces stats', () => {
-    const isaac = new Unit(ISAAC, 5); // Base ATK 27
+    const isaac = new Unit(ISAAC, 5); // Base ATK 26 (BALANCE: 27→26)
 
     // Apply debuff: ATK ×0.75
     isaac.statusEffects.push({
@@ -75,12 +75,12 @@ describe('TASK 2: Status Effect Multipliers', () => {
       duration: 2,
     });
 
-    // 27 × 0.75 = 20.25 → floor = 20
-    expect(isaac.stats.atk).toBe(20);
+    // 26 × 0.75 = 19.5 → floor = 19 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(19);
   });
 
   test('✅ Multiple buffs stack multiplicatively', () => {
-    const isaac = new Unit(ISAAC, 5); // Base ATK 27
+    const isaac = new Unit(ISAAC, 5); // Base ATK 26 (BALANCE: 27→26)
 
     // Two buffs: ×1.25 and ×1.2
     isaac.statusEffects.push(
@@ -88,8 +88,8 @@ describe('TASK 2: Status Effect Multipliers', () => {
       { type: 'buff', stat: 'atk', modifier: 1.2, duration: 2 }
     );
 
-    // 27 × 1.25 × 1.2 = 40.5 → floor = 40
-    expect(isaac.stats.atk).toBe(40);
+    // 26 × 1.25 × 1.2 = 39 → floor = 39 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(39);
   });
 
   test('✅ Status effects do NOT affect HP/PP', () => {
@@ -112,17 +112,17 @@ describe('TASK 2: Complete Stat Calculation Formula', () => {
 
   test('🎯 Formula: floor((base + level + equipment + djinn) × effects)', () => {
     const isaac = new Unit(ISAAC, 5);
-    // Base: ATK 15
+    // Base: ATK 14 (BALANCE: 15→14)
     // Level 5: +12 (3 × 4)
-    // Total before modifiers: 27
+    // Total before modifiers: 26 (BALANCE: 27→26)
 
     // Equipment: Sol Blade +30 ATK
     isaac.equipItem('weapon', SOL_BLADE);
-    expect(isaac.stats.atk).toBe(57); // 27 + 30
+    expect(isaac.stats.atk).toBe(56); // 26 + 30 (BALANCE: 27→26)
 
     // Djinn: 3 Venus +12 ATK
     isaac.equipDjinn([FLINT, GRANITE, BANE]);
-    expect(isaac.stats.atk).toBe(69); // 27 + 30 + 12
+    expect(isaac.stats.atk).toBe(68); // 26 + 30 + 12 (BALANCE: 27→26)
 
     // Buff: Blessing ×1.25
     isaac.statusEffects.push({
@@ -132,19 +132,19 @@ describe('TASK 2: Complete Stat Calculation Formula', () => {
       duration: 3,
     });
 
-    // (27 + 30 + 12) × 1.25 = 86.25 → floor = 86
-    expect(isaac.stats.atk).toBe(86);
+    // (26 + 30 + 12) × 1.25 = 85 → floor = 85 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(85);
 
     // ← PROVES complete stat formula works!
   });
 
   test('🎯 Defensive stats follow same formula', () => {
     const garet = new Unit(GARET, 5);
-    // Base DEF: 8, Growth: +1, Level 5: 8 + (1 × 4) = 12
+    // Base DEF: 7 (BALANCE: 8→7), Growth: +1, Level 5: 7 + (1 × 4) = 11
 
     // Equipment: Steel Armor +18 DEF
     garet.equipItem('armor', STEEL_ARMOR);
-    expect(garet.stats.def).toBe(30); // 12 + 18
+    expect(garet.stats.def).toBe(29); // 11 + 18 (BALANCE: 8→7)
 
     // Buff: Guardian's Stance ×1.5
     garet.statusEffects.push({
@@ -154,8 +154,8 @@ describe('TASK 2: Complete Stat Calculation Formula', () => {
       duration: 2,
     });
 
-    // (12 + 18) × 1.5 = 45
-    expect(garet.stats.def).toBe(45);
+    // (11 + 18) × 1.5 = 43.5 → floor = 43 (BALANCE: 8→7)
+    expect(garet.stats.def).toBe(43);
 
     // ← PROVES formula works for DEF!
   });
@@ -187,12 +187,12 @@ describe('CONTEXT-AWARE: Stat Modifiers Create Strategy', () => {
 
   test('🎯 Buffs make weak units competitive', () => {
     const mia = new Unit(MIA, 5);  // Low ATK: 12 + (2 × 4) = 20
-    const garet = new Unit(GARET, 5); // High ATK: 18 + (4 × 4) = 34
+    const garet = new Unit(GARET, 5); // High ATK: 19 + (3 × 4) = 31 (BALANCE: 18→19, growth 4→3)
 
-    // Mia unbuffed is weaker (59% of Garet's ATK)
+    // Mia unbuffed is weaker (65% of Garet's ATK) (BALANCE: Garet 34→31)
     expect(mia.stats.atk).toBe(20);
-    expect(garet.stats.atk).toBe(34);
-    expect(mia.stats.atk / garet.stats.atk).toBeLessThan(0.6);
+    expect(garet.stats.atk).toBe(31);
+    expect(mia.stats.atk / garet.stats.atk).toBeLessThan(0.7);
 
     // Apply double buff to Mia
     mia.statusEffects.push(
@@ -203,26 +203,26 @@ describe('CONTEXT-AWARE: Stat Modifiers Create Strategy', () => {
     // 20 × 1.5 × 1.3 = 39
     expect(mia.stats.atk).toBe(39);
 
-    // Now stronger than unbuffed Garet!
+    // Now stronger than unbuffed Garet! (31)
     expect(mia.stats.atk).toBeGreaterThan(garet.stats.atk);
 
     // ← PROVES buffs enable support units to become DPS!
   });
 
   test('🎯 Equipment progression path: Iron → Steel → Legendary', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Early game: Iron Sword
     isaac.equipItem('weapon', IRON_SWORD);
-    const earlyATK = isaac.stats.atk; // 27 + 12 = 39
+    const earlyATK = isaac.stats.atk; // 26 + 12 = 38 (BALANCE: 27→26)
 
     // Mid game: Steel Sword
     isaac.equipItem('weapon', STEEL_SWORD);
-    const midATK = isaac.stats.atk; // 27 + 20 = 47
+    const midATK = isaac.stats.atk; // 26 + 20 = 46 (BALANCE: 27→26)
 
     // Late game: Sol Blade
     isaac.equipItem('weapon', SOL_BLADE);
-    const lateATK = isaac.stats.atk; // 27 + 30 = 57
+    const lateATK = isaac.stats.atk; // 26 + 30 = 56 (BALANCE: 27→26)
 
     expect(midATK).toBeGreaterThan(earlyATK);
     expect(lateATK).toBeGreaterThan(midATK);
@@ -232,25 +232,25 @@ describe('CONTEXT-AWARE: Stat Modifiers Create Strategy', () => {
   });
 
   test('🎯 Djinn specialization vs hybrid trade-off', () => {
-    const isaac1 = new Unit(ISAAC, 5); // ATK 27
-    const isaac2 = new Unit(ISAAC, 5); // ATK 27
+    const isaac1 = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
+    const isaac2 = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Specialized: All Venus (3× same element)
     isaac1.equipDjinn([FLINT, GRANITE, BANE]);
-    const specializedATK = isaac1.stats.atk; // 27 + 12 = 39
+    const specializedATK = isaac1.stats.atk; // 26 + 12 = 38 (BALANCE: 27→26)
 
     // Hybrid: Mixed elements
     isaac2.equipDjinn([FLINT, FORGE, FIZZ]);
-    const hybridATK = isaac2.stats.atk; // 27 + 4 = 31
+    const hybridATK = isaac2.stats.atk; // 26 + 4 = 30 (BALANCE: 27→26)
 
     // Specialized gives 3× more ATK bonus
-    expect((specializedATK - 27) / (hybridATK - 27)).toBe(3);
+    expect((specializedATK - 26) / (hybridATK - 26)).toBe(3);
 
     // ← PROVES specialization rewards!
   });
 
   test('🎯 Debuffs counter strong enemies', () => {
-    const garet = new Unit(GARET, 5); // ATK 34 (highest DPS)
+    const garet = new Unit(GARET, 5); // ATK 31 (BALANCE: 34→31, base 18→19, growth 4→3)
 
     // Enemy applies debuff
     garet.statusEffects.push({
@@ -260,10 +260,10 @@ describe('CONTEXT-AWARE: Stat Modifiers Create Strategy', () => {
       duration: 3,
     });
 
-    // 34 × 0.5 = 17
-    expect(garet.stats.atk).toBe(17);
+    // 31 × 0.5 = 15.5 → floor = 15 (BALANCE: 34→31)
+    expect(garet.stats.atk).toBe(15);
 
-    // Now weaker than Isaac (27 ATK)!
+    // Now weaker than Isaac (26 ATK)! (BALANCE: 27→26)
     const isaac = new Unit(ISAAC, 5);
     expect(garet.stats.atk).toBeLessThan(isaac.stats.atk);
 
@@ -294,7 +294,7 @@ describe('CONTEXT-AWARE: Stat Modifiers Create Strategy', () => {
 describe('EDGE CASES: Stat Calculation', () => {
 
   test('Floor function rounds down correctly', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Apply buff that creates fractional result
     isaac.statusEffects.push({
@@ -304,19 +304,19 @@ describe('EDGE CASES: Stat Calculation', () => {
       duration: 3,
     });
 
-    // 27 × 1.1 = 29.7 → floor = 29
-    expect(isaac.stats.atk).toBe(29);
-    expect(isaac.stats.atk).not.toBe(30); // Not rounded up!
+    // 26 × 1.1 = 28.6 → floor = 28 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(28);
+    expect(isaac.stats.atk).not.toBe(29); // Not rounded up!
   });
 
   test('Unequipping removes bonuses immediately', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     isaac.equipItem('weapon', SOL_BLADE);
-    expect(isaac.stats.atk).toBe(57); // 27 + 30
+    expect(isaac.stats.atk).toBe(56); // 26 + 30 (BALANCE: 27→26)
 
     isaac.unequipItem('weapon');
-    expect(isaac.stats.atk).toBe(27); // Back to base
+    expect(isaac.stats.atk).toBe(26); // Back to base (BALANCE: 27→26)
 
     // ← PROVES stats recalculate on unequip!
   });
@@ -324,15 +324,15 @@ describe('EDGE CASES: Stat Calculation', () => {
   test('Stats recalculate every time accessed', () => {
     const isaac = new Unit(ISAAC, 5);
 
-    const atk1 = isaac.stats.atk; // 27
+    const atk1 = isaac.stats.atk; // 26 (BALANCE: 27→26)
     isaac.equipItem('weapon', IRON_SWORD);
-    const atk2 = isaac.stats.atk; // 39
+    const atk2 = isaac.stats.atk; // 38 (BALANCE: 27→26)
     isaac.equipDjinn([FLINT, GRANITE, BANE]);
-    const atk3 = isaac.stats.atk; // 51
+    const atk3 = isaac.stats.atk; // 50 (BALANCE: 27→26)
 
-    expect(atk1).toBe(27);
-    expect(atk2).toBe(39);
-    expect(atk3).toBe(51);
+    expect(atk1).toBe(26);
+    expect(atk2).toBe(38);
+    expect(atk3).toBe(50);
 
     // ← PROVES calculateStats() is called each time!
   });
@@ -361,7 +361,7 @@ describe('DATA INTEGRITY: Stat Formulas', () => {
   });
 
   test('Stats never become negative', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     // Apply extreme debuff
     isaac.statusEffects.push({
@@ -371,7 +371,7 @@ describe('DATA INTEGRITY: Stat Formulas', () => {
       duration: 3,
     });
 
-    // 27 × 0.01 = 0.27 → floor = 0
+    // 26 × 0.01 = 0.26 → floor = 0 (BALANCE: 27→26)
     expect(isaac.stats.atk).toBe(0);
     expect(isaac.stats.atk).toBeGreaterThanOrEqual(0);
 

@@ -20,8 +20,11 @@ export interface PlayerData {
   /** Collected Djinn (max 12) */
   djinnCollected: Djinn[];
 
-  /** Inventory items */
+  /** Equipment inventory */
   inventory: Equipment[];
+
+  /** Consumable items inventory (with quantities) */
+  items: Record<string, number>; // itemId -> quantity
 
   /** Gold currency */
   gold: number;
@@ -40,6 +43,7 @@ export function createPlayerData(starterUnit: Unit): PlayerData {
     recruitmentFlags: {},
     djinnCollected: [],
     inventory: [],
+    items: {}, // Start with no consumable items
     gold: 500, // Starting gold from GAME_MECHANICS.md Section 14
     storyFlags: {},
   };
@@ -73,6 +77,7 @@ export function recruitUnit(
       : [...playerData.activePartyIds],
     djinnCollected: [...playerData.djinnCollected],
     inventory: [...playerData.inventory],
+    items: { ...playerData.items },
     recruitmentFlags: recruitmentFlag
       ? { ...playerData.recruitmentFlags, [recruitmentFlag]: true }
       : { ...playerData.recruitmentFlags },

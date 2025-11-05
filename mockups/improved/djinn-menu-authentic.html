@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Djinn Menu - Golden Sun Authentic</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--space-lg);
+      color: var(--color-text-primary);
+    }
+
+    .djinn-container {
+      width: 1200px;
+      max-width: 100%;
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-lg);
+    }
+
+    /* ===== HEADER ===== */
+    .djinn-header {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 2px solid var(--color-border-light);
+    }
+
+    .djinn-title {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .djinn-subtitle {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .djinn-main {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: var(--space-lg);
+      grid-template-areas:
+        "party team-info"
+        "party djinn-grid";
+    }
+
+    /* ===== PARTY PORTRAITS ===== */
+    .party-panel {
+      grid-area: party;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-md);
+    }
+
+    .party-portraits {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .party-portrait {
+      text-align: center;
+      padding: var(--space-sm);
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-radius: 4px;
+    }
+
+    .portrait-sprite {
+      font-size: 40px;
+      margin-bottom: var(--space-xs);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .portrait-name {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: 2px;
+    }
+
+    .portrait-level {
+      font-size: 7px;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== TEAM INFO (Slots + Class) ===== */
+    .team-info {
+      grid-area: team-info;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    .team-slots-panel {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-md);
+    }
+
+    .panel-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+
+    .team-slots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+    }
+
+    .team-slot {
+      width: 64px;
+      height: 64px;
+      border: 3px solid;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+      background: var(--color-bg-dark);
+    }
+
+    .team-slot.venus { border-color: var(--color-venus); box-shadow: var(--glow-venus); }
+    .team-slot.mars { border-color: var(--color-mars); box-shadow: var(--glow-mars); }
+    .team-slot.mercury { border-color: var(--color-mercury); box-shadow: var(--glow-mercury); }
+    .team-slot.empty { border-color: #444; border-style: dashed; background: rgba(0, 0, 0, 0.5); }
+
+    .slot-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      color: var(--color-text-primary);
+      white-space: nowrap;
+    }
+
+    .class-panel {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-dark);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .current-class {
+      font-size: var(--font-size-md);
+      color: var(--color-venus);
+      text-shadow: var(--shadow-text), var(--glow-venus);
+      margin-bottom: var(--space-sm);
+    }
+
+    .class-description {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    /* ===== DJINN GRID (4 Columns) ===== */
+    .djinn-grid {
+      grid-area: djinn-grid;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+    }
+
+    .element-column {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid;
+      padding: var(--space-md);
+      border-radius: 4px;
+    }
+
+    .element-column.venus { border-color: var(--color-venus); }
+    .element-column.mars { border-color: var(--color-mars); }
+    .element-column.mercury { border-color: var(--color-mercury); }
+    .element-column.jupiter { border-color: var(--color-jupiter); }
+
+    .element-header {
+      text-align: center;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 2px solid;
+    }
+
+    .element-header.venus { border-bottom-color: var(--color-venus); }
+    .element-header.mars { border-bottom-color: var(--color-mars); }
+    .element-header.mercury { border-bottom-color: var(--color-mercury); }
+    .element-header.jupiter { border-bottom-color: var(--color-jupiter); }
+
+    .element-icon {
+      font-size: 32px;
+      margin-bottom: var(--space-xs);
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    .element-name {
+      font-size: var(--font-size-sm);
+      text-shadow: var(--shadow-text);
+    }
+
+    .element-name.venus { color: var(--color-venus); }
+    .element-name.mars { color: var(--color-mars); }
+    .element-name.mercury { color: var(--color-mercury); }
+    .element-name.jupiter { color: var(--color-jupiter); }
+
+    .djinn-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .djinn-card {
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      padding: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      position: relative;
+    }
+
+    .djinn-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .djinn-card.set {
+      border-color: var(--color-border-highlight);
+      box-shadow: var(--glow-focus);
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+
+    .djinn-card.standby {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% {
+        box-shadow: 0 0 4px rgba(255, 215, 127, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 12px rgba(255, 215, 127, 1);
+      }
+    }
+
+    .djinn-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-xs);
+    }
+
+    .djinn-name {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .djinn-status {
+      font-size: 6px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
+    .djinn-status.set {
+      background: var(--color-hp-green);
+      color: #000;
+    }
+
+    .djinn-status.standby {
+      background: #666;
+      color: #CCC;
+    }
+
+    .djinn-stats {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+    }
+
+    .djinn-bonus {
+      color: var(--color-hp-green);
+    }
+
+    /* ===== PSYNERGY PANEL ===== */
+    .psynergy-panel {
+      margin-top: var(--space-lg);
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: var(--space-md);
+    }
+
+    .psynergy-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+
+    .psynergy-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .psynergy-item {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      padding: var(--space-xs);
+      background: var(--color-bg-dark);
+      border: 1px solid var(--color-border-light);
+      text-align: center;
+    }
+
+    .psynergy-item.venus { border-left: 3px solid var(--color-venus); }
+    .psynergy-item.mars { border-left: 3px solid var(--color-mars); }
+    .psynergy-item.mercury { border-left: 3px solid var(--color-mercury); }
+    .psynergy-item.jupiter { border-left: 3px solid var(--color-jupiter); }
+
+    /* ===== FOOTER ===== */
+    .djinn-footer {
+      margin-top: var(--space-lg);
+      text-align: center;
+    }
+
+    .back-button {
+      padding: var(--space-sm) var(--space-xl);
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-gold);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+    }
+
+    .back-button:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+
+    .back-button:focus {
+      outline: 3px solid var(--color-border-highlight);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="djinn-container">
+    <!-- Header -->
+    <div class="djinn-header">
+      <h1 class="djinn-title">DJINN MANAGEMENT</h1>
+      <p class="djinn-subtitle">Set Djinn to unlock classes and Psynergy abilities</p>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="djinn-main">
+      <!-- Party Portraits -->
+      <div class="party-panel">
+        <div class="party-portraits">
+          <div class="party-portrait">
+            <div class="portrait-sprite">🧍</div>
+            <div class="portrait-name">Isaac</div>
+            <div class="portrait-level">Lv 3</div>
+          </div>
+          <div class="party-portrait">
+            <div class="portrait-sprite">🧍‍♂️</div>
+            <div class="portrait-name">Garet</div>
+            <div class="portrait-level">Lv 3</div>
+          </div>
+          <div class="party-portrait">
+            <div class="portrait-sprite">🧙</div>
+            <div class="portrait-name">Ivan</div>
+            <div class="portrait-level">Lv 2</div>
+          </div>
+          <div class="party-portrait">
+            <div class="portrait-sprite">🧙‍♀️</div>
+            <div class="portrait-name">Mia</div>
+            <div class="portrait-level">Lv 2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Info (Slots + Class) -->
+      <div class="team-info">
+        <!-- Team Slots -->
+        <div class="team-slots-panel">
+          <h3 class="panel-title">TEAM DJINN (3/3)</h3>
+          <div class="team-slots">
+            <div class="team-slot venus">
+              🟠
+              <span class="slot-label">Flint</span>
+            </div>
+            <div class="team-slot mars">
+              🔴
+              <span class="slot-label">Forge</span>
+            </div>
+            <div class="team-slot mercury">
+              🔵
+              <span class="slot-label">Fizz</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Display -->
+        <div class="class-panel">
+          <h3 class="panel-title">CURRENT CLASS</h3>
+          <div class="current-class">Venus Adept</div>
+          <p class="class-description">
+            All same element boost: +15 ATK, +10 DEF<br>
+            Elemental mastery unlocked
+          </p>
+        </div>
+      </div>
+
+      <!-- Djinn Grid (4 Columns) -->
+      <div class="djinn-grid">
+        <!-- Venus Column -->
+        <div class="element-column venus">
+          <div class="element-header venus">
+            <div class="element-icon">🟠</div>
+            <div class="element-name venus">VENUS</div>
+          </div>
+          <div class="djinn-list">
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Flint</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 1<br>
+                <span class="djinn-bonus">+10 HP, +5 ATK</span>
+              </div>
+            </div>
+
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Granite</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 2<br>
+                <span class="djinn-bonus">+15 HP, +8 DEF</span>
+              </div>
+            </div>
+
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Quartz</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 3<br>
+                <span class="djinn-bonus">+20 HP, +10 ATK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mars Column -->
+        <div class="element-column mars">
+          <div class="element-header mars">
+            <div class="element-icon">🔴</div>
+            <div class="element-name mars">MARS</div>
+          </div>
+          <div class="djinn-list">
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Forge</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 1<br>
+                <span class="djinn-bonus">+8 ATK, +5 SPD</span>
+              </div>
+            </div>
+
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Fever</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 2<br>
+                <span class="djinn-bonus">+12 ATK, +6 SPD</span>
+              </div>
+            </div>
+
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Corona</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 3<br>
+                <span class="djinn-bonus">+15 ATK, +8 SPD</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mercury Column -->
+        <div class="element-column mercury">
+          <div class="element-header mercury">
+            <div class="element-icon">🔵</div>
+            <div class="element-name mercury">MERCURY</div>
+          </div>
+          <div class="djinn-list">
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Fizz</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 1<br>
+                <span class="djinn-bonus">+5 DEF, +10 HP</span>
+              </div>
+            </div>
+
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Sleet</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 2<br>
+                <span class="djinn-bonus">+8 DEF, +15 HP</span>
+              </div>
+            </div>
+
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Mist</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 3<br>
+                <span class="djinn-bonus">+12 DEF, +20 HP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jupiter Column -->
+        <div class="element-column jupiter">
+          <div class="element-header jupiter">
+            <div class="element-icon">🟣</div>
+            <div class="element-name jupiter">JUPITER</div>
+          </div>
+          <div class="djinn-list">
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Gust</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 1<br>
+                <span class="djinn-bonus">+7 SPD, +5 ATK</span>
+              </div>
+            </div>
+
+            <div class="djinn-card set">
+              <div class="djinn-top">
+                <span class="djinn-name">Breeze</span>
+                <span class="djinn-status set">SET</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 2<br>
+                <span class="djinn-bonus">+10 SPD, +8 ATK</span>
+              </div>
+            </div>
+
+            <div class="djinn-card standby">
+              <div class="djinn-top">
+                <span class="djinn-name">Squall</span>
+                <span class="djinn-status standby">STANDBY</span>
+              </div>
+              <div class="djinn-stats">
+                Tier 3<br>
+                <span class="djinn-bonus">+12 SPD, +10 ATK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unlocked Psynergy -->
+    <div class="psynergy-panel">
+      <h3 class="psynergy-title">UNLOCKED PSYNERGY ABILITIES</h3>
+      <div class="psynergy-list">
+        <div class="psynergy-item venus">Ragnarok</div>
+        <div class="psynergy-item venus">Earthquake</div>
+        <div class="psynergy-item mars">Volcano</div>
+        <div class="psynergy-item mars">Fire Blast</div>
+        <div class="psynergy-item mercury">Cure Wave</div>
+        <div class="psynergy-item mercury">Ice Horn</div>
+        <div class="psynergy-item jupiter">Thunder Mine</div>
+        <div class="psynergy-item jupiter">Ray</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="djinn-footer">
+      <button class="back-button">← BACK TO MENU</button>
+    </div>
+  </div>
+</body>
+</html>

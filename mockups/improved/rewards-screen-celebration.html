@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewards Screen - Victory Celebration</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--space-lg);
+      color: var(--color-text-primary);
+      overflow: hidden;
+    }
+
+    .rewards-container {
+      width: 800px;
+      max-width: 100%;
+      position: relative;
+    }
+
+    /* ===== VICTORY BANNER ===== */
+    .victory-banner {
+      text-align: center;
+      margin-bottom: var(--space-xxl);
+      position: relative;
+      z-index: var(--z-overlay);
+    }
+
+    .victory-title {
+      font-size: 48px;
+      color: var(--color-text-gold);
+      text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+      animation: victory-pulse 1s ease-in-out infinite, victory-appear 0.5s ease-out;
+      letter-spacing: 4px;
+      position: relative;
+    }
+
+    @keyframes victory-appear {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes victory-pulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(255, 215, 127, 0.8));
+      }
+      50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 16px rgba(255, 215, 127, 1));
+      }
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+      font-size: 32px;
+    }
+
+    .star {
+      animation: twinkle 0.8s ease-in-out infinite;
+    }
+
+    .star:nth-child(1) { animation-delay: 0s; }
+    .star:nth-child(2) { animation-delay: 0.2s; }
+    .star:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes twinkle {
+      0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 0.7;
+      }
+    }
+
+    /* ===== REWARD PANELS ===== */
+    .reward-panel {
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      box-shadow: var(--shadow-panel);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      animation: slide-in 0.5s ease-out;
+    }
+
+    @keyframes slide-in {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .panel-title {
+      font-size: var(--font-size-md);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+
+    .reward-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+    }
+
+    .reward-item {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-light);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .reward-icon {
+      font-size: 40px;
+      margin-bottom: var(--space-sm);
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    .reward-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .reward-value {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      font-weight: bold;
+    }
+
+    .value-counter {
+      display: inline-block;
+      animation: count-up 1s ease-out;
+    }
+
+    @keyframes count-up {
+      from {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* ===== ITEMS FOUND ===== */
+    .items-panel {
+      animation-delay: 0.2s;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .item-row {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid var(--color-border-light);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .item-icon {
+      font-size: 32px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+    }
+
+    .item-type {
+      font-size: 7px;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== LEVEL UP PANEL ===== */
+    .levelup-panel {
+      animation-delay: 0.4s;
+      background: linear-gradient(135deg, rgba(26, 53, 96, 0.9) 0%, rgba(12, 16, 40, 0.9) 100%);
+      border-color: var(--color-text-gold);
+      box-shadow: var(--shadow-panel), 0 0 20px rgba(255, 215, 127, 0.5);
+    }
+
+    .levelup-title {
+      font-size: var(--font-size-xl);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text), 0 0 12px rgba(255, 215, 127, 1);
+      margin-bottom: var(--space-lg);
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+
+    .levelup-character {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 2px solid var(--color-border-light);
+    }
+
+    .char-sprite {
+      font-size: 64px;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+      animation: bounce 0.6s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      25% { transform: translateY(-20px); }
+      50% { transform: translateY(-10px); }
+      75% { transform: translateY(-5px); }
+    }
+
+    .char-details {
+      flex: 1;
+    }
+
+    .char-name-large {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .level-change {
+      font-size: var(--font-size-md);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+    }
+
+    .level-arrow {
+      color: var(--color-hp-green);
+      margin: 0 var(--space-sm);
+    }
+
+    .stat-gains {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .stat-gain {
+      background: rgba(0, 0, 0, 0.4);
+      padding: var(--space-sm);
+      text-align: center;
+      border: 1px solid var(--color-border-light);
+    }
+
+    .stat-gain-label {
+      font-size: 7px;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+
+    .stat-gain-value {
+      font-size: var(--font-size-sm);
+      color: var(--color-hp-green);
+      text-shadow: var(--shadow-text);
+    }
+
+    .new-ability {
+      background: rgba(255, 215, 127, 0.2);
+      border: 2px solid var(--color-text-gold);
+      padding: var(--space-md);
+      text-align: center;
+      animation: glow-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 215, 127, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255, 215, 127, 1);
+      }
+    }
+
+    .new-badge-large {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .ability-name-large {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text), 0 0 8px rgba(255, 215, 127, 0.8);
+    }
+
+    /* ===== CONTINUE BUTTON ===== */
+    .continue-button {
+      margin-top: var(--space-xl);
+      text-align: center;
+    }
+
+    .btn-continue {
+      padding: var(--space-md) var(--space-xxl);
+      background: var(--color-bg-dark);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-gold);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: var(--font-size-md);
+      cursor: pointer;
+      transition: all var(--timing-fast);
+      text-shadow: var(--shadow-text);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .btn-continue:hover {
+      background: var(--color-border-light);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 215, 127, 1);
+    }
+
+    /* ===== SPARKLE PARTICLES ===== */
+    .sparkles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, var(--color-text-gold), transparent);
+      border-radius: 50%;
+      animation: rise 3s linear infinite;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-100vh) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    /* Generate sparkles */
+    .sparkle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .sparkle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+    .sparkle:nth-child(3) { left: 30%; animation-delay: 1s; }
+    .sparkle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+    .sparkle:nth-child(5) { left: 50%; animation-delay: 2s; }
+    .sparkle:nth-child(6) { left: 60%; animation-delay: 2.5s; }
+    .sparkle:nth-child(7) { left: 70%; animation-delay: 0.3s; }
+    .sparkle:nth-child(8) { left: 80%; animation-delay: 0.8s; }
+    .sparkle:nth-child(9) { left: 90%; animation-delay: 1.3s; }
+    .sparkle:nth-child(10) { left: 95%; animation-delay: 1.8s; }
+  </style>
+</head>
+<body>
+  <!-- Sparkle particles background -->
+  <div class="sparkles">
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+  </div>
+
+  <div class="rewards-container">
+    <!-- Victory Banner -->
+    <div class="victory-banner">
+      <h1 class="victory-title">VICTORY!</h1>
+      <div class="stars">
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+      </div>
+    </div>
+
+    <!-- XP and Gold Rewards -->
+    <div class="reward-panel">
+      <h2 class="panel-title">REWARDS GAINED</h2>
+      <div class="reward-grid">
+        <div class="reward-item">
+          <div class="reward-icon">⭐</div>
+          <div class="reward-label">EXPERIENCE</div>
+          <div class="reward-value"><span class="value-counter">+250 XP</span></div>
+        </div>
+        <div class="reward-item">
+          <div class="reward-icon">💰</div>
+          <div class="reward-label">GOLD</div>
+          <div class="reward-value"><span class="value-counter">+120 G</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Found -->
+    <div class="reward-panel items-panel">
+      <h2 class="panel-title">ITEMS FOUND</h2>
+      <div class="item-list">
+        <div class="item-row">
+          <div class="item-icon">⚔️</div>
+          <div class="item-info">
+            <div class="item-name">Broad Sword</div>
+            <div class="item-type">Weapon • +18 ATK</div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-icon">🧪</div>
+          <div class="item-info">
+            <div class="item-name">Potion x2</div>
+            <div class="item-type">Consumable • Restores 50 HP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level Up Panel -->
+    <div class="reward-panel levelup-panel">
+      <h2 class="levelup-title">📈 LEVEL UP!</h2>
+
+      <div class="levelup-character">
+        <div class="char-sprite">🧍</div>
+        <div class="char-details">
+          <div class="char-name-large">Isaac</div>
+          <div class="level-change">
+            Level 2 <span class="level-arrow">→</span> Level 3
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-gains">
+        <div class="stat-gain">
+          <div class="stat-gain-label">HP</div>
+          <div class="stat-gain-value">+15</div>
+        </div>
+        <div class="stat-gain">
+          <div class="stat-gain-label">ATK</div>
+          <div class="stat-gain-value">+3</div>
+        </div>
+        <div class="stat-gain">
+          <div class="stat-gain-label">DEF</div>
+          <div class="stat-gain-value">+2</div>
+        </div>
+        <div class="stat-gain">
+          <div class="stat-gain-label">SPD</div>
+          <div class="stat-gain-value">+1</div>
+        </div>
+      </div>
+
+      <div class="new-ability">
+        <div class="new-badge-large">🆕 NEW ABILITY UNLOCKED</div>
+        <div class="ability-name-large">Ragnarok</div>
+      </div>
+    </div>
+
+    <!-- Continue Button -->
+    <div class="continue-button">
+      <button class="btn-continue">CONTINUE</button>
+    </div>
+  </div>
+</body>
+</html>

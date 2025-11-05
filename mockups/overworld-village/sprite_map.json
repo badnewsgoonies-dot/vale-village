@@ -1,0 +1,55 @@
+{
+  "screen": "overworld-village-gathering",
+  "background": "linear-gradient(135deg, #88C070, #48A038)",
+  "scenery": [
+    {
+      "type": "tree",
+      "sprite": "./assets/Tree1.gif",
+      "position": "left"
+    },
+    {
+      "type": "tree",
+      "sprite": "./assets/Tree2.gif",
+      "position": "right"
+    },
+    {
+      "type": "gate",
+      "sprite": "./assets/Vale_Gate.gif",
+      "position": "bottom-center"
+    }
+  ],
+  "characters": [
+    {"name": "Isaac", "sprite": "./assets/Isaac.gif", "type": "protagonist"},
+    {"name": "Garet", "sprite": "./assets/Garet.gif", "type": "protagonist"},
+    {"name": "Ivan", "sprite": "./assets/Ivan.gif", "type": "protagonist"},
+    {"name": "Mia", "sprite": "./assets/Mia.gif", "type": "protagonist"},
+    {"name": "Felix", "sprite": "./assets/Felix.gif", "type": "protagonist"},
+    {"name": "Jenna", "sprite": "./assets/Jenna.gif", "type": "protagonist"},
+    {"name": "Sheba", "sprite": "./assets/Sheba.gif", "type": "protagonist"},
+    {"name": "Piers", "sprite": "./assets/Piers.gif", "type": "protagonist"},
+    {"name": "Alex", "sprite": "./assets/Alex.gif", "type": "antagonist"},
+    {"name": "Saturos", "sprite": "./assets/Saturos.gif", "type": "antagonist"},
+    {"name": "Elder", "sprite": "./assets/Elder.gif", "type": "major_npc"},
+    {"name": "Kraden", "sprite": "./assets/Kraden.gif", "type": "major_npc"},
+    {"name": "Dora", "sprite": "./assets/Dora.gif", "type": "major_npc"},
+    {"name": "Kyle", "sprite": "./assets/Kyle.gif", "type": "major_npc"},
+    {"name": "Great Healer", "sprite": "./assets/Great_Healer.gif", "type": "major_npc"},
+    {"name": "Aaron", "sprite": "./assets/Aaron_Jerra.gif", "type": "major_npc"},
+    {"name": "Kay", "sprite": "./assets/Kay_Jerra.gif", "type": "major_npc"},
+    {"name": "Innkeeper", "sprite": "./assets/Innkeeper.gif", "type": "major_npc"},
+    {"name": "Armorshop Owner", "sprite": "./assets/Armorshop_Owner.gif", "type": "major_npc"},
+    {"name": "Scholar 1", "sprite": "./assets/Scholar-1.gif", "type": "minor_npc"},
+    {"name": "Scholar 2", "sprite": "./assets/Scholar-2.gif", "type": "minor_npc"},
+    {"name": "Villager 1", "sprite": "./assets/Villager1.gif", "type": "minor_npc"},
+    {"name": "Villager 2", "sprite": "./assets/Villager2.gif", "type": "minor_npc"},
+    {"name": "Villager 3", "sprite": "./assets/Villager3.gif", "type": "minor_npc"}
+  ],
+  "stats": {
+    "total_sprites": 27,
+    "protagonists": 8,
+    "antagonists": 2,
+    "major_npcs": 9,
+    "minor_npcs": 5,
+    "scenery": 3
+  }
+}

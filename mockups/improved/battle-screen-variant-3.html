@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Vertical Split</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      display: flex;
+    }
+
+    /* Left: Enemy Side */
+    .enemy-side {
+      width: 50%;
+      position: relative;
+      background: url('/sprites/backgrounds/gs1/Mountain.gif') center/cover;
+      border-right: 3px solid #d4af37;
+    }
+
+    .enemy-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(224,80,80,0.9) 0%, rgba(224,80,80,0) 100%);
+      padding: 12px;
+      text-align: center;
+      border-bottom: 2px solid #e05050;
+    }
+
+    .enemy-title {
+      font-size: 10px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      letter-spacing: 2px;
+    }
+
+    .enemy-battle-area {
+      position: absolute;
+      top: 80px;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .enemy-unit {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .enemy-sprite {
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 120px;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .enemy-info-box {
+      margin-top: 12px;
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #e05050;
+      border-radius: 6px;
+      padding: 8px 12px;
+      min-width: 180px;
+    }
+
+    .enemy-name {
+      font-size: 9px;
+      color: #e05050;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .enemy-hp-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .enemy-hp-label {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .enemy-hp-bar {
+      flex: 1;
+      height: 10px;
+      background: #2a1810;
+      border: 1px solid #e05050;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .enemy-hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+      transition: width 0.3s ease;
+    }
+
+    .enemy-weakness-icons {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .element-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #666;
+    }
+
+    .element-venus { background: radial-gradient(circle, #e8a050 0%, #b87020 100%); }
+    .element-mars { background: radial-gradient(circle, #e05050 0%, #a03030 100%); }
+    .element-mercury { background: radial-gradient(circle, #5090d8 0%, #2060a8 100%); }
+    .element-jupiter { background: radial-gradient(circle, #a858d8 0%, #7030a0 100%); }
+
+    .enemy-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      padding: 8px;
+      border-top: 2px solid #e05050;
+    }
+
+    .combat-log {
+      font-size: 7px;
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    .log-entry {
+      margin-bottom: 3px;
+      color: #999;
+    }
+
+    .log-entry:last-child {
+      color: #fff;
+    }
+
+    /* Right: Party Side */
+    .party-side {
+      width: 50%;
+      position: relative;
+      background: linear-gradient(180deg, #1a1a3a 0%, #0a0a1a 100%);
+    }
+
+    .party-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(80,144,216,0.9) 0%, rgba(80,144,216,0) 100%);
+      padding: 12px;
+      text-align: center;
+      border-bottom: 2px solid #5090d8;
+    }
+
+    .party-title {
+      font-size: 10px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      letter-spacing: 2px;
+    }
+
+    .party-battle-area {
+      position: absolute;
+      top: 80px;
+      bottom: 180px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .party-unit {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(20,20,40,0.6);
+      border: 2px solid #5090d8;
+      border-radius: 8px;
+      padding: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .party-unit.active {
+      border-color: #d4af37;
+      background: rgba(40,40,60,0.8);
+      box-shadow: 0 0 12px rgba(212,175,55,0.4);
+    }
+
+    .party-portrait {
+      width: 56px;
+      height: 56px;
+      border: 3px solid #5090d8;
+      border-radius: 6px;
+      background-size: cover;
+      flex-shrink: 0;
+    }
+
+    .party-unit.active .party-portrait {
+      border-color: #d4af37;
+    }
+
+    .party-details {
+      flex: 1;
+    }
+
+    .party-unit-name {
+      font-size: 9px;
+      color: #5090d8;
+      margin-bottom: 4px;
+    }
+
+    .party-unit.active .party-unit-name {
+      color: #d4af37;
+    }
+
+    .party-stats-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .stat-chip {
+      font-size: 6px;
+      color: #888;
+      background: rgba(0,0,0,0.4);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid #444;
+    }
+
+    .stat-chip .value {
+      color: #fff;
+      margin-left: 2px;
+    }
+
+    .party-hp-pp {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bar-label {
+      font-size: 6px;
+      color: #888;
+      width: 16px;
+    }
+
+    .stat-bar {
+      flex: 1;
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid #666;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #50d850 0%, #20a020 100%);
+    }
+
+    .pp-fill {
+      height: 100%;
+      background: linear-gradient(180deg, #5090d8 0%, #2060a8 100%);
+    }
+
+    .bar-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .party-sprite-preview {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .party-sprite-preview img {
+      width: auto;
+      height: 50px;
+      filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+    }
+
+    /* Command Area */
+    .command-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 160px;
+      background: rgba(0,0,0,0.9);
+      border-top: 3px solid #d4af37;
+      padding: 16px;
+    }
+
+    .command-title {
+      font-size: 8px;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .command-btn {
+      background: linear-gradient(180deg, #3a3a5a 0%, #1a1a3a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 14px;
+      text-align: center;
+      position: relative;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+    }
+
+    .command-btn:hover {
+      background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212,175,55,0.3);
+    }
+
+    .command-icon {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* Turn Counter */
+    .turn-counter {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      border: 3px solid #d4af37;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      box-shadow: 0 0 20px rgba(212,175,55,0.5);
+    }
+
+    .turn-label {
+      font-size: 6px;
+      color: #d4af37;
+    }
+
+    .turn-number {
+      font-size: 18px;
+      color: #fff;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Left: Enemy Side -->
+    <div class="enemy-side">
+      <div class="enemy-header">
+        <div class="enemy-title">⚔️ FOES ⚔️</div>
+      </div>
+
+      <div class="enemy-battle-area">
+        <div class="enemy-unit">
+          <div class="enemy-sprite">
+            <img src="/sprites/battle/enemies/Thunder_Lizard.gif" alt="Thunder Lizard">
+          </div>
+          <div class="enemy-info-box">
+            <div class="enemy-name">THUNDER LIZARD</div>
+            <div class="enemy-hp-container">
+              <span class="enemy-hp-label">HP</span>
+              <div class="enemy-hp-bar">
+                <div class="enemy-hp-fill" style="width: 78%;"></div>
+              </div>
+            </div>
+            <div class="enemy-weakness-icons">
+              <div class="element-icon element-venus"></div>
+              <div class="element-icon element-mercury"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="enemy-unit">
+          <div class="enemy-sprite" style="animation-delay: -1.5s;">
+            <img src="/sprites/battle/enemies/Goblin.gif" alt="Goblin">
+          </div>
+          <div class="enemy-info-box">
+            <div class="enemy-name">GOBLIN</div>
+            <div class="enemy-hp-container">
+              <span class="enemy-hp-label">HP</span>
+              <div class="enemy-hp-bar">
+                <div class="enemy-hp-fill" style="width: 45%;"></div>
+              </div>
+            </div>
+            <div class="enemy-weakness-icons">
+              <div class="element-icon element-mars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enemy-footer">
+        <div class="combat-log">
+          <div class="log-entry">Goblin lunged forward!</div>
+          <div class="log-entry">Isaac took 23 damage!</div>
+          <div class="log-entry">Isaac's turn...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Party Side -->
+    <div class="party-side">
+      <div class="party-header">
+        <div class="party-title">⚔️ HEROES ⚔️</div>
+      </div>
+
+      <div class="party-battle-area">
+        <div class="party-unit active">
+          <div class="party-portrait" style="background: url('/sprites/portraits/Isaac_Portrait.gif') center/cover;"></div>
+          <div class="party-details">
+            <div class="party-unit-name">ISAAC</div>
+            <div class="party-stats-row">
+              <div class="stat-chip">LV <span class="value">12</span></div>
+              <div class="stat-chip">ATK <span class="value">124</span></div>
+              <div class="stat-chip">DEF <span class="value">98</span></div>
+            </div>
+            <div class="party-hp-pp">
+              <div class="bar-row">
+                <div class="bar-label">HP</div>
+                <div class="stat-bar">
+                  <div class="hp-fill" style="width: 82%;"></div>
+                  <div class="bar-text">197/240</div>
+                </div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">PP</div>
+                <div class="stat-bar">
+                  <div class="pp-fill" style="width: 58%;"></div>
+                  <div class="bar-text">35/60</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="party-sprite-preview">
+            <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+          </div>
+        </div>
+
+        <div class="party-unit">
+          <div class="party-portrait" style="background: url('/sprites/portraits/Garet_Portrait.gif') center/cover;"></div>
+          <div class="party-details">
+            <div class="party-unit-name">GARET</div>
+            <div class="party-stats-row">
+              <div class="stat-chip">LV <span class="value">11</span></div>
+              <div class="stat-chip">ATK <span class="value">118</span></div>
+              <div class="stat-chip">DEF <span class="value">105</span></div>
+            </div>
+            <div class="party-hp-pp">
+              <div class="bar-row">
+                <div class="bar-label">HP</div>
+                <div class="stat-bar">
+                  <div class="hp-fill" style="width: 70%;"></div>
+                  <div class="bar-text">175/250</div>
+                </div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">PP</div>
+                <div class="stat-bar">
+                  <div class="pp-fill" style="width: 40%;"></div>
+                  <div class="bar-text">20/50</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="party-sprite-preview">
+            <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+          </div>
+        </div>
+
+        <div class="party-unit">
+          <div class="party-portrait" style="background: url('/sprites/portraits/Ivan_Portrait.gif') center/cover;"></div>
+          <div class="party-details">
+            <div class="party-unit-name">IVAN</div>
+            <div class="party-stats-row">
+              <div class="stat-chip">LV <span class="value">12</span></div>
+              <div class="stat-chip">ATK <span class="value">95</span></div>
+              <div class="stat-chip">DEF <span class="value">82</span></div>
+            </div>
+            <div class="party-hp-pp">
+              <div class="bar-row">
+                <div class="bar-label">HP</div>
+                <div class="stat-bar">
+                  <div class="hp-fill" style="width: 94%;"></div>
+                  <div class="bar-text">188/200</div>
+                </div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">PP</div>
+                <div class="stat-bar">
+                  <div class="pp-fill" style="width: 75%;"></div>
+                  <div class="bar-text">60/80</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="party-sprite-preview">
+            <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+          </div>
+        </div>
+
+        <div class="party-unit">
+          <div class="party-portrait" style="background: url('/sprites/portraits/Mia_Portrait.gif') center/cover;"></div>
+          <div class="party-details">
+            <div class="party-unit-name">MIA</div>
+            <div class="party-stats-row">
+              <div class="stat-chip">LV <span class="value">11</span></div>
+              <div class="stat-chip">ATK <span class="value">88</span></div>
+              <div class="stat-chip">DEF <span class="value">90</span></div>
+            </div>
+            <div class="party-hp-pp">
+              <div class="bar-row">
+                <div class="bar-label">HP</div>
+                <div class="stat-bar">
+                  <div class="hp-fill" style="width: 88%;"></div>
+                  <div class="bar-text">176/200</div>
+                </div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">PP</div>
+                <div class="stat-bar">
+                  <div class="pp-fill" style="width: 54%;"></div>
+                  <div class="bar-text">49/90</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="party-sprite-preview">
+            <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+          </div>
+        </div>
+      </div>
+
+      <!-- Command Area -->
+      <div class="command-area">
+        <div class="command-title">ISAAC'S TURN</div>
+        <div class="command-grid">
+          <button class="command-btn">
+            <div class="command-icon">⚔️</div>
+            <div>ATTACK</div>
+          </button>
+          <button class="command-btn">
+            <div class="command-icon">✨</div>
+            <div>PSYNERGY</div>
+          </button>
+          <button class="command-btn">
+            <div class="command-icon">🔮</div>
+            <div>DJINN</div>
+          </button>
+          <button class="command-btn">
+            <div class="command-icon">🛡️</div>
+            <div>DEFEND</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turn Counter (Center) -->
+    <div class="turn-counter">
+      <div class="turn-label">TURN</div>
+      <div class="turn-number">4</div>
+    </div>
+  </div>
+</body>
+</html>

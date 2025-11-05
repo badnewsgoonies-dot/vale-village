@@ -1,0 +1,192 @@
+{
+  "screen": "rewards-screen",
+  "description": "Sprite map for Rewards Screen - post-battle celebration with XP, gold, items, recruitment, and level ups",
+  "lastUpdated": "2025-11-03",
+  "spriteRoot": "../Sprites!",
+  "sprites": {
+    "items": [
+      {
+        "id": "broad-sword",
+        "name": "Broad Sword",
+        "type": "weapon",
+        "path": "Sprites!/icons/items/long-swords/Broad_Sword.gif",
+        "localPath": "../Sprites!/icons/items/long-swords/Broad_Sword.gif",
+        "size": "24x24",
+        "usage": "Reward drop example"
+      },
+      {
+        "id": "healing-herb",
+        "name": "Herb",
+        "type": "consumable",
+        "path": "Sprites!/icons/items/single-use/healing/",
+        "localPath": "../Sprites!/icons/items/single-use/healing/",
+        "size": "24x24",
+        "usage": "Common healing item drop",
+        "note": "Browse healing folder for herb sprite"
+      },
+      {
+        "id": "crystal-shard",
+        "name": "Crystal Shard",
+        "type": "material",
+        "path": "Sprites!/icons/items/forgeable/",
+        "localPath": "../Sprites!/icons/items/forgeable/",
+        "size": "24x24",
+        "usage": "Rare material drop"
+      }
+    ],
+    "currency": {
+      "id": "coins",
+      "name": "Gold Coins",
+      "path": "Sprites!/icons/buttons/Coins.gif",
+      "localPath": "../Sprites!/icons/buttons/Coins.gif",
+      "size": "32x32",
+      "usage": "Money display icon"
+    },
+    "recruitment": [
+      {
+        "id": "mia-portrait",
+        "name": "Mia",
+        "element": "mercury",
+        "path": "Sprites!/icons/characters/Mia.gif",
+        "localPath": "../Sprites!/icons/characters/Mia.gif",
+        "size": "64x64",
+        "usage": "New recruit announcement (example)",
+        "context": "After friendly spar at Healing House"
+      },
+      {
+        "id": "felix-portrait",
+        "name": "Felix",
+        "element": "venus",
+        "path": "Sprites!/icons/characters/Felix1.gif",
+        "localPath": "../Sprites!/icons/characters/Felix1.gif",
+        "size": "64x64",
+        "usage": "Honor duel recruitment"
+      }
+    ],
+    "levelUp": [
+      {
+        "id": "isaac-portrait",
+        "name": "Isaac",
+        "path": "Sprites!/icons/characters/Isaac1.gif",
+        "localPath": "../Sprites!/icons/characters/Isaac1.gif",
+        "size": "48x48",
+        "usage": "Level up display"
+      },
+      {
+        "id": "garet-portrait",
+        "name": "Garet",
+        "path": "Sprites!/icons/characters/Garet1.gif",
+        "localPath": "../Sprites!/icons/characters/Garet1.gif",
+        "size": "48x48",
+        "usage": "Level up display"
+      },
+      {
+        "id": "ivan-portrait",
+        "name": "Ivan",
+        "path": "Sprites!/icons/characters/Ivan.gif",
+        "localPath": "../Sprites!/icons/characters/Ivan.gif",
+        "size": "48x48",
+        "usage": "Level up display"
+      }
+    ],
+    "ui": {
+      "emotions": [
+        {
+          "id": "happy",
+          "name": "Happy",
+          "path": "Sprites!/icons/misc/Happy.gif",
+          "localPath": "../Sprites!/icons/misc/Happy.gif",
+          "size": "16x16",
+          "usage": "Celebration emotion"
+        },
+        {
+          "id": "joy",
+          "name": "Joy",
+          "path": "Sprites!/icons/misc/joy.gif",
+          "localPath": "../Sprites!/icons/misc/joy.gif",
+          "size": "16x16",
+          "usage": "Victory emotion"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "continue-button",
+          "name": "Continue",
+          "path": "Sprites!/icons/buttons/Continue.gif",
+          "localPath": "../Sprites!/icons/buttons/Continue.gif",
+          "size": "32x32",
+          "usage": "Proceed to next screen"
+        }
+      ]
+    }
+  },
+  "animations": {
+    "victoryBanner": {
+      "animation": "victoryPulse",
+      "duration": "2s",
+      "loop": "infinite",
+      "description": "Pulsing glow on victory banner"
+    },
+    "sparkles": {
+      "count": 4,
+      "positions": ["top-left", "top-right", "bottom-left", "bottom-right"],
+      "animation": "float",
+      "duration": "1.5-2s",
+      "description": "Floating sparkles for recruitment panel"
+    },
+    "staggeredEntrance": {
+      "xpCard": "0.1s delay",
+      "moneyCard": "0.2s delay",
+      "itemsPanel": "0.3s delay",
+      "recruitmentPanel": "0.4s delay",
+      "levelUpPanel": "0.5s delay",
+      "continueButton": "1s delay"
+    }
+  },
+  "conditionalPanels": {
+    "alwaysShown": [
+      "Victory Banner",
+      "XP Gained",
+      "Money Gained",
+      "Items Panel",
+      "Continue Button"
+    ],
+    "conditionallyShown": [
+      {
+        "panel": "Recruitment Announcement",
+        "condition": "After defeating recruitable NPC or completing recruitment quest",
+        "examples": ["Mia (Friendly Spar)", "Felix (Honor Duel)", "Jenna (Rescue Quest)"]
+      },
+      {
+        "panel": "Level Up Notification",
+        "condition": "When 1+ units gain enough XP to level",
+        "maxUnits": 4,
+        "color": "Green (#50D850)"
+      }
+    ]
+  },
+  "layout": {
+    "resolution": "720x480+ (3x GBA scale)",
+    "flow": "Vertical, centered",
+    "panels": [
+      "Victory Banner (top): Gold text with glow",
+      "Rewards Grid (2 columns): XP left, Money right",
+      "Items Panel: Grid of obtained items",
+      "Recruitment Panel (conditional): Gold gradient background with sparkles",
+      "Level Up Panel (conditional): Green gradient background",
+      "Continue Button (bottom): Large gold-bordered button"
+    ]
+  },
+  "notes": [
+    "✅ Updated with actual Sprites! directory paths (Nov 3, 2025)",
+    "All 10 unit portraits available for recruitment/level up displays",
+    "766+ item icons available for reward drops",
+    "Coins icon available in Sprites!/icons/buttons/Coins.gif",
+    "Emotion icons available for victory celebration",
+    "Continue button sprite available",
+    "Recruitment panel uses larger 64x64 portraits for emphasis",
+    "Level up uses 48x48 portraits (same as unit collection)",
+    "Sparkles effect is CSS-only (no sprite needed)",
+    "Total animation duration: ~2.3 seconds for all entrance effects"
+  ]
+}

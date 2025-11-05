@@ -1,41 +1,16 @@
-import './App.css'
+import { GameProvider } from './context/GameProvider';
+import { ScreenRouter } from './router/ScreenRouter';
+import './App.css';
+import './tokens.css';
 
 function App() {
-  const openMockup = (mockupName: string) => {
-    window.open(`/mockups/${mockupName}.html`, '_blank')
-  }
-
   return (
-    <div className="App">
-      <h1>Vale Chronicles</h1>
-      <p>Golden Sun-inspired tactical RPG - In Development</p>
-
-      <div className="mockup-nav">
-        <h2>Available Mockups</h2>
-        <div className="mockup-buttons">
-          <button onClick={() => openMockup('battle-transition')}>
-            Battle Transition
-          </button>
-          <button onClick={() => openMockup('equipment-screen')}>
-            Equipment Screen
-          </button>
-          <button onClick={() => openMockup('rewards-screen')}>
-            Rewards Screen
-          </button>
-          <button onClick={() => openMockup('unit-collection')}>
-            Unit Collection
-          </button>
-          <button
-            onClick={() => openMockup('vale-village')}
-            className="missing"
-            title="This mockup file is missing"
-          >
-            Vale Village (Missing)
-          </button>
-        </div>
+    <GameProvider>
+      <div className="app-container">
+        <ScreenRouter />
       </div>
-    </div>
-  )
+    </GameProvider>
+  );
 }
 
-export default App
+export default App;

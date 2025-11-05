@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automated Gameplay Demo - Vale Chronicles</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .demo-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== SCENES ===== */
+    .scene {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ===== OVERWORLD ===== */
+    .overworld {
+      background: var(--color-grass-mid);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px),
+        repeating-linear-gradient(90deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px);
+    }
+
+    .world {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .building {
+      position: absolute;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .building.house {
+      width: 120px;
+      height: auto;
+      left: 340px;
+      top: 250px;
+    }
+
+    .npc {
+      position: absolute;
+      width: 32px;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .npc.elder {
+      left: 500px;
+      top: 400px;
+    }
+
+    .player {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+      z-index: 100;
+      transition: none;
+    }
+
+    .player.moving {
+      animation: walk 0.4s steps(4) infinite;
+    }
+
+    @keyframes walk {
+      0% { transform: translate(-50%, -50%) translateY(0); }
+      25% { transform: translate(-50%, -50%) translateY(-2px); }
+      50% { transform: translate(-50%, -50%) translateY(0); }
+      75% { transform: translate(-50%, -50%) translateY(2px); }
+    }
+
+    /* ===== DIALOGUE ===== */
+    .dialogue-box {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 880px;
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 16px 24px;
+      font-size: 10px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      opacity: 0;
+      z-index: 200;
+      transition: opacity 0.3s;
+    }
+
+    .dialogue-box.visible {
+      opacity: 1;
+    }
+
+    .dialogue-name {
+      color: var(--color-text-gold);
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    /* ===== BATTLE TRANSITION ===== */
+    .transition-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    .transition-overlay.fade-in {
+      animation: fade-in 400ms ease-in forwards;
+    }
+
+    .transition-overlay.fade-out {
+      animation: fade-out 400ms ease-out forwards;
+    }
+
+    @keyframes fade-in {
+      to { opacity: 1; }
+    }
+
+    @keyframes fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* Encounter Flash */
+    .encounter-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 70%);
+      opacity: 0;
+      z-index: 400;
+      pointer-events: none;
+    }
+
+    .encounter-flash.active {
+      animation: flash 200ms ease-out;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .encounter-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid #FFD87F;
+      border-radius: 8px;
+      padding: 20px 40px;
+      font-size: 16px;
+      color: #FFD87F;
+      text-shadow: 2px 2px 0 #000;
+      z-index: 410;
+      opacity: 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+
+    .encounter-text.active {
+      animation: encounter-bounce 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+
+    @keyframes encounter-bounce {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .enemy-name {
+      color: var(--color-mars);
+      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(224, 80, 80, 0.8);
+      font-weight: bold;
+    }
+
+    /* ===== BATTLE SCENE ===== */
+    .battle-scene {
+      background: url('../../public/sprites/backgrounds/gs1/Cave.gif') center/cover no-repeat,
+                  linear-gradient(180deg, #3A2A1A 0%, #2A1A0A 50%, #1A0A00 100%);
+      image-rendering: pixelated;
+    }
+
+    .battle-grid {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 80px 60px;
+    }
+
+    .enemy-area {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+    }
+
+    .enemy-sprite {
+      width: 80px;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .party-area {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .party-sprite {
+      width: 64px;
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    .party-sprite.attacking {
+      animation: attack-lunge 600ms ease-out;
+    }
+
+    @keyframes attack-lunge {
+      0% { transform: translateX(0); }
+      30% { transform: translateX(40px) scale(1.1); }
+      60% { transform: translateX(40px) scale(1.1); }
+      100% { transform: translateX(0); }
+    }
+
+    .enemy-sprite.hit {
+      animation: hit-flash 300ms ease-out;
+    }
+
+    @keyframes hit-flash {
+      0%, 100% { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6)); }
+      50% { filter: drop-shadow(0 4px 12px rgba(255, 0, 0, 0.9)) brightness(1.5); }
+    }
+
+    .damage-number {
+      position: absolute;
+      font-size: 24px;
+      color: #FFF;
+      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(255, 0, 0, 0.8);
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 300;
+    }
+
+    .damage-number.active {
+      animation: damage-rise 1s ease-out forwards;
+    }
+
+    @keyframes damage-rise {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.8);
+      }
+      30% {
+        transform: translateY(-20px) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(1);
+      }
+    }
+
+    /* Combat Log */
+    .combat-log {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid var(--color-border-light);
+      padding: 12px 16px;
+      font-size: 10px;
+      color: var(--color-text-primary);
+      line-height: 1.4;
+      max-height: 80px;
+      overflow: hidden;
+      z-index: 200;
+    }
+
+    .combat-message {
+      margin-bottom: 4px;
+    }
+
+    /* ===== REWARDS SCENE ===== */
+    .rewards-scene {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .victory-banner {
+      font-size: 32px;
+      color: var(--color-text-gold);
+      text-shadow: 4px 4px 0 var(--color-text-shadow);
+      animation: victory-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes victory-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .rewards-panel {
+      background: rgba(15, 37, 80, 0.9);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 24px 32px;
+      font-size: 12px;
+      color: var(--color-text-primary);
+      min-width: 400px;
+    }
+
+    .reward-item {
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reward-label {
+      color: var(--color-text-secondary);
+    }
+
+    .reward-value {
+      color: var(--color-text-gold);
+      font-size: 14px;
+    }
+
+    .level-up-notice {
+      background: rgba(232, 160, 80, 0.2);
+      border: 2px solid var(--color-venus);
+      padding: 16px;
+      margin-top: 16px;
+      text-align: center;
+      animation: glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(232, 160, 80, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(232, 160, 80, 0.8); }
+    }
+
+    /* ===== DEMO CONTROLS ===== */
+    .demo-controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-border-light);
+      padding: 12px;
+      font-size: 8px;
+      color: var(--color-text-gold);
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    .demo-status {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border-dark);
+    }
+
+    .demo-progress {
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--color-border-dark);
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-hp-green) 0%, var(--color-venus) 100%);
+      width: 0%;
+      transition: width 0.5s ease-out;
+    }
+
+    .control-btn {
+      padding: 6px 12px;
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 7px;
+      cursor: pointer;
+      margin-top: 8px;
+      width: 100%;
+      transition: all var(--timing-fast);
+    }
+
+    .control-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- DEMO CONTROLS -->
+    <div class="demo-controls">
+      <div class="demo-status">
+        <strong>🎮 AUTO-PLAY DEMO</strong><br>
+        <span id="current-action">Starting demo...</span>
+      </div>
+      <div class="demo-progress">
+        <strong>Progress:</strong>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div style="margin-top: 4px;">
+          <span id="progress-text">0 / 10 steps</span>
+        </div>
+      </div>
+      <button class="control-btn" onclick="location.reload()">🔄 RESTART DEMO</button>
+    </div>
+
+    <!-- OVERWORLD SCENE -->
+    <div class="scene overworld active" id="overworld-scene">
+      <div class="world" id="world">
+        <img
+          src="../../public/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif"
+          alt="House"
+          class="building house"
+        >
+        <img
+          src="../../public/sprites/overworld/npcs/Elder.gif"
+          alt="Elder"
+          class="npc elder"
+        >
+        <img
+          src="../../public/sprites/overworld/protagonists/Isaac.gif"
+          alt="Isaac"
+          class="player"
+          id="player"
+        >
+      </div>
+
+      <div class="dialogue-box" id="dialogue-box">
+        <div class="dialogue-name" id="dialogue-name">Elder</div>
+        <div id="dialogue-text">Welcome to Vale Village, Isaac. The world needs brave adventurers like you!</div>
+      </div>
+    </div>
+
+    <!-- BATTLE TRANSITION ELEMENTS -->
+    <div class="encounter-flash" id="encounter-flash"></div>
+    <div class="encounter-text" id="encounter-text">
+      A wild <span class="enemy-name">GOBLIN</span> appeared!
+    </div>
+
+    <!-- BATTLE SCENE -->
+    <div class="scene battle-scene" id="battle-scene">
+      <div class="battle-grid">
+        <div class="enemy-area">
+          <img
+            src="../../public/sprites/battle/enemies/Goblin.gif"
+            alt="Goblin"
+            class="enemy-sprite"
+            id="enemy-sprite"
+          >
+        </div>
+
+        <div class="party-area">
+          <img
+            src="../../public/sprites/battle/party/isaac/Isaac_Long Sword_Front.gif"
+            alt="Isaac"
+            class="party-sprite"
+            id="party-sprite"
+          >
+        </div>
+      </div>
+
+      <div class="combat-log" id="combat-log">
+        <div class="combat-message">Battle start!</div>
+      </div>
+
+      <div class="damage-number" id="damage-number" style="left: 480px; top: 200px;">-25</div>
+    </div>
+
+    <!-- REWARDS SCENE -->
+    <div class="scene rewards-scene" id="rewards-scene">
+      <div class="victory-banner">VICTORY!</div>
+
+      <div class="rewards-panel">
+        <div class="reward-item">
+          <span class="reward-label">💰 Gold Earned:</span>
+          <span class="reward-value">50g</span>
+        </div>
+        <div class="reward-item">
+          <span class="reward-label">⭐ Experience:</span>
+          <span class="reward-value">100 XP</span>
+        </div>
+        <div class="reward-item">
+          <span class="reward-label">🎁 Items:</span>
+          <span class="reward-value">Herb x2</span>
+        </div>
+
+        <div class="level-up-notice">
+          <strong>LEVEL UP!</strong><br>
+          Isaac reached Level 2!<br>
+          <small>+12 HP  +5 PP  +3 ATK</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSITION OVERLAY -->
+    <div class="transition-overlay" id="transition-overlay"></div>
+  </div>
+
+  <script>
+    // Demo state machine
+    const DEMO_STEPS = [
+      { name: 'Overworld Exploration', duration: 3000, action: 'exploreOverworld' },
+      { name: 'Talk to Elder', duration: 3000, action: 'talkToNPC' },
+      { name: 'Random Encounter Trigger', duration: 2000, action: 'triggerEncounter' },
+      { name: 'Battle Transition', duration: 2700, action: 'battleTransition' },
+      { name: 'Isaac Attacks', duration: 2000, action: 'playerAttack' },
+      { name: 'Enemy Attacks', duration: 2000, action: 'enemyAttack' },
+      { name: 'Isaac Finishes Enemy', duration: 2500, action: 'finalBlow' },
+      { name: 'Victory Celebration', duration: 3000, action: 'showVictory' },
+      { name: 'Rewards & Level Up', duration: 4000, action: 'showRewards' },
+      { name: 'Return to Overworld', duration: 2000, action: 'returnToOverworld' },
+    ];
+
+    let currentStep = 0;
+    let totalDuration = DEMO_STEPS.reduce((sum, step) => sum + step.duration, 0);
+    let elapsedTime = 0;
+
+    // Elements
+    const overworldScene = document.getElementById('overworld-scene');
+    const battleScene = document.getElementById('battle-scene');
+    const rewardsScene = document.getElementById('rewards-scene');
+    const transitionOverlay = document.getElementById('transition-overlay');
+    const encounterFlash = document.getElementById('encounter-flash');
+    const encounterText = document.getElementById('encounter-text');
+    const dialogueBox = document.getElementById('dialogue-box');
+    const combatLog = document.getElementById('combat-log');
+    const damageNumber = document.getElementById('damage-number');
+    const player = document.getElementById('player');
+    const world = document.getElementById('world');
+    const partySprite = document.getElementById('party-sprite');
+    const enemySprite = document.getElementById('enemy-sprite');
+
+    // Progress tracking
+    const currentActionEl = document.getElementById('current-action');
+    const progressFillEl = document.getElementById('progress-fill');
+    const progressTextEl = document.getElementById('progress-text');
+
+    function updateProgress() {
+      const progress = ((currentStep / DEMO_STEPS.length) * 100).toFixed(0);
+      progressFillEl.style.width = `${progress}%`;
+      progressTextEl.textContent = `${currentStep} / ${DEMO_STEPS.length} steps`;
+    }
+
+    function switchScene(sceneName) {
+      [overworldScene, battleScene, rewardsScene].forEach(scene => {
+        scene.classList.remove('active');
+      });
+
+      if (sceneName === 'overworld') overworldScene.classList.add('active');
+      else if (sceneName === 'battle') battleScene.classList.add('active');
+      else if (sceneName === 'rewards') rewardsScene.classList.add('active');
+    }
+
+    async function transition(duration = 400) {
+      transitionOverlay.classList.add('fade-in');
+      await wait(duration);
+    }
+
+    async function fadeIn(duration = 400) {
+      transitionOverlay.classList.remove('fade-in');
+      transitionOverlay.classList.add('fade-out');
+      await wait(duration);
+      transitionOverlay.classList.remove('fade-out');
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function addCombatMessage(message) {
+      const msg = document.createElement('div');
+      msg.className = 'combat-message';
+      msg.textContent = message;
+      combatLog.appendChild(msg);
+
+      // Keep only last 3 messages
+      while (combatLog.children.length > 3) {
+        combatLog.removeChild(combatLog.firstChild);
+      }
+    }
+
+    // ===== DEMO ACTIONS =====
+
+    async function exploreOverworld() {
+      currentActionEl.textContent = 'Exploring Vale Village...';
+      player.classList.add('moving');
+
+      // Move world to simulate walking
+      await animateWorldMove(-50, -50, 1500);
+      await animateWorldMove(30, 20, 1500);
+
+      player.classList.remove('moving');
+    }
+
+    async function animateWorldMove(deltaX, deltaY, duration) {
+      const startX = 0;
+      const startY = 0;
+      const steps = 30;
+      const stepDuration = duration / steps;
+
+      for (let i = 0; i <= steps; i++) {
+        const progress = i / steps;
+        const x = startX + (deltaX * progress);
+        const y = startY + (deltaY * progress);
+        world.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        await wait(stepDuration);
+      }
+    }
+
+    async function talkToNPC() {
+      currentActionEl.textContent = 'Talking to Elder...';
+      player.classList.remove('moving');
+      dialogueBox.classList.add('visible');
+      await wait(3000);
+      dialogueBox.classList.remove('visible');
+    }
+
+    async function triggerEncounter() {
+      currentActionEl.textContent = 'Random encounter!';
+      player.classList.add('moving');
+      await wait(1000);
+      player.classList.remove('moving');
+
+      // Tremor effect
+      overworldScene.style.animation = 'tremor 300ms ease-in-out';
+      await wait(300);
+      overworldScene.style.animation = '';
+    }
+
+    async function battleTransition() {
+      currentActionEl.textContent = 'Battle transition...';
+
+      // Stage 1: Encounter flash
+      encounterFlash.classList.add('active');
+      await wait(200);
+      encounterFlash.classList.remove('active');
+
+      // Stage 2: Encounter text
+      encounterText.classList.add('active');
+      await wait(1000);
+      encounterText.classList.remove('active');
+
+      // Stage 3: Fade to black
+      await transition(400);
+
+      // Stage 4: Switch to battle
+      switchScene('battle');
+      await fadeIn(400);
+
+      addCombatMessage('A wild Goblin appeared!');
+      await wait(700);
+    }
+
+    async function playerAttack() {
+      currentActionEl.textContent = 'Isaac attacks!';
+      addCombatMessage('Isaac attacks!');
+      await wait(300);
+
+      // Attack animation
+      partySprite.classList.add('attacking');
+      await wait(300);
+
+      // Hit effect
+      enemySprite.classList.add('hit');
+      damageNumber.textContent = '-25';
+      damageNumber.classList.add('active');
+      await wait(300);
+
+      enemySprite.classList.remove('hit');
+      addCombatMessage('Goblin takes 25 damage!');
+
+      await wait(600);
+      partySprite.classList.remove('attacking');
+      damageNumber.classList.remove('active');
+    }
+
+    async function enemyAttack() {
+      currentActionEl.textContent = 'Goblin attacks!';
+      addCombatMessage('Goblin attacks!');
+      await wait(500);
+
+      // Enemy attack (simple)
+      addCombatMessage('Isaac takes 12 damage!');
+      await wait(1500);
+    }
+
+    async function finalBlow() {
+      currentActionEl.textContent = 'Finishing blow!';
+      addCombatMessage('Isaac uses Ragnarok!');
+      await wait(300);
+
+      partySprite.classList.add('attacking');
+      await wait(400);
+
+      enemySprite.classList.add('hit');
+      damageNumber.textContent = '-48';
+      damageNumber.style.left = '480px';
+      damageNumber.style.top = '180px';
+      damageNumber.classList.add('active');
+
+      await wait(500);
+      enemySprite.style.opacity = '0';
+      enemySprite.style.transition = 'opacity 0.5s';
+      addCombatMessage('Goblin was defeated!');
+
+      await wait(1000);
+      partySprite.classList.remove('attacking');
+      damageNumber.classList.remove('active');
+    }
+
+    async function showVictory() {
+      currentActionEl.textContent = 'Victory!';
+      addCombatMessage('Victory!');
+      await wait(1500);
+
+      await transition(400);
+      switchScene('rewards');
+      await fadeIn(400);
+    }
+
+    async function showRewards() {
+      currentActionEl.textContent = 'Collecting rewards...';
+      await wait(4000);
+    }
+
+    async function returnToOverworld() {
+      currentActionEl.textContent = 'Returning to overworld...';
+      await transition(400);
+      switchScene('overworld');
+
+      // Reset battle elements
+      enemySprite.style.opacity = '1';
+      enemySprite.style.transition = '';
+      combatLog.innerHTML = '<div class="combat-message">Battle start!</div>';
+      world.style.transform = 'translate(-50%, -50%)';
+
+      await fadeIn(400);
+
+      currentActionEl.textContent = '✅ Demo complete! Restarting...';
+      await wait(2000);
+      location.reload();
+    }
+
+    // ===== RUN DEMO =====
+
+    async function runDemo() {
+      for (let i = 0; i < DEMO_STEPS.length; i++) {
+        currentStep = i;
+        updateProgress();
+
+        const step = DEMO_STEPS[i];
+
+        // Execute action
+        await window[step.action]();
+      }
+
+      currentStep = DEMO_STEPS.length;
+      updateProgress();
+    }
+
+    // Start demo after 1 second
+    setTimeout(() => {
+      runDemo();
+    }, 1000);
+  </script>
+</body>
+</html>

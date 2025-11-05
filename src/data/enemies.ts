@@ -1,6 +1,7 @@
 import type { Ability } from '@/types/Ability';
 import type { Element } from '@/types/Element';
 import type { Stats } from '@/types/Stats';
+import type { Equipment } from '@/types/Equipment';
 import {
   SLASH,
   FIREBALL,
@@ -12,6 +13,18 @@ import {
   QUAKE,
   CLAY_SPIRE,
 } from './abilities';
+import {
+  LEATHER_VEST,
+  CLOTH_CAP,
+  LEATHER_BOOTS,
+  IRON_SWORD,
+  IRON_ARMOR,
+  IRON_HELM,
+  STEEL_SWORD,
+  STEEL_ARMOR,
+  STEEL_HELM,
+  HYPER_BOOTS,
+} from './equipment';
 
 /**
  * Enemy Definition
@@ -20,6 +33,7 @@ import {
  * - No equipment or Djinn
  * - Fixed stats (no growth rates)
  * - Reward data for XP and Gold
+ * - Optional equipment drops with chances
  */
 export interface Enemy {
   id: string;
@@ -34,6 +48,12 @@ export interface Enemy {
 
   /** Base Gold before level multiplier */
   baseGold: number;
+
+  /** Optional equipment drops with drop rates (0.0 to 1.0) */
+  drops?: {
+    equipment: Equipment;
+    chance: number; // 0.05 = 5%, 0.10 = 10%, etc.
+  }[];
 }
 
 /**
@@ -59,6 +79,9 @@ export const GOBLIN: Enemy = {
   element: 'Neutral',
   baseXp: 15,
   baseGold: 10,
+  drops: [
+    { equipment: CLOTH_CAP, chance: 0.08 }, // 8% drop rate
+  ],
 };
 
 export const WILD_WOLF: Enemy = {
@@ -77,6 +100,9 @@ export const WILD_WOLF: Enemy = {
   element: 'Neutral',
   baseXp: 12,
   baseGold: 8,
+  drops: [
+    { equipment: LEATHER_VEST, chance: 0.10 }, // 10% drop rate
+  ],
 };
 
 export const SLIME: Enemy = {
@@ -95,6 +121,9 @@ export const SLIME: Enemy = {
   element: 'Mercury',
   baseXp: 20,
   baseGold: 15,
+  drops: [
+    { equipment: LEATHER_BOOTS, chance: 0.07 }, // 7% drop rate
+  ],
 };
 
 // ========== TIER 2: Mid Game (Levels 2-3) ==========
@@ -115,6 +144,9 @@ export const FIRE_SPRITE: Enemy = {
   element: 'Mars',
   baseXp: 25,
   baseGold: 18,
+  drops: [
+    { equipment: IRON_SWORD, chance: 0.12 }, // 12% drop rate
+  ],
 };
 
 export const EARTH_GOLEM: Enemy = {
@@ -133,6 +165,9 @@ export const EARTH_GOLEM: Enemy = {
   element: 'Venus',
   baseXp: 45,
   baseGold: 30,
+  drops: [
+    { equipment: IRON_ARMOR, chance: 0.15 }, // 15% drop rate
+  ],
 };
 
 export const WIND_WISP: Enemy = {
@@ -151,6 +186,9 @@ export const WIND_WISP: Enemy = {
   element: 'Jupiter',
   baseXp: 40,
   baseGold: 25,
+  drops: [
+    { equipment: IRON_HELM, chance: 0.14 }, // 14% drop rate
+  ],
 };
 
 // ========== TIER 3: Late Game (Levels 4-5) ==========
@@ -171,6 +209,9 @@ export const FIRE_ELEMENTAL: Enemy = {
   element: 'Mars',
   baseXp: 60,
   baseGold: 40,
+  drops: [
+    { equipment: STEEL_SWORD, chance: 0.18 }, // 18% drop rate
+  ],
 };
 
 export const ICE_GUARDIAN: Enemy = {
@@ -189,6 +230,9 @@ export const ICE_GUARDIAN: Enemy = {
   element: 'Mercury',
   baseXp: 65,
   baseGold: 45,
+  drops: [
+    { equipment: STEEL_ARMOR, chance: 0.17 }, // 17% drop rate
+  ],
 };
 
 export const STONE_TITAN: Enemy = {
@@ -207,6 +251,9 @@ export const STONE_TITAN: Enemy = {
   element: 'Venus',
   baseXp: 80,
   baseGold: 60,
+  drops: [
+    { equipment: STEEL_HELM, chance: 0.20 }, // 20% drop rate
+  ],
 };
 
 export const STORM_LORD: Enemy = {
@@ -225,6 +272,9 @@ export const STORM_LORD: Enemy = {
   element: 'Jupiter',
   baseXp: 90,
   baseGold: 70,
+  drops: [
+    { equipment: HYPER_BOOTS, chance: 0.22 }, // 22% drop rate
+  ],
 };
 
 /**

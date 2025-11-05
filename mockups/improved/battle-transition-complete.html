@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Battle Transition - 4 Stages</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .transition-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: linear-gradient(180deg, #88C070 0%, #70A858 40%, #609048 100%);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== STAGE 1: OVERWORLD (Anticipation) ===== */
+    .overworld {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .grass-bg {
+      position: absolute;
+      inset: 0;
+      background-color: var(--color-grass-mid);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px),
+        repeating-linear-gradient(90deg, transparent, transparent 16px, rgba(104, 160, 80, 0.2) 16px, rgba(104, 160, 80, 0.2) 17px);
+    }
+
+    .player {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Stage 1: Tremor animation */
+    @keyframes tremor {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2px, 1px); }
+      20% { transform: translate(2px, -1px); }
+      30% { transform: translate(-1px, 2px); }
+      40% { transform: translate(1px, -2px); }
+      50% { transform: translate(-2px, -1px); }
+      60% { transform: translate(2px, 1px); }
+      70% { transform: translate(-1px, -2px); }
+      80% { transform: translate(1px, 2px); }
+      90% { transform: translate(-2px, 1px); }
+    }
+
+    .stage-1 .overworld {
+      animation: tremor 300ms ease-in-out;
+      filter: brightness(0.7);
+    }
+
+    /* ===== STAGE 2: ENCOUNTER TEXT ===== */
+    .encounter-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 70%);
+      opacity: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .stage-2 .encounter-flash {
+      animation: flash 200ms ease-out;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .encounter-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(15, 37, 80, 0.95);
+      border: 3px solid #FFD87F;
+      border-radius: 8px;
+      padding: 20px 40px;
+      font-size: 16px;
+      color: #FFD87F;
+      text-shadow: 2px 2px 0 #000;
+      z-index: 20;
+      opacity: 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+
+    .stage-2 .encounter-text {
+      animation: encounter-bounce 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+
+    @keyframes encounter-bounce {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .stage-3 .encounter-text {
+      animation: text-fade-out 200ms ease-out 600ms forwards;
+    }
+
+    @keyframes text-fade-out {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+    }
+
+    .enemy-name {
+      color: var(--color-mars);
+      text-shadow: 2px 2px 0 #000, 0 0 8px rgba(224, 80, 80, 0.8);
+      font-weight: bold;
+    }
+
+    /* ===== STAGE 3: SWIRL ANIMATION ===== */
+    .swirl-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      opacity: 0;
+    }
+
+    .stage-3 .swirl-container {
+      animation: swirl-appear 100ms ease-out forwards;
+    }
+
+    @keyframes swirl-appear {
+      to { opacity: 1; }
+    }
+
+    .swirl-circle {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      border-style: solid;
+      opacity: 0;
+    }
+
+    .swirl-circle-1 {
+      border-width: 8px;
+      border-color: rgba(255, 255, 255, 0.9);
+      animation: swirl-expand 800ms ease-out 0ms forwards;
+    }
+
+    .swirl-circle-2 {
+      border-width: 6px;
+      border-color: rgba(255, 215, 127, 0.8);
+      animation: swirl-expand 800ms ease-out 100ms forwards;
+    }
+
+    .swirl-circle-3 {
+      border-width: 4px;
+      border-color: rgba(80, 144, 216, 0.7);
+      animation: swirl-expand 800ms ease-out 200ms forwards;
+    }
+
+    .swirl-circle-4 {
+      border-width: 2px;
+      border-color: rgba(232, 160, 80, 0.6);
+      animation: swirl-expand 800ms ease-out 300ms forwards;
+    }
+
+    @keyframes swirl-expand {
+      0% {
+        width: 0;
+        height: 0;
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+        border-width: 8px;
+      }
+      60% {
+        opacity: 0.8;
+        border-width: 4px;
+      }
+      80% {
+        opacity: 0.5;
+        border-width: 2px;
+      }
+      100% {
+        width: 2000px;
+        height: 2000px;
+        transform: scale(10) rotate(1080deg);
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    /* ===== STAGE 4: FADE TO BATTLE ===== */
+    .battle-fade {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .stage-4 .battle-fade {
+      animation: fade-to-black 200ms ease-in forwards;
+    }
+
+    @keyframes fade-to-black {
+      to { opacity: 1; }
+    }
+
+    .battle-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #3A2A1A 0%, #2A1A0A 50%, #1A0A00 100%);
+      z-index: 50;
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+    }
+
+    .stage-5 .battle-screen {
+      animation: battle-appear 700ms ease-out forwards;
+    }
+
+    @keyframes battle-appear {
+      0% {
+        opacity: 0;
+        filter: brightness(0);
+      }
+      50% {
+        opacity: 0.5;
+        filter: brightness(0.5);
+      }
+      100% {
+        opacity: 1;
+        filter: brightness(1);
+      }
+    }
+
+    .battle-ready-text {
+      font-size: 32px;
+      color: var(--color-text-gold);
+      text-shadow: 4px 4px 0 var(--color-text-shadow);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+    }
+
+    /* ===== STAGE INDICATOR ===== */
+    .stage-indicator {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid var(--color-text-gold);
+      padding: var(--space-sm);
+      z-index: 1000;
+      font-size: 7px;
+      color: var(--color-text-gold);
+      min-width: 280px;
+    }
+
+    .stage-item {
+      padding: 4px 0;
+      opacity: 0.4;
+      transition: opacity var(--timing-fast);
+    }
+
+    .stage-item.active {
+      opacity: 1;
+      color: var(--color-hp-green);
+      font-weight: bold;
+    }
+
+    .stage-item.completed {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+
+    /* ===== REPLAY BUTTON ===== */
+    .replay-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    .replay-btn {
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--color-bg-dark);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary), var(--font-fallback);
+      font-size: 8px;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .replay-btn:hover {
+      background: var(--color-border-light);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="transition-container" id="container">
+    <!-- STAGE 1-2: Overworld -->
+    <div class="overworld">
+      <div class="grass-bg"></div>
+      <img src="../../public/sprites/overworld/protagonists/Isaac.gif" alt="Isaac" class="player">
+    </div>
+
+    <!-- STAGE 2: Flash -->
+    <div class="encounter-flash"></div>
+
+    <!-- STAGE 2-3: Encounter Text -->
+    <div class="encounter-text">
+      A wild <span class="enemy-name">GOBLIN</span> appeared!
+    </div>
+
+    <!-- STAGE 3: Swirl Circles -->
+    <div class="swirl-container">
+      <div class="swirl-circle swirl-circle-1"></div>
+      <div class="swirl-circle swirl-circle-2"></div>
+      <div class="swirl-circle swirl-circle-3"></div>
+      <div class="swirl-circle swirl-circle-4"></div>
+    </div>
+
+    <!-- STAGE 4: Fade to Black -->
+    <div class="battle-fade"></div>
+
+    <!-- STAGE 5: Battle Screen -->
+    <div class="battle-screen">
+      <div class="battle-ready-text">BATTLE START!</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="replay-container">
+      <button class="replay-btn" onclick="location.reload()">▶️ REPLAY</button>
+    </div>
+
+    <!-- Stage Indicator -->
+    <div class="stage-indicator">
+      <div class="stage-item stage-1">Stage 1: Tremor (0-300ms)</div>
+      <div class="stage-item stage-2">Stage 2: Encounter Flash + Text (300-800ms)</div>
+      <div class="stage-item stage-3">Stage 3: Swirl Animation (800-1800ms)</div>
+      <div class="stage-item stage-4">Stage 4: Fade to Black (1800-2000ms)</div>
+      <div class="stage-item stage-5">Stage 5: Battle Appears (2000-2700ms)</div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('container');
+
+    // Sequence timing
+    const stages = [
+      { class: 'stage-1', delay: 0, duration: 300, label: '.stage-1' },
+      { class: 'stage-2', delay: 300, duration: 500, label: '.stage-2' },
+      { class: 'stage-3', delay: 800, duration: 1000, label: '.stage-3' },
+      { class: 'stage-4', delay: 1800, duration: 200, label: '.stage-4' },
+      { class: 'stage-5', delay: 2000, duration: 700, label: '.stage-5' }
+    ];
+
+    // Activate stages sequentially
+    stages.forEach((stage, index) => {
+      setTimeout(() => {
+        container.classList.add(stage.class);
+
+        // Update indicator
+        const indicator = document.querySelector(stage.label);
+        indicator.classList.add('active');
+
+        // Mark previous as completed
+        stages.slice(0, index).forEach(prev => {
+          const prevIndicator = document.querySelector(prev.label);
+          prevIndicator.classList.remove('active');
+          prevIndicator.classList.add('completed');
+        });
+      }, stage.delay);
+    });
+  </script>
+</body>
+</html>

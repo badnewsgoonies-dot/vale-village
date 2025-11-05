@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Immersive Background</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: url('/sprites/backgrounds/gs1/Waterfall.gif') center/cover;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Vignette effect for immersion */
+    .vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      top: 100px;
+      left: 0;
+      right: 0;
+      height: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 100px;
+      z-index: 10;
+    }
+
+    .enemy-unit {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .enemy-sprite {
+      animation: enemyFloat 3s ease-in-out infinite;
+      filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.8));
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 160px;
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Minimal floating HP bar */
+    .floating-hp {
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(224,80,80,0.5);
+      border-radius: 12px;
+      padding: 4px 12px;
+      min-width: 120px;
+    }
+
+    .floating-name {
+      font-size: 7px;
+      color: #e05050;
+      text-align: center;
+      margin-bottom: 3px;
+    }
+
+    .floating-hp-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(42,24,16,0.8);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .floating-hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+      transition: width 0.3s ease;
+      box-shadow: 0 0 6px rgba(80,216,80,0.6);
+    }
+
+    /* Party Area */
+    .party-area {
+      position: absolute;
+      bottom: 120px;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 120px;
+      gap: 60px;
+      z-index: 20;
+    }
+
+    .party-unit {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .party-sprite {
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.9));
+    }
+
+    .party-sprite img {
+      width: auto;
+      height: 140px;
+    }
+
+    /* Minimal floating status */
+    .floating-status {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(80,144,216,0.5);
+      border-radius: 12px;
+      padding: 4px 10px;
+      min-width: 100px;
+    }
+
+    .party-unit.active .floating-status {
+      border-color: rgba(212,175,55,0.8);
+      box-shadow: 0 0 12px rgba(212,175,55,0.4);
+    }
+
+    .floating-party-name {
+      font-size: 7px;
+      color: #5090d8;
+      text-align: center;
+      margin-bottom: 3px;
+    }
+
+    .party-unit.active .floating-party-name {
+      color: #d4af37;
+    }
+
+    .floating-bars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mini-status-bar {
+      width: 40px;
+      height: 5px;
+      background: rgba(42,24,16,0.8);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mini-hp {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+      box-shadow: 0 0 4px rgba(80,216,80,0.5);
+    }
+
+    .mini-pp {
+      height: 100%;
+      background: linear-gradient(90deg, #5090d8 0%, #2060a8 100%);
+      box-shadow: 0 0 4px rgba(80,144,216,0.5);
+    }
+
+    /* Ultra-minimal corner HUD */
+    .corner-hud {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(212,175,55,0.4);
+      border-radius: 8px;
+      padding: 8px 14px;
+      z-index: 50;
+      font-size: 8px;
+      color: #d4af37;
+    }
+
+    /* Floating combat message */
+    .floating-message {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      border: 2px solid rgba(212,175,55,0.3);
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 8px;
+      color: #fff;
+      text-align: center;
+      z-index: 50;
+      max-width: 500px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    }
+
+    /* Bottom command overlay */
+    .command-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.9) 100%);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 16px;
+      gap: 16px;
+    }
+
+    .immersive-btn {
+      background: rgba(20,20,40,0.85);
+      backdrop-filter: blur(4px);
+      border: 2px solid rgba(106,106,138,0.6);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 14px 28px;
+      min-width: 160px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .immersive-btn:hover {
+      background: rgba(40,40,60,0.95);
+      border-color: rgba(212,175,55,0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(212,175,55,0.3);
+    }
+
+    .btn-icon-large {
+      font-size: 16px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* Particle effects overlay (optional decorative) */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+      background:
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3), transparent);
+      background-size: 200px 200px, 150px 150px, 180px 180px, 220px 220px;
+      background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+      animation: particleFloat 30s linear infinite;
+      opacity: 0.4;
+    }
+
+    @keyframes particleFloat {
+      from { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+      to { background-position: 200px 200px, 240px 260px, 330px 470px, 270px 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Vignette -->
+    <div class="vignette"></div>
+
+    <!-- Particles -->
+    <div class="particles"></div>
+
+    <!-- Corner HUD -->
+    <div class="corner-hud">
+      TURN 8
+    </div>
+
+    <!-- Floating Message -->
+    <div class="floating-message">
+      Thunder Lizard channels elemental power...
+    </div>
+
+    <!-- Enemy Area -->
+    <div class="enemy-area">
+      <div class="enemy-unit">
+        <div class="enemy-sprite">
+          <img src="/sprites/battle/enemies/Thunder_Lizard.gif" alt="Thunder Lizard">
+        </div>
+        <div class="floating-hp">
+          <div class="floating-name">THUNDER LIZARD</div>
+          <div class="floating-hp-bar">
+            <div class="floating-hp-fill" style="width: 72%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enemy-unit">
+        <div class="enemy-sprite" style="animation-delay: -1.5s;">
+          <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        </div>
+        <div class="floating-hp">
+          <div class="floating-name">DIRE WOLF</div>
+          <div class="floating-hp-bar">
+            <div class="floating-hp-fill" style="width: 54%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Party Area -->
+    <div class="party-area">
+      <div class="party-unit active">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        </div>
+        <div class="floating-status">
+          <div class="floating-party-name">ISAAC</div>
+          <div class="floating-bars">
+            <div class="mini-status-bar">
+              <div class="mini-hp" style="width: 85%;"></div>
+            </div>
+            <div class="mini-status-bar">
+              <div class="mini-pp" style="width: 60%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        </div>
+        <div class="floating-status">
+          <div class="floating-party-name">GARET</div>
+          <div class="floating-bars">
+            <div class="mini-status-bar">
+              <div class="mini-hp" style="width: 70%;"></div>
+            </div>
+            <div class="mini-status-bar">
+              <div class="mini-pp" style="width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        </div>
+        <div class="floating-status">
+          <div class="floating-party-name">IVAN</div>
+          <div class="floating-bars">
+            <div class="mini-status-bar">
+              <div class="mini-hp" style="width: 92%;"></div>
+            </div>
+            <div class="mini-status-bar">
+              <div class="mini-pp" style="width: 75%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+        </div>
+        <div class="floating-status">
+          <div class="floating-party-name">MIA</div>
+          <div class="floating-bars">
+            <div class="mini-status-bar">
+              <div class="mini-hp" style="width: 88%;"></div>
+            </div>
+            <div class="mini-status-bar">
+              <div class="mini-pp" style="width: 54%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Overlay -->
+    <div class="command-overlay">
+      <button class="immersive-btn">
+        <span class="btn-icon-large">⚔️</span>
+        <div>ATTACK</div>
+      </button>
+      <button class="immersive-btn">
+        <span class="btn-icon-large">✨</span>
+        <div>PSYNERGY</div>
+      </button>
+      <button class="immersive-btn">
+        <span class="btn-icon-large">🔮</span>
+        <div>DJINN</div>
+      </button>
+      <button class="immersive-btn">
+        <span class="btn-icon-large">🛡️</span>
+        <div>DEFEND</div>
+      </button>
+    </div>
+  </div>
+</body>
+</html>

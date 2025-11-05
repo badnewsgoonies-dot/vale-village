@@ -58,3 +58,217 @@ p {
 .mockup-buttons button.missing:hover {
   background: #777;
 }
+
+/* Demo Sections */
+.demo-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.demo-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* React Component Buttons */
+.mockup-buttons button.react-component {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  padding-right: 140px;
+  text-align: left;
+}
+
+.mockup-buttons button.react-component:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #653b8e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.mockup-buttons button.coming-soon {
+  background: #ccc;
+  cursor: not-allowed;
+  position: relative;
+  padding-right: 160px;
+  text-align: left;
+}
+
+.mockup-buttons button.coming-soon:hover {
+  background: #ccc;
+}
+
+/* Badges */
+.badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.react-component .badge {
+  background: rgba(76, 175, 80, 0.9);
+}
+
+.coming-soon .badge {
+  background: rgba(255, 152, 0, 0.8);
+}
+
+/* Progress Section */
+.progress-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+.progress-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.checklist li {
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 1.1rem;
+}
+
+.checklist li.done {
+  background: rgba(76, 175, 80, 0.3);
+  font-weight: bold;
+}
+
+/* App Container */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+  overflow: hidden;
+}
+
+/* Title screen styles */
+.title-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 2rem;
+  background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+}
+
+.title-screen h1 {
+  font-size: 3rem;
+  color: var(--color-text-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.title-screen button {
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+  background: var(--color-border-highlight);
+  color: var(--color-text-light);
+  border: 2px solid var(--color-border-light);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.title-screen button:hover {
+  background: var(--color-bg-panel);
+  border-color: var(--color-border-highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Placeholder and error screens */
+.placeholder-screen,
+.error-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 2rem;
+  color: var(--color-text-light);
+  background: linear-gradient(180deg, #1a2540 0%, #0a1530 100%);
+}
+
+.error-screen {
+  color: #ff6b6b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .title-screen h1 {
+    font-size: 2rem;
+  }
+
+  .title-screen button {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .mockup-buttons button {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .mockup-buttons button.react-component,
+  .mockup-buttons button.coming-soon {
+    padding-right: 12px;
+    text-align: center;
+  }
+
+  .badge {
+    position: static;
+    display: block;
+    margin-top: 0.5rem;
+    transform: none;
+  }
+}

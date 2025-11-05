@@ -75,13 +75,13 @@ describe('TASK 5: Team-Wide Djinn Bonuses', () => {
       const updatedTeam = equipped.value;
 
       // ALL units get +12 ATK, +8 DEF from 3 Venus Djinn
-      expect(isaac.calculateStats(updatedTeam).atk).toBe(39); // 27 + 12
-      expect(garet.calculateStats(updatedTeam).atk).toBe(46); // 34 + 12
+      expect(isaac.calculateStats(updatedTeam).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
+      expect(garet.calculateStats(updatedTeam).atk).toBe(43); // 31 + 12 (BALANCE: 34→31)
       expect(mia.calculateStats(updatedTeam).atk).toBe(32);   // 20 + 12
       expect(ivan.calculateStats(updatedTeam).atk).toBe(30);  // 18 + 12
 
       expect(isaac.calculateStats(updatedTeam).def).toBe(26); // 18 + 8
-      expect(garet.calculateStats(updatedTeam).def).toBe(20); // 12 + 8
+      expect(garet.calculateStats(updatedTeam).def).toBe(19); // 11 + 8 (BALANCE: 12→11)
       expect(mia.calculateStats(updatedTeam).def).toBe(32);   // 24 + 8
       expect(ivan.calculateStats(updatedTeam).def).toBe(18);  // 10 + 8
 
@@ -90,7 +90,7 @@ describe('TASK 5: Team-Wide Djinn Bonuses', () => {
   });
 
   test('🎯 Without team, units get no Djinn bonus', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
@@ -98,24 +98,24 @@ describe('TASK 5: Team-Wide Djinn Bonuses', () => {
 
     // With team: +12 ATK
     if (isOk(equipped)) {
-      expect(isaac.calculateStats(equipped.value).atk).toBe(39); // 27 + 12
+      expect(isaac.calculateStats(equipped.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
     }
 
     // Without team: No Djinn bonus
-    expect(isaac.calculateStats().atk).toBe(27); // Just base
+    expect(isaac.calculateStats().atk).toBe(26); // Just base (BALANCE: 27→26)
 
     // ← PROVES team parameter is required for Djinn bonuses!
   });
 
   test('🎯 Different Djinn compositions give different bonuses', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27, DEF 18, SPD 16
+    const isaac = new Unit(ISAAC, 5); // ATK 26, DEF 18, SPD 16 (BALANCE: 27→26)
 
     // 3 same element: +12 ATK, +8 DEF
     const team1 = createTeam([isaac]);
     team1.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipped1 = equipDjinn(team1, [FLINT, GRANITE, BANE]);
     if (isOk(equipped1)) {
-      expect(isaac.calculateStats(equipped1.value).atk).toBe(39); // 27 + 12
+      expect(isaac.calculateStats(equipped1.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
       expect(isaac.calculateStats(equipped1.value).def).toBe(26); // 18 + 8
     }
 
@@ -124,7 +124,7 @@ describe('TASK 5: Team-Wide Djinn Bonuses', () => {
     team2.collectedDjinn = [FLINT, FORGE, FIZZ];
     const equipped2 = equipDjinn(team2, [FLINT, FORGE, FIZZ]);
     if (isOk(equipped2)) {
-      expect(isaac.calculateStats(equipped2.value).atk).toBe(31); // 27 + 4
+      expect(isaac.calculateStats(equipped2.value).atk).toBe(30); // 26 + 4 (BALANCE: 27→26)
       expect(isaac.calculateStats(equipped2.value).def).toBe(22); // 18 + 4
       expect(isaac.calculateStats(equipped2.value).spd).toBe(20); // 16 + 4
     }
@@ -198,8 +198,8 @@ describe('TASK 5: Djinn Activation System', () => {
   });
 
   test('🎯 Activating Djinn weakens ENTIRE team', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
-    const garet = new Unit(GARET, 5); // ATK 34
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
+    const garet = new Unit(GARET, 5); // ATK 31 (BALANCE: 34→31)
     const mia = new Unit(MIA, 5);     // ATK 20
     const ivan = new Unit(IVAN, 5);   // ATK 18
 
@@ -209,15 +209,15 @@ describe('TASK 5: Djinn Activation System', () => {
 
     if (isOk(equipped)) {
       // Before activation: 3 Venus = +12 ATK to all
-      expect(isaac.calculateStats(equipped.value).atk).toBe(39); // 27 + 12
-      expect(garet.calculateStats(equipped.value).atk).toBe(46); // 34 + 12
+      expect(isaac.calculateStats(equipped.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
+      expect(garet.calculateStats(equipped.value).atk).toBe(43); // 31 + 12 (BALANCE: 34→31)
 
       // Activate Flint (3 Venus → 2 Venus)
       const activated = activateDjinn(equipped.value, 'flint', isaac);
       if (isOk(activated)) {
         // After activation: 2 Venus = +8 ATK (ALL units lose 4 ATK!)
-        expect(isaac.calculateStats(activated.value).atk).toBe(35); // 27 + 8
-        expect(garet.calculateStats(activated.value).atk).toBe(42); // 34 + 8
+        expect(isaac.calculateStats(activated.value).atk).toBe(34); // 26 + 8 (BALANCE: 27→26)
+        expect(garet.calculateStats(activated.value).atk).toBe(39); // 31 + 8 (BALANCE: 34→31)
         expect(mia.calculateStats(activated.value).atk).toBe(28);   // 20 + 8
         expect(ivan.calculateStats(activated.value).atk).toBe(26);  // 18 + 8
 
@@ -265,7 +265,7 @@ describe('TASK 5: Djinn Recovery System', () => {
   });
 
   test('🎯 Recovery restores team strength', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
 
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
@@ -273,16 +273,16 @@ describe('TASK 5: Djinn Recovery System', () => {
 
     if (isOk(equipped)) {
       // Before: 3 Venus = +12 ATK
-      expect(isaac.calculateStats(equipped.value).atk).toBe(39); // 27 + 12
+      expect(isaac.calculateStats(equipped.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
       // Activate: 2 Venus = +8 ATK
       const activated = activateDjinn(equipped.value, 'flint', isaac);
       if (isOk(activated)) {
-        expect(isaac.calculateStats(activated.value).atk).toBe(35); // 27 + 8
+        expect(isaac.calculateStats(activated.value).atk).toBe(34); // 26 + 8 (BALANCE: 27→26)
 
         // After 2 turns: 3 Venus = +12 ATK (restored!)
         const recovered = updateDjinnRecovery(activated.value, 2);
-        expect(isaac.calculateStats(recovered).atk).toBe(39); // 27 + 12
+        expect(isaac.calculateStats(recovered).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
         // ← PROVES recovery restores team strength!
       }
@@ -412,7 +412,7 @@ describe('TASK 5: Summon System', () => {
 describe('CONTEXT-AWARE: Strategic Decisions', () => {
 
   test('🎯 Specialization vs Versatility trade-off', () => {
-    const isaac = new Unit(ISAAC, 5); // ATK 27, DEF 18, SPD 16
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26), DEF 18, SPD 16
 
     // Specialized: 3 Venus (max offensive)
     const team1 = createTeam([isaac]);
@@ -426,12 +426,12 @@ describe('CONTEXT-AWARE: Strategic Decisions', () => {
 
     if (isOk(specialized) && isOk(versatile)) {
       // Specialized: +12 ATK, +8 DEF, +0 SPD
-      expect(isaac.calculateStats(specialized.value).atk).toBe(39); // 27 + 12
+      expect(isaac.calculateStats(specialized.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
       expect(isaac.calculateStats(specialized.value).def).toBe(26); // 18 + 8
       expect(isaac.calculateStats(specialized.value).spd).toBe(16); // 16 + 0
 
       // Versatile: +4 ATK, +4 DEF, +4 SPD
-      expect(isaac.calculateStats(versatile.value).atk).toBe(31); // 27 + 4
+      expect(isaac.calculateStats(versatile.value).atk).toBe(30); // 26 + 4 (BALANCE: 27→26)
       expect(isaac.calculateStats(versatile.value).def).toBe(22); // 18 + 4
       expect(isaac.calculateStats(versatile.value).spd).toBe(20); // 16 + 4
 
@@ -440,7 +440,7 @@ describe('CONTEXT-AWARE: Strategic Decisions', () => {
   });
 
   test('🎯 Activation is high-risk, high-reward', () => {
-    const isaac = new Unit(ISAAC, 5);
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipped = equipDjinn(team, [FLINT, GRANITE, BANE]);
@@ -449,13 +449,13 @@ describe('CONTEXT-AWARE: Strategic Decisions', () => {
       // Risk: Lose 4 ATK for 2 turns (across entire team)
       // Reward: Deal 80 damage (from Flint's unleash)
 
-      // Before: 39 ATK
-      expect(isaac.calculateStats(equipped.value).atk).toBe(39);
+      // Before: 38 ATK (BALANCE: 39→38)
+      expect(isaac.calculateStats(equipped.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
 
-      // After activation: 35 ATK (penalty!)
+      // After activation: 34 ATK (penalty!) (BALANCE: 35→34)
       const activated = activateDjinn(equipped.value, 'flint', isaac);
       if (isOk(activated)) {
-        expect(isaac.calculateStats(activated.value).atk).toBe(35);
+        expect(isaac.calculateStats(activated.value).atk).toBe(34); // 26 + 8 (BALANCE: 27→26)
 
         // Worth it? 80 damage vs 2 turns of -4 ATK penalty
         // ← PROVES activation is a tactical decision!
@@ -502,20 +502,20 @@ describe('EDGE CASES: Team Djinn System', () => {
   });
 
   test('Equipping 0 Djinn clears bonuses', () => {
-    const isaac = new Unit(ISAAC, 5);
+    const isaac = new Unit(ISAAC, 5); // ATK 26 (BALANCE: 27→26)
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
 
     // Equip 3 Djinn
     const equipped = equipDjinn(team, [FLINT, GRANITE, BANE]);
     if (isOk(equipped)) {
-      expect(isaac.calculateStats(equipped.value).atk).toBe(39); // 27 + 12
+      expect(isaac.calculateStats(equipped.value).atk).toBe(38); // 26 + 12 (BALANCE: 27→26)
     }
 
     // Equip 0 Djinn (unequip all)
     const empty = equipDjinn(team, []);
     if (isOk(empty)) {
-      expect(isaac.calculateStats(empty.value).atk).toBe(27); // No bonus
+      expect(isaac.calculateStats(empty.value).atk).toBe(26); // No bonus (BALANCE: 27→26)
     }
   });
 

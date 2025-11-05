@@ -109,7 +109,7 @@ describe('TASK 3: Level Up System', () => {
     // Stats should match level 3
     // Level 3: base + (growth × 2)
     expect(isaac.stats.hp).toBe(140); // 100 + (20 × 2)
-    expect(isaac.stats.atk).toBe(21); // 15 + (3 × 2)
+    expect(isaac.stats.atk).toBe(20); // 14 + (3 × 2) (BALANCE: 21→20)
 
     // ← PROVES multi-level jumps work!
   });
@@ -142,11 +142,11 @@ describe('TASK 3: Level Up System', () => {
     expect(isaac.currentPp).toBe(5);
 
     // Level up
-    isaac.gainXP(100); // Level 2: Max HP 120, Max PP 24
+    isaac.gainXP(100); // Level 2: Max HP 120, Max PP 27 (BALANCE: 24→27)
 
     // Should be fully healed to NEW max values
     expect(isaac.currentHp).toBe(120);
-    expect(isaac.currentPp).toBe(24);
+    expect(isaac.currentPp).toBe(27); // BALANCE: 24→27 (base 24 + 3 growth)
 
     // ← PROVES level up fully heals!
   });
@@ -177,13 +177,13 @@ describe('TASK 3: Level Up System', () => {
 describe('TASK 3: Stat Calculation at Different Levels', () => {
 
   test('✅ Isaac stats match GAME_MECHANICS.md at all levels', () => {
-    // From GAME_MECHANICS.md Section 1.3
+    // From GAME_MECHANICS.md Section 1.3 (BALANCE: ATK base 15→14, PP base 20→24, PP growth 4→3)
     const expectedStats = {
-      1: { hp: 100, pp: 20, atk: 15, def: 10, mag: 12, spd: 12 },
-      2: { hp: 120, pp: 24, atk: 18, def: 12, mag: 14, spd: 13 },
-      3: { hp: 140, pp: 28, atk: 21, def: 14, mag: 16, spd: 14 },
-      4: { hp: 160, pp: 32, atk: 24, def: 16, mag: 18, spd: 15 },
-      5: { hp: 180, pp: 36, atk: 27, def: 18, mag: 20, spd: 16 },
+      1: { hp: 100, pp: 24, atk: 14, def: 10, mag: 12, spd: 12 },
+      2: { hp: 120, pp: 27, atk: 17, def: 12, mag: 14, spd: 13 },
+      3: { hp: 140, pp: 30, atk: 20, def: 14, mag: 16, spd: 14 },
+      4: { hp: 160, pp: 33, atk: 23, def: 16, mag: 18, spd: 15 },
+      5: { hp: 180, pp: 36, atk: 26, def: 18, mag: 20, spd: 16 },
     };
 
     for (let level = 1; level <= 5; level++) {
@@ -202,12 +202,13 @@ describe('TASK 3: Stat Calculation at Different Levels', () => {
   });
 
   test('✅ Garet stats match GAME_MECHANICS.md at all levels', () => {
+    // BALANCE: ATK base 18→19, ATK growth 4→3, DEF base 8→7, SPD base 10→8
     const expectedStats = {
-      1: { hp: 120, pp: 15, atk: 18, def: 8, mag: 10, spd: 10 },
-      2: { hp: 135, pp: 18, atk: 22, def: 9, mag: 12, spd: 11 },
-      3: { hp: 150, pp: 21, atk: 26, def: 10, mag: 14, spd: 12 },
-      4: { hp: 165, pp: 24, atk: 30, def: 11, mag: 16, spd: 13 },
-      5: { hp: 180, pp: 27, atk: 34, def: 12, mag: 18, spd: 14 },
+      1: { hp: 120, pp: 15, atk: 19, def: 7, mag: 10, spd: 8 },
+      2: { hp: 135, pp: 18, atk: 22, def: 8, mag: 12, spd: 9 },
+      3: { hp: 150, pp: 21, atk: 25, def: 9, mag: 14, spd: 10 },
+      4: { hp: 165, pp: 24, atk: 28, def: 10, mag: 16, spd: 11 },
+      5: { hp: 180, pp: 27, atk: 31, def: 11, mag: 18, spd: 12 },
     };
 
     for (let level = 1; level <= 5; level++) {
@@ -365,7 +366,7 @@ describe('EDGE CASES: Leveling System', () => {
 
     expect(isaac.level).toBe(5);
     expect(isaac.stats.hp).toBe(180);
-    expect(isaac.stats.atk).toBe(27);
+    expect(isaac.stats.atk).toBe(26); // BALANCE: 27→26
     expect(isaac.getUnlockedAbilities().length).toBe(5);
   });
 
@@ -406,9 +407,9 @@ describe('DATA INTEGRITY: All 10 Units Level Correctly', () => {
   test('✅ Felix stats match GAME_MECHANICS.md (Rogue Assassin)', () => {
     const felix5 = new Unit(FELIX, 5);
 
-    // From GAME_MECHANICS.md Section 1.3
+    // From GAME_MECHANICS.md Section 1.3 (BALANCE: ATK growth 4→3)
     expect(felix5.stats.hp).toBe(151);  // 95 + (14 × 4)
-    expect(felix5.stats.atk).toBe(33);  // 17 + (4 × 4)
+    expect(felix5.stats.atk).toBe(29);  // 17 + (3 × 4) (BALANCE: 33→29)
     expect(felix5.stats.spd).toBe(30);  // 18 + (3 × 4) - highest SPD!
 
     // ← PROVES Felix's speed specialization!
@@ -417,9 +418,9 @@ describe('DATA INTEGRITY: All 10 Units Level Correctly', () => {
   test('✅ Jenna stats match GAME_MECHANICS.md (AoE Fire Mage)', () => {
     const jenna5 = new Unit(JENNA, 5);
 
-    // From GAME_MECHANICS.md Section 1.3
+    // From GAME_MECHANICS.md Section 1.3 (BALANCE: ATK base 9→11, MAG base 20→28)
     expect(jenna5.stats.hp).toBe(123);  // 75 + (12 × 4)
-    expect(jenna5.stats.mag).toBe(40);  // 20 + (5 × 4) - highest MAG!
+    expect(jenna5.stats.mag).toBe(48);  // 28 + (5 × 4) - highest MAG! (BALANCE: 40→48)
     expect(jenna5.stats.def).toBe(9);   // 5 + (1 × 4) - lowest DEF!
 
     // ← PROVES Jenna's glass cannon design!

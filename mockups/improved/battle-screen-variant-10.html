@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Screen - Combo System Display</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: url('/sprites/backgrounds/gs1/Cave.gif') center/cover;
+      overflow: hidden;
+      border: 4px solid #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 80px;
+      z-index: 10;
+    }
+
+    .enemy-unit {
+      position: relative;
+    }
+
+    .enemy-sprite {
+      animation: enemyFloat 3s ease-in-out infinite;
+    }
+
+    .enemy-sprite img {
+      width: auto;
+      height: 140px;
+      filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
+    }
+
+    @keyframes enemyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .enemy-label-simple {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      color: #e05050;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #e05050;
+    }
+
+    /* Party Area */
+    .party-area {
+      position: absolute;
+      bottom: 260px;
+      left: 0;
+      right: 0;
+      height: 160px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-left: 100px;
+      gap: 50px;
+      z-index: 20;
+    }
+
+    .party-sprite img {
+      width: auto;
+      height: 110px;
+      filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.8));
+    }
+
+    .party-label-simple {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      color: #5090d8;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #5090d8;
+    }
+
+    /* Combo Display Panel - Top Right */
+    .combo-panel {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 320px;
+      background: rgba(0,0,0,0.9);
+      border: 3px solid #d4af37;
+      border-radius: 8px;
+      padding: 12px;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.8);
+    }
+
+    .combo-title {
+      font-size: 8px;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .combo-chain {
+      background: linear-gradient(135deg, #2a2a4a 0%, #1a1a2a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .chain-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .chain-label {
+      font-size: 7px;
+      color: #a858d8;
+    }
+
+    .chain-multiplier {
+      font-size: 9px;
+      color: #d4af37;
+    }
+
+    .chain-steps {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .chain-step {
+      background: rgba(20,20,40,0.8);
+      border: 2px solid #5090d8;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 6px;
+      color: #5090d8;
+      flex: 1;
+      text-align: center;
+    }
+
+    .chain-arrow {
+      color: #d4af37;
+      font-size: 8px;
+    }
+
+    .chain-bonus {
+      background: rgba(212,175,55,0.2);
+      border: 1px solid #d4af37;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 6px;
+      color: #d4af37;
+      text-align: center;
+    }
+
+    /* Elemental Synergy Display */
+    .synergy-display {
+      background: linear-gradient(135deg, #1a3a1a 0%, #0a1a0a 100%);
+      border: 2px solid #50d850;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .synergy-header {
+      font-size: 7px;
+      color: #50d850;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .synergy-elements {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .element-orb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .element-orb.venus {
+      background: radial-gradient(circle, #e8a050 0%, #b87020 100%);
+      border-color: #d4af37;
+      box-shadow: 0 0 8px rgba(232,160,80,0.6);
+    }
+
+    .element-orb.mars {
+      background: radial-gradient(circle, #e05050 0%, #a03030 100%);
+      border-color: #e05050;
+      box-shadow: 0 0 8px rgba(224,80,80,0.6);
+    }
+
+    .element-orb.jupiter {
+      background: radial-gradient(circle, #a858d8 0%, #7030a0 100%);
+      border-color: #a858d8;
+      box-shadow: 0 0 8px rgba(168,88,216,0.6);
+    }
+
+    .synergy-plus {
+      color: #50d850;
+      font-size: 10px;
+    }
+
+    .synergy-bonus-text {
+      font-size: 6px;
+      color: #50d850;
+      text-align: center;
+    }
+
+    /* Active Effects */
+    .active-effects {
+      background: linear-gradient(135deg, #3a2a1a 0%, #1a1a0a 100%);
+      border: 2px solid #e8a050;
+      border-radius: 6px;
+      padding: 8px;
+    }
+
+    .effects-header {
+      font-size: 7px;
+      color: #e8a050;
+      margin-bottom: 6px;
+    }
+
+    .effect-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .effect-badge {
+      background: rgba(232,160,80,0.2);
+      border: 1px solid #e8a050;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 5px;
+      color: #e8a050;
+    }
+
+    /* Bottom Status Bar */
+    .status-bar {
+      position: absolute;
+      bottom: 140px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: rgba(0,0,0,0.85);
+      border-top: 2px solid #d4af37;
+      border-bottom: 2px solid #d4af37;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 20px;
+    }
+
+    .party-hp-quick {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hp-quick-name {
+      font-size: 7px;
+      color: #5090d8;
+      width: 40px;
+    }
+
+    .hp-quick-bar {
+      width: 60px;
+      height: 8px;
+      background: #2a1810;
+      border: 1px solid #5090d8;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .hp-quick-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #50d850 0%, #20a020 100%);
+    }
+
+    /* Command Panel */
+    .command-panel-combo {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 130px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 15%, rgba(0,0,0,0.95) 100%);
+      z-index: 100;
+      padding: 16px 40px;
+    }
+
+    .combo-hint {
+      text-align: center;
+      font-size: 7px;
+      color: #a858d8;
+      margin-bottom: 10px;
+      background: rgba(168,88,216,0.1);
+      border: 1px solid #a858d8;
+      border-radius: 4px;
+      padding: 6px;
+    }
+
+    .commands-combo {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .combo-btn {
+      background: linear-gradient(180deg, #3a3a5a 0%, #1a1a3a 100%);
+      border: 2px solid #6a6a8a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    .combo-btn.combo-ready {
+      border-color: #d4af37;
+      box-shadow: 0 0 12px rgba(212,175,55,0.5);
+    }
+
+    .combo-btn:hover {
+      background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
+      border-color: #d4af37;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(212,175,55,0.3);
+    }
+
+    .combo-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #d4af37;
+      color: #000;
+      font-size: 6px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .btn-icon {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-container">
+    <!-- Combo Panel -->
+    <div class="combo-panel">
+      <div class="combo-title">⚡ COMBO SYSTEM ⚡</div>
+
+      <!-- Active Combo Chain -->
+      <div class="combo-chain">
+        <div class="chain-header">
+          <div class="chain-label">ELEMENTAL CHAIN</div>
+          <div class="chain-multiplier">×2.4</div>
+        </div>
+        <div class="chain-steps">
+          <div class="chain-step">ISAAC<br>QUAKE</div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-step">GARET<br>VOLCANO</div>
+          <div class="chain-arrow">→</div>
+          <div class="chain-step">???</div>
+        </div>
+        <div class="chain-bonus">+140% DAMAGE NEXT HIT</div>
+      </div>
+
+      <!-- Elemental Synergy -->
+      <div class="synergy-display">
+        <div class="synergy-header">ELEMENTAL SYNERGY ACTIVE</div>
+        <div class="synergy-elements">
+          <div class="element-orb venus">♁</div>
+          <div class="synergy-plus">+</div>
+          <div class="element-orb mars">♂</div>
+          <div class="synergy-plus">+</div>
+          <div class="element-orb jupiter">♃</div>
+        </div>
+        <div class="synergy-bonus-text">TRINITY BOOST • +50% ALL STATS</div>
+      </div>
+
+      <!-- Active Effects -->
+      <div class="active-effects">
+        <div class="effects-header">ACTIVE BUFFS</div>
+        <div class="effect-badges">
+          <div class="effect-badge">⬆ ATK +30%</div>
+          <div class="effect-badge">🛡️ DEF +20%</div>
+          <div class="effect-badge">⚡ AGI +25%</div>
+          <div class="effect-badge">✨ PP REGEN</div>
+          <div class="effect-badge">🔥 FIRE ENHANCE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enemy Area -->
+    <div class="enemy-area">
+      <div class="enemy-unit">
+        <div class="enemy-sprite">
+          <img src="/sprites/battle/enemies/Thunder_Lizard.gif" alt="Thunder Lizard">
+        </div>
+        <div class="enemy-label-simple">THUNDER LIZARD</div>
+      </div>
+
+      <div class="enemy-unit">
+        <div class="enemy-sprite" style="animation-delay: -1.5s;">
+          <img src="/sprites/battle/enemies/Dire_Wolf.gif" alt="Dire Wolf">
+        </div>
+        <div class="enemy-label-simple">DIRE WOLF</div>
+      </div>
+    </div>
+
+    <!-- Party Area -->
+    <div class="party-area">
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Isaac_Long Sword_Front.gif" alt="Isaac">
+        </div>
+        <div class="party-label-simple">ISAAC</div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Garet_Axe_Front.gif" alt="Garet">
+        </div>
+        <div class="party-label-simple">GARET</div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Ivan_Short Sword_Front.gif" alt="Ivan">
+        </div>
+        <div class="party-label-simple">IVAN</div>
+      </div>
+
+      <div class="party-unit">
+        <div class="party-sprite">
+          <img src="/sprites/battle/party/Mia_Staff_Front.gif" alt="Mia">
+        </div>
+        <div class="party-label-simple">MIA</div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="party-hp-quick">
+        <div class="hp-quick-name">ISAAC</div>
+        <div class="hp-quick-bar">
+          <div class="hp-quick-fill" style="width: 85%;"></div>
+        </div>
+      </div>
+
+      <div class="party-hp-quick">
+        <div class="hp-quick-name">GARET</div>
+        <div class="hp-quick-bar">
+          <div class="hp-quick-fill" style="width: 70%;"></div>
+        </div>
+      </div>
+
+      <div class="party-hp-quick">
+        <div class="hp-quick-name">IVAN</div>
+        <div class="hp-quick-bar">
+          <div class="hp-quick-fill" style="width: 92%;"></div>
+        </div>
+      </div>
+
+      <div class="party-hp-quick">
+        <div class="hp-quick-name">MIA</div>
+        <div class="hp-quick-bar">
+          <div class="hp-quick-fill" style="width: 88%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Panel -->
+    <div class="command-panel-combo">
+      <div class="combo-hint">
+        💡 Use Jupiter Psynergy to complete the Trinity Chain! Bonus damage awaits!
+      </div>
+
+      <div class="commands-combo">
+        <button class="combo-btn">
+          <div class="btn-icon">⚔️</div>
+          <div>ATTACK</div>
+        </button>
+
+        <button class="combo-btn combo-ready">
+          <span class="combo-badge">COMBO</span>
+          <div class="btn-icon">✨</div>
+          <div>PSYNERGY</div>
+        </button>
+
+        <button class="combo-btn combo-ready">
+          <span class="combo-badge">SYNERGY</span>
+          <div class="btn-icon">🔮</div>
+          <div>DJINN</div>
+        </button>
+
+        <button class="combo-btn">
+          <div class="btn-icon">🛡️</div>
+          <div>DEFEND</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

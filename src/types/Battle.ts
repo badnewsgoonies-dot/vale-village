@@ -1,6 +1,7 @@
 import type { Unit } from './Unit';
 import type { Team } from './Team';
 import type { Ability } from './Ability';
+import type { Stats } from './Stats';
 import { getElementModifier } from './Element';
 import { Ok, Err, type Result } from '@/utils/Result';
 import type { RNG } from '@/utils/SeededRNG';
@@ -8,9 +9,9 @@ import { globalRNG } from '@/utils/SeededRNG';
 import {
   calculateBattleRewards,
   distributeRewards,
-  type EnemyReward,
   type RewardDistribution,
 } from './BattleRewards';
+import { ENEMIES } from '@/data/enemies';
 
 /**
  * Battle result types
@@ -34,6 +35,7 @@ export interface ActionResult {
   damage?: number;
   healing?: number;
   critical?: boolean;
+  dodged?: boolean;
   message: string;
   targetIds: string[];
 }
@@ -63,6 +65,9 @@ export interface BattleState {
 
   /** Battle log (for UI display) */
   log: string[];
+
+  /** Is this a boss battle? (cannot flee) */
+  isBossBattle?: boolean;
 }
 
 /**
@@ -186,9 +191,15 @@ export function calculatePsynergyDamage(
     ? getElementModifier(ability.element, defender.element)
     : 1.0;
 
-  const damage = Math.floor(
+  let damage = Math.floor(
     (basePower + magicPower - magicDefense) * elementModifier * getRandomMultiplier(rng)
   );
+
+  // Apply elemental resist from armor (e.g., Dragon Scales)
+  const resist = defender.equipment.armor?.elementalResist || 0;
+  if (ability.element && resist > 0) {
+    damage = Math.floor(damage * (1 - resist));
+  }
 
   return Math.max(1, damage);
 }
@@ -220,6 +231,29 @@ export function calculateHealAmount(
 
   // ALWAYS clamp final result to minimum 0
   return Math.max(0, healAmount);
+}
+
+/**
+ * Check if defender dodges attacker's ability
+ * From GAME_MECHANICS.md Section 5.1.4
+ * 
+ * Formula: baseEvasion (5%) + equipmentEvasion + speedBonus
+ * Speed bonus = 1% per SPD difference in defender's favor
+ * Final evasion capped at 75%
+ */
+export function checkDodge(
+  attacker: Unit,
+  defender: Unit,
+  rng: RNG = globalRNG
+): boolean {
+  const BASE_EVASION = 0.05; // 5% base
+  const equipmentEvasion = defender.equipment.boots?.evasion || 0;
+  const speedBonus = (defender.stats.spd - attacker.stats.spd) * 0.01; // 1% per SPD point
+  
+  const totalEvasion = BASE_EVASION + (equipmentEvasion / 100) + speedBonus;
+  const finalEvasion = Math.max(0, Math.min(0.75, totalEvasion)); // Clamp to 0-75%
+  
+  return rng.next() < finalEvasion;
 }
 
 /**
@@ -266,11 +300,26 @@ export function executeAbility(
     case 'physical':
     case 'psynergy': {
       let totalDamage = 0;
+      let elementModifier = 1.0;
+      let anyDodged = false;
 
       for (const target of targets) {
+        // Check for dodge BEFORE calculating damage
+        const dodged = checkDodge(caster, target, rng);
+        
+        if (dodged) {
+          anyDodged = true;
+          continue; // Skip damage for this target
+        }
+
         let damage = ability.type === 'physical'
           ? calculatePhysicalDamage(caster, target, ability, rng)
           : calculatePsynergyDamage(caster, target, ability, rng);
+
+        // Capture element modifier for psynergy attacks (for messaging)
+        if (ability.type === 'psynergy' && ability.element) {
+          elementModifier = getElementModifier(ability.element, target.element);
+        }
 
         // Apply critical hit multiplier
         if (isCritical) {
@@ -282,8 +331,36 @@ export function executeAbility(
         totalDamage += actualDamage;
       }
 
-      message += isCritical ? ' Critical hit!' : '';
-      message += ` Deals ${totalDamage} damage!`;
+      // Build message based on what happened
+      if (anyDodged && totalDamage === 0) {
+        // All attacks dodged
+        message += ' Miss!';
+        return {
+          message,
+          targetIds,
+          dodged: true,
+          damage: 0,
+        };
+      }
+
+      if (anyDodged && totalDamage > 0) {
+        // Some dodged, some hit
+        message += isCritical ? ' Critical hit!' : '';
+        message += ` Deals ${totalDamage} damage! (Some attacks missed)`;
+      } else {
+        // None dodged
+        message += isCritical ? ' Critical hit!' : '';
+        message += ` Deals ${totalDamage} damage!`;
+      }
+      
+      // Add element effectiveness message
+      if (ability.type === 'psynergy' && ability.element && elementModifier !== 1.0) {
+        if (elementModifier > 1.0) {
+          message += ' Super effective!';
+        } else if (elementModifier < 1.0) {
+          message += ' Not very effective...';
+        }
+      }
 
       return {
         damage: totalDamage,
@@ -325,7 +402,10 @@ export function executeAbility(
       for (const target of targets) {
         if (ability.buffEffect) {
           // Add status effect for each stat modifier
+          // Only include stats that are in the Stats type (filter out 'evasion' etc.)
+          const validStats: Array<keyof Stats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
           for (const [stat, modifier] of Object.entries(ability.buffEffect)) {
+<<<<<<< HEAD
             if (typeof modifier === 'number') {
               // Skip evasion as it's not part of core Stats type (handled separately)
               if (stat === 'evasion') continue;
@@ -333,6 +413,12 @@ export function executeAbility(
               target.statusEffects.push({
                 type: ability.type === 'buff' ? 'buff' : 'debuff',
                 stat: stat as 'atk' | 'def' | 'mag' | 'spd',
+=======
+            if (typeof modifier === 'number' && validStats.includes(stat as keyof Stats)) {
+              target.statusEffects.push({
+                type: ability.type === 'buff' ? 'buff' : 'debuff',
+                stat: stat as keyof Stats,
+>>>>>>> 97cd426c17963a2a2bad1e353a04091e8f31bbd5
                 modifier,
                 duration: ability.duration || 3,
               });
@@ -369,6 +455,64 @@ export function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleR
   if (allPlayerKO) return BattleResult.PLAYER_DEFEAT;
 
   return null;
+}
+
+/**
+ * Process status effect tick at start of unit's turn
+ * From GAME_MECHANICS.md Section 5.3
+ * 
+ * Poison: 8% max HP damage per turn
+ * Burn: 10% max HP damage per turn
+ * Freeze: Skip turn, 30% break chance per turn
+ * Paralyze: Checked separately before action execution
+ */
+export function processStatusEffectTick(
+  unit: Unit,
+  rng: RNG = globalRNG
+): { damage: number; messages: string[] } {
+  let totalDamage = 0;
+  const messages: string[] = [];
+
+  for (const effect of unit.statusEffects) {
+    if (effect.type === 'poison') {
+      const damage = Math.floor(unit.maxHp * 0.08);
+      const actualDamage = unit.takeDamage(damage);
+      totalDamage += actualDamage;
+      messages.push(`${unit.name} takes ${actualDamage} poison damage!`);
+    } else if (effect.type === 'burn') {
+      const damage = Math.floor(unit.maxHp * 0.10);
+      const actualDamage = unit.takeDamage(damage);
+      totalDamage += actualDamage;
+      messages.push(`${unit.name} takes ${actualDamage} burn damage!`);
+    } else if (effect.type === 'freeze') {
+      const breakChance = 0.3; // 30% chance to break free
+      if (rng.next() < breakChance) {
+        messages.push(`${unit.name} broke free from freeze!`);
+        effect.duration = 0; // Mark for removal
+      } else {
+        messages.push(`${unit.name} is frozen and cannot act!`);
+      }
+    }
+  }
+
+  return { damage: totalDamage, messages };
+}
+
+/**
+ * Check if unit's action fails due to paralyze
+ * From GAME_MECHANICS.md Section 5.3
+ * 
+ * Paralyze: 50% chance action fails
+ */
+export function checkParalyzeFailure(
+  unit: Unit,
+  rng: RNG = globalRNG
+): boolean {
+  const paralyzed = unit.statusEffects.find(e => e.type === 'paralyze');
+  if (paralyzed && rng.next() < 0.5) {
+    return true; // Action fails (50% chance)
+  }
+  return false;
 }
 
 /**
@@ -502,21 +646,34 @@ export function processBattleVictory(
     throw new Error('Can only process rewards for player victory');
   }
 
-  // Convert enemies to reward data
-  const enemyRewards: EnemyReward[] = battle.enemies.map(enemy => ({
-    baseXp: 20, // Default values - in real game, would come from enemy definition
-    baseGold: 15,
-    level: enemy.level,
-  }));
+  // Get Enemy definitions from defeated enemy units
+  const defeatedEnemies = battle.enemies.map(enemyUnit => {
+    const enemyDef = ENEMIES[enemyUnit.id];
+    if (!enemyDef) {
+      // Fallback for unknown enemies
+      console.warn(`Unknown enemy ID: ${enemyUnit.id}, using default rewards`);
+      return {
+        id: enemyUnit.id,
+        name: enemyUnit.name,
+        level: enemyUnit.level,
+        stats: enemyUnit.baseStats,
+        abilities: enemyUnit.abilities,
+        element: enemyUnit.element,
+        baseXp: 20,
+        baseGold: 15,
+      };
+    }
+    return enemyDef;
+  });
 
   // Check survival status
   const alivePlayerUnits = battle.playerTeam.units.filter(u => !u.isKO);
   const allSurvived = alivePlayerUnits.length === battle.playerTeam.units.length;
   const survivorCount = alivePlayerUnits.length;
 
-  // Calculate rewards
+  // Calculate rewards (including equipment drops)
   const rewards = calculateBattleRewards(
-    enemyRewards,
+    defeatedEnemies,
     allSurvived,
     survivorCount,
     rng

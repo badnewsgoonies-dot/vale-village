@@ -1,7 +1,9 @@
 import type { Unit } from './Unit';
 import type { Team } from './Team';
+import type { Equipment } from './Equipment';
 import type { RNG } from '@/utils/SeededRNG';
 import { globalRNG } from '@/utils/SeededRNG';
+import type { Enemy } from '@/data/enemies';
 
 /**
  * Battle Rewards System
@@ -41,6 +43,9 @@ export interface BattleRewards {
 
   /** Number of enemies defeated */
   enemiesDefeated: number;
+
+  /** Equipment dropped from enemies */
+  equipmentDrops: Equipment[];
 }
 
 /**
@@ -77,21 +82,49 @@ export interface RewardDistribution {
 }
 
 /**
+ * Calculate equipment drops from defeated enemies
+ *
+ * @param enemies - Array of defeated Enemy instances (with drops data)
+ * @param rng - RNG instance for deterministic testing
+ * @returns Array of dropped equipment
+ */
+export function calculateEquipmentDrops(
+  enemies: Enemy[],
+  rng: RNG = globalRNG
+): Equipment[] {
+  const drops: Equipment[] = [];
+
+  for (const enemy of enemies) {
+    if (enemy.drops) {
+      for (const drop of enemy.drops) {
+        // Roll for drop chance
+        if (rng.next() < drop.chance) {
+          drops.push(drop.equipment);
+        }
+      }
+    }
+  }
+
+  return drops;
+}
+
+/**
  * Calculate total rewards from defeated enemies
  *
  * Formulas (Golden Sun-inspired):
  * - XP per enemy: baseXp × level × survivalBonus
  * - Gold per enemy: baseGold × level × random(1.0, 1.2)
  * - Survival bonus: 1.5× if all party members survive
+ * - Equipment drops: Based on enemy drops table and RNG
  *
- * @param enemies - Array of defeated enemies with reward data
+ * @param enemies - Array of defeated Enemy instances
  * @param allSurvived - True if all party members survived
  * @param survivorCount - Number of surviving party members
  * @param rng - RNG instance for deterministic testing
  * @returns Calculated battle rewards
  */
 export function calculateBattleRewards(
-  enemies: EnemyReward[],
+  enemies: Enemy[],
   allSurvived: boolean,
   survivorCount: number,
   rng: RNG = globalRNG
@@ -105,6 +138,7 @@ export function calculateBattleRewards(
       survivorCount,
       allSurvived,
       enemiesDefeated: 0,
+      equipmentDrops: [],
     };
   }
 
@@ -117,6 +151,7 @@ export function calculateBattleRewards(
       survivorCount: 0,
       allSurvived: false,
       enemiesDefeated: enemies.length,
+      equipmentDrops: [],
     };
   }
 
@@ -139,6 +174,9 @@ export function calculateBattleRewards(
     totalGold += Math.floor(baseGoldReward * variance);
   }
 
+  // Calculate equipment drops
+  const equipmentDrops = calculateEquipmentDrops(enemies, rng);
+
   // Split XP equally among survivors
   const xpPerUnit = Math.floor(totalXp / survivorCount);
 
@@ -149,6 +187,7 @@ export function calculateBattleRewards(
     survivorCount,
     allSurvived,
     enemiesDefeated: enemies.length,
+    equipmentDrops,
   };
 }
 
