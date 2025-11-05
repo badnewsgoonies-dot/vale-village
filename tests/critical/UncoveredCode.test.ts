@@ -29,7 +29,7 @@ describe('CRITICAL: Equipment Edge Cases (78.37% coverage - missing 22%)', () =>
     expect(() => isaac.equipItem('weapon', brokenItem)).not.toThrow();
 
     // Stats should remain unchanged (graceful degradation)
-    expect(isaac.stats.atk).toBe(27); // No bonus applied
+    expect(isaac.stats.atk).toBe(26); // No bonus applied (BALANCE: 27→26)
   });
 
   test('What if equipment has undefined stat values?', () => {
@@ -50,7 +50,7 @@ describe('CRITICAL: Equipment Edge Cases (78.37% coverage - missing 22%)', () =>
     isaac.equipItem('weapon', weirdItem);
 
     // Should handle undefined gracefully (treat as 0)
-    expect(isaac.stats.atk).toBe(27); // Base, no crash
+    expect(isaac.stats.atk).toBe(26); // Base, no crash (BALANCE: 27→26)
   });
 
   test('What if equipment has negative stat bonuses?', () => {
@@ -70,7 +70,7 @@ describe('CRITICAL: Equipment Edge Cases (78.37% coverage - missing 22%)', () =>
     isaac.equipItem('weapon', cursedItem);
 
     // Negative bonuses should work (cursed items)
-    expect(isaac.stats.atk).toBe(17); // 27 - 10
+    expect(isaac.stats.atk).toBe(16); // 26 - 10 (BALANCE: 27→26)
   });
 });
 
@@ -148,8 +148,8 @@ describe('CRITICAL: Status Effect Duration Edge Cases', () => {
       { type: 'buff', stat: 'atk', modifier: 1.3, duration: 2 }
     );
 
-    // Should multiply: 27 × 1.5 × 1.3 = 52.65 → 52
-    expect(isaac.stats.atk).toBe(52);
+    // Should multiply: 26 × 1.5 × 1.3 = 50.7 → 50 (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(50);
   });
 
   test('What if buff and debuff on same stat?', () => {
@@ -160,8 +160,8 @@ describe('CRITICAL: Status Effect Duration Edge Cases', () => {
       { type: 'debuff', stat: 'atk', modifier: 0.5, duration: 2 }
     );
 
-    // 27 × 2.0 × 0.5 = 27 (cancel out!)
-    expect(isaac.stats.atk).toBe(27);
+    // 26 × 2.0 × 0.5 = 26 (cancel out!) (BALANCE: 27→26)
+    expect(isaac.stats.atk).toBe(26);
   });
 });
 
@@ -244,15 +244,15 @@ describe('CRITICAL: Djinn System Edge Cases', () => {
     const isaac = new Unit(ISAAC, 5);
     isaac.equipDjinn([FLINT, GRANITE, BANE]);
 
-    const beforeAtk = isaac.stats.atk; // 27 + 12 = 39
+    const beforeAtk = isaac.stats.atk; // 26 + 12 = 38 (BALANCE: 27→26)
 
     // Unequip all
     isaac.equipDjinn([]);
 
-    const afterAtk = isaac.stats.atk; // 27 (no bonus)
+    const afterAtk = isaac.stats.atk; // 26 (no bonus) (BALANCE: 27→26)
 
     expect(afterAtk).toBeLessThan(beforeAtk);
-    expect(afterAtk).toBe(27);
+    expect(afterAtk).toBe(26);
   });
 });
 
@@ -307,7 +307,7 @@ describe('CRITICAL: calculateStats() Edge Cases', () => {
     const stats = isaac.calculateStats();
 
     // Should work (no team Djinn bonuses)
-    expect(stats.atk).toBe(27);
+    expect(stats.atk).toBe(26); // (BALANCE: 27→26)
   });
 
   test('What if calculateStats called with team that unit is not in?', () => {
@@ -320,7 +320,7 @@ describe('CRITICAL: calculateStats() Edge Cases', () => {
     const stats = isaac.calculateStats(otherTeam as any);
 
     // Should not get Djinn bonuses (not in team)
-    expect(stats.atk).toBe(27);
+    expect(stats.atk).toBe(26); // (BALANCE: 27→26)
   });
 
   test('Performance: calculateStats called 10,000 times', () => {

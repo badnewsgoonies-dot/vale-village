@@ -22,11 +22,11 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
    * From GAME_MECHANICS.md Section 3.2 - Equipment Example
    *
    * "Example: Isaac Level 5, Iron Sword, Iron Armor, Team has 3 Venus Djinn equipped
-   *  Base (Lv5): HP 180, ATK 27, DEF 18, MAG 20, SPD 16
+   *  Base (Lv5): HP 180, ATK 26, DEF 18, MAG 20, SPD 16 (BALANCE: 27→26)
    *  Iron Sword: ATK +12
    *  Iron Armor: HP +20, DEF +10
    *  3 Venus Djinn (team): ATK +12, DEF +8 (ALL units get this!)
-   *  FINAL: HP 200, ATK 51, DEF 36, MAG 20, SPD 16"
+   *  FINAL: HP 200, ATK 50, DEF 36, MAG 20, SPD 16 (BALANCE: 51→50)"
    */
   test('📋 Section 3.2 Equipment Example: Isaac L5 with Iron Sword, Iron Armor, 3 Venus Djinn', () => {
     const isaac = new Unit(ISAAC, 5);

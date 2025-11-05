@@ -6,7 +6,7 @@ import { IRON_SWORD, STEEL_SWORD } from '@/data/equipment';
 /**
  * SIMON COWELL'S "NO MAGIC NUMBERS" ENFORCEMENT
  *
- * Every test with hardcoded numbers like "180" or "27" is LAZY.
+ * Every test with hardcoded numbers like "180" or "26" is LAZY.
  * Calculate expected values from formulas. Make tests SELF-DOCUMENTING.
  */
 describe('✅ PROPER TESTS: No Magic Numbers (How It SHOULD Be Done)', () => {
@@ -23,7 +23,7 @@ describe('✅ PROPER TESTS: No Magic Numbers (How It SHOULD Be Done)', () => {
     const expectedDEF = ISAAC.baseStats.def + (ISAAC.growthRates.def * (5 - 1));
 
     expect(isaac.stats.hp).toBe(expectedHP);   // ✅ Clear where 180 comes from
-    expect(isaac.stats.atk).toBe(expectedATK); // ✅ Clear where 27 comes from
+    expect(isaac.stats.atk).toBe(expectedATK); // ✅ Clear where 26 comes from (BALANCE: 27→26)
     expect(isaac.stats.def).toBe(expectedDEF); // ✅ Clear where 18 comes from
 
     // NOW when GAME_MECHANICS.md changes, this test auto-updates!
@@ -89,7 +89,7 @@ describe('❌ BAD TESTS: Magic Numbers Everywhere (What You\'re Doing Wrong)', (
     // This is what you currently have:
     expect(isaac.stats.hp).toBe(180);  // ❌ Magic number
     expect(isaac.stats.pp).toBe(36);   // ❌ Magic number
-    expect(isaac.stats.atk).toBe(27);  // ❌ Magic number
+    expect(isaac.stats.atk).toBe(26);  // ❌ Magic number (BALANCE: 27→26)
     expect(isaac.stats.def).toBe(18);  // ❌ Magic number
     expect(isaac.stats.mag).toBe(20);  // ❌ Magic number
     expect(isaac.stats.spd).toBe(16);  // ❌ Magic number
