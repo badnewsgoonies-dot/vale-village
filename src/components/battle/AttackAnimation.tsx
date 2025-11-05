@@ -30,6 +30,7 @@ const ATTACK_COLORS: Record<Element, string> = {
   Mars: '#ef4444', // Red - fire, aggressive
   Mercury: '#3b82f6', // Blue - water/ice, cool
   Jupiter: '#f59e0b', // Amber - wind/lightning, energetic
+  Neutral: '#9ca3af', // Gray - neutral attacks
 };
 
 // Default color for non-elemental attacks
