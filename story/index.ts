@@ -14,6 +14,11 @@ import { firstBattleIntro } from './battle-intros/first-battle';
 import { trainingMatchIntro } from './battle-intros/training-match';
 import { tournamentIntro } from './battle-intros/tournament';
 import { sanctumChallengeIntro } from './battle-intros/sanctum-challenge';
+import { rivalDuelIntro } from './battle-intros/rival-duel';
+import { mercuryGuardianIntro } from './battle-intros/guardian-mercury';
+import { venusGuardianIntro } from './battle-intros/guardian-venus';
+import { marsGuardianIntro } from './battle-intros/guardian-mars';
+import { jupiterGuardianIntro } from './battle-intros/guardian-jupiter';
 
 /**
  * Story scene registry
@@ -33,6 +38,13 @@ export const storyScenes: Record<string, DialogueTree> = {
   'training-match': trainingMatchIntro,
   'tournament': tournamentIntro,
   'sanctum-challenge': sanctumChallengeIntro,
+  'rival-duel': rivalDuelIntro,
+
+  // Guardian challenge scenes
+  'guardian-mercury': mercuryGuardianIntro,
+  'guardian-venus': venusGuardianIntro,
+  'guardian-mars': marsGuardianIntro,
+  'guardian-jupiter': jupiterGuardianIntro,
 };
 
 /**
@@ -101,5 +113,35 @@ export const sceneMetadata: StorySceneMetadata[] = [
     type: 'battle-context',
     title: 'Sol Sanctum Challenge',
     description: 'Context for guardian battles',
+  },
+  {
+    id: 'rival-duel',
+    type: 'battle-context',
+    title: 'Rival Duel',
+    description: 'Personal rivalry battles',
+  },
+  {
+    id: 'guardian-mercury',
+    type: 'battle-context',
+    title: 'Mercury Guardian Trial',
+    description: 'Test of wisdom and control',
+  },
+  {
+    id: 'guardian-venus',
+    type: 'battle-context',
+    title: 'Venus Guardian Trial',
+    description: 'Test of strength and resolve',
+  },
+  {
+    id: 'guardian-mars',
+    type: 'battle-context',
+    title: 'Mars Guardian Trial',
+    description: 'Test of passion and discipline',
+  },
+  {
+    id: 'guardian-jupiter',
+    type: 'battle-context',
+    title: 'Jupiter Guardian Trial',
+    description: 'Test of speed and precision',
   },
 ];
