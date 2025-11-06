@@ -2,9 +2,11 @@
  * NPC Dialogue Trees
  *
  * Contains all dialogue data for NPCs in Vale Village and beyond.
+ * Also includes story scenes (intro, chapters, battle contexts).
  */
 
 import type { DialogueTree } from '@/types/Dialogue';
+import { storyScenes } from '../../story';
 
 /**
  * Elder - Introduces the game, provides tutorial guidance
@@ -370,8 +372,10 @@ const villager2Dialogue: DialogueTree = {
 /**
  * Main dialogue registry
  * Maps NPC IDs to their dialogue trees
+ * Also includes story scenes for narrator-driven content
  */
 export const dialogueRegistry: Record<string, DialogueTree> = {
+  // NPCs
   elder: elderDialogue,
   garet: garetDialogue,
   jenna: jennaDialogue,
@@ -380,6 +384,9 @@ export const dialogueRegistry: Record<string, DialogueTree> = {
   innkeeper: innkeeperDialogue,
   'villager-1': villager1Dialogue,
   'villager-2': villager2Dialogue,
+
+  // Story scenes (imported from story/ directory)
+  ...storyScenes,
 };
 
 /**
