@@ -54,32 +54,8 @@ export const ScreenRouter: React.FC = () => {
     case 'PARTY_MANAGEMENT':
       return <PartyManagementScreen />;
 
-    case 'EQUIPMENT': {
-      // Get actual Unit instances
-      const units = state.playerData.unitsCollected;
-
-      // Get selected unit from screen state
-      const unitId = (screen as any).unitId || state.playerData.activePartyIds[0];
-      const selectedUnit = units.find(u => u.id === unitId) || units[0];
-
-      // Get inventory as Equipment instances
-      const inventory = state.playerData.inventory;
-
-      return (
-        <EquipmentScreen
-          units={units}
-          selectedUnit={selectedUnit}
-          inventory={inventory}
-          onEquipItem={(unitId, slot, equipment) => {
-            actions.equipItem(unitId, slot, equipment);
-          }}
-          onUnequipItem={(unitId, slot) => {
-            actions.unequipItem(unitId, slot);
-          }}
-          onReturn={() => actions.goBack()}
-        />
-      );
-    }
+    case 'EQUIPMENT':
+      return <EquipmentScreen />;
 
     case 'REWARDS':
       // Get rewards from last battle

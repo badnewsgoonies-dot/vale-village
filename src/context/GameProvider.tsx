@@ -5,6 +5,8 @@ import type { PlayerData } from '@/types/PlayerData';
 import { Unit } from '@/types/Unit';
 import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
 import type { Equipment, EquipmentLoadout } from '@/types/Equipment';
+import { EQUIPMENT } from '@/data/equipment';
+import { ALL_DJINN } from '@/data/djinn';
 import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
@@ -29,20 +31,34 @@ function enemyToUnit(enemy: Enemy): Unit {
 }
 
 function createInitialPlayerData(): PlayerData {
-  // Create starter party: Isaac, Garet, Ivan, Mia
+  // Create ALL 10 units for testing
   const isaac = new Unit(UNIT_DEFINITIONS.isaac);
   const garet = new Unit(UNIT_DEFINITIONS.garet);
   const ivan = new Unit(UNIT_DEFINITIONS.ivan);
   const mia = new Unit(UNIT_DEFINITIONS.mia);
+  const felix = new Unit(UNIT_DEFINITIONS.felix);
+  const jenna = new Unit(UNIT_DEFINITIONS.jenna);
+  const sheba = new Unit(UNIT_DEFINITIONS.sheba);
+  const piers = new Unit(UNIT_DEFINITIONS.piers);
+  const kraden = new Unit(UNIT_DEFINITIONS.kraden);
+  const kyle = new Unit(UNIT_DEFINITIONS.kyle);
+
+  const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
+
+  // For testing: Unlock all Djinn
+  const allDjinn = Object.values(ALL_DJINN);
+
+  // For testing: Add all equipment to inventory
+  const allEquipment = Object.values(EQUIPMENT);
 
   return {
-    unitsCollected: [isaac, garet, ivan, mia],
-    activePartyIds: [isaac.id, garet.id, ivan.id, mia.id],
+    unitsCollected: allUnits, // All 10 units unlocked
+    activePartyIds: [isaac.id, garet.id, ivan.id, mia.id], // First 4 active
     recruitmentFlags: {},
-    gold: 100,
-    inventory: [],
+    gold: 10000, // More gold for testing
+    inventory: allEquipment, // All equipment available
     items: {}, // Start with no consumable items
-    djinnCollected: [],
+    djinnCollected: allDjinn, // All Djinn unlocked
     equippedDjinnIds: [],
     storyFlags: {},
   };

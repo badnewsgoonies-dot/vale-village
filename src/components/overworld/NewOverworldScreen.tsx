@@ -239,6 +239,10 @@ export const NewOverworldScreen: React.FC = () => {
         case 'J':
           actions.navigate({ type: 'DJINN_MENU' });
           break;
+        case 'e':
+        case 'E':
+          actions.navigate({ type: 'EQUIPMENT', unitId: state.playerData.activePartyIds[0] });
+          break;
         case 'Escape':
           if (showDialogue) {
             closeDialogue();
@@ -394,7 +398,7 @@ export const NewOverworldScreen: React.FC = () => {
 
       {/* Controls */}
       <div className="controls-hud">
-        <p>WASD/Arrows: Move | Space: Interact | P: Party | J: Djinn | ESC: Menu</p>
+        <p>WASD/Arrows: Move | Space: Interact | P: Party | J: Djinn | E: Equipment | ESC: Menu</p>
       </div>
     </div>
   );

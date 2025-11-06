@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
@@ -6,25 +7,31 @@ import type { Unit } from '@/types/Unit';
 import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import './EquipmentScreen.css';
 
-interface EquipmentScreenProps {
-  units: Unit[];
-  selectedUnit: Unit;
-  inventory: Equipment[];
-  onEquipItem: (unitId: string, slot: EquipmentSlot, equipment: Equipment) => void;
-  onUnequipItem: (unitId: string, slot: EquipmentSlot) => void;
-  onReturn: () => void;
-}
-
-export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
-  units,
-  selectedUnit: initialSelectedUnit,
-  inventory,
-  onEquipItem,
-  onUnequipItem,
-  onReturn
-}) => {
-  const [selectedUnit, setSelectedUnit] = useState<Unit>(initialSelectedUnit);
+export const EquipmentScreen: React.FC = () => {
+  const { state, actions } = useGame();
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
+  const [showAllUnits, setShowAllUnits] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const allUnits = state.playerData.unitsCollected;
+  const activePartyIds = state.playerData.activePartyIds;
+  const inventory = state.playerData.inventory;
+
+  // Split units into active and bench
+  const activeUnits = allUnits.filter(u => activePartyIds.includes(u.id));
+  const benchUnits = allUnits.filter(u => !activePartyIds.includes(u.id));
+
+  // Auto-select first active unit if none selected
+  React.useEffect(() => {
+    if (!selectedUnit && activeUnits.length > 0) {
+      setSelectedUnit(activeUnits[0]);
+    }
+  }, [activeUnits, selectedUnit]);
+
+  if (!selectedUnit) {
+    return <div className="equipment-screen">Loading...</div>;
+  }
 
   const currentEquipment = selectedUnit.equipment;
 
@@ -51,12 +58,18 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   const currentStats = selectedUnit.calculateStats();
 
   const handleEquipItem = (item: Equipment) => {
-    onEquipItem(selectedUnit.id, item.slot, item);
+    actions.equipItem(selectedUnit.id, item.slot, item);
     setSelectedItem(null);
+    setErrorMessage(null);
   };
 
   const handleUnequipItem = (slot: EquipmentSlot) => {
-    onUnequipItem(selectedUnit.id, slot);
+    actions.unequipItem(selectedUnit.id, slot);
+    setErrorMessage(null);
+  };
+
+  const handleReturn = () => {
+    actions.goBack();
   };
 
   const renderSlot = (slot: EquipmentSlot, label: string) => {
@@ -88,45 +101,103 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
   return (
     <div className="equipment-screen">
       <div className="equipment-container">
-      {/* Unit Selector Panel */}
-      <aside className="unit-selector" role="navigation" aria-label="Unit selection">
-        <h2>PARTY</h2>
-        <div className="unit-list">
-          {units.map(unit => (
-            <div
-              key={unit.id}
-              className={`unit-card ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
-              tabIndex={0}
-              role="button"
-              aria-pressed={selectedUnit?.id === unit.id}
-              aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element`}
-              onClick={() => {
-                setSelectedUnit(unit);
-                setSelectedItem(null);
-              }}
-            >
-              <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
-              <div className="unit-info">
-                <div className="unit-name">
-                  {unit.name}
-                  <span className="unit-element">
-                    <ElementIcon element={unit.element} size="tiny" />
-                  </span>
-                </div>
-                <div className="unit-level">Lv {unit.level}</div>
-              </div>
+        {/* Header */}
+        <header className="equipment-header">
+          <div className="header-content">
+            <h1>EQUIPMENT</h1>
+            <div className="unit-summary">
+              <span className="active-count">Active: {activeUnits.length} / 4</span>
+              <span className="divider">•</span>
+              <span className="total-count">Total: {allUnits.length} / 10</span>
             </div>
-          ))}
-        </div>
-      </aside>
+          </div>
+          <Button onClick={handleReturn} ariaLabel="Return to previous menu">
+            RETURN
+          </Button>
+        </header>
 
-      {/* Header Panel */}
-      <header className="header-panel">
-        <h1>EQUIPMENT</h1>
-        <Button onClick={onReturn} ariaLabel="Return to previous menu">
-          RETURN
-        </Button>
-      </header>
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="error-message" role="alert">
+            ⚠️ {errorMessage}
+          </div>
+        )}
+
+        {/* Main Content - Unit selector and selected unit details */}
+        <div className="equipment-content">
+          {/* Unit Selector Panel */}
+          <aside className="unit-selector" role="navigation" aria-label="Unit selection">
+            <h2>PARTY</h2>
+            <div className="unit-list">
+              {activeUnits.map(unit => (
+                <div
+                  key={unit.id}
+                  className={`unit-card ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={selectedUnit?.id === unit.id}
+                  aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element`}
+                  onClick={() => {
+                    setSelectedUnit(unit);
+                    setSelectedItem(null);
+                  }}
+                >
+                  <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
+                  <div className="unit-info">
+                    <div className="unit-name">
+                      {unit.name}
+                      <span className="unit-element">
+                        <ElementIcon element={unit.element} size="tiny" />
+                      </span>
+                    </div>
+                    <div className="unit-level">Lv {unit.level}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {benchUnits.length > 0 && (
+              <>
+                <h3 className="bench-header">BENCH</h3>
+                <div className="unit-list bench-list">
+                  {benchUnits.map(unit => (
+                    <div
+                      key={unit.id}
+                      className={`unit-card ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
+                      tabIndex={0}
+                      role="button"
+                      aria-pressed={selectedUnit?.id === unit.id}
+                      aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element`}
+                      onClick={() => {
+                        setSelectedUnit(unit);
+                        setSelectedItem(null);
+                      }}
+                    >
+                      <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
+                      <div className="unit-info">
+                        <div className="unit-name">
+                          {unit.name}
+                          <span className="unit-element">
+                            <ElementIcon element={unit.element} size="tiny" />
+                          </span>
+                        </div>
+                        <div className="unit-level">Lv {unit.level}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="toggle-all-units">
+              <Button
+                onClick={() => setShowAllUnits(!showAllUnits)}
+                ariaLabel={showAllUnits ? "Hide full roster" : "Show full roster"}
+              >
+                {showAllUnits ? "▲ HIDE FULL ROSTER" : "▼ SHOW FULL ROSTER"}
+              </Button>
+            </div>
+          </aside>
 
       {/* Equipped Items Panel */}
       {selectedUnit && (
@@ -207,6 +278,7 @@ export const EquipmentScreen: React.FC<EquipmentScreenProps> = ({
           ))}
         </div>
       </section>
+        </div>
       </div>
     </div>
   );
