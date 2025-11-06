@@ -677,13 +677,19 @@ export const ValeVillageOverworld: React.FC = () => {
   const getPlayerSprite = () => {
     const characterName = state.playerData.unitsCollected[0]?.name || 'Isaac';
     const action = isMoving ? (isRunning ? 'Run' : 'Walk') : '';
-    const dirMap = {
-      up: 'Up',
-      down: '',
-      left: 'Left',
-      right: 'Right',
+
+    // Direction mapping - note: stationary up uses "Back", moving uses "Up"
+    const getDirection = () => {
+      if (playerDirection === 'up') {
+        return action ? 'Up' : 'Back'; // Moving: Isaac_Walk_Up.gif, Stationary: Isaac_Back.gif
+      }
+      if (playerDirection === 'down') {
+        return ''; // Isaac.gif (no suffix for down)
+      }
+      return playerDirection.charAt(0).toUpperCase() + playerDirection.slice(1); // Left/Right
     };
-    const dirSuffix = dirMap[playerDirection];
+
+    const dirSuffix = getDirection();
 
     // Build path: Isaac_Walk_Left.gif or Isaac_Left.gif or Isaac.gif
     let path = characterName;
