@@ -630,26 +630,11 @@ export const ValeVillageOverworld: React.FC = () => {
     }
   }, [playerPos, getNPCAtPosition]);
 
-  // Close dialogue
-  const closeDialogue = useCallback(() => {
-    setShowDialogue(false);
-    
-  }, []);
-
   // Keyboard controls
   useEffect(() => {
     const keys = new Set<string>();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Dialogue is open - only allow closing
-      if (showDialogue) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          closeDialogue();
-        }
-        return;
-      }
-
       // Prevent default for game controls
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Shift', 'Escape', ' ', 'Enter'].includes(e.key)) {
         e.preventDefault();
@@ -684,7 +669,7 @@ export const ValeVillageOverworld: React.FC = () => {
 
     // Movement loop
     const moveInterval = setInterval(() => {
-      if (showDialogue || keys.size === 0) {
+      if (keys.size === 0) {
         setIsMoving(false);
         return;
       }
@@ -736,7 +721,7 @@ export const ValeVillageOverworld: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [playerPos, showDialogue, isRunning, canMoveTo, handleInteract, closeDialogue, actions]);
+  }, [playerPos, isRunning, canMoveTo, handleInteract, actions]);
 
   // Calculate camera offset (center on player)
   const cameraOffset = useMemo(() => {
