@@ -155,6 +155,10 @@ export class Unit {
     const equipmentBonuses: Partial<Stats> = {};
     for (const item of Object.values(this.equipment)) {
       if (!item) continue;
+
+      // CRITICAL: Handle malformed equipment with missing statBonus
+      if (!item.statBonus || typeof item.statBonus !== 'object') continue;
+
       for (const [stat, value] of Object.entries(item.statBonus)) {
         if (value !== undefined && value !== null && typeof value === 'number') {
           const key = stat as keyof Stats;
@@ -356,6 +360,14 @@ export class Unit {
     if (djinnList.length > 3) {
       return Err('Cannot equip more than 3 Djinn per unit');
     }
+
+    // CRITICAL: Check for duplicate Djinn
+    const djinnIds = djinnList.map(d => d.id);
+    const uniqueIds = new Set(djinnIds);
+    if (djinnIds.length !== uniqueIds.size) {
+      return Err('Cannot equip duplicate Djinn');
+    }
+
     this.djinn = djinnList;
     for (const d of djinnList) {
       this.djinnStates.set(d.id, 'Set');
@@ -372,6 +384,16 @@ export class Unit {
     if (!djinn) {
       return Err(`Djinn ${djinnId} not equipped`);
     }
+
+    // CRITICAL: Check if Djinn is already Standby or Recovery
+    const currentState = this.djinnStates.get(djinnId);
+    if (currentState === 'Standby') {
+      return Err(`Djinn ${djinnId} is already in Standby state`);
+    }
+    if (currentState === 'Recovery') {
+      return Err(`Djinn ${djinnId} is in Recovery state`);
+    }
+
     this.djinnStates.set(djinnId, 'Standby');
     return Ok(this);
   }
