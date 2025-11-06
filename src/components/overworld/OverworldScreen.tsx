@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Unit } from '@/types/Unit';
 import type { Screen } from '@/context/types';
 import { VALE_VILLAGE_MAP } from '@/data/maps/valeVillage';
+import { VALE_VILLAGE_BUILDINGS, getBuildingCollisionTiles } from '@/data/maps/valeVillageBuildings';
 import { TerrainTile } from './TerrainTile';
+import { BuildingSprite } from './BuildingSprite';
 import './OverworldScreen.css';
 
 interface OverworldScreenProps {
@@ -89,6 +91,9 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [dialogue, setDialogue] = useState<Dialogue | null>(null);
+
+  // Building collision tiles (computed once)
+  const buildingCollisionTiles = useMemo(() => getBuildingCollisionTiles(), []);
 
   // Map entities (NPCs, scenery, triggers)
   const mapEntities: MapEntity[] = useMemo(() => [
@@ -188,11 +193,16 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
       return false;
     }
 
+    // Check building collision
+    if (buildingCollisionTiles.has(`${x},${y}`)) {
+      return false;
+    }
+
     // Check entity collisions
     return !mapEntities.some(entity =>
       entity.blocking && entity.x === x && entity.y === y
     );
-  }, [mapEntities]);
+  }, [mapEntities, buildingCollisionTiles]);
 
   // Handle player movement
   const handleMove = useCallback((newX: number, newY: number, newDirection: Direction) => {
@@ -404,6 +414,20 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
               />
             ))
           )}
+        </div>
+
+        {/* Buildings layer */}
+        <div className="overworld-buildings">
+          {VALE_VILLAGE_BUILDINGS.map(building => (
+            <BuildingSprite
+              key={building.id}
+              type={building.type}
+              x={building.x}
+              y={building.y}
+              width={building.width}
+              height={building.height}
+            />
+          ))}
         </div>
 
         {/* Entities and player layer (combined and sorted by Y) */}
