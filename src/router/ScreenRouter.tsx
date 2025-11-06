@@ -13,6 +13,7 @@ import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
 import { GameDemo } from '@/components/demo/GameDemo';
+import { DialogueScreen } from '@/components/dialogue/DialogueScreen';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -129,8 +130,7 @@ export const ScreenRouter: React.FC = () => {
       return <ShopScreen />;
 
     case 'DIALOGUE':
-      // TODO: Dialogue screen (not yet implemented)
-      return <div className="placeholder-screen">Dialogue - Coming Soon</div>;
+      return <DialogueScreen />;
 
     case 'DEMO':
       return <GameDemo />;

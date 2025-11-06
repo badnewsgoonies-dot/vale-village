@@ -13,6 +13,7 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "framer-motion": "^12.23.24",
     "pure-rand": "^6.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

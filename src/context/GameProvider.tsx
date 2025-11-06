@@ -217,6 +217,57 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
+  const recruitUnit = useCallback((unitId: string) => {
+    setState(prev => {
+      // Check if unit already recruited
+      const alreadyRecruited = prev.playerData.unitsCollected.some(u => u.id === unitId);
+      if (alreadyRecruited) {
+        console.log(`Unit ${unitId} already recruited`);
+        return prev;
+      }
+
+      // Find unit definition
+      const unitDef = UNIT_DEFINITIONS[unitId];
+      if (!unitDef) {
+        console.error(`Unit definition not found: ${unitId}`);
+        return { ...prev, error: `Unit ${unitId} not found` };
+      }
+
+      // Create new unit instance
+      const newUnit = new Unit(unitDef);
+
+      // Check if we have space (max 10 units)
+      if (prev.playerData.unitsCollected.length >= 10) {
+        return { ...prev, error: 'Maximum unit collection reached (10 units)' };
+      }
+
+      console.log(`Recruiting unit: ${newUnit.name}`);
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          unitsCollected: [...prev.playerData.unitsCollected, newUnit],
+          recruitmentFlags: {
+            ...prev.playerData.recruitmentFlags,
+            [unitId]: true,
+          },
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const addGold = useCallback((amount: number) => {
+    setState(prev => ({
+      ...prev,
+      playerData: {
+        ...prev.playerData,
+        gold: prev.playerData.gold + amount,
+      },
+    }));
+  }, []);
+
   // Battle actions
   const startBattle = useCallback((enemyIds: string[]) => {
     console.log('Starting battle with enemies:', enemyIds);
@@ -639,6 +690,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     equipItem,
     unequipItem,
     setActiveParty,
+    recruitUnit,
+    addGold,
     startBattle,
     executeTurn,
     endBattle,

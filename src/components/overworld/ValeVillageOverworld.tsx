@@ -30,9 +30,6 @@ export const ValeVillageOverworld: React.FC = () => {
   const [playerDirection, setPlayerDirection] = useState<'up' | 'down' | 'left' | 'right'>('down');
   const [isRunning, setIsRunning] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
-  const [showDialogue, setShowDialogue] = useState(false);
-  const [dialogueSpeaker, setDialogueSpeaker] = useState('');
-  const [dialogueText, setDialogueText] = useState('');
 
   // Vale Village map entities (based on vale-village-authentic.html)
   const mapEntities: MapEntity[] = useMemo(() => [
@@ -150,10 +147,8 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'interactive',
       blocking: true,
       onInteract: () => {
-        setDialogueSpeaker('Psynergy Stone');
-        setDialogueText('Your PP has been restored!');
-        setShowDialogue(true);
         // TODO: Restore PP
+        console.log('Psynergy Stone: PP restored!');
       },
     },
 
@@ -166,9 +161,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'interactive',
       blocking: true,
       onInteract: () => {
-        setDialogueSpeaker('Great Psynergy Stone');
-        setDialogueText('The stone pulses with ancient energy...');
-        setShowDialogue(true);
+        console.log('Great Psynergy Stone: Ancient energy...');
       },
     },
 
@@ -182,10 +175,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Elder');
-        setDialogueText('Welcome to Vale, young warrior. The Sanctum holds ancient secrets...');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'elder' });
       },
     },
 
@@ -198,10 +188,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Innkeeper');
-        setDialogueText('Welcome to the Vale Inn! Would you like to rest? It costs 10 gold.');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'innkeeper' });
       },
     },
 
@@ -214,10 +201,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Shopkeeper');
-        setDialogueText('Fine weapons and armor for sale! Would you like to battle first?');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'weaponshop-owner' });
       },
     },
 
@@ -230,10 +214,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Garet');
-        setDialogueText('Hey Isaac! Want to explore Sol Sanctum later? Or maybe a quick battle?');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'garet' });
       },
     },
 
@@ -246,10 +227,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Jenna');
-        setDialogueText('Be careful out there, Isaac! The world can be dangerous.');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'jenna' });
       },
     },
 
@@ -262,10 +240,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Kraden');
-        setDialogueText('The Psynergy Stones are fascinating relics of ancient Alchemy...');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'kraden' });
       },
     },
 
@@ -278,10 +253,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Villager');
-        setDialogueText('Beautiful day in Vale, isn\'t it?');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'villager-1' });
       },
     },
     {
@@ -292,13 +264,10 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
-        setDialogueSpeaker('Villager');
-        setDialogueText('I heard there are monsters near the forest. Be careful!');
-        setShowDialogue(true);
+        actions.navigate({ type: 'DIALOGUE', npcId: 'villager-2' });
       },
     },
-  ], []);
+  ], [actions]);
 
   // Check if position is walkable
   const canMoveTo = useCallback((x: number, y: number): boolean => {
@@ -342,26 +311,11 @@ export const ValeVillageOverworld: React.FC = () => {
     }
   }, [playerPos, getNPCAtPosition]);
 
-  // Close dialogue
-  const closeDialogue = useCallback(() => {
-    setShowDialogue(false);
-    
-  }, []);
-
   // Keyboard controls
   useEffect(() => {
     const keys = new Set<string>();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Dialogue is open - only allow closing
-      if (showDialogue) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          closeDialogue();
-        }
-        return;
-      }
-
       // Prevent default for game controls
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Shift', 'Escape', ' ', 'Enter'].includes(e.key)) {
         e.preventDefault();
@@ -396,7 +350,7 @@ export const ValeVillageOverworld: React.FC = () => {
 
     // Movement loop
     const moveInterval = setInterval(() => {
-      if (showDialogue || keys.size === 0) {
+      if (keys.size === 0) {
         setIsMoving(false);
         return;
       }
@@ -448,7 +402,7 @@ export const ValeVillageOverworld: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [playerPos, showDialogue, isRunning, canMoveTo, handleInteract, closeDialogue, actions]);
+  }, [playerPos, isRunning, canMoveTo, handleInteract, actions]);
 
   // Calculate camera offset (center on player)
   const cameraOffset = useMemo(() => {
@@ -533,17 +487,6 @@ export const ValeVillageOverworld: React.FC = () => {
           <div>LV: {state.playerData.unitsCollected[0]?.level || 1}</div>
         </div>
       </div>
-
-      {/* Dialogue Box */}
-      {showDialogue && (
-        <div className="vale-dialogue-overlay">
-          <div className="vale-dialogue-box">
-            <div className="dialogue-speaker">{dialogueSpeaker}</div>
-            <div className="dialogue-text">{dialogueText}</div>
-            <div className="dialogue-prompt">Press Space or Enter to close</div>
-          </div>
-        </div>
-      )}
 
       {/* Minimap */}
       <div className="vale-minimap">
