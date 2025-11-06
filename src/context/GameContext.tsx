@@ -1,7 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { GameState, Screen, StoryFlags } from './types';
 import type { Equipment } from '@/types/Equipment';
-import type { Djinn } from '@/types/Djinn';
 import type { AreaId, ChestId, BossId, TreasureChest } from '@/types/Area';
 
 export interface GameActions {
@@ -19,7 +18,7 @@ export interface GameActions {
   unequipItem: (unitId: string, slot: string) => void;
 
   // Djinn
-  equipDjinn: (unitId: string, djinn: Djinn) => void;
+  equipDjinn: (djinnId: string) => void;
   unequipDjinn: (djinnId: string) => void;
 
   // Battle

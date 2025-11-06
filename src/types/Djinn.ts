@@ -27,6 +27,12 @@ export interface Djinn {
     targets: 'all-enemies' | 'single-enemy' | 'all-allies' | 'single-ally';
   };
 
+  // Abilities granted when equipped
+  grantsAbilities: {
+    matching: string;  // Ability ID for units with matching element
+    counter: string;   // Ability ID for units with counter element (Venus↔Mars, Mercury↔Jupiter)
+  };
+
   // How to acquire this Djinn
   source: string;
 }

@@ -231,6 +231,14 @@ export const NewOverworldScreen: React.FC = () => {
             handleInteract();
           }
           break;
+        case 'p':
+        case 'P':
+          actions.navigate({ type: 'PARTY_MANAGEMENT' });
+          break;
+        case 'j':
+        case 'J':
+          actions.navigate({ type: 'DJINN_MENU' });
+          break;
         case 'q':
         case 'Q':
           actions.navigate({ type: 'QUEST_LOG' });

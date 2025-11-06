@@ -4,10 +4,10 @@ import type { Unit } from '@/types/Unit';
 import { TitleScreen } from '@/components/title';
 import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
+import { PartyManagementScreen } from '@/components/party/PartyManagementScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
 import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
-import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
@@ -50,6 +50,9 @@ export const ScreenRouter: React.FC = () => {
         />
       );
     }
+
+    case 'PARTY_MANAGEMENT':
+      return <PartyManagementScreen />;
 
     case 'EQUIPMENT': {
       // Get actual Unit instances
@@ -117,7 +120,7 @@ export const ScreenRouter: React.FC = () => {
             const firstUnitId = state.playerData.activePartyIds[0];
             actions.navigate({ type: 'EQUIPMENT', unitId: firstUnitId });
           }}
-          onNavigateToParty={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
+          onNavigateToParty={() => actions.navigate({ type: 'PARTY_MANAGEMENT' })}
           onNavigateToQuestLog={() => actions.navigate({ type: 'QUEST_LOG' })}
           onResume={() => actions.navigate({ type: 'OVERWORLD' })}
         />
