@@ -684,9 +684,13 @@ export const ValeVillageOverworld: React.FC = () => {
       right: 'Right',
     };
     const dirSuffix = dirMap[playerDirection];
-    const separator = dirSuffix && action ? '_' : '';
 
-    return `/sprites/overworld/protagonists/${characterName}${action ? `_${action}` : ''}${separator}${dirSuffix}.gif`;
+    // Build path: Isaac_Walk_Left.gif or Isaac_Left.gif or Isaac.gif
+    let path = characterName;
+    if (action) path += `_${action}`;
+    if (dirSuffix) path += `_${dirSuffix}`;
+
+    return `/sprites/overworld/protagonists/${path}.gif`;
   };
 
   // Minimap position
