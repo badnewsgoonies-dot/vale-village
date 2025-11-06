@@ -3,8 +3,10 @@ import type { Unit } from '@/types/Unit';
 import type { Screen } from '@/context/types';
 import { VALE_VILLAGE_MAP } from '@/data/maps/valeVillage';
 import { VALE_VILLAGE_BUILDINGS, getBuildingCollisionTiles } from '@/data/maps/valeVillageBuildings';
+import { VALE_VILLAGE_PROPS, getPropCollisionTiles } from '@/data/maps/valeVillageVegetation';
 import { TerrainTile } from './TerrainTile';
 import { BuildingSprite } from './BuildingSprite';
+import { PropSprite } from './PropSprite';
 import './OverworldScreen.css';
 
 interface OverworldScreenProps {
@@ -94,6 +96,9 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
 
   // Building collision tiles (computed once)
   const buildingCollisionTiles = useMemo(() => getBuildingCollisionTiles(), []);
+
+  // Prop collision tiles (computed once)
+  const propCollisionTiles = useMemo(() => getPropCollisionTiles(), []);
 
   // Map entities (NPCs, scenery, triggers)
   const mapEntities: MapEntity[] = useMemo(() => [
@@ -198,11 +203,16 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
       return false;
     }
 
+    // Check prop collision (trees, statues)
+    if (propCollisionTiles.has(`${x},${y}`)) {
+      return false;
+    }
+
     // Check entity collisions
     return !mapEntities.some(entity =>
       entity.blocking && entity.x === x && entity.y === y
     );
-  }, [mapEntities, buildingCollisionTiles]);
+  }, [mapEntities, buildingCollisionTiles, propCollisionTiles]);
 
   // Handle player movement
   const handleMove = useCallback((newX: number, newY: number, newDirection: Direction) => {
@@ -426,6 +436,19 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
               y={building.y}
               width={building.width}
               height={building.height}
+            />
+          ))}
+        </div>
+
+        {/* Props/Vegetation layer */}
+        <div className="overworld-props">
+          {VALE_VILLAGE_PROPS.map(prop => (
+            <PropSprite
+              key={prop.id}
+              type={prop.type}
+              x={prop.x}
+              y={prop.y}
+              blocking={prop.blocking}
             />
           ))}
         </div>
