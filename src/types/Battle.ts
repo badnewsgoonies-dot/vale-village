@@ -405,20 +405,10 @@ export function executeAbility(
           // Only include stats that are in the Stats type (filter out 'evasion' etc.)
           const validStats: Array<keyof Stats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
           for (const [stat, modifier] of Object.entries(ability.buffEffect)) {
-<<<<<<< HEAD
-            if (typeof modifier === 'number') {
-              // Skip evasion as it's not part of core Stats type (handled separately)
-              if (stat === 'evasion') continue;
-
-              target.statusEffects.push({
-                type: ability.type === 'buff' ? 'buff' : 'debuff',
-                stat: stat as 'atk' | 'def' | 'mag' | 'spd',
-=======
             if (typeof modifier === 'number' && validStats.includes(stat as keyof Stats)) {
               target.statusEffects.push({
                 type: ability.type === 'buff' ? 'buff' : 'debuff',
                 stat: stat as keyof Stats,
->>>>>>> 97cd426c17963a2a2bad1e353a04091e8f31bbd5
                 modifier,
                 duration: ability.duration || 3,
               });

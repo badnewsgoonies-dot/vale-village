@@ -167,7 +167,6 @@ export function activateDjinn(
   });
 
   // Update activation count
-  const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
   newTeam.activationsThisTurn.set(activatingUnit.id, unitActivations + 1);
 
   // Backward compatibility
