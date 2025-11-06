@@ -239,10 +239,6 @@ export const NewOverworldScreen: React.FC = () => {
         case 'J':
           actions.navigate({ type: 'DJINN_MENU' });
           break;
-        case 'q':
-        case 'Q':
-          actions.navigate({ type: 'QUEST_LOG' });
-          break;
         case 'Escape':
           if (showDialogue) {
             closeDialogue();
@@ -398,26 +394,7 @@ export const NewOverworldScreen: React.FC = () => {
 
       {/* Controls */}
       <div className="controls-hud">
-        <p>WASD/Arrows: Move | Space: Interact | Q: Quest Log | ESC: Menu</p>
-      </div>
-
-      {/* Active quests mini-display */}
-      <div className="active-quests">
-        {state.quests
-          .filter((q) => q.status === 'active')
-          .slice(0, 2)
-          .map((quest) => (
-            <div key={quest.id} className="mini-quest">
-              <strong>{quest.title}</strong>
-              <div className="mini-objectives">
-                {quest.objectives.slice(0, 2).map((obj) => (
-                  <div key={obj.id} className={obj.completed ? 'completed' : ''}>
-                    {obj.completed ? '☑' : '☐'} {obj.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        <p>WASD/Arrows: Move | Space: Interact | P: Party | J: Djinn | ESC: Menu</p>
       </div>
     </div>
   );

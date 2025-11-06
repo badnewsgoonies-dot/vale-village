@@ -6,7 +6,6 @@ interface MainMenuProps {
   onNavigateToDjinn: () => void;
   onNavigateToEquipment: () => void;
   onNavigateToParty: () => void;
-  onNavigateToQuestLog: () => void;
   onResume: () => void;
 }
 
@@ -14,7 +13,6 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onNavigateToDjinn,
   onNavigateToEquipment,
   onNavigateToParty,
-  onNavigateToQuestLog,
   onResume
 }) => {
   return (
@@ -52,16 +50,6 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               <span className="menu-icon">★</span>
               <span className="menu-label">PARTY</span>
               <span className="menu-hint">Manage Units</span>
-            </Button>
-
-            <Button 
-              onClick={onNavigateToQuestLog}
-              className="menu-option"
-              ariaLabel="Open Quest Log"
-            >
-              <span className="menu-icon">📜</span>
-              <span className="menu-label">QUEST LOG</span>
-              <span className="menu-hint">View Quests</span>
             </Button>
 
             <Button 
