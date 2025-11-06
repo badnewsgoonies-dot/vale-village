@@ -278,7 +278,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
+
         setDialogueSpeaker('Villager');
         setDialogueText('Beautiful day in Vale, isn\'t it?');
         setShowDialogue(true);
@@ -292,13 +292,332 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'npc',
       blocking: true,
       onInteract: () => {
-        
+
         setDialogueSpeaker('Villager');
         setDialogueText('I heard there are monsters near the forest. Be careful!');
         setShowDialogue(true);
       },
     },
-  ], []);
+
+
+    // ===== NATURAL SCENERY =====
+    // Trees - Northern forest area (near Sol Sanctum)
+    {
+      id: 'tree-n1',
+      x: 650,
+      y: 150,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-n2',
+      x: 720,
+      y: 180,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-n3',
+      x: 1050,
+      y: 160,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-n4',
+      x: 1130,
+      y: 200,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Trees - Western edge
+    {
+      id: 'tree-w1',
+      x: 150,
+      y: 400,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-w2',
+      x: 180,
+      y: 520,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-w3',
+      x: 160,
+      y: 680,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-w4',
+      x: 140,
+      y: 850,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Trees - Eastern edge
+    {
+      id: 'tree-e1',
+      x: 1650,
+      y: 450,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-e2',
+      x: 1700,
+      y: 600,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-e3',
+      x: 1680,
+      y: 780,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Trees - Southern area (decorative)
+    {
+      id: 'tree-s1',
+      x: 400,
+      y: 1250,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-s2',
+      x: 650,
+      y: 1300,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'tree-s3',
+      x: 1000,
+      y: 1280,
+      sprite: '/sprites/scenery/nature/Tree.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Rocks and boulders
+    {
+      id: 'rock-1',
+      x: 280,
+      y: 350,
+      sprite: '/sprites/scenery/nature/Rock.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'rock-2',
+      x: 600,
+      y: 480,
+      sprite: '/sprites/scenery/nature/Rock.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'rock-3',
+      x: 1300,
+      y: 500,
+      sprite: '/sprites/scenery/nature/Rock.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'rock-4',
+      x: 850,
+      y: 1100,
+      sprite: '/sprites/scenery/nature/Rock.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'rock-5',
+      x: 1550,
+      y: 1050,
+      sprite: '/sprites/scenery/nature/Rock.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // River tiles (flowing south through eastern side)
+    {
+      id: 'river-1',
+      x: 1600,
+      y: 900,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-2',
+      x: 1600,
+      y: 950,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-3',
+      x: 1600,
+      y: 1000,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-4',
+      x: 1600,
+      y: 1050,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-5',
+      x: 1600,
+      y: 1100,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-6',
+      x: 1600,
+      y: 1150,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'river-7',
+      x: 1600,
+      y: 1200,
+      sprite: '/sprites/scenery/terrain/Water.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Bridge crossing the river
+    {
+      id: 'bridge-1',
+      x: 1590,
+      y: 1020,
+      sprite: '/sprites/scenery/terrain/Bridge.gif',
+      type: 'scenery',
+      blocking: false, // Can walk over bridge
+    },
+
+    // Flowers and decorative bushes
+    {
+      id: 'flowers-1',
+      x: 800,
+      y: 500,
+      sprite: '/sprites/scenery/nature/Flowers.gif',
+      type: 'scenery',
+      blocking: false,
+    },
+    {
+      id: 'flowers-2',
+      x: 1000,
+      y: 600,
+      sprite: '/sprites/scenery/nature/Flowers.gif',
+      type: 'scenery',
+      blocking: false,
+    },
+    {
+      id: 'flowers-3',
+      x: 650,
+      y: 750,
+      sprite: '/sprites/scenery/nature/Flowers.gif',
+      type: 'scenery',
+      blocking: false,
+    },
+    {
+      id: 'bush-1',
+      x: 450,
+      y: 800,
+      sprite: '/sprites/scenery/nature/Bush.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'bush-2',
+      x: 1100,
+      y: 950,
+      sprite: '/sprites/scenery/nature/Bush.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Fences around houses
+    {
+      id: 'fence-1',
+      x: 380,
+      y: 500,
+      sprite: '/sprites/scenery/objects/Fence.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+    {
+      id: 'fence-2',
+      x: 1050,
+      y: 330,
+      sprite: '/sprites/scenery/objects/Fence.gif',
+      type: 'scenery',
+      blocking: true,
+    },
+
+    // Signs
+    {
+      id: 'sign-sanctum',
+      x: 900,
+      y: 320,
+      sprite: '/sprites/scenery/objects/Sign.gif',
+      type: 'interactive',
+      blocking: false,
+      onInteract: () => {
+        setDialogueSpeaker('Sign');
+        setDialogueText('↑ Sol Sanctum - Sacred Ground');
+        setShowDialogue(true);
+      },
+    },
+    {
+      id: 'sign-shops',
+      x: 1250,
+      y: 1050,
+      sprite: '/sprites/scenery/objects/Sign.gif',
+      type: 'interactive',
+      blocking: false,
+      onInteract: () => {
+        setDialogueSpeaker('Sign');
+        setDialogueText('→ Shops & Inn');
+        setShowDialogue(true);
+      },
+    },
 
   // Check if position is walkable
   const canMoveTo = useCallback((x: number, y: number): boolean => {
