@@ -121,13 +121,9 @@ export const ScreenRouter: React.FC = () => {
             actions.navigate({ type: 'EQUIPMENT', unitId: firstUnitId });
           }}
           onNavigateToParty={() => actions.navigate({ type: 'PARTY_MANAGEMENT' })}
-          onNavigateToQuestLog={() => actions.navigate({ type: 'QUEST_LOG' })}
           onResume={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );
-
-    case 'QUEST_LOG':
-      return <QuestLogScreen />;
 
     case 'SHOP':
       return <ShopScreen />;
