@@ -568,9 +568,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'interactive',
       blocking: false,
       onInteract: () => {
-        setDialogueSpeaker('Sign');
-        setDialogueText('↑ Sol Sanctum - Sacred Ground');
-        setShowDialogue(true);
+        console.log('Sign: ↑ Sol Sanctum - Sacred Ground');
       },
     },
     {
@@ -581,9 +579,7 @@ export const ValeVillageOverworld: React.FC = () => {
       type: 'interactive',
       blocking: false,
       onInteract: () => {
-        setDialogueSpeaker('Sign');
-        setDialogueText('→ Shops & Inn');
-        setShowDialogue(true);
+        console.log('Sign: → Shops & Inn');
       },
     },
   ], []);
@@ -806,17 +802,6 @@ export const ValeVillageOverworld: React.FC = () => {
           <div>LV: {state.playerData.unitsCollected[0]?.level || 1}</div>
         </div>
       </div>
-
-      {/* Dialogue Box */}
-      {showDialogue && (
-        <div className="vale-dialogue-overlay">
-          <div className="vale-dialogue-box">
-            <div className="dialogue-speaker">{dialogueSpeaker}</div>
-            <div className="dialogue-text">{dialogueText}</div>
-            <div className="dialogue-prompt">Press Space or Enter to close</div>
-          </div>
-        </div>
-      )}
 
       {/* Minimap */}
       <div className="vale-minimap">
