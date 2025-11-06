@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import type {
   TutorialId,
   Tutorial,
   TutorialSystemState,
   TutorialProgress,
   TutorialStatus,
-  TutorialObjective,
   ShowcaseSettings,
   FeatureGalleryState,
   TutorialBadge,

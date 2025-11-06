@@ -1,5 +1,4 @@
 import type { Unit } from './Unit';
-import type { Ability } from './Ability';
 import type { Djinn } from './Djinn';
 
 /**
