@@ -263,15 +263,17 @@
 {
   "screen": "equipment-screen",
   "description": "Sprite map for Equipment Management screen - gear slots, inventory, and stat comparison",
-  "lastUpdated": "2025-11-02",
+  "lastUpdated": "2025-11-03",
+  "spriteRoot": "../Sprites!",
   "sprites": {
     "characters": [
       {
         "id": "isaac-portrait",
         "name": "Isaac",
         "element": "venus",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/isaac/isaac_front.gif",
-        "size": "32x32",
+        "path": "Sprites!/icons/characters/Isaac1.gif",
+        "localPath": "../Sprites!/icons/characters/Isaac1.gif",
+        "size": "48x48",
         "usage": "Unit selector portrait",
         "notes": "Earth element adept, starter choice A"
       },
@@ -279,8 +281,9 @@
         "id": "garet-portrait",
         "name": "Garet",
         "element": "mars",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/garet/garet_front.gif",
-        "size": "32x32",
+        "path": "Sprites!/icons/characters/Garet1.gif",
+        "localPath": "../Sprites!/icons/characters/Garet1.gif",
+        "size": "48x48",
         "usage": "Unit selector portrait",
         "notes": "Fire element adept, starter choice B"
       },
@@ -288,8 +291,9 @@
         "id": "ivan-portrait",
         "name": "Ivan",
         "element": "jupiter",
-        "path": "NextEraGame/public/sprites/golden-sun/overworld/ivan/ivan_front.gif",
-        "size": "32x32",
+        "path": "Sprites!/icons/characters/Ivan.gif",
+        "localPath": "../Sprites!/icons/characters/Ivan.gif",
+        "size": "48x48",
         "usage": "Unit selector portrait",
         "notes": "Wind element adept, starter choice C"
       }
@@ -298,48 +302,43 @@
       "weapons": [
         {
           "id": "longsword",
-          "name": "Longsword",
+          "name": "Long Sword",
           "type": "weapon",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/longsword.png",
+          "path": "Sprites!/icons/items/long-swords/Long_Sword.gif",
+          "localPath": "../Sprites!/icons/items/long-swords/Long_Sword.gif",
           "size": "24x24",
           "usage": "Isaac's starting weapon",
-          "stats": {
-            "atk": "+12"
-          }
+          "stats": { "atk": "+12" }
         },
         {
           "id": "broad-sword",
           "name": "Broad Sword",
           "type": "weapon",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/broad_sword.png",
+          "path": "Sprites!/icons/items/long-swords/Broad_Sword.gif",
+          "localPath": "../Sprites!/icons/items/long-swords/Broad_Sword.gif",
           "size": "24x24",
           "usage": "Inventory item (upgrade option)",
-          "stats": {
-            "atk": "+19"
-          }
+          "stats": { "atk": "+19" }
         },
         {
-          "id": "battle-axe",
-          "name": "Battle Axe",
+          "id": "excalibur",
+          "name": "Excalibur",
           "type": "weapon",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/battle_axe.png",
+          "path": "Sprites!/icons/items/long-swords/Excalibur.gif",
+          "localPath": "../Sprites!/icons/items/long-swords/Excalibur.gif",
           "size": "24x24",
-          "usage": "Garet's weapon type",
-          "stats": {
-            "atk": "+25"
-          }
+          "usage": "Legendary sword",
+          "stats": { "atk": "+45" }
         },
         {
-          "id": "wooden-staff",
-          "name": "Wooden Staff",
+          "id": "gaia-blade",
+          "name": "Gaia Blade",
           "type": "weapon",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/weapons/wooden_staff.png",
+          "path": "Sprites!/icons/items/long-swords/Gaia_Blade.gif",
+          "localPath": "../Sprites!/icons/items/long-swords/Gaia_Blade.gif",
           "size": "24x24",
-          "usage": "Ivan's weapon type",
-          "stats": {
-            "atk": "+8",
-            "psy": "+5"
-          }
+          "usage": "Earth-element weapon",
+          "stats": { "atk": "+38" }
         }
       ],
       "armor": [
@@ -347,134 +346,111 @@
           "id": "leather-vest",
           "name": "Leather Vest",
           "type": "armor",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/leather_vest.png",
+          "path": "Sprites!/icons/items/clothing/",
+          "localPath": "../Sprites!/icons/items/clothing/",
           "size": "24x24",
-          "usage": "Isaac's starting armor",
-          "stats": {
-            "def": "+8"
-          }
-        },
-        {
-          "id": "steel-armor",
-          "name": "Steel Armor",
-          "type": "armor",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/steel_armor.png",
-          "size": "24x24",
-          "usage": "Inventory item (upgrade)",
-          "stats": {
-            "def": "+18"
-          }
+          "usage": "Basic armor",
+          "stats": { "def": "+8" },
+          "note": "Browse clothing folder for specific vest sprite"
         },
         {
           "id": "chain-mail",
           "name": "Chain Mail",
           "type": "armor",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/armor/chain_mail.png",
+          "path": "Sprites!/icons/items/armor/",
+          "localPath": "../Sprites!/icons/items/armor/",
           "size": "24x24",
-          "usage": "Inventory item",
-          "stats": {
-            "def": "+14"
-          }
+          "usage": "Medium armor",
+          "stats": { "def": "+14" },
+          "note": "Browse armor folder for chain mail sprite"
         }
       ],
       "helms": [
         {
-          "id": "iron-helm",
-          "name": "Iron Helm",
-          "type": "helm",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/helms/iron_helm.png",
-          "size": "24x24",
-          "usage": "Inventory item",
-          "stats": {
-            "def": "+6"
-          }
-        },
-        {
           "id": "leather-cap",
           "name": "Leather Cap",
           "type": "helm",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/helms/leather_cap.png",
+          "path": "Sprites!/icons/items/hats/",
+          "localPath": "../Sprites!/icons/items/hats/",
           "size": "24x24",
-          "usage": "Inventory item",
-          "stats": {
-            "def": "+3"
-          }
+          "usage": "Basic headgear",
+          "stats": { "def": "+3" }
+        },
+        {
+          "id": "iron-helm",
+          "name": "Iron Helm",
+          "type": "helm",
+          "path": "Sprites!/icons/items/helmets/",
+          "localPath": "../Sprites!/icons/items/helmets/",
+          "size": "24x24",
+          "usage": "Heavy headgear",
+          "stats": { "def": "+6" }
         }
       ],
       "boots": [
         {
-          "id": "hermes-boots",
-          "name": "Hermes Boots",
+          "id": "leather-boots",
+          "name": "Leather Boots",
           "type": "boots",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/boots/hermes_boots.png",
+          "path": "Sprites!/icons/items/boots/",
+          "localPath": "../Sprites!/icons/items/boots/",
           "size": "24x24",
-          "usage": "Inventory item (speed boost)",
-          "stats": {
-            "spd": "+10",
-            "def": "+2"
-          }
+          "usage": "Basic footwear",
+          "stats": { "def": "+2", "spd": "+2" }
         }
       ]
     },
     "ui": {
-      "icons": [
+      "buttons": [
         {
-          "id": "weapon-slot-icon",
-          "name": "Weapon Slot",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/weapon_slot.png",
-          "size": "16x16",
-          "usage": "Equipment slot indicator"
+          "id": "status-button",
+          "name": "Status",
+          "path": "Sprites!/icons/buttons/Status.gif",
+          "localPath": "../Sprites!/icons/buttons/Status.gif",
+          "size": "32x32",
+          "usage": "Menu button"
         },
         {
-          "id": "armor-slot-icon",
-          "name": "Armor Slot",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/armor_slot.png",
-          "size": "16x16",
-          "usage": "Equipment slot indicator"
-        },
-        {
-          "id": "helm-slot-icon",
-          "name": "Helm Slot",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/helm_slot.png",
-          "size": "16x16",
-          "usage": "Equipment slot indicator"
-        },
-        {
-          "id": "boots-slot-icon",
-          "name": "Boots Slot",
-          "path": "NextEraGame/public/sprites/golden-sun/icons/ui/boots_slot.png",
-          "size": "16x16",
-          "usage": "Equipment slot indicator"
+          "id": "item-button",
+          "name": "Item",
+          "path": "Sprites!/icons/buttons/Item.gif",
+          "localPath": "../Sprites!/icons/buttons/Item.gif",
+          "size": "32x32",
+          "usage": "Menu button"
         }
       ],
       "elementSymbols": [
         {
-          "id": "venus-symbol",
+          "id": "venus-star",
           "element": "venus",
-          "unicode": "♦",
+          "path": "Sprites!/icons/misc/Venus_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Venus_Star.gif",
           "color": "#E8A050",
           "usage": "Earth element indicator (Isaac)"
         },
         {
-          "id": "mars-symbol",
+          "id": "mars-star",
           "element": "mars",
-          "unicode": "▲",
+          "path": "Sprites!/icons/misc/Mars_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Mars_Star.gif",
           "color": "#E05050",
           "usage": "Fire element indicator (Garet)"
         },
         {
-          "id": "jupiter-symbol",
+          "id": "jupiter-star",
           "element": "jupiter",
-          "unicode": "◆",
+          "path": "Sprites!/icons/misc/Jupiter_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Jupiter_Star.gif",
           "color": "#A858D8",
           "usage": "Wind element indicator (Ivan)"
         },
         {
-          "id": "mercury-symbol",
+          "id": "mercury-star",
           "element": "mercury",
-          "unicode": "●",
+          "path": "Sprites!/icons/misc/Mercury_Star.gif",
+          "localPath": "../Sprites!/icons/misc/Mercury_Star.gif",
           "color": "#5090D8",
-          "usage": "Water element indicator (Mia - future unit)"
+          "usage": "Water element indicator (Mia)"
         }
       ]
     }
@@ -495,29 +471,13 @@
     "focusRings": "3px gold outline on focus",
     "contrast": "WCAG 2.1 AA compliant (text 4.5:1, UI 3:1)"
   },
-  "interactionStates": {
-    "unitCard": {
-      "default": "Transparent background, dark border",
-      "hover": "Light blue background, bright border",
-      "selected": "Blue background, gold border, glow effect"
-    },
-    "equipmentSlot": {
-      "default": "Dark background",
-      "hover": "Light blue background",
-      "empty": "Gray text, italic style"
-    },
-    "inventoryItem": {
-      "default": "Dark background",
-      "hover": "Light blue background, translateY(-2px)"
-    }
-  },
   "notes": [
-    "Mockup uses placeholder Unicode symbols (🗡, 🛡, etc.) - replace with actual sprite icons",
-    "Stat comparison shows live preview when hovering inventory items",
-    "Equipment slots can be clicked to unequip items",
-    "Inventory items can be dragged or clicked to equip",
-    "Unit selector switches context for equipment display",
-    "Color coding matches element types (Venus=orange, Mars=red, Jupiter=purple)"
+    "✅ Updated with actual Sprites! directory paths (Nov 3, 2025)",
+    "All weapon sprites located in Sprites!/icons/items/long-swords/",
+    "Character portraits use 48x48 icons from Sprites!/icons/characters/",
+    "Element stars available as GIF files in Sprites!/icons/misc/",
+    "Some equipment categories need specific file browsing (armor, boots, helms)",
+    "Total available: 20+ swords, 50+ armor pieces, 40+ helms, 20+ boots"
   ]
 }
 >>>>>>> da011dae5a42c00b1fdb0e0f62b8f00e0a566dcf

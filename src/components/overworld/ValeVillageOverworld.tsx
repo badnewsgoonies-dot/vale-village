@@ -299,6 +299,7 @@ export const ValeVillageOverworld: React.FC = () => {
       },
     },
 
+
     // ===== NATURAL SCENERY =====
     // Trees - Northern forest area (near Sol Sanctum)
     {
@@ -617,7 +618,6 @@ export const ValeVillageOverworld: React.FC = () => {
         setShowDialogue(true);
       },
     },
-  ], []);
 
   // Check if position is walkable
   const canMoveTo = useCallback((x: number, y: number): boolean => {
