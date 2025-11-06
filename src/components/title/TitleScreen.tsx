@@ -24,25 +24,13 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   const handleNewGame = () => {
-    onNavigate({ type: 'INTRO' });
-  };
-
-  const handleContinue = () => {
-    // TODO: Load saved game
+    // Go straight to Vale Village overworld
     onNavigate({ type: 'OVERWORLD' });
   };
 
   const handleTestBattle = () => {
     onStartBattle(['goblin', 'wild-wolf', 'slime']);
     onNavigate({ type: 'BATTLE' });
-  };
-
-  const handleUnitCollection = () => {
-    onNavigate({ type: 'UNIT_COLLECTION' });
-  };
-
-  const handleDemo = () => {
-    onNavigate({ type: 'DEMO' });
   };
 
   if (!menuVisible) {
@@ -81,19 +69,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
         <nav className="title-menu">
           <button className="title-menu-item primary" onClick={handleNewGame}>
             <span className="menu-icon">▶</span>
-            <span className="menu-text">New Game</span>
-          </button>
-          <button className="title-menu-item secondary" onClick={handleContinue}>
-            <span className="menu-icon">⟳</span>
-            <span className="menu-text">Continue</span>
-          </button>
-          <button className="title-menu-item secondary" onClick={handleUnitCollection}>
-            <span className="menu-icon">★</span>
-            <span className="menu-text">Unit Collection</span>
-          </button>
-          <button className="title-menu-item highlight" onClick={handleDemo}>
-            <span className="menu-icon">🎮</span>
-            <span className="menu-text">Game Demo</span>
+            <span className="menu-text">Start Game</span>
           </button>
           <button className="title-menu-item debug" onClick={handleTestBattle}>
             <span className="menu-icon">⚔</span>
