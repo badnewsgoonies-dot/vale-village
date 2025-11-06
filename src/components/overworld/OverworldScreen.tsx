@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Unit } from '@/types/Unit';
 import type { Screen } from '@/context/types';
+import { VALE_VILLAGE_MAP } from '@/data/maps/valeVillage';
+import { TerrainTile } from './TerrainTile';
 import './OverworldScreen.css';
 
 interface OverworldScreenProps {
@@ -34,8 +36,8 @@ interface Position {
 }
 
 const TILE_SIZE = 32;
-const MAP_WIDTH = 20;
-const MAP_HEIGHT = 15;
+const MAP_WIDTH = 30;  // Updated for Vale Village terrain map
+const MAP_HEIGHT = 25;  // Updated for Vale Village terrain map
 
 // Direction to sprite suffix mapping
 const directionToSpriteMap: Record<Direction, string> = {
@@ -82,7 +84,7 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
   onStartBattle,
 }) => {
   // Player state
-  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 10, y: 10 });
+  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 15, y: 5 });  // Central plaza on stone path
   const [playerDirection, setPlayerDirection] = useState<Direction>('S');
   const [isRunning, setIsRunning] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
@@ -178,6 +180,11 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
   const canMoveTo = useCallback((x: number, y: number): boolean => {
     // Check map bounds
     if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) {
+      return false;
+    }
+
+    // Check terrain collision (water, cliffs, etc.)
+    if (!VALE_VILLAGE_MAP.collisionMap[y][x]) {
       return false;
     }
 
@@ -385,8 +392,19 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
           transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
         }}
       >
-        {/* Background layer */}
-        <div className="overworld-background" />
+        {/* Terrain layer */}
+        <div className="overworld-terrain">
+          {VALE_VILLAGE_MAP.layers.ground.map((row, rowIndex) =>
+            row.map((terrainType, colIndex) => (
+              <TerrainTile
+                key={`terrain-${colIndex}-${rowIndex}`}
+                type={terrainType}
+                x={colIndex}
+                y={rowIndex}
+              />
+            ))
+          )}
+        </div>
 
         {/* Entities and player layer (combined and sorted by Y) */}
         <div className="overworld-entities">
