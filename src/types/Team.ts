@@ -136,8 +136,13 @@ export function activateDjinn(
     return Err(`Unit must deal/take 30+ total damage to activate Djinn (current: ${totalDamage})`);
   }
 
+  // Check per-unit limit (1 Djinn per unit per turn)
+  const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
+  if (unitActivations >= 1) {
+    return Err('Unit can only activate 1 Djinn per turn');
+  }
+
   // Check team limit (3 activations per turn)
-  // NOTE: No per-unit limit to allow units to activate multiple Djinn for summons
   const totalActivations = Array.from(team.activationsThisTurn.values())
     .reduce((sum, count) => sum + count, 0);
   if (totalActivations >= 3) {
@@ -161,8 +166,7 @@ export function activateDjinn(
     turnActivated: team.currentTurn,
   });
 
-  // Update activation count
-  const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
+  // Update activation count (reuse unitActivations from line 140)
   newTeam.activationsThisTurn.set(activatingUnit.id, unitActivations + 1);
 
   // Backward compatibility
@@ -197,14 +201,16 @@ export function updateDjinnRecovery(team: Team, currentTurn: number): Team {
   for (const [djinnId, tracker] of newTeam.djinnTrackers) {
     if (tracker.state === 'Standby') {
       const turnsInStandby = currentTurn - tracker.turnActivated;
-      if (turnsInStandby >= 2) {
+      // "After 2 turns" means 3rd turn onwards (>2, not >=2)
+      if (turnsInStandby > 2) {
         tracker.state = 'Set';
         // Backward compatibility
         newTeam.djinnStates!.set(djinnId, 'Set');
       }
     } else if (tracker.state === 'Recovery') {
       const turnsInRecovery = currentTurn - tracker.turnActivated;
-      if (turnsInRecovery >= 3) {
+      // "After 3 turns" means 4th turn onwards (>3, not >=3)
+      if (turnsInRecovery > 3) {
         tracker.state = 'Set';
         // Backward compatibility
         newTeam.djinnStates!.set(djinnId, 'Set');

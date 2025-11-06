@@ -262,10 +262,15 @@ describe('TASK 5 REFACTOR: Per-Djinn Recovery Timing', () => {
         turn1 = updateDjinnRecovery(turn1, turn1.currentTurn);
         expect(turn1.djinnTrackers.get('flint')?.state).toBe('Standby');
 
-        // Turn 2: Recovers to Set
+        // Turn 2: Still Standby
         let turn2 = advanceTurn(turn1);
         turn2 = updateDjinnRecovery(turn2, turn2.currentTurn);
-        expect(turn2.djinnTrackers.get('flint')?.state).toBe('Set');
+        expect(turn2.djinnTrackers.get('flint')?.state).toBe('Standby');
+
+        // Turn 3: Recovers to Set (after 2 complete turns)
+        let turn3 = advanceTurn(turn2);
+        turn3 = updateDjinnRecovery(turn3, turn3.currentTurn);
+        expect(turn3.djinnTrackers.get('flint')?.state).toBe('Set');
       }
     }
   });
@@ -288,17 +293,23 @@ describe('TASK 5 REFACTOR: Per-Djinn Recovery Timing', () => {
         let turn1 = advanceTurn(turn0.value);
         turn1 = activateDjinn(turn1, 'granite', garet).value as typeof turn1;
 
-        // Turn 2: FLINT recovers (activated turn 0), GRANITE still Standby
+        // Turn 2: Both still Standby
         let turn2 = advanceTurn(turn1);
         turn2 = updateDjinnRecovery(turn2, turn2.currentTurn);
-        expect(turn2.djinnTrackers.get('flint')?.state).toBe('Set');
+        expect(turn2.djinnTrackers.get('flint')?.state).toBe('Standby');
         expect(turn2.djinnTrackers.get('granite')?.state).toBe('Standby');
 
-        // Turn 3: GRANITE recovers (activated turn 1)
+        // Turn 3: FLINT recovers (activated turn 0), GRANITE still Standby
         let turn3 = advanceTurn(turn2);
         turn3 = updateDjinnRecovery(turn3, turn3.currentTurn);
         expect(turn3.djinnTrackers.get('flint')?.state).toBe('Set');
-        expect(turn3.djinnTrackers.get('granite')?.state).toBe('Set');
+        expect(turn3.djinnTrackers.get('granite')?.state).toBe('Standby');
+
+        // Turn 4: GRANITE recovers (activated turn 1)
+        let turn4 = advanceTurn(turn3);
+        turn4 = updateDjinnRecovery(turn4, turn4.currentTurn);
+        expect(turn4.djinnTrackers.get('flint')?.state).toBe('Set');
+        expect(turn4.djinnTrackers.get('granite')?.state).toBe('Set');
       }
     }
   });
@@ -324,10 +335,15 @@ describe('TASK 5 REFACTOR: Per-Djinn Recovery Timing', () => {
       turn2 = updateDjinnRecovery(turn2, turn2.currentTurn);
       expect(turn2.djinnTrackers.get('flint')?.state).toBe('Recovery');
 
-      // Turn 3: Recovers to Set
+      // Turn 3: Still Recovery
       let turn3 = advanceTurn(turn2);
       turn3 = updateDjinnRecovery(turn3, turn3.currentTurn);
-      expect(turn3.djinnTrackers.get('flint')?.state).toBe('Set');
+      expect(turn3.djinnTrackers.get('flint')?.state).toBe('Recovery');
+
+      // Turn 4: Recovers to Set (after 3 complete turns)
+      let turn4 = advanceTurn(turn3);
+      turn4 = updateDjinnRecovery(turn4, turn4.currentTurn);
+      expect(turn4.djinnTrackers.get('flint')?.state).toBe('Set');
     }
   });
 });
@@ -537,12 +553,17 @@ describe('TASK 5 REFACTOR: Integration Tests', () => {
       current = updateDjinnRecovery(current, current.currentTurn);
       expect(getStandbyDjinn(current).length).toBe(1); // Still Standby
 
-      // Turn 2: Advance, recovery check → Set
+      // Turn 2: Advance, still Standby
+      current = advanceTurn(current);
+      current = updateDjinnRecovery(current, current.currentTurn);
+      expect(getStandbyDjinn(current).length).toBe(1); // Still Standby
+
+      // Turn 3: Advance, recovery check → Set
       current = advanceTurn(current);
       current = updateDjinnRecovery(current, current.currentTurn);
       expect(getSetDjinn(current).length).toBe(1); // Recovered!
 
-      // Turn 2: Can activate again
+      // Turn 3: Can activate again
       current = activateDjinn(current, 'flint', isaac).value as typeof current;
       expect(getStandbyDjinn(current).length).toBe(1);
     }
@@ -591,7 +612,12 @@ describe('TASK 5 REFACTOR: Integration Tests', () => {
         current = updateDjinnRecovery(current, current.currentTurn);
         expect(getSetDjinn(current).length).toBe(0);
 
-        // Turn 3: All recover to Set
+        // Turn 3: Still Recovery
+        current = advanceTurn(current);
+        current = updateDjinnRecovery(current, current.currentTurn);
+        expect(getSetDjinn(current).length).toBe(0);
+
+        // Turn 4: All recover to Set (after 3 complete turns in Recovery)
         current = advanceTurn(current);
         current = updateDjinnRecovery(current, current.currentTurn);
         expect(getSetDjinn(current).length).toBe(3);
