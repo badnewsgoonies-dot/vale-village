@@ -1,0 +1,19 @@
+.shadow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5; /* Below buildings/props but above terrain */
+
+  /* Elliptical shadow shape */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  /* Smooth shadow edges */
+  filter: blur(2px);
+
+  /* Slightly flatten the shadow */
+  transform: scaleY(0.6);
+}
