@@ -4,9 +4,11 @@ import type { Screen } from '@/context/types';
 import { VALE_VILLAGE_MAP } from '@/data/maps/valeVillage';
 import { VALE_VILLAGE_BUILDINGS, getBuildingCollisionTiles } from '@/data/maps/valeVillageBuildings';
 import { VALE_VILLAGE_PROPS, getPropCollisionTiles } from '@/data/maps/valeVillageVegetation';
+import { VALE_VILLAGE_NPCS, getRandomNPCDialogue } from '@/data/npcs/valeVillageNPCs';
 import { TerrainTile } from './TerrainTile';
 import { BuildingSprite } from './BuildingSprite';
 import { PropSprite } from './PropSprite';
+import { ParticleEffect } from './ParticleEffect';
 import './OverworldScreen.css';
 
 interface OverworldScreenProps {
@@ -55,17 +57,7 @@ const directionToSpriteMap: Record<Direction, string> = {
   'SW': 'SW',
 };
 
-// NPC dialogue data
-const NPC_DIALOGUES: Record<string, string> = {
-  elder: "Welcome to Vale Village, young warrior! The world of Weyard needs heroes like you.",
-  dora: "The shop is open if you need supplies. We have the finest potions in all of Vale!",
-  villager1: "I heard there are monsters near the forest to the south. Be careful out there!",
-  villager2: "The elders say the Elemental Stars hold great power. I wonder if it's true...",
-};
-
-const getNpcDialogue = (npcId: string): string => {
-  return NPC_DIALOGUES[npcId] || "...";
-};
+// NPC dialogue is now handled by the valeVillageNPCs data file
 
 // Get tile in front of player based on direction
 const getFacingTile = (x: number, y: number, direction: Direction): Position => {
@@ -102,44 +94,16 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
 
   // Map entities (NPCs, scenery, triggers)
   const mapEntities: MapEntity[] = useMemo(() => [
-    // Major NPCs
-    {
-      id: 'elder',
-      x: 8,
-      y: 5,
-      sprite: '/sprites/overworld/majornpcs/Elder.gif',
-      type: 'npc',
-      blocking: true,
-      interactable: true,
-    },
-    {
-      id: 'dora',
-      x: 12,
-      y: 5,
-      sprite: '/sprites/overworld/majornpcs/Dora.gif',
-      type: 'npc',
-      blocking: true,
-      interactable: true,
-    },
-    // Minor NPCs
-    {
-      id: 'villager1',
-      x: 6,
-      y: 8,
-      sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
-      type: 'npc',
-      blocking: true,
-      interactable: true,
-    },
-    {
-      id: 'villager2',
-      x: 14,
-      y: 8,
-      sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
-      type: 'npc',
-      blocking: true,
-      interactable: true,
-    },
+    // Convert all Vale Village NPCs to MapEntity format
+    ...VALE_VILLAGE_NPCS.map(npc => ({
+      id: npc.id,
+      x: npc.x,
+      y: npc.y,
+      sprite: npc.sprite,
+      type: 'npc' as const,
+      blocking: npc.blocking,
+      interactable: npc.interactable,
+    })),
     // Battle trigger zones (with visual markers for debugging)
     {
       id: 'battle_zone_1',
@@ -257,10 +221,14 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
 
     if (npc) {
       console.log('Interacting with NPC:', npc.id);
-      const npcName = npc.id.charAt(0).toUpperCase() + npc.id.slice(1);
+
+      // Get NPC data for proper name display
+      const npcData = VALE_VILLAGE_NPCS.find(n => n.id === npc.id);
+      const npcName = npcData?.name || npc.id.charAt(0).toUpperCase() + npc.id.slice(1);
+
       setDialogue({
         speaker: npcName,
-        text: getNpcDialogue(npc.id),
+        text: getRandomNPCDialogue(npc.id),
       });
 
       // Call onInteract if defined
@@ -451,6 +419,12 @@ export const OverworldScreen: React.FC<OverworldScreenProps> = ({
               blocking={prop.blocking}
             />
           ))}
+        </div>
+
+        {/* Particle Effects layer */}
+        <div className="overworld-effects">
+          {/* Psynergy Stone effect (from building data) */}
+          <ParticleEffect type="psynergy" x={11} y={2} active={true} />
         </div>
 
         {/* Entities and player layer (combined and sorted by Y) */}

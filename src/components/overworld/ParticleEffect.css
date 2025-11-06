@@ -1,0 +1,68 @@
+.particle-effect-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30; /* Above entities */
+  overflow: visible;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 50ms linear;
+}
+
+/* Psynergy particles (cyan/blue glow) */
+.particle-psynergy {
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 1) 0%,
+    rgba(0, 200, 255, 0.8) 50%,
+    rgba(0, 150, 255, 0) 100%
+  );
+  box-shadow: 0 0 4px rgba(0, 255, 255, 0.8);
+}
+
+/* Sparkle particles (white/yellow) */
+.particle-sparkle {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 200, 0.8) 50%,
+    rgba(255, 200, 100, 0) 100%
+  );
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
+}
+
+/* Water ripple particles (blue) */
+.particle-water-ripple {
+  background: radial-gradient(
+    circle,
+    rgba(100, 150, 255, 0.6) 0%,
+    rgba(50, 100, 200, 0.4) 50%,
+    rgba(0, 50, 150, 0) 100%
+  );
+}
+
+/* Fire particles (red/orange) */
+.particle-fire {
+  background: radial-gradient(
+    circle,
+    rgba(255, 100, 0, 1) 0%,
+    rgba(255, 50, 0, 0.8) 50%,
+    rgba(200, 0, 0, 0) 100%
+  );
+  box-shadow: 0 0 4px rgba(255, 100, 0, 0.8);
+}
+
+/* Wind particles (white/transparent) */
+.particle-wind {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(200, 200, 255, 0.4) 50%,
+    rgba(150, 150, 200, 0) 100%
+  );
+}

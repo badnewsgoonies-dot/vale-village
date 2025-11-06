@@ -1,4 +1,5 @@
 import React from 'react';
+import { Shadow } from './Shadow';
 import './PropSprite.css';
 
 export type PropType =
@@ -99,27 +100,49 @@ export const PropSprite: React.FC<PropSpriteProps> = ({
   const sprite = getPropSprite(type);
   const size = getPropSize(type);
 
+  // Determine if this prop should cast a shadow
+  const isTree = type.startsWith('tree-');
+  const isStatue = type.startsWith('statue-');
+  const shouldCastShadow = isTree || isStatue;
+
+  // Shadow size based on prop type
+  const shadowSize = isTree ? 'large' : isStatue ? 'medium' : 'small';
+
   return (
-    <div
-      className={`prop-sprite ${blocking ? 'prop-blocking' : ''}`}
-      style={{
-        left: `${x * TILE_SIZE}px`,
-        top: `${y * TILE_SIZE}px`,
-        width: `${size.width * TILE_SIZE}px`,
-        height: `${size.height * TILE_SIZE}px`,
-      }}
-      data-prop-type={type}
-    >
-      <img
-        src={sprite}
-        alt={type}
-        className="prop-image"
+    <>
+      {/* Shadow layer (only for trees and statues) */}
+      {shouldCastShadow && (
+        <Shadow
+          x={x}
+          y={y + size.height - 1}
+          size={shadowSize}
+          direction="southeast"
+          opacity={isTree ? 0.3 : 0.2}
+        />
+      )}
+
+      {/* Prop sprite */}
+      <div
+        className={`prop-sprite ${blocking ? 'prop-blocking' : ''}`}
         style={{
-          width: '100%',
-          height: '100%',
-          imageRendering: 'pixelated',
+          left: `${x * TILE_SIZE}px`,
+          top: `${y * TILE_SIZE}px`,
+          width: `${size.width * TILE_SIZE}px`,
+          height: `${size.height * TILE_SIZE}px`,
         }}
-      />
-    </div>
+        data-prop-type={type}
+      >
+        <img
+          src={sprite}
+          alt={type}
+          className="prop-image"
+          style={{
+            width: '100%',
+            height: '100%',
+            imageRendering: 'pixelated',
+          }}
+        />
+      </div>
+    </>
   );
 };

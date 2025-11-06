@@ -1,4 +1,5 @@
 import React from 'react';
+import { Shadow } from './Shadow';
 import './BuildingSprite.css';
 
 export type BuildingType =
@@ -92,26 +93,41 @@ export const BuildingSprite: React.FC<BuildingSpriteProps> = ({
 }) => {
   const sprite = getBuildingSprite(type);
 
+  // Determine shadow size based on building size
+  const shadowSize = width >= 3 ? 'xlarge' : height >= 3 ? 'large' : 'medium';
+
   return (
-    <div
-      className="building-sprite"
-      style={{
-        left: `${x * TILE_SIZE}px`,
-        top: `${y * TILE_SIZE}px`,
-        width: `${width * TILE_SIZE}px`,
-        height: `${height * TILE_SIZE}px`,
-      }}
-    >
-      <img
-        src={sprite}
-        alt={type}
-        className="building-image"
-        style={{
-          width: '100%',
-          height: '100%',
-          imageRendering: 'pixelated',
-        }}
+    <>
+      {/* Shadow layer */}
+      <Shadow
+        x={x}
+        y={y + height - 1}
+        size={shadowSize}
+        direction="southeast"
+        opacity={0.25}
       />
-    </div>
+
+      {/* Building sprite */}
+      <div
+        className="building-sprite"
+        style={{
+          left: `${x * TILE_SIZE}px`,
+          top: `${y * TILE_SIZE}px`,
+          width: `${width * TILE_SIZE}px`,
+          height: `${height * TILE_SIZE}px`,
+        }}
+      >
+        <img
+          src={sprite}
+          alt={type}
+          className="building-image"
+          style={{
+            width: '100%',
+            height: '100%',
+            imageRendering: 'pixelated',
+          }}
+        />
+      </div>
+    </>
   );
 };
