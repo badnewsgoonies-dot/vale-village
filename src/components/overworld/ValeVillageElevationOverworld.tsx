@@ -30,6 +30,12 @@ export const ValeVillageElevationOverworld: React.FC = () => {
   const [isMoving, setIsMoving] = useState(false);
   const [nearTransition, setNearTransition] = useState<TransitionZone | null>(null);
 
+  // Smooth movement state
+  const velocityRef = React.useRef<Position>({ x: 0, y: 0 });
+  const lastFrameTimeRef = React.useRef<number>(performance.now());
+  const keysRef = React.useRef(new Set<string>());
+  const [cameraPos, setCameraPos] = useState<Position>({ x: 0, y: 0 });
+
   // Filter entities by current elevation
   const visibleEntities = useMemo(() => {
     return VALE_ENTITIES.filter(entity => entity.elevation === playerElevation);
@@ -115,15 +121,15 @@ export const ValeVillageElevationOverworld: React.FC = () => {
 
   // Keyboard controls
   useEffect(() => {
-    const keys = new Set<string>();
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'Shift', 'Escape', ' ', 'Enter', 'e'].includes(e.key.toLowerCase())) {
+      const key = e.key.toLowerCase();
+
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'shift', 'escape', ' ', 'enter', 'e'].includes(key)) {
         e.preventDefault();
       }
 
       // Interaction / Transition
-      if ((e.key === ' ' || e.key === 'Enter' || e.key.toLowerCase() === 'e') && nearTransition) {
+      if ((e.key === ' ' || e.key === 'Enter' || key === 'e') && nearTransition) {
         handleTransition();
         return;
       }
@@ -139,87 +145,170 @@ export const ValeVillageElevationOverworld: React.FC = () => {
         setIsRunning(true);
       }
 
-      keys.add(e.key.toLowerCase());
+      keysRef.current.add(key);
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+
       if (e.key === 'Shift') {
         setIsRunning(false);
       }
-      keys.delete(e.key.toLowerCase());
+      keysRef.current.delete(key);
     };
 
-    // Movement loop
-    const moveInterval = setInterval(() => {
-      if (keys.size === 0) {
-        setIsMoving(false);
-        return;
-      }
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
-      let dx = 0;
-      let dy = 0;
-      const speed = isRunning ? 4 : 2;
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [handleTransition, nearTransition, actions]);
+
+  // Smooth movement loop with requestAnimationFrame
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const WALK_SPEED = 140; // pixels per second
+    const RUN_SPEED = 240;   // pixels per second
+    const ACCELERATION = 800; // pixels per second squared
+    const DECELERATION = 1200; // pixels per second squared
+
+    const gameLoop = () => {
+      const currentTime = performance.now();
+      const deltaTime = Math.min((currentTime - lastFrameTimeRef.current) / 1000, 0.1); // Cap at 100ms
+      lastFrameTimeRef.current = currentTime;
+
+      const keys = keysRef.current;
+      const targetSpeed = isRunning ? RUN_SPEED : WALK_SPEED;
+
+      // Calculate input direction
+      let inputX = 0;
+      let inputY = 0;
 
       const up = keys.has('w') || keys.has('arrowup');
       const down = keys.has('s') || keys.has('arrowdown');
       const left = keys.has('a') || keys.has('arrowleft');
       const right = keys.has('d') || keys.has('arrowright');
 
-      if (up) {
-        dy -= speed;
-        setPlayerDirection('up');
-      }
-      if (down) {
-        dy += speed;
-        setPlayerDirection('down');
-      }
-      if (left) {
-        dx -= speed;
-        setPlayerDirection('left');
-      }
-      if (right) {
-        dx += speed;
-        setPlayerDirection('right');
+      if (up) inputY -= 1;
+      if (down) inputY += 1;
+      if (left) inputX -= 1;
+      if (right) inputX += 1;
+
+      // Normalize diagonal movement (prevent faster diagonal speed)
+      const inputMagnitude = Math.sqrt(inputX * inputX + inputY * inputY);
+      if (inputMagnitude > 0) {
+        inputX /= inputMagnitude;
+        inputY /= inputMagnitude;
       }
 
-      if (dx !== 0 || dy !== 0) {
-        const newX = playerPos.x + dx;
-        const newY = playerPos.y + dy;
+      // Update player direction based on last input
+      if (inputY < 0) setPlayerDirection('up');
+      else if (inputY > 0) setPlayerDirection('down');
+      else if (inputX < 0) setPlayerDirection('left');
+      else if (inputX > 0) setPlayerDirection('right');
 
+      // Calculate target velocity
+      const targetVelX = inputX * targetSpeed;
+      const targetVelY = inputY * targetSpeed;
+
+      // Apply acceleration/deceleration
+      const accel = inputMagnitude > 0 ? ACCELERATION : DECELERATION;
+
+      const velDiffX = targetVelX - velocityRef.current.x;
+      const velDiffY = targetVelY - velocityRef.current.y;
+      const velDiffMag = Math.sqrt(velDiffX * velDiffX + velDiffY * velDiffY);
+
+      if (velDiffMag > 0) {
+        const maxChange = accel * deltaTime;
+        const change = Math.min(maxChange, velDiffMag);
+        const changeRatio = change / velDiffMag;
+
+        velocityRef.current.x += velDiffX * changeRatio;
+        velocityRef.current.y += velDiffY * changeRatio;
+      }
+
+      // Apply velocity to position
+      const moving = Math.abs(velocityRef.current.x) > 1 || Math.abs(velocityRef.current.y) > 1;
+      setIsMoving(moving);
+
+      if (moving) {
+        const newX = playerPos.x + velocityRef.current.x * deltaTime;
+        const newY = playerPos.y + velocityRef.current.y * deltaTime;
+
+        // Check collision
         if (canMoveTo(newX, newY)) {
           setPlayerPos({ x: newX, y: newY });
-          setIsMoving(true);
         } else {
-          setIsMoving(false);
+          // Try sliding along walls
+          if (canMoveTo(newX, playerPos.y)) {
+            setPlayerPos(prev => ({ ...prev, x: newX }));
+            velocityRef.current.y = 0;
+          } else if (canMoveTo(playerPos.x, newY)) {
+            setPlayerPos(prev => ({ ...prev, y: newY }));
+            velocityRef.current.x = 0;
+          } else {
+            // Full stop
+            velocityRef.current.x = 0;
+            velocityRef.current.y = 0;
+          }
         }
       }
-    }, 50);
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+      animationFrameId = requestAnimationFrame(gameLoop);
+    };
+
+    animationFrameId = requestAnimationFrame(gameLoop);
 
     return () => {
-      clearInterval(moveInterval);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [playerPos, isRunning, canMoveTo, handleTransition, nearTransition, actions]);
+  }, [playerPos, isRunning, canMoveTo]);
 
   // Check for transitions
   useEffect(() => {
     checkTransitions();
   }, [checkTransitions]);
 
-  // Camera calculation
+  // Smooth camera following
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const smoothCamera = () => {
+      // Target camera position (centered on player)
+      let targetX = playerPos.x - VIEWPORT_WIDTH / 2;
+      let targetY = playerPos.y - VIEWPORT_HEIGHT / 2;
+
+      // Clamp to world bounds
+      targetX = Math.max(0, Math.min(WORLD_WIDTH - VIEWPORT_WIDTH, targetX));
+      targetY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, targetY));
+
+      // Smooth easing (lerp with factor 0.15 for smooth follow)
+      const CAMERA_SMOOTHING = 0.15;
+      const newX = cameraPos.x + (targetX - cameraPos.x) * CAMERA_SMOOTHING;
+      const newY = cameraPos.y + (targetY - cameraPos.y) * CAMERA_SMOOTHING;
+
+      // Only update if there's meaningful change (avoid jitter)
+      if (Math.abs(newX - cameraPos.x) > 0.01 || Math.abs(newY - cameraPos.y) > 0.01) {
+        setCameraPos({ x: newX, y: newY });
+      }
+
+      animationFrameId = requestAnimationFrame(smoothCamera);
+    };
+
+    animationFrameId = requestAnimationFrame(smoothCamera);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [playerPos, cameraPos]);
+
+  // Camera offset for rendering
   const cameraOffset = useMemo(() => {
-    let cameraX = playerPos.x - VIEWPORT_WIDTH / 2;
-    let cameraY = playerPos.y - VIEWPORT_HEIGHT / 2;
-
-    cameraX = Math.max(0, Math.min(WORLD_WIDTH - VIEWPORT_WIDTH, cameraX));
-    cameraY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, cameraY));
-
-    return { x: -cameraX, y: -cameraY };
-  }, [playerPos]);
+    return { x: -cameraPos.x, y: -cameraPos.y };
+  }, [cameraPos]);
 
   // Get player sprite
   const getPlayerSprite = () => {

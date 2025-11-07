@@ -23,8 +23,11 @@
   position: absolute;
   width: 1920px;  /* 120 tiles × 16px */
   height: 1920px; /* 120 tiles × 16px */
-  transition: transform 0.1s linear;
   will-change: transform;
+  /* Hardware acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 /* ===== TERRAIN LAYER ===== */
@@ -45,6 +48,10 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   pointer-events: none;
+  /* Hardware acceleration for smooth movement */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .vale-entity img {
