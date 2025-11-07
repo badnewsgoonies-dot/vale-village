@@ -20,7 +20,9 @@ type DemoStep =
   | { action: 'announce'; text: string; duration: number }
   | { action: 'walk'; target: Position; elevation: ElevationLevel; run?: boolean }
   | { action: 'wait'; duration: number }
+
   | { action: 'transition'; toLevel: ElevationLevel };
+
 
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 1500;
