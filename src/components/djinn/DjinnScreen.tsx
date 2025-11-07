@@ -43,7 +43,7 @@ export const DjinnScreen: React.FC = () => {
   };
 
   const handleReturn = () => {
-    actions.navigate({ type: 'OVERWORLD' });
+    actions.goBack();
   };
 
   const handleEquip = (djinn: Djinn) => {
