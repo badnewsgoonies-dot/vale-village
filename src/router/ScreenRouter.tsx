@@ -8,9 +8,12 @@ import { PartyManagementScreen } from '@/components/party/PartyManagementScreen'
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
 import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
+import { ValeVillageElevationOverworld } from '@/components/overworld/ValeVillageElevationOverworld';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
+import { AbilitiesScreen } from '@/components/abilities/AbilitiesScreen';
+import { SummonsScreen } from '@/components/summons/SummonsScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
 import { GameDemo } from '@/components/demo/GameDemo';
 import { DialogueScreen } from '@/components/dialogue/DialogueScreen';
@@ -57,6 +60,12 @@ export const ScreenRouter: React.FC = () => {
     case 'EQUIPMENT':
       return <EquipmentScreen />;
 
+    case 'ABILITIES':
+      return <AbilitiesScreen />;
+
+    case 'SUMMONS':
+      return <SummonsScreen />;
+
     case 'REWARDS':
       // Get rewards from last battle
       const battleRewards = state.lastBattleRewards;
@@ -83,7 +92,7 @@ export const ScreenRouter: React.FC = () => {
       return <BattleScreen />;
 
     case 'OVERWORLD':
-      return <ValeVillageOverworld />;
+      return <ValeVillageElevationOverworld />;
 
     case 'DJINN_MENU':
       return <DjinnScreen />;
@@ -97,6 +106,8 @@ export const ScreenRouter: React.FC = () => {
             actions.navigate({ type: 'EQUIPMENT', unitId: firstUnitId });
           }}
           onNavigateToParty={() => actions.navigate({ type: 'PARTY_MANAGEMENT' })}
+          onNavigateToAbilities={() => actions.navigate({ type: 'ABILITIES' })}
+          onNavigateToSummons={() => actions.navigate({ type: 'SUMMONS' })}
           onResume={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );

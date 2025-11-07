@@ -23,8 +23,11 @@
   position: absolute;
   width: 1920px;  /* 120 tiles × 16px */
   height: 1920px; /* 120 tiles × 16px */
-  transition: transform 0.1s linear;
   will-change: transform;
+  /* Hardware acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 /* ===== TERRAIN LAYER ===== */
@@ -45,6 +48,10 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   pointer-events: none;
+  /* Hardware acceleration for smooth movement */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .vale-entity img {
@@ -228,4 +235,40 @@
   padding: 2px 4px;
   margin: 0 2px;
   color: #FFD700;
+}
+
+/* ===== TRANSITION PROMPT ===== */
+.transition-prompt {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.95);
+  border: 3px solid #FFD700;
+  padding: 12px 24px;
+  z-index: 200;
+  text-align: center;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.prompt-text {
+  font-size: 10px;
+  color: #FFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin-bottom: 6px;
+}
+
+.prompt-destination {
+  font-size: 8px;
+  color: #FFD700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+  }
 }
