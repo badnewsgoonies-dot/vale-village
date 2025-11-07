@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGame } from '@/context/GameContext';
+import type { Screen } from '@/context/types';
 import {
   ElevationLevel,
   ELEVATION_CONFIGS,
@@ -20,7 +21,7 @@ type DemoStep =
   | { action: 'walk'; target: Position; elevation: ElevationLevel; run?: boolean }
   | { action: 'wait'; duration: number }
   | { action: 'transition'; toLevel: ElevationLevel }
-  | { action: 'menu'; screen: { type: string; unitId?: string }; duration: number };
+  | { action: 'menu'; screen: Screen; duration: number };
 
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 1500;
