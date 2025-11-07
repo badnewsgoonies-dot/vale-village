@@ -1,0 +1,360 @@
+.touch-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  pointer-events: none;
+  z-index: 1000;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.touch-controls * {
+  pointer-events: auto;
+}
+
+/* Left side - Joystick */
+.touch-controls-left {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+
+.joystick {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  touch-action: none;
+}
+
+.joystick-base {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(40, 40, 50, 0.8) 0%, rgba(30, 30, 40, 0.9) 100%);
+  border: 3px solid rgba(100, 100, 120, 0.6);
+  border-radius: 50%;
+  position: relative;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.joystick.active .joystick-base {
+  border-color: rgba(120, 180, 255, 0.8);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(120, 180, 255, 0.3);
+}
+
+.joystick-directions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.direction-marker {
+  position: absolute;
+  color: rgba(150, 150, 170, 0.5);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.direction-marker.up {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.direction-marker.down {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.direction-marker.left {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.direction-marker.right {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.joystick-stick {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(180, 180, 200, 0.9) 0%, rgba(120, 120, 140, 0.95) 100%);
+  border: 2px solid rgba(200, 200, 220, 0.8);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3);
+  transition: transform 0.05s ease-out;
+}
+
+.joystick.active .joystick-stick {
+  background: radial-gradient(circle, rgba(200, 220, 255, 0.9) 0%, rgba(140, 160, 200, 0.95) 100%);
+  border-color: rgba(160, 200, 255, 0.9);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3),
+    0 0 12px rgba(120, 180, 255, 0.5);
+}
+
+/* Right side - Action buttons */
+.touch-controls-right {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.action-buttons {
+  width: 180px;
+  height: 180px;
+  position: relative;
+}
+
+.action-button {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(100, 100, 120, 0.6);
+  background: radial-gradient(circle, rgba(60, 60, 80, 0.9) 0%, rgba(40, 40, 60, 0.95) 100%);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Press Start 2P', monospace, system-ui;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.1s ease;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+.action-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+/* ABXY Diamond layout */
+.button-y {
+  top: 0;
+  left: 60px;
+  background: radial-gradient(circle, rgba(100, 150, 100, 0.9) 0%, rgba(60, 100, 60, 0.95) 100%);
+  border-color: rgba(120, 180, 120, 0.7);
+}
+
+.button-y:active {
+  background: radial-gradient(circle, rgba(120, 180, 120, 0.95) 0%, rgba(80, 130, 80, 1) 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(120, 180, 120, 0.6);
+}
+
+.button-x {
+  top: 60px;
+  left: 0;
+  background: radial-gradient(circle, rgba(100, 120, 180, 0.9) 0%, rgba(60, 80, 140, 0.95) 100%);
+  border-color: rgba(120, 150, 220, 0.7);
+}
+
+.button-x:active {
+  background: radial-gradient(circle, rgba(120, 150, 220, 0.95) 0%, rgba(80, 100, 170, 1) 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(120, 150, 220, 0.6);
+}
+
+.button-b {
+  top: 60px;
+  right: 0;
+  background: radial-gradient(circle, rgba(180, 100, 100, 0.9) 0%, rgba(140, 60, 60, 0.95) 100%);
+  border-color: rgba(220, 120, 120, 0.7);
+}
+
+.button-b:active {
+  background: radial-gradient(circle, rgba(220, 120, 120, 0.95) 0%, rgba(170, 80, 80, 1) 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(220, 120, 120, 0.6);
+}
+
+.button-a {
+  bottom: 0;
+  left: 60px;
+  background: radial-gradient(circle, rgba(180, 120, 100, 0.9) 0%, rgba(140, 80, 60, 0.95) 100%);
+  border-color: rgba(220, 150, 120, 0.7);
+}
+
+.button-a:active {
+  background: radial-gradient(circle, rgba(220, 150, 120, 0.95) 0%, rgba(170, 100, 80, 1) 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(220, 150, 120, 0.6);
+}
+
+/* Center - Select and Start */
+.touch-controls-center {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+}
+
+.meta-button {
+  width: 80px;
+  height: 32px;
+  border-radius: 16px;
+  border: 2px solid rgba(100, 100, 120, 0.6);
+  background: radial-gradient(ellipse, rgba(50, 50, 70, 0.9) 0%, rgba(35, 35, 55, 0.95) 100%);
+  color: rgba(200, 200, 220, 0.9);
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Press Start 2P', monospace, system-ui;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.1s ease;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  letter-spacing: 1px;
+}
+
+.meta-button:active {
+  transform: translateY(1px);
+  background: radial-gradient(ellipse, rgba(70, 70, 100, 0.95) 0%, rgba(50, 50, 80, 1) 100%);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 0 10px rgba(120, 150, 200, 0.4);
+}
+
+.button-select {
+  background: radial-gradient(ellipse, rgba(60, 50, 70, 0.9) 0%, rgba(40, 35, 55, 0.95) 100%);
+}
+
+.button-start {
+  background: radial-gradient(ellipse, rgba(70, 60, 50, 0.9) 0%, rgba(55, 45, 35, 0.95) 100%);
+}
+
+/* Hide on desktop/large screens */
+@media (min-width: 1024px) {
+  .touch-controls {
+    display: none;
+  }
+}
+
+/* Adjust for tablets */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .joystick {
+    width: 140px;
+    height: 140px;
+  }
+
+  .joystick-stick {
+    width: 55px;
+    height: 55px;
+  }
+
+  .action-buttons {
+    width: 160px;
+    height: 160px;
+  }
+
+  .action-button {
+    width: 55px;
+    height: 55px;
+    font-size: 18px;
+  }
+
+  .button-y,
+  .button-a {
+    left: 52px;
+  }
+
+  .button-x,
+  .button-b {
+    top: 52px;
+  }
+}
+
+/* Adjust for small phones */
+@media (max-width: 400px) {
+  .touch-controls {
+    height: 240px;
+  }
+
+  .touch-controls-left {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .touch-controls-right {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .joystick {
+    width: 120px;
+    height: 120px;
+  }
+
+  .joystick-stick {
+    width: 45px;
+    height: 45px;
+  }
+
+  .action-buttons {
+    width: 140px;
+    height: 140px;
+  }
+
+  .action-button {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .button-y,
+  .button-a {
+    left: 46px;
+  }
+
+  .button-x,
+  .button-b {
+    top: 46px;
+  }
+
+  .meta-button {
+    width: 70px;
+    height: 28px;
+    font-size: 8px;
+  }
+
+  .touch-controls-center {
+    top: 10px;
+    gap: 15px;
+  }
+}
