@@ -551,8 +551,8 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       targetX = Math.max(0, Math.min(WORLD_WIDTH - VIEWPORT_WIDTH, targetX));
       targetY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, targetY));
 
-      // Smooth easing (lerp with factor 0.15 for smooth follow)
-      const CAMERA_SMOOTHING = 0.15;
+      // Smooth easing (faster in demo mode for better tracking)
+      const CAMERA_SMOOTHING = demoMode ? 0.35 : 0.15;
       const newX = cameraPos.x + (targetX - cameraPos.x) * CAMERA_SMOOTHING;
       const newY = cameraPos.y + (targetY - cameraPos.y) * CAMERA_SMOOTHING;
 
@@ -569,7 +569,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [playerPos, cameraPos]);
+  }, [playerPos, cameraPos, demoMode]);
 
   // Camera offset for rendering
   const cameraOffset = useMemo(() => {

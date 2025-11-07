@@ -48,6 +48,7 @@
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   pointer-events: none;
+  z-index: 10; /* Above paths (z-index: 1) and terrain */
   /* Hardware acceleration for smooth movement */
   will-change: transform;
   transform: translateZ(0);
