@@ -42,6 +42,16 @@ export const UNIT_SPRITE_MAPPING: Record<string, UnitSpriteMapping> = {
     folder: 'piers',
     weapons: ['lSword', 'Mace'],
     animations: 12
+  },
+  'kraden': {
+    folder: 'ivan', // Fallback to Ivan sprites
+    weapons: ['Staff'],
+    animations: 12
+  },
+  'kyle': {
+    folder: 'garet', // Fallback to Garet sprites
+    weapons: ['lSword', 'Axe'],
+    animations: 12
   }
 };
 

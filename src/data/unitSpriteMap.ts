@@ -78,6 +78,12 @@ export const UNIT_SPRITE_MAP: Record<string, UnitSpriteMapping> = {
     portrait: '/sprites/portraits/saturos.gif',
     weapon: 'Sword',
   },
+  'kyle': {
+    overworld: '/sprites/overworld/protagonists/Garet.gif', // Fallback to Garet
+    battle: '/sprites/battle/party/garet/Garet_lSword_Front.gif', // Fallback to Garet
+    portrait: '/sprites/portraits/garet.gif', // Fallback to Garet
+    weapon: 'lSword',
+  },
 };
 
 /**

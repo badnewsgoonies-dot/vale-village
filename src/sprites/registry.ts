@@ -43,15 +43,23 @@ class SpriteRegistry {
       weapon = mapping.weapons[0];
     }
 
-    // Handle Jenna fallback for missing front-cast animations
+    // Handle Jenna fallback for missing front animations
     let folder = mapping.folder;
-    if (unitId === 'jenna' && animation.startsWith('CastFront')) {
-      folder = mapping.fallback || 'jenna';
+    let finalWeapon = weapon;
+
+    if (unitId === 'jenna') {
+      // Jenna only has Back animations for lBlade, use jenna_gs2/Staff for all Front animations
+      if (weapon === 'lBlade' && (animation.includes('Front') || animation.includes('Downed'))) {
+        folder = mapping.fallback || 'jenna_gs2';
+        finalWeapon = 'Staff'; // Use Staff sprites for front-facing animations
+      } else if (animation.startsWith('CastFront')) {
+        folder = mapping.fallback || 'jenna';
+      }
     }
 
     // Build filename: Isaac_Axe_Front.gif
     const characterName = this.capitalize(folder === 'jenna_gs2' ? 'Jenna' : unitId);
-    const filename = `${characterName}_${weapon}_${animation}.gif`;
+    const filename = `${characterName}_${finalWeapon}_${animation}.gif`;
     const path = `${this.baseUrl}/battle/party/${folder}/${filename}`;
 
     return path;
