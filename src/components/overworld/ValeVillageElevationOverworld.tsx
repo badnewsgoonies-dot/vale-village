@@ -14,6 +14,14 @@ interface Position {
   y: number;
 }
 
+// Demo sequence step types
+type DemoStep =
+  | { action: 'announce'; text: string; duration: number }
+  | { action: 'walk'; target: Position; elevation: ElevationLevel; run?: boolean }
+  | { action: 'wait'; duration: number }
+  | { action: 'transition'; toLevel: ElevationLevel }
+  | { action: 'menu'; screen: { type: string; unitId?: string }; duration: number };
+
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 1500;
 const VIEWPORT_WIDTH = 960;
@@ -148,7 +156,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
   }, [nearTransition, playerElevation]);
 
   // Demo mode waypoints and actions
-  const demoSequence = useMemo(() => [
+  const demoSequence = useMemo((): DemoStep[] => [
     // Start in Main Village
     { action: 'announce', text: 'Vale Village - Multi-Level Overworld System', duration: 3 },
     { action: 'walk', target: { x: 350, y: 400 }, elevation: ElevationLevel.MAIN },
