@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { getDjinnGrantedAbilities } from '@/utils/djinnCalculations';
-import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import './AbilitiesScreen.css';
 
 export const AbilitiesScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<any>(null);
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
 
   const allUnits = state.playerData.unitsCollected;
   const activePartyIds = state.playerData.activePartyIds;
 
   // Split units into active and bench
-  const activeUnits = allUnits.filter(u => activePartyIds.includes(u.id));
-  const benchUnits = allUnits.filter(u => !activePartyIds.includes(u.id));
-
-  // Get equipped Djinn for ability grants
-  const equippedDjinn = state.playerData.djinnCollected.filter(d => 
-    state.playerData.equippedDjinnIds.includes(d.id)
+  const activeUnits = useMemo(
+    () => allUnits.filter(u => activePartyIds.includes(u.id)),
+    [allUnits, activePartyIds]
+  );
+  const benchUnits = useMemo(
+    () => allUnits.filter(u => !activePartyIds.includes(u.id)),
+    [allUnits, activePartyIds]
   );
 
   // Auto-select first active unit if none selected
@@ -30,6 +30,14 @@ export const AbilitiesScreen: React.FC = () => {
       setSelectedUnit(activeUnits[0]);
     }
   }, [activeUnits, selectedUnit]);
+
+  // Get equipped Djinn for ability grants
+  const equippedDjinn = useMemo(
+    () => state.playerData.djinnCollected.filter(d => 
+      state.playerData.equippedDjinnIds.includes(d.id)
+    ),
+    [state.playerData.djinnCollected, state.playerData.equippedDjinnIds]
+  );
 
   if (!selectedUnit) {
     return <div className="abilities-screen">Loading...</div>;
@@ -41,13 +49,13 @@ export const AbilitiesScreen: React.FC = () => {
   // Get Djinn-granted abilities for this unit (returns ability IDs)
   const djinnAbilityIds = getDjinnGrantedAbilities(selectedUnit, equippedDjinn);
   const djinnAbilities = djinnAbilityIds
-    .map(id => nativeAbilities.find(a => a.id === id))
+    .map((id: string) => nativeAbilities.find((a: Ability) => a.id === id))
     .filter((a): a is Ability => a !== undefined);
 
   // Get equipment-granted abilities
-  const equipmentAbilities = Object.values(selectedUnit.equipment)
-    .filter(equip => equip?.unlocksAbility)
-    .map(equip => nativeAbilities.find(a => a.id === equip!.unlocksAbility))
+  const equipmentAbilities = Object.values(selectedUnit.equipment as any)
+    .filter((equip: any) => equip?.unlocksAbility)
+    .map((equip: any) => nativeAbilities.find((a: Ability) => a.id === equip.unlocksAbility))
     .filter((a): a is Ability => a !== undefined);
 
   // Categorize abilities by element and type
@@ -79,6 +87,18 @@ export const AbilitiesScreen: React.FC = () => {
   const handleReturn = () => {
     actions.goBack();
   };
+
+  // Unit ability counts memoized for performance
+  const unitAbilityCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    allUnits.forEach(unit => {
+      const total = unit.abilities.length + 
+        getDjinnGrantedAbilities(unit, equippedDjinn).length +
+        Object.values(unit.equipment).filter(e => e?.unlocksAbility).length;
+      counts.set(unit.id, total);
+    });
+    return counts;
+  }, [allUnits, equippedDjinn]);
 
   const getAbilityColor = (ability: Ability): string => {
     if (ability.type === 'physical') return 'physical';
@@ -133,7 +153,10 @@ export const AbilitiesScreen: React.FC = () => {
               <span className="total-count">Total: {allUnits.length} / 10</span>
             </div>
           </div>
-          <Button onClick={handleReturn} ariaLabel="Return to previous menu">
+          <Button 
+            onClick={handleReturn} 
+            ariaLabel="Return to previous menu"
+          >
             RETURN
           </Button>
         </header>
@@ -145,9 +168,7 @@ export const AbilitiesScreen: React.FC = () => {
             <h2>PARTY</h2>
             <div className="unit-list">
               {activeUnits.map(unit => {
-                const totalAbilities = unit.abilities.length + 
-                  getDjinnGrantedAbilities(unit, equippedDjinn).length +
-                  Object.values(unit.equipment).filter(e => e?.unlocksAbility).length;
+                const totalAbilities = unitAbilityCounts.get(unit.id) || 0;
 
                 return (
                   <div

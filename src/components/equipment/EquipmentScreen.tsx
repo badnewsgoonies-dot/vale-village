@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
 import { ABILITIES } from '@/data/abilities';
-import type { Unit } from '@/types/Unit';
 import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import type { Ability } from '@/types/Ability';
 import './EquipmentScreen.css';
 
 export const EquipmentScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Equipment['slot'] extends string ? any : null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
   const [showAllUnits, setShowAllUnits] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -20,9 +19,15 @@ export const EquipmentScreen: React.FC = () => {
   const activePartyIds = state.playerData.activePartyIds;
   const inventory = state.playerData.inventory;
 
-  // Split units into active and bench
-  const activeUnits = allUnits.filter(u => activePartyIds.includes(u.id));
-  const benchUnits = allUnits.filter(u => !activePartyIds.includes(u.id));
+  // Split units into active and bench (memoized)
+  const activeUnits = useMemo(
+    () => allUnits.filter(u => activePartyIds.includes(u.id)),
+    [allUnits, activePartyIds]
+  );
+  const benchUnits = useMemo(
+    () => allUnits.filter(u => !activePartyIds.includes(u.id)),
+    [allUnits, activePartyIds]
+  );
 
   // Auto-select first active unit if none selected
   React.useEffect(() => {
@@ -35,23 +40,27 @@ export const EquipmentScreen: React.FC = () => {
     return <div className="equipment-screen">Loading...</div>;
   }
 
-  const currentEquipment = selectedUnit.equipment;
-
-  // Get abilities granted by equipment
-  const getEquipmentAbilities = (equipment: Record<EquipmentSlot, Equipment | null>): Ability[] => {
-    const abilities: Ability[] = [];
-    Object.values(equipment).forEach(item => {
-      if (item?.unlocksAbility) {
-        const ability = ABILITIES[item.unlocksAbility];
-        if (ability) {
-          abilities.push(ability);
+  // Memoize equipment abilities
+  const currentEquipment = selectedUnit?.equipment || {};
+  const getEquipmentAbilities = useMemo(() => {
+    return (equipment: Record<EquipmentSlot, Equipment | null>): Ability[] => {
+      const abilities: Ability[] = [];
+      Object.values(equipment).forEach(item => {
+        if (item?.unlocksAbility) {
+          const ability = ABILITIES[item.unlocksAbility];
+          if (ability) {
+            abilities.push(ability);
+          }
         }
-      }
-    });
-    return abilities;
-  };
+      });
+      return abilities;
+    };
+  }, []);
 
-  const currentAbilities = getEquipmentAbilities(currentEquipment);
+  const currentAbilities = useMemo(
+    () => getEquipmentAbilities(currentEquipment),
+    [currentEquipment, getEquipmentAbilities]
+  );
 
   // Get ability changes when hovering over an item
   const getAbilityChanges = (item: Equipment | null): { added: Ability[]; removed: Ability[] } => {
