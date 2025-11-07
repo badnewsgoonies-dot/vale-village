@@ -7,7 +7,7 @@ import {
   ElevationEntity,
   TransitionZone
 } from '@/types/elevation';
-import { VALE_ENTITIES, VALE_TRANSITIONS, CLIFF_EDGES } from '@/data/maps/valeVillageElevation';
+import { VALE_ENTITIES, VALE_TRANSITIONS, CLIFF_EDGES, TERRAIN_FEATURES } from '@/data/maps/valeVillageElevation';
 import './ValeVillageOverworld.css';
 
 interface Position {
@@ -626,17 +626,66 @@ export const ValeVillageElevationOverworld: React.FC = () => {
             }}
           />
 
-          {/* Cliff edges visualization */}
+          {/* Terrain features (paths, decorations) */}
+          {TERRAIN_FEATURES.map((feature, idx) => {
+            if (feature.type === 'path') {
+              return (
+                <div
+                  key={`terrain-${idx}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${feature.x}px`,
+                    top: `${feature.y}px`,
+                    width: `${feature.width}px`,
+                    height: `${feature.height}px`,
+                    background: feature.sprite === 'stone'
+                      ? 'linear-gradient(135deg, #8B7355 0%, #A0826D 25%, #8B7355 50%, #A0826D 75%, #8B7355 100%)'
+                      : 'linear-gradient(135deg, #8B6F47 0%, #A0826D 50%, #8B6F47 100%)',
+                    backgroundSize: '16px 16px',
+                    border: '2px solid rgba(139, 115, 85, 0.5)',
+                    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }}
+                />
+              );
+            }
+            if (feature.type === 'grass-patch') {
+              return (
+                <div
+                  key={`terrain-${idx}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${feature.x}px`,
+                    top: `${feature.y}px`,
+                    width: '32px',
+                    height: '32px',
+                    backgroundImage: `url(${feature.sprite})`,
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }}
+                />
+              );
+            }
+            return null;
+          })}
+
+          {/* Cliff edges visualization (improved walls) */}
           {CLIFF_EDGES.map((cliff, idx) => (
             <div
               key={`cliff-${idx}`}
               style={{
                 position: 'absolute',
                 left: `${cliff.xStart}px`,
-                top: `${cliff.y}px`,
+                top: `${cliff.y - 16}px`,
                 width: `${cliff.xEnd - cliff.xStart}px`,
-                height: '4px',
-                background: 'linear-gradient(90deg, rgba(80,60,40,0.3), rgba(100,80,60,0.5), rgba(80,60,40,0.3))',
+                height: '32px',
+                background: 'linear-gradient(180deg, rgba(101, 67, 33, 0.9) 0%, rgba(139, 90, 43, 0.95) 50%, rgba(101, 67, 33, 0.9) 100%)',
+                borderTop: '3px solid rgba(139, 90, 43, 0.7)',
+                borderBottom: '3px solid rgba(80, 53, 26, 0.9)',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.3)',
                 pointerEvents: 'none',
                 zIndex: 5,
               }}

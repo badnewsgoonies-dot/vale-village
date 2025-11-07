@@ -438,3 +438,19 @@ export const CLIFF_EDGES = [
   // Between Main and Lower (y=900)
   { y: 900, xStart: 0, xEnd: 1200, blocksFrom: ElevationLevel.LOWER, blocksTo: ElevationLevel.MAIN },
 ];
+
+// Visual terrain features (paths, decorations)
+export const TERRAIN_FEATURES = [
+  // Main plaza path (horizontal)
+  { type: 'path', x: 100, y: 550, width: 1000, height: 50, sprite: 'stone' },
+  // North-south path to stairs
+  { type: 'path', x: 475, y: 300, width: 50, height: 250, sprite: 'dirt' },
+  // Lower plaza path
+  { type: 'path', x: 100, y: 1050, width: 1000, height: 50, sprite: 'stone' },
+
+  // Decorative elements
+  { type: 'grass-patch', x: 200, y: 400, sprite: '/sprites/scenery/outdoor/sm/Grass2.gif' },
+  { type: 'grass-patch', x: 800, y: 450, sprite: '/sprites/scenery/outdoor/sm/Grass2.gif' },
+  { type: 'grass-patch', x: 300, y: 1100, sprite: '/sprites/scenery/outdoor/sm/Grass2.gif' },
+  { type: 'grass-patch', x: 700, y: 150, sprite: '/sprites/scenery/outdoor/sm/Grass2.gif' },
+];
