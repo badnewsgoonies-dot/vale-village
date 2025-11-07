@@ -9,7 +9,9 @@ export type Screen =
   | { type: 'INTRO' }
   | { type: 'UNIT_COLLECTION' }
   | { type: 'PARTY_MANAGEMENT' }
-  | { type: 'EQUIPMENT'; unitId: string }
+  | { type: 'EQUIPMENT'; unitId?: string }
+  | { type: 'ABILITIES' }
+  | { type: 'SUMMONS' }
   | { type: 'BATTLE' }
   | { type: 'REWARDS' }
   | { type: 'DJINN_MENU' }

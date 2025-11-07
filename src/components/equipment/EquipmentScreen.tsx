@@ -3,8 +3,10 @@ import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
+import { ABILITIES } from '@/data/abilities';
 import type { Unit } from '@/types/Unit';
 import type { Equipment, EquipmentSlot } from '@/types/Equipment';
+import type { Ability } from '@/types/Ability';
 import './EquipmentScreen.css';
 
 export const EquipmentScreen: React.FC = () => {
@@ -34,6 +36,53 @@ export const EquipmentScreen: React.FC = () => {
   }
 
   const currentEquipment = selectedUnit.equipment;
+
+  // Get abilities granted by equipment
+  const getEquipmentAbilities = (equipment: Record<EquipmentSlot, Equipment | null>): Ability[] => {
+    const abilities: Ability[] = [];
+    Object.values(equipment).forEach(item => {
+      if (item?.unlocksAbility) {
+        const ability = ABILITIES[item.unlocksAbility];
+        if (ability) {
+          abilities.push(ability);
+        }
+      }
+    });
+    return abilities;
+  };
+
+  const currentAbilities = getEquipmentAbilities(currentEquipment);
+
+  // Get ability changes when hovering over an item
+  const getAbilityChanges = (item: Equipment | null): { added: Ability[]; removed: Ability[] } => {
+    if (!item) {
+      return { added: [], removed: [] };
+    }
+
+    const currentItem = currentEquipment[item.slot];
+    const added: Ability[] = [];
+    const removed: Ability[] = [];
+
+    // Check if new item grants ability
+    if (item.unlocksAbility) {
+      const ability = ABILITIES[item.unlocksAbility];
+      if (ability) {
+        added.push(ability);
+      }
+    }
+
+    // Check if current item grants ability
+    if (currentItem?.unlocksAbility) {
+      const ability = ABILITIES[currentItem.unlocksAbility];
+      if (ability) {
+        removed.push(ability);
+      }
+    }
+
+    return { added, removed };
+  };
+
+  const abilityChanges = getAbilityChanges(selectedItem);
 
   // Calculate stat changes when hovering over an item
   const calculateStatChange = (item: Equipment | null): { atk: number; def: number; spd: number } => {
@@ -255,27 +304,124 @@ export const EquipmentScreen: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Equipment Abilities */}
+          <div className="equipment-abilities">
+            <h3>ABILITIES {selectedItem && (abilityChanges.added.length > 0 || abilityChanges.removed.length > 0) ? '(Current → With Selection)' : '(Current)'}</h3>
+            
+            {currentAbilities.length === 0 && !selectedItem && (
+              <p className="no-abilities">No equipment abilities equipped</p>
+            )}
+
+            {currentAbilities.length > 0 && (
+              <div className="abilities-list current">
+                {currentAbilities.map(ability => (
+                  <div 
+                    key={ability.id} 
+                    className={`ability-badge ${selectedItem && abilityChanges.removed.some(a => a.id === ability.id) ? 'ability-removed' : ''}`}
+                  >
+                    <span className="ability-name">{ability.name}</span>
+                    {ability.element && <ElementIcon element={ability.element} size="tiny" />}
+                    <span className="ability-pp">PP: {ability.ppCost}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedItem && abilityChanges.added.length > 0 && (
+              <>
+                {currentAbilities.length > 0 && <div className="abilities-arrow">↓</div>}
+                <div className="abilities-list preview">
+                  {abilityChanges.added.map(ability => (
+                    <div key={ability.id} className="ability-badge ability-added">
+                      <span className="ability-name">{ability.name}</span>
+                      {ability.element && <ElementIcon element={ability.element} size="tiny" />}
+                      <span className="ability-pp">PP: {ability.ppCost}</span>
+                      <span className="ability-tag">NEW!</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {selectedItem && !selectedItem.unlocksAbility && currentAbilities.some(a => abilityChanges.removed.some(r => r.id === a.id)) && (
+              <div className="ability-warning">
+                ⚠️ Unequipping will remove ability access
+              </div>
+            )}
+          </div>
         </section>
       )}
 
       {/* Inventory Panel */}
       <section className="inventory-panel" aria-label="Equipment inventory">
         <h2>INVENTORY</h2>
-        <div className="inventory-grid">
-          {inventory.map(item => (
-            <div
-              key={item.id}
-              className={`inventory-item ${selectedItem?.id === item.id ? 'selected' : ''}`}
-              tabIndex={0}
-              role="button"
-              aria-label={item.name}
-              onClick={() => setSelectedItem(item)}
-              onDoubleClick={() => handleEquipItem(item)}
-            >
-              <EquipmentIcon equipment={item} size="medium" className="item-icon" />
-              <div className="item-name">{item.name}</div>
+        
+        {/* Selected Item Details */}
+        {selectedItem && (
+          <div className="selected-item-details">
+            <div className="item-details-header">
+              <EquipmentIcon equipment={selectedItem} size="medium" />
+              <div>
+                <h3>{selectedItem.name}</h3>
+                <p className="item-tier">{selectedItem.tier} {selectedItem.slot}</p>
+              </div>
             </div>
-          ))}
+            
+            {selectedItem.unlocksAbility && ABILITIES[selectedItem.unlocksAbility] && (
+              <div className="item-ability-info">
+                <div className="ability-label">✨ Grants Ability:</div>
+                <div className="ability-details">
+                  <span className="ability-name-large">{ABILITIES[selectedItem.unlocksAbility].name}</span>
+                  {ABILITIES[selectedItem.unlocksAbility].element && (
+                    <ElementIcon element={ABILITIES[selectedItem.unlocksAbility].element!} size="small" />
+                  )}
+                </div>
+                <p className="ability-description">{ABILITIES[selectedItem.unlocksAbility].description}</p>
+                <div className="ability-stats">
+                  <span>PP Cost: {ABILITIES[selectedItem.unlocksAbility].ppCost}</span>
+                  {ABILITIES[selectedItem.unlocksAbility].basePower > 0 && (
+                    <span> | Power: {ABILITIES[selectedItem.unlocksAbility].basePower}</span>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            <div className="item-stat-bonuses">
+              {selectedItem.statBonus.atk && <div>ATK +{selectedItem.statBonus.atk}</div>}
+              {selectedItem.statBonus.def && <div>DEF +{selectedItem.statBonus.def}</div>}
+              {selectedItem.statBonus.spd && <div>SPD +{selectedItem.statBonus.spd}</div>}
+              {selectedItem.statBonus.hp && <div>HP +{selectedItem.statBonus.hp}</div>}
+              {selectedItem.statBonus.pp && <div>PP +{selectedItem.statBonus.pp}</div>}
+              {selectedItem.statBonus.mag && <div>MAG +{selectedItem.statBonus.mag}</div>}
+            </div>
+          </div>
+        )}
+        
+        <div className="inventory-grid">
+          {inventory.map(item => {
+            const grantsAbility = item.unlocksAbility ? ABILITIES[item.unlocksAbility] : null;
+            
+            return (
+              <div
+                key={item.id}
+                className={`inventory-item ${selectedItem?.id === item.id ? 'selected' : ''} ${grantsAbility ? 'has-ability' : ''}`}
+                tabIndex={0}
+                role="button"
+                aria-label={`${item.name}${grantsAbility ? ` - Grants ${grantsAbility.name}` : ''}`}
+                onClick={() => setSelectedItem(item)}
+                onDoubleClick={() => handleEquipItem(item)}
+              >
+                <EquipmentIcon equipment={item} size="medium" className="item-icon" />
+                <div className="item-name">{item.name}</div>
+                {grantsAbility && (
+                  <div className="ability-indicator" title={`Grants: ${grantsAbility.name}`}>
+                    ✨
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
         </div>
