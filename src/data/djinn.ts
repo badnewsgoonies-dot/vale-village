@@ -16,6 +16,10 @@ export const FLINT: Djinn = {
     basePower: 50,
     targets: 'single-enemy',
   },
+  grantsAbilities: {
+    matching: 'earthquake',
+    counter: 'magma-surge',
+  },
   source: 'Vale Cavern (Tutorial)',
 };
 
@@ -30,6 +34,10 @@ export const GRANITE: Djinn = {
     basePower: 80,
     targets: 'single-enemy',
   },
+  grantsAbilities: {
+    matching: 'stone-spire',
+    counter: 'inferno-burst',
+  },
   source: 'Kolima Forest (Recruit Mia)',
 };
 
@@ -43,6 +51,10 @@ export const BANE: Djinn = {
     type: 'damage',
     basePower: 120,
     targets: 'single-enemy',
+  },
+  grantsAbilities: {
+    matching: 'crystal-powder',
+    counter: 'flame-shield',
   },
   source: 'Mercury Lighthouse (Boss drop)',
 };
@@ -59,6 +71,10 @@ export const FORGE: Djinn = {
     basePower: 55,
     targets: 'single-enemy',
   },
+  grantsAbilities: {
+    matching: 'volcanic-blast',
+    counter: 'gaia-shield',
+  },
   source: 'Goma Plateau',
 };
 
@@ -73,6 +89,10 @@ export const CORONA: Djinn = {
     basePower: 85,
     targets: 'all-enemies',
   },
+  grantsAbilities: {
+    matching: 'blast-burn',
+    counter: 'tectonic-shift',
+  },
   source: 'Mt. Aleph',
 };
 
@@ -86,6 +106,10 @@ export const FURY: Djinn = {
     type: 'damage',
     basePower: 130,
     targets: 'all-enemies',
+  },
+  grantsAbilities: {
+    matching: 'solar-flare',
+    counter: 'earthen-wall',
   },
   source: 'Mars Lighthouse (Boss drop)',
 };
@@ -102,6 +126,10 @@ export const FIZZ: Djinn = {
     basePower: 60,
     targets: 'single-ally',
   },
+  grantsAbilities: {
+    matching: 'tidal-wave',
+    counter: 'lightning-bolt',
+  },
   source: 'Mogall Forest',
 };
 
@@ -116,6 +144,10 @@ export const TONIC: Djinn = {
     basePower: 100,
     targets: 'all-allies',
   },
+  grantsAbilities: {
+    matching: 'freeze-prism',
+    counter: 'spark-storm',
+  },
   source: 'Xian (Shop)',
 };
 
@@ -129,6 +161,10 @@ export const CRYSTAL: Djinn = {
     type: 'heal',
     basePower: 150,
     targets: 'all-allies',
+  },
+  grantsAbilities: {
+    matching: 'deluge',
+    counter: 'thunder-mine',
   },
   source: 'Mercury Lighthouse (Hidden room)',
 };
@@ -145,6 +181,10 @@ export const BREEZE: Djinn = {
     basePower: 45,
     targets: 'all-enemies',
   },
+  grantsAbilities: {
+    matching: 'whirlwind',
+    counter: 'frost-bite',
+  },
   source: 'Kalay Docks',
 };
 
@@ -159,6 +199,10 @@ export const SQUALL: Djinn = {
     basePower: 0,
     targets: 'all-allies',
   },
+  grantsAbilities: {
+    matching: 'storm-ray',
+    counter: 'blizzard',
+  },
   source: 'Tolbi (Colosso reward)',
 };
 
@@ -172,6 +216,10 @@ export const STORM: Djinn = {
     type: 'damage',
     basePower: 140,
     targets: 'all-enemies',
+  },
+  grantsAbilities: {
+    matching: 'tornado',
+    counter: 'arctic-blast',
   },
   source: 'Jupiter Lighthouse (Boss drop)',
 };

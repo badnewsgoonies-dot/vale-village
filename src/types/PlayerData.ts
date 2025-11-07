@@ -20,6 +20,9 @@ export interface PlayerData {
   /** Collected Djinn (max 12) */
   djinnCollected: Djinn[];
 
+  /** IDs of currently equipped Djinn (max 3, party-wide) */
+  equippedDjinnIds: string[];
+
   /** Equipment inventory */
   inventory: Equipment[];
 
@@ -42,6 +45,7 @@ export function createPlayerData(starterUnit: Unit): PlayerData {
     activePartyIds: [starterUnit.id],
     recruitmentFlags: {},
     djinnCollected: [],
+    equippedDjinnIds: [],
     inventory: [],
     items: {}, // Start with no consumable items
     gold: 500, // Starting gold from GAME_MECHANICS.md Section 14

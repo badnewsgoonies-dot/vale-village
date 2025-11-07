@@ -298,6 +298,299 @@ export const MEGIDDO: Ability = {
   description: 'Legendary sword technique unleashed by Sol Blade',
 };
 
+// ========== DJINN-GRANTED ABILITIES ==========
+// Venus Djinn abilities (Flint, Granite, Quartz)
+export const EARTHQUAKE: Ability = {
+  id: 'earthquake',
+  name: 'Earthquake',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 7,
+  basePower: 45,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Flint - Shatters the earth beneath enemies',
+};
+
+export const MAGMA_SURGE: Ability = {
+  id: 'magma-surge',
+  name: 'Magma Surge',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 7,
+  basePower: 45,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Flint (counter) - Erupts lava at target',
+};
+
+export const STONE_SPIRE: Ability = {
+  id: 'stone-spire',
+  name: 'Stone Spire',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 10,
+  basePower: 70,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Granite - Impales enemy with stone pillar',
+};
+
+export const INFERNO_BURST: Ability = {
+  id: 'inferno-burst',
+  name: 'Inferno Burst',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 10,
+  basePower: 70,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Granite (counter) - Explosive fire damage',
+};
+
+export const CRYSTAL_POWDER: Ability = {
+  id: 'crystal-powder',
+  name: 'Crystal Powder',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 12,
+  basePower: 90,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Quartz - Razor-sharp crystal shards',
+};
+
+export const FLAME_SHIELD: Ability = {
+  id: 'flame-shield',
+  name: 'Flame Shield',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 8,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Granted by Quartz (counter) - Fire barrier that reflects damage',
+};
+
+// Mars Djinn abilities (Forge, Cannon, Scorch)
+export const VOLCANIC_BLAST: Ability = {
+  id: 'volcanic-blast',
+  name: 'Volcanic Blast',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 9,
+  basePower: 55,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Forge - Molten rock bombardment',
+};
+
+export const GAIA_SHIELD: Ability = {
+  id: 'gaia-shield',
+  name: 'Gaia Shield',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 9,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Granted by Forge (counter) - Earth barrier increases DEF',
+};
+
+export const BLAST_BURN: Ability = {
+  id: 'blast-burn',
+  name: 'Blast Burn',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 11,
+  basePower: 75,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Cannon - Concentrated fire beam',
+};
+
+export const TECTONIC_SHIFT: Ability = {
+  id: 'tectonic-shift',
+  name: 'Tectonic Shift',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 11,
+  basePower: 75,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Cannon (counter) - Ground-shaking tremor',
+};
+
+export const SOLAR_FLARE: Ability = {
+  id: 'solar-flare',
+  name: 'Solar Flare',
+  type: 'psynergy',
+  element: 'Mars',
+  ppCost: 14,
+  basePower: 95,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Scorch - Searing solar rays',
+};
+
+export const EARTHEN_WALL: Ability = {
+  id: 'earthen-wall',
+  name: 'Earthen Wall',
+  type: 'psynergy',
+  element: 'Venus',
+  ppCost: 10,
+  basePower: 0,
+  targets: 'all-allies',
+  unlockLevel: 1,
+  description: 'Granted by Scorch (counter) - Stone barrier protects party',
+};
+
+// Mercury Djinn abilities (Fizz, Sleet, Mist)
+export const TIDAL_WAVE: Ability = {
+  id: 'tidal-wave',
+  name: 'Tidal Wave',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 8,
+  basePower: 50,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Fizz - Crashing water attack',
+};
+
+export const LIGHTNING_BOLT: Ability = {
+  id: 'lightning-bolt',
+  name: 'Lightning Bolt',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 8,
+  basePower: 50,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Fizz (counter) - Electric shock',
+};
+
+export const FREEZE_PRISM: Ability = {
+  id: 'freeze-prism',
+  name: 'Freeze Prism',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 11,
+  basePower: 68,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Sleet - Encases enemy in ice',
+};
+
+export const SPARK_STORM: Ability = {
+  id: 'spark-storm',
+  name: 'Spark Storm',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 11,
+  basePower: 68,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Sleet (counter) - Electric discharge',
+};
+
+export const DELUGE: Ability = {
+  id: 'deluge',
+  name: 'Deluge',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 13,
+  basePower: 88,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Mist - Torrential downpour',
+};
+
+export const THUNDER_MINE: Ability = {
+  id: 'thunder-mine',
+  name: 'Thunder Mine',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 13,
+  basePower: 88,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Mist (counter) - Explosive electric trap',
+};
+
+// Jupiter Djinn abilities (Gust, Breeze, Zephyr)
+export const WHIRLWIND: Ability = {
+  id: 'whirlwind',
+  name: 'Whirlwind',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 9,
+  basePower: 53,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Gust - Violent wind vortex',
+};
+
+export const FROST_BITE: Ability = {
+  id: 'frost-bite',
+  name: 'Frost Bite',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 9,
+  basePower: 53,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Gust (counter) - Freezing wind attack',
+};
+
+export const STORM_RAY: Ability = {
+  id: 'storm-ray',
+  name: 'Storm Ray',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 12,
+  basePower: 72,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Granted by Breeze - Concentrated lightning beam',
+};
+
+export const BLIZZARD: Ability = {
+  id: 'blizzard',
+  name: 'Blizzard',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 12,
+  basePower: 72,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Breeze (counter) - Freezing snowstorm',
+};
+
+export const TORNADO: Ability = {
+  id: 'tornado',
+  name: 'Tornado',
+  type: 'psynergy',
+  element: 'Jupiter',
+  ppCost: 15,
+  basePower: 93,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Zephyr - Devastating cyclone',
+};
+
+export const ARCTIC_BLAST: Ability = {
+  id: 'arctic-blast',
+  name: 'Arctic Blast',
+  type: 'psynergy',
+  element: 'Mercury',
+  ppCost: 15,
+  basePower: 93,
+  targets: 'all-enemies',
+  unlockLevel: 1,
+  description: 'Granted by Zephyr (counter) - Sub-zero wind burst',
+};
+
 /**
  * All abilities indexed by ID
  */
@@ -332,4 +625,29 @@ export const ABILITIES: Record<string, Ability> = {
   'winds-favor': WINDS_FAVOR,
   // Legendary
   'megiddo': MEGIDDO,
+  // Djinn-Granted Abilities
+  'earthquake': EARTHQUAKE,
+  'magma-surge': MAGMA_SURGE,
+  'stone-spire': STONE_SPIRE,
+  'inferno-burst': INFERNO_BURST,
+  'crystal-powder': CRYSTAL_POWDER,
+  'flame-shield': FLAME_SHIELD,
+  'volcanic-blast': VOLCANIC_BLAST,
+  'gaia-shield': GAIA_SHIELD,
+  'blast-burn': BLAST_BURN,
+  'tectonic-shift': TECTONIC_SHIFT,
+  'solar-flare': SOLAR_FLARE,
+  'earthen-wall': EARTHEN_WALL,
+  'tidal-wave': TIDAL_WAVE,
+  'lightning-bolt': LIGHTNING_BOLT,
+  'freeze-prism': FREEZE_PRISM,
+  'spark-storm': SPARK_STORM,
+  'deluge': DELUGE,
+  'thunder-mine': THUNDER_MINE,
+  'whirlwind': WHIRLWIND,
+  'frost-bite': FROST_BITE,
+  'storm-ray': STORM_RAY,
+  'blizzard': BLIZZARD,
+  'tornado': TORNADO,
+  'arctic-blast': ARCTIC_BLAST,
 };

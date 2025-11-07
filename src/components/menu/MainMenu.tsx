@@ -6,7 +6,8 @@ interface MainMenuProps {
   onNavigateToDjinn: () => void;
   onNavigateToEquipment: () => void;
   onNavigateToParty: () => void;
-  onNavigateToQuestLog: () => void;
+  onNavigateToAbilities: () => void;
+  onNavigateToSummons: () => void;
   onResume: () => void;
 }
 
@@ -14,7 +15,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onNavigateToDjinn,
   onNavigateToEquipment,
   onNavigateToParty,
-  onNavigateToQuestLog,
+  onNavigateToAbilities,
+  onNavigateToSummons,
   onResume
 }) => {
   return (
@@ -55,13 +57,23 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             </Button>
 
             <Button 
-              onClick={onNavigateToQuestLog}
+              onClick={onNavigateToAbilities}
               className="menu-option"
-              ariaLabel="Open Quest Log"
+              ariaLabel="Open Abilities menu"
             >
-              <span className="menu-icon">📜</span>
-              <span className="menu-label">QUEST LOG</span>
-              <span className="menu-hint">View Quests</span>
+              <span className="menu-icon">✨</span>
+              <span className="menu-label">ABILITIES</span>
+              <span className="menu-hint">View Skills</span>
+            </Button>
+
+            <Button 
+              onClick={onNavigateToSummons}
+              className="menu-option"
+              ariaLabel="Open Summons menu"
+            >
+              <span className="menu-icon">🔮</span>
+              <span className="menu-label">SUMMONS</span>
+              <span className="menu-hint">Ultimate Attacks</span>
             </Button>
 
             <Button 

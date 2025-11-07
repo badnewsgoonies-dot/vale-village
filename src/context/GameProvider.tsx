@@ -5,7 +5,8 @@ import type { PlayerData } from '@/types/PlayerData';
 import { Unit } from '@/types/Unit';
 import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
 import type { Equipment, EquipmentLoadout } from '@/types/Equipment';
-import type { Djinn } from '@/types/Djinn';
+import { EQUIPMENT } from '@/data/equipment';
+import { ALL_DJINN } from '@/data/djinn';
 import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
@@ -30,20 +31,35 @@ function enemyToUnit(enemy: Enemy): Unit {
 }
 
 function createInitialPlayerData(): PlayerData {
-  // Create starter party: Isaac, Garet, Ivan, Mia
+  // Create ALL 10 units for testing
   const isaac = new Unit(UNIT_DEFINITIONS.isaac);
   const garet = new Unit(UNIT_DEFINITIONS.garet);
   const ivan = new Unit(UNIT_DEFINITIONS.ivan);
   const mia = new Unit(UNIT_DEFINITIONS.mia);
+  const felix = new Unit(UNIT_DEFINITIONS.felix);
+  const jenna = new Unit(UNIT_DEFINITIONS.jenna);
+  const sheba = new Unit(UNIT_DEFINITIONS.sheba);
+  const piers = new Unit(UNIT_DEFINITIONS.piers);
+  const kraden = new Unit(UNIT_DEFINITIONS.kraden);
+  const kyle = new Unit(UNIT_DEFINITIONS.kyle);
+
+  const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
+
+  // For testing: Unlock all Djinn
+  const allDjinn = Object.values(ALL_DJINN);
+
+  // For testing: Add all equipment to inventory
+  const allEquipment = Object.values(EQUIPMENT);
 
   return {
-    unitsCollected: [isaac, garet, ivan, mia],
-    activePartyIds: [isaac.id, garet.id, ivan.id, mia.id],
+    unitsCollected: allUnits, // All 10 units unlocked
+    activePartyIds: [isaac.id, garet.id, ivan.id, mia.id], // First 4 active
     recruitmentFlags: {},
-    gold: 100,
-    inventory: [],
+    gold: 10000, // More gold for testing
+    inventory: allEquipment, // All equipment available
     items: {}, // Start with no consumable items
-    djinnCollected: [],
+    djinnCollected: allDjinn, // All Djinn unlocked
+    equippedDjinnIds: [],
     storyFlags: {},
   };
 }
@@ -191,8 +207,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Party management
   const setActiveParty = useCallback((unitIds: string[]) => {
-    if (unitIds.length !== 4) {
-      setState(prev => ({ ...prev, error: 'Active party must have exactly 4 units' }));
+    // Validate party size (1-4 units)
+    if (unitIds.length < 1 || unitIds.length > 4) {
+      setState(prev => ({ ...prev, error: 'Active party must have 1-4 units' }));
       return;
     }
 
@@ -215,6 +232,57 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error: null,
       };
     });
+  }, []);
+
+  const recruitUnit = useCallback((unitId: string) => {
+    setState(prev => {
+      // Check if unit already recruited
+      const alreadyRecruited = prev.playerData.unitsCollected.some(u => u.id === unitId);
+      if (alreadyRecruited) {
+        console.log(`Unit ${unitId} already recruited`);
+        return prev;
+      }
+
+      // Find unit definition
+      const unitDef = UNIT_DEFINITIONS[unitId];
+      if (!unitDef) {
+        console.error(`Unit definition not found: ${unitId}`);
+        return { ...prev, error: `Unit ${unitId} not found` };
+      }
+
+      // Create new unit instance
+      const newUnit = new Unit(unitDef);
+
+      // Check if we have space (max 10 units)
+      if (prev.playerData.unitsCollected.length >= 10) {
+        return { ...prev, error: 'Maximum unit collection reached (10 units)' };
+      }
+
+      console.log(`Recruiting unit: ${newUnit.name}`);
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          unitsCollected: [...prev.playerData.unitsCollected, newUnit],
+          recruitmentFlags: {
+            ...prev.playerData.recruitmentFlags,
+            [unitId]: true,
+          },
+        },
+        error: null,
+      };
+    });
+  }, []);
+
+  const addGold = useCallback((amount: number) => {
+    setState(prev => ({
+      ...prev,
+      playerData: {
+        ...prev.playerData,
+        gold: prev.playerData.gold + amount,
+      },
+    }));
   }, []);
 
   // Battle actions
@@ -305,13 +373,52 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  // Djinn actions (placeholder implementations)
-  const equipDjinn = useCallback((unitId: string, djinn: Djinn) => {
-    console.log('equipDjinn not yet implemented', unitId, djinn);
+  // Djinn management
+  const equipDjinn = useCallback((djinnId: string) => {
+    setState(prev => {
+      // Validation: Check if Djinn is collected
+      const djinn = prev.playerData.djinnCollected.find(d => d.id === djinnId);
+      if (!djinn) {
+        return { ...prev, error: 'Cannot equip Djinn that has not been collected' };
+      }
+
+      // Validation: Check if already equipped
+      if (prev.playerData.equippedDjinnIds.includes(djinnId)) {
+        return { ...prev, error: 'Djinn is already equipped' };
+      }
+
+      // Validation: Max 3 Djinn equipped
+      if (prev.playerData.equippedDjinnIds.length >= 3) {
+        return { ...prev, error: 'Maximum 3 Djinn can be equipped. Unequip one first.' };
+      }
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          equippedDjinnIds: [...prev.playerData.equippedDjinnIds, djinnId],
+        },
+        error: null,
+      };
+    });
   }, []);
 
   const unequipDjinn = useCallback((djinnId: string) => {
-    console.log('unequipDjinn not yet implemented', djinnId);
+    setState(prev => {
+      // Validation: Check if Djinn is actually equipped
+      if (!prev.playerData.equippedDjinnIds.includes(djinnId)) {
+        return { ...prev, error: 'Djinn is not currently equipped' };
+      }
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          equippedDjinnIds: prev.playerData.equippedDjinnIds.filter(id => id !== djinnId),
+        },
+        error: null,
+      };
+    });
   }, []);
 
   // Quest management
@@ -639,6 +746,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     equipItem,
     unequipItem,
     setActiveParty,
+    recruitUnit,
+    addGold,
     startBattle,
     executeTurn,
     endBattle,

@@ -6,7 +6,11 @@
 
 export type Result<T, E = Error> =
   | { ok: true; value: T }
-  | { ok: false; error: E };
+  /* When Err, include an optional `value` property (undefined) so callers that
+     access `.value` without narrowing don't produce property-not-exist errors.
+     This keeps compatibility with existing tests which assume `.value` is
+     accessible at runtime (even though it's undefined on Err). */
+  | { ok: false; error: E; value?: undefined };
 
 export const Ok = <T>(value: T): Result<T, never> => ({ ok: true, value });
 

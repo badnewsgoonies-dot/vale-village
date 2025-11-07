@@ -1,0 +1,200 @@
+{
+  "screen": "battle-screen",
+  "description": "Sprite map for Battle Screen - turn-based combat with enemies, party, and command menu",
+  "lastUpdated": "2025-11-03",
+  "spriteRoot": "../Sprites!",
+  "sprites": {
+    "backgrounds": [
+      {
+        "id": "cave-bg",
+        "name": "Cave Background",
+        "path": "Sprites!/backgrounds/gs1/Cave.gif",
+        "localPath": "../Sprites!/backgrounds/gs1/Cave.gif",
+        "usage": "Common battle background",
+        "resolution": "240x160 (scaled 3x)"
+      },
+      {
+        "id": "vale-bg",
+        "name": "Vale Background",
+        "path": "Sprites!/backgrounds/gs1/Vale.gif",
+        "localPath": "../Sprites!/backgrounds/gs1/Vale.gif",
+        "usage": "Vale Village battles"
+      },
+      {
+        "id": "desert-bg",
+        "name": "Desert Background",
+        "path": "Sprites!/backgrounds/gs1/Desert.gif",
+        "localPath": "../Sprites!/backgrounds/gs1/Desert.gif",
+        "usage": "Desert area battles"
+      },
+      {
+        "id": "forest-bg",
+        "name": "Forest Background",
+        "path": "Sprites!/backgrounds/gs1/Kolima_Forest.gif",
+        "localPath": "../Sprites!/backgrounds/gs1/Kolima_Forest.gif",
+        "usage": "Forest area battles"
+      }
+    ],
+    "enemies": [
+      {
+        "id": "goblin",
+        "name": "Goblin",
+        "path": "Sprites!/battle/enemies/Alec_Goblin.gif",
+        "localPath": "../Sprites!/battle/enemies/Alec_Goblin.gif",
+        "size": "varies",
+        "level": "1-3",
+        "usage": "Common early enemy"
+      },
+      {
+        "id": "bat",
+        "name": "Bat",
+        "path": "Sprites!/battle/enemies/Bat.gif",
+        "localPath": "../Sprites!/battle/enemies/Bat.gif",
+        "usage": "Flying enemy"
+      },
+      {
+        "id": "troll",
+        "name": "Cave Troll",
+        "path": "Sprites!/battle/enemies/Cave_Troll.gif",
+        "localPath": "../Sprites!/battle/enemies/Cave_Troll.gif",
+        "usage": "Mid-tier enemy"
+      },
+      {
+        "id": "chimera",
+        "name": "Chimera",
+        "path": "Sprites!/battle/enemies/Chimera.gif",
+        "localPath": "../Sprites!/battle/enemies/Chimera.gif",
+        "usage": "Strong mid-game enemy"
+      }
+    ],
+    "party": {
+      "isaac": {
+        "idle": {
+          "front": "Sprites!/battle/party/isaac/Isaac_lBlade_Front.gif",
+          "back": "Sprites!/battle/party/isaac/Isaac_lBlade_Back.gif"
+        },
+        "attack": {
+          "attack1": "Sprites!/battle/party/isaac/Isaac_lBlade_Attack1.gif",
+          "attack2": "Sprites!/battle/party/isaac/Isaac_lBlade_Attack2.gif"
+        },
+        "cast": {
+          "castFront1": "Sprites!/battle/party/isaac/Isaac_lBlade_CastFront1.gif",
+          "castFront2": "Sprites!/battle/party/isaac/Isaac_lBlade_CastFront2.gif",
+          "castBack1": "Sprites!/battle/party/isaac/Isaac_lBlade_CastBack1.gif",
+          "castBack2": "Sprites!/battle/party/isaac/Isaac_lBlade_CastBack2.gif"
+        },
+        "hit": {
+          "hitFront": "Sprites!/battle/party/isaac/Isaac_lBlade_HitFront.gif",
+          "hitBack": "Sprites!/battle/party/isaac/Isaac_lBlade_HitBack.gif"
+        },
+        "downed": {
+          "downedFront": "Sprites!/battle/party/isaac/Isaac_lBlade_DownedFront.gif",
+          "downedBack": "Sprites!/battle/party/isaac/Isaac_lBlade_DownedBack.gif"
+        }
+      },
+      "garet": {
+        "idle": {
+          "front": "Sprites!/battle/party/garet/Garet_Axe_Front.gif",
+          "back": "Sprites!/battle/party/garet/Garet_Axe_Back.gif"
+        }
+      },
+      "ivan": {
+        "idle": {
+          "front": "Sprites!/battle/party/ivan/Ivan_Staff_Front.gif",
+          "back": "Sprites!/battle/party/ivan/Ivan_Staff_Back.gif"
+        }
+      },
+      "mia": {
+        "idle": {
+          "front": "Sprites!/battle/party/mia/Mia_Staff_Front.gif",
+          "back": "Sprites!/battle/party/mia/Mia_Staff_Back.gif"
+        }
+      }
+    },
+    "ui": {
+      "buttons": [
+        {
+          "id": "fight-button",
+          "name": "Fight",
+          "path": "Sprites!/icons/buttons/Fight.gif",
+          "localPath": "../Sprites!/icons/buttons/Fight.gif",
+          "size": "32x32"
+        },
+        {
+          "id": "psynergy-button",
+          "name": "Psynergy",
+          "path": "Sprites!/icons/buttons/Psynergy.gif",
+          "localPath": "../Sprites!/icons/buttons/Psynergy.gif",
+          "size": "32x32"
+        },
+        {
+          "id": "djinn-button",
+          "name": "Djinni",
+          "path": "Sprites!/icons/buttons/Djinni.gif",
+          "localPath": "../Sprites!/icons/buttons/Djinni.gif",
+          "size": "32x32"
+        },
+        {
+          "id": "item-button",
+          "name": "Item",
+          "path": "Sprites!/icons/buttons/Item.gif",
+          "localPath": "../Sprites!/icons/buttons/Item.gif",
+          "size": "32x32"
+        },
+        {
+          "id": "flee-button",
+          "name": "Run",
+          "path": "Sprites!/icons/buttons/Run.gif",
+          "localPath": "../Sprites!/icons/buttons/Run.gif",
+          "size": "32x32"
+        }
+      ]
+    },
+    "djinn": [
+      {
+        "id": "venus-djinn",
+        "element": "venus",
+        "path": "Sprites!/battle/djinn/Venus_Djinn_Front.gif",
+        "localPath": "../Sprites!/battle/djinn/Venus_Djinn_Front.gif"
+      },
+      {
+        "id": "mars-djinn",
+        "element": "mars",
+        "path": "Sprites!/battle/djinn/Mars_Djinn_Front.gif",
+        "localPath": "../Sprites!/battle/djinn/Mars_Djinn_Front.gif"
+      },
+      {
+        "id": "mercury-djinn",
+        "element": "mercury",
+        "path": "Sprites!/battle/djinn/Mercury_Djinn_Front.gif",
+        "localPath": "../Sprites!/battle/djinn/Mercury_Djinn_Front.gif"
+      },
+      {
+        "id": "jupiter-djinn",
+        "element": "jupiter",
+        "path": "Sprites!/battle/djinn/Jupiter_Djinn_Front.gif",
+        "localPath": "../Sprites!/battle/djinn/Jupiter_Djinn_Front.gif"
+      }
+    ]
+  },
+  "layout": {
+    "resolution": "720x480 (3x GBA scale)",
+    "zones": [
+      "Background: Full screen battle backdrop",
+      "Enemy Zone (top): 3 enemy positions with platforms",
+      "Party Zone (bottom): 4 party positions with platforms",
+      "Turn Order (top): Pills showing turn sequence",
+      "Combat Log (bottom-left): Text feed of battle actions",
+      "Command Menu (bottom-right): 5 command buttons"
+    ]
+  },
+  "notes": [
+    "✅ Updated with actual Sprites! directory paths (Nov 3, 2025)",
+    "72 battle backgrounds available (36 GS1 + 36 GS2)",
+    "100+ enemy sprites available",
+    "Each party member has 51+ battle animation sprites",
+    "Isaac sprites include Axe, Light Blade, Mace, and Staff weapon variants",
+    "All 5 command buttons available in Sprites!/icons/buttons/",
+    "Djinn sprites available for all 4 elements (front and back views)"
+  ]
+}

@@ -1,0 +1,12 @@
+.building-sprite {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10; /* Above terrain (0) but below entities (20) */
+}
+
+.building-image {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+}

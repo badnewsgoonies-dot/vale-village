@@ -118,6 +118,8 @@ export function activateDjinn(
   djinnId: string,
   activatingUnit: Unit
 ): Result<Team, string> {
+  // DEBUG: log activation attempt (temporarily added for test investigation)
+  console.log('[DEBUG] activateDjinn called', { currentTurn: team.currentTurn, djinnId, unit: activatingUnit.id });
   // Check Djinn is equipped
   const djinn = team.equippedDjinn.find(d => d.id === djinnId);
   if (!djinn) {
@@ -165,8 +167,7 @@ export function activateDjinn(
     state: 'Standby',
     turnActivated: team.currentTurn,
   });
-
-  // Update activation count (reuse unitActivations from line 140)
+  // Update activation count (reuse unitActivations)
   newTeam.activationsThisTurn.set(activatingUnit.id, unitActivations + 1);
 
   // Backward compatibility
@@ -305,6 +306,8 @@ export function executeSummon(
   casterMAG: number
 ): Result<SummonResult, string> {
   const standbyDjinn = getStandbyDjinn(team);
+
+  console.log('[DEBUG] executeSummon called', { summonType, standbyCount: standbyDjinn.length, standbyIds: standbyDjinn.map(d => d.id) });
 
   if (standbyDjinn.length < 3) {
     return Err(`Need 3 Standby Djinn to summon (currently have ${standbyDjinn.length})`);

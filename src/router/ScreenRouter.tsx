@@ -4,15 +4,18 @@ import type { Unit } from '@/types/Unit';
 import { TitleScreen } from '@/components/title';
 import { EquipmentScreen } from '@/components/equipment/EquipmentScreen';
 import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
+import { PartyManagementScreen } from '@/components/party/PartyManagementScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
 import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
-import { QuestLogScreen } from '@/components/quests/QuestLogScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
+import { AbilitiesScreen } from '@/components/abilities/AbilitiesScreen';
+import { SummonsScreen } from '@/components/summons/SummonsScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
 import { GameDemo } from '@/components/demo/GameDemo';
+import { DialogueScreen } from '@/components/dialogue/DialogueScreen';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -50,32 +53,17 @@ export const ScreenRouter: React.FC = () => {
       );
     }
 
-    case 'EQUIPMENT': {
-      // Get actual Unit instances
-      const units = state.playerData.unitsCollected;
+    case 'PARTY_MANAGEMENT':
+      return <PartyManagementScreen />;
 
-      // Get selected unit from screen state
-      const unitId = (screen as any).unitId || state.playerData.activePartyIds[0];
-      const selectedUnit = units.find(u => u.id === unitId) || units[0];
+    case 'EQUIPMENT':
+      return <EquipmentScreen />;
 
-      // Get inventory as Equipment instances
-      const inventory = state.playerData.inventory;
+    case 'ABILITIES':
+      return <AbilitiesScreen />;
 
-      return (
-        <EquipmentScreen
-          units={units}
-          selectedUnit={selectedUnit}
-          inventory={inventory}
-          onEquipItem={(unitId, slot, equipment) => {
-            actions.equipItem(unitId, slot, equipment);
-          }}
-          onUnequipItem={(unitId, slot) => {
-            actions.unequipItem(unitId, slot);
-          }}
-          onReturn={() => actions.goBack()}
-        />
-      );
-    }
+    case 'SUMMONS':
+      return <SummonsScreen />;
 
     case 'REWARDS':
       // Get rewards from last battle
@@ -116,21 +104,18 @@ export const ScreenRouter: React.FC = () => {
             const firstUnitId = state.playerData.activePartyIds[0];
             actions.navigate({ type: 'EQUIPMENT', unitId: firstUnitId });
           }}
-          onNavigateToParty={() => actions.navigate({ type: 'UNIT_COLLECTION' })}
-          onNavigateToQuestLog={() => actions.navigate({ type: 'QUEST_LOG' })}
+          onNavigateToParty={() => actions.navigate({ type: 'PARTY_MANAGEMENT' })}
+          onNavigateToAbilities={() => actions.navigate({ type: 'ABILITIES' })}
+          onNavigateToSummons={() => actions.navigate({ type: 'SUMMONS' })}
           onResume={() => actions.navigate({ type: 'OVERWORLD' })}
         />
       );
-
-    case 'QUEST_LOG':
-      return <QuestLogScreen />;
 
     case 'SHOP':
       return <ShopScreen />;
 
     case 'DIALOGUE':
-      // TODO: Dialogue screen (not yet implemented)
-      return <div className="placeholder-screen">Dialogue - Coming Soon</div>;
+      return <DialogueScreen />;
 
     case 'DEMO':
       return <GameDemo />;

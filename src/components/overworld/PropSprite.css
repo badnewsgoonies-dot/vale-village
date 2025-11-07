@@ -1,0 +1,17 @@
+.prop-sprite {
+  position: absolute;
+  pointer-events: none;
+  z-index: 15; /* Above buildings (10), below entities (20) */
+}
+
+.prop-image {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+/* Blocking props have slightly higher z-index for proper occlusion */
+.prop-blocking {
+  z-index: 16;
+}

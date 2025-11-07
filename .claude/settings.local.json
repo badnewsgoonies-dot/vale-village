@@ -32,7 +32,9 @@
       "Bash(wc:*)",
       "Bash(xdg-open:*)",
       "Bash(ROLE_2_GRAPHICS_MOCKUP_ONBOARDING_FIXED.md)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(printf:*)",
+      "Bash(/c/Dev/AiGames/vale-village/ANALYSIS_REPORT.txt)"
     ],
     "deny": [],
     "ask": []

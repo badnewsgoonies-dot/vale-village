@@ -45,7 +45,9 @@ export const BattleScreen: React.FC = () => {
     isCritical?: boolean;
     position: { x: number; y: number };
   }>>([]);
-  const [animationIdCounter, setAnimationIdCounter] = useState(0);
+  // We only use the setter to allocate unique animation IDs atomically.
+  // The current counter value is intentionally unused.
+  const [, setAnimationIdCounter] = useState(0);
 
   if (!battle) {
     return (
@@ -125,46 +127,46 @@ export const BattleScreen: React.FC = () => {
   }, [selectedCommand, selectedAbility, currentActor]);
 
   // Helper: Trigger animation for ability
+  // Allocates 2 animation IDs atomically to avoid race conditions
   const triggerAnimation = (ability: Ability, _target: Unit, damage: number, isHeal: boolean = false) => {
-    // Calculate target position (center of screen for simplicity)
-    // In a real implementation, you'd get the actual screen position of the target unit
     const position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-    const newId = animationIdCounter;
-    setAnimationIdCounter(prev => prev + 1);
+    setAnimationIdCounter(prev => {
+      const attackId = prev;
+      const numberId = prev + 1;
 
-    // Show psynergy animation for non-physical abilities
-    if (shouldShowPsynergyAnimation(ability.id)) {
-      setActiveAnimations(prev => [...prev, {
-        id: newId,
-        type: 'psynergy',
-        abilityId: ability.id,
-        position,
-      }]);
-    } else {
-      // Show attack animation for physical attacks
-      setActiveAnimations(prev => [...prev, {
-        id: newId,
-        type: 'attack',
-        element: ability.element,
-        position,
-      }]);
-    }
+      // Show psynergy animation for non-physical abilities
+      if (shouldShowPsynergyAnimation(ability.id)) {
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: attackId,
+          type: 'psynergy',
+          abilityId: ability.id,
+          position,
+        }]);
+      } else {
+        // Show attack animation for physical attacks
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: attackId,
+          type: 'attack',
+          element: ability.element,
+          position,
+        }]);
+      }
 
-    // Show damage/heal number after a brief delay
-    setTimeout(() => {
-      const numberId = animationIdCounter + 1;
-      setAnimationIdCounter(prev => prev + 1);
+      // Show damage/heal number after a brief delay
+      setTimeout(() => {
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: numberId,
+          type: isHeal ? 'heal' : 'damage',
+          damage: Math.abs(damage),
+          isHeal,
+          isCritical: false, // TODO: Implement critical hit detection
+          position,
+        }]);
+      }, 300);
 
-      setActiveAnimations(prev => [...prev, {
-        id: numberId,
-        type: isHeal ? 'heal' : 'damage',
-        damage: Math.abs(damage),
-        isHeal,
-        isCritical: false, // TODO: Implement critical hit detection
-        position,
-      }]);
-    }, 300);
+      return prev + 2;
+    });
   };
 
   // Helper: Remove animation by ID
@@ -505,3 +507,4 @@ export const BattleScreen: React.FC = () => {
     </div>
   );
 };
+

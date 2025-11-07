@@ -8,7 +8,10 @@ export type Screen =
   | { type: 'TITLE' }
   | { type: 'INTRO' }
   | { type: 'UNIT_COLLECTION' }
-  | { type: 'EQUIPMENT'; unitId: string }
+  | { type: 'PARTY_MANAGEMENT' }
+  | { type: 'EQUIPMENT'; unitId?: string }
+  | { type: 'ABILITIES' }
+  | { type: 'SUMMONS' }
   | { type: 'BATTLE' }
   | { type: 'REWARDS' }
   | { type: 'DJINN_MENU' }
@@ -16,7 +19,6 @@ export type Screen =
   | { type: 'OVERWORLD'; location?: AreaId }
   | { type: 'SHOP'; shopType: 'item' | 'equipment' | 'inn' }
   | { type: 'DIALOGUE'; npcId: string; dialogueKey?: string }
-  | { type: 'QUEST_LOG' }
   | { type: 'DEMO' };
 
 /**

@@ -110,31 +110,23 @@ export const GameDemo: React.FC = () => {
       category: 'Player Resources',
       actions: [
         {
-          name: 'Add 100 Gold',
+          name: 'Show Current Gold',
           action: () => {
-            actions.addGold(100);
-            showMessage('Added 100 Gold!');
+            showMessage(`Current Gold: ${state.playerData.gold}`);
           },
         },
         {
-          name: 'Add 500 Gold',
+          name: 'Go to Shop (Spend Gold)',
           action: () => {
-            actions.addGold(500);
-            showMessage('Added 500 Gold!');
+            actions.navigate({ type: 'SHOP', shopType: 'equipment' });
+            showMessage('Opened Equipment Shop');
           },
         },
         {
-          name: 'Remove 50 Gold',
+          name: 'Show Inventory Count',
           action: () => {
-            actions.spendGold(50);
-            showMessage('Spent 50 Gold');
-          },
-        },
-        {
-          name: 'Heal Party (Full HP/PP)',
-          action: () => {
-            // Auto-heal after battle simulation
-            showMessage('Party Fully Healed!');
+            const count = state.playerData.inventory.length;
+            showMessage(`Inventory: ${count} items`);
           },
         },
       ],
@@ -143,21 +135,13 @@ export const GameDemo: React.FC = () => {
       category: 'Party Management',
       actions: [
         {
-          name: 'Add XP to Active Party (100 XP)',
+          name: 'Show Party Levels',
           action: () => {
-            state.playerData.activePartyIds.forEach(unitId => {
-              actions.gainExperience(unitId, 100);
-            });
-            showMessage('Active Party gained 100 XP!');
-          },
-        },
-        {
-          name: 'Add XP to Active Party (500 XP)',
-          action: () => {
-            state.playerData.activePartyIds.forEach(unitId => {
-              actions.gainExperience(unitId, 500);
-            });
-            showMessage('Active Party gained 500 XP!');
+            const party = state.playerData.unitsCollected.filter(u =>
+              state.playerData.activePartyIds.includes(u.id)
+            );
+            const levels = party.map(u => `${u.name} Lv${u.level}`).join(', ');
+            showMessage(levels || 'No active party');
           },
         },
         {
@@ -207,15 +191,15 @@ export const GameDemo: React.FC = () => {
         {
           name: 'Show Collected Djinn',
           action: () => {
-            const count = state.djinnCollected.length;
+            const count = state.playerData.djinnCollected.length;
             showMessage(`Collected Djinn: ${count}/12`);
           },
         },
         {
-          name: 'Show Equipped Djinn',
+          name: 'Go to Djinn Screen',
           action: () => {
-            const equipped = state.djinnEquipped.filter(d => d).length;
-            showMessage(`Equipped Djinn: ${equipped}/3 slots`);
+            actions.navigate({ type: 'DJINN_MENU' });
+            showMessage('Opened Djinn Screen');
           },
         },
       ],
@@ -283,7 +267,7 @@ export const GameDemo: React.FC = () => {
           action: () => {
             const firstUnit = state.playerData.unitsCollected[0];
             if (firstUnit) {
-              showMessage(`${firstUnit.name} - Lv${firstUnit.level} | HP:${firstUnit.currentStats.HP} | PP:${firstUnit.currentStats.PP}`);
+              showMessage(`${firstUnit.name} - Lv${firstUnit.level} | HP:${firstUnit.currentHp} | PP:${firstUnit.currentPp}`);
             } else {
               showMessage('No units in party');
             }
@@ -337,7 +321,7 @@ export const GameDemo: React.FC = () => {
           <div><strong>Gold:</strong> {state.playerData.gold}</div>
           <div><strong>Units:</strong> {state.playerData.unitsCollected.length}</div>
           <div><strong>Active Party:</strong> {state.playerData.activePartyIds.length}/4</div>
-          <div><strong>Djinn:</strong> {state.djinnCollected.length}/12</div>
+          <div><strong>Djinn:</strong> {state.playerData.djinnCollected.length}/12</div>
           <div><strong>Inventory:</strong> {state.playerData.inventory.length} items</div>
         </div>
       </div>
