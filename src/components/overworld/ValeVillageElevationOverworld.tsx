@@ -124,19 +124,34 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
 
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'shift', 'escape', ' ', 'enter', 'e'].includes(key)) {
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'shift', 'escape', ' ', 'enter', 'e', 'j', 'p'].includes(key)) {
         e.preventDefault();
       }
 
-      // Interaction / Transition
-      if ((e.key === ' ' || e.key === 'Enter' || key === 'e') && nearTransition) {
+      // Interaction / Transition (SPACE or ENTER only)
+      if ((e.key === ' ' || e.key === 'Enter') && nearTransition) {
         handleTransition();
         return;
       }
 
-      // Menu
+      // Menu shortcuts
       if (e.key === 'Escape') {
         actions.navigate({ type: 'MAIN_MENU' });
+        return;
+      }
+
+      if (key === 'j') {
+        actions.navigate({ type: 'DJINN_MENU' });
+        return;
+      }
+
+      if (key === 'p') {
+        actions.navigate({ type: 'PARTY_MANAGEMENT' });
+        return;
+      }
+
+      if (key === 'e') {
+        actions.navigate({ type: 'EQUIPMENT' });
         return;
       }
 
@@ -444,7 +459,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       {nearTransition && (
         <div className="transition-prompt">
           <div className="prompt-text">
-            Press [SPACE] or [E] to use {nearTransition.type}
+            Press [SPACE] or [ENTER] to use {nearTransition.type}
           </div>
           <div className="prompt-destination">
             → {ELEVATION_CONFIGS[
@@ -460,7 +475,8 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       <div className="vale-controls">
         <div><span className="key">WASD</span> / <span className="key">↑↓←→</span> Move</div>
         <div><span className="key">SHIFT</span> Run</div>
-        <div><span className="key">SPACE/E</span> Use Transition</div>
+        <div><span className="key">SPACE/ENTER</span> Use Transition</div>
+        <div><span className="key">J</span> Djinn | <span className="key">P</span> Party | <span className="key">E</span> Equipment</div>
         <div><span className="key">ESC</span> Menu</div>
       </div>
     </div>
