@@ -196,8 +196,8 @@ export const VALE_VILLAGE: Area = {
       name: 'Billy',
       position: { x: 8, y: 11 },
       blocking: false,
-      dialogue: 'I found some cute slimes! Let\'s battle with them!',
-      battleOnInteract: ['slime'],
+      dialogue: 'I found some cute critters! Let\'s battle with them!',
+      battleOnInteract: ['grub', 'worm'], // NEW: Nature critters
       battleOnlyOnce: true,
     },
     {
@@ -205,8 +205,8 @@ export const VALE_VILLAGE: Area = {
       name: 'Lucy',
       position: { x: 13, y: 11 },
       blocking: false,
-      dialogue: 'My pet goblins escaped! Can you catch them?',
-      battleOnInteract: ['goblin', 'goblin'],
+      dialogue: 'My pet monsters escaped! Can you catch them?',
+      battleOnInteract: ['mini-goblin', 'kobold'], // NEW: Small humanoids
       battleOnlyOnce: true,
     },
     {
@@ -269,7 +269,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 1, y: 13 },
       blocking: false,
       dialogue: '*SNAP SNAP* (It attacks!)',
-      battleOnInteract: ['slime', 'wild-wolf'],
+      battleOnInteract: ['rat', 'spider', 'bat'], // NEW: Critter enemies
       battleOnlyOnce: true,
     },
     {
@@ -278,7 +278,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 2, y: 14 },
       blocking: false,
       dialogue: '*aggressive clicking*',
-      battleOnInteract: ['slime'],
+      battleOnInteract: ['roach', 'vermin'], // NEW: Pest enemies
       battleOnlyOnce: true,
     },
     {
@@ -287,7 +287,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 19, y: 1 },
       blocking: false,
       dialogue: '*demonic squawk* (Dark energy radiates from it!)',
-      battleOnInteract: ['wind-wisp', 'wind-wisp', 'wind-wisp'],
+      battleOnInteract: ['seabird', 'seafowl', 'bat'], // NEW: Bird enemies
       battleOnlyOnce: true,
     },
   ],
@@ -313,9 +313,13 @@ export const FOREST_PATH: Area = {
   hasRandomEncounters: true,
   encounterRate: 15, // Battle every ~15 steps
   enemyPools: [
-    { weight: 50, enemyIds: ['wild-wolf'] },
-    { weight: 30, enemyIds: ['goblin', 'goblin'] },
-    { weight: 20, enemyIds: ['slime', 'wild-wolf'] },
+    { weight: 30, enemyIds: ['wild-wolf'] },
+    { weight: 25, enemyIds: ['goblin', 'goblin'] },
+    { weight: 15, enemyIds: ['slime', 'wild-wolf'] },
+    { weight: 10, enemyIds: ['rat', 'rat', 'rat'] }, // NEW: Rat swarm
+    { weight: 8, enemyIds: ['bat', 'bat'] }, // NEW: Flying enemies
+    { weight: 7, enemyIds: ['spider', 'grub'] }, // NEW: Critter mix
+    { weight: 5, enemyIds: ['poison-toad', 'mole'] }, // NEW: Nature enemies
   ],
   bosses: [
     {

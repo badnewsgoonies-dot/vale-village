@@ -2593,6 +2593,115 @@ const FREE_HEALING = {
 
 ---
 
+## 9. ENEMY CATALOG
+
+### 9.1 Enemy System Overview
+
+**Total Enemies Implemented:** 30 (10 original + 20 Batch 1)
+**Total Enemies Planned:** 173 (enemies.ts will scale to 179 total with all batches)
+
+### 9.2 Enemy Categories
+
+#### Original Enemies (10 total)
+
+**Tier 1: Early Game (Levels 1-2)**
+- Goblin (Level 1, Neutral) - 30 HP, 8 ATK, 5 DEF
+- Wild Wolf (Level 1, Neutral) - 25 HP, 10 ATK, 3 DEF, fast (12 SPD)
+- Slime (Level 2, Mercury) - 40 HP, 6 ATK, 8 DEF, uses Frost
+
+**Tier 2: Mid Game (Levels 2-3)**
+- Fire Sprite (Level 2, Mars) - 45 HP, 12 MAG, uses Fireball
+- Earth Golem (Level 3, Venus) - 90 HP, 20 DEF, uses Quake, tank enemy
+- Wind Wisp (Level 3, Jupiter) - 55 HP, 18 SPD, 16 MAG, uses Plasma
+
+**Tier 3: Late Game (Levels 4-5)**
+- Fire Elemental (Level 4, Mars) - 120 HP, 22 MAG, uses Volcano
+- Ice Guardian (Level 4, Mercury) - 140 HP, 18 DEF, uses Ice Horn
+- Stone Titan (Level 5, Venus) - 180 HP, 28 DEF, uses Clay Spire, boss-tier
+- Storm Lord (Level 5, Jupiter) - 150 HP, 28 MAG, 22 SPD, uses Plasma
+
+#### Batch 1: Basic Enemies (20 total - Levels 1-2)
+
+**Level 1 Wildlife & Pests (10 enemies)**
+- Rat (Level 1, Neutral) - 20 HP, fast pest, low ATK
+- Bat (Level 1, Jupiter) - 18 HP, flying enemy, 14 SPD, uses Gust
+- Spider (Level 1, Venus) - 22 HP, web attacks
+- Grub (Level 1, Neutral) - 28 HP, defensive (8 DEF), slow
+- Worm (Level 1, Venus) - 24 HP, uses Quake, burrowing
+- Vermin (Level 1, Neutral) - 16 HP, fast swarm unit
+- Mini-Goblin (Level 1, Neutral) - 22 HP, weaker goblin variant
+- Kobold (Level 1, Neutral) - 26 HP, small humanoid
+- Roach (Level 1, Neutral) - 19 HP, fast pest
+- Momonga (Level 1, Neutral) - 21 HP, flying squirrel
+
+**Level 2 Nature & Creatures (10 enemies)**
+- Emu (Level 2, Neutral) - 35 HP, fast bird (15 SPD)
+- Seabird (Level 2, Jupiter) - 30 HP, uses Gust, coastal
+- Seafowl (Level 2, Jupiter) - 32 HP, uses Gust, water bird
+- Wild Mushroom (Level 2, Venus) - 38 HP, uses Quake, plant enemy
+- Poison Toad (Level 2, Mercury) - 36 HP, uses Frost, poison
+- Devil Frog (Level 2, Mercury) - 40 HP, uses Frost, drops Leather Vest (8%)
+- Mole (Level 2, Venus) - 34 HP, defensive (10 DEF), uses Quake
+- Mad Mole (Level 2, Venus) - 37 HP, aggressive mole variant
+- Mad Vermin (Level 2, Neutral) - 29 HP, fast (15 SPD), rabid
+- Squirrelfang (Level 2, Neutral) - 31 HP, aggressive rodent
+
+### 9.3 Enemy Integration in Areas
+
+**Vale Village (Town)**
+- NPC battles use: Goblin, Wild Wolf, Slime, Earth Golem, Fire Sprite, Wind Wisp
+- NEW NPCs use: Rat, Spider, Bat, Roach, Vermin, Grub, Worm, Mini-Goblin, Kobold, Seabird, Seafowl
+
+**Forest Path (Dungeon - Random Encounters)**
+- Enemy pools (100% total weight):
+  - Wild Wolf (30%)
+  - Goblin × 2 (25%)
+  - Slime + Wild Wolf (15%)
+  - Rat × 3 swarm (10%) - NEW
+  - Bat × 2 flying (8%) - NEW
+  - Spider + Grub (7%) - NEW
+  - Poison Toad + Mole (5%) - NEW
+
+**Ancient Ruins (Dungeon - Random Encounters)**
+- Enemy pools: Goblin × 2 (40%), Wild Wolf + Goblin (35%), Slime × 2 + Goblin (25%)
+- Boss: Golem King (Goblin + Wild Wolf + Goblin)
+
+### 9.4 Enemy Design Guidelines
+
+**Stat Scaling by Level:**
+- **Level 1-2:** HP: 16-40, ATK: 4-12, DEF: 2-10, SPD: 4-16
+- **Level 3-4:** HP: 45-140, ATK: 8-18, DEF: 6-20, SPD: 5-22
+- **Level 5:** HP: 150-180, ATK: 20-28, DEF: 12-28, SPD: 8-22
+
+**Enemy Archetypes:**
+- **Swarm:** Low HP, fast, appear in groups (Rat, Vermin, Bat)
+- **Tank:** High HP/DEF, slow, strong attacks (Grub, Golem, Mole)
+- **Fast:** High SPD, low DEF, dodge-focused (Bat, Emu, Mad Vermin)
+- **Caster:** Uses Psynergy, high MAG, low physical stats (Sprites, Wisps)
+- **Balanced:** Medium all stats, reliable (Goblin, Wolf, Kobold)
+
+**Drop Rates:**
+- Common enemies: 0-8% drop rate
+- Mid-tier: 10-18% drop rate
+- Elite: 20-25% drop rate
+
+### 9.5 Enemy Implementation Status
+
+**Completed Batches:**
+- ✅ Batch 1: 20 basic enemies (Levels 1-2)
+
+**Planned Batches (149 enemies remaining):**
+- ⬜ Batch 2: 25 common enemies (Levels 2-3) - Hobgoblins, Wolfkin, Ants, Bees
+- ⬜ Batch 3: 25 intermediate enemies (Levels 3-4) - Gnomes, Undead, Spirits, Orcs
+- ⬜ Batch 4: 25 advanced enemies (Levels 4-5) - Lizardmen, Golems, Gargoyles
+- ⬜ Batch 5: 25 elite enemies (Levels 5-6) - Trolls, Harpies, Gryphons, Wyverns
+- ⬜ Batch 6: 25 high-level enemies (Levels 6-8) - Dragons, Demons, Chimeras
+- ⬜ Batch 7: 24 late-game enemies (Levels 8-10) - Liches, Titans, Ancient Horrors
+
+**See:** `/docs/ENEMY_IMPLEMENTATION_PLAN.md` for complete enemy roster
+
+---
+
 ## BALANCE CHANGES SUMMARY
 
 **Date Applied**: 2025-11-03
