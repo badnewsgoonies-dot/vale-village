@@ -32,7 +32,7 @@ export const BattleFlowController: React.FC<BattleFlowControllerProps> = ({
   const { state, actions } = useGame();
   const [phase, setPhase] = useState<FlowPhase>('teamSelection');
   const [selectedPartyIds, setSelectedPartyIds] = useState<string[]>([]);
-  const [_selectedDjinnIds, _setSelectedDjinnIds] = useState<string[]>([]);
+  const [_selectedDjinnIds, setSelectedDjinnIds] = useState<string[]>([]);
 
   // Handle team selection confirmation
   const handleTeamConfirmed = (unitIds: string[]) => {
@@ -50,7 +50,7 @@ export const BattleFlowController: React.FC<BattleFlowControllerProps> = ({
 
   // Handle Djinn selection confirmation and start battle
   const handleDjinnConfirmed = (djinnIds: string[]) => {
-    _setSelectedDjinnIds(djinnIds);
+    setSelectedDjinnIds(djinnIds);
 
     // Apply Djinn selection
     // First unequip all current Djinn

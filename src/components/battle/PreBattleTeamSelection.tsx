@@ -12,6 +12,7 @@ interface PreBattleTeamSelectionProps {
 
 export const PreBattleTeamSelection: React.FC<PreBattleTeamSelectionProps> = ({
   onConfirm,
+  onCancel,
 }) => {
   const { state } = useGame();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -84,6 +85,9 @@ export const PreBattleTeamSelection: React.FC<PreBattleTeamSelectionProps> = ({
             <p className="subtitle">Choose up to 4 units for this battle</p>
           </div>
           <div className="header-actions">
+            <Button onClick={onCancel} ariaLabel="Cancel">
+              CANCEL
+            </Button>
             <Button onClick={handleConfirm} ariaLabel="Confirm team selection" variant="primary">
               CONFIRM
             </Button>
