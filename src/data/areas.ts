@@ -290,6 +290,116 @@ export const VALE_VILLAGE: Area = {
       battleOnInteract: ['seabird', 'seafowl', 'bat'], // NEW: Bird enemies
       battleOnlyOnce: true,
     },
+
+    // === RECRUITABLE CHARACTERS (Battle Trainers) ===
+    // Venus (Earth) Adepts
+    {
+      id: 'isaac-trainer',
+      name: 'Isaac',
+      position: { x: 5, y: 4 },
+      blocking: true,
+      dialogue: {
+        default: 'I am Isaac, Earth Adept. Test your strength against my earth summons!',
+        quest_forest_complete: 'You\'ve proven yourself capable. Join me in the Ancient Ruins!',
+      },
+      battleOnInteract: ['rock-golem', 'stone-golem'], // Level 4-5 earth enemies
+      battleOnlyOnce: false, // Can battle multiple times for training
+    },
+    {
+      id: 'felix-trainer',
+      name: 'Felix',
+      position: { x: 3, y: 12 },
+      blocking: true,
+      dialogue: 'Felix here. An honor duel awaits those who seek true power!',
+      battleOnInteract: ['gargoyle', 'earth-lizard', 'gnome'], // Level 4 earth/stone mix
+      battleOnlyOnce: false,
+    },
+
+    // Mars (Fire) Adepts
+    {
+      id: 'garet-trainer',
+      name: 'Garet',
+      position: { x: 15, y: 4 },
+      blocking: true,
+      dialogue: 'Garet\'s the name, flames are my game! Ready to feel the heat?',
+      battleOnInteract: ['salamander', 'fire-worm', 'imp'], // Level 3-4 fire enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'jenna-trainer',
+      name: 'Jenna',
+      position: { x: 7, y: 13 },
+      blocking: true,
+      dialogue: 'I need rescuing from these fire spirits I accidentally summoned! Help!',
+      battleOnInteract: ['fire-worm', 'salamander'], // Level 3 fire enemies
+      battleOnlyOnce: true, // Rescue quest - one time only
+    },
+    {
+      id: 'kyle-trainer',
+      name: 'Kyle',
+      position: { x: 10, y: 2 },
+      blocking: true,
+      dialogue: {
+        default: 'I am Kyle, master of the blade. Only the worthy may face my warrior\'s trial!',
+        quest_ruins_complete: 'You have conquered the ruins. Perhaps you are ready for my trial...',
+      },
+      battleOnInteract: ['wyvern', 'demon-imp', 'orc-warrior'], // Level 5-6 elite enemies
+      battleOnlyOnce: false,
+    },
+
+    // Mercury (Water) Adepts
+    {
+      id: 'mia-trainer',
+      name: 'Mia',
+      position: { x: 17, y: 11 },
+      blocking: true,
+      dialogue: 'Mia, healer and ice mage. Let\'s have a friendly spar with my water spirits!',
+      battleOnInteract: ['ooze', 'slime-beast', 'merman'], // Level 3-4 water enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'piers-trainer',
+      name: 'Piers',
+      position: { x: 1, y: 3 },
+      blocking: true,
+      dialogue: 'As guardian of the harbor, I command the tides! Face my aquatic allies!',
+      battleOnInteract: ['gillman', 'merman', 'king-cobra'], // Level 4-5 aquatic enemies
+      battleOnlyOnce: false,
+    },
+
+    // Jupiter (Wind) Adepts
+    {
+      id: 'ivan-trainer',
+      name: 'Ivan',
+      position: { x: 17, y: 13 },
+      blocking: true,
+      dialogue: 'Ivan at your service! My wind magic calls forth these aerial creatures!',
+      battleOnInteract: ['drone-bee', 'fighter-bee', 'pixie'], // Level 3 wind/flying enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'sheba-trainer',
+      name: 'Sheba',
+      position: { x: 12, y: 13 },
+      blocking: true,
+      dialogue: 'I was found in the forest among these wind spirits. Can you calm them?',
+      battleOnInteract: ['pixie', 'faery', 'willowisp'], // Level 3-4 fairy/wind enemies
+      battleOnlyOnce: true, // Found in forest - rescue scenario
+    },
+
+    // Neutral (Versatile)
+    {
+      id: 'kraden-trainer',
+      name: 'Kraden',
+      position: { x: 2, y: 8 },
+      blocking: true,
+      dialogue: {
+        default: 'Ah, a student! I am Kraden, alchemist and researcher. Let me test your knowledge of all elements!',
+        quest_forest_active: 'Fascinating creatures in that forest! Collect data for me, won\'t you?',
+      },
+      battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Level 4 mixed elements
+      battleOnlyOnce: false,
+    },
   ],
   exits: [
     {
