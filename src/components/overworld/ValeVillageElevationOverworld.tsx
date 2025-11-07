@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGame } from '@/context/GameContext';
-import type { Screen } from '@/context/types';
 import {
   ElevationLevel,
   ELEVATION_CONFIGS,
