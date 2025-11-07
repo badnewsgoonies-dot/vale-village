@@ -20,8 +20,9 @@ type DemoStep =
   | { action: 'announce'; text: string; duration: number }
   | { action: 'walk'; target: Position; elevation: ElevationLevel; run?: boolean }
   | { action: 'wait'; duration: number }
-  | { action: 'transition'; toLevel: ElevationLevel }
-  | { action: 'menu'; screen: Screen; duration: number };
+
+  | { action: 'transition'; toLevel: ElevationLevel };
+
 
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 1500;
@@ -183,28 +184,34 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     { action: 'walk', target: { x: 500, y: 280 }, elevation: ElevationLevel.UPPER },
     { action: 'transition', toLevel: ElevationLevel.MAIN },
 
-    // Show menus
-    { action: 'announce', text: 'Menu System - Abilities Screen', duration: 2 },
-    { action: 'menu', screen: { type: 'ABILITIES' }, duration: 3 },
+    // Explore more buildings
+    { action: 'announce', text: 'Exploring Isaac\'s House', duration: 2 },
+    { action: 'walk', target: { x: 350, y: 380 }, elevation: ElevationLevel.MAIN },
+    { action: 'wait', duration: 1 },
 
-    { action: 'announce', text: 'Menu System - Summons Screen', duration: 2 },
-    { action: 'menu', screen: { type: 'SUMMONS' }, duration: 3 },
+    { action: 'announce', text: 'Visiting Training Grounds', duration: 2 },
+    { action: 'walk', target: { x: 250, y: 550 }, elevation: ElevationLevel.MAIN },
+    { action: 'wait', duration: 1 },
 
-    { action: 'announce', text: 'Menu System - Equipment Screen', duration: 2 },
-    { action: 'menu', screen: { type: 'EQUIPMENT' }, duration: 3 },
+    // Go to lower level
+    { action: 'announce', text: 'Going Down to Lower Plaza', duration: 2 },
+    { action: 'walk', target: { x: 600, y: 850 }, elevation: ElevationLevel.MAIN },
+    { action: 'transition', toLevel: ElevationLevel.LOWER },
+    { action: 'walk', target: { x: 400, y: 1100 }, elevation: ElevationLevel.LOWER },
+    { action: 'wait', duration: 1.5 },
 
-    { action: 'announce', text: 'Menu System - Party Management', duration: 2 },
-    { action: 'menu', screen: { type: 'PARTY_MANAGEMENT' }, duration: 3 },
+    // Come back up
+    { action: 'announce', text: 'Returning to Main Level', duration: 2 },
+    { action: 'walk', target: { x: 600, y: 900 }, elevation: ElevationLevel.LOWER },
+    { action: 'transition', toLevel: ElevationLevel.MAIN },
 
-    { action: 'announce', text: 'Menu System - Djinn Menu', duration: 2 },
-    { action: 'menu', screen: { type: 'DJINN_MENU' }, duration: 3 },
-
-    // Final showcase
-    { action: 'announce', text: 'Smooth 60 FPS Movement System', duration: 2 },
+    // Final showcase - running
+    { action: 'announce', text: 'Smooth 60 FPS Movement', duration: 2 },
     { action: 'walk', target: { x: 800, y: 600 }, elevation: ElevationLevel.MAIN, run: true },
-    { action: 'walk', target: { x: 400, y: 700 }, elevation: ElevationLevel.MAIN, run: true },
+    { action: 'walk', target: { x: 300, y: 700 }, elevation: ElevationLevel.MAIN, run: true },
+    { action: 'walk', target: { x: 600, y: 500 }, elevation: ElevationLevel.MAIN, run: true },
 
-    { action: 'announce', text: 'Demo Complete - Looping...', duration: 2 },
+    { action: 'announce', text: 'Demo Complete - Restarting...', duration: 2 },
   ], []);
 
   // Handle building interaction
@@ -503,20 +510,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
             demoWaitTimerRef.current = 500; // Small delay after transition
           }
           break;
-
-        case 'menu':
-          if (demoWaitTimerRef.current === 0) {
-            actions.navigate(currentStep.screen);
-            demoWaitTimerRef.current = currentStep.duration * 1000;
-          } else if (demoWaitTimerRef.current > 0) {
-            demoWaitTimerRef.current -= 100;
-            if (demoWaitTimerRef.current <= 0) {
-              actions.navigate({ type: 'OVERWORLD' });
-              demoWaypointIndexRef.current++;
-              demoWaitTimerRef.current = 500; // Small delay after menu
-            }
-          }
-          break;
       }
 
       // Clear announcement after duration
@@ -551,8 +544,8 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       targetX = Math.max(0, Math.min(WORLD_WIDTH - VIEWPORT_WIDTH, targetX));
       targetY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, targetY));
 
-      // Smooth easing (lerp with factor 0.15 for smooth follow)
-      const CAMERA_SMOOTHING = 0.15;
+      // Smooth easing (faster in demo mode for better tracking)
+      const CAMERA_SMOOTHING = demoMode ? 0.35 : 0.15;
       const newX = cameraPos.x + (targetX - cameraPos.x) * CAMERA_SMOOTHING;
       const newY = cameraPos.y + (targetY - cameraPos.y) * CAMERA_SMOOTHING;
 
@@ -569,7 +562,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [playerPos, cameraPos]);
+  }, [playerPos, cameraPos, demoMode]);
 
   // Camera offset for rendering
   const cameraOffset = useMemo(() => {
