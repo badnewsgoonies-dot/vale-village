@@ -25,7 +25,7 @@ export type EnemyId = keyof typeof ENEMIES;
  */
 
 /** Valid area IDs - matches areas.ts AREAS registry */
-export type AreaId = 'vale_village' | 'forest_path' | 'ancient_ruins';
+export type AreaId = 'vale_village' | 'forest_path' | 'ancient_ruins' | 'battle_row';
 
 /** Valid quest IDs - matches quests.ts quest registry */
 export type QuestId =
