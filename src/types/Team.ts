@@ -39,7 +39,7 @@ export interface Team {
   activationsThisTurn: Map<string, number>;
 
   /** DEPRECATED: Old state tracking (for backward compatibility) */
-  djinnStates?: Map<string, DjinnState>;
+  djinnStates: Map<string, DjinnState>;
 }
 
 /**
