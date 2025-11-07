@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useGame } from '@/context/GameContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 
@@ -13,6 +14,19 @@ export const AbilityMenu: React.FC<AbilityMenuProps> = ({
   onSelectAbility,
   onBack
 }) => {
+  const { state } = useGame();
+
+  // Force re-render when unit level changes or Djinn are equipped
+  // This ensures abilities update when learned mid-battle
+  const availableAbilities = useMemo(() => {
+    return unit.getAvailableAbilities();
+  }, [
+    unit.id,
+    unit.level,
+    state.playerData.equippedDjinnIds.length,
+    state.playerData.equippedDjinnIds.join(','), // Track actual Djinn equipped
+  ]);
+
   return (
     <div className="action-menu ability-menu">
       <div className="menu-header">
@@ -20,7 +34,7 @@ export const AbilityMenu: React.FC<AbilityMenuProps> = ({
         <h3 className="menu-title">Select Psynergy</h3>
       </div>
       <div className="ability-list">
-        {unit.getAvailableAbilities().map(ability => {
+        {availableAbilities.map(ability => {
           const canUse = unit.canUseAbility(ability.id);
           return (
             <button

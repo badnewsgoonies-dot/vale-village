@@ -13,6 +13,8 @@ export type Screen =
   | { type: 'ABILITIES' }
   | { type: 'SUMMONS' }
   | { type: 'BATTLE' }
+  | { type: 'BATTLE_FLOW'; enemyUnitIds: string[]; npcId?: string }
+  | { type: 'POST_BATTLE_CUTSCENE'; npcId?: string; victory: boolean }
   | { type: 'REWARDS' }
   | { type: 'DJINN_MENU' }
   | { type: 'MAIN_MENU' }

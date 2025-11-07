@@ -22,7 +22,7 @@ export interface GameActions {
   unequipDjinn: (djinnId: string) => void;
 
   // Battle
-  startBattle: (enemyIds: string[]) => void;
+  startBattle: (enemyIds: string[], npcId?: string) => void;
   executeTurn: (abilityId: string, targetId: string) => void;
   endBattle: () => void;
 

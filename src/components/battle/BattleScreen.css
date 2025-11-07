@@ -268,9 +268,36 @@
   border-top: 2px solid #4A4A4A;
   z-index: 10;
   display: grid;
-  grid-template-columns: 200px 1fr 400px;
+  grid-template-columns: minmax(180px, 1fr) minmax(300px, 2fr) minmax(280px, 1.5fr);
   gap: 8px;
   padding: 8px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1024px) {
+  .bottom-panel {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .log-area {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 100px;
+  }
+
+  .portraits-area {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .action-area {
+    grid-column: 1;
+    grid-row: 3;
+  }
 }
 
 /* Combat Log */
