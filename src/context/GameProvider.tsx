@@ -286,8 +286,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Battle actions
-  const startBattle = useCallback((enemyIds: string[]) => {
-    console.log('Starting battle with enemies:', enemyIds);
+  const startBattle = useCallback((enemyIds: string[], npcId?: string) => {
+    console.log('Starting battle with enemies:', enemyIds, 'npcId:', npcId);
 
     setState(prev => {
       // Get active party units
@@ -317,11 +317,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Create battle state
       const battleState = createBattleState(playerTeam, enemies);
+      // Add npcId to battle state
+      battleState.npcId = npcId;
 
       console.log('Battle initialized:', {
         playerUnits: playerTeam.units.length,
         enemyUnits: enemies.length,
         turnOrder: battleState.turnOrder.map(u => u.name),
+        npcId,
       });
 
       return {

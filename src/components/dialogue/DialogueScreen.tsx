@@ -59,14 +59,14 @@ export const DialogueScreen: React.FC = () => {
   const executeAction = useCallback((action: DialogueAction) => {
     switch (action.type) {
     case 'START_BATTLE': {
-      // Start battle with specified enemy units
+      // Start battle flow (Team Selection → Djinn Selection → Battle)
       const enemyUnits = action.enemyUnitIds;
-      // Store the victory node for after battle
-      if (action.onVictory) {
-        // We'll need to navigate back to dialogue after battle
-        // For now, we'll start the battle and handle victory in the battle flow
-      }
-      actions.startBattle(enemyUnits);
+      // Navigate to battle flow controller instead of direct battle
+      actions.navigate({
+        type: 'BATTLE_FLOW',
+        enemyUnitIds: enemyUnits,
+        npcId: npcId, // Pass NPC ID for post-battle cutscene
+      });
       break;
     }
 

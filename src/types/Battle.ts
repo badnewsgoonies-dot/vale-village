@@ -68,6 +68,9 @@ export interface BattleState {
 
   /** Is this a boss battle? (cannot flee) */
   isBossBattle?: boolean;
+
+  /** NPC ID that triggered this battle (for post-battle cutscene) */
+  npcId?: string;
 }
 
 /**

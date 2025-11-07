@@ -196,8 +196,8 @@ export const VALE_VILLAGE: Area = {
       name: 'Billy',
       position: { x: 8, y: 11 },
       blocking: false,
-      dialogue: 'I found some cute slimes! Let\'s battle with them!',
-      battleOnInteract: ['slime'],
+      dialogue: 'I found some cute critters! Let\'s battle with them!',
+      battleOnInteract: ['grub', 'worm'], // NEW: Nature critters
       battleOnlyOnce: true,
     },
     {
@@ -205,8 +205,8 @@ export const VALE_VILLAGE: Area = {
       name: 'Lucy',
       position: { x: 13, y: 11 },
       blocking: false,
-      dialogue: 'My pet goblins escaped! Can you catch them?',
-      battleOnInteract: ['goblin', 'goblin'],
+      dialogue: 'My pet monsters escaped! Can you catch them?',
+      battleOnInteract: ['mini-goblin', 'kobold'], // NEW: Small humanoids
       battleOnlyOnce: true,
     },
     {
@@ -269,7 +269,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 1, y: 13 },
       blocking: false,
       dialogue: '*SNAP SNAP* (It attacks!)',
-      battleOnInteract: ['slime', 'wild-wolf'],
+      battleOnInteract: ['rat', 'spider', 'bat'], // NEW: Critter enemies
       battleOnlyOnce: true,
     },
     {
@@ -278,7 +278,7 @@ export const VALE_VILLAGE: Area = {
       position: { x: 2, y: 14 },
       blocking: false,
       dialogue: '*aggressive clicking*',
-      battleOnInteract: ['slime'],
+      battleOnInteract: ['roach', 'vermin'], // NEW: Pest enemies
       battleOnlyOnce: true,
     },
     {
@@ -287,8 +287,200 @@ export const VALE_VILLAGE: Area = {
       position: { x: 19, y: 1 },
       blocking: false,
       dialogue: '*demonic squawk* (Dark energy radiates from it!)',
-      battleOnInteract: ['wind-wisp', 'wind-wisp', 'wind-wisp'],
+      battleOnInteract: ['seabird', 'seafowl', 'bat'], // NEW: Bird enemies
       battleOnlyOnce: true,
+    },
+
+    // === RECRUITABLE CHARACTERS (Battle Trainers) ===
+    // Venus (Earth) Adepts
+    {
+      id: 'isaac-trainer',
+      name: 'Isaac',
+      position: { x: 5, y: 4 },
+      blocking: true,
+      dialogue: {
+        default: 'I am Isaac, Earth Adept. Test your strength against my earth summons!',
+        quest_forest_complete: 'You\'ve proven yourself capable. Join me in the Ancient Ruins!',
+      },
+      battleOnInteract: ['rock-golem', 'stone-golem'], // Level 4-5 earth enemies
+      battleOnlyOnce: false, // Can battle multiple times for training
+    },
+    {
+      id: 'felix-trainer',
+      name: 'Felix',
+      position: { x: 3, y: 12 },
+      blocking: true,
+      dialogue: 'Felix here. An honor duel awaits those who seek true power!',
+      battleOnInteract: ['gargoyle', 'earth-lizard', 'gnome'], // Level 4 earth/stone mix
+      battleOnlyOnce: false,
+    },
+
+    // Mars (Fire) Adepts
+    {
+      id: 'garet-trainer',
+      name: 'Garet',
+      position: { x: 15, y: 4 },
+      blocking: true,
+      dialogue: 'Garet\'s the name, flames are my game! Ready to feel the heat?',
+      battleOnInteract: ['salamander', 'fire-worm', 'imp'], // Level 3-4 fire enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'jenna-trainer',
+      name: 'Jenna',
+      position: { x: 7, y: 13 },
+      blocking: true,
+      dialogue: 'I need rescuing from these fire spirits I accidentally summoned! Help!',
+      battleOnInteract: ['fire-worm', 'salamander'], // Level 3 fire enemies
+      battleOnlyOnce: true, // Rescue quest - one time only
+    },
+    {
+      id: 'kyle-trainer',
+      name: 'Kyle',
+      position: { x: 10, y: 2 },
+      blocking: true,
+      dialogue: {
+        default: 'I am Kyle, master of the blade. Only the worthy may face my warrior\'s trial!',
+        quest_ruins_complete: 'You have conquered the ruins. Perhaps you are ready for my trial...',
+      },
+      battleOnInteract: ['wyvern', 'demon-imp', 'orc-warrior'], // Level 5-6 elite enemies
+      battleOnlyOnce: false,
+    },
+
+    // Mercury (Water) Adepts
+    {
+      id: 'mia-trainer',
+      name: 'Mia',
+      position: { x: 17, y: 11 },
+      blocking: true,
+      dialogue: 'Mia, healer and ice mage. Let\'s have a friendly spar with my water spirits!',
+      battleOnInteract: ['ooze', 'slime-beast', 'merman'], // Level 3-4 water enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'piers-trainer',
+      name: 'Piers',
+      position: { x: 1, y: 3 },
+      blocking: true,
+      dialogue: 'As guardian of the harbor, I command the tides! Face my aquatic allies!',
+      battleOnInteract: ['gillman', 'merman', 'king-cobra'], // Level 4-5 aquatic enemies
+      battleOnlyOnce: false,
+    },
+
+    // Jupiter (Wind) Adepts
+    {
+      id: 'ivan-trainer',
+      name: 'Ivan',
+      position: { x: 17, y: 13 },
+      blocking: true,
+      dialogue: 'Ivan at your service! My wind magic calls forth these aerial creatures!',
+      battleOnInteract: ['drone-bee', 'fighter-bee', 'pixie'], // Level 3 wind/flying enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'sheba-trainer',
+      name: 'Sheba',
+      position: { x: 12, y: 13 },
+      blocking: true,
+      dialogue: 'I was found in the forest among these wind spirits. Can you calm them?',
+      battleOnInteract: ['pixie', 'faery', 'willowisp'], // Level 3-4 fairy/wind enemies
+      battleOnlyOnce: true, // Found in forest - rescue scenario
+    },
+
+    // Neutral (Versatile)
+    {
+      id: 'kraden-trainer',
+      name: 'Kraden',
+      position: { x: 2, y: 8 },
+      blocking: true,
+      dialogue: {
+        default: 'Ah, a student! I am Kraden, alchemist and researcher. Let me test your knowledge of all elements!',
+        quest_forest_active: 'Fascinating creatures in that forest! Collect data for me, won\'t you?',
+      },
+      battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Level 4 mixed elements
+      battleOnlyOnce: false,
+    },
+
+    // === UNIQUE CHARACTERS (Special NPCs) ===
+    {
+      id: 'Monk_sitting',
+      name: 'Zen Master',
+      position: { x: 11, y: 6 },
+      blocking: true,
+      dialogue: {
+        default: 'Meditation has given me power over spirits. Face my inner demons!',
+        quest_ruins_complete: 'You have achieved enlightenment through battle. Well done.',
+      },
+      battleOnInteract: ['ghost', 'spirit', 'will-head', 'wraith'], // Level 3-6 spiritual enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'tiedup_villager',
+      name: 'Captured Villager',
+      position: { x: 19, y: 12 },
+      blocking: true,
+      dialogue: {
+        default: 'Help! Bandits left these monsters to guard me! Free me!',
+        quest_forest_complete: 'Thank you for saving me! Those bandits won\'t get away with this!',
+      },
+      battleOnInteract: ['brigand', 'thief', 'ruffian'], // Level 4 bandit-themed enemies
+      battleOnlyOnce: true, // Rescue mission - one time only
+    },
+    {
+      id: 'Cursed_Tree',
+      name: 'Cursed Ancient Tree',
+      position: { x: 4, y: 14 },
+      blocking: true,
+      dialogue: '*The tree groans with dark energy* A curse binds nature spirits here!',
+      battleOnInteract: ['creeper', 'vine', 'brambler', 'wild-mushroom'], // Level 2-5 plant enemies
+      battleOnlyOnce: true, // Breaking the curse
+    },
+
+    // === ADDITIONAL VILLAGERS (Generic Townsfolk) ===
+    {
+      id: 'Villager-18',
+      name: 'Beast Tamer',
+      position: { x: 14, y: 9 },
+      blocking: true,
+      dialogue: 'I train wild beasts for the village guard! Want to test them?',
+      battleOnInteract: ['dire-wolf', 'wild-cat', 'lynx'], // Level 2-3 beast enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-19',
+      name: 'Insect Collector',
+      position: { x: 8, y: 7 },
+      blocking: false,
+      dialogue: 'Check out my rare bug collection! They\'re quite fierce!',
+      battleOnInteract: ['ant-lion', 'flash-ant', 'hornet'], // Level 3 insect enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-20',
+      name: 'Undead Hunter',
+      position: { x: 16, y: 9 },
+      blocking: true,
+      dialogue: 'I hunt the undead for a living. Let me show you what I\'ve captured!',
+      battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-21',
+      name: 'Slime Rancher',
+      position: { x: 6, y: 12 },
+      blocking: false,
+      dialogue: 'My slime ranch has the strongest slimes in Vale! Prove me wrong!',
+      battleOnInteract: ['ooze', 'slime-beast'], // Level 3 slime variants
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-22',
+      name: 'Lizard Keeper',
+      position: { x: 13, y: 5 },
+      blocking: true,
+      dialogue: 'These lizards are my pets! They\'ve been trained for combat!',
+      battleOnInteract: ['lizard-man', 'lizard-fighter', 'thunder-lizard'], // Level 4 lizard enemies
+      battleOnlyOnce: false,
     },
   ],
   exits: [
@@ -313,9 +505,13 @@ export const FOREST_PATH: Area = {
   hasRandomEncounters: true,
   encounterRate: 15, // Battle every ~15 steps
   enemyPools: [
-    { weight: 50, enemyIds: ['wild-wolf'] },
-    { weight: 30, enemyIds: ['goblin', 'goblin'] },
-    { weight: 20, enemyIds: ['slime', 'wild-wolf'] },
+    { weight: 30, enemyIds: ['wild-wolf'] },
+    { weight: 25, enemyIds: ['goblin', 'goblin'] },
+    { weight: 15, enemyIds: ['slime', 'wild-wolf'] },
+    { weight: 10, enemyIds: ['rat', 'rat', 'rat'] }, // NEW: Rat swarm
+    { weight: 8, enemyIds: ['bat', 'bat'] }, // NEW: Flying enemies
+    { weight: 7, enemyIds: ['spider', 'grub'] }, // NEW: Critter mix
+    { weight: 5, enemyIds: ['poison-toad', 'mole'] }, // NEW: Nature enemies
   ],
   bosses: [
     {

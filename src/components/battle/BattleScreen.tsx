@@ -155,12 +155,20 @@ export const BattleScreen: React.FC = () => {
         setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
       }
       
-      setTimeout(() => actions.navigate({ type: 'REWARDS' }), 2000);
+      setTimeout(() => actions.navigate({
+        type: 'POST_BATTLE_CUTSCENE',
+        npcId: battle.npcId,
+        victory: true,
+      }), 2000);
       return;
     } else if (battleEnd === 'defeat') {
       setPhase('defeat');
       setCombatLog(prev => [...prev, '>>> DEFEAT... <<<']);
-      setTimeout(() => actions.navigate({ type: 'TITLE' }), 2000);
+      setTimeout(() => actions.navigate({
+        type: 'POST_BATTLE_CUTSCENE',
+        npcId: battle.npcId,
+        victory: false,
+      }), 2000);
       return;
     }
 
@@ -218,12 +226,20 @@ export const BattleScreen: React.FC = () => {
         setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
       }
       
-      setTimeout(() => actions.navigate({ type: 'REWARDS' }), 2000);
+      setTimeout(() => actions.navigate({
+        type: 'POST_BATTLE_CUTSCENE',
+        npcId: battle.npcId,
+        victory: true,
+      }), 2000);
       return;
     } else if (battleEnd === 'defeat') {
       setPhase('defeat');
       setCombatLog(prev => [...prev, '>>> DEFEAT... <<<']);
-      setTimeout(() => actions.navigate({ type: 'TITLE' }), 2000);
+      setTimeout(() => actions.navigate({
+        type: 'POST_BATTLE_CUTSCENE',
+        npcId: battle.npcId,
+        victory: false,
+      }), 2000);
       return;
     }
 

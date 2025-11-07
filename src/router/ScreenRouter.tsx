@@ -16,6 +16,8 @@ import { SummonsScreen } from '@/components/summons/SummonsScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
 import { GameDemo } from '@/components/demo/GameDemo';
 import { DialogueScreen } from '@/components/dialogue/DialogueScreen';
+import { BattleFlowController } from '@/components/battle/BattleFlowController';
+import { PostBattleCutscene } from '@/components/battle/PostBattleCutscene';
 import { ScreenTransition } from './ScreenTransition';
 
 export const ScreenRouter: React.FC = () => {
@@ -89,6 +91,22 @@ export const ScreenRouter: React.FC = () => {
 
     case 'BATTLE':
       return <BattleScreen />;
+
+    case 'BATTLE_FLOW':
+      return (
+        <BattleFlowController
+          enemyUnitIds={screen.enemyUnitIds}
+          npcId={screen.npcId}
+        />
+      );
+
+    case 'POST_BATTLE_CUTSCENE':
+      return (
+        <PostBattleCutscene
+          npcId={screen.npcId}
+          victory={screen.victory}
+        />
+      );
 
     case 'OVERWORLD':
       return <ValeVillageElevationOverworld />;
