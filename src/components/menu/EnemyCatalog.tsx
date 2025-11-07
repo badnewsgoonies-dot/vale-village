@@ -78,57 +78,58 @@ export function EnemyCatalog() {
 
   return (
     <div className="enemy-catalog">
-      <div className="catalog-header">
-        <h1>Enemy Catalog</h1>
-        <p className="catalog-stats">
-          {sortedEnemies.length} / {allEnemies.length} enemies shown
-        </p>
-      </div>
-
-      <div className="catalog-filters">
-        <div className="filter-group">
-          <label>Search:</label>
-          <input
-            type="text"
-            placeholder="Search by name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
+      <div className="catalog-container">
+        <div className="catalog-header">
+          <h1>Enemy Catalog</h1>
+          <p className="catalog-stats">
+            {sortedEnemies.length} / {allEnemies.length} enemies shown
+          </p>
         </div>
 
-        <div className="filter-group">
-          <label>Element:</label>
-          <select
-            value={elementFilter}
-            onChange={(e) => setElementFilter(e.target.value as FilterElement)}
-          >
-            <option value="All">All</option>
-            <option value="Neutral">Neutral</option>
-            <option value="Venus">Venus (Earth)</option>
-            <option value="Mars">Mars (Fire)</option>
-            <option value="Mercury">Mercury (Water)</option>
-            <option value="Jupiter">Jupiter (Wind)</option>
-          </select>
+        <div className="catalog-filters">
+          <div className="filter-group">
+            <label>Search:</label>
+            <input
+              type="text"
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
+          <div className="filter-group">
+            <label>Element:</label>
+            <select
+              value={elementFilter}
+              onChange={(e) => setElementFilter(e.target.value as FilterElement)}
+            >
+              <option value="All">All</option>
+              <option value="Neutral">Neutral</option>
+              <option value="Venus">Venus (Earth)</option>
+              <option value="Mars">Mars (Fire)</option>
+              <option value="Mercury">Mercury (Water)</option>
+              <option value="Jupiter">Jupiter (Wind)</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Level:</label>
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value as FilterLevel)}
+            >
+              <option value="All">All Levels</option>
+              <option value="1-2">Level 1-2</option>
+              <option value="3-4">Level 3-4</option>
+              <option value="5-6">Level 5-6</option>
+              <option value="7-8">Level 7-8</option>
+              <option value="9-10">Level 9-10</option>
+            </select>
+          </div>
         </div>
 
-        <div className="filter-group">
-          <label>Level:</label>
-          <select
-            value={levelFilter}
-            onChange={(e) => setLevelFilter(e.target.value as FilterLevel)}
-          >
-            <option value="All">All Levels</option>
-            <option value="1-2">Level 1-2</option>
-            <option value="3-4">Level 3-4</option>
-            <option value="5-6">Level 5-6</option>
-            <option value="7-8">Level 7-8</option>
-            <option value="9-10">Level 9-10</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="catalog-content">
+        <div className="catalog-content">
         {Object.entries(groupedByLevel).map(([level, enemies]) => (
           <div key={level} className="level-group">
             <h2 className="level-header">Level {level} ({enemies.length} enemies)</h2>
@@ -155,11 +156,12 @@ export function EnemyCatalog() {
           </div>
         ))}
 
-        {sortedEnemies.length === 0 && (
-          <div className="no-results">
-            <p>No enemies found matching your filters.</p>
-          </div>
-        )}
+          {sortedEnemies.length === 0 && (
+            <div className="no-results">
+              <p>No enemies found matching your filters.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {selectedEnemy && (
