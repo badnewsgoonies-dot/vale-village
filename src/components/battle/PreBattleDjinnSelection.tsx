@@ -232,12 +232,12 @@ export const PreBattleDjinnSelection: React.FC<PreBattleDjinnSelectionProps> = (
               </span>
             </div>
             <div className="details-description">
-              <p>{selectedDjinn.description}</p>
+              <p>{selectedDjinn.lore}</p>
             </div>
             <div className="details-effect">
-              <h4>Effect</h4>
-              <p>{selectedDjinn.statBonus.atk > 0 && `+${selectedDjinn.statBonus.atk} ATK`}</p>
-              <p>{selectedDjinn.statBonus.def > 0 && `+${selectedDjinn.statBonus.def} DEF`}</p>
+              <h4>Unleash Effect</h4>
+              <p>{selectedDjinn.unleashEffect.type.toUpperCase()}: {selectedDjinn.unleashEffect.basePower} power</p>
+              <p>Targets: {selectedDjinn.unleashEffect.targets}</p>
             </div>
           </aside>
         )}

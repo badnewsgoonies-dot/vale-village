@@ -492,6 +492,14 @@ export const VALE_VILLAGE: Area = {
       targetArea: 'forest_path',
       targetPosition: { x: 10, y: 2 },
     },
+    {
+      id: 'to_battle_row',
+      position: { x: 9, y: 0 },
+      width: 2,
+      height: 1,
+      targetArea: 'battle_row',
+      targetPosition: { x: 1, y: 7 },
+    },
   ],
   backgroundColor: '#4a7c4e',
 };
@@ -782,12 +790,193 @@ export const ANCIENT_RUINS: Area = {
 };
 
 /**
+ * BATTLE ROW - Linear Progression Area
+ *
+ * Narrative Context:
+ * A village that enslaves monsters for battle entertainment. The player (Isaac)
+ * refuses to participate in monster exploitation and fights to free them.
+ * Player fights WITH Djinn (spiritual beings opposing slavery), not monsters.
+ *
+ * Design:
+ * - 10 houses in a horizontal row (left to right progression)
+ * - Each house contains an NPC battle encounter
+ * - Recruitable NPCs fight WITH their monsters, then join after defeat
+ * - Non-recruitable NPCs just send monsters to fight
+ */
+export const BATTLE_ROW: Area = {
+  id: 'battle_row',
+  name: 'Battle Row',
+  type: 'town',
+  width: 24,
+  height: 15,
+  hasRandomEncounters: false,
+  bosses: [],
+  treasures: [
+    {
+      id: 'village_starter_chest',
+      position: { x: 1, y: 7 },
+      contents: {
+        gold: 200,
+        equipment: [STEEL_SWORD, IRON_ARMOR],
+      },
+      opened: false,
+    },
+  ],
+  npcs: [
+    // === HOUSE 1 (x=2) - Regular NPC ===
+    {
+      id: 'house1-beast-tamer',
+      name: 'Beast Tamer',
+      position: { x: 2, y: 7 },
+      blocking: true,
+      dialogue: {
+        default: 'Welcome to Battle Row! I train wild beasts for combat. Face them if you dare!',
+        quest_forest_complete: 'You look strong... but can you handle my beasts?',
+      },
+      battleOnInteract: ['dire-wolf', 'wild-cat', 'lynx'], // Level 2-3 beasts
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 2 (x=4) - Regular NPC ===
+    {
+      id: 'house2-undead-hunter',
+      name: 'Undead Hunter',
+      position: { x: 4, y: 7 },
+      blocking: true,
+      dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
+      battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 3 (x=6) - RECRUITABLE: Garet ===
+    {
+      id: 'house3-garet',
+      name: 'Garet',
+      position: { x: 6, y: 7 },
+      blocking: true,
+      dialogue: {
+        default: 'Garet here! My fire spirits fight for me. Show me what you\'ve got!',
+        quest_forest_complete: 'You\'ve freed those monsters? Maybe... you\'re right. I\'ll join you!',
+      },
+      battleOnInteract: ['salamander', 'fire-worm', 'imp', 'demon-imp'], // Fire enemies commanded by Garet
+      battleOnlyOnce: true, // Recruitable - join after defeat
+    },
+
+    // === HOUSE 4 (x=8) - Regular NPC ===
+    {
+      id: 'house4-insect-collector',
+      name: 'Insect Collector',
+      position: { x: 8, y: 7 },
+      blocking: true,
+      dialogue: 'My rare bug collection fights in the arena! Witness their power!',
+      battleOnInteract: ['ant-lion', 'flash-ant', 'hornet', 'drone-bee'], // Level 3 insects
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 5 (x=10) - Regular NPC ===
+    {
+      id: 'house5-slime-rancher',
+      name: 'Slime Rancher',
+      position: { x: 10, y: 7 },
+      blocking: true,
+      dialogue: 'These are the strongest slimes in all the land! Prove me wrong!',
+      battleOnInteract: ['ooze', 'slime-beast', 'slime'], // Level 3 slimes
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 6 (x=12) - Regular NPC ===
+    {
+      id: 'house6-lizard-keeper',
+      name: 'Lizard Keeper',
+      position: { x: 12, y: 7 },
+      blocking: true,
+      dialogue: 'My combat-trained lizards are unbeatable! Take them on!',
+      battleOnInteract: ['lizard-man', 'lizard-fighter', 'thunder-lizard', 'earth-lizard'], // Level 4 lizards
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 7 (x=14) - RECRUITABLE: Mia ===
+    {
+      id: 'house7-mia',
+      name: 'Mia',
+      position: { x: 14, y: 7 },
+      blocking: true,
+      dialogue: {
+        default: 'I am Mia, healer and ice mage. My water spirits will test your resolve!',
+        quest_forest_complete: 'Your compassion for the monsters... I understand now. Let me join your cause!',
+      },
+      battleOnInteract: ['ooze', 'slime-beast', 'merman', 'gillman'], // Water enemies commanded by Mia
+      battleOnlyOnce: true, // Recruitable - join after defeat
+    },
+
+    // === HOUSE 8 (x=16) - Unique NPC (Zen Master) ===
+    {
+      id: 'house8-zen-master',
+      name: 'Zen Master',
+      position: { x: 16, y: 7 },
+      blocking: true,
+      dialogue: 'Through meditation, I command spirits. Face my inner demons!',
+      battleOnInteract: ['ghost', 'spirit', 'will-head', 'wraith'], // Level 3-6 spiritual
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 9 (x=18) - Regular NPC ===
+    {
+      id: 'house9-elemental-summoner',
+      name: 'Elemental Summoner',
+      position: { x: 18, y: 7 },
+      blocking: true,
+      dialogue: 'I summon elementals from all realms! Can you withstand their power?',
+      battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'pixie'], // Level 4 mixed elementals
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 10 (x=20) - RECRUITABLE: Kraden ===
+    {
+      id: 'house10-kraden',
+      name: 'Kraden',
+      position: { x: 20, y: 7 },
+      blocking: true,
+      dialogue: {
+        default: 'Ah, a visitor! I am Kraden, alchemist and researcher. My elemental test awaits you!',
+        quest_forest_complete: 'Fascinating! Your Djinn philosophy aligns with ancient alchemy. I shall join you!',
+      },
+      battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Mixed elementals commanded by Kraden
+      battleOnlyOnce: true, // Recruitable - join after defeat
+    },
+  ],
+  exits: [
+    // Exit back to Vale Village on the left
+    {
+      id: 'to_vale_village',
+      position: { x: 0, y: 6 },
+      width: 1,
+      height: 3,
+      targetArea: 'vale_village',
+      targetPosition: { x: 18, y: 7 },
+    },
+    // Victory exit on the right (after completing all houses)
+    {
+      id: 'to_victory',
+      position: { x: 23, y: 6 },
+      width: 1,
+      height: 3,
+      targetArea: 'vale_village',
+      targetPosition: { x: 2, y: 7 },
+      requiredFlag: 'battle_row_complete',
+    },
+  ],
+  backgroundColor: '#4a3c28',
+};
+
+/**
  * All areas indexed by ID
  */
 export const ALL_AREAS: Record<string, Area> = {
   vale_village: VALE_VILLAGE,
   forest_path: FOREST_PATH,
   ancient_ruins: ANCIENT_RUINS,
+  battle_row: BATTLE_ROW,
 };
 
 /**

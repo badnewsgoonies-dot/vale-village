@@ -111,6 +111,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       vale_village: createInitialAreaState(),
       forest_path: createInitialAreaState(),
       ancient_ruins: createInitialAreaState(),
+      battle_row: createInitialAreaState(),
     },
   });
 

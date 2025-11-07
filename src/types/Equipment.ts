@@ -3,12 +3,12 @@ import type { Stats } from './Stats';
 /**
  * Equipment slots (from GAME_MECHANICS.md Section 3)
  */
-export type EquipmentSlot = 'weapon' | 'armor' | 'helm' | 'boots';
+export type EquipmentSlot = 'weapon' | 'armor' | 'helm' | 'boots' | 'accessory';
 
 /**
  * Equipment tiers
  */
-export type EquipmentTier = 'basic' | 'iron' | 'steel' | 'legendary';
+export type EquipmentTier = 'basic' | 'bronze' | 'iron' | 'steel' | 'silver' | 'mythril' | 'legendary' | 'artifact';
 
 /**
  * Equipment item definition

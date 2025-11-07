@@ -32,7 +32,7 @@ export const BattleFlowController: React.FC<BattleFlowControllerProps> = ({
   const { state, actions } = useGame();
   const [phase, setPhase] = useState<FlowPhase>('teamSelection');
   const [selectedPartyIds, setSelectedPartyIds] = useState<string[]>([]);
-  const [selectedDjinnIds, setSelectedDjinnIds] = useState<string[]>([]);
+  const [_selectedDjinnIds, setSelectedDjinnIds] = useState<string[]>([]);
 
   // Handle team selection confirmation
   const handleTeamConfirmed = (unitIds: string[]) => {
