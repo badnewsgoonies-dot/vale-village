@@ -1,11 +1,12 @@
 import { describe, test, expect } from 'vitest';
 import { Unit } from '@/types/Unit';
-import { createTeam, equipDjinn } from '@/types/Team';
+import { createTeam, equipDjinn, activateDjinn } from '@/types/Team';
 import { ISAAC, GARET, MIA, IVAN, FELIX } from '@/data/unitDefinitions';
 import { IRON_SWORD, IRON_ARMOR } from '@/data/equipment';
 import { FLINT, GRANITE, BANE, FORGE, FIZZ } from '@/data/djinn';
 import { executeAbility, checkCriticalHit } from '@/types/Battle';
 import { QUAKE } from '@/data/abilities';
+import { unwrap } from '@/utils/Result';
 
 /**
  * Spec Verification Tests: GAME_MECHANICS.md Examples
@@ -39,7 +40,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipResult = equipDjinn(team, [FLINT, GRANITE, BANE]);
-    const updatedTeam = equipResult.value;
+    const updatedTeam = unwrap(equipResult);
 
     const stats = isaac.calculateStats(updatedTeam);
 
@@ -66,7 +67,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipResult = equipDjinn(team, [FLINT, GRANITE, BANE]);
-    const updatedTeam = equipResult.value;
+    const updatedTeam = unwrap(equipResult);
 
     const baseStats = isaac.stats;
     const statsWithDjinn = isaac.calculateStats(updatedTeam);
@@ -91,7 +92,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, GRANITE, FORGE];
     const equipResult = equipDjinn(team, [FLINT, GRANITE, FORGE]);
-    const updatedTeam = equipResult.value;
+    const updatedTeam = unwrap(equipResult);
 
     const baseStats = isaac.stats;
     const statsWithDjinn = isaac.calculateStats(updatedTeam);
@@ -116,7 +117,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac]);
     team.collectedDjinn = [FLINT, FORGE, FIZZ];
     const equipResult = equipDjinn(team, [FLINT, FORGE, FIZZ]);
-    const updatedTeam = equipResult.value;
+    const updatedTeam = unwrap(equipResult);
 
     const baseStats = isaac.stats;
     const statsWithDjinn = isaac.calculateStats(updatedTeam);
@@ -148,7 +149,7 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac, garet, mia, ivan]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipResult = equipDjinn(team, [FLINT, GRANITE, BANE]);
-    const updatedTeam = equipResult.value;
+    const updatedTeam = unwrap(equipResult);
 
     // All 4 units should get same bonuses
     const isaacStats = isaac.calculateStats(updatedTeam);
@@ -270,15 +271,15 @@ describe('📋 SPEC VERIFICATION: GAME_MECHANICS.md Examples', () => {
     const team = createTeam([isaac, garet, mia, ivan]);
     team.collectedDjinn = [FLINT, GRANITE, BANE];
     const equipResult = equipDjinn(team, [FLINT, GRANITE, BANE]);
-    let updatedTeam = equipResult.value;
+    let updatedTeam = unwrap(equipResult);
 
     // Before activation: All units get +12 ATK from 3 Venus
     const isaacAtkBefore = isaac.calculateStats(updatedTeam).atk;
     const garetAtkBefore = garet.calculateStats(updatedTeam).atk;
 
     // Activate 1 Djinn (Flint)
-    const activateResult = isaac.activateDjinn(FLINT.id, updatedTeam);
-    updatedTeam = activateResult.value;
+    const activateResult = activateDjinn(updatedTeam, FLINT.id, isaac);
+    updatedTeam = unwrap(activateResult);
 
     // After activation: Check that synergy bonuses changed
     const isaacAtkAfter = isaac.calculateStats(updatedTeam).atk;
