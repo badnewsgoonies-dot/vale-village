@@ -7,7 +7,6 @@ import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { PartyManagementScreen } from '@/components/party/PartyManagementScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
-import { ValeVillageOverworld } from '@/components/overworld/ValeVillageOverworld';
 import { ValeVillageElevationOverworld } from '@/components/overworld/ValeVillageElevationOverworld';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';

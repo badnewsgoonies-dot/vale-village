@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
+import type { Djinn } from '@/types/Djinn';
 import { SummonIcon } from '@/sprites/components/SummonIcon';
 import { DjinnIcon } from '@/sprites/components/DjinnIcon';
 import type { Element } from '@/types/Element';
@@ -60,11 +61,12 @@ export const SummonsScreen: React.FC = () => {
   const collectedDjinn = state.playerData.djinnCollected;
 
   // Count Djinn by element
-  const djinnByElement = {
+  const djinnByElement: Record<Element, Djinn[]> = {
     Venus: collectedDjinn.filter(d => d.element === 'Venus'),
     Mars: collectedDjinn.filter(d => d.element === 'Mars'),
     Mercury: collectedDjinn.filter(d => d.element === 'Mercury'),
     Jupiter: collectedDjinn.filter(d => d.element === 'Jupiter'),
+    Neutral: [],
   };
 
   const handleReturn = () => {
@@ -84,10 +86,10 @@ export const SummonsScreen: React.FC = () => {
     }
 
     // Use first 3 Djinn for calculation
-    const djinnToUse = elementDjinn.slice(0, 3);
-    
-    // Tier bonus: +20 per tier level
-    const tierBonus = djinnToUse.reduce((sum, d) => sum + (d.tier * 20), 0);
+  const djinnToUse = elementDjinn.slice(0, 3);
+
+  // Tier bonus: +20 per tier level
+  const tierBonus = djinnToUse.reduce((sum: number, d: Djinn) => sum + (d.tier * 20), 0);
     
     // MAG bonus: Assume min/max MAG from party
     const party = state.playerData.unitsCollected.filter(u => 
@@ -239,7 +241,7 @@ export const SummonsScreen: React.FC = () => {
                   </div>
                   <div className="calc-row">
                     <span>+ Tier Bonuses (3 Djinn):</span>
-                    <span className="calc-value">+{djinnByElement[selectedSummon.element].slice(0, 3).reduce((sum, d) => sum + (d.tier * 20), 0)}</span>
+                    <span className="calc-value">+{djinnByElement[selectedSummon.element].slice(0, 3).reduce((sum: number, d: Djinn) => sum + (d.tier * 20), 0)}</span>
                   </div>
                   <div className="calc-row">
                     <span>+ 50% Caster's MAG:</span>
@@ -257,7 +259,7 @@ export const SummonsScreen: React.FC = () => {
               <div className="detail-section">
                 <h3>Available {selectedSummon.element} Djinn</h3>
                 <div className="djinn-list">
-                  {djinnByElement[selectedSummon.element].map((djinn, index) => (
+                  {djinnByElement[selectedSummon.element].map((djinn: Djinn, index: number) => (
                     <div key={djinn.id} className="djinn-item">
                       <DjinnIcon
                         djinn={djinn}

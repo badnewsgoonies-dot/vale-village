@@ -97,6 +97,33 @@
   border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent; /* iOS touch feedback */
+}
+
+/* Touch-optimized cards for mobile */
+.unit-card.touch-card {
+  min-height: 60px; /* Larger tap targets */
+  padding: var(--spacing-md);
+}
+
+.unit-card:hover,
+.unit-card:focus {
+  background: var(--color-bg-hover);
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.unit-card.selected {
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+/* Touch-optimized button */
+.touch-optimized {
+  min-height: 48px; /* iOS/Android minimum touch target */
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-md);
 }
 
 .unit-card:hover {
@@ -381,6 +408,122 @@
   font-size: var(--font-size-sm);
   line-height: 1.6;
   color: var(--color-text-primary);
+}
+
+/* ===== MOBILE & TOUCH OPTIMIZATIONS ===== */
+
+/* iPhone SE / Small phones (320-375px) */
+@media (max-width: 375px) {
+  .abilities-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .unit-selector {
+    max-height: 25vh;
+    overflow-y: auto;
+  }
+
+  .ability-details {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 40vh;
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .ability-details.visible {
+    transform: translateY(0);
+  }
+
+  .abilities-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .header-content h1 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* iPhone 12/13/14 (390px) */
+@media (min-width: 376px) and (max-width: 428px) {
+  .abilities-content {
+    grid-template-columns: 180px 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .ability-details {
+    grid-column: 1 / -1;
+    max-height: 30vh;
+  }
+}
+
+/* Tablets and larger phones (429px - 768px) */
+@media (min-width: 429px) and (max-width: 768px) {
+  .abilities-content {
+    grid-template-columns: 200px 1fr 280px;
+  }
+}
+
+/* Touch device optimizations (regardless of screen size) */
+@media (hover: none) and (pointer: coarse) {
+  .unit-card,
+  .ability-card {
+    min-height: 54px; /* Larger touch targets */
+    padding: var(--spacing-md);
+  }
+
+  .btn, button {
+    min-height: 48px;
+    min-width: 48px;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  /* Remove hover states on touch */
+  .unit-card:hover,
+  .ability-card:hover {
+    background: var(--color-bg-dark);
+    border-color: var(--color-border);
+  }
+
+  /* Active (pressed) state for touch feedback */
+  .unit-card:active,
+  .ability-card:active {
+    transform: scale(0.98);
+    background: var(--color-accent-dark);
+  }
+
+  /* Disable text selection on touch for better UX */
+  * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* But allow selection in text fields/content */
+  input, textarea, .detail-description {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .abilities-screen {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .abilities-container {
+    grid-template-rows: auto minmax(400px, 1fr);
+  }
+
+  .unit-selector {
+    max-height: 200px;
+  }
 }
 
 /* Responsive */
