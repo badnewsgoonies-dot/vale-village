@@ -277,23 +277,410 @@ export const STORM_LORD: Enemy = {
   ],
 };
 
+// ========== BATCH 1: Basic Enemies (Levels 1-2) ==========
+
+export const RAT: Enemy = {
+  id: 'rat',
+  name: 'Rat',
+  level: 1,
+  stats: {
+    hp: 20,
+    pp: 0,
+    atk: 6,
+    def: 3,
+    mag: 2,
+    spd: 10,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 10,
+  baseGold: 6,
+};
+
+export const BAT: Enemy = {
+  id: 'bat',
+  name: 'Bat',
+  level: 1,
+  stats: {
+    hp: 18,
+    pp: 5,
+    atk: 5,
+    def: 2,
+    mag: 4,
+    spd: 14,
+  },
+  abilities: [SLASH, GUST],
+  element: 'Jupiter',
+  baseXp: 12,
+  baseGold: 7,
+};
+
+export const SPIDER: Enemy = {
+  id: 'spider',
+  name: 'Spider',
+  level: 1,
+  stats: {
+    hp: 22,
+    pp: 0,
+    atk: 7,
+    def: 4,
+    mag: 3,
+    spd: 9,
+  },
+  abilities: [SLASH],
+  element: 'Venus',
+  baseXp: 11,
+  baseGold: 7,
+};
+
+export const GRUB: Enemy = {
+  id: 'grub',
+  name: 'Grub',
+  level: 1,
+  stats: {
+    hp: 28,
+    pp: 0,
+    atk: 4,
+    def: 8,
+    mag: 2,
+    spd: 4,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 8,
+  baseGold: 5,
+};
+
+export const WORM: Enemy = {
+  id: 'worm',
+  name: 'Worm',
+  level: 1,
+  stats: {
+    hp: 24,
+    pp: 5,
+    atk: 5,
+    def: 6,
+    mag: 5,
+    spd: 5,
+  },
+  abilities: [SLASH, QUAKE],
+  element: 'Venus',
+  baseXp: 10,
+  baseGold: 6,
+};
+
+export const VERMIN: Enemy = {
+  id: 'vermin',
+  name: 'Vermin',
+  level: 1,
+  stats: {
+    hp: 16,
+    pp: 0,
+    atk: 7,
+    def: 2,
+    mag: 2,
+    spd: 11,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 9,
+  baseGold: 6,
+};
+
+export const MINI_GOBLIN: Enemy = {
+  id: 'mini-goblin',
+  name: 'Mini-Goblin',
+  level: 1,
+  stats: {
+    hp: 22,
+    pp: 0,
+    atk: 6,
+    def: 4,
+    mag: 2,
+    spd: 7,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 11,
+  baseGold: 8,
+};
+
+export const KOBOLD: Enemy = {
+  id: 'kobold',
+  name: 'Kobold',
+  level: 1,
+  stats: {
+    hp: 26,
+    pp: 0,
+    atk: 8,
+    def: 5,
+    mag: 3,
+    spd: 8,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 13,
+  baseGold: 9,
+};
+
+export const ROACH: Enemy = {
+  id: 'roach',
+  name: 'Roach',
+  level: 1,
+  stats: {
+    hp: 19,
+    pp: 0,
+    atk: 5,
+    def: 6,
+    mag: 2,
+    spd: 12,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 9,
+  baseGold: 6,
+};
+
+export const MOMONGA: Enemy = {
+  id: 'momonga',
+  name: 'Momonga',
+  level: 1,
+  stats: {
+    hp: 21,
+    pp: 0,
+    atk: 6,
+    def: 3,
+    mag: 3,
+    spd: 13,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 10,
+  baseGold: 7,
+};
+
+export const EMU: Enemy = {
+  id: 'emu',
+  name: 'Emu',
+  level: 2,
+  stats: {
+    hp: 35,
+    pp: 0,
+    atk: 10,
+    def: 5,
+    mag: 3,
+    spd: 15,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 18,
+  baseGold: 13,
+};
+
+export const SEABIRD: Enemy = {
+  id: 'seabird',
+  name: 'Seabird',
+  level: 2,
+  stats: {
+    hp: 30,
+    pp: 8,
+    atk: 8,
+    def: 4,
+    mag: 7,
+    spd: 16,
+  },
+  abilities: [SLASH, GUST],
+  element: 'Jupiter',
+  baseXp: 16,
+  baseGold: 12,
+};
+
+export const SEAFOWL: Enemy = {
+  id: 'seafowl',
+  name: 'Seafowl',
+  level: 2,
+  stats: {
+    hp: 32,
+    pp: 10,
+    atk: 9,
+    def: 4,
+    mag: 8,
+    spd: 14,
+  },
+  abilities: [SLASH, GUST],
+  element: 'Jupiter',
+  baseXp: 17,
+  baseGold: 12,
+};
+
+export const WILD_MUSHROOM: Enemy = {
+  id: 'wild-mushroom',
+  name: 'Wild Mushroom',
+  level: 2,
+  stats: {
+    hp: 38,
+    pp: 12,
+    atk: 6,
+    def: 9,
+    mag: 9,
+    spd: 6,
+  },
+  abilities: [SLASH, QUAKE],
+  element: 'Venus',
+  baseXp: 19,
+  baseGold: 14,
+};
+
+export const POISON_TOAD: Enemy = {
+  id: 'poison-toad',
+  name: 'Poison Toad',
+  level: 2,
+  stats: {
+    hp: 36,
+    pp: 10,
+    atk: 7,
+    def: 7,
+    mag: 8,
+    spd: 7,
+  },
+  abilities: [SLASH, FROST],
+  element: 'Mercury',
+  baseXp: 18,
+  baseGold: 13,
+};
+
+export const DEVIL_FROG: Enemy = {
+  id: 'devil-frog',
+  name: 'Devil Frog',
+  level: 2,
+  stats: {
+    hp: 40,
+    pp: 12,
+    atk: 9,
+    def: 6,
+    mag: 10,
+    spd: 8,
+  },
+  abilities: [SLASH, FROST],
+  element: 'Mercury',
+  baseXp: 20,
+  baseGold: 15,
+  drops: [
+    { equipment: LEATHER_VEST, chance: 0.08 }, // 8% drop rate
+  ],
+};
+
+export const MOLE: Enemy = {
+  id: 'mole',
+  name: 'Mole',
+  level: 2,
+  stats: {
+    hp: 34,
+    pp: 8,
+    atk: 8,
+    def: 10,
+    mag: 6,
+    spd: 6,
+  },
+  abilities: [SLASH, QUAKE],
+  element: 'Venus',
+  baseXp: 17,
+  baseGold: 12,
+};
+
+export const MAD_MOLE: Enemy = {
+  id: 'mad-mole',
+  name: 'Mad Mole',
+  level: 2,
+  stats: {
+    hp: 37,
+    pp: 10,
+    atk: 11,
+    def: 8,
+    mag: 7,
+    spd: 9,
+  },
+  abilities: [SLASH, QUAKE],
+  element: 'Venus',
+  baseXp: 19,
+  baseGold: 14,
+};
+
+export const MAD_VERMIN: Enemy = {
+  id: 'mad-vermin',
+  name: 'Mad Vermin',
+  level: 2,
+  stats: {
+    hp: 29,
+    pp: 0,
+    atk: 12,
+    def: 4,
+    mag: 3,
+    spd: 15,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 18,
+  baseGold: 13,
+};
+
+export const SQUIRRELFANG: Enemy = {
+  id: 'squirrelfang',
+  name: 'Squirrelfang',
+  level: 2,
+  stats: {
+    hp: 31,
+    pp: 0,
+    atk: 10,
+    def: 5,
+    mag: 4,
+    spd: 14,
+  },
+  abilities: [SLASH],
+  element: 'Neutral',
+  baseXp: 17,
+  baseGold: 12,
+};
+
 /**
  * All enemies indexed by ID
  */
 export const ENEMIES: Record<string, Enemy> = {
-  // Tier 1: Early Game
+  // Tier 1: Early Game (Original)
   'goblin': GOBLIN,
   'wild-wolf': WILD_WOLF,
   'slime': SLIME,
 
-  // Tier 2: Mid Game
+  // Tier 2: Mid Game (Original)
   'fire-sprite': FIRE_SPRITE,
   'earth-golem': EARTH_GOLEM,
   'wind-wisp': WIND_WISP,
 
-  // Tier 3: Late Game
+  // Tier 3: Late Game (Original)
   'fire-elemental': FIRE_ELEMENTAL,
   'ice-guardian': ICE_GUARDIAN,
   'stone-titan': STONE_TITAN,
   'storm-lord': STORM_LORD,
+
+  // Batch 1: Basic Enemies (Levels 1-2)
+  'rat': RAT,
+  'bat': BAT,
+  'spider': SPIDER,
+  'grub': GRUB,
+  'worm': WORM,
+  'vermin': VERMIN,
+  'mini-goblin': MINI_GOBLIN,
+  'kobold': KOBOLD,
+  'roach': ROACH,
+  'momonga': MOMONGA,
+  'emu': EMU,
+  'seabird': SEABIRD,
+  'seafowl': SEAFOWL,
+  'wild-mushroom': WILD_MUSHROOM,
+  'poison-toad': POISON_TOAD,
+  'devil-frog': DEVIL_FROG,
+  'mole': MOLE,
+  'mad-mole': MAD_MOLE,
+  'mad-vermin': MAD_VERMIN,
+  'squirrelfang': SQUIRRELFANG,
 };
