@@ -1,5 +1,6 @@
 import type { Equipment } from './Equipment';
 import type { Item } from './Item';
+import { ENEMIES } from '@/data/enemies';
 
 /**
  * Area/Location system for Vale Chronicles
@@ -7,20 +8,10 @@ import type { Item } from './Item';
  */
 
 /**
- * Valid enemy IDs - matches enemies.ts ENEMIES registry
- * Adding type safety to prevent runtime errors from invalid enemy IDs
+ * Valid enemy IDs - auto-generated from enemies.ts ENEMIES registry
+ * This ensures type safety and prevents runtime errors from invalid enemy IDs
  */
-export type EnemyId =
-  | 'goblin'
-  | 'wild-wolf'
-  | 'slime'
-  | 'fire-sprite'
-  | 'earth-golem'
-  | 'wind-wisp'
-  | 'fire-elemental'
-  | 'ice-guardian'
-  | 'stone-titan'
-  | 'storm-lord';
+export type EnemyId = keyof typeof ENEMIES;
 
 /**
  * Game World IDs - Use snake_case for technical reasons
