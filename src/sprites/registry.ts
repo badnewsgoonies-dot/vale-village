@@ -108,6 +108,25 @@ class SpriteRegistry {
   }
 
   /**
+   * Get Summon sprite path
+   *
+   * @param summonName - Name of the summon (e.g., "Titan", "Phoenix")
+   * @param _element - Element of the summon (reserved for future use, fallback handled in component)
+   * @returns Full path to summon sprite
+   *
+   * @example
+   * const path = spriteRegistry.getSummonSprite('Titan', 'Venus');
+   * // Returns: "/sprites/battle/summons/Titan.gif"
+   * // Falls back to: "/sprites/battle/djinn/Venus_Djinn_Front.gif"
+   */
+  getSummonSprite(summonName: string, _element: string): string {
+    // Try summon-specific sprite first
+    const summonPath = `${this.baseUrl}/battle/summons/${summonName}.gif`;
+    return summonPath;
+    // Note: Fallback to element Djinn is handled in component via onError
+  }
+
+  /**
    * Preload sprites for a team (useful before battle)
    *
    * @param units - Array of units to preload

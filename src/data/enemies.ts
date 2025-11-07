@@ -12,6 +12,11 @@ import {
   PLASMA,
   QUAKE,
   CLAY_SPIRE,
+  RAGNAROK,
+  PYROCLASM,
+  TEMPEST,
+  GLACIAL_BLESSING,
+  JUDGMENT,
 } from './abilities';
 import {
   LEATHER_VEST,
@@ -277,6 +282,60 @@ export const STORM_LORD: Enemy = {
   ],
 };
 
+// ========== TIER 4: FINAL BOSS ==========
+
+/**
+ * Nox Typhon - Ancient Demon Final Boss
+ *
+ * The ultimate challenge of Vale Chronicles.
+ * Ancient shadow elemental sealed beneath Sol Sanctum.
+ *
+ * BOSS MECHANICS:
+ * - 3-Phase Battle: AI adapts based on HP thresholds
+ *   - Phase 1 (100-66% HP): Balanced elemental attacks
+ *   - Phase 2 (66-33% HP): Aggressive multi-target AOE spam
+ *   - Phase 3 (<33% HP): Desperate ultimate abilities + self-healing
+ * - Cannot Flee: This is a boss battle
+ * - Multi-Element Mastery: Only enemy that uses all 4 elements
+ * - Self-Healing: GLACIAL_BLESSING allows sustain mechanic
+ *
+ * DESIGN INTENT:
+ * - Tests mastery of all game systems (elements, equipment, Djinn, strategy)
+ * - Long battle (500 HP = ~25-30 hits from level 5 party)
+ * - Highest stats in the entire game
+ * - Massive rewards justify difficulty (2000 XP, 1000 Gold)
+ *
+ * STORY CONTEXT:
+ * - Sealed beneath Sol Sanctum for centuries
+ * - Final boss of main story (Story Beat 9)
+ * - Can wield any element (reflects "shadow elemental" lore)
+ * - Defeat unlocks ending sequence
+ */
+export const NOX_TYPHON: Enemy = {
+  id: 'nox-typhon',
+  name: 'Nox Typhon',
+  level: 10,
+  stats: {
+    hp: 500,   // Massive HP pool (1.67× expected level 10 enemy)
+    pp: 100,   // Huge PP pool for sustained ultimate spam
+    atk: 35,   // High physical attack
+    def: 30,   // High defense
+    mag: 40,   // HIGHEST magic in entire game
+    spd: 25,   // High speed (acts before most units)
+  },
+  abilities: [
+    RAGNAROK,          // Venus ultimate (Earth)
+    PYROCLASM,         // Mars ultimate (Fire) - AOE
+    TEMPEST,           // Jupiter ultimate (Wind) - AOE
+    GLACIAL_BLESSING,  // Mercury ultimate (Water) - Heal self!
+    JUDGMENT,          // Signature ultimate ability - AOE
+  ],
+  element: 'Neutral', // Can use all 4 elements!
+  baseXp: 2000,  // Massive reward (enough to level entire party 1-2 levels)
+  baseGold: 1000, // Game-ending reward
+  drops: [], // No equipment drops - this is the final boss
+};
+
 /**
  * All enemies indexed by ID
  */
@@ -296,4 +355,7 @@ export const ENEMIES: Record<string, Enemy> = {
   'ice-guardian': ICE_GUARDIAN,
   'stone-titan': STONE_TITAN,
   'storm-lord': STORM_LORD,
+
+  // Tier 4: Final Boss
+  'nox-typhon': NOX_TYPHON,
 };

@@ -8,6 +8,10 @@ import { CommandMenu } from './CommandMenu';
 import { AbilityMenu } from './AbilityMenu';
 import { CombatLog } from './CombatLog';
 import { PartyPortraits } from './PartyPortraits';
+import { PsynergyAnimation } from './PsynergyAnimation';
+import { AttackAnimation } from './AttackAnimation';
+import { DamageNumber } from './DamageNumber';
+import { shouldShowPsynergyAnimation } from '@/data/psynergySprites';
 import { executeAbility, calculateTurnOrder, attemptFlee, processStatusEffectTick, checkParalyzeFailure } from '@/types/Battle';
 import './BattleScreen.css';
 
@@ -29,6 +33,21 @@ export const BattleScreen: React.FC = () => {
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [combatLog, setCombatLog] = useState<string[]>([]);
   const [currentActorIndex, setCurrentActorIndex] = useState(0);
+
+  // Animation state
+  const [activeAnimations, setActiveAnimations] = useState<Array<{
+    id: number;
+    type: 'psynergy' | 'attack' | 'damage' | 'heal';
+    abilityId?: string;
+    element?: string;
+    damage?: number;
+    isHeal?: boolean;
+    isCritical?: boolean;
+    position: { x: number; y: number };
+  }>>([]);
+  // We only use the setter to allocate unique animation IDs atomically.
+  // The current counter value is intentionally unused.
+  const [, setAnimationIdCounter] = useState(0);
 
   if (!battle) {
     return (
@@ -107,6 +126,54 @@ export const BattleScreen: React.FC = () => {
     executePlayerTurn(target);
   }, [selectedCommand, selectedAbility, currentActor]);
 
+  // Helper: Trigger animation for ability
+  // Allocates 2 animation IDs atomically to avoid race conditions
+  const triggerAnimation = (ability: Ability, _target: Unit, damage: number, isHeal: boolean = false) => {
+    const position = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    setAnimationIdCounter(prev => {
+      const attackId = prev;
+      const numberId = prev + 1;
+
+      // Show psynergy animation for non-physical abilities
+      if (shouldShowPsynergyAnimation(ability.id)) {
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: attackId,
+          type: 'psynergy',
+          abilityId: ability.id,
+          position,
+        }]);
+      } else {
+        // Show attack animation for physical attacks
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: attackId,
+          type: 'attack',
+          element: ability.element,
+          position,
+        }]);
+      }
+
+      // Show damage/heal number after a brief delay
+      setTimeout(() => {
+        setActiveAnimations(prevAnims => [...prevAnims, {
+          id: numberId,
+          type: isHeal ? 'heal' : 'damage',
+          damage: Math.abs(damage),
+          isHeal,
+          isCritical: false, // TODO: Implement critical hit detection
+          position,
+        }]);
+      }, 300);
+
+      return prev + 2;
+    });
+  };
+
+  // Helper: Remove animation by ID
+  const removeAnimation = (id: number) => {
+    setActiveAnimations(prev => prev.filter(anim => anim.id !== id));
+  };
+
   // Execute player action
   const executePlayerTurn = async (target: Unit) => {
     setPhase('animating');
@@ -134,8 +201,13 @@ export const BattleScreen: React.FC = () => {
     // Add to combat log
     setCombatLog(prev => [...prev, result.message]);
 
-    // Play animation (placeholder)
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Trigger animation based on ability type
+    const isHeal = ability.type === 'healing';
+    const damageAmount = isHeal ? (result.healing || 0) : (result.damage || 0);
+    triggerAnimation(ability, target, damageAmount, isHeal);
+
+    // Wait for animation to complete
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Check battle end
     const battleEnd = checkBattleEnd();
@@ -197,8 +269,13 @@ export const BattleScreen: React.FC = () => {
     // Add to combat log
     setCombatLog(prev => [...prev, result.message]);
 
-    // Play animation
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Trigger animation based on ability type
+    const isHeal = ability.type === 'healing';
+    const damageAmount = isHeal ? (result.healing || 0) : (result.damage || 0);
+    triggerAnimation(ability, target, damageAmount, isHeal);
+
+    // Wait for animation to complete
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Check battle end
     const battleEnd = checkBattleEnd();
@@ -381,6 +458,53 @@ export const BattleScreen: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Active Animations */}
+      {activeAnimations.map(anim => {
+        if (anim.type === 'psynergy' && anim.abilityId) {
+          return (
+            <PsynergyAnimation
+              key={anim.id}
+              abilityId={anim.abilityId}
+              position={anim.position}
+              size={anim.abilityId.includes('all') ? 192 : 128} // Larger for AOE spells
+              onComplete={() => removeAnimation(anim.id)}
+            />
+          );
+        } else if (anim.type === 'attack') {
+          return (
+            <AttackAnimation
+              key={anim.id}
+              element={anim.element as any}
+              targetPosition={anim.position}
+              onComplete={() => removeAnimation(anim.id)}
+              duration={1000}
+            />
+          );
+        } else if (anim.type === 'damage' && anim.damage !== undefined) {
+          return (
+            <DamageNumber
+              key={anim.id}
+              value={anim.damage}
+              type={anim.isCritical ? 'critical' : 'damage'}
+              position={anim.position}
+              onComplete={() => removeAnimation(anim.id)}
+            />
+          );
+        } else if (anim.type === 'heal' && anim.damage !== undefined) {
+          return (
+            <DamageNumber
+              key={anim.id}
+              value={anim.damage}
+              type="heal"
+              position={anim.position}
+              onComplete={() => removeAnimation(anim.id)}
+            />
+          );
+        }
+        return null;
+      })}
     </div>
   );
 };
+

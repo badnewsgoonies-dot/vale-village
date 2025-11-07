@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { ALL_DJINN } from '@/data/djinn';
 import { calculateDjinnStatBonuses, getDjinnGrantedAbilities } from '@/utils/djinnCalculations';
+import { DjinnIcon } from '@/sprites/components/DjinnIcon';
 import type { Djinn } from '@/types/Djinn';
 import type { Unit } from '@/types/Unit';
 import './DjinnScreen.css';
@@ -214,9 +215,9 @@ export const DjinnScreen: React.FC = () => {
                 >
                   {djinn ? (
                     <>
-                      <img
-                        src={`/sprites/battle/djinn/${djinn.element}_Djinn_Front.gif`}
-                        alt={djinn.name}
+                      <DjinnIcon
+                        djinn={djinn}
+                        size="medium"
                         className="slot-sprite"
                       />
                       <div className="slot-name">{djinn.name}</div>
@@ -312,9 +313,9 @@ const DjinnElementGroup: React.FC<DjinnElementGroupProps> = ({
               tabIndex={0}
               aria-label={`${d.name} - ${equipped ? 'Equipped' : 'Not equipped'}`}
             >
-              <img
-                src={`/sprites/battle/djinn/${d.element}_Djinn_Front.gif`}
-                alt={d.name}
+              <DjinnIcon
+                djinn={d}
+                size="small"
                 className="djinn-sprite"
               />
               <div className="djinn-info">

@@ -20,7 +20,19 @@ export const VALE_VILLAGE: Area = {
   width: 20,
   height: 15,
   hasRandomEncounters: false,
-  bosses: [],
+  bosses: [
+    {
+      id: 'nox_typhon_boss',
+      position: { x: 10, y: 1 }, // North center of village (Sol Sanctum entrance)
+      enemyIds: ['nox-typhon'],
+      dialogue: {
+        before: 'The ancient seal has broken! Nox Typhon emerges from Sol Sanctum!\n\n"Foolish mortals... after centuries of imprisonment, I am FREE! Vale Village will be the first to fall!"',
+        after: 'Nox Typhon screams in anguish as the light consumes it.\n\n"No... impossible! I am... eternal..."\n\nThe demon dissolves into shadow. Vale Village is saved!',
+      },
+      defeated: false,
+      questId: undefined,
+    },
+  ],
   treasures: [
     {
       id: 'village_starter_chest',

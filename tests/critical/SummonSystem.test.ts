@@ -80,11 +80,14 @@ describe('CRITICAL: Summon System Mechanics', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'forge', garet);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'corona', garet);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'fury', garet);
       if (isOk(r3)) team = r3.value;
@@ -119,11 +122,14 @@ describe('CRITICAL: Summon System Mechanics', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'fizz', mia);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'tonic', mia);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'crystal', mia);
       if (isOk(r3)) team = r3.value;
@@ -153,11 +159,14 @@ describe('CRITICAL: Summon System Mechanics', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'bane', isaac);
       if (isOk(r3)) team = r3.value;
@@ -198,8 +207,10 @@ describe('EDGE CASES: Summon System Failures', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 2 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
@@ -240,11 +251,14 @@ describe('EDGE CASES: Summon System Failures', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'forge', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'corona', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'fury', isaac);
       if (isOk(r3)) team = r3.value;
@@ -271,11 +285,14 @@ describe('EDGE CASES: Summon System Failures', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'forge', isaac);
       if (isOk(r3)) team = r3.value;
@@ -305,11 +322,14 @@ describe('CRITICAL: Summon Recovery Mechanics', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'bane', isaac);
       if (isOk(r3)) team = r3.value;
@@ -331,7 +351,11 @@ describe('CRITICAL: Summon Recovery Mechanics', () => {
         team = advanceTurn(team);
         expect(getStandbyDjinn(team)).toHaveLength(0);
 
-        // Turn 3: All return to Set
+        // Turn 3
+        team = advanceTurn(team);
+        expect(getStandbyDjinn(team)).toHaveLength(0);
+
+        // Turn 4: All return to Set (after 3 complete turns in Recovery)
         team = advanceTurn(team);
 
         const setDjinn = getSetDjinn(team);
@@ -362,11 +386,14 @@ describe('BROKEN?: Summon System Exploits', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'bane', isaac);
       if (isOk(r3)) team = r3.value;
@@ -397,11 +424,14 @@ describe('BROKEN?: Summon System Exploits', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'bane', isaac);
       if (isOk(r3)) team = r3.value;
@@ -432,11 +462,14 @@ describe('BROKEN?: Summon System Exploits', () => {
     if (isOk(equipped)) {
       team = equipped.value;
 
+      // Activate 3 Djinn (need to advance turn between each due to per-unit limit)
       const r1 = activateDjinn(team, 'flint', isaac);
       if (isOk(r1)) team = r1.value;
+      team = advanceTurn(team);
 
       const r2 = activateDjinn(team, 'granite', isaac);
       if (isOk(r2)) team = r2.value;
+      team = advanceTurn(team);
 
       const r3 = activateDjinn(team, 'bane', isaac);
       if (isOk(r3)) team = r3.value;

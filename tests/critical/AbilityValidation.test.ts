@@ -482,13 +482,12 @@ describe('CRITICAL: Revival Edge Cases', () => {
     expect(ally.isKO).toBe(true);
 
     const result = executeAbility(isaac, PLY, [ally]); // No revivesFallen
+  // BUG #6 FIXED: Dead units can't be healed (need revival first)
+  expect(result.healing).toBe(0);
 
-    // BUG #6 FIXED: Dead units can no longer be healed
-    expect(result.healing).toBe(0);
-
-    // Dead unit should remain dead
-    expect(ally.isKO).toBe(true);
-    expect(ally.currentHp).toBe(0);
+  // They stay dead with 0 HP
+  expect(ally.currentHp).toBe(0);
+  expect(ally.isKO).toBe(true);
   });
 });
 
