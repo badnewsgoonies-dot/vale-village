@@ -400,6 +400,88 @@ export const VALE_VILLAGE: Area = {
       battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Level 4 mixed elements
       battleOnlyOnce: false,
     },
+
+    // === UNIQUE CHARACTERS (Special NPCs) ===
+    {
+      id: 'Monk_sitting',
+      name: 'Zen Master',
+      position: { x: 11, y: 6 },
+      blocking: true,
+      dialogue: {
+        default: 'Meditation has given me power over spirits. Face my inner demons!',
+        quest_ruins_complete: 'You have achieved enlightenment through battle. Well done.',
+      },
+      battleOnInteract: ['ghost', 'spirit', 'will-head', 'wraith'], // Level 3-6 spiritual enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'tiedup_villager',
+      name: 'Captured Villager',
+      position: { x: 19, y: 12 },
+      blocking: true,
+      dialogue: {
+        default: 'Help! Bandits left these monsters to guard me! Free me!',
+        quest_forest_complete: 'Thank you for saving me! Those bandits won\'t get away with this!',
+      },
+      battleOnInteract: ['brigand', 'thief', 'ruffian'], // Level 4 bandit-themed enemies
+      battleOnlyOnce: true, // Rescue mission - one time only
+    },
+    {
+      id: 'Cursed_Tree',
+      name: 'Cursed Ancient Tree',
+      position: { x: 4, y: 14 },
+      blocking: true,
+      dialogue: '*The tree groans with dark energy* A curse binds nature spirits here!',
+      battleOnInteract: ['creeper', 'vine', 'brambler', 'wild-mushroom'], // Level 2-5 plant enemies
+      battleOnlyOnce: true, // Breaking the curse
+    },
+
+    // === ADDITIONAL VILLAGERS (Generic Townsfolk) ===
+    {
+      id: 'Villager-18',
+      name: 'Beast Tamer',
+      position: { x: 14, y: 9 },
+      blocking: true,
+      dialogue: 'I train wild beasts for the village guard! Want to test them?',
+      battleOnInteract: ['dire-wolf', 'wild-cat', 'lynx'], // Level 2-3 beast enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-19',
+      name: 'Insect Collector',
+      position: { x: 8, y: 7 },
+      blocking: false,
+      dialogue: 'Check out my rare bug collection! They\'re quite fierce!',
+      battleOnInteract: ['ant-lion', 'flash-ant', 'hornet'], // Level 3 insect enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-20',
+      name: 'Undead Hunter',
+      position: { x: 16, y: 9 },
+      blocking: true,
+      dialogue: 'I hunt the undead for a living. Let me show you what I\'ve captured!',
+      battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead enemies
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-21',
+      name: 'Slime Rancher',
+      position: { x: 6, y: 12 },
+      blocking: false,
+      dialogue: 'My slime ranch has the strongest slimes in Vale! Prove me wrong!',
+      battleOnInteract: ['ooze', 'slime-beast'], // Level 3 slime variants
+      battleOnlyOnce: false,
+    },
+    {
+      id: 'Villager-22',
+      name: 'Lizard Keeper',
+      position: { x: 13, y: 5 },
+      blocking: true,
+      dialogue: 'These lizards are my pets! They\'ve been trained for combat!',
+      battleOnInteract: ['lizard-man', 'lizard-fighter', 'thunder-lizard'], // Level 4 lizard enemies
+      battleOnlyOnce: false,
+    },
   ],
   exits: [
     {
