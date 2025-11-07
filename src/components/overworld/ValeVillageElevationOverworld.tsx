@@ -773,13 +773,59 @@ export const ValeVillageElevationOverworld: React.FC = () => {
         </div>
       )}
 
+      {/* Demo Mode Toggle Button (Mobile-Friendly) */}
+      <button
+        onClick={() => {
+          setDemoMode(prev => !prev);
+          if (!demoMode) {
+            demoWaypointIndexRef.current = 0;
+            demoWaitTimerRef.current = 0;
+            setDemoAnnouncement('Demo Mode Activated');
+            setTimeout(() => setDemoAnnouncement(null), 2000);
+          } else {
+            setDemoAnnouncement(null);
+            keysRef.current.clear();
+          }
+        }}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          background: demoMode ? 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)' : 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+          border: '4px solid white',
+          color: 'white',
+          fontSize: '36px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+          zIndex: 9998,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.3s ease',
+          touchAction: 'manipulation',
+          userSelect: 'none',
+          WebkitTapHighlightColor: 'transparent'
+        }}
+        onTouchStart={(e) => {
+          e.currentTarget.style.transform = 'scale(0.9)';
+        }}
+        onTouchEnd={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+      >
+        {demoMode ? '⏹' : '▶️'}
+      </button>
+
       {/* Controls */}
       <div className="vale-controls">
         <div><span className="key">WASD</span> / <span className="key">↑↓←→</span> Move</div>
         <div><span className="key">SHIFT</span> Run</div>
         <div><span className="key">SPACE/ENTER</span> Interact</div>
         <div><span className="key">J</span> Djinn | <span className="key">P</span> Party | <span className="key">E</span> Equipment</div>
-        <div><span className="key">D</span> Demo Mode</div>
         <div><span className="key">ESC</span> Menu</div>
       </div>
     </div>
