@@ -29,6 +29,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [nearTransition, setNearTransition] = useState<TransitionZone | null>(null);
+  const [nearBuilding, setNearBuilding] = useState<ElevationEntity | null>(null);
 
   // Smooth movement state
   const velocityRef = React.useRef<Position>({ x: 0, y: 0 });
@@ -103,6 +104,26 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     setNearTransition(null);
   }, [playerPos, availableTransitions]);
 
+  // Check for nearby interactive buildings
+  const checkBuildingProximity = useCallback(() => {
+    const interactiveBuildings = visibleEntities.filter(
+      entity => entity.type === 'building' && entity.onInteract
+    );
+
+    for (const building of interactiveBuildings) {
+      const dx = Math.abs(playerPos.x - building.x);
+      const dy = Math.abs(playerPos.y - building.y);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Interaction range for buildings (slightly larger than collision box)
+      if (distance < 60) {
+        setNearBuilding(building);
+        return;
+      }
+    }
+    setNearBuilding(null);
+  }, [playerPos, visibleEntities]);
+
   // Handle elevation transition
   const handleTransition = useCallback(() => {
     if (!nearTransition) return;
@@ -119,6 +140,42 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     setPlayerPos(prev => ({ ...prev, y: prev.y + offsetY }));
   }, [nearTransition, playerElevation]);
 
+  // Handle building interaction
+  const handleBuildingInteraction = useCallback(() => {
+    if (!nearBuilding) return;
+
+    // Handle different building types
+    switch (nearBuilding.id) {
+      case 'equipment-shop':
+        actions.navigate({ type: 'SHOP', shopType: 'equipment' });
+        break;
+
+      case 'sol-sanctum':
+        // TODO: Navigate to Sol Sanctum dungeon when implemented
+        console.log('Sol Sanctum dungeon coming soon!');
+        break;
+
+      case 'elders-house':
+      case 'isaacs-house':
+      case 'garets-house':
+      case 'training-grounds':
+      case 'vale-house-1':
+      case 'vale-house-2':
+      case 'vale-house-3':
+      case 'vale-house-4':
+        // For now, show a simple message (TODO: Create interior screens)
+        console.log(`Entering ${nearBuilding.label}...`);
+        // Future: actions.navigate({ type: 'INTERIOR', buildingId: nearBuilding.id });
+        break;
+
+      default:
+        // Fallback to onInteract if defined
+        if (nearBuilding.onInteract) {
+          nearBuilding.onInteract();
+        }
+    }
+  }, [nearBuilding, actions]);
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -129,9 +186,15 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       }
 
       // Interaction / Transition (SPACE or ENTER only)
-      if ((e.key === ' ' || e.key === 'Enter') && nearTransition) {
-        handleTransition();
-        return;
+      if (e.key === ' ' || e.key === 'Enter') {
+        if (nearTransition) {
+          handleTransition();
+          return;
+        }
+        if (nearBuilding) {
+          handleBuildingInteraction();
+          return;
+        }
       }
 
       // Menu shortcuts
@@ -179,7 +242,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [handleTransition, nearTransition, actions]);
+  }, [handleTransition, handleBuildingInteraction, nearTransition, nearBuilding, actions]);
 
   // Smooth movement loop with requestAnimationFrame
   useEffect(() => {
@@ -286,6 +349,11 @@ export const ValeVillageElevationOverworld: React.FC = () => {
   useEffect(() => {
     checkTransitions();
   }, [checkTransitions]);
+
+  // Check for nearby buildings
+  useEffect(() => {
+    checkBuildingProximity();
+  }, [checkBuildingProximity]);
 
   // Smooth camera following
   useEffect(() => {
@@ -471,11 +539,23 @@ export const ValeVillageElevationOverworld: React.FC = () => {
         </div>
       )}
 
+      {/* Building interaction prompt */}
+      {!nearTransition && nearBuilding && (
+        <div className="transition-prompt">
+          <div className="prompt-text">
+            Press [SPACE] or [ENTER] to enter
+          </div>
+          <div className="prompt-destination">
+            → {nearBuilding.label || 'Building'}
+          </div>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="vale-controls">
         <div><span className="key">WASD</span> / <span className="key">↑↓←→</span> Move</div>
         <div><span className="key">SHIFT</span> Run</div>
-        <div><span className="key">SPACE/ENTER</span> Use Transition</div>
+        <div><span className="key">SPACE/ENTER</span> Interact</div>
         <div><span className="key">J</span> Djinn | <span className="key">P</span> Party | <span className="key">E</span> Equipment</div>
         <div><span className="key">ESC</span> Menu</div>
       </div>
