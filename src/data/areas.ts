@@ -809,7 +809,7 @@ export const BATTLE_ROW: Area = {
   id: 'battle_row',
   name: 'Battle Row',
   type: 'town',
-  width: 50, // Wide enough for horizontal layout
+  width: 130, // Extended for 30 houses
   height: 15,
   hasRandomEncounters: false,
   bosses: [],
@@ -956,9 +956,249 @@ export const BATTLE_ROW: Area = {
       battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Mixed elementals commanded by Kraden
       battleOnlyOnce: true, // Recruitable - join after defeat
     },
+
+    // === HOUSE 11 (x=44, y=7) - Rat Breeder ===
+    {
+      id: 'house11-rat-breeder',
+      name: 'Rat Breeder',
+      position: { x: 44, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-7.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['rat', 'armored-rat', 'rat-fighter'], // Level 1-3 rats
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 12 (x=48, y=7) - Bat Handler ===
+    {
+      id: 'house12-bat-handler',
+      name: 'Bat Handler',
+      position: { x: 48, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-8.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['bat', 'rabid-bat', 'bat'], // Level 1-3 bats
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 13 (x=52, y=7) - Spider Tamer ===
+    {
+      id: 'house13-spider-tamer',
+      name: 'Spider Tamer',
+      position: { x: 52, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-9.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['spider', 'tarantula', 'recluse'], // Level 1-3 spiders
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 14 (x=56, y=7) - Goblin Wrangler ===
+    {
+      id: 'house14-goblin-wrangler',
+      name: 'Goblin Wrangler',
+      position: { x: 56, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-10.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['goblin', 'hobgoblin', 'alec-goblin'], // Level 1-3 goblins
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 15 (x=60, y=7) - Vermin Trainer ===
+    {
+      id: 'house15-vermin-trainer',
+      name: 'Vermin Trainer',
+      position: { x: 60, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-11.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['vermin', 'mad-vermin', 'grub'], // Level 1-2 vermin
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 16 (x=64, y=7) - Hound Master ===
+    {
+      id: 'house16-hound-master',
+      name: 'Hound Master',
+      position: { x: 64, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-12.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['dread-hound', 'wolfkin', 'wolfkin-cub'], // Level 3-4 canines
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 17 (x=68, y=7) - Bee Keeper ===
+    {
+      id: 'house17-bee-keeper',
+      name: 'Bee Keeper',
+      position: { x: 68, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-13.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['drone-bee', 'fighter-bee', 'hornet'], // Level 3-4 bees
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 18 (x=72, y=7) - Ant Farmer ===
+    {
+      id: 'house18-ant-farmer',
+      name: 'Ant Farmer',
+      position: { x: 72, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-14.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['flash-ant', 'numb-ant', 'punch-ant'], // Level 3 ants
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 19 (x=76, y=7) - Toad Collector ===
+    {
+      id: 'house19-toad-collector',
+      name: 'Toad Collector',
+      position: { x: 76, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-15.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['poison-toad', 'devil-frog', 'poison-toad'], // Level 2-3 amphibians
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 20 (x=80, y=7) - Mole Wrangler ===
+    {
+      id: 'house20-mole-wrangler',
+      name: 'Mole Wrangler',
+      position: { x: 80, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-16.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['mole', 'mad-mole', 'mole'], // Level 2-3 moles
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 21 (x=84, y=7) - Aqua Specialist ===
+    {
+      id: 'house21-aqua-specialist',
+      name: 'Aqua Specialist',
+      position: { x: 84, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-17.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['merman', 'gillman', 'water-beast'], // Level 4-6 aquatic
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 22 (x=88, y=7) - Fire Trainer ===
+    {
+      id: 'house22-fire-trainer',
+      name: 'Fire Trainer',
+      position: { x: 88, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-18.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['salamander', 'fire-worm', 'molten-worm'], // Level 4-6 fire
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 23 (x=92, y=7) - Earth Defender ===
+    {
+      id: 'house23-earth-defender',
+      name: 'Earth Defender',
+      position: { x: 92, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-19.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['rock-hog', 'stone-beast', 'earth-golem'], // Level 5-7 earth
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 24 (x=96, y=7) - Wind Caller ===
+    {
+      id: 'house24-wind-caller',
+      name: 'Wind Caller',
+      position: { x: 96, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-20.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['willowisp', 'harpy', 'pixie'], // Level 4-6 wind
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 25 (x=100, y=7) - Ghost Hunter ===
+    {
+      id: 'house25-ghost-hunter',
+      name: 'Ghost Hunter',
+      position: { x: 100, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager21.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['ghost', 'spirit', 'wraith'], // Level 4-6 undead
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 26 (x=104, y=7) - Demon Summoner ===
+    {
+      id: 'house26-demon-summoner',
+      name: 'Demon Summoner',
+      position: { x: 104, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager22.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['imp', 'demon-imp', 'dark-fiend'], // Level 4-7 demons
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 27 (x=108, y=7) - Dragon Tamer ===
+    {
+      id: 'house27-dragon-tamer',
+      name: 'Dragon Tamer',
+      position: { x: 108, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Scholar-1.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['pterodactyl', 'chimera', 'manticore'], // Level 7-9 dragons
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 28 (x=112, y=7) - Elite Golem Master ===
+    {
+      id: 'house28-golem-master',
+      name: 'Golem Master',
+      position: { x: 112, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Scholar-2.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['earth-golem', 'stone-giant', 'living-statue'], // Level 7-10 golems
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 29 (x=116, y=7) - Titan Summoner ===
+    {
+      id: 'house29-titan-summoner',
+      name: 'Titan Summoner',
+      position: { x: 116, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/MartialArtist1.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['minotaur', 'cyclops', 'golem-king'], // Level 8-10 titans
+      battleOnlyOnce: false,
+    },
+
+    // === HOUSE 30 (x=120, y=7) - Final Boss Trainer ===
+    {
+      id: 'house30-champion',
+      name: 'Champion Trainer',
+      position: { x: 120, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/MartialArtist2.gif',
+      blocking: true,
+      dialogue: 'My trained rats are fierce fighters! Face them!',
+      battleOnInteract: ['fenrir', 'basilisk', 'hydra'], // Level 9-10 legendary
+      battleOnlyOnce: false,
+    },
   ],
 
-  // === BUILDINGS (10 houses with unique Vale sprites) ===
+  // === BUILDINGS (30 houses with unique Vale sprites) ===
   buildings: [
     {
       id: 'house1',
@@ -1030,6 +1270,27 @@ export const BATTLE_ROW: Area = {
       sprite: '/sprites/scenery/buildings/Vale/Vale_Kradens_House.gif',
       blocking: true,
     },
+    // Houses 11-30
+    { id: 'house11', label: 'Rat Breeder\'s House', position: { x: 44, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building8.gif', blocking: true },
+    { id: 'house12', label: 'Bat Handler\'s House', position: { x: 48, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building1.gif', blocking: true },
+    { id: 'house13', label: 'Spider Tamer\'s House', position: { x: 52, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building2.gif', blocking: true },
+    { id: 'house14', label: 'Goblin Wrangler\'s House', position: { x: 56, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building3.gif', blocking: true },
+    { id: 'house15', label: 'Vermin Trainer\'s House', position: { x: 60, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building4.gif', blocking: true },
+    { id: 'house16', label: 'Hound Master\'s House', position: { x: 64, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building5.gif', blocking: true },
+    { id: 'house17', label: 'Bee Keeper\'s House', position: { x: 68, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building6.gif', blocking: true },
+    { id: 'house18', label: 'Ant Farmer\'s House', position: { x: 72, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building7.gif', blocking: true },
+    { id: 'house19', label: 'Toad Collector\'s House', position: { x: 76, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building8.gif', blocking: true },
+    { id: 'house20', label: 'Mole Wrangler\'s House', position: { x: 80, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Jennas_House.gif', blocking: true },
+    { id: 'house21', label: 'Aqua Specialist\'s House', position: { x: 84, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Inn.gif', blocking: true },
+    { id: 'house22', label: 'Fire Trainer\'s House', position: { x: 88, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_WepArm_Shop.gif', blocking: true },
+    { id: 'house23', label: 'Earth Defender\'s House', position: { x: 92, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building1.gif', blocking: true },
+    { id: 'house24', label: 'Wind Caller\'s House', position: { x: 96, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building2.gif', blocking: true },
+    { id: 'house25', label: 'Ghost Hunter\'s House', position: { x: 100, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building3.gif', blocking: true },
+    { id: 'house26', label: 'Demon Summoner\'s House', position: { x: 104, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building4.gif', blocking: true },
+    { id: 'house27', label: 'Dragon Tamer\'s House', position: { x: 108, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building5.gif', blocking: true },
+    { id: 'house28', label: 'Golem Master\'s House', position: { x: 112, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building6.gif', blocking: true },
+    { id: 'house29', label: 'Titan Summoner\'s House', position: { x: 116, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Building7.gif', blocking: true },
+    { id: 'house30', label: 'Champion\'s House', position: { x: 120, y: 7 }, sprite: '/sprites/scenery/buildings/Vale/Vale_Sanctum.gif', blocking: true },
   ],
 
   // === SCENERY (trees, bushes, decorations) ===
@@ -1076,6 +1337,75 @@ export const BATTLE_ROW: Area = {
     { id: 'flowers8', position: { x: 33, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
     { id: 'flowers9', position: { x: 37, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
     { id: 'flowers10', position: { x: 41, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+
+    // Extended scenery for houses 11-30
+    // Trees between houses 11-20
+    { id: 'tree14', position: { x: 46, y: 5 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
+    { id: 'tree15', position: { x: 50, y: 9 }, sprite: '/sprites/scenery/plants/Small_Tree1.gif', blocking: true },
+    { id: 'tree16', position: { x: 54, y: 4 }, sprite: '/sprites/scenery/plants/Tree1.gif', blocking: true },
+    { id: 'tree17', position: { x: 58, y: 10 }, sprite: '/sprites/scenery/plants/Small_Tree2.gif', blocking: true },
+    { id: 'tree18', position: { x: 62, y: 5 }, sprite: '/sprites/scenery/plants/Tree5.gif', blocking: true },
+    { id: 'tree19', position: { x: 66, y: 9 }, sprite: '/sprites/scenery/plants/Small_Tree3.gif', blocking: true },
+    { id: 'tree20', position: { x: 70, y: 4 }, sprite: '/sprites/scenery/plants/Tree6.gif', blocking: true },
+    { id: 'tree21', position: { x: 74, y: 10 }, sprite: '/sprites/scenery/plants/Small_Tree4.gif', blocking: true },
+    { id: 'tree22', position: { x: 78, y: 5 }, sprite: '/sprites/scenery/plants/Tree7.gif', blocking: true },
+    { id: 'tree23', position: { x: 82, y: 9 }, sprite: '/sprites/scenery/plants/Small_Tree5.gif', blocking: true },
+
+    // Trees between houses 21-30
+    { id: 'tree24', position: { x: 86, y: 4 }, sprite: '/sprites/scenery/plants/Tree9.gif', blocking: true },
+    { id: 'tree25', position: { x: 90, y: 10 }, sprite: '/sprites/scenery/plants/Tree11.gif', blocking: true },
+    { id: 'tree26', position: { x: 94, y: 5 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
+    { id: 'tree27', position: { x: 98, y: 9 }, sprite: '/sprites/scenery/plants/Tree1.gif', blocking: true },
+    { id: 'tree28', position: { x: 102, y: 4 }, sprite: '/sprites/scenery/plants/Tree5.gif', blocking: true },
+    { id: 'tree29', position: { x: 106, y: 10 }, sprite: '/sprites/scenery/plants/Tree6.gif', blocking: true },
+    { id: 'tree30', position: { x: 110, y: 5 }, sprite: '/sprites/scenery/plants/Tree7.gif', blocking: true },
+    { id: 'tree31', position: { x: 114, y: 9 }, sprite: '/sprites/scenery/plants/Tree9.gif', blocking: true },
+    { id: 'tree32', position: { x: 118, y: 4 }, sprite: '/sprites/scenery/plants/Tree11.gif', blocking: true },
+    { id: 'tree33', position: { x: 122, y: 10 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
+
+    // Bushes for houses 11-30
+    { id: 'bush11', position: { x: 43, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush12', position: { x: 47, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush13', position: { x: 51, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush14', position: { x: 55, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush15', position: { x: 59, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush16', position: { x: 63, y: 7 }, sprite: '/sprites/scenery/plants/Shrub5.gif', blocking: false },
+    { id: 'bush17', position: { x: 67, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush18', position: { x: 71, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush19', position: { x: 75, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush20', position: { x: 79, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush21', position: { x: 83, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush22', position: { x: 87, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush23', position: { x: 91, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush24', position: { x: 95, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush25', position: { x: 99, y: 7 }, sprite: '/sprites/scenery/plants/Shrub5.gif', blocking: false },
+    { id: 'bush26', position: { x: 103, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush27', position: { x: 107, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush28', position: { x: 111, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush29', position: { x: 115, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush30', position: { x: 119, y: 7 }, sprite: '/sprites/scenery/plants/Shrub5.gif', blocking: false },
+
+    // Flowers for houses 11-30
+    { id: 'flowers11', position: { x: 45, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers12', position: { x: 49, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers13', position: { x: 53, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers14', position: { x: 57, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers15', position: { x: 61, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers16', position: { x: 65, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers17', position: { x: 69, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers18', position: { x: 73, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers19', position: { x: 77, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers20', position: { x: 81, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers21', position: { x: 85, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers22', position: { x: 89, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers23', position: { x: 93, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers24', position: { x: 97, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers25', position: { x: 101, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers26', position: { x: 105, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers27', position: { x: 109, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers28', position: { x: 113, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers29', position: { x: 117, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers30', position: { x: 121, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
   ],
 
   exits: [
@@ -1088,10 +1418,10 @@ export const BATTLE_ROW: Area = {
       targetArea: 'vale_village',
       targetPosition: { x: 18, y: 7 },
     },
-    // Victory exit on the right (after completing all houses)
+    // Victory exit on the right (after completing all 30 houses)
     {
       id: 'to_victory',
-      position: { x: 49, y: 6 },
+      position: { x: 129, y: 6 },
       width: 1,
       height: 3,
       targetArea: 'vale_village',
