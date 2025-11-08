@@ -800,7 +800,7 @@ export const ANCIENT_RUINS: Area = {
  * Design:
  * - 10 houses in a straight horizontal line (left to right progression)
  * - All houses at y=7 (middle row only)
- * - Evenly spaced: x=2, 4, 6, 8, 10, 12, 14, 16, 18, 20
+ * - Evenly spaced: x=4, 8, 12, 16, 20, 24, 28, 32, 36, 40
  * - Each house contains an NPC battle encounter
  * - Recruitable NPCs fight WITH their monsters, then join after defeat
  * - Non-recruitable NPCs just send monsters to fight
