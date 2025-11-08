@@ -10,12 +10,15 @@ import {
   type NPC,
 } from '@/types/Area';
 import { DialogueBox } from '@/components/dialogue/DialogueBox';
+import { TouchControls } from '@/components/controls/TouchControls';
+import { useGameInput } from '@/hooks/useGameInput';
 import './NewOverworldScreen.css';
 
 export const NewOverworldScreen: React.FC = () => {
   const { state, actions } = useGame();
   const [showDialogue, setShowDialogue] = useState<string | null>(null);
   const [currentNPC, setCurrentNPC] = useState<NPC | null>(null);
+  const { handleDirectionInput, stopDirectionInput, mapButtonToAction } = useGameInput();
 
   const area = getAreaById(state.currentLocation);
   const areaState = state.areaStates[state.currentLocation];
@@ -408,6 +411,49 @@ export const NewOverworldScreen: React.FC = () => {
       <div className="controls-hud">
         <p>WASD/Arrows: Move | Space: Interact | P: Party | J: Djinn | E: Equipment | A: Abilities | U: Summons | ESC: Menu</p>
       </div>
+
+      {/* Touch controls for mobile */}
+      <TouchControls
+        onDirectionChange={(direction) => {
+          if (showDialogue) return; // Don't allow movement during dialogue
+          handleDirectionInput(direction, handleMove);
+        }}
+        onButtonPress={(button) => {
+          const action = mapButtonToAction(button);
+          switch (action) {
+            case 'interact':
+              if (showDialogue) {
+                closeDialogue();
+              } else {
+                handleInteract();
+              }
+              break;
+            case 'cancel':
+              if (showDialogue) {
+                closeDialogue();
+              }
+              break;
+            case 'menu':
+              actions.navigate({ type: 'MAIN_MENU' });
+              break;
+            case 'pause':
+              actions.navigate({ type: 'MAIN_MENU' });
+              break;
+            case 'special':
+              actions.navigate({ type: 'PARTY_MANAGEMENT' });
+              break;
+            case 'map':
+              actions.navigate({ type: 'DJINN_MENU' });
+              break;
+          }
+        }}
+        onButtonRelease={(button) => {
+          // Handle button release if needed
+          if (button === 'A' || button === 'B') {
+            stopDirectionInput();
+          }
+        }}
+      />
     </div>
   );
 };
