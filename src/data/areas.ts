@@ -1137,51 +1137,51 @@ export const BATTLE_ROW: Area = {
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 26 (x=104, y=7) - Demon Summoner ===
+    // === HOUSE 26 (x=104, y=7) - Beast Master ===
     {
-      id: 'house26-demon-summoner',
-      name: 'Demon Summoner',
+      id: 'house26-beast-master',
+      name: 'Beast Master',
       position: { x: 104, y: 7 },
       sprite: '/sprites/overworld/minornpcs/Villager22.gif',
       blocking: true,
-      dialogue: 'My trained rats are fierce fighters! Face them!',
-      battleOnInteract: ['imp', 'demon-imp', 'dark-fiend'], // Level 4-7 demons
+      dialogue: 'I command the legendary beasts! Face them!',
+      battleOnInteract: ['chimera', 'phoenix', 'fenrir'], // Level 7 legendary beasts (all have sprites)
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 27 (x=108, y=7) - Dragon Tamer ===
+    // === HOUSE 27 (x=108, y=7) - Elite Summoner ===
     {
-      id: 'house27-dragon-tamer',
-      name: 'Dragon Tamer',
+      id: 'house27-elite-summoner',
+      name: 'Elite Summoner',
       position: { x: 108, y: 7 },
       sprite: '/sprites/overworld/minornpcs/Scholar-1.gif',
       blocking: true,
-      dialogue: 'My trained rats are fierce fighters! Face them!',
-      battleOnInteract: ['pterodactyl', 'chimera', 'manticore'], // Level 7-9 dragons
+      dialogue: 'My elite monsters will test your strength!',
+      battleOnInteract: ['grand-chimera', 'hydra', 'grand-golem'], // Level 8 elite monsters (all have sprites)
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 28 (x=112, y=7) - Elite Golem Master ===
+    // === HOUSE 28 (x=112, y=7) - Undead Master ===
     {
-      id: 'house28-golem-master',
-      name: 'Golem Master',
+      id: 'house28-undead-master',
+      name: 'Undead Master',
       position: { x: 112, y: 7 },
       sprite: '/sprites/overworld/minornpcs/Scholar-2.gif',
       blocking: true,
-      dialogue: 'My trained rats are fierce fighters! Face them!',
-      battleOnInteract: ['earth-golem', 'stone-giant', 'living-statue'], // Level 7-10 golems
+      dialogue: 'Rise, my undead servants! Crush them!',
+      battleOnInteract: ['lich', 'orc-lord', 'minotaur'], // Level 5-8 powerful enemies (all have sprites)
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 29 (x=116, y=7) - Titan Summoner ===
+    // === HOUSE 29 (x=116, y=7) - Legendary Trainer ===
     {
-      id: 'house29-titan-summoner',
-      name: 'Titan Summoner',
+      id: 'house29-legendary-trainer',
+      name: 'Legendary Trainer',
       position: { x: 116, y: 7 },
       sprite: '/sprites/overworld/minornpcs/MartialArtist1.gif',
       blocking: true,
-      dialogue: 'My trained rats are fierce fighters! Face them!',
-      battleOnInteract: ['minotaur', 'cyclops', 'golem-king'], // Level 8-10 titans
+      dialogue: 'Face the ultimate challenge!',
+      battleOnInteract: ['grand-chimera', 'hydra', 'lich'], // Level 8 legendary team (all have sprites)
       battleOnlyOnce: false,
     },
 
@@ -1192,8 +1192,8 @@ export const BATTLE_ROW: Area = {
       position: { x: 120, y: 7 },
       sprite: '/sprites/overworld/minornpcs/MartialArtist2.gif',
       blocking: true,
-      dialogue: 'My trained rats are fierce fighters! Face them!',
-      battleOnInteract: ['fenrir', 'basilisk', 'hydra'], // Level 9-10 legendary
+      dialogue: 'You\'ve come far. Face my ultimate team!',
+      battleOnInteract: ['grand-golem', 'grand-chimera', 'hydra'], // Level 8 final boss team (all have sprites)
       battleOnlyOnce: false,
     },
   ],
