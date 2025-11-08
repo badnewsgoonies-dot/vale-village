@@ -99,6 +99,24 @@ export interface NPC {
   battleOnlyOnce?: boolean; // If true, only battle once then show dialogue
 }
 
+export interface Building {
+  id: string;
+  label: string;
+  position: Position; // Grid position (in tiles)
+  sprite: string; // Path to building sprite
+  blocking: boolean; // Can player walk through?
+  interactable?: boolean; // Can player interact with it?
+  onInteract?: () => void; // What happens when interacted with
+}
+
+export interface Scenery {
+  id: string;
+  position: Position; // Grid position (in tiles)
+  sprite: string; // Path to scenery sprite (tree, bush, grass, etc.)
+  blocking: boolean; // Can player walk through?
+  layer?: 'background' | 'foreground'; // Render layer (default: foreground)
+}
+
 export interface AreaExit {
   id: string;
   position: Position;
@@ -129,6 +147,12 @@ export interface Area {
 
   // NPCs
   npcs: NPC[];
+
+  // Buildings
+  buildings?: Building[];
+
+  // Scenery (trees, plants, decorations)
+  scenery?: Scenery[];
 
   // Area transitions
   exits: AreaExit[];

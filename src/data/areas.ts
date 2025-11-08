@@ -830,6 +830,7 @@ export const BATTLE_ROW: Area = {
       id: 'house1-beast-tamer',
       name: 'Beast Tamer',
       position: { x: 4, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
       blocking: true,
       dialogue: {
         default: 'Welcome to Battle Row! I train wild beasts for combat. Face them if you dare!',
@@ -844,6 +845,7 @@ export const BATTLE_ROW: Area = {
       id: 'house2-undead-hunter',
       name: 'Undead Hunter',
       position: { x: 8, y: 7 },
+      sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
       blocking: true,
       dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
       battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead
@@ -853,6 +855,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 3 (x=12, y=7) - RECRUITABLE: Garet ===
     {
       id: 'house3-garet',
+      sprite: '/sprites/overworld/protagonists/Garet.gif',
       name: 'Garet',
       position: { x: 12, y: 7 },
       blocking: true,
@@ -867,6 +870,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 4 (x=16, y=7) - Regular NPC ===
     {
       id: 'house4-insect-collector',
+      sprite: '/sprites/overworld/minornpcs/Villager-3.gif',
       name: 'Insect Collector',
       position: { x: 16, y: 7 },
       blocking: true,
@@ -878,6 +882,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 5 (x=20, y=7) - Regular NPC ===
     {
       id: 'house5-slime-rancher',
+      sprite: '/sprites/overworld/minornpcs/Villager-4.gif',
       name: 'Slime Rancher',
       position: { x: 20, y: 7 },
       blocking: true,
@@ -889,6 +894,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 6 (x=24, y=7) - Regular NPC ===
     {
       id: 'house6-lizard-keeper',
+      sprite: '/sprites/overworld/minornpcs/Villager-5.gif',
       name: 'Lizard Keeper',
       position: { x: 24, y: 7 },
       blocking: true,
@@ -900,6 +906,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 7 (x=28, y=7) - RECRUITABLE: Mia ===
     {
       id: 'house7-mia',
+      sprite: '/sprites/overworld/protagonists/Mia.gif',
       name: 'Mia',
       position: { x: 28, y: 7 },
       blocking: true,
@@ -914,6 +921,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 8 (x=32, y=7) - Unique NPC (Zen Master) ===
     {
       id: 'house8-zen-master',
+      sprite: '/sprites/overworld/minornpcs/Monk_sitting.gif',
       name: 'Zen Master',
       position: { x: 32, y: 7 },
       blocking: true,
@@ -925,6 +933,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 9 (x=36, y=7) - Regular NPC ===
     {
       id: 'house9-elemental-summoner',
+      sprite: '/sprites/overworld/minornpcs/Villager-6.gif',
       name: 'Elemental Summoner',
       position: { x: 36, y: 7 },
       blocking: true,
@@ -936,6 +945,7 @@ export const BATTLE_ROW: Area = {
     // === HOUSE 10 (x=40, y=7) - RECRUITABLE: Kraden ===
     {
       id: 'house10-kraden',
+      sprite: '/sprites/overworld/protagonists/Kraden.gif',
       name: 'Kraden',
       position: { x: 40, y: 7 },
       blocking: true,
@@ -947,6 +957,127 @@ export const BATTLE_ROW: Area = {
       battleOnlyOnce: true, // Recruitable - join after defeat
     },
   ],
+
+  // === BUILDINGS (10 houses with unique Vale sprites) ===
+  buildings: [
+    {
+      id: 'house1',
+      label: 'Beast Tamer\'s House',
+      position: { x: 4, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building1.gif',
+      blocking: true,
+    },
+    {
+      id: 'house2',
+      label: 'Undead Hunter\'s House',
+      position: { x: 8, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building2.gif',
+      blocking: true,
+    },
+    {
+      id: 'house3',
+      label: 'Garet\'s House',
+      position: { x: 12, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Garets_House.gif',
+      blocking: true,
+    },
+    {
+      id: 'house4',
+      label: 'Insect Collector\'s House',
+      position: { x: 16, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building3.gif',
+      blocking: true,
+    },
+    {
+      id: 'house5',
+      label: 'Slime Rancher\'s House',
+      position: { x: 20, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building4.gif',
+      blocking: true,
+    },
+    {
+      id: 'house6',
+      label: 'Lizard Keeper\'s House',
+      position: { x: 24, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building5.gif',
+      blocking: true,
+    },
+    {
+      id: 'house7',
+      label: 'Mia\'s House',
+      position: { x: 28, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Isaacs_House.gif',
+      blocking: true,
+    },
+    {
+      id: 'house8',
+      label: 'Zen Master\'s House',
+      position: { x: 32, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building6.gif',
+      blocking: true,
+    },
+    {
+      id: 'house9',
+      label: 'Elemental Summoner\'s House',
+      position: { x: 36, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Building7.gif',
+      blocking: true,
+    },
+    {
+      id: 'house10',
+      label: 'Kraden\'s House',
+      position: { x: 40, y: 7 },
+      sprite: '/sprites/scenery/buildings/Vale/Vale_Kradens_House.gif',
+      blocking: true,
+    },
+  ],
+
+  // === SCENERY (trees, bushes, decorations) ===
+  scenery: [
+    // Trees on left edge
+    { id: 'tree1', position: { x: 2, y: 4 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
+    { id: 'tree2', position: { x: 2, y: 10 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
+
+    // Trees between houses
+    { id: 'tree3', position: { x: 6, y: 5 }, sprite: '/sprites/scenery/plants/Small_Tree1.gif', blocking: true },
+    { id: 'tree4', position: { x: 10, y: 9 }, sprite: '/sprites/scenery/plants/Small_Tree2.gif', blocking: true },
+    { id: 'tree5', position: { x: 14, y: 4 }, sprite: '/sprites/scenery/plants/Tree1.gif', blocking: true },
+    { id: 'tree6', position: { x: 18, y: 10 }, sprite: '/sprites/scenery/plants/Small_Tree3.gif', blocking: true },
+    { id: 'tree7', position: { x: 22, y: 5 }, sprite: '/sprites/scenery/plants/Tree5.gif', blocking: true },
+    { id: 'tree8', position: { x: 26, y: 9 }, sprite: '/sprites/scenery/plants/Small_Tree4.gif', blocking: true },
+    { id: 'tree9', position: { x: 30, y: 4 }, sprite: '/sprites/scenery/plants/Tree6.gif', blocking: true },
+    { id: 'tree10', position: { x: 34, y: 10 }, sprite: '/sprites/scenery/plants/Small_Tree5.gif', blocking: true },
+    { id: 'tree11', position: { x: 38, y: 5 }, sprite: '/sprites/scenery/plants/Tree7.gif', blocking: true },
+
+    // Trees on right edge
+    { id: 'tree12', position: { x: 42, y: 3 }, sprite: '/sprites/scenery/plants/Tree9.gif', blocking: true },
+    { id: 'tree13', position: { x: 44, y: 11 }, sprite: '/sprites/scenery/plants/Tree11.gif', blocking: true },
+
+    // Bushes for variety
+    { id: 'bush1', position: { x: 3, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush2', position: { x: 7, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush3', position: { x: 11, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush4', position: { x: 15, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush5', position: { x: 19, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+    { id: 'bush6', position: { x: 23, y: 7 }, sprite: '/sprites/scenery/plants/Shrub5.gif', blocking: false },
+    { id: 'bush7', position: { x: 27, y: 7 }, sprite: '/sprites/scenery/plants/Bush3.gif', blocking: false },
+    { id: 'bush8', position: { x: 31, y: 7 }, sprite: '/sprites/scenery/plants/Shrub1.gif', blocking: false },
+    { id: 'bush9', position: { x: 35, y: 7 }, sprite: '/sprites/scenery/plants/Shrub3.gif', blocking: false },
+    { id: 'bush10', position: { x: 39, y: 7 }, sprite: '/sprites/scenery/plants/Bush.gif', blocking: false },
+
+    // Flowers for decoration (non-blocking)
+    { id: 'flowers1', position: { x: 5, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers2', position: { x: 9, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers3', position: { x: 13, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers4', position: { x: 17, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers5', position: { x: 21, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers6', position: { x: 25, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers7', position: { x: 29, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers8', position: { x: 33, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers9', position: { x: 37, y: 6 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+    { id: 'flowers10', position: { x: 41, y: 8 }, sprite: '/sprites/scenery/plants/Flowers.gif', blocking: false, layer: 'background' },
+  ],
+
   exits: [
     // Exit back to Vale Village on the left
     {
