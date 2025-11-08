@@ -52,23 +52,38 @@ export const DialogueScreen: React.FC = () => {
 
   // Camera work: Zoom on dialogue start and important moments
   useEffect(() => {
-    // Zoom in slightly when entering dialogue
-    cameraControls.zoomTo(1.2, 600);
-
-    // Check for dramatic keywords in text to trigger closer zoom
     const text = currentNode.text.toLowerCase();
-    const dramaticKeywords = [
-      'never', 'must', 'free', 'monsters', 'justice', 'truth',
-      'join', 'wrong', 'understand', 'fight', 'freedom'
-    ];
+    const speaker = currentNode.speaker.toLowerCase();
 
-    const isDramatic = dramaticKeywords.some(keyword => text.includes(keyword));
+    // Check if this is a Djinn revelation moment
+    const isDjinnSpeaker = speaker.includes('djinn') || speaker.includes('spirit') || speaker.includes('elemental');
+    const revelationKeywords = ['truth', 'reveal', 'injustice', 'enslaved', 'see now', 'witness'];
+    const isRevelation = revelationKeywords.some(keyword => text.includes(keyword));
 
-    if (isDramatic) {
-      // Dramatic line - zoom closer
+    if (isDjinnSpeaker || isRevelation) {
+      // Djinn revelation - dramatic mystical moment
+      cameraControls.shake('medium', 500); // Shake when Djinn appears
       setTimeout(() => {
-        cameraControls.zoomTo(1.5, 600);
-      }, 300);
+        cameraControls.zoomTo(2.0, 1000); // Extreme close-up for revelation
+      }, 500);
+    } else {
+      // Normal dialogue: Zoom in slightly when entering
+      cameraControls.zoomTo(1.2, 600);
+
+      // Check for dramatic keywords in text to trigger closer zoom
+      const dramaticKeywords = [
+        'never', 'must', 'free', 'monsters', 'justice', 'truth',
+        'join', 'wrong', 'understand', 'fight', 'freedom'
+      ];
+
+      const isDramatic = dramaticKeywords.some(keyword => text.includes(keyword));
+
+      if (isDramatic) {
+        // Dramatic line - zoom closer
+        setTimeout(() => {
+          cameraControls.zoomTo(1.5, 600);
+        }, 300);
+      }
     }
 
     // Cleanup: Reset camera when leaving dialogue
