@@ -65,9 +65,10 @@
 .pre-battle-content {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 320px;
   gap: 24px;
   overflow-y: auto;
+  max-height: calc(100vh - 200px);
 }
 
 /* Section Headers */
@@ -161,15 +162,15 @@
 
 /* Unit Details Panel */
 .unit-details-panel {
-  position: absolute;
-  right: 20px;
-  top: 120px;
-  width: 280px;
+  position: relative;
   padding: 20px;
   background: rgba(0, 0, 0, 0.8);
   border: 2px solid rgba(255, 215, 0, 0.5);
   border-radius: 8px;
   backdrop-filter: blur(10px);
+  align-self: start;
+  position: sticky;
+  top: 0;
 }
 
 .details-header {

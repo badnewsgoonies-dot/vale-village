@@ -20,6 +20,7 @@ export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
   npcId,
   victory,
 }) => {
+  console.log('[POST_BATTLE_CUTSCENE] Rendering with:', { npcId, victory });
   const { actions } = useGame();
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 

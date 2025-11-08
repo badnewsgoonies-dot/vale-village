@@ -1,0 +1,71 @@
+.mana-circles-container {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border-bottom: 2px solid rgba(136, 204, 255, 0.3);
+  z-index: 19;
+}
+
+.mana-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #88ccff;
+  text-shadow: 0 0 4px rgba(136, 204, 255, 0.8);
+}
+
+.mana-circles {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.mana-circle {
+  font-size: 20px;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.mana-circle.filled {
+  color: #44aaff;
+  text-shadow: 0 0 8px rgba(68, 170, 255, 0.9);
+  filter: brightness(1.2);
+}
+
+.mana-circle.empty {
+  color: #334455;
+  text-shadow: none;
+  opacity: 0.5;
+}
+
+.mana-count {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .mana-circles-container {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .mana-label {
+    font-size: 12px;
+  }
+
+  .mana-circle {
+    font-size: 16px;
+  }
+
+  .mana-count {
+    font-size: 12px;
+  }
+}

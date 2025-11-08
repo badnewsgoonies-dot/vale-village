@@ -1,0 +1,79 @@
+.ability-animation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 90; /* Below summons (100) but above everything else */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  animation: abilityFadeIn 0.2s ease-in;
+  pointer-events: none; /* Don't block clicks */
+}
+
+@keyframes abilityFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ability-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ability-name {
+  font-size: 18px;
+  color: #FFD966;
+  text-shadow:
+    0 0 8px rgba(255, 217, 102, 0.8),
+    0 0 16px rgba(255, 217, 102, 0.4);
+  margin: 0;
+  letter-spacing: 1px;
+  animation: abilityNameAppear 0.3s ease-out;
+}
+
+@keyframes abilityNameAppear {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ability-sprite {
+  max-width: 60vw;
+  max-height: 40vh;
+  object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+  animation: abilitySpriteAppear 0.3s ease-out;
+}
+
+@keyframes abilitySpriteAppear {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .ability-name {
+    font-size: 14px;
+  }
+
+  .ability-sprite {
+    max-width: 70vw;
+    max-height: 35vh;
+  }
+}

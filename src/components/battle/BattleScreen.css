@@ -143,7 +143,7 @@
 /* Turn Order Bar */
 .turn-order-bar {
   position: absolute;
-  top: 64px;
+  top: 128px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -578,9 +578,26 @@
   flex: 1;
 }
 
+.ability-costs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .pp-cost {
   color: #66AAFF;
   font-size: 8px;
+}
+
+.mana-cost {
+  color: #44aaff;
+  font-size: 9px;
+  text-shadow: 0 0 4px rgba(68, 170, 255, 0.6);
+}
+
+.mana-cost.insufficient {
+  color: #ff4444;
+  text-shadow: 0 0 4px rgba(255, 68, 68, 0.6);
 }
 
 /* Target Prompt */
@@ -697,4 +714,216 @@
 .combat-log::-webkit-scrollbar-thumb:hover,
 .ability-list::-webkit-scrollbar-thumb:hover {
   background: #4B5AA0;
+}
+
+/* ===== QUEUE BATTLE SYSTEM STYLES ===== */
+
+/* Bottom Panel - Queue Mode */
+.bottom-panel {
+  display: flex;
+  gap: 8px;
+}
+
+/* Action Queue (Left 40%) */
+.action-queue {
+  flex: 2;
+  padding: 12px;
+  background: rgba(0, 0, 30, 0.8);
+  border: 2px solid #3A4680;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-queue h3 {
+  font-size: 10px;
+  color: #FFD966;
+  margin: 0 0 4px 0;
+}
+
+.queue-slot {
+  font-size: 9px;
+  color: #B8C0E8;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+}
+
+.execute-button {
+  margin-top: auto;
+  padding: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  border: 2px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.execute-button.ready {
+  background: linear-gradient(180deg, #44AA44, #338833);
+  border-color: #55CC55;
+  color: #FFF;
+}
+
+.execute-button.ready:hover {
+  background: linear-gradient(180deg, #55BB55, #449944);
+}
+
+.execute-button.disabled {
+  background: #333;
+  border-color: #555;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Command Panel (Right 60%) */
+.command-panel {
+  flex: 3;
+  padding: 12px;
+  background: rgba(0, 0, 30, 0.8);
+  border: 2px solid #3A4680;
+  border-radius: 4px;
+}
+
+.command-panel h3 {
+  font-size: 10px;
+  color: #FFD966;
+  margin: 0 0 4px 0;
+}
+
+.command-panel p {
+  font-size: 8px;
+  color: #B8C0E8;
+  margin: 4px 0;
+}
+
+.target-hint {
+  color: #88CCFF !important;
+  font-style: italic;
+  margin-top: 8px !important;
+}
+
+/* Combat Log Full Width (Execution Phase) */
+.combat-log-full {
+  flex: 1;
+  padding: 12px;
+  background: rgba(0, 0, 30, 0.8);
+  border: 2px solid #3A4680;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+
+/* Back button in command panel */
+.command-panel .back-button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-size: 8px;
+  background: linear-gradient(180deg, #555, #333);
+  border: 2px solid #666;
+  border-radius: 3px;
+  color: #FFF;
+  cursor: pointer;
+}
+
+.command-panel .back-button:hover {
+  background: linear-gradient(180deg, #666, #444);
+}
+
+
+/* ========== VISUAL POLISH ========== */
+
+/* Execute button glow when ready */
+.execute-button.ready {
+  animation: executeGlow 2s ease-in-out infinite;
+}
+
+@keyframes executeGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(68, 204, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(68, 204, 68, 0.8), 0 0 30px rgba(68, 204, 68, 0.4);
+  }
+}
+
+/* Active unit glow */
+.hero.active, .enemy.active {
+  filter: drop-shadow(0 0 12px rgba(255, 217, 102, 0.8));
+  animation: activeUnitPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes activeUnitPulse {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Victory/Defeat enhanced */
+.battle-result {
+  animation: resultAppear 0.5s ease-out;
+}
+
+@keyframes resultAppear {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.battle-result.victory h2 {
+  color: #FFD700;
+  text-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4);
+  animation: victoryShine 1.5s ease-in-out infinite;
+}
+
+@keyframes victoryShine {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Smooth transitions for all interactive elements */
+button, .djinn-slot, .menu-button {
+  transition: all 0.2s ease;
+}
+
+/* Enhanced hover states */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* HP bar smooth transitions */
+.hp-fill, .hp-bar-mini .hp-fill {
+  transition: width 0.3s ease;
+}
+
+/* Combat log messages fade in */
+.combat-log-message {
+  animation: logMessageFadeIn 0.3s ease-out;
+}
+
+@keyframes logMessageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

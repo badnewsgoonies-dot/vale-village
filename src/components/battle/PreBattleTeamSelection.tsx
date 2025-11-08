@@ -157,52 +157,58 @@ export const PreBattleTeamSelection: React.FC<PreBattleTeamSelectionProps> = ({
               </div>
             )}
           </section>
-        </div>
 
-        {/* Unit Details Panel */}
-        {selectedUnit && selectedStats && (
+          {/* Unit Details Panel */}
           <aside className="unit-details-panel">
-            <div className="details-header">
-              <h3>{selectedUnit.name}</h3>
-              <span className="element-badge">{selectedUnit.element}</span>
-            </div>
-            <div className="details-info">
-              <div className="info-row">
-                <span className="label">Level:</span>
-                <span className="value">{selectedUnit.level}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">HP:</span>
-                <span className="value">{selectedUnit.currentHp} / {selectedStats.hp}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">PP:</span>
-                <span className="value">{selectedUnit.currentPp} / {selectedStats.pp}</span>
-              </div>
-            </div>
-            <div className="details-stats">
-              <h4>Stats</h4>
-              <div className="stat-grid">
-                <div className="stat-item">
-                  <span className="stat-name">ATK</span>
-                  <span className="stat-value">{selectedStats.atk}</span>
+            {selectedUnit && selectedStats ? (
+              <>
+                <div className="details-header">
+                  <h3>{selectedUnit.name}</h3>
+                  <span className="element-badge">{selectedUnit.element}</span>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-name">DEF</span>
-                  <span className="stat-value">{selectedStats.def}</span>
+                <div className="details-info">
+                  <div className="info-row">
+                    <span className="label">Level:</span>
+                    <span className="value">{selectedUnit.level}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">HP:</span>
+                    <span className="value">{selectedUnit.currentHp} / {selectedStats.hp}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">PP:</span>
+                    <span className="value">{selectedUnit.currentPp} / {selectedStats.pp}</span>
+                  </div>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-name">MAG</span>
-                  <span className="stat-value">{selectedStats.mag}</span>
+                <div className="details-stats">
+                  <h4>Stats</h4>
+                  <div className="stat-grid">
+                    <div className="stat-item">
+                      <span className="stat-name">ATK</span>
+                      <span className="stat-value">{selectedStats.atk}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-name">DEF</span>
+                      <span className="stat-value">{selectedStats.def}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-name">MAG</span>
+                      <span className="stat-value">{selectedStats.mag}</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-name">SPD</span>
+                      <span className="stat-value">{selectedStats.spd}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="stat-item">
-                  <span className="stat-name">SPD</span>
-                  <span className="stat-value">{selectedStats.spd}</span>
-                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '20px' }}>
+                Click on a unit to view details
               </div>
-            </div>
+            )}
           </aside>
-        )}
+        </div>
       </div>
     </div>
   );
