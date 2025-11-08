@@ -389,10 +389,6 @@ export const BattleScreen: React.FC = () => {
   };
 
   return (
-    <div 
-      className="battle-screen"
-      data-area={state.currentLocation || 'vale_village'}
-    >
     <div className="battle-screen" data-area={state.currentLocation || 'vale_village'}>
       {/* Summon Animation Overlay */}
       {phase === 'summoning' && selectedDjinn.length > 0 && (() => {
