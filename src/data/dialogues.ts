@@ -370,6 +370,96 @@ const villager2Dialogue: DialogueTree = {
 };
 
 /**
+ * Isaac - Protagonist's internal monologue on arriving in town
+ */
+const isaacArrivalDialogue: DialogueTree = {
+  npcId: 'isaac_arrival',
+  startNode: 'arrival',
+  nodes: {
+    arrival: {
+      id: 'arrival',
+      speaker: 'Isaac',
+      text: 'Wow, this place is big. I wonder what\'s happening around town...',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      action: { type: 'END_DIALOGUE' },
+    },
+  },
+};
+
+/**
+ * First Djinn - The mystical being who reveals the truth
+ */
+const firstDjinnDialogue: DialogueTree = {
+  npcId: 'first_djinn',
+  startNode: 'appear',
+  nodes: {
+    appear: {
+      id: 'appear',
+      speaker: 'Djinn',
+      text: 'My God, I\'ve been waiting forever for you to come!',
+      // Camera: Auto shake + 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'isaac_confused',
+    },
+    isaac_confused: {
+      id: 'isaac_confused',
+      speaker: 'Isaac',
+      text: 'Sorry, what did you say? And what the heck even are you?',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      nextNode: 'urgency',
+    },
+    urgency: {
+      id: 'urgency',
+      speaker: 'Djinn',
+      text: 'There\'s no time! You are the hero that we need, and your moment has come. Let me explain...',
+      // Camera: Still 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'actually_time',
+    },
+    actually_time: {
+      id: 'actually_time',
+      speaker: 'Djinn',
+      text: 'Actually, there is time. This world is full of injustice. These so-called "monsters" - or so they have become - are enslaved to work and do battle.',
+      // Camera: 2.0x zoom (keywords: "injustice" + "enslaved")
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'the_master',
+    },
+    the_master: {
+      id: 'the_master',
+      speaker: 'Djinn',
+      text: 'They all serve the master in the castle, and nobody has been able to stop this. The only way to reach him is through a near-impossible trial of battles to your right.',
+      // Camera: 1.5x zoom (keyword: "master")
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'the_legend',
+    },
+    the_legend: {
+      id: 'the_legend',
+      speaker: 'Djinn',
+      text: 'But the legend has foretold - you are the chosen one! I shall join your team, and together we will be the saviors.',
+      // Camera: 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'lets_begin',
+    },
+    lets_begin: {
+      id: 'lets_begin',
+      speaker: 'Djinn',
+      text: 'Let\'s enter the first challenge together and get this journey started!',
+      // Camera: Still zoomed
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      action: { type: 'SET_FLAG', flag: 'obtained_djinn_flint', value: true },
+      nextNode: 'isaac_response',
+    },
+    isaac_response: {
+      id: 'isaac_response',
+      speaker: 'Isaac',
+      text: 'I ain\'t got nothing better to do today.',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      action: { type: 'END_DIALOGUE' },
+    },
+  },
+};
+
+/**
  * Main dialogue registry
  * Maps NPC IDs to their dialogue trees
  * Also includes story scenes for narrator-driven content
@@ -384,6 +474,10 @@ export const dialogueRegistry: Record<string, DialogueTree> = {
   innkeeper: innkeeperDialogue,
   'villager-1': villager1Dialogue,
   'villager-2': villager2Dialogue,
+
+  // Story NPCs
+  'isaac_arrival': isaacArrivalDialogue,
+  'first_djinn': firstDjinnDialogue,
 
   // Story scenes (imported from story/ directory)
   ...storyScenes,
