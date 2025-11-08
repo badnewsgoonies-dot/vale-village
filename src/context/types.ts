@@ -1,6 +1,5 @@
 import type { PlayerData } from '@/types/PlayerData';
 import type { BattleState } from '@/types/Battle';
-import type { Quest } from '@/types/Quest';
 import type { AreaId, BossId, ChestId } from '@/types/Area';
 import type { RewardDistribution } from '@/types/BattleRewards';
 
@@ -35,12 +34,6 @@ export interface StoryFlags {
   // Tutorial
   intro_seen: boolean;
   talked_to_elder_first_time: boolean;
-
-  // Quest progression
-  quest_forest_started: boolean;
-  quest_forest_complete: boolean;
-  quest_ruins_started: boolean;
-  quest_ruins_complete: boolean;
 
   // Boss defeats
   defeated_alpha_wolf: boolean;
@@ -79,8 +72,7 @@ export interface GameState {
   loading: boolean;
   error: string | null;
 
-  // New systems
-  quests: Quest[];
+  // Game systems
   storyFlags: StoryFlags;
   currentLocation: AreaId; // Now type-safe! 'vale_village', 'forest_path', 'ancient_ruins'
   playerPosition: { x: number; y: number }; // Player position on current map

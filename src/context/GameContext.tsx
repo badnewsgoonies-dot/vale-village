@@ -23,13 +23,7 @@ export interface GameActions {
 
   // Battle
   startBattle: (enemyIds: string[], npcId?: string) => void;
-  executeTurn: (abilityId: string, targetId: string) => void;
   endBattle: () => void;
-
-  // Quests
-  startQuest: (questId: string) => void;
-  completeQuest: (questId: string) => void;
-  updateQuestObjective: (questId: string, objectiveId: string, increment?: number) => void;
 
   // Story flags
   setStoryFlag: (flag: keyof StoryFlags, value: boolean) => void;

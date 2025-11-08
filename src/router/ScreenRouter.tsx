@@ -70,6 +70,9 @@ export const ScreenRouter: React.FC = () => {
       // Get rewards from last battle
       const battleRewards = state.lastBattleRewards;
       const partyUnits = state.playerData.unitsCollected;
+      console.log('[REWARDS_SCREEN] lastBattleRewards:', battleRewards);
+      console.log('[REWARDS_SCREEN] XP:', battleRewards?.rewards.totalXp || 0);
+      console.log('[REWARDS_SCREEN] Gold:', battleRewards?.rewards.totalGold || 0);
       return (
         <RewardsScreen
           xp={battleRewards?.rewards.totalXp || 0}
