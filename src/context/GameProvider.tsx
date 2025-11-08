@@ -397,11 +397,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return prev;
       }
 
-<<<<<<< Updated upstream
-      // Calculate rewards if player won
-      let rewards = null;
-      if (prev.currentBattle.status === BattleResult.PLAYER_VICTORY) {
-=======
       // Determine if player won (check actual battle state, not status field)
       const playersAlive = prev.currentBattle.playerTeam.units.some(u => !u.isKO);
       const enemiesAlive = prev.currentBattle.enemies.some(u => !u.isKO);
@@ -414,7 +409,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let rewards = null;
       if (playerWon) {
         console.log('[endBattle] Player won! Processing rewards...');
->>>>>>> Stashed changes
         rewards = processBattleVictory(prev.currentBattle);
         console.log('[endBattle] Rewards calculated:', rewards);
 
