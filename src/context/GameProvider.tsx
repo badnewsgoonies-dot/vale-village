@@ -31,9 +31,25 @@ function enemyToUnit(enemy: Enemy): Unit {
   return new Unit(unitDef, enemy.level);
 }
 
-function createInitialPlayerData(): PlayerData {
-  // Create ALL 10 units for testing
+function createInitialPlayerData(mode: 'fresh' | 'debug' = 'fresh'): PlayerData {
   const isaac = new Unit(UNIT_DEFINITIONS.isaac);
+
+  if (mode === 'fresh') {
+    // Fresh start: Only Isaac, no items, minimal gold
+    return {
+      unitsCollected: [isaac], // Only Isaac
+      activePartyIds: [isaac.id],
+      recruitmentFlags: {},
+      gold: 0, // No starting gold
+      inventory: [], // No equipment
+      items: {}, // No consumable items
+      djinnCollected: [], // No Djinn
+      equippedDjinnIds: [],
+      storyFlags: {},
+    };
+  }
+
+  // Debug mode: ALL units, equipment, and Djinn unlocked for testing
   const garet = new Unit(UNIT_DEFINITIONS.garet);
   const ivan = new Unit(UNIT_DEFINITIONS.ivan);
   const mia = new Unit(UNIT_DEFINITIONS.mia);
@@ -45,11 +61,7 @@ function createInitialPlayerData(): PlayerData {
   const kyle = new Unit(UNIT_DEFINITIONS.kyle);
 
   const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
-
-  // For testing: Unlock all Djinn
   const allDjinn = Object.values(ALL_DJINN);
-
-  // For testing: Add all equipment to inventory
   const allEquipment = Object.values(EQUIPMENT);
 
   return {
@@ -763,9 +775,62 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
+  // Start new game with specified mode
+  const startNewGame = useCallback((mode: 'fresh' | 'debug' = 'fresh') => {
+    setState({
+      playerData: createInitialPlayerData(mode),
+      currentBattle: null,
+      lastBattleRewards: null,
+      currentScreen: { type: 'DIALOGUE', npcId: 'first_djinn' }, // Start with Isaac+Djinn cutscene
+      screenHistory: [],
+      loading: false,
+      error: null,
+      storyFlags: createInitialStoryFlags(),
+      currentLocation: 'battle_row',
+      playerPosition: { x: 2, y: 7 }, // Starting position in Battle Row
+      areaStates: {
+        vale_village: createInitialAreaState(),
+        forest_path: createInitialAreaState(),
+        ancient_ruins: createInitialAreaState(),
+        battle_row: createInitialAreaState(),
+        house1_interior: createInitialAreaState(),
+        house2_interior: createInitialAreaState(),
+        house3_interior: createInitialAreaState(),
+        house4_interior: createInitialAreaState(),
+        house5_interior: createInitialAreaState(),
+        house6_interior: createInitialAreaState(),
+        house7_interior: createInitialAreaState(),
+        house8_interior: createInitialAreaState(),
+        house9_interior: createInitialAreaState(),
+        house10_interior: createInitialAreaState(),
+        house11_interior: createInitialAreaState(),
+        house12_interior: createInitialAreaState(),
+        house13_interior: createInitialAreaState(),
+        house14_interior: createInitialAreaState(),
+        house15_interior: createInitialAreaState(),
+        house16_interior: createInitialAreaState(),
+        house17_interior: createInitialAreaState(),
+        house18_interior: createInitialAreaState(),
+        house19_interior: createInitialAreaState(),
+        house20_interior: createInitialAreaState(),
+        house21_interior: createInitialAreaState(),
+        house22_interior: createInitialAreaState(),
+        house23_interior: createInitialAreaState(),
+        house24_interior: createInitialAreaState(),
+        house25_interior: createInitialAreaState(),
+        house26_interior: createInitialAreaState(),
+        house27_interior: createInitialAreaState(),
+        house28_interior: createInitialAreaState(),
+        house29_interior: createInitialAreaState(),
+        house30_interior: createInitialAreaState(),
+      },
+    });
+  }, []);
+
   const actions = {
     navigate,
     goBack,
+    startNewGame,
     equipItem,
     unequipItem,
     setActiveParty,
