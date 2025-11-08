@@ -798,12 +798,7 @@ export const BATTLE_ROW: Area = {
     },
   ],
   npcs: [
-<<<<<<< Updated upstream
-    // NPCs are inside the houses, not outside blocking the entrances
-=======
     // NPCs removed - battles happen inside houses when entering buildings
-    // TODO: Implement house interiors with NPCs inside
->>>>>>> Stashed changes
   ],
 
   // === BUILDINGS (30 houses with unique Vale sprites) ===
