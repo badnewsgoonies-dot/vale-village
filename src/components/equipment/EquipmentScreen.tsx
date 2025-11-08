@@ -14,7 +14,7 @@ export const EquipmentScreen: React.FC = () => {
   const { state, actions } = useGame();
   const [selectedUnit, setSelectedUnit] = useState<Equipment['slot'] extends string ? any : null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
-  const [showAllUnits, setShowAllUnits] = useState(false);
+  // const [showAllUnits, setShowAllUnits] = useState(false); // Unused - reserved for future feature
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inventoryFilter, setInventoryFilter] = useState<InventoryFilter>('all');
 
