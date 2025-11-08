@@ -160,6 +160,12 @@ export const BattleScreen: React.FC = () => {
         if (!unit.isKO) {
           totalPPRestored += unit.regeneratePP();
         }
+      });
+
+      if (totalPPRestored > 0) {
+        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
+      }
+
       setTimeout(() => {
         actions.navigate({
           type: 'POST_BATTLE_CUTSCENE',
