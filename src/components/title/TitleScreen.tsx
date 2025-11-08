@@ -9,18 +9,7 @@ interface TitleScreenProps {
 }
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBattle }) => {
-  console.log('[TitleScreen] Rendering component - START');
-
-  let actions;
-  try {
-    const game = useGame();
-    actions = game.actions;
-    console.log('[TitleScreen] useGame hook successful');
-  } catch (error) {
-    console.error('[TitleScreen] Error in useGame hook:', error);
-    return <div style={{ color: 'white', padding: '20px' }}>Error loading game context: {String(error)}</div>;
-  }
-
+  const { actions } = useGame();
   const [showPressStart, setShowPressStart] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
 
