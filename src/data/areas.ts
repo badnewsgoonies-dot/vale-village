@@ -817,7 +817,7 @@ export const BATTLE_ROW: Area = {
   id: 'battle_row',
   name: 'Battle Row',
   type: 'town',
-  width: 130, // Extended for 30 houses
+  width: 50, // Wide enough for horizontal layout
   height: 15,
   hasRandomEncounters: false,
   bosses: [],
@@ -838,7 +838,6 @@ export const BATTLE_ROW: Area = {
       id: 'house1-beast-tamer',
       name: 'Beast Tamer',
       position: { x: 4, y: 7 },
-      sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
       blocking: true,
       dialogue: {
         default: 'Welcome to Battle Row! I train wild beasts for combat. Face them if you dare!',
@@ -853,7 +852,6 @@ export const BATTLE_ROW: Area = {
       id: 'house2-undead-hunter',
       name: 'Undead Hunter',
       position: { x: 8, y: 7 },
-      sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
       blocking: true,
       dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
       battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead
@@ -1429,7 +1427,7 @@ export const BATTLE_ROW: Area = {
     // Victory exit on the right (after completing all 30 houses)
     {
       id: 'to_victory',
-      position: { x: 129, y: 6 },
+      position: { x: 49, y: 6 },
       width: 1,
       height: 3,
       targetArea: 'vale_village',
