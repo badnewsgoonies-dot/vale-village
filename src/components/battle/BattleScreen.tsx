@@ -24,7 +24,7 @@ interface QueuedAction {
   manaCost: number;
 }
 
-export const QueueBattleScreen: React.FC = () => {
+export const BattleScreen: React.FC = () => {
   const { state, actions } = useGame();
   const battle = state.currentBattle;
 
@@ -300,9 +300,13 @@ export const QueueBattleScreen: React.FC = () => {
     const allEnemiesDown = battle.enemies.every(e => e.isKO);
     console.log('[BATTLE] Victory check:', { allEnemiesDown, enemyStatus: battle.enemies.map(e => ({ id: e.id, hp: e.stats.hp, isKO: e.isKO })) });
     if (allEnemiesDown) {
-      console.log('[BATTLE] Victory detected! Transitioning to post-battle cutscene...');
+      console.log('[BATTLE] Victory detected! Processing rewards and transitioning to post-battle cutscene...');
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
+
+      // Process battle rewards BEFORE navigating
+      actions.endBattle();
+
       setTimeout(() => {
         console.log('[BATTLE] Navigating to POST_BATTLE_CUTSCENE', { npcId: battle.npcId });
         actions.navigate({
@@ -322,6 +326,10 @@ export const QueueBattleScreen: React.FC = () => {
     if (allPlayersDown) {
       setPhase('defeat');
       setCombatLog(prev => [...prev, '>>> DEFEAT... <<<']);
+
+      // End battle (no rewards on defeat, but cleans up battle state)
+      actions.endBattle();
+
       setTimeout(() => {
         actions.navigate({
           type: 'POST_BATTLE_CUTSCENE',

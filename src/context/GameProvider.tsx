@@ -395,9 +395,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return prev;
       }
 
+      // Determine if player won (check actual battle state, not status field)
+      const playersAlive = prev.currentBattle.playerTeam.units.some(u => !u.isKO);
+      const enemiesAlive = prev.currentBattle.enemies.some(u => !u.isKO);
+      const playerWon = playersAlive && !enemiesAlive;
+
       // Calculate rewards if player won
       let rewards = null;
-      if (prev.currentBattle.status === BattleResult.PLAYER_VICTORY) {
+      if (playerWon) {
         rewards = processBattleVictory(prev.currentBattle);
 
         // Check for NPC bonus rewards
