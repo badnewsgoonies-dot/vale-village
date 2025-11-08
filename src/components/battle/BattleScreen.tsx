@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context';
-import { useCamera } from '@/context/CameraContext';
+import { useCamera, CameraProvider } from '@/context/CameraContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import { StatusBar } from './StatusBar';
@@ -21,7 +21,7 @@ type BattlePhase =
   | 'victory'           // Battle won
   | 'defeat';           // Battle lost
 
-export const BattleScreen: React.FC = () => {
+const BattleScreenContent: React.FC = () => {
   const { state, actions } = useGame();
   const { controls: cameraControls } = useCamera();
   const battle = state.currentBattle;
@@ -46,7 +46,7 @@ export const BattleScreen: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, []); // Only on mount
+  }, [cameraControls]); // Only on mount
 
   if (!battle) {
     return (
@@ -438,5 +438,13 @@ export const BattleScreen: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const BattleScreen: React.FC = () => {
+  return (
+    <CameraProvider>
+      <BattleScreenContent />
+    </CameraProvider>
   );
 };

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera } from '@/context/CameraContext';
+import { useCamera, CameraProvider } from '@/context/CameraContext';
 import { getDialogueTree } from '@/data/dialogues';
 import type { DialogueChoice, DialogueAction } from '@/types/Dialogue';
 import { DialogueBox } from './DialogueBox';
 import './DialogueScreen.css';
 
-export const DialogueScreen: React.FC = () => {
+const DialogueScreenContent: React.FC = () => {
   const { state, actions } = useGame();
   const { controls: cameraControls } = useCamera();
   const screen = state.currentScreen;
@@ -90,7 +90,7 @@ export const DialogueScreen: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, [currentNodeId]);
+  }, [currentNodeId, cameraControls]);
 
   // Execute action when node changes
   useEffect(() => {
@@ -261,5 +261,13 @@ export const DialogueScreen: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+export const DialogueScreen: React.FC = () => {
+  return (
+    <CameraProvider>
+      <DialogueScreenContent />
+    </CameraProvider>
   );
 };

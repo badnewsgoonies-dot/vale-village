@@ -53,6 +53,7 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
 
   const [transitionDuration, setTransitionDuration] = useState(0);
+  const shakeTimersRef = React.useRef<NodeJS.Timeout[]>([]);
 
   // Helper to animate camera properties
   const animateCamera = useCallback((
@@ -84,31 +85,39 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     zoomIn: useCallback((amount = 0.5, duration = 500) => {
       setCamera(prev => {
         const newZoom = Math.min(10, prev.zoom + amount);
-        animateCamera({ zoom: newZoom }, duration);
-        return prev;
+        return { ...prev, zoom: newZoom };
       });
-    }, [animateCamera]),
+      setTransitionDuration(duration);
+      if (duration > 0) {
+        setTimeout(() => setTransitionDuration(0), duration);
+      }
+    }, []),
 
     zoomOut: useCallback((amount = 0.5, duration = 500) => {
       setCamera(prev => {
         const newZoom = Math.max(0.1, prev.zoom - amount);
-        animateCamera({ zoom: newZoom }, duration);
-        return prev;
+        return { ...prev, zoom: newZoom };
       });
-    }, [animateCamera]),
+      setTransitionDuration(duration);
+      if (duration > 0) {
+        setTimeout(() => setTransitionDuration(0), duration);
+      }
+    }, []),
 
     panTo: useCallback((x: number, y: number, duration = 500) => {
       animateCamera({ position: { x, y } }, duration);
     }, [animateCamera]),
 
     panBy: useCallback((dx: number, dy: number, duration = 500) => {
-      setCamera(prev => {
-        animateCamera({
-          position: { x: prev.position.x + dx, y: prev.position.y + dy }
-        }, duration);
-        return prev;
-      });
-    }, [animateCamera]),
+      setCamera(prev => ({
+        ...prev,
+        position: { x: prev.position.x + dx, y: prev.position.y + dy }
+      }));
+      setTransitionDuration(duration);
+      if (duration > 0) {
+        setTimeout(() => setTransitionDuration(0), duration);
+      }
+    }, []),
 
     focusOn: useCallback((
       target: { x: number; y: number },
@@ -138,6 +147,10 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       intensity: 'light' | 'medium' | 'heavy' | number = 'medium',
       duration = 500
     ) => {
+      // Clear any existing shake timers
+      shakeTimersRef.current.forEach(timer => clearTimeout(timer));
+      shakeTimersRef.current = [];
+
       const intensityMap = {
         light: 0.3,
         medium: 0.6,
@@ -158,7 +171,7 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const stepDuration = duration / steps;
 
       for (let i = 1; i <= steps; i++) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           setCamera(prev => ({
             ...prev,
             shake: {
@@ -167,6 +180,7 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             },
           }));
         }, stepDuration * i);
+        shakeTimersRef.current.push(timer);
       }
     }, []),
 
@@ -184,9 +198,22 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, [animateCamera]),
   };
 
+  // Cleanup shake timers on unmount
+  React.useEffect(() => {
+    return () => {
+      shakeTimersRef.current.forEach(timer => clearTimeout(timer));
+    };
+  }, []);
+
+  const shakeClass = camera.shake.intensity > 0 ? 'camera-shaking' : '';
+  const shakeStyle = camera.shake.intensity > 0
+    ? { '--shake-intensity': camera.shake.intensity } as React.CSSProperties
+    : {};
+
   return (
     <CameraContext.Provider value={{ camera, controls }}>
       <div
+        className={shakeClass}
         style={{
           transition: transitionDuration > 0
             ? `transform ${transitionDuration}ms ease-out`
@@ -195,11 +222,11 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             translate(${camera.position.x}px, ${camera.position.y}px)
             scale(${camera.zoom})
             rotate(${camera.rotation}deg)
-            translate(${camera.shake.intensity * (Math.random() - 0.5) * 20}px, ${camera.shake.intensity * (Math.random() - 0.5) * 20}px)
           `,
           transformOrigin: 'center center',
           width: '100%',
           height: '100%',
+          ...shakeStyle,
         }}
       >
         {children}

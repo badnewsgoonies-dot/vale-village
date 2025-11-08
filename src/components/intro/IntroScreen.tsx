@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera } from '@/context/CameraContext';
+import { useCamera, CameraProvider } from '@/context/CameraContext';
 import './IntroScreen.css';
 
 const INTRO_MESSAGES = [
@@ -9,7 +9,7 @@ const INTRO_MESSAGES = [
   'The Elder has called for brave warriors to investigate.',
 ];
 
-export const IntroScreen: React.FC = () => {
+const IntroScreenContent: React.FC = () => {
   const { actions } = useGame();
   const { controls: cameraControls } = useCamera();
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -33,7 +33,7 @@ export const IntroScreen: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, [currentMessage]);
+  }, [currentMessage, cameraControls]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -59,5 +59,13 @@ export const IntroScreen: React.FC = () => {
         <p className="intro-prompt">Press Space to continue...</p>
       </div>
     </div>
+  );
+};
+
+export const IntroScreen: React.FC = () => {
+  return (
+    <CameraProvider>
+      <IntroScreenContent />
+    </CameraProvider>
   );
 };

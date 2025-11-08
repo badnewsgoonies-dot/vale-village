@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera } from '@/context/CameraContext';
+import { useCamera, CameraProvider } from '@/context/CameraContext';
 import { Button } from '../shared';
 import './PostBattleCutscene.css';
 
@@ -17,7 +17,7 @@ interface PostBattleCutsceneProps {
   victory: boolean;
 }
 
-export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
+const PostBattleCutsceneContent: React.FC<PostBattleCutsceneProps> = ({
   npcId,
   victory,
 }) => {
@@ -87,7 +87,7 @@ export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
     return () => {
       cameraControls.reset(600);
     };
-  }, [currentMessageIndex, victory, npcId, isLastMessage]);
+  }, [currentMessageIndex, victory, npcId, isLastMessage, cameraControls]);
 
   // Auto-advance after delay or wait for player input
   const handleAdvance = () => {
@@ -162,5 +162,13 @@ export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
         </div>
       </div>
     </div>
+  );
+};
+
+export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = (props) => {
+  return (
+    <CameraProvider>
+      <PostBattleCutsceneContent {...props} />
+    </CameraProvider>
   );
 };

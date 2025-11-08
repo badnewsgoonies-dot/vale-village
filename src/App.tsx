@@ -1,5 +1,4 @@
 import { GameProvider } from './context/GameProvider';
-import { CameraProvider } from './context/CameraContext';
 import { GameViewport } from './components/viewport';
 import { ScreenRouter } from './router/ScreenRouter';
 import './App.css';
@@ -13,11 +12,9 @@ function App() {
         baseWidth={800}
         integerScaling={false} // Set to true for pixel-perfect scaling
       >
-        <CameraProvider>
-          <div className="app-container">
-            <ScreenRouter />
-          </div>
-        </CameraProvider>
+        <div className="app-container">
+          <ScreenRouter />
+        </div>
       </GameViewport>
     </GameProvider>
   );
