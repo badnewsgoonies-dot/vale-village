@@ -12,8 +12,6 @@ import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
-import { getAllQuests } from '@/data/quests';
-import { updateObjectiveProgress } from '@/types/Quest';
 import type { AreaId, ChestId, BossId } from '@/types/Area';
 import { ALL_AREAS } from '@/data/areas';
 
@@ -106,7 +104,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     screenHistory: [],
     loading: false,
     error: null,
-    quests: getAllQuests(),
     storyFlags: createInitialStoryFlags(),
     currentLocation: 'battle_row',
     playerPosition: { x: 2, y: 7 }, // Starting position in Battle Row
@@ -528,83 +525,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  // Quest management
-  const startQuest = useCallback((questId: string) => {
-    setState(prev => ({
-      ...prev,
-      quests: prev.quests.map(q =>
-        q.id === questId ? { ...q, status: 'active' as const } : q
-      ),
-    }));
-  }, []);
-
-  const completeQuest = useCallback((questId: string) => {
-    setState(prev => {
-      const quest = prev.quests.find(q => q.id === questId);
-      if (!quest) return prev;
-
-      // Give rewards
-      const newGold = prev.playerData.gold + quest.rewards.gold;
-      const newInventory = [...prev.playerData.inventory, ...quest.rewards.items];
-
-      // Add Djinn if reward includes one
-      const newDjinnCollected = quest.rewards.djinn
-        ? [...prev.playerData.djinnCollected, quest.rewards.djinn]
-        : prev.playerData.djinnCollected;
-
-      // Mark quest as complete
-      const updatedQuests = prev.quests.map(q =>
-        q.id === questId ? { ...q, status: 'completed' as const } : q
-      );
-
-      // Unlock next quests if any
-      const questsToUnlock = quest.unlocksQuestIds || [];
-      const finalQuests = updatedQuests.map(q =>
-        questsToUnlock.includes(q.id) ? { ...q, status: 'active' as const } : q
-      );
-
-      return {
-        ...prev,
-        quests: finalQuests,
-        playerData: {
-          ...prev.playerData,
-          gold: newGold,
-          inventory: newInventory,
-          djinnCollected: newDjinnCollected,
-        },
-      };
-    });
-  }, []);
-
-  const updateQuestObjective = useCallback(
-    (questId: string, objectiveId: string, increment: number = 1) => {
-      setState(prev => {
-        const quest = prev.quests.find(q => q.id === questId);
-        if (!quest || quest.status !== 'active') return prev;
-
-        const updatedQuests = prev.quests.map(q => {
-          if (q.id !== questId) return q;
-
-          const updatedObjectives = q.objectives.map(obj =>
-            obj.id === objectiveId ? updateObjectiveProgress(obj, increment) : obj
-          );
-
-          // Auto-complete quest if all objectives done
-          const allComplete = updatedObjectives.every(obj => obj.completed);
-
-          return {
-            ...q,
-            objectives: updatedObjectives,
-            status: allComplete ? ('completed' as const) : q.status,
-          };
-        });
-
-        return { ...prev, quests: updatedQuests };
-      });
-    },
-    []
-  );
-
   // Story flags management
   const setStoryFlag = useCallback((flag: keyof StoryFlags, value: boolean) => {
     setState(prev => ({
@@ -860,10 +780,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     endBattle,
     equipDjinn,
     unequipDjinn,
-    // Quest actions
-    startQuest,
-    completeQuest,
-    updateQuestObjective,
     // Story flags
     setStoryFlag,
     // Location
