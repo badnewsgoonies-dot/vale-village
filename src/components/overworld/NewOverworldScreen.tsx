@@ -137,8 +137,8 @@ export const NewOverworldScreen: React.FC = () => {
             return;
           }
           
-          // Start battle with NPC's enemies
-          actions.startBattle(npc.battleOnInteract);
+          // Start battle with NPC's enemies, passing NPC ID for rewards
+          actions.startBattle(npc.battleOnInteract, npc.id);
           actions.navigate({ type: 'BATTLE' });
           
           // Mark as battled if battleOnlyOnce
@@ -303,7 +303,81 @@ export const NewOverworldScreen: React.FC = () => {
             )}
           </div>
 
-          {/* Render NPCs */}
+          {/* Render background scenery (flowers, grass) */}
+          {area.scenery
+            ?.filter((s) => s.layer === 'background')
+            .map((scenery) => (
+              <div
+                key={scenery.id}
+                className="scenery background"
+                style={{
+                  left: `${scenery.position.x * 32}px`,
+                  top: `${scenery.position.y * 32}px`,
+                }}
+              >
+                <img
+                  src={scenery.sprite}
+                  alt={scenery.id}
+                  className="scenery-sprite"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            ))}
+
+          {/* Render buildings */}
+          {area.buildings?.map((building) => (
+            <div
+              key={building.id}
+              className="building"
+              style={{
+                left: `${building.position.x * 32}px`,
+                top: `${building.position.y * 32}px`,
+                zIndex: building.position.y,
+              }}
+            >
+              <img
+                src={building.sprite}
+                alt={building.label}
+                className="building-sprite"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const textNode = e.currentTarget.nextSibling;
+                  if (textNode) (textNode as HTMLElement).style.display = 'block';
+                }}
+              />
+              <span className="building-fallback" style={{ display: 'none' }}>
+                🏠
+              </span>
+            </div>
+          ))}
+
+          {/* Render foreground scenery (trees, bushes) with depth sorting */}
+          {area.scenery
+            ?.filter((s) => s.layer !== 'background')
+            .map((scenery) => (
+              <div
+                key={scenery.id}
+                className="scenery foreground"
+                style={{
+                  left: `${scenery.position.x * 32}px`,
+                  top: `${scenery.position.y * 32}px`,
+                  zIndex: scenery.position.y,
+                }}
+              >
+                <img
+                  src={scenery.sprite}
+                  alt={scenery.id}
+                  className="scenery-sprite"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            ))}
+
+          {/* Render NPCs with depth sorting */}
           {area.npcs.map((npc) => (
             <div
               key={npc.id}
@@ -311,10 +385,11 @@ export const NewOverworldScreen: React.FC = () => {
               style={{
                 left: `${npc.position.x * 32}px`,
                 top: `${npc.position.y * 32}px`,
+                zIndex: npc.position.y + 100, // NPCs render above buildings
               }}
             >
               <img
-                src={`/sprites/overworld/minornpcs/${npc.id}.gif`}
+                src={npc.sprite || `/sprites/overworld/minornpcs/${npc.id}.gif`}
                 alt={npc.name}
                 className="npc-sprite"
                 onError={(e) => {

@@ -7,6 +7,7 @@ import { UNIT_DEFINITIONS } from '@/data/unitDefinitions';
 import type { Equipment, EquipmentLoadout } from '@/types/Equipment';
 import { EQUIPMENT } from '@/data/equipment';
 import { ALL_DJINN } from '@/data/djinn';
+import type { Djinn } from '@/types/Djinn';
 import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
@@ -14,6 +15,7 @@ import { createTeam } from '@/types/Team';
 import { getAllQuests } from '@/data/quests';
 import { updateObjectiveProgress } from '@/types/Quest';
 import type { AreaId, ChestId, BossId } from '@/types/Area';
+import { ALL_AREAS } from '@/data/areas';
 
 // Convert Enemy to Unit for battles
 function enemyToUnit(enemy: Enemy): Unit {
@@ -112,6 +114,36 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       forest_path: createInitialAreaState(),
       ancient_ruins: createInitialAreaState(),
       battle_row: createInitialAreaState(),
+      house1_interior: createInitialAreaState(),
+      house2_interior: createInitialAreaState(),
+      house3_interior: createInitialAreaState(),
+      house4_interior: createInitialAreaState(),
+      house5_interior: createInitialAreaState(),
+      house6_interior: createInitialAreaState(),
+      house7_interior: createInitialAreaState(),
+      house8_interior: createInitialAreaState(),
+      house9_interior: createInitialAreaState(),
+      house10_interior: createInitialAreaState(),
+      house11_interior: createInitialAreaState(),
+      house12_interior: createInitialAreaState(),
+      house13_interior: createInitialAreaState(),
+      house14_interior: createInitialAreaState(),
+      house15_interior: createInitialAreaState(),
+      house16_interior: createInitialAreaState(),
+      house17_interior: createInitialAreaState(),
+      house18_interior: createInitialAreaState(),
+      house19_interior: createInitialAreaState(),
+      house20_interior: createInitialAreaState(),
+      house21_interior: createInitialAreaState(),
+      house22_interior: createInitialAreaState(),
+      house23_interior: createInitialAreaState(),
+      house24_interior: createInitialAreaState(),
+      house25_interior: createInitialAreaState(),
+      house26_interior: createInitialAreaState(),
+      house27_interior: createInitialAreaState(),
+      house28_interior: createInitialAreaState(),
+      house29_interior: createInitialAreaState(),
+      house30_interior: createInitialAreaState(),
     },
   });
 
@@ -345,22 +377,64 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('No active battle to end');
         return prev;
       }
-      
+
       // Calculate rewards if player won
       let rewards = null;
       if (prev.currentBattle.status === BattleResult.PLAYER_VICTORY) {
         rewards = processBattleVictory(prev.currentBattle);
-        
-        // Add equipment drops to inventory and gold
+
+        // Check for NPC bonus rewards
+        let npcBonusGold = 0;
+        const npcBonusEquipment: Equipment[] = [];
+        let npcDjinn: Djinn | null = null;
+
+        if (prev.currentBattle.npcId) {
+          // Find the NPC in current area
+          const currentArea = ALL_AREAS[prev.currentLocation];
+          const npc = currentArea?.npcs.find(n => n.id === prev.currentBattle?.npcId);
+
+          if (npc?.battleRewards) {
+            console.log('NPC battle rewards found:', npc.battleRewards);
+            npcBonusGold = npc.battleRewards.gold || 0;
+            if (npc.battleRewards.equipment) {
+              npcBonusEquipment.push(...npc.battleRewards.equipment);
+            }
+            if (npc.battleRewards.djinnId) {
+              const djinn = ALL_DJINN[npc.battleRewards.djinnId];
+              if (djinn) {
+                npcDjinn = djinn;
+              }
+            }
+          }
+        }
+
+        // Merge NPC rewards with battle rewards
+        const totalGold = rewards.goldEarned + npcBonusGold;
+        const totalEquipment = [...rewards.rewards.equipmentDrops, ...npcBonusEquipment];
+
+        // Update rewards object to include NPC bonuses
+        rewards = {
+          ...rewards,
+          goldEarned: totalGold,
+          rewards: {
+            ...rewards.rewards,
+            equipmentDrops: totalEquipment,
+          },
+        };
+
+        // Add equipment drops to inventory, gold, and djinn
         const updatedPlayerData = {
           ...prev.playerData,
-          gold: prev.playerData.gold + rewards.goldEarned,
+          gold: prev.playerData.gold + totalGold,
           inventory: [
             ...prev.playerData.inventory,
-            ...rewards.rewards.equipmentDrops
+            ...totalEquipment
           ],
+          djinnCollected: npcDjinn
+            ? [...prev.playerData.djinnCollected, npcDjinn]
+            : prev.playerData.djinnCollected,
         };
-        
+
         return {
           ...prev,
           playerData: updatedPlayerData,
