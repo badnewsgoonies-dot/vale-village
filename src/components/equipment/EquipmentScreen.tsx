@@ -331,13 +331,13 @@ export const EquipmentScreen: React.FC = () => {
             {currentAbilities.length > 0 && (
               <div className="abilities-list current">
                 {currentAbilities.map(ability => (
-                  <div 
-                    key={ability.id} 
+                  <div
+                    key={ability.id}
                     className={`ability-badge ${selectedItem && abilityChanges.removed.some(a => a.id === ability.id) ? 'ability-removed' : ''}`}
                   >
                     <span className="ability-name">{ability.name}</span>
                     {ability.element && <ElementIcon element={ability.element} size="tiny" />}
-                    <span className="ability-pp">PP: {ability.ppCost}</span>
+                    <span className="ability-mana">Mana: {ability.manaCost}○</span>
                   </div>
                 ))}
               </div>
@@ -351,7 +351,7 @@ export const EquipmentScreen: React.FC = () => {
                     <div key={ability.id} className="ability-badge ability-added">
                       <span className="ability-name">{ability.name}</span>
                       {ability.element && <ElementIcon element={ability.element} size="tiny" />}
-                      <span className="ability-pp">PP: {ability.ppCost}</span>
+                      <span className="ability-mana">Mana: {ability.manaCost}○</span>
                       <span className="ability-tag">NEW!</span>
                     </div>
                   ))}
@@ -434,7 +434,7 @@ export const EquipmentScreen: React.FC = () => {
                 </div>
                 <p className="ability-description">{ABILITIES[selectedItem.unlocksAbility].description}</p>
                 <div className="ability-stats">
-                  <span>PP Cost: {ABILITIES[selectedItem.unlocksAbility].ppCost}</span>
+                  <span>Mana Cost: {ABILITIES[selectedItem.unlocksAbility].manaCost}○</span>
                   {ABILITIES[selectedItem.unlocksAbility].basePower > 0 && (
                     <span> | Power: {ABILITIES[selectedItem.unlocksAbility].basePower}</span>
                   )}

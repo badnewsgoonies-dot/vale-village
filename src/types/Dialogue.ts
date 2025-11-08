@@ -20,6 +20,7 @@ export type DialogueAction =
   | { type: 'SET_FLAG'; flag: keyof StoryFlags; value: boolean }
   | { type: 'GIVE_ITEM'; itemId: string; quantity: number }
   | { type: 'GIVE_GOLD'; amount: number }
+  | { type: 'GIVE_DJINN'; djinnId: string } // Add Djinn to player's collection
   | { type: 'OPEN_SHOP'; shopType: 'item' | 'equipment' | 'inn' }
   | { type: 'NAVIGATE'; screen: 'OVERWORLD' | 'MAIN_MENU' }
   | { type: 'END_DIALOGUE' }; // Close dialogue and return to previous screen

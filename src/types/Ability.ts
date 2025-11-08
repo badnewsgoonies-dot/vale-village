@@ -5,11 +5,11 @@ import type { Element } from './Element';
  */
 export type AbilityType =
   | 'physical'   // Physical attack using ATK stat
-  | 'psynergy'   // Psynergy attack using MAG stat, costs PP
-  | 'healing'    // Healing using MAG stat, costs PP
-  | 'buff'       // Buff allies, costs PP
-  | 'debuff'     // Debuff enemies, costs PP
-  | 'summon';    // Summon (requires Djinn), costs PP
+  | 'psynergy'   // Psynergy attack using MAG stat, costs mana circles
+  | 'healing'    // Healing using MAG stat, costs mana circles
+  | 'buff'       // Buff allies, costs mana circles
+  | 'debuff'     // Debuff enemies, costs mana circles
+  | 'summon';    // Summon (requires Djinn), costs mana circles
 
 /**
  * Target types for abilities
@@ -29,8 +29,7 @@ export interface Ability {
   name: string;
   type: AbilityType;
   element?: Element;
-  ppCost: number;
-  manaCost: number;             // Mana circles (0-4+)
+  manaCost: number;             // Mana circles cost (0-4+), based on team's manaContribution
   basePower: number;
   targets: AbilityTarget;
   unlockLevel: number;
@@ -57,7 +56,6 @@ export function createPhysicalAttack(name: string): Ability {
     id: name.toLowerCase(),
     name,
     type: 'physical',
-    ppCost: 0,
     manaCost: 0, // Basic attacks are free
     basePower: 0, // Uses unit's ATK
     targets: 'single-enemy',

@@ -8,10 +8,14 @@ export interface GameActions {
   navigate: (screen: Screen) => void;
   goBack: () => void;
 
+  // Game flow
+  startNewGame: (mode?: 'fresh' | 'debug') => void;
+
   // Unit management
   setActiveParty: (unitIds: string[]) => void;
   recruitUnit: (unitId: string) => void;
   addGold: (amount: number) => void;
+  giveDjinn: (djinnId: string) => void;
 
   // Equipment
   equipItem: (unitId: string, slot: string, equipment: Equipment) => void;

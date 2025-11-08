@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useGame } from '@/context/GameContext';
 import './TitleScreen.css';
 import type { Screen } from '@/context/types';
 
@@ -8,6 +9,7 @@ interface TitleScreenProps {
 }
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBattle }) => {
+  const { actions } = useGame();
   const [showPressStart, setShowPressStart] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -24,8 +26,13 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   const handleNewGame = () => {
-    // Go straight to Vale Village overworld
-    onNavigate({ type: 'OVERWORLD' });
+    // Start fresh: Only Isaac, no items, 0 gold
+    actions.startNewGame('fresh');
+  };
+
+  const handleDebugGame = () => {
+    // Start with everything unlocked: All units, all equipment, all Djinn
+    actions.startNewGame('debug');
   };
 
   const handleTestBattle = () => {
@@ -69,7 +76,11 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
         <nav className="title-menu">
           <button className="title-menu-item primary" onClick={handleNewGame}>
             <span className="menu-icon">▶</span>
-            <span className="menu-text">Start Game</span>
+            <span className="menu-text">New Game</span>
+          </button>
+          <button className="title-menu-item secondary" onClick={handleDebugGame}>
+            <span className="menu-icon">★</span>
+            <span className="menu-text">New Game (All Unlocked)</span>
           </button>
           <button className="title-menu-item debug" onClick={handleTestBattle}>
             <span className="menu-icon">⚔</span>

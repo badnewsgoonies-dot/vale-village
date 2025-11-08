@@ -124,7 +124,7 @@ export const AbilitiesScreen: React.FC = () => {
           {isLocked && <div className="lock-icon">🔒</div>}
         </div>
         <div className="ability-stats">
-          <span className="ability-cost">PP: {ability.ppCost}</span>
+          <span className="ability-cost">Mana: {ability.manaCost}○</span>
           {ability.basePower > 0 && (
             <span className="ability-power">PWR: {ability.basePower}</span>
           )}
@@ -246,8 +246,6 @@ export const AbilitiesScreen: React.FC = () => {
               <h2>{selectedUnit.name}'s Abilities</h2>
               <div className="unit-stats-summary">
                 <span>Lv {selectedUnit.level}</span>
-                <span className="divider">•</span>
-                <span>PP: {selectedUnit.currentPp} / {selectedUnit.maxPp}</span>
               </div>
             </div>
 
@@ -318,8 +316,8 @@ export const AbilitiesScreen: React.FC = () => {
                   </div>
                 )}
                 <div className="detail-row">
-                  <span className="label">PP Cost:</span>
-                  <span className="value">{selectedAbility.ppCost}</span>
+                  <span className="label">Mana Cost:</span>
+                  <span className="value">{selectedAbility.manaCost}○</span>
                 </div>
                 {selectedAbility.basePower > 0 && (
                   <div className="detail-row">

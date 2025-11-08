@@ -219,7 +219,7 @@ export function EnemyCatalog() {
                   {selectedEnemy.abilities.map((ability, i) => (
                     <li key={i}>
                       <strong>{ability.name}</strong>
-                      {ability.ppCost > 0 && <span> ({ability.ppCost} PP)</span>}
+                      {ability.manaCost > 0 && <span> ({ability.manaCost}○)</span>}
                       {ability.element && <span className="ability-element"> - {ability.element}</span>}
                     </li>
                   ))}
