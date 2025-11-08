@@ -14,14 +14,6 @@ interface Position {
   y: number;
 }
 
-// Demo sequence step types
-type DemoStep =
-  | { action: 'announce'; text: string; duration: number }
-  | { action: 'walk'; target: Position; elevation: ElevationLevel; run?: boolean }
-  | { action: 'wait'; duration: number }
-
-  | { action: 'transition'; toLevel: ElevationLevel };
-
 
 const WORLD_WIDTH = 1200;
 const WORLD_HEIGHT = 1500;
@@ -39,13 +31,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
   const [isMoving, setIsMoving] = useState(false);
   const [nearTransition, setNearTransition] = useState<TransitionZone | null>(null);
   const [nearBuilding, setNearBuilding] = useState<ElevationEntity | null>(null);
-
-  // Demo mode state
-  const [demoMode, setDemoMode] = useState(false);
-  const [demoAnnouncement, setDemoAnnouncement] = useState<string | null>(null);
-  const demoWaypointIndexRef = React.useRef(0);
-  const demoWaitTimerRef = React.useRef(0);
-  const demoTargetRef = React.useRef<Position | null>(null);
 
   // Smooth movement state
   const velocityRef = React.useRef<Position>({ x: 0, y: 0 });
@@ -156,63 +141,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     setPlayerPos(prev => ({ ...prev, y: prev.y + offsetY }));
   }, [nearTransition, playerElevation]);
 
-  // Demo mode waypoints and actions
-  const demoSequence = useMemo((): DemoStep[] => [
-    // Start in Main Village
-    { action: 'announce', text: 'Vale Village - Multi-Level Overworld System', duration: 3 },
-    { action: 'walk', target: { x: 350, y: 400 }, elevation: ElevationLevel.MAIN },
-
-    // Show building interaction
-    { action: 'announce', text: 'Building Entry System', duration: 2 },
-    { action: 'walk', target: { x: 750, y: 550 }, elevation: ElevationLevel.MAIN }, // Equipment Shop
-    { action: 'wait', duration: 1 },
-
-    // Show elevation transition
-    { action: 'announce', text: 'Elevation Transitions - Going Up', duration: 2 },
-    { action: 'walk', target: { x: 500, y: 280 }, elevation: ElevationLevel.MAIN }, // Stairs
-    { action: 'transition', toLevel: ElevationLevel.UPPER },
-    { action: 'walk', target: { x: 700, y: 120 }, elevation: ElevationLevel.UPPER }, // Sol Sanctum
-    { action: 'wait', duration: 1.5 },
-
-    // Explore upper level
-    { action: 'announce', text: 'Upper Level - Sacred Heights', duration: 2 },
-    { action: 'walk', target: { x: 450, y: 220 }, elevation: ElevationLevel.UPPER }, // Elder's House
-
-    // Go back down
-    { action: 'announce', text: 'Returning to Main Village', duration: 2 },
-    { action: 'walk', target: { x: 500, y: 280 }, elevation: ElevationLevel.UPPER },
-    { action: 'transition', toLevel: ElevationLevel.MAIN },
-
-    // Explore more buildings
-    { action: 'announce', text: 'Exploring Isaac\'s House', duration: 2 },
-    { action: 'walk', target: { x: 350, y: 380 }, elevation: ElevationLevel.MAIN },
-    { action: 'wait', duration: 1 },
-
-    { action: 'announce', text: 'Visiting Training Grounds', duration: 2 },
-    { action: 'walk', target: { x: 250, y: 550 }, elevation: ElevationLevel.MAIN },
-    { action: 'wait', duration: 1 },
-
-    // Go to lower level
-    { action: 'announce', text: 'Going Down to Lower Plaza', duration: 2 },
-    { action: 'walk', target: { x: 600, y: 850 }, elevation: ElevationLevel.MAIN },
-    { action: 'transition', toLevel: ElevationLevel.LOWER },
-    { action: 'walk', target: { x: 400, y: 1100 }, elevation: ElevationLevel.LOWER },
-    { action: 'wait', duration: 1.5 },
-
-    // Come back up
-    { action: 'announce', text: 'Returning to Main Level', duration: 2 },
-    { action: 'walk', target: { x: 600, y: 900 }, elevation: ElevationLevel.LOWER },
-    { action: 'transition', toLevel: ElevationLevel.MAIN },
-
-    // Final showcase - running
-    { action: 'announce', text: 'Smooth 60 FPS Movement', duration: 2 },
-    { action: 'walk', target: { x: 800, y: 600 }, elevation: ElevationLevel.MAIN, run: true },
-    { action: 'walk', target: { x: 300, y: 700 }, elevation: ElevationLevel.MAIN, run: true },
-    { action: 'walk', target: { x: 600, y: 500 }, elevation: ElevationLevel.MAIN, run: true },
-
-    { action: 'announce', text: 'Demo Complete - Restarting...', duration: 2 },
-  ], []);
-
   // Handle building interaction
   const handleBuildingInteraction = useCallback(() => {
     if (!nearBuilding) return;
@@ -269,23 +197,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
           return;
         }
       }
-
-      // Demo mode toggle
-      if (key === 'd') {
-        setDemoMode(prev => !prev);
-        if (!demoMode) {
-          demoWaypointIndexRef.current = 0;
-          demoWaitTimerRef.current = 0;
-          setDemoAnnouncement('Demo Mode Activated');
-          setTimeout(() => setDemoAnnouncement(null), 2000);
-        } else {
-          setDemoAnnouncement(null);
-        }
-        return;
-      }
-
-      // Skip demo mode controls if in demo mode
-      if (demoMode) return;
 
       // Menu shortcuts
       if (e.key === 'Escape') {
@@ -435,91 +346,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     };
   }, [playerPos, isRunning, canMoveTo]);
 
-  // Demo mode execution loop
-  useEffect(() => {
-    if (!demoMode) {
-      demoTargetRef.current = null;
-      return;
-    }
-
-    const interval = setInterval(() => {
-      const currentStep = demoSequence[demoWaypointIndexRef.current];
-      if (!currentStep) {
-        // Loop back to start
-        demoWaypointIndexRef.current = 0;
-        return;
-      }
-
-      // Handle different action types
-      switch (currentStep.action) {
-        case 'announce':
-          setDemoAnnouncement(currentStep.text);
-          demoWaitTimerRef.current = currentStep.duration * 1000;
-          demoWaypointIndexRef.current++;
-          break;
-
-        case 'walk':
-          if (demoWaitTimerRef.current > 0) {
-            demoWaitTimerRef.current -= 100;
-            return;
-          }
-
-          const target = currentStep.target;
-          const dx = target.x - playerPos.x;
-          const dy = target.y - playerPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 20) {
-            // Reached waypoint
-            demoWaypointIndexRef.current++;
-            demoTargetRef.current = null;
-            setIsRunning(false);
-          } else {
-            // Move towards target
-            demoTargetRef.current = target;
-            setIsRunning(currentStep.run || false);
-
-            // Simulate key presses
-            keysRef.current.clear();
-            if (Math.abs(dx) > 10) {
-              keysRef.current.add(dx > 0 ? 'd' : 'a');
-            }
-            if (Math.abs(dy) > 10) {
-              keysRef.current.add(dy > 0 ? 's' : 'w');
-            }
-          }
-          break;
-
-        case 'wait':
-          if (demoWaitTimerRef.current === 0) {
-            demoWaitTimerRef.current = currentStep.duration * 1000;
-          }
-          if (demoWaitTimerRef.current > 0) {
-            demoWaitTimerRef.current -= 100;
-            if (demoWaitTimerRef.current <= 0) {
-              demoWaypointIndexRef.current++;
-            }
-          }
-          break;
-
-        case 'transition':
-          if (nearTransition) {
-            handleTransition();
-            demoWaypointIndexRef.current++;
-            demoWaitTimerRef.current = 500; // Small delay after transition
-          }
-          break;
-      }
-
-      // Clear announcement after duration
-      if (demoAnnouncement && currentStep.action === 'announce' && demoWaitTimerRef.current <= 0) {
-        setDemoAnnouncement(null);
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [demoMode, demoSequence, playerPos, nearTransition, demoAnnouncement, handleTransition, actions]);
-
   // Check for transitions
   useEffect(() => {
     checkTransitions();
@@ -543,8 +369,8 @@ export const ValeVillageElevationOverworld: React.FC = () => {
       targetX = Math.max(0, Math.min(WORLD_WIDTH - VIEWPORT_WIDTH, targetX));
       targetY = Math.max(0, Math.min(WORLD_HEIGHT - VIEWPORT_HEIGHT, targetY));
 
-      // Smooth easing (faster in demo mode for better tracking)
-      const CAMERA_SMOOTHING = demoMode ? 0.35 : 0.15;
+      // Smooth easing
+      const CAMERA_SMOOTHING = 0.15;
       const newX = cameraPos.x + (targetX - cameraPos.x) * CAMERA_SMOOTHING;
       const newY = cameraPos.y + (targetY - cameraPos.y) * CAMERA_SMOOTHING;
 
@@ -561,7 +387,7 @@ export const ValeVillageElevationOverworld: React.FC = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [playerPos, cameraPos, demoMode]);
+  }, [playerPos, cameraPos]);
 
   // Camera offset for rendering
   const cameraOffset = useMemo(() => {
@@ -774,101 +600,6 @@ export const ValeVillageElevationOverworld: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Demo Mode Announcement */}
-      {demoAnnouncement && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: 'rgba(0, 0, 0, 0.95)',
-          border: '4px solid #FFD700',
-          borderRadius: '12px',
-          padding: '32px 48px',
-          fontSize: '28px',
-          fontWeight: 'bold',
-          color: '#FFD700',
-          textAlign: 'center',
-          zIndex: 10000,
-          boxShadow: '0 8px 32px rgba(255, 215, 0, 0.5)',
-          animation: 'fadeInOut 0.5s ease-in-out',
-          fontFamily: 'monospace',
-          letterSpacing: '2px',
-          textTransform: 'uppercase'
-        }}>
-          {demoAnnouncement}
-        </div>
-      )}
-
-      {/* Demo Mode Indicator */}
-      {demoMode && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(255, 0, 0, 0.9)',
-          border: '2px solid #FF0000',
-          borderRadius: '20px',
-          padding: '8px 24px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          color: 'white',
-          zIndex: 9999,
-          animation: 'pulse 2s infinite',
-          fontFamily: 'monospace'
-        }}>
-          🎮 DEMO MODE ACTIVE • Press D to Exit
-        </div>
-      )}
-
-      {/* Demo Mode Toggle Button (Mobile-Friendly) */}
-      <button
-        onClick={() => {
-          setDemoMode(prev => !prev);
-          if (!demoMode) {
-            demoWaypointIndexRef.current = 0;
-            demoWaitTimerRef.current = 0;
-            setDemoAnnouncement('Demo Mode Activated');
-            setTimeout(() => setDemoAnnouncement(null), 2000);
-          } else {
-            setDemoAnnouncement(null);
-            keysRef.current.clear();
-          }
-        }}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: demoMode ? 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)' : 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-          border: '4px solid white',
-          color: 'white',
-          fontSize: '36px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
-          zIndex: 9998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.3s ease',
-          touchAction: 'manipulation',
-          userSelect: 'none',
-          WebkitTapHighlightColor: 'transparent'
-        }}
-        onTouchStart={(e) => {
-          e.currentTarget.style.transform = 'scale(0.9)';
-        }}
-        onTouchEnd={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        {demoMode ? '⏹' : '▶️'}
-      </button>
 
       {/* Controls */}
       <div className="vale-controls">
