@@ -24,6 +24,18 @@ export const PartyManagementScreen: React.FC = () => {
     }
   }, [allUnits, selectedUnit]);
 
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleReturn();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleReturn]);
+
   const handleSwapToActive = (unit: Unit) => {
     // Validation: Can't exceed 4 active units
     if (activeUnits.length >= 4) {
@@ -59,9 +71,9 @@ export const PartyManagementScreen: React.FC = () => {
     }
   };
 
-  const handleReturn = () => {
+  const handleReturn = React.useCallback(() => {
     actions.goBack();
-  };
+  }, [actions]);
 
   const selectedStats = selectedUnit ? selectedUnit.calculateStats() : null;
 

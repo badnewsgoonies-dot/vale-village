@@ -96,7 +96,7 @@ export function equipDjinn(team: Team, djinn: Djinn[]): Result<Team, string> {
       turnActivated: -999,  // Never activated
     });
     // Backward compatibility
-    newTeam.djinnStates!.set(d.id, 'Set');
+    newTeam.djinnStates.set(d.id, 'Set');
   }
 
   return Ok(newTeam);
@@ -118,8 +118,6 @@ export function activateDjinn(
   djinnId: string,
   activatingUnit: Unit
 ): Result<Team, string> {
-  // DEBUG: log activation attempt (temporarily added for test investigation)
-  console.log('[DEBUG] activateDjinn called', { currentTurn: team.currentTurn, djinnId, unit: activatingUnit.id });
   // Check Djinn is equipped
   const djinn = team.equippedDjinn.find(d => d.id === djinnId);
   if (!djinn) {
@@ -140,7 +138,6 @@ export function activateDjinn(
 
   // Check per-unit limit (1 Djinn per unit per turn)
   const unitActivations = team.activationsThisTurn.get(activatingUnit.id) || 0;
-  console.log('[DEBUG] unitActivations before check', { unitActivations, activationsThisTurn: Array.from(team.activationsThisTurn.entries()) });
   if (unitActivations >= 1) {
     return Err('Unit can only activate 1 Djinn per turn');
   }
@@ -173,7 +170,7 @@ export function activateDjinn(
   newTeam.activationsThisTurn.set(activatingUnit.id, unitActivations + 1);
 
   // Backward compatibility
-  newTeam.djinnStates!.set(djinnId, 'Standby');
+  newTeam.djinnStates.set(djinnId, 'Standby');
 
   return Ok(newTeam);
 }
@@ -207,14 +204,14 @@ export function updateDjinnRecovery(team: Team, currentTurn: number): Team {
       if (turnsInStandby >= 2) {
         tracker.state = 'Set';
         // Backward compatibility
-        newTeam.djinnStates!.set(djinnId, 'Set');
+        newTeam.djinnStates.set(djinnId, 'Set');
       }
     } else if (tracker.state === 'Recovery') {
       const turnsInRecovery = currentTurn - tracker.turnActivated;
       if (turnsInRecovery >= 3) {
         tracker.state = 'Set';
         // Backward compatibility
-        newTeam.djinnStates!.set(djinnId, 'Set');
+        newTeam.djinnStates.set(djinnId, 'Set');
       }
     }
   }
@@ -307,8 +304,6 @@ export function executeSummon(
 ): Result<SummonResult, string> {
   const standbyDjinn = getStandbyDjinn(team);
 
-  console.log('[DEBUG] executeSummon called', { summonType, standbyCount: standbyDjinn.length, standbyIds: standbyDjinn.map(d => d.id) });
-
   if (standbyDjinn.length < 3) {
     return Err(`Need 3 Standby Djinn to summon (currently have ${standbyDjinn.length})`);
   }
@@ -345,7 +340,7 @@ export function executeSummon(
       turnActivated: team.currentTurn,
     });
     // Backward compatibility
-    newTeam.djinnStates!.set(d.id, 'Recovery');
+    newTeam.djinnStates.set(d.id, 'Recovery');
   }
 
   return Ok({

@@ -22,12 +22,13 @@ function enemyToUnit(enemy: Enemy): Unit {
   const unitDef: UnitDefinition = {
     id: enemy.id,
     name: enemy.name,
-    role: enemy.name as any, // Use name as role for enemies
+    role: 'Pure DPS', // Enemies use generic role instead of unsafe type cast
     description: `A ${enemy.name} enemy`,
     element: enemy.element,
     baseStats: enemy.stats,
     growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies
     abilities: enemy.abilities,
+    manaContribution: 0, // Enemies don't contribute to player mana pool
   };
   return new Unit(unitDef, enemy.level);
 }
@@ -181,7 +182,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       try {
         const updatedUnit = unit.clone();
+
+        // Get the currently equipped item (if any) before equipping new one
+        const previouslyEquippedItem = updatedUnit.equipment[slot as keyof EquipmentLoadout];
+
+        // Equip the new item
         updatedUnit.equipItem(slot as keyof EquipmentLoadout, equipment);
+
+        // Remove the equipped item from inventory
+        const inventoryIndex = prev.playerData.inventory.findIndex(item => item.id === equipment.id);
+        const newInventory = [...prev.playerData.inventory];
+        if (inventoryIndex !== -1) {
+          newInventory.splice(inventoryIndex, 1);
+        }
+
+        // Add previously equipped item back to inventory (if there was one)
+        if (previouslyEquippedItem) {
+          newInventory.push(previouslyEquippedItem);
+        }
 
         return {
           ...prev,
@@ -190,6 +208,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             unitsCollected: prev.playerData.unitsCollected.map(u =>
               u.id === unitId ? updatedUnit : u
             ),
+            inventory: newInventory,
           },
           error: null,
         };
@@ -378,10 +397,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return prev;
       }
 
+<<<<<<< Updated upstream
       // Calculate rewards if player won
       let rewards = null;
       if (prev.currentBattle.status === BattleResult.PLAYER_VICTORY) {
+=======
+      // Determine if player won (check actual battle state, not status field)
+      const playersAlive = prev.currentBattle.playerTeam.units.some(u => !u.isKO);
+      const enemiesAlive = prev.currentBattle.enemies.some(u => !u.isKO);
+      const playerWon = playersAlive && !enemiesAlive;
+
+      console.log('[endBattle] Battle status:', { playersAlive, enemiesAlive, playerWon });
+      console.log('[endBattle] Enemy IDs:', prev.currentBattle.enemies.map(e => ({ id: e.id, name: e.name, level: e.level })));
+
+      // Calculate rewards if player won
+      let rewards = null;
+      if (playerWon) {
+        console.log('[endBattle] Player won! Processing rewards...');
+>>>>>>> Stashed changes
         rewards = processBattleVictory(prev.currentBattle);
+        console.log('[endBattle] Rewards calculated:', rewards);
 
         // Check for NPC bonus rewards
         let npcBonusGold = 0;

@@ -187,7 +187,10 @@ export const DialogueScreen: React.FC = () => {
                   src={currentNode.portrait}
                   alt={currentNode.speaker}
                   onError={(e) => {
-                    e.currentTarget.parentElement!.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.style.display = 'none';
+                    }
                   }}
                 />
               </div>

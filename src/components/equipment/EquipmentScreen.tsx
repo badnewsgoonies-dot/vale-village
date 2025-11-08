@@ -8,16 +8,25 @@ import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import type { Ability } from '@/types/Ability';
 import './EquipmentScreen.css';
 
+type InventoryFilter = 'all' | 'weapon' | 'armor' | 'helm' | 'boots' | 'accessory';
+
 export const EquipmentScreen: React.FC = () => {
   const { state, actions } = useGame();
   const [selectedUnit, setSelectedUnit] = useState<Equipment['slot'] extends string ? any : null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
   const [showAllUnits, setShowAllUnits] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [inventoryFilter, setInventoryFilter] = useState<InventoryFilter>('all');
 
   const allUnits = state.playerData.unitsCollected;
   const activePartyIds = state.playerData.activePartyIds;
   const inventory = state.playerData.inventory;
+
+  // Filter inventory based on selected tab
+  const filteredInventory = useMemo(() => {
+    if (inventoryFilter === 'all') return inventory;
+    return inventory.filter(item => item.slot === inventoryFilter);
+  }, [inventory, inventoryFilter]);
 
   // Split units into active and bench (memoized)
   const activeUnits = useMemo(
@@ -126,9 +135,9 @@ export const EquipmentScreen: React.FC = () => {
     setErrorMessage(null);
   };
 
-  const handleReturn = () => {
+  const handleReturn = React.useCallback(() => {
     actions.goBack();
-  };
+  }, [actions]);
 
   const renderSlot = (slot: EquipmentSlot, label: string) => {
     const item = currentEquipment[slot];
@@ -181,95 +190,92 @@ export const EquipmentScreen: React.FC = () => {
           </div>
         )}
 
-        {/* Main Content - Unit selector and selected unit details */}
-        <div className="equipment-content">
-          {/* Unit Selector Panel */}
-          <aside className="unit-selector" role="navigation" aria-label="Unit selection">
-            <h2>PARTY</h2>
-            <div className="unit-list">
+        {/* Current Team Bar */}
+        <div className="current-team-bar">
+          <div className="team-section">
+            <h3>Current Team</h3>
+            <div className="team-portraits">
               {activeUnits.map(unit => (
                 <div
                   key={unit.id}
-                  className={`unit-card ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
-                  tabIndex={0}
-                  role="button"
-                  aria-pressed={selectedUnit?.id === unit.id}
-                  aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element`}
+                  className={`team-portrait ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
                   onClick={() => {
                     setSelectedUnit(unit);
                     setSelectedItem(null);
                   }}
+                  role="button"
+                  tabIndex={0}
                 >
-                  <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
-                  <div className="unit-info">
-                    <div className="unit-name">
-                      {unit.name}
-                      <span className="unit-element">
-                        <ElementIcon element={unit.element} size="tiny" />
-                      </span>
-                    </div>
-                    <div className="unit-level">Lv {unit.level}</div>
-                  </div>
+                  <BattleUnit unit={unit} animation="Front" className="portrait-sprite" />
+                  <div className="portrait-name">{unit.name}</div>
                 </div>
               ))}
             </div>
+          </div>
 
-            {benchUnits.length > 0 && (
-              <>
-                <h3 className="bench-header">BENCH</h3>
-                <div className="unit-list bench-list">
-                  {benchUnits.map(unit => (
-                    <div
-                      key={unit.id}
-                      className={`unit-card ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
-                      tabIndex={0}
-                      role="button"
-                      aria-pressed={selectedUnit?.id === unit.id}
-                      aria-label={`${unit.name}, Level ${unit.level}, ${unit.element} element`}
-                      onClick={() => {
-                        setSelectedUnit(unit);
-                        setSelectedItem(null);
-                      }}
-                    >
-                      <BattleUnit unit={unit} animation="Front" className="unit-sprite" />
-                      <div className="unit-info">
-                        <div className="unit-name">
-                          {unit.name}
-                          <span className="unit-element">
-                            <ElementIcon element={unit.element} size="tiny" />
-                          </span>
-                        </div>
-                        <div className="unit-level">Lv {unit.level}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            <div className="toggle-all-units">
-              <Button
-                onClick={() => setShowAllUnits(!showAllUnits)}
-                ariaLabel={showAllUnits ? "Hide full roster" : "Show full roster"}
-              >
-                {showAllUnits ? "▲ HIDE FULL ROSTER" : "▼ SHOW FULL ROSTER"}
-              </Button>
+          {benchUnits.length > 0 && (
+            <div className="bench-section">
+              <h3>Bench</h3>
+              <div className="team-portraits">
+                {benchUnits.map(unit => (
+                  <div
+                    key={unit.id}
+                    className={`team-portrait ${selectedUnit?.id === unit.id ? 'selected' : ''}`}
+                    onClick={() => {
+                      setSelectedUnit(unit);
+                      setSelectedItem(null);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <BattleUnit unit={unit} animation="Front" className="portrait-sprite" />
+                    <div className="portrait-name">{unit.name}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </aside>
+          )}
+        </div>
 
+        {/* Main Content - Equipment and Inventory */}
+        <div className="equipment-content">
       {/* Equipped Items Panel */}
       {selectedUnit && (
         <section className="equipped-panel" aria-label="Currently equipped items">
-          <div className="equipped-header">
-            <h2>EQUIPPED: {selectedUnit.name}</h2>
+          {/* Unit Info Banner */}
+          <div className="unit-info-banner">
+            <div className="banner-portrait">
+              <BattleUnit unit={selectedUnit} animation="Front" className="banner-sprite" />
+            </div>
+            <div className="banner-details">
+              <h2 className="banner-unit-name">{selectedUnit.name}</h2>
+              <div className="banner-meta">
+                <span>Lv {selectedUnit.level}</span>
+                <span className="divider">•</span>
+                <ElementIcon element={selectedUnit.element} size="small" />
+                <span>{selectedUnit.element}</span>
+              </div>
+            </div>
           </div>
 
-          {/* Equipment Slots */}
-          <div className="equipped-grid">
-            {renderSlot('weapon', 'Weapon')}
-            {renderSlot('armor', 'Armor')}
-            {renderSlot('helm', 'Helm')}
-            {renderSlot('boots', 'Boots')}
+          {/* Equipment Slots - Plus/Cross Layout */}
+          <div className="equipped-plus-layout">
+            {/* Top: Helm */}
+            <div className="equipment-top">
+              {renderSlot('helm', 'HELM')}
+            </div>
+
+            {/* Middle Row: Weapon, Armor, Accessory */}
+            <div className="equipment-middle">
+              {renderSlot('weapon', 'WEAPON')}
+              {renderSlot('armor', 'ARMOR')}
+              {renderSlot('accessory', 'ACCESSORY')}
+            </div>
+
+            {/* Bottom: Boots */}
+            <div className="equipment-bottom">
+              {renderSlot('boots', 'BOOTS')}
+            </div>
           </div>
 
           {/* Stat Comparison */}
@@ -365,7 +371,47 @@ export const EquipmentScreen: React.FC = () => {
       {/* Inventory Panel */}
       <section className="inventory-panel" aria-label="Equipment inventory">
         <h2>INVENTORY</h2>
-        
+
+        {/* Filter Tabs */}
+        <div className="inventory-filter-tabs">
+          <button
+            className={`filter-tab ${inventoryFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('all')}
+          >
+            All
+          </button>
+          <button
+            className={`filter-tab ${inventoryFilter === 'weapon' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('weapon')}
+          >
+            Weapon
+          </button>
+          <button
+            className={`filter-tab ${inventoryFilter === 'armor' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('armor')}
+          >
+            Armor
+          </button>
+          <button
+            className={`filter-tab ${inventoryFilter === 'helm' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('helm')}
+          >
+            Helm
+          </button>
+          <button
+            className={`filter-tab ${inventoryFilter === 'boots' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('boots')}
+          >
+            Boots
+          </button>
+          <button
+            className={`filter-tab ${inventoryFilter === 'accessory' ? 'active' : ''}`}
+            onClick={() => setInventoryFilter('accessory')}
+          >
+            Accessory
+          </button>
+        </div>
+
         {/* Selected Item Details */}
         {selectedItem && (
           <div className="selected-item-details">
@@ -408,7 +454,7 @@ export const EquipmentScreen: React.FC = () => {
         )}
         
         <div className="inventory-grid">
-          {inventory.map(item => {
+          {filteredInventory.map(item => {
             const grantsAbility = item.unlocksAbility ? ABILITIES[item.unlocksAbility] : null;
             
             return (

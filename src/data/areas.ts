@@ -56,14 +56,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Mayor',
       position: { x: 10, y: 5 },
       blocking: true,
-      dialogue: {
-        default: 'Welcome to Vale Village, traveler. We are a peaceful town... for now.',
-        intro: 'Monsters have been spotted near the forest. Can you investigate?',
-        quest_forest_active: 'Have you cleared the forest yet?',
-        quest_forest_complete: 'Thank you! But there\'s more trouble ahead...',
-        quest_ruins_active: 'The ancient ruins hold secrets. Please investigate them.',
-        quest_ruins_complete: 'You have saved us all. Vale Village is in your debt.',
-      },
+      dialogue: 'Hey',
       questId: 'quest_clear_forest',
       battleOnInteract: ['earth-golem'],
       battleOnlyOnce: true,
@@ -73,7 +66,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Dora the Shopkeeper',
       position: { x: 15, y: 8 },
       blocking: true,
-      dialogue: 'Welcome to my shop! Buy items before you go adventuring.',
+      dialogue: 'Welcome to my shop!',
       shopType: 'item',
       battleOnInteract: ['slime'],
       battleOnlyOnce: true,
@@ -83,7 +76,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Brock the Blacksmith',
       position: { x: 5, y: 8 },
       blocking: true,
-      dialogue: 'Need equipment? I have the finest weapons and armor!',
+      dialogue: 'Need equipment?',
       shopType: 'equipment',
       battleOnInteract: ['goblin'],
       battleOnlyOnce: true,
@@ -93,7 +86,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Martha the Innkeeper',
       position: { x: 10, y: 12 },
       blocking: true,
-      dialogue: 'Rest at my inn to restore your health and energy. Only 10 gold!',
+      dialogue: 'Rest here?',
       shopType: 'inn',
       battleOnInteract: ['slime'],
       battleOnlyOnce: true,
@@ -105,11 +98,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Tom the Farmer',
       position: { x: 3, y: 10 },
       blocking: true,
-      dialogue: {
-        default: 'Want to test your skills? I\'ll show you some farming strength!',
-        quest_forest_active: 'Those monsters appeared after that earthquake... Be careful out there!',
-        quest_forest_complete: 'The forest is safe again. Thank you, brave warrior!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['wild-wolf'],
       battleOnlyOnce: true,
     },
@@ -118,10 +107,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Young Sarah',
       position: { x: 17, y: 6 },
       blocking: true,
-      dialogue: {
-        default: 'I\'ve been practicing! Let me show you my Psynergy!',
-        quest_ruins_complete: 'Wow! You defeated the Golem King! You\'re amazing!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['slime', 'slime'],
       battleOnlyOnce: true,
     },
@@ -130,7 +116,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Old Martha',
       position: { x: 7, y: 3 },
       blocking: true,
-      dialogue: 'Back in my day, we fought REAL monsters! Let me teach you a lesson!',
+      dialogue: 'Hey',
       battleOnInteract: ['goblin', 'goblin'],
       battleOnlyOnce: true,
     },
@@ -139,7 +125,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Farmer Jack',
       position: { x: 12, y: 3 },
       blocking: true,
-      dialogue: 'My scarecrows came to life! Help me fight them off!',
+      dialogue: 'Hey',
       battleOnInteract: ['wind-wisp', 'wild-wolf'],
       battleOnlyOnce: true,
     },
@@ -148,7 +134,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Young Tim',
       position: { x: 4, y: 6 },
       blocking: false,
-      dialogue: 'I caught some wild creatures! Wanna battle?',
+      dialogue: 'Hey',
       battleOnInteract: ['slime', 'slime', 'slime'],
       battleOnlyOnce: true,
     },
@@ -157,7 +143,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Merchant',
       position: { x: 16, y: 4 },
       blocking: true,
-      dialogue: 'Bandits stole my goods! These wolves are trained to guard me!',
+      dialogue: 'Hey',
       battleOnInteract: ['wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
@@ -166,7 +152,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Apprentice',
       position: { x: 6, y: 9 },
       blocking: false,
-      dialogue: 'I forged these metal golems for practice! Fight them!',
+      dialogue: 'Hey',
       battleOnInteract: ['earth-golem'],
       battleOnlyOnce: true,
     },
@@ -175,7 +161,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Town Guard',
       position: { x: 9, y: 1 },
       blocking: true,
-      dialogue: 'Show me your combat skills! Every adventurer must pass my test!',
+      dialogue: 'Hey',
       battleOnInteract: ['goblin', 'wild-wolf', 'goblin'],
       battleOnlyOnce: true,
     },
@@ -184,7 +170,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Fisherman Pete',
       position: { x: 1, y: 7 },
       blocking: true,
-      dialogue: 'The wind spirits answer my call! Can you handle them?',
+      dialogue: 'Hey',
       battleOnInteract: ['wind-wisp', 'wind-wisp'],
       battleOnlyOnce: true,
     },
@@ -193,7 +179,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Herbalist',
       position: { x: 18, y: 10 },
       blocking: true,
-      dialogue: 'These healing herbs attracted nature spirits! Battle them!',
+      dialogue: 'Hey',
       battleOnInteract: ['fire-sprite', 'slime'],
       battleOnlyOnce: true,
     },
@@ -204,7 +190,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Billy',
       position: { x: 8, y: 11 },
       blocking: false,
-      dialogue: 'I found some cute critters! Let\'s battle with them!',
+      dialogue: 'Hey',
       battleOnInteract: ['grub', 'worm'], // NEW: Nature critters
       battleOnlyOnce: true,
     },
@@ -213,7 +199,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Lucy',
       position: { x: 13, y: 11 },
       blocking: false,
-      dialogue: 'My pet monsters escaped! Can you catch them?',
+      dialogue: 'Hey',
       battleOnInteract: ['mini-goblin', 'kobold'], // NEW: Small humanoids
       battleOnlyOnce: true,
     },
@@ -222,7 +208,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Tommy',
       position: { x: 14, y: 3 },
       blocking: false,
-      dialogue: 'That shiny rock was actually a fire sprite! Help!',
+      dialogue: 'Hey',
       battleOnInteract: ['fire-sprite'],
       battleOnlyOnce: true,
     },
@@ -233,7 +219,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Scholar Elric',
       position: { x: 2, y: 5 },
       blocking: true,
-      dialogue: 'Let me test your knowledge of elemental combat! Face my summons!',
+      dialogue: 'Hey',
       battleOnInteract: ['fire-sprite', 'wind-wisp'],
       battleOnlyOnce: true,
     },
@@ -242,10 +228,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Sage Aldric',
       position: { x: 18, y: 2 },
       blocking: true,
-      dialogue: {
-        default: 'The four elements challenge you! Prove your worth!',
-        quest_ruins_active: 'The ancient ruins are protected by elemental guardians. Use their weaknesses!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['fire-sprite', 'earth-golem', 'wind-wisp'],
       battleOnlyOnce: true,
     },
@@ -256,7 +239,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Traveling Merchant',
       position: { x: 11, y: 9 },
       blocking: true,
-      dialogue: 'Road bandits trained these beasts! Help me fight them off!',
+      dialogue: 'Hey',
       battleOnInteract: ['goblin', 'wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
@@ -265,7 +248,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Bard',
       position: { x: 13, y: 7 },
       blocking: false,
-      dialogue: 'My music attracts spirits! Let\'s see if you can handle them!',
+      dialogue: 'Hey',
       battleOnInteract: ['wind-wisp', 'fire-sprite'],
       battleOnlyOnce: true,
     },
@@ -276,7 +259,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Giant Crab',
       position: { x: 1, y: 13 },
       blocking: false,
-      dialogue: '*SNAP SNAP* (It attacks!)',
+      dialogue: 'Hey',
       battleOnInteract: ['rat', 'spider', 'bat'], // NEW: Critter enemies
       battleOnlyOnce: true,
     },
@@ -285,7 +268,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Angry Crab',
       position: { x: 2, y: 14 },
       blocking: false,
-      dialogue: '*aggressive clicking*',
+      dialogue: 'Hey',
       battleOnInteract: ['roach', 'vermin'], // NEW: Pest enemies
       battleOnlyOnce: true,
     },
@@ -294,7 +277,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Possessed Seagull',
       position: { x: 19, y: 1 },
       blocking: false,
-      dialogue: '*demonic squawk* (Dark energy radiates from it!)',
+      dialogue: 'Hey',
       battleOnInteract: ['seabird', 'seafowl', 'bat'], // NEW: Bird enemies
       battleOnlyOnce: true,
     },
@@ -306,10 +289,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Isaac',
       position: { x: 5, y: 4 },
       blocking: true,
-      dialogue: {
-        default: 'I am Isaac, Earth Adept. Test your strength against my earth summons!',
-        quest_forest_complete: 'You\'ve proven yourself capable. Join me in the Ancient Ruins!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['rock-golem', 'stone-golem'], // Level 4-5 earth enemies
       battleOnlyOnce: false, // Can battle multiple times for training
     },
@@ -318,7 +298,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Felix',
       position: { x: 3, y: 12 },
       blocking: true,
-      dialogue: 'Felix here. An honor duel awaits those who seek true power!',
+      dialogue: 'Hey',
       battleOnInteract: ['gargoyle', 'earth-lizard', 'gnome'], // Level 4 earth/stone mix
       battleOnlyOnce: false,
     },
@@ -329,7 +309,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Garet',
       position: { x: 15, y: 4 },
       blocking: true,
-      dialogue: 'Garet\'s the name, flames are my game! Ready to feel the heat?',
+      dialogue: 'Hey',
       battleOnInteract: ['salamander', 'fire-worm', 'imp'], // Level 3-4 fire enemies
       battleOnlyOnce: false,
     },
@@ -338,7 +318,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Jenna',
       position: { x: 7, y: 13 },
       blocking: true,
-      dialogue: 'I need rescuing from these fire spirits I accidentally summoned! Help!',
+      dialogue: 'Hey',
       battleOnInteract: ['fire-worm', 'salamander'], // Level 3 fire enemies
       battleOnlyOnce: true, // Rescue quest - one time only
     },
@@ -347,10 +327,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Kyle',
       position: { x: 10, y: 2 },
       blocking: true,
-      dialogue: {
-        default: 'I am Kyle, master of the blade. Only the worthy may face my warrior\'s trial!',
-        quest_ruins_complete: 'You have conquered the ruins. Perhaps you are ready for my trial...',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['wyvern', 'demon-imp', 'orc-warrior'], // Level 5-6 elite enemies
       battleOnlyOnce: false,
     },
@@ -361,7 +338,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Mia',
       position: { x: 17, y: 11 },
       blocking: true,
-      dialogue: 'Mia, healer and ice mage. Let\'s have a friendly spar with my water spirits!',
+      dialogue: 'Hey',
       battleOnInteract: ['ooze', 'slime-beast', 'merman'], // Level 3-4 water enemies
       battleOnlyOnce: false,
     },
@@ -370,7 +347,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Piers',
       position: { x: 1, y: 3 },
       blocking: true,
-      dialogue: 'As guardian of the harbor, I command the tides! Face my aquatic allies!',
+      dialogue: 'Hey',
       battleOnInteract: ['gillman', 'merman', 'king-cobra'], // Level 4-5 aquatic enemies
       battleOnlyOnce: false,
     },
@@ -381,7 +358,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Ivan',
       position: { x: 17, y: 13 },
       blocking: true,
-      dialogue: 'Ivan at your service! My wind magic calls forth these aerial creatures!',
+      dialogue: 'Hey',
       battleOnInteract: ['drone-bee', 'fighter-bee', 'pixie'], // Level 3 wind/flying enemies
       battleOnlyOnce: false,
     },
@@ -390,7 +367,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Sheba',
       position: { x: 12, y: 13 },
       blocking: true,
-      dialogue: 'I was found in the forest among these wind spirits. Can you calm them?',
+      dialogue: 'Hey',
       battleOnInteract: ['pixie', 'faery', 'willowisp'], // Level 3-4 fairy/wind enemies
       battleOnlyOnce: true, // Found in forest - rescue scenario
     },
@@ -401,10 +378,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Kraden',
       position: { x: 2, y: 8 },
       blocking: true,
-      dialogue: {
-        default: 'Ah, a student! I am Kraden, alchemist and researcher. Let me test your knowledge of all elements!',
-        quest_forest_active: 'Fascinating creatures in that forest! Collect data for me, won\'t you?',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'], // Level 4 mixed elements
       battleOnlyOnce: false,
     },
@@ -415,10 +389,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Zen Master',
       position: { x: 11, y: 6 },
       blocking: true,
-      dialogue: {
-        default: 'Meditation has given me power over spirits. Face my inner demons!',
-        quest_ruins_complete: 'You have achieved enlightenment through battle. Well done.',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['ghost', 'spirit', 'will-head', 'wraith'], // Level 3-6 spiritual enemies
       battleOnlyOnce: false,
     },
@@ -427,10 +398,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Captured Villager',
       position: { x: 19, y: 12 },
       blocking: true,
-      dialogue: {
-        default: 'Help! Bandits left these monsters to guard me! Free me!',
-        quest_forest_complete: 'Thank you for saving me! Those bandits won\'t get away with this!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['brigand', 'thief', 'ruffian'], // Level 4 bandit-themed enemies
       battleOnlyOnce: true, // Rescue mission - one time only
     },
@@ -439,7 +407,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Cursed Ancient Tree',
       position: { x: 4, y: 14 },
       blocking: true,
-      dialogue: '*The tree groans with dark energy* A curse binds nature spirits here!',
+      dialogue: 'Hey',
       battleOnInteract: ['creeper', 'vine', 'brambler', 'wild-mushroom'], // Level 2-5 plant enemies
       battleOnlyOnce: true, // Breaking the curse
     },
@@ -450,7 +418,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Beast Tamer',
       position: { x: 14, y: 9 },
       blocking: true,
-      dialogue: 'I train wild beasts for the village guard! Want to test them?',
+      dialogue: 'Hey',
       battleOnInteract: ['dire-wolf', 'wild-cat', 'lynx'], // Level 2-3 beast enemies
       battleOnlyOnce: false,
     },
@@ -459,7 +427,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Insect Collector',
       position: { x: 8, y: 7 },
       blocking: false,
-      dialogue: 'Check out my rare bug collection! They\'re quite fierce!',
+      dialogue: 'Hey',
       battleOnInteract: ['ant-lion', 'flash-ant', 'hornet'], // Level 3 insect enemies
       battleOnlyOnce: false,
     },
@@ -468,7 +436,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Undead Hunter',
       position: { x: 16, y: 9 },
       blocking: true,
-      dialogue: 'I hunt the undead for a living. Let me show you what I\'ve captured!',
+      dialogue: 'Hey',
       battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead enemies
       battleOnlyOnce: false,
     },
@@ -477,7 +445,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Slime Rancher',
       position: { x: 6, y: 12 },
       blocking: false,
-      dialogue: 'My slime ranch has the strongest slimes in Vale! Prove me wrong!',
+      dialogue: 'Hey',
       battleOnInteract: ['ooze', 'slime-beast'], // Level 3 slime variants
       battleOnlyOnce: false,
     },
@@ -486,7 +454,7 @@ export const VALE_VILLAGE: Area = {
       name: 'Lizard Keeper',
       position: { x: 13, y: 5 },
       blocking: true,
-      dialogue: 'These lizards are my pets! They\'ve been trained for combat!',
+      dialogue: 'Hey',
       battleOnInteract: ['lizard-man', 'lizard-fighter', 'thunder-lizard'], // Level 4 lizard enemies
       battleOnlyOnce: false,
     },
@@ -603,10 +571,7 @@ export const FOREST_PATH: Area = {
       name: 'Lost Traveler',
       position: { x: 7, y: 5 },
       blocking: true,
-      dialogue: {
-        default: 'Monsters are chasing me! Please help fight them off!',
-        quest_forest_complete: 'Thank you for clearing the monsters! I can finally go home!',
-      },
+      dialogue: 'Hey',
       battleOnInteract: ['wild-wolf', 'goblin'],
       battleOnlyOnce: true,
     },
@@ -615,7 +580,7 @@ export const FOREST_PATH: Area = {
       name: 'Injured Hunter',
       position: { x: 14, y: 15 },
       blocking: true,
-      dialogue: 'The wolves that attacked me are still nearby! Finish them!',
+      dialogue: 'Hey',
       battleOnInteract: ['wild-wolf', 'wild-wolf', 'wild-wolf'],
       battleOnlyOnce: true,
     },
@@ -624,7 +589,7 @@ export const FOREST_PATH: Area = {
       name: 'Cursed Tree',
       position: { x: 10, y: 20 },
       blocking: false,
-      dialogue: 'The tree pulses with dark energy... it spawns monsters!',
+      dialogue: 'Hey',
       battleOnInteract: ['goblin', 'slime', 'goblin', 'slime'],
       battleOnlyOnce: true,
     },
@@ -645,7 +610,7 @@ export const FOREST_PATH: Area = {
       height: 1,
       targetArea: 'ancient_ruins',
       targetPosition: { x: 10, y: 2 },
-      requiredFlag: 'quest_forest_complete', // Can only access after clearing forest
+      requiredFlag: 'ancient_ruins_unlocked', // Can only access after unlocking
     },
   ],
   backgroundColor: '#2d5016',
@@ -767,7 +732,7 @@ export const ANCIENT_RUINS: Area = {
       name: 'Ancient Monk',
       position: { x: 7, y: 22 },
       blocking: true,
-      dialogue: 'Test your enlightenment against these ancient spirits!',
+      dialogue: 'Hey',
       battleOnInteract: ['storm-lord'],
       battleOnlyOnce: true,
     },
@@ -833,7 +798,12 @@ export const BATTLE_ROW: Area = {
     },
   ],
   npcs: [
+<<<<<<< Updated upstream
     // NPCs are inside the houses, not outside blocking the entrances
+=======
+    // NPCs removed - battles happen inside houses when entering buildings
+    // TODO: Implement house interiors with NPCs inside
+>>>>>>> Stashed changes
   ],
 
   // === BUILDINGS (30 houses with unique Vale sprites) ===
@@ -933,6 +903,20 @@ export const BATTLE_ROW: Area = {
 
   // === SCENERY (trees, bushes, decorations) ===
   scenery: [
+    // TOP ROW - Fill empty sky area (y: 2-3)
+    { id: 'cloud1', position: { x: 8, y: 2 }, sprite: '/sprites/scenery/plants/Small_Tree1.gif', blocking: false, layer: 'background' },
+    { id: 'cloud2', position: { x: 20, y: 2 }, sprite: '/sprites/scenery/plants/Small_Tree2.gif', blocking: false, layer: 'background' },
+    { id: 'cloud3', position: { x: 32, y: 2 }, sprite: '/sprites/scenery/plants/Small_Tree3.gif', blocking: false, layer: 'background' },
+    { id: 'cloud4', position: { x: 44, y: 2 }, sprite: '/sprites/scenery/plants/Small_Tree4.gif', blocking: false, layer: 'background' },
+    { id: 'cloud5', position: { x: 56, y: 2 }, sprite: '/sprites/scenery/plants/Small_Tree5.gif', blocking: false, layer: 'background' },
+    { id: 'cloud6', position: { x: 68, y: 2 }, sprite: '/sprites/scenery/plants/Tree1.gif', blocking: false, layer: 'background' },
+    { id: 'cloud7', position: { x: 80, y: 2 }, sprite: '/sprites/scenery/plants/Tree5.gif', blocking: false, layer: 'background' },
+    { id: 'cloud8', position: { x: 92, y: 2 }, sprite: '/sprites/scenery/plants/Tree6.gif', blocking: false, layer: 'background' },
+    { id: 'cloud9', position: { x: 104, y: 2 }, sprite: '/sprites/scenery/plants/Tree7.gif', blocking: false, layer: 'background' },
+    { id: 'cloud10', position: { x: 116, y: 2 }, sprite: '/sprites/scenery/plants/Tree9.gif', blocking: false, layer: 'background' },
+
+    // Vertical paths are now handled by CSS (see NewOverworldScreen.css battle_row section)
+
     // Trees on left edge
     { id: 'tree1', position: { x: 2, y: 4 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
     { id: 'tree2', position: { x: 2, y: 10 }, sprite: '/sprites/scenery/plants/Tree.gif', blocking: true },
@@ -1055,7 +1039,7 @@ export const BATTLE_ROW: Area = {
       height: 3,
       targetArea: 'vale_village',
       targetPosition: { x: 2, y: 7 },
-      requiredFlag: 'battle_row_complete',
+      // No flag required - players can leave Battle Row at any time
     },
     // House entrances (30 houses)
     { id: 'enter_house1', position: { x: 4, y: 7 }, width: 1, height: 1, targetArea: 'house1_interior', targetPosition: { x: 5, y: 6 } },
@@ -1089,7 +1073,7 @@ export const BATTLE_ROW: Area = {
     { id: 'enter_house29', position: { x: 116, y: 7 }, width: 1, height: 1, targetArea: 'house29_interior', targetPosition: { x: 5, y: 6 } },
     { id: 'enter_house30', position: { x: 120, y: 7 }, width: 1, height: 1, targetArea: 'house30_interior', targetPosition: { x: 5, y: 6 } },
   ],
-  backgroundColor: '#2a2a1a', // Dark ground for battle arena
+  backgroundColor: '#4a7c4e', // Bright green grass like Vale Village
 };
 
 // ========================================
@@ -1158,7 +1142,7 @@ function createHouseInterior(
         position: { x: 5, y: 3 },
         sprite: npcData.sprite,
         blocking: true,
-        dialogue: npcData.dialogue,
+        dialogue: 'Hey',
         battleOnInteract: npcData.battleEnemies as any,
         battleOnlyOnce: false,
         battleRewards: rewards
@@ -1171,23 +1155,92 @@ function createHouseInterior(
       },
     ],
     buildings: [],
-    scenery: rewards.equipment.map((_equip, idx) => ({
-      id: `reward-display-${idx}`,
-      position: { x: 3 + idx * 2, y: 2 },
-      sprite: '/sprites/icons/items/treasure-chest.gif', // Placeholder for equipment display
-      blocking: false,
-      layer: 'foreground' as const,
-    })).concat(
-      rewards.djinn
-        ? [{
-            id: 'djinn-display',
-            position: { x: 5, y: 1 },
-            sprite: `/sprites/battle/djinn/${rewards.djinn === 'flint' || rewards.djinn === 'granite' || rewards.djinn === 'bane' ? 'Venus' : rewards.djinn === 'forge' || rewards.djinn === 'corona' || rewards.djinn === 'fury' ? 'Mars' : rewards.djinn === 'fizz' || rewards.djinn === 'tonic' || rewards.djinn === 'crystal' ? 'Mercury' : 'Jupiter'}_Djinn_Front.gif`,
-            blocking: false,
-            layer: 'foreground' as const,
-          }]
-        : []
-    ),
+    scenery: [
+      // Furniture - Bed (top left)
+      {
+        id: 'bed',
+        position: { x: 1, y: 1 },
+        sprite: '/sprites/scenery/indoor/lg/Bed.gif',
+        blocking: true,
+        layer: 'foreground' as const,
+      },
+      // Table (center-left)
+      {
+        id: 'table',
+        position: { x: 2, y: 4 },
+        sprite: '/sprites/scenery/indoor/lg/table1.gif',
+        blocking: true,
+        layer: 'foreground' as const,
+      },
+      // Chair (left of table)
+      {
+        id: 'chair1',
+        position: { x: 1, y: 4 },
+        sprite: '/sprites/scenery/indoor/sm/chair.gif',
+        blocking: true,
+        layer: 'foreground' as const,
+      },
+      // Chair (right of table)
+      {
+        id: 'chair2',
+        position: { x: 3, y: 4 },
+        sprite: '/sprites/scenery/indoor/sm/chair.gif',
+        blocking: true,
+        layer: 'foreground' as const,
+      },
+      // Bookshelf (top right)
+      {
+        id: 'bookshelf',
+        position: { x: 8, y: 1 },
+        sprite: '/sprites/scenery/indoor/lg/bookcase1.gif',
+        blocking: true,
+        layer: 'foreground' as const,
+      },
+      // Pot/Plant (bottom left corner)
+      {
+        id: 'pot1',
+        position: { x: 1, y: 6 },
+        sprite: '/sprites/scenery/indoor/sm/Houseplant.gif',
+        blocking: false,
+        layer: 'foreground' as const,
+      },
+      // Pot/Plant (bottom right corner)
+      {
+        id: 'pot2',
+        position: { x: 8, y: 6 },
+        sprite: '/sprites/scenery/indoor/sm/Houseplant.gif',
+        blocking: false,
+        layer: 'foreground' as const,
+      },
+      // Rug (center floor decoration)
+      {
+        id: 'rug',
+        position: { x: 4, y: 4 },
+        sprite: '/sprites/scenery/indoor/lg/rug1.gif',
+        blocking: false,
+        layer: 'background' as const,
+      },
+    ]
+      // Equipment reward displays
+      .concat(rewards.equipment.map((_equip, idx) => ({
+        id: `reward-display-${idx}`,
+        position: { x: 6 + idx, y: 2 },
+        sprite: '/sprites/icons/items/treasure-chest.gif',
+        blocking: false,
+        layer: 'foreground' as const,
+      })))
+      // Djinn display
+      .concat(
+        rewards.djinn
+          ? [{
+              id: 'djinn-display',
+              position: { x: 7, y: 1 },
+              sprite: `/sprites/battle/djinn/${rewards.djinn === 'flint' || rewards.djinn === 'granite' || rewards.djinn === 'bane' ? 'Venus' : rewards.djinn === 'forge' || rewards.djinn === 'corona' || rewards.djinn === 'fury' ? 'Mars' : rewards.djinn === 'fizz' || rewards.djinn === 'tonic' || rewards.djinn === 'crystal' ? 'Mercury' : 'Jupiter'}_Djinn_Front.gif`,
+              blocking: false,
+              layer: 'foreground' as const,
+            }]
+          : []
+      ),
     exits: [
       {
         id: 'exit',
@@ -1207,7 +1260,7 @@ const HOUSE1_INTERIOR = createHouseInterior(1, {
   id: 'house1-skeleton-tamer',
   name: 'Skeleton Tamer',
   sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
-  dialogue: 'I raise undead warriors for battle! Test your skills!',
+  dialogue: 'Hey',
   battleEnemies: ['skeleton', 'zombie'],
 });
 
@@ -1215,7 +1268,7 @@ const HOUSE2_INTERIOR = createHouseInterior(2, {
   id: 'house2-zombie-keeper',
   name: 'Zombie Keeper',
   sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
-  dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
+  dialogue: 'Hey',
   battleEnemies: ['skeleton', 'zombie', 'ghoul'],
 });
 
@@ -1231,7 +1284,7 @@ const HOUSE4_INTERIOR = createHouseInterior(4, {
   id: 'house4-insect-collector',
   name: 'Insect Collector',
   sprite: '/sprites/overworld/minornpcs/Villager-3.gif',
-  dialogue: 'My rare bug collection fights in the arena! Witness their power!',
+  dialogue: 'Hey',
   battleEnemies: ['ant-lion', 'flash-ant', 'hornet', 'drone-bee'],
 });
 
@@ -1239,7 +1292,7 @@ const HOUSE5_INTERIOR = createHouseInterior(5, {
   id: 'house5-slime-rancher',
   name: 'Slime Rancher',
   sprite: '/sprites/overworld/minornpcs/Villager-4.gif',
-  dialogue: 'These are the strongest slimes in all the land! Prove me wrong!',
+  dialogue: 'Hey',
   battleEnemies: ['ooze', 'slime-beast', 'slime'],
 });
 
@@ -1247,7 +1300,7 @@ const HOUSE6_INTERIOR = createHouseInterior(6, {
   id: 'house6-lizard-keeper',
   name: 'Lizard Keeper',
   sprite: '/sprites/overworld/minornpcs/Villager-5.gif',
-  dialogue: 'My combat-trained lizards are unbeatable! Take them on!',
+  dialogue: 'Hey',
   battleEnemies: ['lizard-man', 'lizard-fighter', 'thunder-lizard', 'earth-lizard'],
 });
 
@@ -1255,7 +1308,7 @@ const HOUSE7_INTERIOR = createHouseInterior(7, {
   id: 'house7-mia',
   name: 'Mia',
   sprite: '/sprites/overworld/protagonists/Mia.gif',
-  dialogue: 'I am Mia, healer and ice mage. My water spirits will test your resolve!',
+  dialogue: 'Hey',
   battleEnemies: ['ooze', 'slime-beast', 'merman', 'gillman'],
 });
 
@@ -1263,7 +1316,7 @@ const HOUSE8_INTERIOR = createHouseInterior(8, {
   id: 'house8-zen-master',
   name: 'Zen Master',
   sprite: '/sprites/overworld/minornpcs/Monk_sitting.gif',
-  dialogue: 'Through meditation, I command spirits. Face my inner demons!',
+  dialogue: 'Hey',
   battleEnemies: ['ghost', 'spirit', 'will-head', 'wraith'],
 });
 
@@ -1271,7 +1324,7 @@ const HOUSE9_INTERIOR = createHouseInterior(9, {
   id: 'house9-elemental-summoner',
   name: 'Elemental Summoner',
   sprite: '/sprites/overworld/minornpcs/Villager-6.gif',
-  dialogue: 'I summon elementals from all realms! Can you withstand their power?',
+  dialogue: 'Hey',
   battleEnemies: ['gnome-wizard', 'demon-imp', 'willowisp', 'pixie'],
 });
 
@@ -1279,7 +1332,7 @@ const HOUSE10_INTERIOR = createHouseInterior(10, {
   id: 'house10-kraden',
   name: 'Kraden',
   sprite: '/sprites/overworld/protagonists/Kraden.gif',
-  dialogue: 'Ah, a visitor! I am Kraden, alchemist and researcher. My elemental test awaits you!',
+  dialogue: 'Hey',
   battleEnemies: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'],
 });
 
@@ -1287,7 +1340,7 @@ const HOUSE11_INTERIOR = createHouseInterior(11, {
   id: 'house11-rat-breeder',
   name: 'Rat Breeder',
   sprite: '/sprites/overworld/minornpcs/Villager-7.gif',
-  dialogue: 'My trained rats are fierce fighters! Face them!',
+  dialogue: 'Hey',
   battleEnemies: ['rat', 'armored-rat', 'rat-fighter'],
 });
 
@@ -1295,7 +1348,7 @@ const HOUSE12_INTERIOR = createHouseInterior(12, {
   id: 'house12-bat-handler',
   name: 'Bat Handler',
   sprite: '/sprites/overworld/minornpcs/Villager-8.gif',
-  dialogue: 'My bats will overwhelm you!',
+  dialogue: 'Hey',
   battleEnemies: ['bat', 'rabid-bat', 'bat'],
 });
 
@@ -1303,7 +1356,7 @@ const HOUSE13_INTERIOR = createHouseInterior(13, {
   id: 'house13-spider-tamer',
   name: 'Spider Tamer',
   sprite: '/sprites/overworld/minornpcs/Villager-9.gif',
-  dialogue: 'Spiders are the ultimate predators!',
+  dialogue: 'Hey',
   battleEnemies: ['spider', 'tarantula', 'recluse'],
 });
 
@@ -1311,7 +1364,7 @@ const HOUSE14_INTERIOR = createHouseInterior(14, {
   id: 'house14-goblin-wrangler',
   name: 'Goblin Wrangler',
   sprite: '/sprites/overworld/minornpcs/Villager-10.gif',
-  dialogue: 'Goblins may be small, but they fight dirty!',
+  dialogue: 'Hey',
   battleEnemies: ['goblin', 'hobgoblin', 'mini-goblin'],
 });
 
@@ -1319,7 +1372,7 @@ const HOUSE15_INTERIOR = createHouseInterior(15, {
   id: 'house15-pest-exterminator',
   name: 'Pest Exterminator',
   sprite: '/sprites/overworld/minornpcs/Villager-11.gif',
-  dialogue: 'I know all the pests! Let me introduce you!',
+  dialogue: 'Hey',
   battleEnemies: ['vermin', 'roach', 'grub'],
 });
 
@@ -1327,15 +1380,15 @@ const HOUSE16_INTERIOR = createHouseInterior(16, {
   id: 'house16-hound-trainer',
   name: 'Hound Trainer',
   sprite: '/sprites/overworld/minornpcs/Villager-12.gif',
-  dialogue: 'My war hounds are unstoppable!',
-  battleEnemies: ['wild-wolf', 'wild-dog', 'hell-hound'],
+  dialogue: 'Hey',
+  battleEnemies: ['wild-wolf', 'dire-wolf', 'dread-hound'],
 });
 
 const HOUSE17_INTERIOR = createHouseInterior(17, {
   id: 'house17-bee-keeper',
   name: 'Bee Keeper',
   sprite: '/sprites/overworld/minornpcs/Villager-13.gif',
-  dialogue: 'Beware the swarm!',
+  dialogue: 'Hey',
   battleEnemies: ['drone-bee', 'warrior-bee', 'hornet'],
 });
 
@@ -1343,7 +1396,7 @@ const HOUSE18_INTERIOR = createHouseInterior(18, {
   id: 'house18-ant-farmer',
   name: 'Ant Farmer',
   sprite: '/sprites/overworld/minornpcs/Villager-14.gif',
-  dialogue: 'My ant colony will bury you!',
+  dialogue: 'Hey',
   battleEnemies: ['flash-ant', 'ant-lion', 'flash-ant'],
 });
 
@@ -1351,23 +1404,23 @@ const HOUSE19_INTERIOR = createHouseInterior(19, {
   id: 'house19-toad-collector',
   name: 'Toad Collector',
   sprite: '/sprites/overworld/minornpcs/Villager-15.gif',
-  dialogue: 'Toxic toads are my specialty!',
-  battleEnemies: ['toad', 'poison-toad', 'toad'],
+  dialogue: 'Hey',
+  battleEnemies: ['devil-frog', 'poison-toad', 'devil-frog'],
 });
 
 const HOUSE20_INTERIOR = createHouseInterior(20, {
   id: 'house20-mole-handler',
   name: 'Mole Handler',
   sprite: '/sprites/overworld/minornpcs/Villager-16.gif',
-  dialogue: 'Underground warriors attack!',
-  battleEnemies: ['giant-mole', 'giant-mole', 'grub'],
+  dialogue: 'Hey',
+  battleEnemies: ['mad-mole', 'mad-mole', 'grub'],
 });
 
 const HOUSE21_INTERIOR = createHouseInterior(21, {
   id: 'house21-aqua-specialist',
   name: 'Aqua Specialist',
   sprite: '/sprites/overworld/minornpcs/Villager-17.gif',
-  dialogue: 'Water creatures are the strongest!',
+  dialogue: 'Hey',
   battleEnemies: ['merman', 'gillman', 'ooze'],
 });
 
@@ -1375,7 +1428,7 @@ const HOUSE22_INTERIOR = createHouseInterior(22, {
   id: 'house22-fire-trainer',
   name: 'Fire Trainer',
   sprite: '/sprites/overworld/minornpcs/Villager-18.gif',
-  dialogue: 'Feel the burn!',
+  dialogue: 'Hey',
   battleEnemies: ['salamander', 'fire-worm', 'imp'],
 });
 
@@ -1383,7 +1436,7 @@ const HOUSE23_INTERIOR = createHouseInterior(23, {
   id: 'house23-earth-defender',
   name: 'Earth Defender',
   sprite: '/sprites/overworld/minornpcs/Villager-19.gif',
-  dialogue: 'Earth creatures are impenetrable!',
+  dialogue: 'Hey',
   battleEnemies: ['gnome', 'earth-golem', 'gargoyle'],
 });
 
@@ -1391,7 +1444,7 @@ const HOUSE24_INTERIOR = createHouseInterior(24, {
   id: 'house24-wind-caller',
   name: 'Wind Caller',
   sprite: '/sprites/overworld/minornpcs/Villager-20.gif',
-  dialogue: 'The wind obeys my command!',
+  dialogue: 'Hey',
   battleEnemies: ['willowisp', 'pixie', 'wind-wisp'],
 });
 
@@ -1399,7 +1452,7 @@ const HOUSE25_INTERIOR = createHouseInterior(25, {
   id: 'house25-ghost-hunter',
   name: 'Ghost Hunter',
   sprite: '/sprites/overworld/minornpcs/Villager-21.gif',
-  dialogue: 'I hunt ghosts, but I also command them!',
+  dialogue: 'Hey',
   battleEnemies: ['ghost', 'spirit', 'wraith'],
 });
 
@@ -1407,7 +1460,7 @@ const HOUSE26_INTERIOR = createHouseInterior(26, {
   id: 'house26-beast-master',
   name: 'Beast Master',
   sprite: '/sprites/overworld/minornpcs/Villager22.gif',
-  dialogue: 'I command the legendary beasts! Face them!',
+  dialogue: 'Hey',
   battleEnemies: ['chimera', 'phoenix', 'fenrir'],
 });
 
@@ -1415,7 +1468,7 @@ const HOUSE27_INTERIOR = createHouseInterior(27, {
   id: 'house27-elite-summoner',
   name: 'Elite Summoner',
   sprite: '/sprites/overworld/minornpcs/Scholar-1.gif',
-  dialogue: 'My elite monsters will test your strength!',
+  dialogue: 'Hey',
   battleEnemies: ['grand-chimera', 'hydra', 'grand-golem'],
 });
 
@@ -1423,7 +1476,7 @@ const HOUSE28_INTERIOR = createHouseInterior(28, {
   id: 'house28-undead-master',
   name: 'Undead Master',
   sprite: '/sprites/overworld/minornpcs/Scholar-2.gif',
-  dialogue: 'Rise, my undead servants! Crush them!',
+  dialogue: 'Hey',
   battleEnemies: ['lich', 'orc-lord', 'minotaur'],
 });
 
@@ -1431,7 +1484,7 @@ const HOUSE29_INTERIOR = createHouseInterior(29, {
   id: 'house29-legendary-trainer',
   name: 'Legendary Trainer',
   sprite: '/sprites/overworld/minornpcs/MartialArtist1.gif',
-  dialogue: 'Face the ultimate challenge!',
+  dialogue: 'Hey',
   battleEnemies: ['grand-chimera', 'hydra', 'lich'],
 });
 

@@ -112,7 +112,10 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({
                 alt={npcName || 'NPC'}
                 onError={(e) => {
                   // Hide portrait if image fails to load
-                  e.currentTarget.parentElement!.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.style.display = 'none';
+                  }
                 }}
               />
             </div>
