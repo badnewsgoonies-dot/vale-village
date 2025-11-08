@@ -3,12 +3,14 @@ import { useGame } from '@/context/GameContext';
 import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { getDjinnGrantedAbilities } from '@/utils/djinnCalculations';
+import { ABILITIES } from '@/data/abilities';
 import type { Ability } from '@/types/Ability';
+import type { Unit } from '@/types/Unit';
 import './AbilitiesScreen.css';
 
 export const AbilitiesScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<any>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
 
   const allUnits = state.playerData.unitsCollected;
@@ -24,6 +26,26 @@ export const AbilitiesScreen: React.FC = () => {
     [allUnits, activePartyIds]
   );
 
+  // Get equipped Djinn for ability grants
+  const equippedDjinn = useMemo(
+    () => state.playerData.djinnCollected.filter(d =>
+      state.playerData.equippedDjinnIds.includes(d.id)
+    ),
+    [state.playerData.djinnCollected, state.playerData.equippedDjinnIds]
+  );
+
+  // Unit ability counts memoized for performance (BEFORE early return)
+  const unitAbilityCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    allUnits.forEach(unit => {
+      const total = unit.abilities.length +
+        getDjinnGrantedAbilities(unit, equippedDjinn).length +
+        Object.values(unit.equipment).filter(e => e?.unlocksAbility).length;
+      counts.set(unit.id, total);
+    });
+    return counts;
+  }, [allUnits, equippedDjinn]);
+
   // Auto-select first active unit if none selected
   React.useEffect(() => {
     if (!selectedUnit && activeUnits.length > 0) {
@@ -31,13 +53,17 @@ export const AbilitiesScreen: React.FC = () => {
     }
   }, [activeUnits, selectedUnit]);
 
-  // Get equipped Djinn for ability grants
-  const equippedDjinn = useMemo(
-    () => state.playerData.djinnCollected.filter(d => 
-      state.playerData.equippedDjinnIds.includes(d.id)
-    ),
-    [state.playerData.djinnCollected, state.playerData.equippedDjinnIds]
-  );
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleReturn();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   if (!selectedUnit) {
     return <div className="abilities-screen">Loading...</div>;
@@ -49,13 +75,13 @@ export const AbilitiesScreen: React.FC = () => {
   // Get Djinn-granted abilities for this unit (returns ability IDs)
   const djinnAbilityIds = getDjinnGrantedAbilities(selectedUnit, equippedDjinn);
   const djinnAbilities = djinnAbilityIds
-    .map((id: string) => nativeAbilities.find((a: Ability) => a.id === id))
+    .map((id: string) => ABILITIES[id])
     .filter((a): a is Ability => a !== undefined);
 
   // Get equipment-granted abilities
   const equipmentAbilities = Object.values(selectedUnit.equipment as any)
     .filter((equip: any) => equip?.unlocksAbility)
-    .map((equip: any) => nativeAbilities.find((a: Ability) => a.id === equip.unlocksAbility))
+    .map((equip: any) => ABILITIES[equip.unlocksAbility])
     .filter((a): a is Ability => a !== undefined);
 
   // Categorize abilities by element and type
@@ -87,18 +113,6 @@ export const AbilitiesScreen: React.FC = () => {
   const handleReturn = () => {
     actions.goBack();
   };
-
-  // Unit ability counts memoized for performance
-  const unitAbilityCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    allUnits.forEach(unit => {
-      const total = unit.abilities.length + 
-        getDjinnGrantedAbilities(unit, equippedDjinn).length +
-        Object.values(unit.equipment).filter(e => e?.unlocksAbility).length;
-      counts.set(unit.id, total);
-    });
-    return counts;
-  }, [allUnits, equippedDjinn]);
 
   const getAbilityColor = (ability: Ability): string => {
     if (ability.type === 'physical') return 'physical';

@@ -37,8 +37,7 @@ export const BattleFlowController: React.FC<BattleFlowControllerProps> = ({
   // Handle team selection confirmation
   const handleTeamConfirmed = (unitIds: string[]) => {
     setSelectedPartyIds(unitIds);
-    // Apply the party selection immediately
-    actions.setActiveParty(unitIds);
+    // Don't apply party selection globally - wait until battle starts
     // Move to Djinn selection
     setPhase('djinnSelection');
   };
@@ -52,25 +51,17 @@ export const BattleFlowController: React.FC<BattleFlowControllerProps> = ({
   const handleDjinnConfirmed = (djinnIds: string[]) => {
     setSelectedDjinnIds(djinnIds);
 
-    // Apply Djinn selection
-    // First unequip all current Djinn
-    state.playerData.equippedDjinnIds.forEach(id => {
-      actions.unequipDjinn(id);
-    });
-    // Then equip the selected Djinn
-    djinnIds.forEach(id => {
-      actions.equipDjinn(id);
-    });
-
+    // Don't apply Djinn selection globally - pass to startBattle instead
     // Show transition screen briefly
     setPhase('transition');
 
     // Call optional callback
     onBattleStart?.();
 
-    // Start the battle after a brief delay
+    // Start the battle after a brief delay, passing selected party and djinn
     setTimeout(() => {
-      actions.startBattle(enemyUnitIds, npcId);
+      actions.startBattle(enemyUnitIds, npcId, selectedPartyIds, djinnIds);
+      actions.navigate({ type: 'BATTLE' });
     }, 1000);
   };
 

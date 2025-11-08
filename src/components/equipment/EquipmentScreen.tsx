@@ -6,11 +6,12 @@ import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
 import { ABILITIES } from '@/data/abilities';
 import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import type { Ability } from '@/types/Ability';
+import type { Unit } from '@/types/Unit';
 import './EquipmentScreen.css';
 
 export const EquipmentScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<Equipment['slot'] extends string ? any : null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
   const [showAllUnits, setShowAllUnits] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,19 +30,7 @@ export const EquipmentScreen: React.FC = () => {
     [allUnits, activePartyIds]
   );
 
-  // Auto-select first active unit if none selected
-  React.useEffect(() => {
-    if (!selectedUnit && activeUnits.length > 0) {
-      setSelectedUnit(activeUnits[0]);
-    }
-  }, [activeUnits, selectedUnit]);
-
-  if (!selectedUnit) {
-    return <div className="equipment-screen">Loading...</div>;
-  }
-
-  // Memoize equipment abilities
-  const currentEquipment = selectedUnit?.equipment || {};
+  // Memoize equipment abilities factory BEFORE any conditional returns
   const getEquipmentAbilities = useMemo(() => {
     return (equipment: Record<EquipmentSlot, Equipment | null>): Ability[] => {
       const abilities: Ability[] = [];
@@ -57,10 +46,35 @@ export const EquipmentScreen: React.FC = () => {
     };
   }, []);
 
+  // Auto-select first active unit if none selected
+  React.useEffect(() => {
+    if (!selectedUnit && activeUnits.length > 0) {
+      setSelectedUnit(activeUnits[0]);
+    }
+  }, [activeUnits, selectedUnit]);
+
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleReturn();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Calculate current equipment and abilities (BEFORE early return to maintain hook order)
+  const currentEquipment = selectedUnit?.equipment;
   const currentAbilities = useMemo(
-    () => getEquipmentAbilities(currentEquipment),
+    () => currentEquipment ? getEquipmentAbilities(currentEquipment) : [],
     [currentEquipment, getEquipmentAbilities]
   );
+
+  if (!selectedUnit || !currentEquipment) {
+    return <div className="equipment-screen">Loading...</div>;
+  }
 
   // Get ability changes when hovering over an item
   const getAbilityChanges = (item: Equipment | null): { added: Ability[]; removed: Ability[] } => {
@@ -404,6 +418,15 @@ export const EquipmentScreen: React.FC = () => {
               {selectedItem.statBonus.pp && <div>PP +{selectedItem.statBonus.pp}</div>}
               {selectedItem.statBonus.mag && <div>MAG +{selectedItem.statBonus.mag}</div>}
             </div>
+
+            <Button
+              onClick={() => handleEquipItem(selectedItem)}
+              ariaLabel={`Equip ${selectedItem.name}`}
+              variant="primary"
+              style={{ marginTop: '12px', width: '100%' }}
+            >
+              EQUIP TO {selectedItem.slot.toUpperCase()}
+            </Button>
           </div>
         )}
         

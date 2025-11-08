@@ -19,6 +19,18 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onNavigateToSummons,
   onResume
 }) => {
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onResume();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onResume]);
+
   return (
     <div className="main-menu-overlay">
       <div className="main-menu-container">

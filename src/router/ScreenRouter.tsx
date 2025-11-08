@@ -22,6 +22,7 @@ import { ScreenTransition } from './ScreenTransition';
 export const ScreenRouter: React.FC = () => {
   const { state, actions } = useGame();
   const screen = state.currentScreen;
+  console.log('[SCREEN_ROUTER] Current screen:', screen);
 
   const renderScreen = () => {
     switch (screen.type) {
@@ -129,7 +130,7 @@ export const ScreenRouter: React.FC = () => {
       );
 
     case 'SHOP':
-      return <ShopScreen />;
+      return <ShopScreen shopType={screen.shopType} />;
 
     case 'DIALOGUE':
       return <DialogueScreen />;

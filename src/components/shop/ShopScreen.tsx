@@ -12,21 +12,38 @@ import './ShopScreen.css';
 
 type ShopMode = 'buy' | 'sell';
 
+interface ShopScreenProps {
+  shopType: 'item' | 'equipment' | 'inn';
+}
+
 /**
  * Shop Screen - Equipment Only
- * 
+ *
  * DESIGN NOTE: No consumable items in this game.
  * Healing/buffs are handled by abilities (Ply, Wish, etc.).
  * Shops sell equipment only (Weapons, Armor, Helms, Boots).
  */
-export const ShopScreen: React.FC = () => {
+export const ShopScreen: React.FC<ShopScreenProps> = ({ shopType }) => {
   const { state, actions } = useGame();
   const [mode, setMode] = useState<ShopMode>('buy');
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
-  // Get the shop (equipment only)
+  // Get the shop (equipment only for now - can expand later)
+  // TODO: Add support for different shop types (item, inn) when implemented
   const shop: ShopInventory = VALE_VILLAGE_EQUIPMENT_SHOP;
   const shopItems = getShopItems(shop);
+
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        actions.goBack();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleBuy = () => {
     if (!selectedItem) return;

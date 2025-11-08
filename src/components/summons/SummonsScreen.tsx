@@ -73,6 +73,18 @@ export const SummonsScreen: React.FC = () => {
     actions.goBack();
   };
 
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleReturn();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const canSummon = (summon: SummonInfo): boolean => {
     const elementDjinn = djinnByElement[summon.element];
     return elementDjinn.length >= summon.requiredDjinn;

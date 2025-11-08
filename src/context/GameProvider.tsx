@@ -12,8 +12,6 @@ import { ENEMIES, type Enemy } from '@/data/enemies';
 import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
-import { getAllQuests } from '@/data/quests';
-import { updateObjectiveProgress } from '@/types/Quest';
 import type { AreaId, ChestId, BossId } from '@/types/Area';
 import { ALL_AREAS } from '@/data/areas';
 
@@ -28,6 +26,7 @@ function enemyToUnit(enemy: Enemy): Unit {
     baseStats: enemy.stats,
     growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies
     abilities: enemy.abilities,
+    manaContribution: 0, // Enemies don't contribute to player mana pool
   };
   return new Unit(unitDef, enemy.level);
 }
@@ -46,6 +45,28 @@ function createInitialPlayerData(): PlayerData {
   const kyle = new Unit(UNIT_DEFINITIONS.kyle);
 
   const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
+
+  // Equip starter equipment on main party
+  // Warriors get swords, mages get staves, everyone gets basic armor
+  isaac.equipItem('weapon', EQUIPMENT['wooden-sword']);
+  isaac.equipItem('armor', EQUIPMENT['leather-vest']);
+  isaac.equipItem('helm', EQUIPMENT['leather-cap']);
+  isaac.equipItem('boots', EQUIPMENT['leather-boots']);
+
+  garet.equipItem('weapon', EQUIPMENT['wooden-axe']);
+  garet.equipItem('armor', EQUIPMENT['cotton-shirt']);
+  garet.equipItem('helm', EQUIPMENT['cloth-cap']);
+  garet.equipItem('boots', EQUIPMENT['leather-boots']);
+
+  ivan.equipItem('weapon', EQUIPMENT['wooden-staff']);
+  ivan.equipItem('armor', EQUIPMENT['cotton-shirt']);
+  ivan.equipItem('helm', EQUIPMENT['cloth-cap']);
+  ivan.equipItem('boots', EQUIPMENT['leather-boots']);
+
+  mia.equipItem('weapon', EQUIPMENT['wooden-staff']);
+  mia.equipItem('armor', EQUIPMENT['leather-vest']);
+  mia.equipItem('helm', EQUIPMENT['leather-cap']);
+  mia.equipItem('boots', EQUIPMENT['leather-boots']);
 
   // For testing: Unlock all Djinn
   const allDjinn = Object.values(ALL_DJINN);
@@ -70,10 +91,6 @@ function createInitialStoryFlags(): StoryFlags {
   return {
     intro_seen: false,
     talked_to_elder_first_time: false,
-    quest_forest_started: false,
-    quest_forest_complete: false,
-    quest_ruins_started: false,
-    quest_ruins_complete: false,
     defeated_alpha_wolf: false,
     defeated_golem_king: false,
     met_mysterious_stranger: false,
@@ -105,7 +122,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     screenHistory: [],
     loading: false,
     error: null,
-    quests: getAllQuests(),
     storyFlags: createInitialStoryFlags(),
     currentLocation: 'battle_row',
     playerPosition: { x: 2, y: 7 }, // Starting position in Battle Row
@@ -161,7 +177,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const history = [...prev.screenHistory];
       const previousScreen = history.pop();
 
-      if (!previousScreen) return prev;
+      // Safety fallback: if no history, navigate to OVERWORLD
+      if (!previousScreen) {
+        console.warn('[goBack] No screen history, defaulting to OVERWORLD');
+        return {
+          ...prev,
+          currentScreen: { type: 'OVERWORLD' },
+          screenHistory: [],
+        };
+      }
 
       return {
         ...prev,
@@ -272,7 +296,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Check if unit already recruited
       const alreadyRecruited = prev.playerData.unitsCollected.some(u => u.id === unitId);
       if (alreadyRecruited) {
-        console.log(`Unit ${unitId} already recruited`);
         return prev;
       }
 
@@ -290,8 +313,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (prev.playerData.unitsCollected.length >= 10) {
         return { ...prev, error: 'Maximum unit collection reached (10 units)' };
       }
-
-      console.log(`Recruiting unit: ${newUnit.name}`);
 
       return {
         ...prev,
@@ -319,17 +340,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Battle actions
-  const startBattle = useCallback((enemyIds: string[], npcId?: string) => {
-    console.log('Starting battle with enemies:', enemyIds, 'npcId:', npcId);
-
+  const startBattle = useCallback((enemyIds: string[], npcId?: string, partyUnitIds?: string[], djinnIds?: string[]) => {
     setState(prev => {
-      // Get active party units
+      // Get active party units (use provided partyUnitIds or fall back to global activePartyIds)
+      const partyIds = partyUnitIds || prev.playerData.activePartyIds;
       const activeParty = prev.playerData.unitsCollected.filter(
-        unit => prev.playerData.activePartyIds.includes(unit.id)
+        unit => partyIds.includes(unit.id)
       );
 
       // Create player team
       const playerTeam = createTeam(activeParty);
+
+      // Add equipped Djinn to team (use provided djinnIds or fall back to global equippedDjinnIds)
+      const equippedDjinnIds = djinnIds !== undefined ? djinnIds : prev.playerData.equippedDjinnIds;
+      const equippedDjinn = equippedDjinnIds
+        .map(id => prev.playerData.djinnCollected.find(d => d.id === id))
+        .filter((d): d is Djinn => d !== undefined);
+      playerTeam.equippedDjinn = equippedDjinn;
 
       // Create enemy units from IDs
       const enemies = enemyIds
@@ -353,13 +380,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Add npcId to battle state
       battleState.npcId = npcId;
 
-      console.log('Battle initialized:', {
-        playerUnits: playerTeam.units.length,
-        enemyUnits: enemies.length,
-        turnOrder: battleState.turnOrder.map(u => u.name),
-        npcId,
-      });
-
       return {
         ...prev,
         currentBattle: battleState,
@@ -367,9 +387,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  const executeTurn = useCallback((abilityId: string, targetId: string) => {
-    console.log('executeTurn not yet implemented', abilityId, targetId);
-  }, []);
 
   const endBattle = useCallback(() => {
     setState(prev => {
@@ -394,7 +411,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const npc = currentArea?.npcs.find(n => n.id === prev.currentBattle?.npcId);
 
           if (npc?.battleRewards) {
-            console.log('NPC battle rewards found:', npc.battleRewards);
             npcBonusGold = npc.battleRewards.gold || 0;
             if (npc.battleRewards.equipment) {
               npcBonusEquipment.push(...npc.battleRewards.equipment);
@@ -498,83 +514,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     });
   }, []);
-
-  // Quest management
-  const startQuest = useCallback((questId: string) => {
-    setState(prev => ({
-      ...prev,
-      quests: prev.quests.map(q =>
-        q.id === questId ? { ...q, status: 'active' as const } : q
-      ),
-    }));
-  }, []);
-
-  const completeQuest = useCallback((questId: string) => {
-    setState(prev => {
-      const quest = prev.quests.find(q => q.id === questId);
-      if (!quest) return prev;
-
-      // Give rewards
-      const newGold = prev.playerData.gold + quest.rewards.gold;
-      const newInventory = [...prev.playerData.inventory, ...quest.rewards.items];
-
-      // Add Djinn if reward includes one
-      const newDjinnCollected = quest.rewards.djinn
-        ? [...prev.playerData.djinnCollected, quest.rewards.djinn]
-        : prev.playerData.djinnCollected;
-
-      // Mark quest as complete
-      const updatedQuests = prev.quests.map(q =>
-        q.id === questId ? { ...q, status: 'completed' as const } : q
-      );
-
-      // Unlock next quests if any
-      const questsToUnlock = quest.unlocksQuestIds || [];
-      const finalQuests = updatedQuests.map(q =>
-        questsToUnlock.includes(q.id) ? { ...q, status: 'active' as const } : q
-      );
-
-      return {
-        ...prev,
-        quests: finalQuests,
-        playerData: {
-          ...prev.playerData,
-          gold: newGold,
-          inventory: newInventory,
-          djinnCollected: newDjinnCollected,
-        },
-      };
-    });
-  }, []);
-
-  const updateQuestObjective = useCallback(
-    (questId: string, objectiveId: string, increment: number = 1) => {
-      setState(prev => {
-        const quest = prev.quests.find(q => q.id === questId);
-        if (!quest || quest.status !== 'active') return prev;
-
-        const updatedQuests = prev.quests.map(q => {
-          if (q.id !== questId) return q;
-
-          const updatedObjectives = q.objectives.map(obj =>
-            obj.id === objectiveId ? updateObjectiveProgress(obj, increment) : obj
-          );
-
-          // Auto-complete quest if all objectives done
-          const allComplete = updatedObjectives.every(obj => obj.completed);
-
-          return {
-            ...q,
-            objectives: updatedObjectives,
-            status: allComplete ? ('completed' as const) : q.status,
-          };
-        });
-
-        return { ...prev, quests: updatedQuests };
-      });
-    },
-    []
-  );
 
   // Story flags management
   const setStoryFlag = useCallback((flag: keyof StoryFlags, value: boolean) => {
@@ -827,14 +766,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     recruitUnit,
     addGold,
     startBattle,
-    executeTurn,
     endBattle,
     equipDjinn,
     unequipDjinn,
-    // Quest actions
-    startQuest,
-    completeQuest,
-    updateQuestObjective,
     // Story flags
     setStoryFlag,
     // Location

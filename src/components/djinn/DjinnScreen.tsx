@@ -46,6 +46,18 @@ export const DjinnScreen: React.FC = () => {
     actions.goBack();
   };
 
+  // Add ESC key support
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleReturn();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleEquip = (djinn: Djinn) => {
     // Check if already equipped
     if (state.playerData.equippedDjinnIds.includes(djinn.id)) {
