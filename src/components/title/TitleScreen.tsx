@@ -13,6 +13,14 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   const [showPressStart, setShowPressStart] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[TitleScreen] Component mounted');
+    console.log('[TitleScreen] menuVisible:', menuVisible);
+    console.log('[TitleScreen] showPressStart:', showPressStart);
+    console.log('[TitleScreen] actions:', actions);
+  }, [menuVisible, showPressStart, actions]);
+
   // Blinking "Press Start" effect
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,6 +49,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   if (!menuVisible) {
+    console.log('[TitleScreen] Rendering initial screen (Press Start)');
     return (
       <div className="title-screen" onClick={handleStart}>
         <div className="title-background" />
@@ -65,6 +74,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
     );
   }
 
+  console.log('[TitleScreen] Rendering menu screen');
   return (
     <div className="title-screen with-menu">
       <div className="title-background" />

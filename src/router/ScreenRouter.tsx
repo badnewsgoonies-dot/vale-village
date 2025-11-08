@@ -23,9 +23,12 @@ export const ScreenRouter: React.FC = () => {
   const { state, actions } = useGame();
   const screen = state.currentScreen;
 
+  console.log('[ScreenRouter] Current screen:', screen);
+
   const renderScreen = () => {
     switch (screen.type) {
     case 'TITLE':
+      console.log('[ScreenRouter] Rendering TitleScreen');
       return (
         <TitleScreen
           onNavigate={actions.navigate}

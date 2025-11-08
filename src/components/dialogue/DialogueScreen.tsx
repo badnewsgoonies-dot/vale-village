@@ -15,16 +15,10 @@ const DialogueScreenContent: React.FC = () => {
   const npcId = screen.type === 'DIALOGUE' ? screen.npcId : '';
   const initialDialogueKey = screen.type === 'DIALOGUE' ? screen.dialogueKey : undefined;
 
-  // Load dialogue tree
+  // Load dialogue tree BEFORE any hooks
   const dialogueTree = getDialogueTree(npcId);
 
-  // Current dialogue state
-  const [currentNodeId, setCurrentNodeId] = useState<string>(
-    initialDialogueKey || dialogueTree?.startNode || 'greeting'
-  );
-  const [showingChoices, setShowingChoices] = useState(false);
-
-  // Handle missing dialogue tree
+  // Early returns MUST be before any hooks to avoid "Rendered fewer hooks than expected" error
   if (!dialogueTree) {
     return (
       <div className="dialogue-screen-error">
@@ -34,24 +28,25 @@ const DialogueScreenContent: React.FC = () => {
     );
   }
 
+  // Current dialogue state - NOW it's safe to use hooks
+  const [currentNodeId, setCurrentNodeId] = useState<string>(
+    initialDialogueKey || dialogueTree.startNode || 'greeting'
+  );
+  const [showingChoices, setShowingChoices] = useState(false);
+
   // Get current node
   const currentNode = dialogueTree.nodes[currentNodeId];
 
-  // Handle missing node
-  if (!currentNode) {
-    return (
-      <div className="dialogue-screen-error">
-        <h2>Error: Dialogue node "{currentNodeId}" not found</h2>
-        <button onClick={() => actions.goBack()}>Go Back</button>
-      </div>
-    );
-  }
+  // Handle missing node - but can't early return here because we already called hooks above
+  // So we'll handle this in the render logic instead
 
   // Check if node condition is met
-  const nodeConditionMet = !currentNode.condition || currentNode.condition(state.storyFlags);
+  const nodeConditionMet = currentNode && (!currentNode.condition || currentNode.condition(state.storyFlags));
 
   // Camera work: Zoom on dialogue start and important moments
   useEffect(() => {
+    if (!currentNode) return;
+
     const text = currentNode.text.toLowerCase();
     const speaker = currentNode.speaker.toLowerCase();
 
@@ -94,10 +89,31 @@ const DialogueScreenContent: React.FC = () => {
 
   // Execute action when node changes
   useEffect(() => {
+    if (!currentNode) return;
+
     if (currentNode.action && nodeConditionMet) {
       executeAction(currentNode.action);
     }
-  }, [currentNodeId, nodeConditionMet]);
+  }, [currentNodeId, nodeConditionMet, currentNode, executeAction]);
+
+  // Handle node condition not met - skip to next node or go back
+  // MUST be in useEffect to avoid infinite setState loop
+  useEffect(() => {
+    if (!currentNode) {
+      // Node doesn't exist - go back
+      actions.goBack();
+      return;
+    }
+
+    if (!nodeConditionMet) {
+      // Condition not met - skip to next node or go back
+      if (currentNode.nextNode) {
+        setCurrentNodeId(currentNode.nextNode);
+      } else {
+        actions.goBack();
+      }
+    }
+  }, [currentNodeId, nodeConditionMet, currentNode, actions]);
 
   // Execute a dialogue action
   const executeAction = useCallback((action: DialogueAction) => {
@@ -166,7 +182,7 @@ const DialogueScreenContent: React.FC = () => {
     default:
       console.warn('Unknown dialogue action:', action);
     }
-  }, [actions, state.storyFlags]);
+  }, [actions, npcId]);
 
   // Handle choice selection
   const handleChoiceSelect = useCallback((choice: DialogueChoice) => {
@@ -186,6 +202,8 @@ const DialogueScreenContent: React.FC = () => {
 
   // Handle advancing dialogue (Space/Enter when no choices)
   const handleAdvance = useCallback(() => {
+    if (!currentNode) return;
+
     if (currentNode.choices && currentNode.choices.length > 0) {
       // Show choices
       setShowingChoices(true);
@@ -199,17 +217,13 @@ const DialogueScreenContent: React.FC = () => {
   }, [currentNode, actions]);
 
   // Filter choices based on conditions
-  const availableChoices = currentNode.choices?.filter(choice =>
+  const availableChoices = currentNode?.choices?.filter(choice =>
     !choice.condition || choice.condition(state.storyFlags)
   ) || [];
 
-  // If node condition not met, skip to next node or end
-  if (!nodeConditionMet) {
-    if (currentNode.nextNode) {
-      setCurrentNodeId(currentNode.nextNode);
-    } else {
-      actions.goBack();
-    }
+  // Don't render if node doesn't exist or condition not met
+  // (useEffect above will handle navigation)
+  if (!currentNode || !nodeConditionMet) {
     return null;
   }
 
