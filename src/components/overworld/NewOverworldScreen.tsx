@@ -137,8 +137,8 @@ export const NewOverworldScreen: React.FC = () => {
             return;
           }
           
-          // Start battle with NPC's enemies
-          actions.startBattle(npc.battleOnInteract);
+          // Start battle with NPC's enemies, passing NPC ID for rewards
+          actions.startBattle(npc.battleOnInteract, npc.id);
           actions.navigate({ type: 'BATTLE' });
           
           // Mark as battled if battleOnlyOnce

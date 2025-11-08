@@ -1,5 +1,13 @@
 import type { Area } from '@/types/Area';
-import { LEATHER_VEST, CLOTH_CAP, IRON_SWORD, LEATHER_BOOTS, IRON_ARMOR, IRON_HELM, STEEL_SWORD, STEEL_HELM, HYPER_BOOTS } from './equipment';
+import {
+  LEATHER_VEST, CLOTH_CAP, IRON_SWORD, LEATHER_BOOTS, IRON_ARMOR, IRON_HELM, STEEL_SWORD, STEEL_HELM, HYPER_BOOTS,
+  WOODEN_SWORD, BRONZE_SWORD, SILVER_BLADE, MYTHRIL_BLADE, GAIA_BLADE, SOL_BLADE,
+  WOODEN_AXE, BATTLE_AXE, GREAT_AXE, TITANS_AXE,
+  MACE, HEAVY_MACE, DEMON_MACE,
+  WOODEN_STAFF, MAGIC_ROD, SHAMAN_ROD, CRYSTAL_ROD,
+  COTTON_SHIRT, BRONZE_ARMOR, STEEL_ARMOR, SILVER_ARMOR, MYTHRIL_ARMOR, DRAGON_SCALES,
+  LEATHER_CAP, BRONZE_HELM, SILVER_CIRCLET, MYTHRIL_CROWN,
+} from './equipment';
 
 /**
  * Area Definitions - Vale Chronicles
@@ -1428,9 +1436,391 @@ export const BATTLE_ROW: Area = {
       targetPosition: { x: 2, y: 7 },
       requiredFlag: 'battle_row_complete',
     },
+    // House entrances (30 houses)
+    { id: 'enter_house1', position: { x: 4, y: 7 }, width: 1, height: 1, targetArea: 'house1_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house2', position: { x: 8, y: 7 }, width: 1, height: 1, targetArea: 'house2_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house3', position: { x: 12, y: 7 }, width: 1, height: 1, targetArea: 'house3_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house4', position: { x: 16, y: 7 }, width: 1, height: 1, targetArea: 'house4_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house5', position: { x: 20, y: 7 }, width: 1, height: 1, targetArea: 'house5_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house6', position: { x: 24, y: 7 }, width: 1, height: 1, targetArea: 'house6_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house7', position: { x: 28, y: 7 }, width: 1, height: 1, targetArea: 'house7_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house8', position: { x: 32, y: 7 }, width: 1, height: 1, targetArea: 'house8_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house9', position: { x: 36, y: 7 }, width: 1, height: 1, targetArea: 'house9_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house10', position: { x: 40, y: 7 }, width: 1, height: 1, targetArea: 'house10_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house11', position: { x: 44, y: 7 }, width: 1, height: 1, targetArea: 'house11_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house12', position: { x: 48, y: 7 }, width: 1, height: 1, targetArea: 'house12_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house13', position: { x: 52, y: 7 }, width: 1, height: 1, targetArea: 'house13_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house14', position: { x: 56, y: 7 }, width: 1, height: 1, targetArea: 'house14_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house15', position: { x: 60, y: 7 }, width: 1, height: 1, targetArea: 'house15_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house16', position: { x: 64, y: 7 }, width: 1, height: 1, targetArea: 'house16_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house17', position: { x: 68, y: 7 }, width: 1, height: 1, targetArea: 'house17_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house18', position: { x: 72, y: 7 }, width: 1, height: 1, targetArea: 'house18_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house19', position: { x: 76, y: 7 }, width: 1, height: 1, targetArea: 'house19_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house20', position: { x: 80, y: 7 }, width: 1, height: 1, targetArea: 'house20_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house21', position: { x: 84, y: 7 }, width: 1, height: 1, targetArea: 'house21_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house22', position: { x: 88, y: 7 }, width: 1, height: 1, targetArea: 'house22_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house23', position: { x: 92, y: 7 }, width: 1, height: 1, targetArea: 'house23_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house24', position: { x: 96, y: 7 }, width: 1, height: 1, targetArea: 'house24_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house25', position: { x: 100, y: 7 }, width: 1, height: 1, targetArea: 'house25_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house26', position: { x: 104, y: 7 }, width: 1, height: 1, targetArea: 'house26_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house27', position: { x: 108, y: 7 }, width: 1, height: 1, targetArea: 'house27_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house28', position: { x: 112, y: 7 }, width: 1, height: 1, targetArea: 'house28_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house29', position: { x: 116, y: 7 }, width: 1, height: 1, targetArea: 'house29_interior', targetPosition: { x: 5, y: 6 } },
+    { id: 'enter_house30', position: { x: 120, y: 7 }, width: 1, height: 1, targetArea: 'house30_interior', targetPosition: { x: 5, y: 6 } },
   ],
   backgroundColor: '#2a2a1a', // Dark ground for battle arena
 };
+
+// ========================================
+// BATTLE ROW HOUSE INTERIORS (30 houses)
+// ========================================
+
+/**
+ * House Interior Configuration
+ * Maps house number to rewards (equipment + djinn)
+ */
+const HOUSE_REWARDS = {
+  1: { equipment: [WOODEN_SWORD, CLOTH_CAP], gold: 50, djinn: null },
+  2: { equipment: [BRONZE_SWORD, LEATHER_VEST], gold: 75, djinn: 'flint' },
+  3: { equipment: [IRON_SWORD, BRONZE_ARMOR], gold: 100, djinn: null },
+  4: { equipment: [STEEL_SWORD, IRON_ARMOR], gold: 150, djinn: 'granite' },
+  5: { equipment: [SILVER_BLADE, STEEL_ARMOR], gold: 200, djinn: null },
+  6: { equipment: [MACE, IRON_HELM], gold: 125, djinn: 'bane' },
+  7: { equipment: [HEAVY_MACE, STEEL_HELM], gold: 175, djinn: null },
+  8: { equipment: [WOODEN_AXE, SILVER_CIRCLET], gold: 225, djinn: 'forge' },
+  9: { equipment: [BATTLE_AXE, MYTHRIL_CROWN], gold: 250, djinn: null },
+  10: { equipment: [GREAT_AXE, LEATHER_BOOTS], gold: 300, djinn: 'corona' },
+  11: { equipment: [WOODEN_STAFF, HYPER_BOOTS], gold: 100, djinn: null },
+  12: { equipment: [MAGIC_ROD, COTTON_SHIRT], gold: 125, djinn: 'fury' },
+  13: { equipment: [SHAMAN_ROD, BRONZE_HELM], gold: 150, djinn: null },
+  14: { equipment: [CRYSTAL_ROD, SILVER_ARMOR], gold: 200, djinn: 'fizz' },
+  15: { equipment: [DEMON_MACE, MYTHRIL_ARMOR], gold: 250, djinn: null },
+  16: { equipment: [TITANS_AXE, DRAGON_SCALES], gold: 350, djinn: 'tonic' },
+  17: { equipment: [MYTHRIL_BLADE, LEATHER_CAP], gold: 300, djinn: null },
+  18: { equipment: [GAIA_BLADE, BRONZE_ARMOR], gold: 400, djinn: 'crystal' },
+  19: { equipment: [SOL_BLADE, STEEL_ARMOR], gold: 500, djinn: null },
+  20: { equipment: [IRON_SWORD, SILVER_ARMOR], gold: 200, djinn: 'breeze' },
+  21: { equipment: [STEEL_SWORD, MYTHRIL_ARMOR], gold: 275, djinn: null },
+  22: { equipment: [SILVER_BLADE, IRON_HELM], gold: 325, djinn: 'squall' },
+  23: { equipment: [MACE, STEEL_HELM], gold: 175, djinn: null },
+  24: { equipment: [HEAVY_MACE, SILVER_CIRCLET], gold: 225, djinn: 'storm' },
+  25: { equipment: [WOODEN_AXE, MYTHRIL_CROWN], gold: 250, djinn: null },
+  26: { equipment: [BATTLE_AXE, LEATHER_BOOTS], gold: 300, djinn: null },
+  27: { equipment: [GREAT_AXE, HYPER_BOOTS], gold: 350, djinn: null },
+  28: { equipment: [TITANS_AXE, COTTON_SHIRT], gold: 400, djinn: null },
+  29: { equipment: [DEMON_MACE, BRONZE_HELM], gold: 450, djinn: null },
+  30: { equipment: [SOL_BLADE, DRAGON_SCALES], gold: 600, djinn: null },
+};
+
+/**
+ * Generate house interior area
+ */
+function createHouseInterior(
+  houseNum: number,
+  npcData: { id: string; name: string; sprite: string; dialogue: string; battleEnemies: string[] }
+): Area {
+  const rewards = HOUSE_REWARDS[houseNum as keyof typeof HOUSE_REWARDS];
+
+  return {
+    id: `house${houseNum}_interior` as any,
+    name: `${npcData.name}'s House`,
+    type: 'town',
+    width: 10,
+    height: 8,
+    hasRandomEncounters: false,
+    bosses: [],
+    treasures: [],
+    npcs: [
+      {
+        id: `${npcData.id}-interior`,
+        name: npcData.name,
+        position: { x: 5, y: 3 },
+        sprite: npcData.sprite,
+        blocking: true,
+        dialogue: npcData.dialogue,
+        battleOnInteract: npcData.battleEnemies as any,
+        battleOnlyOnce: false,
+        battleRewards: rewards
+          ? {
+              gold: rewards.gold,
+              equipment: rewards.equipment,
+              djinnId: rewards.djinn || undefined,
+            }
+          : undefined,
+      },
+    ],
+    buildings: [],
+    scenery: rewards.equipment.map((_equip, idx) => ({
+      id: `reward-display-${idx}`,
+      position: { x: 3 + idx * 2, y: 2 },
+      sprite: '/sprites/icons/items/treasure-chest.gif', // Placeholder for equipment display
+      blocking: false,
+      layer: 'foreground' as const,
+    })).concat(
+      rewards.djinn
+        ? [{
+            id: 'djinn-display',
+            position: { x: 5, y: 1 },
+            sprite: `/sprites/battle/djinn/${rewards.djinn === 'flint' || rewards.djinn === 'granite' || rewards.djinn === 'bane' ? 'Venus' : rewards.djinn === 'forge' || rewards.djinn === 'corona' || rewards.djinn === 'fury' ? 'Mars' : rewards.djinn === 'fizz' || rewards.djinn === 'tonic' || rewards.djinn === 'crystal' ? 'Mercury' : 'Jupiter'}_Djinn_Front.gif`,
+            blocking: false,
+            layer: 'foreground' as const,
+          }]
+        : []
+    ),
+    exits: [
+      {
+        id: 'exit',
+        position: { x: 4, y: 7 },
+        width: 2,
+        height: 1,
+        targetArea: 'battle_row',
+        targetPosition: { x: houseNum * 4, y: 7 }, // Return to house position
+      },
+    ],
+    backgroundColor: '#4a3020', // Wood interior
+  };
+}
+
+// Generate all 30 house interiors
+const HOUSE1_INTERIOR = createHouseInterior(1, {
+  id: 'house1-skeleton-tamer',
+  name: 'Skeleton Tamer',
+  sprite: '/sprites/overworld/minornpcs/Villager-1.gif',
+  dialogue: 'I raise undead warriors for battle! Test your skills!',
+  battleEnemies: ['skeleton', 'zombie'],
+});
+
+const HOUSE2_INTERIOR = createHouseInterior(2, {
+  id: 'house2-zombie-keeper',
+  name: 'Zombie Keeper',
+  sprite: '/sprites/overworld/minornpcs/Villager-2.gif',
+  dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
+  battleEnemies: ['skeleton', 'zombie', 'ghoul'],
+});
+
+const HOUSE3_INTERIOR = createHouseInterior(3, {
+  id: 'house3-garet',
+  name: 'Garet',
+  sprite: '/sprites/overworld/protagonists/Garet.gif',
+  dialogue: 'Garet here! My fire spirits fight for me. Show me what you\'ve got!',
+  battleEnemies: ['salamander', 'fire-worm', 'imp', 'demon-imp'],
+});
+
+const HOUSE4_INTERIOR = createHouseInterior(4, {
+  id: 'house4-insect-collector',
+  name: 'Insect Collector',
+  sprite: '/sprites/overworld/minornpcs/Villager-3.gif',
+  dialogue: 'My rare bug collection fights in the arena! Witness their power!',
+  battleEnemies: ['ant-lion', 'flash-ant', 'hornet', 'drone-bee'],
+});
+
+const HOUSE5_INTERIOR = createHouseInterior(5, {
+  id: 'house5-slime-rancher',
+  name: 'Slime Rancher',
+  sprite: '/sprites/overworld/minornpcs/Villager-4.gif',
+  dialogue: 'These are the strongest slimes in all the land! Prove me wrong!',
+  battleEnemies: ['ooze', 'slime-beast', 'slime'],
+});
+
+const HOUSE6_INTERIOR = createHouseInterior(6, {
+  id: 'house6-lizard-keeper',
+  name: 'Lizard Keeper',
+  sprite: '/sprites/overworld/minornpcs/Villager-5.gif',
+  dialogue: 'My combat-trained lizards are unbeatable! Take them on!',
+  battleEnemies: ['lizard-man', 'lizard-fighter', 'thunder-lizard', 'earth-lizard'],
+});
+
+const HOUSE7_INTERIOR = createHouseInterior(7, {
+  id: 'house7-mia',
+  name: 'Mia',
+  sprite: '/sprites/overworld/protagonists/Mia.gif',
+  dialogue: 'I am Mia, healer and ice mage. My water spirits will test your resolve!',
+  battleEnemies: ['ooze', 'slime-beast', 'merman', 'gillman'],
+});
+
+const HOUSE8_INTERIOR = createHouseInterior(8, {
+  id: 'house8-zen-master',
+  name: 'Zen Master',
+  sprite: '/sprites/overworld/minornpcs/Monk_sitting.gif',
+  dialogue: 'Through meditation, I command spirits. Face my inner demons!',
+  battleEnemies: ['ghost', 'spirit', 'will-head', 'wraith'],
+});
+
+const HOUSE9_INTERIOR = createHouseInterior(9, {
+  id: 'house9-elemental-summoner',
+  name: 'Elemental Summoner',
+  sprite: '/sprites/overworld/minornpcs/Villager-6.gif',
+  dialogue: 'I summon elementals from all realms! Can you withstand their power?',
+  battleEnemies: ['gnome-wizard', 'demon-imp', 'willowisp', 'pixie'],
+});
+
+const HOUSE10_INTERIOR = createHouseInterior(10, {
+  id: 'house10-kraden',
+  name: 'Kraden',
+  sprite: '/sprites/overworld/protagonists/Kraden.gif',
+  dialogue: 'Ah, a visitor! I am Kraden, alchemist and researcher. My elemental test awaits you!',
+  battleEnemies: ['gnome-wizard', 'demon-imp', 'willowisp', 'merman'],
+});
+
+const HOUSE11_INTERIOR = createHouseInterior(11, {
+  id: 'house11-rat-breeder',
+  name: 'Rat Breeder',
+  sprite: '/sprites/overworld/minornpcs/Villager-7.gif',
+  dialogue: 'My trained rats are fierce fighters! Face them!',
+  battleEnemies: ['rat', 'armored-rat', 'rat-fighter'],
+});
+
+const HOUSE12_INTERIOR = createHouseInterior(12, {
+  id: 'house12-bat-handler',
+  name: 'Bat Handler',
+  sprite: '/sprites/overworld/minornpcs/Villager-8.gif',
+  dialogue: 'My bats will overwhelm you!',
+  battleEnemies: ['bat', 'rabid-bat', 'bat'],
+});
+
+const HOUSE13_INTERIOR = createHouseInterior(13, {
+  id: 'house13-spider-tamer',
+  name: 'Spider Tamer',
+  sprite: '/sprites/overworld/minornpcs/Villager-9.gif',
+  dialogue: 'Spiders are the ultimate predators!',
+  battleEnemies: ['spider', 'tarantula', 'recluse'],
+});
+
+const HOUSE14_INTERIOR = createHouseInterior(14, {
+  id: 'house14-goblin-wrangler',
+  name: 'Goblin Wrangler',
+  sprite: '/sprites/overworld/minornpcs/Villager-10.gif',
+  dialogue: 'Goblins may be small, but they fight dirty!',
+  battleEnemies: ['goblin', 'hobgoblin', 'mini-goblin'],
+});
+
+const HOUSE15_INTERIOR = createHouseInterior(15, {
+  id: 'house15-pest-exterminator',
+  name: 'Pest Exterminator',
+  sprite: '/sprites/overworld/minornpcs/Villager-11.gif',
+  dialogue: 'I know all the pests! Let me introduce you!',
+  battleEnemies: ['vermin', 'roach', 'grub'],
+});
+
+const HOUSE16_INTERIOR = createHouseInterior(16, {
+  id: 'house16-hound-trainer',
+  name: 'Hound Trainer',
+  sprite: '/sprites/overworld/minornpcs/Villager-12.gif',
+  dialogue: 'My war hounds are unstoppable!',
+  battleEnemies: ['wild-wolf', 'wild-dog', 'hell-hound'],
+});
+
+const HOUSE17_INTERIOR = createHouseInterior(17, {
+  id: 'house17-bee-keeper',
+  name: 'Bee Keeper',
+  sprite: '/sprites/overworld/minornpcs/Villager-13.gif',
+  dialogue: 'Beware the swarm!',
+  battleEnemies: ['drone-bee', 'warrior-bee', 'hornet'],
+});
+
+const HOUSE18_INTERIOR = createHouseInterior(18, {
+  id: 'house18-ant-farmer',
+  name: 'Ant Farmer',
+  sprite: '/sprites/overworld/minornpcs/Villager-14.gif',
+  dialogue: 'My ant colony will bury you!',
+  battleEnemies: ['flash-ant', 'ant-lion', 'flash-ant'],
+});
+
+const HOUSE19_INTERIOR = createHouseInterior(19, {
+  id: 'house19-toad-collector',
+  name: 'Toad Collector',
+  sprite: '/sprites/overworld/minornpcs/Villager-15.gif',
+  dialogue: 'Toxic toads are my specialty!',
+  battleEnemies: ['toad', 'poison-toad', 'toad'],
+});
+
+const HOUSE20_INTERIOR = createHouseInterior(20, {
+  id: 'house20-mole-handler',
+  name: 'Mole Handler',
+  sprite: '/sprites/overworld/minornpcs/Villager-16.gif',
+  dialogue: 'Underground warriors attack!',
+  battleEnemies: ['giant-mole', 'giant-mole', 'grub'],
+});
+
+const HOUSE21_INTERIOR = createHouseInterior(21, {
+  id: 'house21-aqua-specialist',
+  name: 'Aqua Specialist',
+  sprite: '/sprites/overworld/minornpcs/Villager-17.gif',
+  dialogue: 'Water creatures are the strongest!',
+  battleEnemies: ['merman', 'gillman', 'ooze'],
+});
+
+const HOUSE22_INTERIOR = createHouseInterior(22, {
+  id: 'house22-fire-trainer',
+  name: 'Fire Trainer',
+  sprite: '/sprites/overworld/minornpcs/Villager-18.gif',
+  dialogue: 'Feel the burn!',
+  battleEnemies: ['salamander', 'fire-worm', 'imp'],
+});
+
+const HOUSE23_INTERIOR = createHouseInterior(23, {
+  id: 'house23-earth-defender',
+  name: 'Earth Defender',
+  sprite: '/sprites/overworld/minornpcs/Villager-19.gif',
+  dialogue: 'Earth creatures are impenetrable!',
+  battleEnemies: ['gnome', 'earth-golem', 'gargoyle'],
+});
+
+const HOUSE24_INTERIOR = createHouseInterior(24, {
+  id: 'house24-wind-caller',
+  name: 'Wind Caller',
+  sprite: '/sprites/overworld/minornpcs/Villager-20.gif',
+  dialogue: 'The wind obeys my command!',
+  battleEnemies: ['willowisp', 'pixie', 'wind-wisp'],
+});
+
+const HOUSE25_INTERIOR = createHouseInterior(25, {
+  id: 'house25-ghost-hunter',
+  name: 'Ghost Hunter',
+  sprite: '/sprites/overworld/minornpcs/Villager-21.gif',
+  dialogue: 'I hunt ghosts, but I also command them!',
+  battleEnemies: ['ghost', 'spirit', 'wraith'],
+});
+
+const HOUSE26_INTERIOR = createHouseInterior(26, {
+  id: 'house26-beast-master',
+  name: 'Beast Master',
+  sprite: '/sprites/overworld/minornpcs/Villager22.gif',
+  dialogue: 'I command the legendary beasts! Face them!',
+  battleEnemies: ['chimera', 'phoenix', 'fenrir'],
+});
+
+const HOUSE27_INTERIOR = createHouseInterior(27, {
+  id: 'house27-elite-summoner',
+  name: 'Elite Summoner',
+  sprite: '/sprites/overworld/minornpcs/Scholar-1.gif',
+  dialogue: 'My elite monsters will test your strength!',
+  battleEnemies: ['grand-chimera', 'hydra', 'grand-golem'],
+});
+
+const HOUSE28_INTERIOR = createHouseInterior(28, {
+  id: 'house28-undead-master',
+  name: 'Undead Master',
+  sprite: '/sprites/overworld/minornpcs/Scholar-2.gif',
+  dialogue: 'Rise, my undead servants! Crush them!',
+  battleEnemies: ['lich', 'orc-lord', 'minotaur'],
+});
+
+const HOUSE29_INTERIOR = createHouseInterior(29, {
+  id: 'house29-legendary-trainer',
+  name: 'Legendary Trainer',
+  sprite: '/sprites/overworld/minornpcs/MartialArtist1.gif',
+  dialogue: 'Face the ultimate challenge!',
+  battleEnemies: ['grand-chimera', 'hydra', 'lich'],
+});
+
+const HOUSE30_INTERIOR = createHouseInterior(30, {
+  id: 'house30-champion',
+  name: 'Champion Trainer',
+  sprite: '/sprites/overworld/minornpcs/MartialArtist2.gif',
+  dialogue: 'You\'ve come far. Face my ultimate team!',
+  battleEnemies: ['grand-golem', 'grand-chimera', 'hydra'],
+});
 
 /**
  * All areas indexed by ID
@@ -1440,6 +1830,36 @@ export const ALL_AREAS: Record<string, Area> = {
   forest_path: FOREST_PATH,
   ancient_ruins: ANCIENT_RUINS,
   battle_row: BATTLE_ROW,
+  house1_interior: HOUSE1_INTERIOR,
+  house2_interior: HOUSE2_INTERIOR,
+  house3_interior: HOUSE3_INTERIOR,
+  house4_interior: HOUSE4_INTERIOR,
+  house5_interior: HOUSE5_INTERIOR,
+  house6_interior: HOUSE6_INTERIOR,
+  house7_interior: HOUSE7_INTERIOR,
+  house8_interior: HOUSE8_INTERIOR,
+  house9_interior: HOUSE9_INTERIOR,
+  house10_interior: HOUSE10_INTERIOR,
+  house11_interior: HOUSE11_INTERIOR,
+  house12_interior: HOUSE12_INTERIOR,
+  house13_interior: HOUSE13_INTERIOR,
+  house14_interior: HOUSE14_INTERIOR,
+  house15_interior: HOUSE15_INTERIOR,
+  house16_interior: HOUSE16_INTERIOR,
+  house17_interior: HOUSE17_INTERIOR,
+  house18_interior: HOUSE18_INTERIOR,
+  house19_interior: HOUSE19_INTERIOR,
+  house20_interior: HOUSE20_INTERIOR,
+  house21_interior: HOUSE21_INTERIOR,
+  house22_interior: HOUSE22_INTERIOR,
+  house23_interior: HOUSE23_INTERIOR,
+  house24_interior: HOUSE24_INTERIOR,
+  house25_interior: HOUSE25_INTERIOR,
+  house26_interior: HOUSE26_INTERIOR,
+  house27_interior: HOUSE27_INTERIOR,
+  house28_interior: HOUSE28_INTERIOR,
+  house29_interior: HOUSE29_INTERIOR,
+  house30_interior: HOUSE30_INTERIOR,
 };
 
 /**

@@ -25,7 +25,18 @@ export type EnemyId = keyof typeof ENEMIES;
  */
 
 /** Valid area IDs - matches areas.ts AREAS registry */
-export type AreaId = 'vale_village' | 'forest_path' | 'ancient_ruins' | 'battle_row';
+export type AreaId =
+  | 'vale_village'
+  | 'forest_path'
+  | 'ancient_ruins'
+  | 'battle_row'
+  // Battle Row house interiors (30 houses)
+  | 'house1_interior' | 'house2_interior' | 'house3_interior' | 'house4_interior' | 'house5_interior'
+  | 'house6_interior' | 'house7_interior' | 'house8_interior' | 'house9_interior' | 'house10_interior'
+  | 'house11_interior' | 'house12_interior' | 'house13_interior' | 'house14_interior' | 'house15_interior'
+  | 'house16_interior' | 'house17_interior' | 'house18_interior' | 'house19_interior' | 'house20_interior'
+  | 'house21_interior' | 'house22_interior' | 'house23_interior' | 'house24_interior' | 'house25_interior'
+  | 'house26_interior' | 'house27_interior' | 'house28_interior' | 'house29_interior' | 'house30_interior';
 
 /** Valid quest IDs - matches quests.ts quest registry */
 export type QuestId =
@@ -97,6 +108,11 @@ export interface NPC {
   shopType?: 'item' | 'equipment' | 'inn'; // Opens shop when talked to
   battleOnInteract?: EnemyId[]; // Enemy IDs to battle when interacting with this NPC (now type-safe!)
   battleOnlyOnce?: boolean; // If true, only battle once then show dialogue
+  battleRewards?: {
+    gold?: number; // Bonus gold reward (added to normal battle gold)
+    equipment?: Equipment[]; // Guaranteed equipment drops (added to RNG drops)
+    djinnId?: string; // Djinn reward (ID from ALL_DJINN registry)
+  };
 }
 
 export interface Building {
