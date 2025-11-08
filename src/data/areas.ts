@@ -798,7 +798,9 @@ export const ANCIENT_RUINS: Area = {
  * Player fights WITH Djinn (spiritual beings opposing slavery), not monsters.
  *
  * Design:
- * - 10 houses in a horizontal row (left to right progression)
+ * - 10 houses in a straight horizontal line (left to right progression)
+ * - All houses at y=7 (middle row only)
+ * - Evenly spaced: x=2, 4, 6, 8, 10, 12, 14, 16, 18, 20
  * - Each house contains an NPC battle encounter
  * - Recruitable NPCs fight WITH their monsters, then join after defeat
  * - Non-recruitable NPCs just send monsters to fight
@@ -807,7 +809,7 @@ export const BATTLE_ROW: Area = {
   id: 'battle_row',
   name: 'Battle Row',
   type: 'town',
-  width: 24,
+  width: 50, // Wide enough for horizontal layout
   height: 15,
   hasRandomEncounters: false,
   bosses: [],
@@ -823,11 +825,11 @@ export const BATTLE_ROW: Area = {
     },
   ],
   npcs: [
-    // === HOUSE 1 (x=2) - Regular NPC ===
+    // === HOUSE 1 (x=4, y=7) - Regular NPC ===
     {
       id: 'house1-beast-tamer',
       name: 'Beast Tamer',
-      position: { x: 2, y: 7 },
+      position: { x: 4, y: 7 },
       blocking: true,
       dialogue: {
         default: 'Welcome to Battle Row! I train wild beasts for combat. Face them if you dare!',
@@ -837,22 +839,22 @@ export const BATTLE_ROW: Area = {
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 2 (x=4) - Regular NPC ===
+    // === HOUSE 2 (x=8, y=7) - Regular NPC ===
     {
       id: 'house2-undead-hunter',
       name: 'Undead Hunter',
-      position: { x: 4, y: 7 },
+      position: { x: 8, y: 7 },
       blocking: true,
       dialogue: 'I capture undead creatures for the arena. Let me show you my collection!',
       battleOnInteract: ['skeleton', 'zombie', 'ghoul'], // Level 3-4 undead
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 3 (x=6) - RECRUITABLE: Garet ===
+    // === HOUSE 3 (x=12, y=7) - RECRUITABLE: Garet ===
     {
       id: 'house3-garet',
       name: 'Garet',
-      position: { x: 6, y: 7 },
+      position: { x: 12, y: 7 },
       blocking: true,
       dialogue: {
         default: 'Garet here! My fire spirits fight for me. Show me what you\'ve got!',
@@ -862,44 +864,44 @@ export const BATTLE_ROW: Area = {
       battleOnlyOnce: true, // Recruitable - join after defeat
     },
 
-    // === HOUSE 4 (x=8) - Regular NPC ===
+    // === HOUSE 4 (x=16, y=7) - Regular NPC ===
     {
       id: 'house4-insect-collector',
       name: 'Insect Collector',
-      position: { x: 8, y: 7 },
+      position: { x: 16, y: 7 },
       blocking: true,
       dialogue: 'My rare bug collection fights in the arena! Witness their power!',
       battleOnInteract: ['ant-lion', 'flash-ant', 'hornet', 'drone-bee'], // Level 3 insects
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 5 (x=10) - Regular NPC ===
+    // === HOUSE 5 (x=20, y=7) - Regular NPC ===
     {
       id: 'house5-slime-rancher',
       name: 'Slime Rancher',
-      position: { x: 10, y: 7 },
+      position: { x: 20, y: 7 },
       blocking: true,
       dialogue: 'These are the strongest slimes in all the land! Prove me wrong!',
       battleOnInteract: ['ooze', 'slime-beast', 'slime'], // Level 3 slimes
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 6 (x=12) - Regular NPC ===
+    // === HOUSE 6 (x=24, y=7) - Regular NPC ===
     {
       id: 'house6-lizard-keeper',
       name: 'Lizard Keeper',
-      position: { x: 12, y: 7 },
+      position: { x: 24, y: 7 },
       blocking: true,
       dialogue: 'My combat-trained lizards are unbeatable! Take them on!',
       battleOnInteract: ['lizard-man', 'lizard-fighter', 'thunder-lizard', 'earth-lizard'], // Level 4 lizards
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 7 (x=14) - RECRUITABLE: Mia ===
+    // === HOUSE 7 (x=28, y=7) - RECRUITABLE: Mia ===
     {
       id: 'house7-mia',
       name: 'Mia',
-      position: { x: 14, y: 7 },
+      position: { x: 28, y: 7 },
       blocking: true,
       dialogue: {
         default: 'I am Mia, healer and ice mage. My water spirits will test your resolve!',
@@ -909,33 +911,33 @@ export const BATTLE_ROW: Area = {
       battleOnlyOnce: true, // Recruitable - join after defeat
     },
 
-    // === HOUSE 8 (x=16) - Unique NPC (Zen Master) ===
+    // === HOUSE 8 (x=32, y=7) - Unique NPC (Zen Master) ===
     {
       id: 'house8-zen-master',
       name: 'Zen Master',
-      position: { x: 16, y: 7 },
+      position: { x: 32, y: 7 },
       blocking: true,
       dialogue: 'Through meditation, I command spirits. Face my inner demons!',
       battleOnInteract: ['ghost', 'spirit', 'will-head', 'wraith'], // Level 3-6 spiritual
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 9 (x=18) - Regular NPC ===
+    // === HOUSE 9 (x=36, y=7) - Regular NPC ===
     {
       id: 'house9-elemental-summoner',
       name: 'Elemental Summoner',
-      position: { x: 18, y: 7 },
+      position: { x: 36, y: 7 },
       blocking: true,
       dialogue: 'I summon elementals from all realms! Can you withstand their power?',
       battleOnInteract: ['gnome-wizard', 'demon-imp', 'willowisp', 'pixie'], // Level 4 mixed elementals
       battleOnlyOnce: false,
     },
 
-    // === HOUSE 10 (x=20) - RECRUITABLE: Kraden ===
+    // === HOUSE 10 (x=40, y=7) - RECRUITABLE: Kraden ===
     {
       id: 'house10-kraden',
       name: 'Kraden',
-      position: { x: 20, y: 7 },
+      position: { x: 40, y: 7 },
       blocking: true,
       dialogue: {
         default: 'Ah, a visitor! I am Kraden, alchemist and researcher. My elemental test awaits you!',
@@ -958,7 +960,7 @@ export const BATTLE_ROW: Area = {
     // Victory exit on the right (after completing all houses)
     {
       id: 'to_victory',
-      position: { x: 23, y: 6 },
+      position: { x: 49, y: 6 },
       width: 1,
       height: 3,
       targetArea: 'vale_village',
@@ -966,7 +968,7 @@ export const BATTLE_ROW: Area = {
       requiredFlag: 'battle_row_complete',
     },
   ],
-  backgroundColor: '#4a3c28',
+  backgroundColor: '#2a2a1a', // Dark ground for battle arena
 };
 
 /**
