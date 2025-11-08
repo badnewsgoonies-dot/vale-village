@@ -122,10 +122,6 @@ export const BattleScreen: React.FC = () => {
     // Determine ability
     let ability: Ability;
     if (selectedCommand === 'attack') {
-<<<<<<< Updated upstream
-      // Use basic attack (first physical ability)
-      ability = currentActor.getAvailableAbilities().find(a => a.type === 'physical') || currentActor.getAvailableAbilities()[0];
-=======
       // Basic attack (0 mana)
       const abilities = currentUnit.getAvailableAbilities({
         equippedDjinn: battle.playerTeam.equippedDjinn,
@@ -138,11 +134,7 @@ export const BattleScreen: React.FC = () => {
         return;
       }
       ability = physicalAbility;
-      manaCost = 0;
     } else if (selectedAbility) {
-      ability = selectedAbility;
-      manaCost = ability.manaCost;
->>>>>>> Stashed changes
     } else {
       ability = selectedAbility!;
     }
@@ -161,7 +153,6 @@ export const BattleScreen: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-<<<<<<< Updated upstream
       
       // Regenerate PP for all alive units
       let totalPPRestored = 0;
@@ -169,7 +160,6 @@ export const BattleScreen: React.FC = () => {
         if (!unit.isKO) {
           totalPPRestored += unit.regeneratePP();
         }
-=======
       setTimeout(() => {
         actions.navigate({
           type: 'POST_BATTLE_CUTSCENE',
@@ -208,20 +198,17 @@ export const BattleScreen: React.FC = () => {
       const abilities = unit.getAvailableAbilities({
         equippedDjinn: battle.playerTeam.equippedDjinn,
         djinnStates
->>>>>>> Stashed changes
       });
       
       if (totalPPRestored > 0) {
         setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
       }
-<<<<<<< Updated upstream
       
       setTimeout(() => actions.navigate({
         type: 'POST_BATTLE_CUTSCENE',
         npcId: battle.npcId,
         victory: true,
       }), 2000);
-=======
 
       // Show ability animation (if it's a psynergy)
       if (ability.type === 'psynergy') {
@@ -257,7 +244,6 @@ export const BattleScreen: React.FC = () => {
           victory: true,
         });
       }, 2000);
->>>>>>> Stashed changes
       return;
     } else if (battleEnd === 'defeat') {
       setPhase('defeat');
@@ -397,12 +383,10 @@ export const BattleScreen: React.FC = () => {
   };
 
   return (
-<<<<<<< Updated upstream
     <div 
       className="battle-screen"
       data-area={state.currentLocation || 'vale_village'}
     >
-=======
     <div className="battle-screen" data-area={state.currentLocation || 'vale_village'}>
       {/* Summon Animation Overlay */}
       {phase === 'summoning' && selectedDjinn.length > 0 && (() => {
@@ -429,7 +413,6 @@ export const BattleScreen: React.FC = () => {
         />
       )}
 
->>>>>>> Stashed changes
       {/* Top Status Bar */}
       <StatusBar units={battle.playerTeam.units} />
 
