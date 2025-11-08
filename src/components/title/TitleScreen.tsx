@@ -9,7 +9,18 @@ interface TitleScreenProps {
 }
 
 export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBattle }) => {
-  const { actions } = useGame();
+  console.log('[TitleScreen] Rendering component - START');
+
+  let actions;
+  try {
+    const game = useGame();
+    actions = game.actions;
+    console.log('[TitleScreen] useGame hook successful');
+  } catch (error) {
+    console.error('[TitleScreen] Error in useGame hook:', error);
+    return <div style={{ color: 'white', padding: '20px' }}>Error loading game context: {String(error)}</div>;
+  }
+
   const [showPressStart, setShowPressStart] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -18,7 +29,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
     console.log('[TitleScreen] Component mounted');
     console.log('[TitleScreen] menuVisible:', menuVisible);
     console.log('[TitleScreen] showPressStart:', showPressStart);
-  }, [menuVisible, showPressStart]);
+    console.log('[TitleScreen] actions:', actions);
+  }, [menuVisible, showPressStart, actions]);
 
   // Blinking "Press Start" effect
   useEffect(() => {
