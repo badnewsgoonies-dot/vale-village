@@ -60,6 +60,7 @@ export const ISAAC: UnitDefinition = {
     RAGNAROK,
     JUDGMENT,
   ],
+  manaContribution: 2,
   description: 'A balanced Earth Adept from Vale, skilled in both combat and Psynergy',
 };
 
@@ -95,6 +96,7 @@ export const GARET: UnitDefinition = {
     METEOR_STRIKE,
     PYROCLASM,
   ],
+  manaContribution: 1,
   description: 'A powerful Fire Adept focused on raw damage output',
 };
 
@@ -129,6 +131,7 @@ export const IVAN: UnitDefinition = {
     THUNDERCLAP,
     TEMPEST,
   ],
+  manaContribution: 3,
   description: 'A swift Wind Adept with devastating elemental magic',
 };
 
@@ -163,6 +166,7 @@ export const MIA: UnitDefinition = {
     WISH,
     GLACIAL_BLESSING,
   ],
+  manaContribution: 2,
   description: 'A compassionate Water Adept specialized in healing and support',
 };
 
@@ -198,6 +202,7 @@ export const FELIX: UnitDefinition = {
     METEOR_STRIKE,
     PYROCLASM,
   ],
+  manaContribution: 2,
   description: 'A fast Earth Adept specializing in quick, deadly strikes',
 };
 
@@ -233,6 +238,7 @@ export const JENNA: UnitDefinition = {
     METEOR_STRIKE,
     PYROCLASM,
   ],
+  manaContribution: 3,
   description: 'A powerful Fire Adept who excels at area-of-effect spells',
 };
 
@@ -267,6 +273,7 @@ export const SHEBA: UnitDefinition = {
     WINDS_FAVOR,
     TEMPEST,
   ],
+  manaContribution: 2,
   description: 'A versatile Wind Adept skilled in buffing and support magic',
 };
 
@@ -302,6 +309,7 @@ export const PIERS: UnitDefinition = {
     WISH,
     GLACIAL_BLESSING,
   ],
+  manaContribution: 1,
   description: 'A stalwart Water Adept built to withstand enemy assaults',
 };
 
@@ -337,6 +345,7 @@ export const KRADEN: UnitDefinition = {
     RAGNAROK,
     JUDGMENT,
   ],
+  manaContribution: 3,
   description: 'A wise scholar with diverse Psynergy abilities',
 };
 
@@ -371,6 +380,7 @@ export const KYLE: UnitDefinition = {
     METEOR_STRIKE,
     PYROCLASM,
   ],
+  manaContribution: 2,
   description: 'A seasoned Fire Adept and the ultimate warrior',
 };
 

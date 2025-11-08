@@ -18,13 +18,25 @@ import {
   LEATHER_VEST,
   CLOTH_CAP,
   LEATHER_BOOTS,
+  LEATHER_CAP,
+  WOODEN_SWORD,
+  WOODEN_AXE,
+  WOODEN_STAFF,
+  COTTON_SHIRT,
+  BRONZE_SWORD,
+  BRONZE_ARMOR,
+  BRONZE_HELM,
   IRON_SWORD,
   IRON_ARMOR,
   IRON_HELM,
+  IRON_BOOTS,
   STEEL_SWORD,
   STEEL_ARMOR,
   STEEL_HELM,
+  STEEL_GREAVES,
   HYPER_BOOTS,
+  POWER_RING,
+  GUARDIAN_RING,
 } from './equipment';
 
 /**
@@ -296,6 +308,9 @@ export const RAT: Enemy = {
   element: 'Neutral',
   baseXp: 10,
   baseGold: 6,
+  drops: [
+    { equipment: LEATHER_BOOTS, chance: 0.05 }, // 5% drop rate
+  ],
 };
 
 export const BAT: Enemy = {
@@ -314,6 +329,9 @@ export const BAT: Enemy = {
   element: 'Jupiter',
   baseXp: 12,
   baseGold: 7,
+  drops: [
+    { equipment: CLOTH_CAP, chance: 0.06 }, // 6% drop rate
+  ],
 };
 
 export const SPIDER: Enemy = {
@@ -332,6 +350,9 @@ export const SPIDER: Enemy = {
   element: 'Venus',
   baseXp: 11,
   baseGold: 7,
+  drops: [
+    { equipment: WOODEN_SWORD, chance: 0.07 }, // 7% drop rate
+  ],
 };
 
 export const GRUB: Enemy = {
@@ -350,6 +371,9 @@ export const GRUB: Enemy = {
   element: 'Neutral',
   baseXp: 8,
   baseGold: 5,
+  drops: [
+    { equipment: COTTON_SHIRT, chance: 0.08 }, // 8% drop rate
+  ],
 };
 
 export const WORM: Enemy = {
@@ -368,6 +392,9 @@ export const WORM: Enemy = {
   element: 'Venus',
   baseXp: 10,
   baseGold: 6,
+  drops: [
+    { equipment: LEATHER_CAP, chance: 0.06 }, // 6% drop rate
+  ],
 };
 
 export const VERMIN: Enemy = {
@@ -386,6 +413,9 @@ export const VERMIN: Enemy = {
   element: 'Neutral',
   baseXp: 9,
   baseGold: 6,
+  drops: [
+    { equipment: LEATHER_VEST, chance: 0.05 }, // 5% drop rate
+  ],
 };
 
 export const MINI_GOBLIN: Enemy = {
@@ -404,6 +434,9 @@ export const MINI_GOBLIN: Enemy = {
   element: 'Neutral',
   baseXp: 11,
   baseGold: 8,
+  drops: [
+    { equipment: WOODEN_AXE, chance: 0.07 }, // 7% drop rate
+  ],
 };
 
 export const KOBOLD: Enemy = {
@@ -422,6 +455,9 @@ export const KOBOLD: Enemy = {
   element: 'Neutral',
   baseXp: 13,
   baseGold: 9,
+  drops: [
+    { equipment: BRONZE_SWORD, chance: 0.09 }, // 9% drop rate
+  ],
 };
 
 export const ROACH: Enemy = {
@@ -440,6 +476,9 @@ export const ROACH: Enemy = {
   element: 'Neutral',
   baseXp: 9,
   baseGold: 6,
+  drops: [
+    { equipment: GUARDIAN_RING, chance: 0.04 }, // 4% drop rate - accessory is rarer
+  ],
 };
 
 export const MOMONGA: Enemy = {
@@ -458,6 +497,9 @@ export const MOMONGA: Enemy = {
   element: 'Neutral',
   baseXp: 10,
   baseGold: 7,
+  drops: [
+    { equipment: POWER_RING, chance: 0.04 }, // 4% drop rate - accessory is rarer
+  ],
 };
 
 export const EMU: Enemy = {
@@ -476,6 +518,9 @@ export const EMU: Enemy = {
   element: 'Neutral',
   baseXp: 18,
   baseGold: 13,
+  drops: [
+    { equipment: IRON_BOOTS, chance: 0.10 }, // 10% drop rate
+  ],
 };
 
 export const SEABIRD: Enemy = {
@@ -548,6 +593,9 @@ export const POISON_TOAD: Enemy = {
   element: 'Mercury',
   baseXp: 18,
   baseGold: 13,
+  drops: [
+    { equipment: BRONZE_ARMOR, chance: 0.10 }, // 10% drop rate
+  ],
 };
 
 export const DEVIL_FROG: Enemy = {
@@ -587,6 +635,9 @@ export const MOLE: Enemy = {
   element: 'Venus',
   baseXp: 17,
   baseGold: 12,
+  drops: [
+    { equipment: BRONZE_HELM, chance: 0.09 }, // 9% drop rate
+  ],
 };
 
 export const MAD_MOLE: Enemy = {
@@ -605,6 +656,9 @@ export const MAD_MOLE: Enemy = {
   element: 'Venus',
   baseXp: 19,
   baseGold: 14,
+  drops: [
+    { equipment: IRON_HELM, chance: 0.11 }, // 11% drop rate
+  ],
 };
 
 export const MAD_VERMIN: Enemy = {

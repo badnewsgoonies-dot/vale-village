@@ -30,6 +30,7 @@ export interface Ability {
   type: AbilityType;
   element?: Element;
   ppCost: number;
+  manaCost: number;             // Mana circles (0-4+)
   basePower: number;
   targets: AbilityTarget;
   unlockLevel: number;
@@ -57,6 +58,7 @@ export function createPhysicalAttack(name: string): Ability {
     name,
     type: 'physical',
     ppCost: 0,
+    manaCost: 0, // Basic attacks are free
     basePower: 0, // Uses unit's ATK
     targets: 'single-enemy',
     unlockLevel: 1,

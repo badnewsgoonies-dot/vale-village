@@ -31,13 +31,14 @@ export interface Equipment {
 }
 
 /**
- * Equipment loadout for a unit (4 slots)
+ * Equipment loadout for a unit (5 slots)
  */
 export interface EquipmentLoadout {
   weapon: Equipment | null;
   armor: Equipment | null;
   helm: Equipment | null;
   boots: Equipment | null;
+  accessory: Equipment | null;
 }
 
 /**
@@ -49,6 +50,7 @@ export function emptyLoadout(): EquipmentLoadout {
     armor: null,
     helm: null,
     boots: null,
+    accessory: null,
   };
 }
 

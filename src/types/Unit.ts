@@ -46,6 +46,7 @@ export interface UnitDefinition {
   baseStats: Stats;
   growthRates: GrowthRates;
   abilities: Ability[];
+  manaContribution: number;  // Base mana circles this unit provides to team pool
   description: string;
 }
 
@@ -71,6 +72,9 @@ export class Unit {
   readonly baseStats: Stats;
   readonly growthRates: GrowthRates;
   readonly description: string;
+
+  // Mana contribution (can increase with levels/equipment)
+  manaContribution: number;
 
   // Progression
   level: number;
@@ -103,6 +107,7 @@ export class Unit {
     this.baseStats = definition.baseStats;
     this.growthRates = definition.growthRates;
     this.description = definition.description;
+    this.manaContribution = definition.manaContribution;
 
     this.level = Math.max(1, Math.min(5, level)); // Clamp to 1-5
     this.xp = initialXp;
@@ -457,7 +462,7 @@ export class Unit {
    * From GAME_MECHANICS.md Section 7.2 (Equipment Special Effects)
    * Equipment like Sol Blade unlocks special abilities (e.g., Megiddo)
    */
-  getAvailableAbilities(): Ability[] {
+  getAvailableAbilities(team?: { equippedDjinn: Djinn[], djinnStates: Map<string, DjinnState> }): Ability[] {
     const baseAbilities = [...this.abilities];
     const equipmentAbilities: Ability[] = [];
 
@@ -471,7 +476,42 @@ export class Unit {
       }
     }
 
-    return [...baseAbilities, ...equipmentAbilities];
+    // Djinn-granted abilities (only from Set Djinn)
+    const djinnAbilities: Ability[] = [];
+    if (team) {
+      // Use team's Djinn (affects ALL units based on element compatibility)
+      const setDjinn = team.equippedDjinn.filter(d =>
+        team.djinnStates.get(d.id) === 'Set'
+      );
+
+      // Inline Djinn ability granting logic to avoid circular dependency
+      const grantedAbilityIds: string[] = [];
+      for (const djinn of setDjinn) {
+        // Matching element grants matching ability
+        if (this.element === djinn.element) {
+          grantedAbilityIds.push(djinn.grantsAbilities.matching);
+        }
+        // Counter element grants counter ability
+        else if (
+          (this.element === 'Venus' && djinn.element === 'Mars') ||
+          (this.element === 'Mars' && djinn.element === 'Venus') ||
+          (this.element === 'Mercury' && djinn.element === 'Jupiter') ||
+          (this.element === 'Jupiter' && djinn.element === 'Mercury')
+        ) {
+          grantedAbilityIds.push(djinn.grantsAbilities.counter);
+        }
+      }
+
+      // Deduplicate and load abilities
+      for (const abilityId of Array.from(new Set(grantedAbilityIds))) {
+        const ability = ABILITIES[abilityId];
+        if (ability) {
+          djinnAbilities.push(ability);
+        }
+      }
+    }
+
+    return [...baseAbilities, ...equipmentAbilities, ...djinnAbilities];
   }
 
   /**
@@ -510,6 +550,7 @@ export class Unit {
       baseStats: this.baseStats,
       growthRates: this.growthRates,
       abilities: this.abilities,
+      manaContribution: this.manaContribution,
       description: this.description,
     };
 
