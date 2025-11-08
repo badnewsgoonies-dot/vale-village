@@ -82,7 +82,6 @@ export class Unit {
 
   // Current state (private with validated setters)
   private _currentHp: number;
-  private _currentPp: number;
 
   // Equipment and abilities
   equipment: EquipmentLoadout;
@@ -128,11 +127,10 @@ export class Unit {
     // Unlock abilities based on level
     this.updateUnlockedAbilities();
 
-    // Calculate max HP/PP and set current to max
+    // Calculate max HP and set current to max
     // Initialize private fields directly (before setters are available)
     const stats = this.calculateStats();
     this._currentHp = stats.hp;
-    this._currentPp = stats.pp;
   }
 
   /**
@@ -149,7 +147,7 @@ export class Unit {
     // Level bonuses: growthRate * (level - 1)
     const levelBonuses: Stats = {
       hp: this.growthRates.hp * (this.level - 1),
-      pp: this.growthRates.pp * (this.level - 1),
+      pp: 0,  // PP system removed - using mana circles instead
       atk: this.growthRates.atk * (this.level - 1),
       def: this.growthRates.def * (this.level - 1),
       mag: this.growthRates.mag * (this.level - 1),
@@ -217,7 +215,7 @@ export class Unit {
     // Calculate final stats
     const finalStats: Stats = {
       hp: base.hp + levelBonuses.hp + (equipmentBonuses.hp || 0),
-      pp: base.pp + levelBonuses.pp + (equipmentBonuses.pp || 0),
+      pp: 0,  // PP system removed - using mana circles instead
       atk: Math.floor(
         (base.atk + levelBonuses.atk + (equipmentBonuses.atk || 0) + djinnSynergy.atk) * atkMultiplier
       ),
@@ -243,13 +241,6 @@ export class Unit {
   }
 
   /**
-   * Get maximum PP for current level
-   */
-  get maxPp(): number {
-    return this.calculateStats().pp;
-  }
-
-  /**
    * Get current stats (includes all bonuses)
    */
   get stats(): Stats {
@@ -267,19 +258,6 @@ export class Unit {
   set currentHp(value: number) {
     // Clamp between 0 and maxHp
     this._currentHp = Math.max(0, Math.min(value, this.maxHp));
-  }
-
-  /**
-   * Get/Set current PP with validation (Bug #3, #4 fix)
-   * Clamps between 0 and maxPp to prevent exploits
-   */
-  get currentPp(): number {
-    return this._currentPp;
-  }
-
-  set currentPp(value: number) {
-    // Clamp between 0 and maxPp
-    this._currentPp = Math.max(0, Math.min(value, this.maxPp));
   }
 
   /**
@@ -310,6 +288,7 @@ export class Unit {
 
   /**
    * Check if unit can use an ability
+   * Note: Mana circle cost is checked at the team level, not per-unit
    */
   canUseAbility(abilityId: string): boolean {
     // Check if unit is knocked out
@@ -326,11 +305,7 @@ export class Unit {
       return false;
     }
 
-    // Check PP cost
-    if (ability.ppCost > this.currentPp) {
-      return false;
-    }
-
+    // PP system removed - mana cost is checked at team level
     return true;
   }
 
@@ -442,22 +417,6 @@ export class Unit {
   }
 
   /**
-   * Regenerate PP after battle
-   * From GAME_MECHANICS.md Section 6.6
-   * Restores 10% of max PP (minimum 1 PP)
-   */
-  regeneratePP(): number {
-    if (this.isKO) {
-      return 0; // Dead units don't regenerate PP
-    }
-
-    const regenAmount = Math.max(1, Math.floor(this.maxPp * 0.1));
-    const before = this.currentPp;
-    this.currentPp = Math.min(this.maxPp, this.currentPp + regenAmount);
-    return this.currentPp - before;
-  }
-
-  /**
    * Get available abilities including equipment-granted abilities
    * From GAME_MECHANICS.md Section 7.2 (Equipment Special Effects)
    * Equipment like Sol Blade unlocks special abilities (e.g., Megiddo)
@@ -556,7 +515,6 @@ export class Unit {
 
     const clone = new Unit(definition, this.level, this.xp);
     clone._currentHp = this._currentHp;
-    clone._currentPp = this._currentPp;
     clone.equipment = { ...this.equipment };
     clone.djinn = [...this.djinn];
     clone.djinnStates = new Map(this.djinnStates);
@@ -602,10 +560,9 @@ export class Unit {
       this.level++;
       this.updateUnlockedAbilities();
 
-      // Fully restore HP/PP to new max values on level up
+      // Fully restore HP to new max value on level up
       const newStats = this.calculateStats();
       this._currentHp = newStats.hp;
-      this._currentPp = newStats.pp;
     }
   }
 }

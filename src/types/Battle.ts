@@ -275,24 +275,8 @@ export function executeAbility(
   const targetIds = targets.map(t => t.id);
   let message = `${caster.name} uses ${ability.name}!`;
 
-  // CRITICAL: Validate PP cost is non-negative (Bug #12 fix)
-  if (ability.ppCost < 0) {
-    return {
-      message: `Invalid ability: ${ability.name} has negative PP cost ${ability.ppCost}`,
-      targetIds: [],
-    };
-  }
-
-  // Check PP cost
-  if (ability.ppCost > caster.currentPp) {
-    return {
-      message: `${caster.name} doesn't have enough PP!`,
-      targetIds: [],
-    };
-  }
-
-  // Deduct PP cost (safe now - we validated ppCost >= 0)
-  caster.currentPp -= ability.ppCost;
+  // NOTE: Mana circle cost checking happens at team level before this function is called
+  // No per-unit PP cost to check or deduct
 
   // Check for critical hit (physical and psynergy only)
   const isCritical = (ability.type === 'physical' || ability.type === 'psynergy')
@@ -604,16 +588,6 @@ export function isPlayerUnit(state: BattleState, unit: Unit): boolean {
 }
 
 /**
- * Restore PP after battle victory
- * From GAME_MECHANICS.md Section 5.2.6
- */
-export function restorePPAfterBattle(units: Unit[]): void {
-  for (const unit of units) {
-    unit.currentPp = unit.maxPp;
-  }
-}
-
-/**
  * Process battle victory and calculate rewards
  *
  * Called when battle ends with PLAYER_VICTORY result.
@@ -675,8 +649,7 @@ export function processBattleVictory(
   // Distribute rewards
   const distribution = distributeRewards(battle.playerTeam, rewards);
 
-  // Restore PP after battle
-  restorePPAfterBattle(battle.playerTeam.units);
+  // No PP restoration needed - using mana circle system instead
 
   return distribution;
 }

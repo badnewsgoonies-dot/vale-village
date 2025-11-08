@@ -39,19 +39,19 @@ export const ISAAC: UnitDefinition = {
   role: 'Balanced Warrior',
   baseStats: {
     hp: 100,
-    pp: 24,
     atk: 14, // BALANCE: 15→14 (unit identity vs Garet)
     def: 10,
     mag: 12,
     spd: 12,
+    pp: 0,
   },
   growthRates: {
     hp: 20,
-    pp: 3,
     atk: 3,
     def: 2,
     mag: 2,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -75,19 +75,19 @@ export const GARET: UnitDefinition = {
   role: 'Pure DPS',
   baseStats: {
     hp: 120,
-    pp: 15,
     atk: 19, // BALANCE: 18→19 (glass cannon)
     def: 7,  // BALANCE: 8→7 (glass cannon fragility)
     mag: 10,
-    spd: 8,  // BALANCE: 10→8 (unit identity)
+    spd: 8,
+    pp: 0,  // BALANCE: 10→8 (unit identity)
   },
   growthRates: {
     hp: 15,
-    pp: 3,
     atk: 3, // BALANCE: 4→3 (reduce power gap)
     def: 1,
     mag: 2,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -110,19 +110,19 @@ export const IVAN: UnitDefinition = {
   role: 'Elemental Mage',
   baseStats: {
     hp: 80,
-    pp: 30,
     atk: 10,
     def: 6,
     mag: 18,
     spd: 15,
+    pp: 0,
   },
   growthRates: {
     hp: 12,
-    pp: 6,
     atk: 2,
     def: 1,
     mag: 4,
     spd: 2,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -145,19 +145,19 @@ export const MIA: UnitDefinition = {
   role: 'Healer',
   baseStats: {
     hp: 90,
-    pp: 25,
     atk: 12,
     def: 12,
     mag: 16,
     spd: 11,
+    pp: 0,
   },
   growthRates: {
     hp: 15,
-    pp: 5,
     atk: 2,
     def: 3,
     mag: 3,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     PLY,
@@ -181,19 +181,19 @@ export const FELIX: UnitDefinition = {
   role: 'Rogue Assassin',
   baseStats: {
     hp: 95,
-    pp: 18,
     atk: 17,
     def: 9,
     mag: 11,
     spd: 18,
+    pp: 0,
   },
   growthRates: {
     hp: 14,
-    pp: 3,
     atk: 3, // BALANCE: 4→3 (reduce power gap)
     def: 1,
     mag: 2,
     spd: 3,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -217,19 +217,19 @@ export const JENNA: UnitDefinition = {
   role: 'AoE Fire Mage',
   baseStats: {
     hp: 75,
-    pp: 28,
     atk: 11, // BALANCE: 9→11 (glass cannon versatility)
     def: 5,
     mag: 28, // BALANCE: 20→28 (glass cannon high damage)
     spd: 13,
+    pp: 0,
   },
   growthRates: {
     hp: 12,
-    pp: 6,
     atk: 1,
     def: 1,
     mag: 5,
     spd: 2,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -252,19 +252,19 @@ export const SHEBA: UnitDefinition = {
   role: 'Support Buffer',
   baseStats: {
     hp: 85,
-    pp: 26,
     atk: 11,
     def: 7,
     mag: 17,
     spd: 14,
+    pp: 0,
   },
   growthRates: {
     hp: 13,
-    pp: 5,
     atk: 2,
     def: 2,
     mag: 4,
     spd: 2,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -288,19 +288,19 @@ export const PIERS: UnitDefinition = {
   role: 'Defensive Tank',
   baseStats: {
     hp: 140,
-    pp: 20,
     atk: 10, // BALANCE: 14→10 (tank trades damage for survivability)
     def: 16,
     mag: 9,  // BALANCE: 13→9 (reduce magical damage)
     spd: 8,
+    pp: 0,
   },
   growthRates: {
     hp: 18,
-    pp: 4,
     atk: 1, // BALANCE: 2→1 (tanks don't scale ATK)
     def: 3,
     mag: 2,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -324,19 +324,19 @@ export const KRADEN: UnitDefinition = {
   role: 'Versatile Scholar',
   baseStats: {
     hp: 70,
-    pp: 35,
     atk: 8,
     def: 8,
     mag: 15,
     spd: 10,
+    pp: 0,
   },
   growthRates: {
     hp: 10,
-    pp: 7,
     atk: 2, // BALANCE: 1→2 (improve scholar viability)
     def: 2,
     mag: 3,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     SLASH,
@@ -359,19 +359,19 @@ export const KYLE: UnitDefinition = {
   role: 'Master Warrior',
   baseStats: {
     hp: 130,
-    pp: 22,
     atk: 16,
     def: 14,
     mag: 14,
     spd: 11,
+    pp: 0,
   },
   growthRates: {
     hp: 17,
-    pp: 4,
     atk: 3,
     def: 2,
     mag: 2,
     spd: 1,
+    pp: 0,
   },
   abilities: [
     SLASH,

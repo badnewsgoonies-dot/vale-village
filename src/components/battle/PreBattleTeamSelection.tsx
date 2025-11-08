@@ -175,10 +175,6 @@ export const PreBattleTeamSelection: React.FC<PreBattleTeamSelectionProps> = ({
                     <span className="label">HP:</span>
                     <span className="value">{selectedUnit.currentHp} / {selectedStats.hp}</span>
                   </div>
-                  <div className="info-row">
-                    <span className="label">PP:</span>
-                    <span className="value">{selectedUnit.currentPp} / {selectedStats.pp}</span>
-                  </div>
                 </div>
                 <div className="details-stats">
                   <h4>Stats</h4>

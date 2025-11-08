@@ -24,7 +24,7 @@ function enemyToUnit(enemy: Enemy): Unit {
     description: `A ${enemy.name} enemy`,
     element: enemy.element,
     baseStats: enemy.stats,
-    growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies
+    growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies (pp unused)
     abilities: enemy.abilities,
     manaContribution: 0, // Enemies don't contribute to player mana pool
   };

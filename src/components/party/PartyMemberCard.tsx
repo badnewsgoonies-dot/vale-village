@@ -49,11 +49,6 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
           value={unit.currentHp}
           maxValue={stats.hp}
         />
-        <StatBar
-          label="PP"
-          value={unit.currentPp}
-          maxValue={stats.pp}
-        />
       </div>
 
       <Button

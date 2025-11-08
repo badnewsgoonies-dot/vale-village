@@ -182,18 +182,6 @@ const BattleScreenContent: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-      
-      // Regenerate PP for all alive units
-      let totalPPRestored = 0;
-      battle.playerTeam.units.forEach(unit => {
-        if (!unit.isKO) {
-          totalPPRestored += unit.regeneratePP();
-        }
-      });
-
-      if (totalPPRestored > 0) {
-        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
-      }
 
       setTimeout(() => {
         actions.navigate({
@@ -255,19 +243,7 @@ const BattleScreenContent: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-      
-      // Regenerate PP for all alive units
-      let totalPPRestored = 0;
-      battle.playerTeam.units.forEach(unit => {
-        if (!unit.isKO) {
-          totalPPRestored += unit.regeneratePP();
-        }
-      });
-      
-      if (totalPPRestored > 0) {
-        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
-      }
-      
+
       setTimeout(() => actions.navigate({
         type: 'POST_BATTLE_CUTSCENE',
         npcId: battle.npcId,
@@ -405,7 +381,7 @@ const BattleScreenContent: React.FC = () => {
           {phase === 'selectAbility' && (
             <AbilityMenu
               unit={currentActor}
-              remainingMana={currentActor.currentPp}
+              remainingMana={battle.playerTeam.units.reduce((sum, u) => sum + u.manaContribution, 0)}
               onSelectAbility={handleAbilitySelect}
               onBack={() => setPhase('selectCommand')}
             />
