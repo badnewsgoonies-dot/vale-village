@@ -139,6 +139,12 @@ const DialogueScreenContent: React.FC = () => {
       break;
     }
 
+    case 'GIVE_DJINN': {
+      // Give Djinn to player
+      actions.giveDjinn(action.djinnId);
+      break;
+    }
+
     case 'OPEN_SHOP': {
       // Open shop screen
       actions.navigate({ type: 'SHOP', shopType: action.shopType });

@@ -15,6 +15,7 @@ export interface GameActions {
   setActiveParty: (unitIds: string[]) => void;
   recruitUnit: (unitId: string) => void;
   addGold: (amount: number) => void;
+  giveDjinn: (djinnId: string) => void;
 
   // Equipment
   equipItem: (unitId: string, slot: string, equipment: Equipment) => void;

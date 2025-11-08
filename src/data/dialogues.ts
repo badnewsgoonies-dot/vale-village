@@ -462,7 +462,7 @@ const firstDjinnDialogue: DialogueTree = {
       text: '*The Djinn glows brightly and leaps into Isaac\'s body, merging with his spirit!*',
       // Camera: Shake + zoom for the merge
       portrait: '/sprites/djinn/Venus/Flint.gif',
-      action: { type: 'SET_FLAG', flag: 'obtained_djinn_flint', value: true },
+      action: { type: 'GIVE_DJINN', djinnId: 'flint' },
       nextNode: 'merge_complete',
     },
     merge_complete: {
@@ -470,6 +470,7 @@ const firstDjinnDialogue: DialogueTree = {
       speaker: 'Isaac',
       text: 'Whoa! I can feel its power flowing through me!',
       portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      // Note: Djinn is given in previous node, now navigate to overworld
       action: { type: 'NAVIGATE', screen: 'OVERWORLD' },
     },
   },

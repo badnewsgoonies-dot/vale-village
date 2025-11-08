@@ -342,6 +342,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   }, []);
 
+  const giveDjinn = useCallback((djinnId: string) => {
+    setState(prev => {
+      // Check if Djinn already collected
+      const alreadyCollected = prev.playerData.djinnCollected.some(d => d.id === djinnId);
+      if (alreadyCollected) {
+        console.log(`Djinn ${djinnId} already collected`);
+        return prev;
+      }
+
+      // Find Djinn definition
+      const djinn = ALL_DJINN[djinnId];
+      if (!djinn) {
+        console.error(`Djinn not found: ${djinnId}`);
+        return { ...prev, error: `Djinn ${djinnId} not found` };
+      }
+
+      console.log(`Giving Djinn: ${djinn.name}`);
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          djinnCollected: [...prev.playerData.djinnCollected, djinn],
+        },
+        error: null,
+      };
+    });
+  }, []);
+
   // Battle actions
   const startBattle = useCallback((enemyIds: string[], npcId?: string) => {
     console.log('Starting battle with enemies:', enemyIds, 'npcId:', npcId);
@@ -836,6 +865,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveParty,
     recruitUnit,
     addGold,
+    giveDjinn,
     startBattle,
     executeTurn,
     endBattle,
