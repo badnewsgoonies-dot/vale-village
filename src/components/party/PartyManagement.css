@@ -76,6 +76,7 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
+  padding-right: 320px; /* Make room for fixed side panel */
   overflow-y: auto;
   flex: 1;
 }
@@ -415,6 +416,7 @@
 @media (max-width: 1200px) {
   .party-content {
     grid-template-columns: 1fr;
+    padding-right: var(--spacing-lg); /* Reset padding on smaller screens */
   }
 
   .unit-details-panel {
