@@ -17,6 +17,11 @@ export const PartyManagementScreen: React.FC = () => {
   const activeUnits = allUnits.filter(u => activePartyIds.includes(u.id));
   const benchUnits = allUnits.filter(u => !activePartyIds.includes(u.id));
 
+  // Define handleReturn early so it can be used in useEffect
+  const handleReturn = React.useCallback(() => {
+    actions.goBack();
+  }, [actions]);
+
   // Auto-select first unit if none selected
   React.useEffect(() => {
     if (!selectedUnit && allUnits.length > 0) {
@@ -70,10 +75,6 @@ export const PartyManagementScreen: React.FC = () => {
       handleSwapToActive(unit);
     }
   };
-
-  const handleReturn = React.useCallback(() => {
-    actions.goBack();
-  }, [actions]);
 
   const selectedStats = selectedUnit ? selectedUnit.calculateStats() : null;
 

@@ -9,7 +9,7 @@ import { EQUIPMENT } from '@/data/equipment';
 import { ALL_DJINN } from '@/data/djinn';
 import type { Djinn } from '@/types/Djinn';
 import { ENEMIES, type Enemy } from '@/data/enemies';
-import { createBattleState, processBattleVictory, BattleResult } from '@/types/Battle';
+import { createBattleState, processBattleVictory } from '@/types/Battle';
 import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
 import type { AreaId, ChestId, BossId } from '@/types/Area';
@@ -69,10 +69,6 @@ function createInitialStoryFlags(): StoryFlags {
   return {
     intro_seen: false,
     talked_to_elder_first_time: false,
-    quest_forest_started: false,
-    quest_forest_complete: false,
-    quest_ruins_started: false,
-    quest_ruins_complete: false,
     defeated_alpha_wolf: false,
     defeated_golem_king: false,
     met_mysterious_stranger: false,

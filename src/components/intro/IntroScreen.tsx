@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useCamera } from '@/context/CameraContext';
 import './IntroScreen.css';
 
 const INTRO_MESSAGES = [
@@ -10,7 +11,29 @@ const INTRO_MESSAGES = [
 
 export const IntroScreen: React.FC = () => {
   const { actions } = useGame();
+  const { controls: cameraControls } = useCamera();
   const [currentMessage, setCurrentMessage] = useState(0);
+
+  // Camera work for intro sequence
+  useEffect(() => {
+    // Opening shot: Wide view of the world
+    if (currentMessage === 0) {
+      cameraControls.zoomTo(0.7, 2000); // Slow zoom out to show village
+    }
+    // Second message: Zoom in slightly - tension building
+    else if (currentMessage === 1) {
+      cameraControls.zoomTo(0.9, 1500); // Zoom in as danger approaches
+    }
+    // Final message: Normal view ready for gameplay
+    else if (currentMessage === 2) {
+      cameraControls.zoomTo(1.0, 1200); // Return to normal view
+    }
+
+    // Cleanup: Reset camera when leaving intro
+    return () => {
+      cameraControls.reset(600);
+    };
+  }, [currentMessage]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {

@@ -370,6 +370,215 @@ const villager2Dialogue: DialogueTree = {
 };
 
 /**
+ * Isaac - Protagonist's internal monologue on arriving in town
+ */
+const isaacArrivalDialogue: DialogueTree = {
+  npcId: 'isaac_arrival',
+  startNode: 'arrival',
+  nodes: {
+    arrival: {
+      id: 'arrival',
+      speaker: 'Isaac',
+      text: 'Wow, this place is big. I wonder what\'s happening around town...',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      action: { type: 'END_DIALOGUE' },
+    },
+  },
+};
+
+/**
+ * First Djinn - The mystical being who reveals the truth
+ */
+const firstDjinnDialogue: DialogueTree = {
+  npcId: 'first_djinn',
+  startNode: 'appear',
+  nodes: {
+    appear: {
+      id: 'appear',
+      speaker: 'Djinn',
+      text: 'My God, I\'ve been waiting forever for you to come!',
+      // Camera: Auto shake + 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'isaac_confused',
+    },
+    isaac_confused: {
+      id: 'isaac_confused',
+      speaker: 'Isaac',
+      text: 'Sorry, what did you say? And what the heck even are you?',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      nextNode: 'urgency',
+    },
+    urgency: {
+      id: 'urgency',
+      speaker: 'Djinn',
+      text: 'There\'s no time! You are the hero that we need, and your moment has come. Let me explain...',
+      // Camera: Still 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'actually_time',
+    },
+    actually_time: {
+      id: 'actually_time',
+      speaker: 'Djinn',
+      text: 'Actually, there is time. This world is full of injustice. These so-called "monsters" - or so they have become - are enslaved to work and do battle.',
+      // Camera: 2.0x zoom (keywords: "injustice" + "enslaved")
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'the_master',
+    },
+    the_master: {
+      id: 'the_master',
+      speaker: 'Djinn',
+      text: 'They all serve the master in the castle, and nobody has been able to stop this. The only way to reach him is through a near-impossible trial of battles to your right.',
+      // Camera: 1.5x zoom (keyword: "master")
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'the_legend',
+    },
+    the_legend: {
+      id: 'the_legend',
+      speaker: 'Djinn',
+      text: 'But the legend has foretold - you are the chosen one! I shall join your team, and together we will be the saviors.',
+      // Camera: 2.0x zoom (Djinn speaker)
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      nextNode: 'lets_begin',
+    },
+    lets_begin: {
+      id: 'lets_begin',
+      speaker: 'Djinn',
+      text: 'Let\'s enter the first challenge together and get this journey started!',
+      // Camera: Still zoomed
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      action: { type: 'SET_FLAG', flag: 'obtained_djinn_flint', value: true },
+      nextNode: 'isaac_response',
+    },
+    isaac_response: {
+      id: 'isaac_response',
+      speaker: 'Isaac',
+      text: 'I ain\'t got nothing better to do today.',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      nextNode: 'djinn_merge',
+    },
+    djinn_merge: {
+      id: 'djinn_merge',
+      speaker: 'Djinn',
+      text: '*The Djinn glows brightly and leaps into Isaac\'s body, merging with his spirit!*',
+      // Camera: Shake + zoom for the merge
+      portrait: '/sprites/djinn/Venus/Flint.gif',
+      action: { type: 'SET_FLAG', flag: 'obtained_djinn_flint', value: true },
+      nextNode: 'merge_complete',
+    },
+    merge_complete: {
+      id: 'merge_complete',
+      speaker: 'Isaac',
+      text: 'Whoa! I can feel its power flowing through me!',
+      portrait: '/sprites/overworld/protagonists/Isaac.gif',
+      action: { type: 'END_DIALOGUE' },
+    },
+  },
+};
+
+/**
+ * Game Tutorial - Comprehensive introduction to game systems
+ */
+const gameTutorialDialogue: DialogueTree = {
+  npcId: 'game_tutorial',
+  startNode: 'welcome',
+  nodes: {
+    welcome: {
+      id: 'welcome',
+      speaker: 'Tutorial',
+      text: 'Hello! Welcome to this epic battle. In this game, you have units to start with, but there are many others to be recruited - each with intricate abilities and ready to be geared up with the best weapons and armor.',
+      nextNode: 'menu_intro',
+    },
+    menu_intro: {
+      id: 'menu_intro',
+      speaker: 'Tutorial',
+      text: 'Let me show you the main menu options available to you. You can access these from the overworld at any time.',
+      nextNode: 'party_menu',
+    },
+    party_menu: {
+      id: 'party_menu',
+      speaker: 'Tutorial',
+      text: 'PARTY MANAGEMENT: Here you can view all your recruited units and swap between your active party (max 4) and bench units. Choose your team wisely!',
+      nextNode: 'equipment_menu',
+    },
+    equipment_menu: {
+      id: 'equipment_menu',
+      speaker: 'Tutorial',
+      text: 'EQUIPMENT: Equip your units with weapons, armor, helms, boots, and accessories. Better gear means stronger stats and better chances in battle!',
+      nextNode: 'abilities_menu',
+    },
+    abilities_menu: {
+      id: 'abilities_menu',
+      speaker: 'Tutorial',
+      text: 'ABILITIES: Each unit unlocks unique abilities as they level up. Review your team\'s abilities here and plan your battle strategies.',
+      nextNode: 'djinn_menu',
+    },
+    djinn_menu: {
+      id: 'djinn_menu',
+      speaker: 'Tutorial',
+      text: 'DJINN: These mystical beings grant powerful bonuses and abilities. Equip Djinn to your units to boost their stats and unlock devastating summon attacks!',
+      nextNode: 'battle_system_intro',
+    },
+    battle_system_intro: {
+      id: 'battle_system_intro',
+      speaker: 'Tutorial',
+      text: 'Now, let me explain how battles work. When you enter combat, you\'ll have several commands available each turn.',
+      nextNode: 'attack_command',
+    },
+    attack_command: {
+      id: 'attack_command',
+      speaker: 'Tutorial',
+      text: 'ATTACK: Execute a basic physical attack on an enemy. Quick and reliable, but not the most powerful option.',
+      nextNode: 'ability_command',
+    },
+    ability_command: {
+      id: 'ability_command',
+      speaker: 'Tutorial',
+      text: 'ABILITY (PSYNERGY): Unleash powerful elemental abilities! These cost PP (Psynergy Points) but deal massive damage or provide helpful effects. Choose wisely based on enemy weaknesses!',
+      nextNode: 'djinn_command',
+    },
+    djinn_command: {
+      id: 'djinn_command',
+      speaker: 'Tutorial',
+      text: 'DJINN: Summon the power of your equipped Djinn for devastating effects! Use multiple Djinn to unleash even more powerful summon attacks.',
+      nextNode: 'defend_command',
+    },
+    defend_command: {
+      id: 'defend_command',
+      speaker: 'Tutorial',
+      text: 'DEFEND: Take a defensive stance to reduce incoming damage. Use this when you need to survive a powerful enemy attack or buy time to heal.',
+      nextNode: 'ready_prompt',
+    },
+    ready_prompt: {
+      id: 'ready_prompt',
+      speaker: 'Tutorial',
+      text: 'You now know the basics! Are you ready to proceed into the first house and begin your journey to free the enslaved monsters?',
+      choices: [
+        { text: 'Yes, let\'s do this!', nextNode: 'encourage' },
+        { text: 'Tell me again about the menus.', nextNode: 'menu_intro' },
+        { text: 'Tell me again about battles.', nextNode: 'battle_system_intro' },
+      ],
+    },
+    encourage: {
+      id: 'encourage',
+      speaker: 'Tutorial',
+      text: 'Excellent! Head to the house on your right to face your first challenge. Remember - fight with courage, and you\'ll convince others to join your cause. Good luck, hero!',
+      action: {
+        type: 'SET_FLAG',
+        flag: 'tutorial_battle_complete',
+        value: true
+      },
+      nextNode: 'end',
+    },
+    end: {
+      id: 'end',
+      speaker: 'Tutorial',
+      text: 'Lead the way, Isaac!',
+      action: { type: 'END_DIALOGUE' },
+    },
+  },
+};
+
+/**
  * Main dialogue registry
  * Maps NPC IDs to their dialogue trees
  * Also includes story scenes for narrator-driven content
@@ -384,6 +593,11 @@ export const dialogueRegistry: Record<string, DialogueTree> = {
   innkeeper: innkeeperDialogue,
   'villager-1': villager1Dialogue,
   'villager-2': villager2Dialogue,
+
+  // Story NPCs
+  'isaac_arrival': isaacArrivalDialogue,
+  'first_djinn': firstDjinnDialogue,
+  'game_tutorial': gameTutorialDialogue,
 
   // Story scenes (imported from story/ directory)
   ...storyScenes,

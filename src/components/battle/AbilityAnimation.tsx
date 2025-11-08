@@ -61,6 +61,7 @@ export const AbilityAnimation: React.FC<AbilityAnimationProps> = ({
         Mars: 'Inferno.gif',
         Mercury: 'Glacier.gif',
         Jupiter: 'Tempest.gif',
+        Neutral: 'Grand_Gaia.gif',
       }[ability.element]
     : null;
 

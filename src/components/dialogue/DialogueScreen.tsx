@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useCamera } from '@/context/CameraContext';
 import { getDialogueTree } from '@/data/dialogues';
 import type { DialogueChoice, DialogueAction } from '@/types/Dialogue';
 import { DialogueBox } from './DialogueBox';
@@ -7,6 +8,7 @@ import './DialogueScreen.css';
 
 export const DialogueScreen: React.FC = () => {
   const { state, actions } = useGame();
+  const { controls: cameraControls } = useCamera();
   const screen = state.currentScreen;
 
   // Get npcId from screen state
@@ -47,6 +49,48 @@ export const DialogueScreen: React.FC = () => {
 
   // Check if node condition is met
   const nodeConditionMet = !currentNode.condition || currentNode.condition(state.storyFlags);
+
+  // Camera work: Zoom on dialogue start and important moments
+  useEffect(() => {
+    const text = currentNode.text.toLowerCase();
+    const speaker = currentNode.speaker.toLowerCase();
+
+    // Check if this is a Djinn revelation moment
+    const isDjinnSpeaker = speaker.includes('djinn') || speaker.includes('spirit') || speaker.includes('elemental');
+    const revelationKeywords = ['truth', 'reveal', 'injustice', 'enslaved', 'see now', 'witness'];
+    const isRevelation = revelationKeywords.some(keyword => text.includes(keyword));
+
+    if (isDjinnSpeaker || isRevelation) {
+      // Djinn revelation - dramatic mystical moment
+      cameraControls.shake('medium', 500); // Shake when Djinn appears
+      setTimeout(() => {
+        cameraControls.zoomTo(2.0, 1000); // Extreme close-up for revelation
+      }, 500);
+    } else {
+      // Normal dialogue: Zoom in slightly when entering
+      cameraControls.zoomTo(1.2, 600);
+
+      // Check for dramatic keywords in text to trigger closer zoom
+      const dramaticKeywords = [
+        'never', 'must', 'free', 'monsters', 'justice', 'truth',
+        'join', 'wrong', 'understand', 'fight', 'freedom'
+      ];
+
+      const isDramatic = dramaticKeywords.some(keyword => text.includes(keyword));
+
+      if (isDramatic) {
+        // Dramatic line - zoom closer
+        setTimeout(() => {
+          cameraControls.zoomTo(1.5, 600);
+        }, 300);
+      }
+    }
+
+    // Cleanup: Reset camera when leaving dialogue
+    return () => {
+      cameraControls.reset(600);
+    };
+  }, [currentNodeId]);
 
   // Execute action when node changes
   useEffect(() => {

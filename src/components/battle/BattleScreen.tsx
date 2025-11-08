@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context';
+import { useCamera } from '@/context/CameraContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import { StatusBar } from './StatusBar';
@@ -22,6 +23,7 @@ type BattlePhase =
 
 export const BattleScreen: React.FC = () => {
   const { state, actions } = useGame();
+  const { controls: cameraControls } = useCamera();
   const battle = state.currentBattle;
 
   const [phase, setPhase] = useState<BattlePhase>('idle');
@@ -29,6 +31,22 @@ export const BattleScreen: React.FC = () => {
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [combatLog, setCombatLog] = useState<string[]>([]);
   const [currentActorIndex, setCurrentActorIndex] = useState(0);
+
+  // Camera work: Battle intro
+  useEffect(() => {
+    // Battle start: Quick zoom out + shake
+    cameraControls.shake('light', 200);
+    cameraControls.zoomTo(0.95, 300);
+
+    setTimeout(() => {
+      cameraControls.zoomTo(1.0, 400);
+    }, 500);
+
+    // Cleanup: Reset camera when leaving battle
+    return () => {
+      cameraControls.reset(600);
+    };
+  }, []); // Only on mount
 
   if (!battle) {
     return (
@@ -123,20 +141,19 @@ export const BattleScreen: React.FC = () => {
     let ability: Ability;
     if (selectedCommand === 'attack') {
       // Basic attack (0 mana)
-      const abilities = currentUnit.getAvailableAbilities({
-        equippedDjinn: battle.playerTeam.equippedDjinn,
-        djinnStates
-      });
+      const abilities = currentActor.getAvailableAbilities();
       const physicalAbility = abilities.find(a => a.type === 'physical') || abilities[0];
       if (!physicalAbility) {
-        console.error('[BATTLE] No abilities available for unit:', currentUnit.id);
-        setCombatLog(prev => [...prev, `${currentUnit.name} has no available abilities!`]);
+        console.error('[BATTLE] No abilities available for unit:', currentActor.id);
+        setCombatLog(prev => [...prev, `${currentActor.name} has no available abilities!`]);
         return;
       }
       ability = physicalAbility;
     } else if (selectedAbility) {
+      ability = selectedAbility;
     } else {
-      ability = selectedAbility!;
+      console.error('[BATTLE] No ability selected!');
+      return;
     }
 
     // Execute via Battle functions
@@ -144,6 +161,18 @@ export const BattleScreen: React.FC = () => {
 
     // Add to combat log
     setCombatLog(prev => [...prev, result.message]);
+
+    // Camera work: Shake on hit
+    if (result.damage && result.damage > 0) {
+      const damagePercent = result.damage / (target.stats.hp || 1);
+      if (damagePercent > 0.3) {
+        // Heavy hit - medium shake
+        cameraControls.shake('medium', 400);
+      } else {
+        // Normal hit - light shake
+        cameraControls.shake('light', 300);
+      }
+    }
 
     // Play animation (placeholder)
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -167,83 +196,6 @@ export const BattleScreen: React.FC = () => {
       }
 
       setTimeout(() => {
-        actions.navigate({
-          type: 'POST_BATTLE_CUTSCENE',
-          npcId: battle.npcId,
-          victory: true,
-        });
-      }, 2000);
-      return;
-    }
-
-    setPhase('executing');
-
-    // Sort actions by SPD
-    const actionsWithUnits = queuedActions
-      .map(action => {
-        const unit = battle.playerTeam.units.find(u => u.id === action.unitId);
-        if (!unit) {
-          console.error('[BATTLE] Unit not found for action:', action);
-          return null;
-        }
-        return { action, unit };
-      })
-      .filter((item): item is { action: QueuedAction; unit: Unit } => item !== null);
-
-    actionsWithUnits.sort((a, b) => {
-      const statsA = a.unit.calculateStats();
-      const statsB = b.unit.calculateStats();
-      return statsB.spd - statsA.spd; // Fastest first
-    });
-
-    // Execute player actions
-    for (const { action, unit } of actionsWithUnits) {
-      const target = [...battle.playerTeam.units, ...battle.enemies].find(u => u.id === action.targetId);
-      if (!target || target.isKO) continue;
-
-      const abilities = unit.getAvailableAbilities({
-        equippedDjinn: battle.playerTeam.equippedDjinn,
-        djinnStates
-      });
-      
-      if (totalPPRestored > 0) {
-        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
-      }
-      
-      setTimeout(() => actions.navigate({
-        type: 'POST_BATTLE_CUTSCENE',
-        npcId: battle.npcId,
-        victory: true,
-      }), 2000);
-
-      // Show ability animation (if it's a psynergy)
-      if (ability.type === 'psynergy') {
-        setCurrentAbilityAnimation(ability);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for animation
-        setCurrentAbilityAnimation(null);
-      }
-
-      const result = executeAbility(unit, ability, [target]);
-      setCombatLog(prev => [...prev, result.message]);
-
-      await new Promise(resolve => setTimeout(resolve, ability.type === 'psynergy' ? 300 : 600));
-    }
-
-    // Check victory
-    const allEnemiesDown = battle.enemies.every(e => e.isKO);
-    console.log('[BATTLE] Victory check:', { allEnemiesDown, enemyStatus: battle.enemies.map(e => ({ id: e.id, hp: e.stats.hp, isKO: e.isKO })) });
-    if (allEnemiesDown) {
-      console.log('[BATTLE] Victory detected! Processing rewards and transitioning to post-battle cutscene...');
-      setPhase('victory');
-      setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-
-      // Process battle rewards BEFORE navigating
-      console.log('[BATTLE] Calling endBattle()...');
-      actions.endBattle();
-      console.log('[BATTLE] endBattle() called successfully');
-
-      setTimeout(() => {
-        console.log('[BATTLE] Navigating to POST_BATTLE_CUTSCENE', { npcId: battle.npcId });
         actions.navigate({
           type: 'POST_BATTLE_CUTSCENE',
           npcId: battle.npcId,
@@ -389,36 +341,7 @@ export const BattleScreen: React.FC = () => {
   };
 
   return (
-    <div 
-      className="battle-screen"
-      data-area={state.currentLocation || 'vale_village'}
-    >
     <div className="battle-screen" data-area={state.currentLocation || 'vale_village'}>
-      {/* Summon Animation Overlay */}
-      {phase === 'summoning' && selectedDjinn.length > 0 && (() => {
-        const firstDjinn = battle.playerTeam.equippedDjinn.find(d => d.id === selectedDjinn[0]);
-        if (!firstDjinn) {
-          console.error('[BATTLE] First Djinn not found in equipped Djinn!', selectedDjinn[0]);
-          setPhase('executing'); // Skip to execution if Djinn not found
-          return null;
-        }
-        return (
-          <SummonAnimation
-            djinnCount={selectedDjinn.length}
-            element={firstDjinn.element}
-            onComplete={() => setPhase('executing')}
-          />
-        );
-      })()}
-
-      {/* Ability Animation Overlay */}
-      {currentAbilityAnimation && (
-        <AbilityAnimation
-          ability={currentAbilityAnimation}
-          onComplete={() => setCurrentAbilityAnimation(null)}
-        />
-      )}
-
       {/* Top Status Bar */}
       <StatusBar units={battle.playerTeam.units} />
 
@@ -482,6 +405,7 @@ export const BattleScreen: React.FC = () => {
           {phase === 'selectAbility' && (
             <AbilityMenu
               unit={currentActor}
+              remainingMana={currentActor.currentPp}
               onSelectAbility={handleAbilitySelect}
               onBack={() => setPhase('selectCommand')}
             />
