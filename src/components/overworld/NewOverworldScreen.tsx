@@ -246,8 +246,8 @@ export const NewOverworldScreen: React.FC = () => {
         case 'E':
           actions.navigate({ type: 'EQUIPMENT', unitId: state.playerData.activePartyIds[0] });
           break;
-        case 'a':
-        case 'A':
+        case 'b':
+        case 'B':
           actions.navigate({ type: 'ABILITIES' });
           break;
         case 'u':

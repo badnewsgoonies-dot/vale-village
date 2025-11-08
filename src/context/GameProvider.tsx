@@ -105,8 +105,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: null,
     quests: getAllQuests(),
     storyFlags: createInitialStoryFlags(),
-    currentLocation: 'vale_village',
-    playerPosition: { x: 10, y: 7 }, // Starting position in Vale Village
+    currentLocation: 'battle_row',
+    playerPosition: { x: 2, y: 7 }, // Starting position in Battle Row
     areaStates: {
       vale_village: createInitialAreaState(),
       forest_path: createInitialAreaState(),

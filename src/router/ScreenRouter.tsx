@@ -7,14 +7,13 @@ import { UnitCollectionScreen } from '@/components/units/UnitCollectionScreen';
 import { PartyManagementScreen } from '@/components/party/PartyManagementScreen';
 import { RewardsScreen } from '@/components/rewards/RewardsScreen';
 import { BattleScreen } from '@/components/battle';
-import { ValeVillageElevationOverworld } from '@/components/overworld/ValeVillageElevationOverworld';
+import { NewOverworldScreen } from '@/components/overworld/NewOverworldScreen';
 import { ShopScreen } from '@/components/shop/ShopScreen';
 import { IntroScreen } from '@/components/intro/IntroScreen';
 import { DjinnScreen } from '@/components/djinn/DjinnScreen';
 import { AbilitiesScreen } from '@/components/abilities/AbilitiesScreen';
 import { SummonsScreen } from '@/components/summons/SummonsScreen';
 import { MainMenu } from '@/components/menu/MainMenu';
-import { GameDemo } from '@/components/demo/GameDemo';
 import { DialogueScreen } from '@/components/dialogue/DialogueScreen';
 import { BattleFlowController } from '@/components/battle/BattleFlowController';
 import { PostBattleCutscene } from '@/components/battle/PostBattleCutscene';
@@ -109,7 +108,7 @@ export const ScreenRouter: React.FC = () => {
       );
 
     case 'OVERWORLD':
-      return <ValeVillageElevationOverworld />;
+      return <NewOverworldScreen />;
 
     case 'DJINN_MENU':
       return <DjinnScreen />;
@@ -134,9 +133,6 @@ export const ScreenRouter: React.FC = () => {
 
     case 'DIALOGUE':
       return <DialogueScreen />;
-
-    case 'DEMO':
-      return <GameDemo />;
 
     default:
       return <div className="error-screen">Unknown screen: {JSON.stringify(screen)}</div>;
