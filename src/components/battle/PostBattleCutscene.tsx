@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useCamera } from '@/context/CameraContext';
 import { Button } from '../shared';
 import './PostBattleCutscene.css';
 
@@ -22,6 +23,7 @@ export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
 }) => {
   console.log('[POST_BATTLE_CUTSCENE] Rendering with:', { npcId, victory });
   const { actions } = useGame();
+  const { controls: cameraControls } = useCamera();
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   // Define cutscene messages based on NPC and outcome
@@ -61,6 +63,31 @@ export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = ({
   const messages = getCutsceneMessages();
   const currentMessage = messages[currentMessageIndex];
   const isLastMessage = currentMessageIndex === messages.length - 1;
+
+  // Camera work for post-battle recruitment cutscene
+  useEffect(() => {
+    if (victory && npcId) {
+      // Victory with NPC - potential recruitment moment
+      if (currentMessageIndex === 0) {
+        // First message: Medium zoom for victory
+        cameraControls.zoomTo(1.3, 800);
+      } else if (isLastMessage) {
+        // Last message: Closer zoom for recruitment moment
+        setTimeout(() => {
+          cameraControls.zoomTo(1.7, 1000); // Close-up for "I'll join you!"
+          cameraControls.shake('light', 300); // Small shake when they join
+        }, 500);
+      }
+    } else if (!victory) {
+      // Defeat: Zoom out slightly
+      cameraControls.zoomTo(0.9, 800);
+    }
+
+    // Cleanup: Reset camera when leaving cutscene
+    return () => {
+      cameraControls.reset(600);
+    };
+  }, [currentMessageIndex, victory, npcId, isLastMessage]);
 
   // Auto-advance after delay or wait for player input
   const handleAdvance = () => {

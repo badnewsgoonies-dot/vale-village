@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context';
+import { useCamera } from '@/context/CameraContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import { StatusBar } from './StatusBar';
@@ -22,6 +23,7 @@ type BattlePhase =
 
 export const BattleScreen: React.FC = () => {
   const { state, actions } = useGame();
+  const { controls: cameraControls } = useCamera();
   const battle = state.currentBattle;
 
   const [phase, setPhase] = useState<BattlePhase>('idle');
@@ -29,6 +31,22 @@ export const BattleScreen: React.FC = () => {
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [combatLog, setCombatLog] = useState<string[]>([]);
   const [currentActorIndex, setCurrentActorIndex] = useState(0);
+
+  // Camera work: Battle intro
+  useEffect(() => {
+    // Battle start: Quick zoom out + shake
+    cameraControls.shake('light', 200);
+    cameraControls.zoomTo(0.95, 300);
+
+    setTimeout(() => {
+      cameraControls.zoomTo(1.0, 400);
+    }, 500);
+
+    // Cleanup: Reset camera when leaving battle
+    return () => {
+      cameraControls.reset(600);
+    };
+  }, []); // Only on mount
 
   if (!battle) {
     return (
@@ -143,6 +161,18 @@ export const BattleScreen: React.FC = () => {
 
     // Add to combat log
     setCombatLog(prev => [...prev, result.message]);
+
+    // Camera work: Shake on hit
+    if (result.damage && result.damage > 0) {
+      const damagePercent = result.damage / (target.stats.hp || 1);
+      if (damagePercent > 0.3) {
+        // Heavy hit - medium shake
+        cameraControls.shake('medium', 400);
+      } else {
+        // Normal hit - light shake
+        cameraControls.shake('light', 300);
+      }
+    }
 
     // Play animation (placeholder)
     await new Promise(resolve => setTimeout(resolve, 800));
