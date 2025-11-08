@@ -24,8 +24,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onNavigate, onStartBat
   };
 
   const handleNewGame = () => {
-    // Go straight to Vale Village overworld
-    onNavigate({ type: 'OVERWORLD' });
+    // Start with Isaac+Djinn cutscene, then to overworld
+    onNavigate({ type: 'DIALOGUE', npcId: 'first_djinn' });
   };
 
   const handleTestBattle = () => {

@@ -470,7 +470,7 @@ const firstDjinnDialogue: DialogueTree = {
       speaker: 'Isaac',
       text: 'Whoa! I can feel its power flowing through me!',
       portrait: '/sprites/overworld/protagonists/Isaac.gif',
-      action: { type: 'END_DIALOGUE' },
+      action: { type: 'NAVIGATE', screen: 'OVERWORLD' },
     },
   },
 };
