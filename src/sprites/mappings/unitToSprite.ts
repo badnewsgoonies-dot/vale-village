@@ -29,9 +29,9 @@ export const UNIT_SPRITE_MAPPING: Record<string, UnitSpriteMapping> = {
   },
   'jenna': {
     folder: 'jenna',
-    weapons: ['lBlade', 'Staff'],
-    animations: 7,
-    fallback: 'jenna_gs2' // CRITICAL: Use GS2 for missing front casts
+    weapons: ['lBlade', 'Staff'], // GS2 also has Ankh but it's not used in GS1
+    animations: 7, // Only back-facing animations (Back, Attack1/2, CastBack1/2, HitBack, DownedBack)
+    fallback: 'jenna_gs2' // CRITICAL: Use GS2 for all front-facing animations (Front, CastFront1/2, HitFront, DownedFront)
   },
   'sheba': {
     folder: 'sheba',
