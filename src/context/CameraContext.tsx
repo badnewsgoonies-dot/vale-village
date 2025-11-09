@@ -54,6 +54,18 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [transitionDuration, setTransitionDuration] = useState(0);
   const shakeTimersRef = React.useRef<NodeJS.Timeout[]>([]);
+  const allTimersRef = React.useRef<NodeJS.Timeout[]>([]); // Track ALL timers for cleanup
+
+  // Helper to create a tracked timeout
+  const createTrackedTimeout = useCallback((callback: () => void, delay: number) => {
+    const timer = setTimeout(() => {
+      callback();
+      // Remove from tracking array after execution
+      allTimersRef.current = allTimersRef.current.filter(t => t !== timer);
+    }, delay);
+    allTimersRef.current.push(timer);
+    return timer;
+  }, []);
 
   // Helper to animate camera properties
   const animateCamera = useCallback((
@@ -65,9 +77,9 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     // Reset transition duration after animation completes
     if (duration > 0) {
-      setTimeout(() => setTransitionDuration(0), duration);
+      createTrackedTimeout(() => setTransitionDuration(0), duration);
     }
-  }, []);
+  }, [createTrackedTimeout]);
 
   const setZoom = useCallback((zoom: number, duration = 0) => {
     animateCamera({ zoom: Math.max(0.1, Math.min(10, zoom)) }, duration);
@@ -92,7 +104,7 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  const zoomOut = useCallback((amount = 0.5, duration = 500) => {
+  const ziooomOut = useCallback((amount = 0.5, duration = 500) => {
     setCamera(prev => {
       const newZoom = Math.max(0.1, prev.zoom - amount);
       return { ...prev, zoom: newZoom };
@@ -210,10 +222,86 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     reset,
   }), [setZoom, setPosition, zoomTo, zoomIn, zoomOut, panTo, panBy, focusOn, shake, rotate, reset]);
 
-  // Cleanup shake timers on unmount
+    animateCamera(updates, duration);
+  }, [animateCamera]);
+
+  const shake = useCallback((
+    intensity: 'light' | 'medium' | 'heavy' | number = 'medium',
+    duration = 500
+  ) => {
+    // Clear any existing shake timers
+    shakeTimersRef.current.forEach(timer => clearTimeout(timer));
+    shakeTimersRef.current = [];
+
+    const intensityMap = {
+      light: 0.3,
+      medium: 0.6,
+      heavy: 1.0,
+    };
+
+    const shakeIntensity = typeof intensity === 'number'
+      ? intensity
+      : intensityMap[intensity];
+
+    setCamera(prev => ({
+      ...prev,
+      shake: { intensity: shakeIntensity, duration },
+    }));
+
+    // Gradually reduce shake intensity
+    const steps = 20;
+    const stepDuration = duration / steps;
+
+    for (let i = 1; i <= steps; i++) {
+      const timer = setTimeout(() => {
+        setCamera(prev => ({
+          ...prev,
+          shake: {
+            intensity: shakeIntensity * (1 - i / steps),
+            duration: duration - (stepDuration * i),
+          },
+        }));
+      }, stepDuration * i);
+      shakeTimersRef.current.push(timer);
+      allTimersRef.current.push(timer); // Also track in global timer array
+    }
+  }, []);
+
+  const rotate = useCallback((degrees: number, duration = 500) => {
+    animateCamera({ rotation: degrees }, duration);
+  }, [animateCamera]);
+
+  const reset = useCallback((duration = 500) => {
+    animateCamera({
+      zoom: 1.0,
+      position: { x: 0, y: 0 },
+      shake: { intensity: 0, duration: 0 },
+      rotation: 0,
+    }, duration);
+  }, [animateCamera]);
+
+  const controls: CameraControls = useMemo(() => ({
+    setZoom,
+    setPosition,
+    zoomTo,
+    zoomIn,
+    zoomOut,
+    panTo,
+    panBy,
+    focusOn,
+    shake,
+    rotate,
+    reset,
+  }), [setZoom, setPosition, zoomTo, zoomIn, zoomOut, panTo, panBy, focusOn, shake, rotate, reset]);
+
+  // Cleanup ALL timers on unmount to prevent memory leaks
   React.useEffect(() => {
     return () => {
+      // Clear all tracked timers
+      allTimersRef.current.forEach(timer => clearTimeout(timer));
+      allTimersRef.current = [];
       shakeTimersRef.current.forEach(timer => clearTimeout(timer));
+      shakeTimersRef.current = [];
     };
   }, []);
 

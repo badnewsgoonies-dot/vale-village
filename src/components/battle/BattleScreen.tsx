@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import { StatusBar } from './StatusBar';
@@ -46,7 +46,8 @@ const BattleScreenContent: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, [cameraControls]); // Only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount - cameraControls is now a stable memoized object
 
   if (!battle) {
     return (
@@ -417,10 +418,4 @@ const BattleScreenContent: React.FC = () => {
   );
 };
 
-export const BattleScreen: React.FC = () => {
-  return (
-    <CameraProvider>
-      <BattleScreenContent />
-    </CameraProvider>
-  );
-};
+export const BattleScreen: React.FC = BattleScreenContent;
