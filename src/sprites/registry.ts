@@ -43,9 +43,11 @@ class SpriteRegistry {
       weapon = mapping.weapons[0];
     }
 
-    // Handle Jenna fallback for missing front-cast animations
+    // Handle Jenna fallback for missing front-facing animations
+    // Jenna's GS1 sprites only have back-facing animations, so we use GS2 for all front-facing states
     let folder = mapping.folder;
-    if (unitId === 'jenna' && animation.startsWith('CastFront')) {
+    const frontFacingAnimations = ['Front', 'CastFront1', 'CastFront2', 'HitFront', 'DownedFront'];
+    if (unitId === 'jenna' && frontFacingAnimations.includes(animation)) {
       folder = mapping.fallback || 'jenna';
     }
 
