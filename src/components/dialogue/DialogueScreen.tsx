@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import { getDialogueTree } from '@/data/dialogues';
 import type { DialogueChoice, DialogueAction } from '@/types/Dialogue';
 import { DialogueBox } from './DialogueBox';
@@ -277,10 +277,4 @@ const DialogueScreenContent: React.FC = () => {
   );
 };
 
-export const DialogueScreen: React.FC = () => {
-  return (
-    <CameraProvider>
-      <DialogueScreenContent />
-    </CameraProvider>
-  );
-};
+export const DialogueScreen: React.FC = DialogueScreenContent;

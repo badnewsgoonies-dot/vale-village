@@ -54,6 +54,18 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [transitionDuration, setTransitionDuration] = useState(0);
   const shakeTimersRef = React.useRef<NodeJS.Timeout[]>([]);
+  const allTimersRef = React.useRef<NodeJS.Timeout[]>([]); // Track ALL timers for cleanup
+
+  // Helper to create a tracked timeout
+  const createTrackedTimeout = useCallback((callback: () => void, delay: number) => {
+    const timer = setTimeout(() => {
+      callback();
+      // Remove from tracking array after execution
+      allTimersRef.current = allTimersRef.current.filter(t => t !== timer);
+    }, delay);
+    allTimersRef.current.push(timer);
+    return timer;
+  }, []);
 
   // Helper to animate camera properties
   const animateCamera = useCallback((
@@ -65,9 +77,9 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     // Reset transition duration after animation completes
     if (duration > 0) {
-      setTimeout(() => setTransitionDuration(0), duration);
+      createTrackedTimeout(() => setTransitionDuration(0), duration);
     }
-  }, []);
+  }, [createTrackedTimeout]);
 
   const setZoom = useCallback((zoom: number, duration = 0) => {
     animateCamera({ zoom: Math.max(0.1, Math.min(10, zoom)) }, duration);
@@ -88,9 +100,9 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
     setTransitionDuration(duration);
     if (duration > 0) {
-      setTimeout(() => setTransitionDuration(0), duration);
+      createTrackedTimeout(() => setTransitionDuration(0), duration);
     }
-  }, []);
+  }, [createTrackedTimeout]);
 
   const zoomOut = useCallback((amount = 0.5, duration = 500) => {
     setCamera(prev => {
@@ -99,9 +111,9 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
     setTransitionDuration(duration);
     if (duration > 0) {
-      setTimeout(() => setTransitionDuration(0), duration);
+      createTrackedTimeout(() => setTransitionDuration(0), duration);
     }
-  }, []);
+  }, [createTrackedTimeout]);
 
   const panTo = useCallback((x: number, y: number, duration = 500) => {
     animateCamera({ position: { x, y } }, duration);
@@ -114,9 +126,9 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }));
     setTransitionDuration(duration);
     if (duration > 0) {
-      setTimeout(() => setTransitionDuration(0), duration);
+      createTrackedTimeout(() => setTransitionDuration(0), duration);
     }
-  }, []);
+  }, [createTrackedTimeout]);
 
   const focusOn = useCallback((
     target: { x: number; y: number },
@@ -180,6 +192,7 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }));
       }, stepDuration * i);
       shakeTimersRef.current.push(timer);
+      allTimersRef.current.push(timer); // Also track in global timer array
     }
   }, []);
 
@@ -210,10 +223,14 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     reset,
   }), [setZoom, setPosition, zoomTo, zoomIn, zoomOut, panTo, panBy, focusOn, shake, rotate, reset]);
 
-  // Cleanup shake timers on unmount
+  // Cleanup ALL timers on unmount to prevent memory leaks
   React.useEffect(() => {
     return () => {
+      // Clear all tracked timers
+      allTimersRef.current.forEach(timer => clearTimeout(timer));
+      allTimersRef.current = [];
       shakeTimersRef.current.forEach(timer => clearTimeout(timer));
+      shakeTimersRef.current = [];
     };
   }, []);
 

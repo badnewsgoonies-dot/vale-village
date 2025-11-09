@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import { Button } from '../shared';
 import './PostBattleCutscene.css';
 
@@ -87,7 +87,8 @@ const PostBattleCutsceneContent: React.FC<PostBattleCutsceneProps> = ({
     return () => {
       cameraControls.reset(600);
     };
-  }, [currentMessageIndex, victory, npcId, isLastMessage, cameraControls]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMessageIndex, victory, npcId, isLastMessage]); // cameraControls is now a stable memoized object, but omit to be safe
 
   // Auto-advance after delay or wait for player input
   const handleAdvance = () => {
@@ -165,10 +166,4 @@ const PostBattleCutsceneContent: React.FC<PostBattleCutsceneProps> = ({
   );
 };
 
-export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = (props) => {
-  return (
-    <CameraProvider>
-      <PostBattleCutsceneContent {...props} />
-    </CameraProvider>
-  );
-};
+export const PostBattleCutscene: React.FC<PostBattleCutsceneProps> = PostBattleCutsceneContent;

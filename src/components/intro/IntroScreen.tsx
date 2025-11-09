@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import './IntroScreen.css';
 
 const INTRO_MESSAGES = [
@@ -33,7 +33,8 @@ const IntroScreenContent: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, [currentMessage, cameraControls]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMessage]); // cameraControls is now a stable memoized object, but omit to be safe
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -62,10 +63,4 @@ const IntroScreenContent: React.FC = () => {
   );
 };
 
-export const IntroScreen: React.FC = () => {
-  return (
-    <CameraProvider>
-      <IntroScreenContent />
-    </CameraProvider>
-  );
-};
+export const IntroScreen: React.FC = IntroScreenContent;
