@@ -24,32 +24,46 @@ function enemyToUnit(enemy: Enemy): Unit {
     description: `A ${enemy.name} enemy`,
     element: enemy.element,
     baseStats: enemy.stats,
-    growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies
+    growthRates: { hp: 0, pp: 0, atk: 0, def: 0, mag: 0, spd: 0 }, // No growth for enemies (pp unused)
     abilities: enemy.abilities,
     manaContribution: 0, // Enemies don't contribute to player mana pool
   };
   return new Unit(unitDef, enemy.level);
 }
 
-function createInitialPlayerData(): PlayerData {
-  // Create ALL 10 units for testing
-  const isaac = new Unit(UNIT_DEFINITIONS.isaac);
-  const garet = new Unit(UNIT_DEFINITIONS.garet);
-  const ivan = new Unit(UNIT_DEFINITIONS.ivan);
-  const mia = new Unit(UNIT_DEFINITIONS.mia);
-  const felix = new Unit(UNIT_DEFINITIONS.felix);
-  const jenna = new Unit(UNIT_DEFINITIONS.jenna);
-  const sheba = new Unit(UNIT_DEFINITIONS.sheba);
-  const piers = new Unit(UNIT_DEFINITIONS.piers);
-  const kraden = new Unit(UNIT_DEFINITIONS.kraden);
-  const kyle = new Unit(UNIT_DEFINITIONS.kyle);
+function createInitialPlayerData(mode: 'fresh' | 'debug' = 'fresh'): PlayerData {
+  // Create Isaac at level 1 for fresh mode, level 5 for debug mode (to unlock all abilities)
+  const isaac = new Unit(UNIT_DEFINITIONS.isaac, mode === 'debug' ? 5 : 1);
+
+  if (mode === 'fresh') {
+    // Fresh start: Only Isaac, no items, minimal gold
+    return {
+      unitsCollected: [isaac], // Only Isaac
+      activePartyIds: [isaac.id],
+      recruitmentFlags: {},
+      gold: 0, // No starting gold
+      inventory: [], // No equipment
+      items: {}, // No consumable items
+      djinnCollected: [], // No Djinn
+      equippedDjinnIds: [],
+      storyFlags: {},
+    };
+  }
+
+  // Debug mode: ALL units, equipment, and Djinn unlocked for testing
+  // Create all units at max level (5) to unlock all abilities
+  const garet = new Unit(UNIT_DEFINITIONS.garet, 5);
+  const ivan = new Unit(UNIT_DEFINITIONS.ivan, 5);
+  const mia = new Unit(UNIT_DEFINITIONS.mia, 5);
+  const felix = new Unit(UNIT_DEFINITIONS.felix, 5);
+  const jenna = new Unit(UNIT_DEFINITIONS.jenna, 5);
+  const sheba = new Unit(UNIT_DEFINITIONS.sheba, 5);
+  const piers = new Unit(UNIT_DEFINITIONS.piers, 5);
+  const kraden = new Unit(UNIT_DEFINITIONS.kraden, 5);
+  const kyle = new Unit(UNIT_DEFINITIONS.kyle, 5);
 
   const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
-
-  // For testing: Unlock all Djinn
   const allDjinn = Object.values(ALL_DJINN);
-
-  // For testing: Add all equipment to inventory
   const allEquipment = Object.values(EQUIPMENT);
 
   return {
@@ -328,6 +342,35 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         gold: prev.playerData.gold + amount,
       },
     }));
+  }, []);
+
+  const giveDjinn = useCallback((djinnId: string) => {
+    setState(prev => {
+      // Check if Djinn already collected
+      const alreadyCollected = prev.playerData.djinnCollected.some(d => d.id === djinnId);
+      if (alreadyCollected) {
+        console.log(`Djinn ${djinnId} already collected`);
+        return prev;
+      }
+
+      // Find Djinn definition
+      const djinn = ALL_DJINN[djinnId];
+      if (!djinn) {
+        console.error(`Djinn not found: ${djinnId}`);
+        return { ...prev, error: `Djinn ${djinnId} not found` };
+      }
+
+      console.log(`Giving Djinn: ${djinn.name}`);
+
+      return {
+        ...prev,
+        playerData: {
+          ...prev.playerData,
+          djinnCollected: [...prev.playerData.djinnCollected, djinn],
+        },
+        error: null,
+      };
+    });
   }, []);
 
   // Battle actions
@@ -763,14 +806,68 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
+  // Start new game with specified mode
+  const startNewGame = useCallback((mode: 'fresh' | 'debug' = 'fresh') => {
+    setState({
+      playerData: createInitialPlayerData(mode),
+      currentBattle: null,
+      lastBattleRewards: null,
+      currentScreen: { type: 'DIALOGUE', npcId: 'first_djinn' }, // Start with Isaac+Djinn cutscene
+      screenHistory: [],
+      loading: false,
+      error: null,
+      storyFlags: createInitialStoryFlags(),
+      currentLocation: 'battle_row',
+      playerPosition: { x: 2, y: 7 }, // Starting position in Battle Row
+      areaStates: {
+        vale_village: createInitialAreaState(),
+        forest_path: createInitialAreaState(),
+        ancient_ruins: createInitialAreaState(),
+        battle_row: createInitialAreaState(),
+        house1_interior: createInitialAreaState(),
+        house2_interior: createInitialAreaState(),
+        house3_interior: createInitialAreaState(),
+        house4_interior: createInitialAreaState(),
+        house5_interior: createInitialAreaState(),
+        house6_interior: createInitialAreaState(),
+        house7_interior: createInitialAreaState(),
+        house8_interior: createInitialAreaState(),
+        house9_interior: createInitialAreaState(),
+        house10_interior: createInitialAreaState(),
+        house11_interior: createInitialAreaState(),
+        house12_interior: createInitialAreaState(),
+        house13_interior: createInitialAreaState(),
+        house14_interior: createInitialAreaState(),
+        house15_interior: createInitialAreaState(),
+        house16_interior: createInitialAreaState(),
+        house17_interior: createInitialAreaState(),
+        house18_interior: createInitialAreaState(),
+        house19_interior: createInitialAreaState(),
+        house20_interior: createInitialAreaState(),
+        house21_interior: createInitialAreaState(),
+        house22_interior: createInitialAreaState(),
+        house23_interior: createInitialAreaState(),
+        house24_interior: createInitialAreaState(),
+        house25_interior: createInitialAreaState(),
+        house26_interior: createInitialAreaState(),
+        house27_interior: createInitialAreaState(),
+        house28_interior: createInitialAreaState(),
+        house29_interior: createInitialAreaState(),
+        house30_interior: createInitialAreaState(),
+      },
+    });
+  }, []);
+
   const actions = {
     navigate,
     goBack,
+    startNewGame,
     equipItem,
     unequipItem,
     setActiveParty,
     recruitUnit,
     addGold,
+    giveDjinn,
     startBattle,
     executeTurn,
     endBattle,

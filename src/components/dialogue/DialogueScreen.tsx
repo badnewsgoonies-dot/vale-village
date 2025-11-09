@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context/GameContext';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import { getDialogueTree } from '@/data/dialogues';
 import type { DialogueChoice, DialogueAction } from '@/types/Dialogue';
 import { DialogueBox } from './DialogueBox';
@@ -18,88 +18,19 @@ const DialogueScreenContent: React.FC = () => {
   // Load dialogue tree
   const dialogueTree = getDialogueTree(npcId);
 
-  // Current dialogue state
+  // Current dialogue state - ALL hooks must be called before any early returns
   const [currentNodeId, setCurrentNodeId] = useState<string>(
     initialDialogueKey || dialogueTree?.startNode || 'greeting'
   );
   const [showingChoices, setShowingChoices] = useState(false);
 
-  // Handle missing dialogue tree
-  if (!dialogueTree) {
-    return (
-      <div className="dialogue-screen-error">
-        <h2>Error: No dialogue found for NPC "{npcId}"</h2>
-        <button onClick={() => actions.goBack()}>Go Back</button>
-      </div>
-    );
-  }
-
   // Get current node
-  const currentNode = dialogueTree.nodes[currentNodeId];
-
-  // Handle missing node
-  if (!currentNode) {
-    return (
-      <div className="dialogue-screen-error">
-        <h2>Error: Dialogue node "{currentNodeId}" not found</h2>
-        <button onClick={() => actions.goBack()}>Go Back</button>
-      </div>
-    );
-  }
+  const currentNode = dialogueTree?.nodes?.[currentNodeId];
 
   // Check if node condition is met
-  const nodeConditionMet = !currentNode.condition || currentNode.condition(state.storyFlags);
+  const nodeConditionMet = currentNode && (!currentNode.condition || currentNode.condition(state.storyFlags));
 
-  // Camera work: Zoom on dialogue start and important moments
-  useEffect(() => {
-    const text = currentNode.text.toLowerCase();
-    const speaker = currentNode.speaker.toLowerCase();
-
-    // Check if this is a Djinn revelation moment
-    const isDjinnSpeaker = speaker.includes('djinn') || speaker.includes('spirit') || speaker.includes('elemental');
-    const revelationKeywords = ['truth', 'reveal', 'injustice', 'enslaved', 'see now', 'witness'];
-    const isRevelation = revelationKeywords.some(keyword => text.includes(keyword));
-
-    if (isDjinnSpeaker || isRevelation) {
-      // Djinn revelation - dramatic mystical moment
-      cameraControls.shake('medium', 500); // Shake when Djinn appears
-      setTimeout(() => {
-        cameraControls.zoomTo(2.0, 1000); // Extreme close-up for revelation
-      }, 500);
-    } else {
-      // Normal dialogue: Zoom in slightly when entering
-      cameraControls.zoomTo(1.2, 600);
-
-      // Check for dramatic keywords in text to trigger closer zoom
-      const dramaticKeywords = [
-        'never', 'must', 'free', 'monsters', 'justice', 'truth',
-        'join', 'wrong', 'understand', 'fight', 'freedom'
-      ];
-
-      const isDramatic = dramaticKeywords.some(keyword => text.includes(keyword));
-
-      if (isDramatic) {
-        // Dramatic line - zoom closer
-        setTimeout(() => {
-          cameraControls.zoomTo(1.5, 600);
-        }, 300);
-      }
-    }
-
-    // Cleanup: Reset camera when leaving dialogue
-    return () => {
-      cameraControls.reset(600);
-    };
-  }, [currentNodeId, cameraControls]);
-
-  // Execute action when node changes
-  useEffect(() => {
-    if (currentNode.action && nodeConditionMet) {
-      executeAction(currentNode.action);
-    }
-  }, [currentNodeId, nodeConditionMet]);
-
-  // Execute a dialogue action
+  // Execute a dialogue action - defined before useEffects that use it
   const executeAction = useCallback((action: DialogueAction) => {
     switch (action.type) {
     case 'START_BATTLE': {
@@ -139,6 +70,12 @@ const DialogueScreenContent: React.FC = () => {
       break;
     }
 
+    case 'GIVE_DJINN': {
+      // Give Djinn to player
+      actions.giveDjinn(action.djinnId);
+      break;
+    }
+
     case 'OPEN_SHOP': {
       // Open shop screen
       actions.navigate({ type: 'SHOP', shopType: action.shopType });
@@ -160,7 +97,85 @@ const DialogueScreenContent: React.FC = () => {
     default:
       console.warn('Unknown dialogue action:', action);
     }
-  }, [actions, state.storyFlags]);
+  }, [actions, npcId]);
+
+  // Camera work: Zoom on dialogue start and important moments
+  // Use ref to prevent infinite loop - only initialize camera once per node
+  useEffect(() => {
+    if (!currentNode || !dialogueTree) return;
+
+    const text = currentNode.text.toLowerCase();
+    const speaker = currentNode.speaker.toLowerCase();
+
+    // Check if this is a Djinn revelation moment
+    const isDjinnSpeaker = speaker.includes('djinn') || speaker.includes('spirit') || speaker.includes('elemental');
+    const revelationKeywords = ['truth', 'reveal', 'injustice', 'enslaved', 'see now', 'witness'];
+    const isRevelation = revelationKeywords.some(keyword => text.includes(keyword));
+
+    if (isDjinnSpeaker || isRevelation) {
+      // Djinn revelation - dramatic mystical moment
+      cameraControls.shake('medium', 500);
+      setTimeout(() => {
+        cameraControls.zoomTo(2.0, 1000);
+      }, 500);
+    } else {
+      // Normal dialogue: Zoom in slightly when entering
+      cameraControls.zoomTo(1.2, 600);
+
+      // Check for dramatic keywords in text to trigger closer zoom
+      const dramaticKeywords = [
+        'never', 'must', 'free', 'monsters', 'justice', 'truth',
+        'join', 'wrong', 'understand', 'fight', 'freedom'
+      ];
+
+      const isDramatic = dramaticKeywords.some(keyword => text.includes(keyword));
+
+      if (isDramatic) {
+        setTimeout(() => {
+          cameraControls.zoomTo(1.5, 600);
+        }, 300);
+      }
+    }
+
+    // Cleanup: Reset camera when component unmounts or dialogue ends
+    return () => {
+      cameraControls.reset(600);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentNodeId, dialogueTree]); // cameraControls omitted to prevent infinite loop - it's a stable object
+
+  // Execute action when node changes
+  useEffect(() => {
+    if (!currentNode || !dialogueTree) return;
+
+    if (currentNode.action && nodeConditionMet) {
+      executeAction(currentNode.action);
+    }
+  }, [currentNodeId, nodeConditionMet, currentNode, executeAction, dialogueTree]);
+
+  // Handle node condition not met or missing dialogue tree
+  useEffect(() => {
+    // If no dialogue tree, go back immediately
+    if (!dialogueTree) {
+      actions.goBack();
+      return;
+    }
+
+    if (!currentNode) {
+      // Node doesn't exist - go back
+      actions.goBack();
+      return;
+    }
+
+    if (!nodeConditionMet) {
+      // Condition not met - skip to next node or go back
+      if (currentNode.nextNode) {
+        setCurrentNodeId(currentNode.nextNode);
+      } else {
+        actions.goBack();
+      }
+    }
+  }, [currentNodeId, nodeConditionMet, currentNode, actions, dialogueTree]);
 
   // Handle choice selection
   const handleChoiceSelect = useCallback((choice: DialogueChoice) => {
@@ -180,6 +195,8 @@ const DialogueScreenContent: React.FC = () => {
 
   // Handle advancing dialogue (Space/Enter when no choices)
   const handleAdvance = useCallback(() => {
+    if (!currentNode) return;
+
     if (currentNode.choices && currentNode.choices.length > 0) {
       // Show choices
       setShowingChoices(true);
@@ -193,17 +210,13 @@ const DialogueScreenContent: React.FC = () => {
   }, [currentNode, actions]);
 
   // Filter choices based on conditions
-  const availableChoices = currentNode.choices?.filter(choice =>
+  const availableChoices = currentNode?.choices?.filter(choice =>
     !choice.condition || choice.condition(state.storyFlags)
   ) || [];
 
-  // If node condition not met, skip to next node or end
-  if (!nodeConditionMet) {
-    if (currentNode.nextNode) {
-      setCurrentNodeId(currentNode.nextNode);
-    } else {
-      actions.goBack();
-    }
+  // Don't render if dialogue tree doesn't exist, node doesn't exist, or condition not met
+  // (useEffect above will handle navigation back)
+  if (!dialogueTree || !currentNode || !nodeConditionMet) {
     return null;
   }
 
@@ -264,10 +277,4 @@ const DialogueScreenContent: React.FC = () => {
   );
 };
 
-export const DialogueScreen: React.FC = () => {
-  return (
-    <CameraProvider>
-      <DialogueScreenContent />
-    </CameraProvider>
-  );
-};
+export const DialogueScreen: React.FC = DialogueScreenContent;

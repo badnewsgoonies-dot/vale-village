@@ -24,16 +24,31 @@ describe('Sprite Registry', () => {
       expect(path).toContain('CastFront1.gif');
     });
 
-    test('Jenna uses regular folder for non-CastFront animations', () => {
+    test('Jenna uses gs2 folder for all front-facing animations', () => {
       const jenna = new Unit(UNIT_DEFINITIONS.jenna);
       const frontPath = spriteRegistry.getBattleSprite(jenna, 'Front');
-      const attackPath = spriteRegistry.getBattleSprite(jenna, 'Attack1');
+      const hitFrontPath = spriteRegistry.getBattleSprite(jenna, 'HitFront');
+      const downedFrontPath = spriteRegistry.getBattleSprite(jenna, 'DownedFront');
 
-      // Should use regular jenna folder for these
-      expect(frontPath).toContain('/jenna/');
-      expect(frontPath).not.toContain('jenna_gs2');
+      // Should use jenna_gs2 folder for all front-facing animations
+      expect(frontPath).toContain('jenna_gs2');
+      expect(hitFrontPath).toContain('jenna_gs2');
+      expect(downedFrontPath).toContain('jenna_gs2');
+    });
+
+    test('Jenna uses regular folder for back-facing animations', () => {
+      const jenna = new Unit(UNIT_DEFINITIONS.jenna);
+      const backPath = spriteRegistry.getBattleSprite(jenna, 'Back');
+      const attackPath = spriteRegistry.getBattleSprite(jenna, 'Attack1');
+      const hitBackPath = spriteRegistry.getBattleSprite(jenna, 'HitBack');
+
+      // Should use regular jenna folder for back-facing animations
+      expect(backPath).toContain('/jenna/');
+      expect(backPath).not.toContain('jenna_gs2');
       expect(attackPath).toContain('/jenna/');
       expect(attackPath).not.toContain('jenna_gs2');
+      expect(hitBackPath).toContain('/jenna/');
+      expect(hitBackPath).not.toContain('jenna_gs2');
     });
 
     test('returns correct path for all 8 units', () => {

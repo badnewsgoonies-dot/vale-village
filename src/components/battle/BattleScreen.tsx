@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '@/context';
-import { useCamera, CameraProvider } from '@/context/CameraContext';
+import { useCamera } from '@/context/CameraContext';
 import type { Unit } from '@/types/Unit';
 import type { Ability } from '@/types/Ability';
 import { StatusBar } from './StatusBar';
@@ -46,7 +46,8 @@ const BattleScreenContent: React.FC = () => {
     return () => {
       cameraControls.reset(600);
     };
-  }, [cameraControls]); // Only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount - cameraControls is now a stable memoized object
 
   if (!battle) {
     return (
@@ -182,18 +183,6 @@ const BattleScreenContent: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-      
-      // Regenerate PP for all alive units
-      let totalPPRestored = 0;
-      battle.playerTeam.units.forEach(unit => {
-        if (!unit.isKO) {
-          totalPPRestored += unit.regeneratePP();
-        }
-      });
-
-      if (totalPPRestored > 0) {
-        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
-      }
 
       setTimeout(() => {
         actions.navigate({
@@ -255,19 +244,7 @@ const BattleScreenContent: React.FC = () => {
     if (battleEnd === 'victory') {
       setPhase('victory');
       setCombatLog(prev => [...prev, '>>> VICTORY! <<<']);
-      
-      // Regenerate PP for all alive units
-      let totalPPRestored = 0;
-      battle.playerTeam.units.forEach(unit => {
-        if (!unit.isKO) {
-          totalPPRestored += unit.regeneratePP();
-        }
-      });
-      
-      if (totalPPRestored > 0) {
-        setCombatLog(prev => [...prev, `Party PP restored! (+${totalPPRestored} PP)`]);
-      }
-      
+
       setTimeout(() => actions.navigate({
         type: 'POST_BATTLE_CUTSCENE',
         npcId: battle.npcId,
@@ -405,7 +382,7 @@ const BattleScreenContent: React.FC = () => {
           {phase === 'selectAbility' && (
             <AbilityMenu
               unit={currentActor}
-              remainingMana={currentActor.currentPp}
+              remainingMana={battle.playerTeam.units.reduce((sum, u) => sum + u.manaContribution, 0)}
               onSelectAbility={handleAbilitySelect}
               onBack={() => setPhase('selectCommand')}
             />
@@ -441,10 +418,4 @@ const BattleScreenContent: React.FC = () => {
   );
 };
 
-export const BattleScreen: React.FC = () => {
-  return (
-    <CameraProvider>
-      <BattleScreenContent />
-    </CameraProvider>
-  );
-};
+export const BattleScreen: React.FC = BattleScreenContent;

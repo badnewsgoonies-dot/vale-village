@@ -47,9 +47,9 @@ export const AbilityMenu: React.FC<AbilityMenuProps> = ({
       </div>
       <div className="ability-list">
         {availableAbilities.map(ability => {
-          const canUsePP = unit.canUseAbility(ability.id);
+          const canUseAbility = unit.canUseAbility(ability.id);
           const canAffordMana = ability.manaCost <= remainingMana;
-          const canUse = canUsePP && canAffordMana;
+          const canUse = canUseAbility && canAffordMana;
 
           return (
             <button
@@ -60,7 +60,6 @@ export const AbilityMenu: React.FC<AbilityMenuProps> = ({
             >
               <span className="ability-name">{ability.name}</span>
               <span className="ability-costs">
-                <span className="pp-cost">{ability.ppCost} PP</span>
                 <span className={`mana-cost ${!canAffordMana ? 'insufficient' : ''}`}>
                   {ability.manaCost}○
                 </span>
