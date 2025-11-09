@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth refresh:*)",
+      "WebFetch(domain:code.claude.com)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(npm run dev:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(git checkout:*)",
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

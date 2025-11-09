@@ -34,7 +34,13 @@
       "Bash(ROLE_2_GRAPHICS_MOCKUP_ONBOARDING_FIXED.md)",
       "Bash(curl:*)",
       "Bash(printf:*)",
-      "Bash(/c/Dev/AiGames/vale-village/ANALYSIS_REPORT.txt)"
+      "Bash(/c/Dev/AiGames/vale-village/ANALYSIS_REPORT.txt)",
+      "Bash(npm run type-check:*)",
+      "Bash(git rm:*)",
+      "Bash(node replace-dialogue.js:*)",
+      "Bash(node add-mana-costs.js:*)",
+      "Bash(echo:*)",
+      "Bash(\"C:\\Dev\\AiGames\\vale-village\\src\\components\\battle\\BattleScreen.css\")"
     ],
     "deny": [],
     "ask": []
