@@ -222,9 +222,6 @@ export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     reset,
   }), [setZoom, setPosition, zoomTo, zoomIn, zoomOut, panTo, panBy, focusOn, shake, rotate, reset]);
 
-    animateCamera(updates, duration);
-  }, [animateCamera]);
-
   const shake = useCallback((
     intensity: 'light' | 'medium' | 'heavy' | number = 'medium',
     duration = 500

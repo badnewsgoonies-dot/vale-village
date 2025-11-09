@@ -32,7 +32,8 @@ function enemyToUnit(enemy: Enemy): Unit {
 }
 
 function createInitialPlayerData(mode: 'fresh' | 'debug' = 'fresh'): PlayerData {
-  const isaac = new Unit(UNIT_DEFINITIONS.isaac);
+  // Create Isaac at level 1 for fresh mode, level 5 for debug mode (to unlock all abilities)
+  const isaac = new Unit(UNIT_DEFINITIONS.isaac, mode === 'debug' ? 5 : 1);
 
   if (mode === 'fresh') {
     // Fresh start: Only Isaac, no items, minimal gold
@@ -50,15 +51,16 @@ function createInitialPlayerData(mode: 'fresh' | 'debug' = 'fresh'): PlayerData 
   }
 
   // Debug mode: ALL units, equipment, and Djinn unlocked for testing
-  const garet = new Unit(UNIT_DEFINITIONS.garet);
-  const ivan = new Unit(UNIT_DEFINITIONS.ivan);
-  const mia = new Unit(UNIT_DEFINITIONS.mia);
-  const felix = new Unit(UNIT_DEFINITIONS.felix);
-  const jenna = new Unit(UNIT_DEFINITIONS.jenna);
-  const sheba = new Unit(UNIT_DEFINITIONS.sheba);
-  const piers = new Unit(UNIT_DEFINITIONS.piers);
-  const kraden = new Unit(UNIT_DEFINITIONS.kraden);
-  const kyle = new Unit(UNIT_DEFINITIONS.kyle);
+  // Create all units at max level (5) to unlock all abilities
+  const garet = new Unit(UNIT_DEFINITIONS.garet, 5);
+  const ivan = new Unit(UNIT_DEFINITIONS.ivan, 5);
+  const mia = new Unit(UNIT_DEFINITIONS.mia, 5);
+  const felix = new Unit(UNIT_DEFINITIONS.felix, 5);
+  const jenna = new Unit(UNIT_DEFINITIONS.jenna, 5);
+  const sheba = new Unit(UNIT_DEFINITIONS.sheba, 5);
+  const piers = new Unit(UNIT_DEFINITIONS.piers, 5);
+  const kraden = new Unit(UNIT_DEFINITIONS.kraden, 5);
+  const kyle = new Unit(UNIT_DEFINITIONS.kyle, 5);
 
   const allUnits = [isaac, garet, ivan, mia, felix, jenna, sheba, piers, kraden, kyle];
   const allDjinn = Object.values(ALL_DJINN);
