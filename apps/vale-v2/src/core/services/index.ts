@@ -3,5 +3,8 @@
  * Services coordinate algorithms and provide higher-level game logic
  */
 
-export * from './battle';
+export * from './BattleService';
+export * from './RngService';
+export * from './SaveService';
+export * from './types';
 

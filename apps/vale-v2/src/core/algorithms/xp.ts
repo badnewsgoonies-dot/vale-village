@@ -102,3 +102,30 @@ export function calculateMaxHpAtLevel(
   return baseHp + (level - 1) * growthRate;
 }
 
+/**
+ * Get XP progress to next level
+ * Returns current level, XP progress, and XP needed for next level
+ * Useful for UI progress bars
+ */
+export function getXpProgress(xp: number): {
+  level: number;
+  current: number;
+  needed: number;
+  progress: number; // 0.0 to 1.0
+} {
+  const level = calculateLevelFromXp(xp);
+  const currentLevelXp = getXpForLevel(level);
+  const nextLevelXp = getXpForLevel(level + 1);
+  
+  const current = xp - currentLevelXp;
+  const needed = nextLevelXp > currentLevelXp ? nextLevelXp - currentLevelXp : 0;
+  const progress = needed > 0 ? current / needed : 1.0;
+  
+  return {
+    level,
+    current,
+    needed,
+    progress: Math.max(0, Math.min(1, progress)), // Clamp to [0, 1]
+  };
+}
+

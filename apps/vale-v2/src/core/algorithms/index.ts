@@ -3,9 +3,10 @@
  * All algorithms are pure functions, deterministic with PRNG
  */
 
-export * from './element';
 export * from './damage';
-export * from './battle';
-export * from './xp';
+export * from './turn-order';
+export * from './status';
 export * from './djinn';
+export * from './targeting';
+export * from './xp';
 

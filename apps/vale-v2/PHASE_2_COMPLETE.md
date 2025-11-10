@@ -112,7 +112,7 @@ apps/vale-v2/
 ```typescript
 import { makePRNG } from './core/random/prng';
 import { calculatePhysicalDamage } from './core/algorithms/damage';
-import { executeAbility } from './core/services/battle';
+import { performAction, startBattle } from './core/services/BattleService';
 
 // Create deterministic RNG
 const rng = makePRNG(12345);

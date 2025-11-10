@@ -1,0 +1,63 @@
+/**
+ * Turn order calculation algorithms
+ * Pure functions, deterministic with PRNG
+ */
+
+import type { Unit } from '../models/Unit';
+import type { PRNG } from '../random/prng';
+import { isUnitKO } from '../models/Unit';
+
+/**
+ * Calculate turn order based on SPD stat
+ * From GAME_MECHANICS.md Section 6.1
+ * Orders by: priority tier (Hermes) > SPD > tiebreaker
+ * Deterministic tiebreaker using turn number for stability
+ * Returns array of unit IDs in turn order
+ */
+export function calculateTurnOrder(
+  units: readonly Unit[],
+  rng: PRNG,
+  turnNumber: number = 0
+): readonly string[] {
+  // Filter out KO'd units
+  const aliveUnits = units.filter(u => !isUnitKO(u));
+
+  // Separate by priority tier (Hermes' Sandals = priority 1, others = priority 0)
+  const priorityUnits = aliveUnits.filter(u =>
+    u.equipment.boots?.alwaysFirstTurn === true
+  );
+
+  const regularUnits = aliveUnits.filter(u =>
+    u.equipment.boots?.alwaysFirstTurn !== true
+  );
+
+  // Create deterministic tiebreaker RNG using turn number
+  // Consume turnNumber values from RNG to create stable tiebreaker
+  const tieRng = rng.clone();
+  for (let i = 0; i < turnNumber; i++) {
+    tieRng.next(); // Advance for determinism
+  }
+
+  // Sort priority units by SPD (descending) with tiebreaker
+  const sortedPriority = [...priorityUnits].sort((a, b) => {
+    const spdDiff = b.baseStats.spd - a.baseStats.spd;
+    if (spdDiff === 0) {
+      return tieRng.next() - 0.5;
+    }
+    return spdDiff;
+  });
+
+  // Sort regular units by SPD (descending) with tiebreaker
+  const sortedRegular = [...regularUnits].sort((a, b) => {
+    const spdDiff = b.baseStats.spd - a.baseStats.spd;
+    if (spdDiff === 0) {
+      return tieRng.next() - 0.5;
+    }
+    return spdDiff;
+  });
+
+  // Priority units first, then regular units
+  const allOrdered = [...sortedPriority, ...sortedRegular];
+  return allOrdered.map(u => u.id);
+}
+
