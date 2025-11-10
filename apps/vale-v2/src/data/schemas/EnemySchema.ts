@@ -23,7 +23,7 @@ export const EquipmentDropSchema = z.object({
 export const EnemySchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  level: z.number().int().min(1).max(5),  // Levels 1-5
+  level: z.number().int().min(1).max(20),  // Levels 1-20
   stats: StatsSchema,
   abilities: z.array(AbilitySchema).min(1),  // At least 1 ability
   element: ElementSchema,

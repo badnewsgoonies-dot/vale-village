@@ -12,7 +12,8 @@ export const AbilitySchema = z.object({
   manaCost: z.number().int().min(0).max(10), // Cannot be negative!
   basePower: z.number().int().min(0), // Cannot be negative!
   targets: z.enum(['single-enemy', 'all-enemies', 'single-ally', 'all-allies', 'self']),
-  unlockLevel: z.number().int().min(1).max(5),
+  unlockLevel: z.number().int().min(1).max(20),
+  kind: z.enum(['attack', 'psynergy']).optional(),
   description: z.string(),
   
   // Optional properties

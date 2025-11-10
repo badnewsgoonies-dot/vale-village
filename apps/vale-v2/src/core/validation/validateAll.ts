@@ -59,10 +59,10 @@ export function validateAllGameData(): void {
   });
   
   // Cross-reference checks
-  // Check ability unlock levels
+  // Check ability unlock levels (1-20)
   Object.entries(ABILITIES).forEach(([id, ability]) => {
-    if (ability.unlockLevel < 1 || ability.unlockLevel > 5) {
-      errors.push(`Ability ${id}: unlockLevel out of range (1..5)`);
+    if (ability.unlockLevel < 1 || ability.unlockLevel > 20) {
+      errors.push(`Ability ${id}: unlockLevel out of range (1..20)`);
     }
   });
   

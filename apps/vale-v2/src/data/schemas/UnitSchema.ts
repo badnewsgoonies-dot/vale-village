@@ -94,7 +94,7 @@ export const UnitSchema = z.object({
   growthRates: StatsSchema,
   description: z.string(),
   manaContribution: z.number().int().min(0),
-  level: z.number().int().min(1).max(5),
+  level: z.number().int().min(1).max(20),
   xp: z.number().int().min(0),
   currentHp: z.number().int().min(0),
   equipment: EquipmentLoadoutSchema,

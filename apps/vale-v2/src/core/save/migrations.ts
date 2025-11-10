@@ -36,12 +36,71 @@ const migrations: Record<string, Migrator> = {
     }
     return old;
   },
+  
+  // Migration 1.1->1.2: Level cap 20, equipment.accessory field
+  // Note: migrator receives the state object (not the full envelope)
+  '1.1->1.2': (oldState: any) => {
+    const migratedState = { ...oldState };
+    
+    // Clamp levels > 20 to 20 and ensure equipment.accessory exists
+    // Process team units
+    if (migratedState.team && migratedState.team.units) {
+      migratedState.team = {
+        ...migratedState.team,
+        units: migratedState.team.units.map((unit: any) => {
+          const updatedUnit: any = { ...unit };
+          
+          // Clamp level
+          if (updatedUnit.level && updatedUnit.level > 20) {
+            updatedUnit.level = 20;
+          }
+          
+          // Ensure equipment.accessory exists
+          if (updatedUnit.equipment) {
+            updatedUnit.equipment = {
+              ...updatedUnit.equipment,
+              accessory: updatedUnit.equipment.accessory ?? null,
+            };
+          } else {
+            updatedUnit.equipment = {
+              weapon: null,
+              armor: null,
+              helm: null,
+              boots: null,
+              accessory: null,
+            };
+          }
+          
+          return updatedUnit;
+        }),
+      };
+    }
+    
+    // Process battle enemies (if enemies are serialized)
+    if (migratedState.battle && migratedState.battle.enemies) {
+      migratedState.battle = {
+        ...migratedState.battle,
+        enemies: migratedState.battle.enemies.map((enemy: any) => {
+          const updatedEnemy: any = { ...enemy };
+          
+          // Clamp level
+          if (updatedEnemy.level && updatedEnemy.level > 20) {
+            updatedEnemy.level = 20;
+          }
+          
+          return updatedEnemy;
+        }),
+      };
+    }
+    
+    return migratedState;
+  },
 };
 
 /**
  * Current save version
  */
-export const CURRENT_SAVE_VERSION: SaveVersion = { major: 1, minor: 1 };
+export const CURRENT_SAVE_VERSION: SaveVersion = { major: 1, minor: 2 };
 
 /**
  * Compare two versions

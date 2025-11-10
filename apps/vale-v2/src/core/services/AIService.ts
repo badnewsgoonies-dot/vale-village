@@ -60,7 +60,10 @@ function scoreAbility(
   let estimatedValue = 0;
 
   if (ability.type === 'physical' || ability.type === 'psynergy') {
-    // Estimate damage (simplified - doesn't account for crit/dodge variance)
+    // Estimate damage using effective stats (simplified - doesn't account for crit/dodge variance)
+    // Note: We need team for effective stats, but scoreAbility doesn't have it
+    // For now, use base stats + level bonuses (equipment/Djinn/status will be handled in actual execution)
+    // TODO: Pass team to scoreAbility for accurate effective stats
     const basePower = ability.basePower || 0;
     const casterStat = ability.type === 'physical' ? caster.baseStats.atk : caster.baseStats.mag;
     const avgTargetDef = validTargets.reduce((sum, t) => {
@@ -69,6 +72,7 @@ function scoreAbility(
     }, 0) / validTargets.length;
 
     // Rough damage estimate (simplified formula)
+    // Note: This is approximate - actual damage uses effective stats in BattleService
     const rawDamage = basePower + casterStat - avgTargetDef;
     const avgDamage = Math.max(1, rawDamage);
 

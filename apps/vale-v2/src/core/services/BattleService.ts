@@ -52,7 +52,7 @@ export function startBattle(
   rng: PRNG
 ): BattleState {
   const allUnits = [...playerTeam.units, ...enemies];
-  const turnOrder = calculateTurnOrder(allUnits, rng, 0); // Start at turn 0
+  const turnOrder = calculateTurnOrder(allUnits, playerTeam, rng, 0); // Start at turn 0
 
   return createBattleState(playerTeam, enemies, turnOrder);
 }
@@ -145,7 +145,8 @@ export function performAction(
   }
 
   // Execute ability with validated alive targets
-  const result = executeAbility(actor, ability, aliveTargets, allUnits, rng);
+  // Pass team for effective stats calculation
+  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, rng);
 
   // Update battle state with new units
   const updatedPlayerUnits = state.playerTeam.units.map(u => {
@@ -220,6 +221,7 @@ function executeAbility(
   ability: Ability,
   targets: readonly Unit[],
   allUnits: readonly Unit[],
+  team: Team,
   rng: PRNG
 ): ActionResult {
   const targetIds = targets.map(t => t.id);
@@ -227,8 +229,9 @@ function executeAbility(
   const updatedUnits: Unit[] = [];
 
   // Check for critical hit (physical and psynergy only)
+  // Uses effective SPD for crit chance calculation
   const isCritical = (ability.type === 'physical' || ability.type === 'psynergy')
-    && checkCriticalHit(caster, rng);
+    && checkCriticalHit(caster, team, rng);
 
   // Execute based on ability type
   switch (ability.type) {
@@ -248,8 +251,9 @@ function executeAbility(
 
         // Check for dodge BEFORE calculating damage
         // Default accuracy is 95% (abilities can override this in the future)
+        // Uses effective stats for both attacker and defender
         const abilityAccuracy = 0.95; // TODO: Add accuracy property to Ability schema
-        const dodged = checkDodge(caster, currentTarget, abilityAccuracy, rng);
+        const dodged = checkDodge(caster, currentTarget, team, abilityAccuracy, rng);
         
         if (dodged) {
           anyDodged = true;
@@ -261,9 +265,10 @@ function executeAbility(
           continue;
         }
 
+        // Use effective stats for damage calculation
         let damage = ability.type === 'physical'
-          ? calculatePhysicalDamage(caster, currentTarget, ability, rng)
-          : calculatePsynergyDamage(caster, currentTarget, ability, rng);
+          ? calculatePhysicalDamage(caster, currentTarget, team, ability, rng)
+          : calculatePsynergyDamage(caster, currentTarget, team, ability, rng);
 
         // Apply critical hit multiplier
         if (isCritical) {
@@ -328,7 +333,8 @@ function executeAbility(
           updatedUnits.push(revivedUnit);
           totalHealing += revivedUnit.currentHp;
         } else if (!isUnitKO(target)) {
-          const healAmount = calculateHealAmount(caster, ability, rng);
+          // Use effective MAG for healing calculation
+          const healAmount = calculateHealAmount(caster, team, ability, rng);
           const healedUnit = applyHealing(target, healAmount);
           updatedUnits.push(healedUnit);
           totalHealing += healedUnit.currentHp - target.currentHp;
@@ -453,6 +459,7 @@ export function endTurn(
     const newTurn = state.currentTurn + 1;
     const newTurnOrder = calculateTurnOrder(
       [...state.playerTeam.units, ...state.enemies],
+      state.playerTeam,
       rng,
       newTurn // Pass turn number for deterministic tiebreaker
     );

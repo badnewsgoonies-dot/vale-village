@@ -31,6 +31,7 @@ export const EquipmentSchema = z.object({
   cost: z.number().int().min(0),
   statBonus: StatsSchema.partial(), // Allow sparse stats
   unlocksAbility: z.string().optional(),
+  equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)
   evasion: z.number().min(0).max(100).optional(), // 0-100 percentage
   alwaysFirstTurn: z.boolean().optional(),
