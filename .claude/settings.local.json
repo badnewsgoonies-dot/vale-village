@@ -35,12 +35,16 @@
       "Bash(curl:*)",
       "Bash(printf:*)",
       "Bash(/c/Dev/AiGames/vale-village/ANALYSIS_REPORT.txt)",
+<<<<<<< Updated upstream
       "Bash(npm run type-check:*)",
       "Bash(git rm:*)",
       "Bash(node replace-dialogue.js:*)",
       "Bash(node add-mana-costs.js:*)",
       "Bash(echo:*)",
       "Bash(\"C:\\Dev\\AiGames\\vale-village\\src\\components\\battle\\BattleScreen.css\")"
+=======
+      "Bash(mkdir:*)"
+>>>>>>> Stashed changes
     ],
     "deny": [],
     "ask": []
