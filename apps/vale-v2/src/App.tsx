@@ -7,7 +7,6 @@ import { createTestBattle } from './ui/utils/testBattle';
 
 function App() {
   const setBattle = useStore((s) => s.setBattle);
-  const battle = useStore((s) => s.battle);
   const story = useStore((s) => s.story);
   const showCredits = useStore((s) => s.showCredits);
   const setShowCredits = useStore((s) => s.setShowCredits);

@@ -23,8 +23,8 @@ export function resolveTargets(
   switch (ability.targets) {
     case 'single-enemy':
       return isPlayerUnit
-        ? enemyUnits.filter(u => !isUnitKO(u)).slice(0, 1)
-        : playerUnits.filter(u => !isUnitKO(u)).slice(0, 1);
+        ? enemyUnits.filter(u => !isUnitKO(u))
+        : playerUnits.filter(u => !isUnitKO(u));
 
     case 'all-enemies':
       return isPlayerUnit
@@ -33,8 +33,8 @@ export function resolveTargets(
 
     case 'single-ally':
       return isPlayerUnit
-        ? playerUnits.filter(u => !isUnitKO(u) && u.id !== caster.id).slice(0, 1)
-        : enemyUnits.filter(u => !isUnitKO(u) && u.id !== caster.id).slice(0, 1);
+        ? playerUnits.filter(u => !isUnitKO(u) && u.id !== caster.id)
+        : enemyUnits.filter(u => !isUnitKO(u) && u.id !== caster.id);
 
     case 'all-allies':
       return isPlayerUnit

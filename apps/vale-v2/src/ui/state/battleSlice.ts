@@ -123,7 +123,7 @@ export const createBattleSlice: StateCreator<
         type: 'battle-end',
         result: battleEnd,
       });
-      
+
       // Emit encounter-finished event if we have an encounterId
       // This is a story-specific event, emitted alongside battle-end for story progression
       const encounterId = getEncounterId(battle);
@@ -134,9 +134,14 @@ export const createBattleSlice: StateCreator<
           encounterId,
         });
       }
-    }
 
-    set({ battle: result.state, events: [...events, ...newEvents] });
+      set({ battle: result.state, events: [...events, ...newEvents] });
+    } else {
+      // Battle continues - advance to next turn
+      const rngEndTurn = makePRNG(rngSeed + turnNumber * 1_000_000);
+      const nextState = endTurn(result.state, rngEndTurn);
+      set({ battle: nextState, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
+    }
   },
 
   endTurn: () => {
@@ -166,7 +171,7 @@ export const createBattleSlice: StateCreator<
     const rng = makePRNG(rngSeed + turnNumber * 1_000_000 + 7);
     try {
       const decision = makeAIDecision(battle, currentActorId, rng);
-      
+
       // Execute the decision
       const result = performAction(battle, currentActorId, decision.abilityId, decision.targetIds, rng);
 
@@ -178,23 +183,31 @@ export const createBattleSlice: StateCreator<
           type: 'battle-end',
           result: battleEnd,
         });
-      }
 
-      set({ battle: result.state, events: [...events, ...newEvents] });
-      
-      // Notify story slice of encounter completion
-      // Also emit encounter-finished event for story progression
-      const encounterId = getEncounterId(battle);
-      if (battleEnd && encounterId) {
-        newEvents.push({
-          type: 'encounter-finished',
-          outcome: battleEnd,
-          encounterId,
-        });
-        const store = get() as any;
-        if (store.onBattleEvents) {
-          store.onBattleEvents(newEvents);
+        // Emit encounter-finished event for story progression
+        const encounterId = getEncounterId(battle);
+        if (encounterId) {
+          newEvents.push({
+            type: 'encounter-finished',
+            outcome: battleEnd,
+            encounterId,
+          });
         }
+
+        set({ battle: result.state, events: [...events, ...newEvents] });
+
+        // Notify story slice of encounter completion
+        if (encounterId) {
+          const store = get() as any;
+          if (store.onBattleEvents) {
+            store.onBattleEvents(newEvents);
+          }
+        }
+      } else {
+        // Battle continues - advance to next turn
+        const rngEndTurn = makePRNG(rngSeed + turnNumber * 1_000_000);
+        const nextState = endTurn(result.state, rngEndTurn);
+        set({ battle: nextState, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
       }
     } catch (error) {
       console.error('AI decision failed:', error);

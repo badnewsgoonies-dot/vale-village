@@ -83,9 +83,16 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
     setSelectedTargets([]);
   };
 
-  const previewData = selectedAbility && selectedTargets.length > 0 && currentActorId
-    ? preview(currentActorId, selectedAbility, selectedTargets)
-    : null;
+  // Preview with error boundary to prevent crashes
+  const previewData = (() => {
+    if (!selectedAbility || selectedTargets.length === 0 || !currentActorId) return null;
+    try {
+      return preview(currentActorId, selectedAbility, selectedTargets);
+    } catch (error) {
+      console.error('Preview failed:', error);
+      return null;
+    }
+  })();
 
   return (
     <div style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '4px', marginTop: '1rem' }}>
