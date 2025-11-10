@@ -10,7 +10,9 @@
       "Bash(npx tsx:*)",
       "Bash(pnpm install:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(pnpm dev)",
+      "Bash(npx vite)"
     ],
     "deny": [],
     "ask": []

@@ -83,6 +83,11 @@ export function createUnit(
 ): Unit {
   const maxHp = definition.baseStats.hp + (level - 1) * definition.growthRates.hp;
 
+  // Auto-unlock abilities based on level
+  const unlockedAbilityIds = definition.abilities
+    .filter(ability => level >= (ability.unlockLevel ?? 1))
+    .map(ability => ability.id);
+
   return {
     id: definition.id,
     name: definition.name,
@@ -105,7 +110,7 @@ export function createUnit(
     djinn: [],
     djinnStates: {},
     abilities: definition.abilities,
-    unlockedAbilityIds: [],
+    unlockedAbilityIds,
     statusEffects: [],
     actionsTaken: 0,
     battleStats: {
