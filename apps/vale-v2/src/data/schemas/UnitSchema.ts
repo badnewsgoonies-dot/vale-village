@@ -36,15 +36,36 @@ export const DjinnStateSchema = z.enum(['Set', 'Standby', 'Recovery']);
 export type DjinnState = z.infer<typeof DjinnStateSchema>;
 
 /**
- * Zod schema for StatusEffect
+ * Zod schema for StatKey
  */
-export const StatusEffectSchema = z.object({
-  type: z.enum(['buff', 'debuff', 'poison', 'burn', 'freeze', 'paralyze']),
-  stat: z.enum(['hp', 'pp', 'atk', 'def', 'mag', 'spd']).optional(),
-  modifier: z.number().optional(),
-  damagePerTurn: z.number().int().min(0).optional(),
-  duration: z.number().int().min(0),
-});
+const StatKeySchema = z.enum(['hp', 'pp', 'atk', 'def', 'mag', 'spd']);
+
+/**
+ * Zod schema for StatusEffect (discriminated union)
+ */
+export const StatusEffectSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('buff'),
+    stat: StatKeySchema,
+    modifier: z.number().positive(),
+    duration: z.number().int().positive(),
+  }),
+  z.object({
+    type: z.literal('debuff'),
+    stat: StatKeySchema,
+    modifier: z.number().negative(),
+    duration: z.number().int().positive(),
+  }),
+  z.object({
+    type: z.enum(['poison', 'burn']),
+    damagePerTurn: z.number().int().positive(),
+    duration: z.number().int().positive(),
+  }),
+  z.object({
+    type: z.enum(['freeze', 'paralyze']),
+    duration: z.number().int().positive(),
+  }),
+]);
 
 /**
  * Zod schema for UnitDefinition
@@ -87,6 +108,16 @@ export const UnitSchema = z.object({
     damageDealt: z.number().int().min(0),
     damageTaken: z.number().int().min(0),
   }),
+}).superRefine((u, ctx) => {
+  // Unit HP cannot exceed max HP
+  const maxHp = u.baseStats.hp + (u.level - 1) * u.growthRates.hp;
+  if (u.currentHp > maxHp) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `currentHp (${u.currentHp}) exceeds maxHp (${maxHp})`,
+      path: ['currentHp'],
+    });
+  }
 });
 
 export type Unit = z.infer<typeof UnitSchema>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { StatsSchema } from './StatsSchema';
 
 /**
  * Zod schema for EquipmentSlot
@@ -28,14 +29,7 @@ export const EquipmentSchema = z.object({
   slot: EquipmentSlotSchema,
   tier: EquipmentTierSchema,
   cost: z.number().int().min(0),
-  statBonus: z.object({
-    hp: z.number().int().optional(),
-    pp: z.number().int().optional(),
-    atk: z.number().int().optional(),
-    def: z.number().int().optional(),
-    mag: z.number().int().optional(),
-    spd: z.number().int().optional(),
-  }),
+  statBonus: StatsSchema.partial(), // Allow sparse stats
   unlocksAbility: z.string().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)
   evasion: z.number().min(0).max(100).optional(), // 0-100 percentage

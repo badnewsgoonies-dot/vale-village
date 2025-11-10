@@ -1,3 +1,5 @@
+const path = require('node:path');
+
 module.exports = {
   root: true,
   env: {
@@ -27,14 +29,18 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
+        project: path.resolve(__dirname, 'tsconfig.json'),
         alwaysTryTypes: true,
-        project: './tsconfig.json',
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
   },
   rules: {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: false }],
+    'import/no-unresolved': 'error',
     'import/no-restricted-paths': [
       'error',
       {

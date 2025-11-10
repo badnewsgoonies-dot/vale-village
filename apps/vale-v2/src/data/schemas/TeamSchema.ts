@@ -21,6 +21,17 @@ export const TeamSchema = z.object({
   currentTurn: z.number().int().min(0),
   activationsThisTurn: z.record(z.string(), z.number().int().min(0)),
   djinnStates: z.record(z.string(), DjinnStateSchema),
+}).superRefine((t, ctx) => {
+  // Team djinn sanity check
+  if (t.equippedDjinn.length > 3) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.too_big,
+      maximum: 3,
+      type: 'array',
+      inclusive: true,
+      path: ['equippedDjinn'],
+    });
+  }
 });
 
 export type Team = z.infer<typeof TeamSchema>;

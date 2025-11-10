@@ -67,8 +67,15 @@ export function createTeam(units: readonly Unit[]): Team {
 
 /**
  * Update team (returns new object - immutability)
+ * Handles nested objects properly
  */
 export function updateTeam(team: Team, updates: Partial<Team>): Team {
-  return { ...team, ...updates };
+  return {
+    ...team,
+    ...updates,
+    djinnTrackers: updates.djinnTrackers ? { ...team.djinnTrackers, ...updates.djinnTrackers } : team.djinnTrackers,
+    activationsThisTurn: updates.activationsThisTurn ? { ...team.activationsThisTurn, ...updates.activationsThisTurn } : team.activationsThisTurn,
+    djinnStates: updates.djinnStates ? { ...team.djinnStates, ...updates.djinnStates } : team.djinnStates,
+  };
 }
 

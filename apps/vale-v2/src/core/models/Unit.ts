@@ -117,8 +117,14 @@ export function createUnit(
 
 /**
  * Update unit (returns new object - immutability)
+ * Handles nested objects properly
  */
 export function updateUnit(unit: Unit, updates: Partial<Unit>): Unit {
-  return { ...unit, ...updates };
+  return {
+    ...unit,
+    ...updates,
+    equipment: updates.equipment ? { ...unit.equipment, ...updates.equipment } : unit.equipment,
+    battleStats: updates.battleStats ? { ...unit.battleStats, ...updates.battleStats } : unit.battleStats,
+  };
 }
 

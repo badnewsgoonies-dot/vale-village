@@ -58,6 +58,44 @@ export function validateAllGameData(): void {
     }
   });
   
+  // Cross-reference checks
+  // Check ability unlock levels
+  Object.entries(ABILITIES).forEach(([id, ability]) => {
+    if (ability.unlockLevel < 1 || ability.unlockLevel > 5) {
+      errors.push(`Ability ${id}: unlockLevel out of range (1..5)`);
+    }
+  });
+  
+  // Check unit abilities exist
+  Object.entries(UNIT_DEFINITIONS).forEach(([id, unit]) => {
+    for (const ability of unit.abilities) {
+      if (!ABILITIES[ability.id]) {
+        errors.push(`Unit ${id}: unknown ability id "${ability.id}"`);
+      }
+    }
+  });
+  
+  // Check enemy abilities exist
+  Object.entries(ENEMIES).forEach(([id, enemy]) => {
+    for (const ability of enemy.abilities) {
+      if (!ABILITIES[ability.id]) {
+        errors.push(`Enemy ${id}: unknown ability id "${ability.id}"`);
+      }
+    }
+    // Check enemy drop equipment is valid
+    if (enemy.drops) {
+      for (const d of enemy.drops) {
+        const r = EquipmentSchema.safeParse(d.equipment);
+        if (!r.success) {
+          const errorMessages = r.error.errors.map(e => 
+            `${e.path.join('.')}: ${e.message}`
+          ).join(', ');
+          errors.push(`Enemy ${id}: invalid drop equipment: ${errorMessages}`);
+        }
+      }
+    }
+  });
+  
   if (errors.length > 0) {
     throw new Error(`Data validation failed:\n${errors.join('\n')}`);
   }
