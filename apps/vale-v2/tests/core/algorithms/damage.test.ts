@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
+import { createTeam } from '../../../src/core/models/Team';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
 import {
   calculatePhysicalDamage,
@@ -79,9 +80,10 @@ describe('Damage Algorithms', () => {
   it('should calculate physical damage', () => {
     const attacker = createSampleUnit('attacker', { atk: 15 });
     const defender = createSampleUnit('defender', { def: 10 });
+    const team = createTeam([attacker, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
     const rng = makePRNG(12345);
 
-    const damage = calculatePhysicalDamage(attacker, defender, physicalAbility, rng);
+    const damage = calculatePhysicalDamage(attacker, defender, team, physicalAbility, rng);
 
     // Damage should be positive and reasonable
     expect(damage).toBeGreaterThan(0);
@@ -91,18 +93,20 @@ describe('Damage Algorithms', () => {
   it('should calculate psynergy damage', () => {
     const attacker = createSampleUnit('attacker', { mag: 20 });
     const defender = createSampleUnit('defender', { def: 10 });
+    const team = createTeam([attacker, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
     const rng = makePRNG(12345);
 
-    const damage = calculatePsynergyDamage(attacker, defender, psynergyAbility, rng);
+    const damage = calculatePsynergyDamage(attacker, defender, team, psynergyAbility, rng);
 
     expect(damage).toBeGreaterThan(0);
   });
 
   it('should calculate healing amount', () => {
     const caster = createSampleUnit('caster', { mag: 15 });
+    const team = createTeam([caster, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
     const rng = makePRNG(12345);
 
-    const healing = calculateHealAmount(caster, healingAbility, rng);
+    const healing = calculateHealAmount(caster, team, healingAbility, rng);
 
     expect(healing).toBeGreaterThanOrEqual(0);
   });

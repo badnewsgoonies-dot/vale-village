@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
+import { createTeam } from '../../../src/core/models/Team';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
 import { calculateTurnOrder } from '../../../src/core/algorithms/turn-order';
 
@@ -63,12 +64,13 @@ describe('Turn Order Algorithm Properties', () => {
       createSampleUnit('unit4', 10),
     ];
 
+    const team = createTeam(units);
     const seed = 12345;
     const rng1 = makePRNG(seed);
     const rng2 = makePRNG(seed);
 
-    const order1 = calculateTurnOrder(units, rng1, 0);
-    const order2 = calculateTurnOrder(units, rng2, 0);
+    const order1 = calculateTurnOrder(units, team, rng1, 0);
+    const order2 = calculateTurnOrder(units, team, rng2, 0);
 
     // Should be deterministic for same seed
     expect(order1).toEqual(order2);
@@ -82,8 +84,9 @@ describe('Turn Order Algorithm Properties', () => {
       createSampleUnit('slow-unit', 5),
     ];
 
+    const team = createTeam(units);
     const rng = makePRNG(12345);
-    const order = calculateTurnOrder(units, rng, 0);
+    const order = calculateTurnOrder(units, team, rng, 0);
 
     // Hermes unit should be first (or in priority tier)
     const hermesIndex = order.indexOf('hermes-unit');
@@ -101,15 +104,16 @@ describe('Turn Order Algorithm Properties', () => {
       createSampleUnit('unit4', 10),
     ];
 
+    const team = createTeam(units);
     const seed = 12345;
     
     // Turn 0
     const rng1 = makePRNG(seed);
-    const order1 = calculateTurnOrder(units, rng1, 0);
+    const order1 = calculateTurnOrder(units, team, rng1, 0);
     
     // Turn 1 (should be deterministic)
     const rng2 = makePRNG(seed);
-    const order2 = calculateTurnOrder(units, rng2, 1);
+    const order2 = calculateTurnOrder(units, team, rng2, 1);
     
     // Both should be valid orders (same units, potentially different order due to tiebreaker)
     expect(order1.length).toBe(order2.length);

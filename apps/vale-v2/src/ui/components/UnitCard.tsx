@@ -1,22 +1,41 @@
 /**
  * Unit card component
  * Displays unit stats, HP/PP bars, and status effects
+ * PR-STATS-EFFECTIVE: Shows effective stats (base + level + equipment + Djinn + status)
  */
 
+import { useMemo } from 'react';
 import type { Unit } from '../../core/models/Unit';
+import type { Team } from '../../core/models/Team';
 import { calculateMaxHp } from '../../core/models/Unit';
+import { calculateEffectiveStats } from '../../core/algorithms/stats';
 
 interface UnitCardProps {
   unit: Unit;
   isPlayer: boolean;
+  team?: Team; // Optional team for effective stats calculation (only needed for player units)
 }
 
-export function UnitCard({ unit, isPlayer }: UnitCardProps) {
+export function UnitCard({ unit, isPlayer, team }: UnitCardProps) {
   const maxHp = calculateMaxHp(unit);
   const hpPercent = (unit.currentHp / maxHp) * 100;
+  
+  // TODO: Migrate PP to team mana in PR-MANA-QUEUE
+  // For now, calculate PP from base stats + level
   const maxPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
   const currentPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp; // TODO: Track PP separately
   const ppPercent = maxPp > 0 ? (currentPp / maxPp) * 100 : 0;
+  
+  // Calculate effective stats (memoized for performance)
+  // PR-STATS-EFFECTIVE: Effective stats include base + level + equipment + Djinn + status
+  // Both player and enemy units use player team for Djinn bonuses (team-wide effect)
+  const effectiveStats = useMemo(() => {
+    if (team) {
+      return calculateEffectiveStats(unit, team);
+    }
+    // Fallback to base stats if team not provided (shouldn't happen in battle)
+    return unit.baseStats;
+  }, [unit, team]);
 
   return (
     <div
@@ -106,7 +125,13 @@ export function UnitCard({ unit, isPlayer }: UnitCardProps) {
       )}
 
       <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#666' }}>
-        ATK: {unit.baseStats.atk} | DEF: {unit.baseStats.def} | MAG: {unit.baseStats.mag} | SPD: {unit.baseStats.spd}
+        {/* PR-STATS-EFFECTIVE: Show effective stats (base + level + equipment + Djinn + status) */}
+        ATK: {effectiveStats.atk} | DEF: {effectiveStats.def} | MAG: {effectiveStats.mag} | SPD: {effectiveStats.spd}
+        {team && isPlayer && effectiveStats.atk !== unit.baseStats.atk && (
+          <span style={{ fontSize: '0.7rem', color: '#999', marginLeft: '0.5rem' }}>
+            (base: {unit.baseStats.atk}/{unit.baseStats.def}/{unit.baseStats.mag}/{unit.baseStats.spd})
+          </span>
+        )}
       </div>
     </div>
   );

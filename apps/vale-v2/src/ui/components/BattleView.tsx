@@ -66,7 +66,7 @@ export function BattleView() {
           <h3>Player Team</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {playerUnits.map((unit) => (
-              <UnitCard key={unit.id} unit={unit} isPlayer={true} />
+              <UnitCard key={unit.id} unit={unit} isPlayer={true} team={battle.playerTeam} />
             ))}
           </div>
         </div>
@@ -74,8 +74,9 @@ export function BattleView() {
         <div className="enemy-side" style={{ flex: 1 }}>
           <h3>Enemies</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* PR-STATS-EFFECTIVE: Enemies also need team for effective stats (Djinn bonuses apply to all units) */}
             {enemies.map((unit) => (
-              <UnitCard key={unit.id} unit={unit} isPlayer={false} />
+              <UnitCard key={unit.id} unit={unit} isPlayer={false} team={battle.playerTeam} />
             ))}
           </div>
         </div>

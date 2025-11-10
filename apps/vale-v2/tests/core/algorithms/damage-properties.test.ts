@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
+import { createTeam } from '../../../src/core/models/Team';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
 import {
   checkCriticalHit,
@@ -46,6 +47,7 @@ describe('Damage Algorithm Properties', () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 999 }), (spd) => {
         const unit = createSampleUnit(spd);
+        const team = createTeam([unit, createSampleUnit(10), createSampleUnit(10), createSampleUnit(10)]);
         const rng = makePRNG(12345);
         
         // Test multiple times to get average
@@ -53,7 +55,7 @@ describe('Damage Algorithm Properties', () => {
         const trials = 1000;
         for (let i = 0; i < trials; i++) {
           const testRng = makePRNG(12345 + i);
-          if (checkCriticalHit(unit, testRng)) {
+          if (checkCriticalHit(unit, team, testRng)) {
             critCount++;
           }
         }
@@ -94,6 +96,8 @@ describe('Damage Algorithm Properties', () => {
               evasion: equipmentEvasion,
             },
           };
+          
+          const team = createTeam([attacker, createSampleUnit(10), createSampleUnit(10), createSampleUnit(10)]);
           
           // Calculate hit chance (same logic as checkDodge)
           const BASE_EVASION = 0.05;

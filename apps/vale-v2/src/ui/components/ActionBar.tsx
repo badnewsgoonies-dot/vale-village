@@ -44,6 +44,8 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
     );
   }
 
+  // TODO: Migrate PP to team mana in PR-MANA-QUEUE
+  // For now, calculate PP from base stats + level
   const currentPp = currentActor.baseStats.pp + (currentActor.level - 1) * currentActor.growthRates.pp; // TODO: Track PP separately
   const availableAbilities = currentActor.abilities.filter(a =>
     currentActor.unlockedAbilityIds.includes(a.id) &&
