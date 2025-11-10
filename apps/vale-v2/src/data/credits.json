@@ -1,0 +1,35 @@
+{
+  "sections": [
+    {
+      "title": "Design & Code",
+      "entries": [
+        "Vale Chronicles Team"
+      ]
+    },
+    {
+      "title": "Art",
+      "entries": [
+        "Placeholder Sprites",
+        "Coming Soon"
+      ]
+    },
+    {
+      "title": "Music & Sound",
+      "entries": [
+        "TBD"
+      ]
+    },
+    {
+      "title": "Special Thanks",
+      "entries": [
+        "Golden Sun Series",
+        "All Playtesters"
+      ]
+    }
+  ],
+  "options": {
+    "scrollSpeed": 40,
+    "music": null
+  }
+}
+
