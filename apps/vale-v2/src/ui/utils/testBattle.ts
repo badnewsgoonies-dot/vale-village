@@ -31,7 +31,7 @@ const testUnitDef: UnitDefinition = {
     mag: 2,
     spd: 1,
   },
-  abilities: [],
+  abilities: ['strike', 'fireball', 'heal'], // Give players some abilities
   manaContribution: 1,
   description: 'A test warrior',
 };
@@ -58,16 +58,18 @@ const testEnemyDef: UnitDefinition = {
     mag: 1,
     spd: 1,
   },
-  abilities: [],
+  abilities: ['strike'], // Give enemies basic strike ability
   manaContribution: 1,
   description: 'A test goblin',
 };
 
 export function createTestBattle() {
-  // Create test units
-  const unit1 = createUnit(testUnitDef, 1, 0);
-  const unit2 = createUnit(testUnitDef, 1, 0);
-  
+  // Create test units with unique IDs
+  const unit1 = createUnit({ ...testUnitDef, id: 'test-warrior-1', name: 'Test Warrior' }, 1, 0);
+  const unit2 = createUnit({ ...testUnitDef, id: 'test-warrior-2', name: 'Test Warrior 2' }, 1, 0);
+  const unit3 = createUnit({ ...testUnitDef, id: 'test-warrior-3', name: 'Test Warrior 3' }, 1, 0);
+  const unit4 = createUnit({ ...testUnitDef, id: 'test-warrior-4', name: 'Test Warrior 4' }, 1, 0);
+
   // Create test enemies
   const enemy1 = createUnit(
     {
@@ -88,9 +90,7 @@ export function createTestBattle() {
     0
   );
 
-  // Create team (need 4 units, so duplicate)
-  const unit3 = createUnit({ ...testUnitDef, id: 'test-warrior-3', name: 'Test Warrior 3' }, 1, 0);
-  const unit4 = createUnit({ ...testUnitDef, id: 'test-warrior-4', name: 'Test Warrior 4' }, 1, 0);
+  // Create team
   const team = createTeam([unit1, unit2, unit3, unit4]);
 
   // Start battle
