@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # TASK BREAKDOWN - Vale Chronicles
 
 **Architect Deliverable - Phase 3**

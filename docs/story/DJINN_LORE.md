@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # DJINN LORE - Vale Chronicles
 
 **Story Director Deliverable - Phase 2**

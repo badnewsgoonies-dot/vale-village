@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # INTEGRATION SPECIFICATIONS - Vale Chronicles
 
 **Architect Deliverable - Phase 3**

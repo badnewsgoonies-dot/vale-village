@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # RECRUITABLE UNITS - Vale Chronicles
 
 **Story Director Deliverable #1**

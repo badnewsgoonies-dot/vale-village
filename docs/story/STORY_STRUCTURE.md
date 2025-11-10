@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # STORY STRUCTURE - Vale Chronicles
 
 **Story Director Deliverable - Phase 2**

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ABILITY FLAVOR TEXT - Vale Chronicles
 
 **Story Director Deliverable - Phase 2**

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # RECRUITABLE UNITS (FULL) - Vale Chronicles
 
 **Story Director Deliverable - Phase 2**

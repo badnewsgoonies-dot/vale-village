@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # TECHNICAL SESSION PLAN - Vale Chronicles
 
 **Architect Deliverable - Phase 3 - MASTER PLAN**

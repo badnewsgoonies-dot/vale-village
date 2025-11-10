@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # NPC DIALOGUES - Vale Chronicles
 
 **Story Director Deliverable - Phase 2**
