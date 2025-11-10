@@ -6,7 +6,11 @@
 import { useState } from 'react';
 import { useStore } from '../state/store';
 
-export function ActionBar() {
+interface ActionBarProps {
+  disabled?: boolean;
+}
+
+export function ActionBar({ disabled = false }: ActionBarProps) {
   const battle = useStore((s) => s.battle);
   const perform = useStore((s) => s.perform);
   const endTurn = useStore((s) => s.endTurn);
@@ -15,7 +19,13 @@ export function ActionBar() {
   const [selectedAbility, setSelectedAbility] = useState<string | null>(null);
   const [selectedTargets, setSelectedTargets] = useState<string[]>([]);
 
-  if (!battle) return null;
+  if (!battle || disabled) {
+    return (
+      <div style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '4px', marginTop: '1rem' }}>
+        <p>Battle ended. Controls disabled.</p>
+      </div>
+    );
+  }
 
   const allUnits = [...battle.playerTeam.units, ...battle.enemies];
   const currentActorId = battle.turnOrder[battle.currentActorIndex];
@@ -29,7 +39,7 @@ export function ActionBar() {
     return (
       <div style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '4px', marginTop: '1rem' }}>
         <p>Enemy turn: {currentActor.name}</p>
-        <button onClick={() => endTurn()}>End Turn</button>
+        <button onClick={() => endTurn()} disabled={disabled}>End Turn</button>
       </div>
     );
   }
@@ -148,14 +158,14 @@ export function ActionBar() {
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <button
           onClick={handleExecute}
-          disabled={!selectedAbility || selectedTargets.length === 0}
+          disabled={disabled || !selectedAbility || selectedTargets.length === 0}
           style={{
             padding: '0.5rem 1rem',
-            backgroundColor: selectedAbility && selectedTargets.length > 0 ? '#4CAF50' : '#ccc',
+            backgroundColor: selectedAbility && selectedTargets.length > 0 && !disabled ? '#4CAF50' : '#ccc',
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: selectedAbility && selectedTargets.length > 0 ? 'pointer' : 'not-allowed',
+            cursor: selectedAbility && selectedTargets.length > 0 && !disabled ? 'pointer' : 'not-allowed',
           }}
         >
           Execute
@@ -165,26 +175,28 @@ export function ActionBar() {
             setSelectedAbility(null);
             setSelectedTargets([]);
           }}
+          disabled={disabled}
           style={{
             padding: '0.5rem 1rem',
-            backgroundColor: '#666',
+            backgroundColor: disabled ? '#ccc' : '#666',
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer',
+            cursor: disabled ? 'not-allowed' : 'pointer',
           }}
         >
           Cancel
         </button>
         <button
           onClick={() => endTurn()}
+          disabled={disabled}
           style={{
             padding: '0.5rem 1rem',
-            backgroundColor: '#FF9800',
+            backgroundColor: disabled ? '#ccc' : '#FF9800',
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer',
+            cursor: disabled ? 'not-allowed' : 'pointer',
           }}
         >
           End Turn

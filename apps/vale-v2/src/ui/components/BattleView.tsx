@@ -12,10 +12,18 @@ import { BattleLog } from './BattleLog';
 import { UnitCard } from './UnitCard';
 
 export function BattleView() {
+  // Use narrow selectors to minimize re-renders
   const battle = useStore((s) => s.battle);
+  const eventsLength = useStore((s) => s.events.length);
   const events = useStore((s) => s.events);
   const dequeue = useStore((s) => s.dequeueEvent);
   const startTurnTick = useStore((s) => s.startTurnTick);
+  
+  // Check for battle end
+  const battleEnded = useStore((s) => {
+    if (!s.battle) return false;
+    return s.events.some(e => e.type === 'battle-end');
+  });
 
   useEffect(() => {
     if (!battle) return;
@@ -24,10 +32,10 @@ export function BattleView() {
   }, [battle?.currentTurn]);
 
   useEffect(() => {
-    if (!events.length) return;
+    if (!events.length || battleEnded) return; // Stop processing if battle ended
     const t = setTimeout(() => dequeue(), 450); // ~450ms per event; tune or vary by type
     return () => clearTimeout(t);
-  }, [events, dequeue]);
+  }, [eventsLength, battleEnded, dequeue]); // Use eventsLength instead of events array
 
   if (!battle) return <div>No battle loaded.</div>;
 
@@ -58,7 +66,7 @@ export function BattleView() {
         </div>
       </div>
 
-      <ActionBar />
+      <ActionBar disabled={battleEnded} />
 
       <BattleLog events={events} renderText={renderEventText} />
     </div>

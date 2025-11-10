@@ -38,23 +38,30 @@ export function calculateTurnOrder(
     tieRng.next(); // Advance for determinism
   }
 
-  // Sort priority units by SPD (descending) with tiebreaker
-  const sortedPriority = [...priorityUnits].sort((a, b) => {
-    const spdDiff = b.baseStats.spd - a.baseStats.spd;
-    if (spdDiff === 0) {
-      return tieRng.next() - 0.5;
-    }
-    return spdDiff;
-  });
+  // Sort priority units: priority desc → SPD desc → stable tiebreak (ID sort then RNG)
+  // Stable ID sort ensures deterministic tiebreaker order
+  const sortedPriority = [...priorityUnits]
+    .sort((a, b) => a.id.localeCompare(b.id)) // Stable sort by ID first
+    .sort((a, b) => {
+      const spdDiff = b.baseStats.spd - a.baseStats.spd;
+      if (spdDiff === 0) {
+        // Stable tiebreaker: use deterministic RNG based on turn number
+        return tieRng.next() - 0.5;
+      }
+      return spdDiff;
+    });
 
-  // Sort regular units by SPD (descending) with tiebreaker
-  const sortedRegular = [...regularUnits].sort((a, b) => {
-    const spdDiff = b.baseStats.spd - a.baseStats.spd;
-    if (spdDiff === 0) {
-      return tieRng.next() - 0.5;
-    }
-    return spdDiff;
-  });
+  // Sort regular units: SPD desc → stable tiebreak (ID sort then RNG)
+  const sortedRegular = [...regularUnits]
+    .sort((a, b) => a.id.localeCompare(b.id)) // Stable sort by ID first
+    .sort((a, b) => {
+      const spdDiff = b.baseStats.spd - a.baseStats.spd;
+      if (spdDiff === 0) {
+        // Stable tiebreaker: use deterministic RNG based on turn number
+        return tieRng.next() - 0.5;
+      }
+      return spdDiff;
+    });
 
   // Priority units first, then regular units
   const allOrdered = [...sortedPriority, ...sortedRegular];

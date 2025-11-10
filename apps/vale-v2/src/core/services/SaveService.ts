@@ -31,6 +31,7 @@ export function saveGame(data: unknown): Result<void, string> {
 
 /**
  * Load game state from localStorage
+ * Includes safety checks and validation with error recovery
  */
 export function loadGame(): Result<unknown, string> {
   try {
@@ -39,17 +40,40 @@ export function loadGame(): Result<unknown, string> {
       return Err('No save file found');
     }
 
-    const data = JSON.parse(serialized);
+    let data: unknown;
+    try {
+      data = JSON.parse(serialized);
+    } catch (parseError) {
+      // Invalid JSON - clear corrupted save
+      localStorage.removeItem(SAVE_KEY);
+      return Err('Save file corrupted (invalid JSON). Save cleared.');
+    }
     
     // Migrate to current version
     const migrationResult = migrateSaveData(data);
     if (!migrationResult.ok) {
-      return Err(migrationResult.error);
+      // Migration failed - clear incompatible save
+      localStorage.removeItem(SAVE_KEY);
+      return Err(`Save file incompatible: ${migrationResult.error}. Save cleared.`);
     }
 
-    return Ok(migrationResult.value);
+    // Validate migrated data matches current schema
+    const validationResult = SaveV1Schema.safeParse(migrationResult.value);
+    if (!validationResult.success) {
+      // Validation failed - clear invalid save
+      localStorage.removeItem(SAVE_KEY);
+      return Err(`Save file validation failed: ${validationResult.error.message}. Save cleared.`);
+    }
+
+    return Ok(validationResult.data);
   } catch (error) {
-    return Err(`Failed to load game: ${error instanceof Error ? error.message : String(error)}`);
+    // Unexpected error - clear save to prevent corruption
+    try {
+      localStorage.removeItem(SAVE_KEY);
+    } catch {
+      // Ignore errors during cleanup
+    }
+    return Err(`Failed to load game: ${error instanceof Error ? error.message : String(error)}. Save cleared.`);
   }
 }
 

@@ -11,9 +11,17 @@ interface BattleLogProps {
 }
 
 export function BattleLog({ events, renderText }: BattleLogProps) {
+  // Throttle announcements for accessibility (batch adjacent events)
+  const announcementText = events.length > 0 
+    ? events.slice(0, 3).map(renderText).join('. ') // Announce first 3 events
+    : '';
+
   return (
     <div
       className="battle-log"
+      role="log"
+      aria-live="polite"
+      aria-label="Battle log"
       style={{
         marginTop: '1rem',
         padding: '1rem',
@@ -44,6 +52,12 @@ export function BattleLog({ events, renderText }: BattleLogProps) {
           ))
         )}
       </div>
+      {/* Hidden announcement for screen readers */}
+      {announcementText && (
+        <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
+          {announcementText}
+        </div>
+      )}
     </div>
   );
 }

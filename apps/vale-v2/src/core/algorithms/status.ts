@@ -11,10 +11,18 @@ import { applyDamage } from './damage';
  * Process status effect tick at start of unit's turn
  * From GAME_MECHANICS.md Section 5.3
  * 
+ * Status tick ordering (executed in this order):
+ * 1. Duration decay (all effects)
+ * 2. Damage-over-time (poison, burn) - applied after decay
+ * 3. Status expiration events emitted for effects that reached duration 0
+ * 
+ * Note: Freeze and Paralyze are checked separately before action execution
+ * (freeze in isFrozen(), paralyze in checkParalyzeFailure())
+ * 
  * Poison: 8% max HP damage per turn
  * Burn: 10% max HP damage per turn
- * Freeze: Skip turn, 30% break chance per turn
- * Paralyze: Checked separately before action execution
+ * Freeze: Skip turn, 30% break chance per turn (checked in isFrozen())
+ * Paralyze: 25% failure chance (checked in checkParalyzeFailure())
  */
 export function processStatusEffectTick(
   unit: Unit,

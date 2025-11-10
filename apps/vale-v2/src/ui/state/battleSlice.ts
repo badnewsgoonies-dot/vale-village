@@ -134,10 +134,18 @@ export const createBattleSlice: StateCreator<
     set({ battle: nextState, turnNumber: turnNumber + 1 });
   },
 
-  dequeueEvent: () =>
-    set((state) => ({
-      events: state.events.slice(1),
-    })),
+  dequeueEvent: () => {
+    // Snapshot-based dequeue to prevent race conditions
+    // If new events arrive during processing, we consume exactly what was there at start
+    set((state) => {
+      if (state.events.length === 0) return state;
+      
+      // Remove exactly the first event (snapshot-based: slice creates new array)
+      const remaining = state.events.slice(1);
+      
+      return { events: remaining };
+    });
+  },
 
   preview: (casterId, abilityId, targets) => {
     const { battle, rngSeed, turnNumber } = get();

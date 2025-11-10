@@ -133,8 +133,19 @@ export function performAction(
     throw new Error(`No valid targets for ability ${abilityId}`);
   }
 
-  // Execute ability
-  const result = executeAbility(actor, ability, targets, allUnits, rng);
+  // Re-validate targets exist and are alive (defensive check)
+  const aliveTargets = targets.filter(t => {
+    const exists = state.playerTeam.units.some(u => u.id === t.id) ||
+                   state.enemies.some(u => u.id === t.id);
+    return exists && !isUnitKO(t);
+  });
+
+  if (aliveTargets.length === 0) {
+    throw new Error(`All targets are KO'd or invalid`);
+  }
+
+  // Execute ability with validated alive targets
+  const result = executeAbility(actor, ability, aliveTargets, allUnits, rng);
 
   // Update battle state with new units
   const updatedPlayerUnits = state.playerTeam.units.map(u => {
@@ -227,14 +238,23 @@ function executeAbility(
       let anyDodged = false;
 
       for (const target of targets) {
+        // Re-validate target exists and is alive (may have been KO'd by previous hits)
+        const currentTarget = updatedUnits.find(u => u.id === target.id) || 
+                             allUnits.find(u => u.id === target.id);
+        if (!currentTarget || isUnitKO(currentTarget)) {
+          // Target already KO'd, skip
+          continue;
+        }
+
         // Check for dodge BEFORE calculating damage
         // Default accuracy is 95% (abilities can override this in the future)
         const abilityAccuracy = 0.95; // TODO: Add accuracy property to Ability schema
-        const dodged = checkDodge(caster, target, abilityAccuracy, rng);
+        const dodged = checkDodge(caster, currentTarget, abilityAccuracy, rng);
         
         if (dodged) {
           anyDodged = true;
-          const existingUnit = allUnits.find(u => u.id === target.id);
+          // Keep current state (may have been updated by previous hits)
+          const existingUnit = updatedUnits.find(u => u.id === currentTarget.id) || currentTarget;
           if (existingUnit) {
             updatedUnits.push(existingUnit);
           }
@@ -242,16 +262,22 @@ function executeAbility(
         }
 
         let damage = ability.type === 'physical'
-          ? calculatePhysicalDamage(caster, target, ability, rng)
-          : calculatePsynergyDamage(caster, target, ability, rng);
+          ? calculatePhysicalDamage(caster, currentTarget, ability, rng)
+          : calculatePsynergyDamage(caster, currentTarget, ability, rng);
 
         // Apply critical hit multiplier
         if (isCritical) {
           damage = Math.floor(damage * 2.0);
         }
 
-        const damagedUnit = applyDamage(target, damage);
-        updatedUnits.push(damagedUnit);
+        const damagedUnit = applyDamage(currentTarget, damage);
+        // Update or add to updatedUnits
+        const existingIndex = updatedUnits.findIndex(u => u.id === damagedUnit.id);
+        if (existingIndex >= 0) {
+          updatedUnits[existingIndex] = damagedUnit;
+        } else {
+          updatedUnits.push(damagedUnit);
+        }
         totalDamage += damage;
       }
 
