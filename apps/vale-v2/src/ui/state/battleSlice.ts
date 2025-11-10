@@ -7,6 +7,7 @@ import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
 import type { BattleEvent } from '../../core/services/types';
 import { performAction, endTurn, checkBattleEnd } from '../../core/services/BattleService';
+import { makeAIDecision } from '../../core/services/AIService';
 import { processStatusEffectTick } from '../../core/algorithms/status';
 import { makePRNG } from '../../core/random/prng';
 
@@ -21,6 +22,7 @@ export interface BattleSlice {
   perform: (casterId: string, abilityId: string, targetIds: readonly string[]) => void;
   endTurn: () => void;
   dequeueEvent: () => void;
+  performAIAction: () => void; // Auto-execute AI decision for enemy turns
   preview: (
     casterId: string,
     abilityId: string,
@@ -132,6 +134,48 @@ export const createBattleSlice: StateCreator<
     const rng = makePRNG(rngSeed + turnNumber * 1_000_000);
     const nextState = endTurn(battle, rng);
     set({ battle: nextState, turnNumber: turnNumber + 1 });
+  },
+
+  performAIAction: () => {
+    const { battle, rngSeed, turnNumber, events } = get();
+    if (!battle) return;
+
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const currentActorId = battle.turnOrder[battle.currentActorIndex];
+    const currentActor = allUnits.find(u => u.id === currentActorId);
+
+    if (!currentActor || !currentActorId) return;
+
+    // Check if it's an enemy turn
+    const isPlayerUnit = battle.playerTeam.units.some(u => u.id === currentActorId);
+    if (isPlayerUnit) return; // Player turn - don't auto-execute
+
+    // Make AI decision
+    const rng = makePRNG(rngSeed + turnNumber * 1_000_000 + 7);
+    try {
+      const decision = makeAIDecision(battle, currentActorId, rng);
+      
+      // Execute the decision
+      const result = performAction(battle, currentActorId, decision.abilityId, decision.targetIds, rng);
+
+      // Check for battle end
+      const battleEnd = checkBattleEnd(result.state);
+      const newEvents: BattleEvent[] = [...result.events];
+      if (battleEnd) {
+        newEvents.push({
+          type: 'battle-end',
+          result: battleEnd,
+        });
+      }
+
+      set({ battle: result.state, events: [...events, ...newEvents] });
+    } catch (error) {
+      console.error('AI decision failed:', error);
+      // Fallback: end turn
+      const rngFallback = makePRNG(rngSeed + turnNumber * 1_000_000);
+      const nextState = endTurn(battle, rngFallback);
+      set({ battle: nextState, turnNumber: turnNumber + 1 });
+    }
   },
 
   dequeueEvent: () => {

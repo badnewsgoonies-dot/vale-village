@@ -10,5 +10,6 @@ export * from './UnitSchema';
 export * from './TeamSchema';
 export * from './BattleStateSchema';
 export * from './EnemySchema';
+export * from './EncounterSchema';
 export * from './SaveV1Schema';
 

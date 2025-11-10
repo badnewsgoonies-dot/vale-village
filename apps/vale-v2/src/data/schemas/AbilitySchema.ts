@@ -26,6 +26,14 @@ export const AbilitySchema = z.object({
     evasion: z.number().optional(),
   }).optional(),
   duration: z.number().int().min(1).optional(),
+  
+  // AI hints (optional metadata for AI decision-making)
+  aiHints: z.object({
+    priority: z.number().min(0).max(3).optional(),
+    target: z.enum(['weakest', 'random', 'lowestRes', 'healerFirst']).optional(),
+    avoidOverkill: z.boolean().optional(),
+    opener: z.boolean().optional(),
+  }).optional(),
 });
 
 export type Ability = z.infer<typeof AbilitySchema>;

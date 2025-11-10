@@ -18,6 +18,7 @@ export function BattleView() {
   const events = useStore((s) => s.events);
   const dequeue = useStore((s) => s.dequeueEvent);
   const startTurnTick = useStore((s) => s.startTurnTick);
+  const performAIAction = useStore((s) => s.performAIAction);
   
   // Check for battle end
   const battleEnded = useStore((s) => {
@@ -28,8 +29,22 @@ export function BattleView() {
   useEffect(() => {
     if (!battle) return;
     startTurnTick(); // Process start-of-turn effects on mount/turn change
+    
+    // Check if it's an enemy turn and auto-execute AI
+    const currentActorId = battle.turnOrder[battle.currentActorIndex];
+    const isPlayerUnit = battle.playerTeam.units.some(u => u.id === currentActorId);
+    
+    if (!isPlayerUnit && currentActorId) {
+      // Enemy turn - execute AI decision after a short delay
+      const timer = setTimeout(() => {
+        performAIAction();
+      }, 500); // 500ms delay for visual feedback
+      return () => clearTimeout(timer);
+    }
+    
+    return undefined; // Explicit return for player turns
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [battle?.currentTurn]);
+  }, [battle?.currentTurn, battle?.currentActorIndex, performAIAction]);
 
   useEffect(() => {
     if (!events.length || battleEnded) return; // Stop processing if battle ended

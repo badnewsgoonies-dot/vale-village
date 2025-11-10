@@ -35,11 +35,11 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
 
   const isPlayerUnit = battle.playerTeam.units.some(u => u.id === currentActorId);
   if (!isPlayerUnit) {
-    // Enemy turn - auto-advance for now
+    // Enemy turn - show AI decision info
     return (
       <div style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '4px', marginTop: '1rem' }}>
         <p>Enemy turn: {currentActor.name}</p>
-        <button onClick={() => endTurn()} disabled={disabled}>End Turn</button>
+        <p style={{ fontSize: '0.9em', color: '#666' }}>AI is deciding...</p>
       </div>
     );
   }
