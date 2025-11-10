@@ -1310,4 +1310,3 @@ assert(rewards.items.some(item => item.rarity === "rare"));
 - Tasks 19, 20, 21, 22 (UI screens)
 
 **Next Document:** TEST_SCENARIOS.md (30+ context-aware tests)
-=======

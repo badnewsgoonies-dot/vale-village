@@ -440,4 +440,3 @@ A fierce, lightning-wreathed wind Djinni. Bolt's form crackles with electricity,
 - **Passive AND Active effects:** Both have rich flavor text
 
 **Handoff Ready:** ✅ Ready for Graphics (visual design) and Architect (mechanical implementation)
-=======

@@ -643,4 +643,3 @@ All ability flavor text written with:
 - ✅ Utility and support abilities
 
 **Handoff Ready:** ✅ Ready for Graphics (VFX design) and Architect (mechanical implementation)
-=======

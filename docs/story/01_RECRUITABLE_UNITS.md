@@ -816,4 +816,3 @@ This roster provides diverse team composition options and ensures no element is 
 - No two characters feel redundant
 
 **Next Phase:** Graphics Mockup receives these profiles to create visual designs.
-=======

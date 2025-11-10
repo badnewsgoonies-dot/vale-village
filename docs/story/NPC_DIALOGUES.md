@@ -859,4 +859,3 @@ Villagers who bring Vale to life.
 - Flavor NPCs make Vale feel alive and lived-in
 
 **Handoff Ready:** ✅ Ready for implementation by Architect/Coder
-=======

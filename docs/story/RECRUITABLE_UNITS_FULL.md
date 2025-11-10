@@ -592,4 +592,3 @@ This document contains the 7 additional recruitable units beyond the 3 starters.
 - No character feels redundant or unnecessary
 
 **Handoff Ready:** ✅ Ready for Graphics Mockup (Role 2) to design visuals for these 7 units
-=======

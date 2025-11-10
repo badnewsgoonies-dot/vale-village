@@ -266,4 +266,3 @@ This document contains complete character profiles for the 3 starter units playe
 **Next Phase:** Graphics Mockup can now create visual designs for these 3 starters!
 
 **Handoff Ready:** ✅ This document is ready to pass to Graphics Mockup (Role 2)
-=======
