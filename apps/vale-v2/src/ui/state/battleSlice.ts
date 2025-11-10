@@ -122,6 +122,16 @@ export const createBattleSlice: StateCreator<
         type: 'battle-end',
         result: battleEnd,
       });
+      
+      // Emit encounter-finished event if we have an encounterId
+      const encounterId = battle.encounterId ?? battle.meta?.encounterId;
+      if (encounterId) {
+        newEvents.push({
+          type: 'encounter-finished',
+          outcome: battleEnd,
+          encounterId,
+        });
+      }
     }
 
     set({ battle: result.state, events: [...events, ...newEvents] });
@@ -169,6 +179,14 @@ export const createBattleSlice: StateCreator<
       }
 
       set({ battle: result.state, events: [...events, ...newEvents] });
+      
+      // Notify story slice of encounter completion
+      if (battleEnd && (battle.encounterId ?? battle.meta?.encounterId)) {
+        const store = get() as any;
+        if (store.onBattleEvents) {
+          store.onBattleEvents(newEvents);
+        }
+      }
     } catch (error) {
       console.error('AI decision failed:', error);
       // Fallback: end turn

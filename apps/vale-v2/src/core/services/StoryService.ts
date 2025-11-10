@@ -26,46 +26,39 @@ export function advanceChapter(
   completedKey: string
 ): Result<StoryState, string> {
   // Chapter 1 -> Chapter 2: Beat Chapter 1 boss
-  if (completedKey === 'boss:ch1' && state.chapter === 1) {
+  // Accept both 'boss:ch1' (from flag) and 'c1_boss' (from encounter ID)
+  if ((completedKey === 'boss:ch1' || completedKey === 'c1_boss') && state.chapter === 1) {
+    // Ensure flag is set
+    const newState = setFlag(state, 'boss:ch1', true);
     return {
       ok: true,
       value: {
-        ...state,
+        ...newState,
         chapter: 2,
-        flags: {
-          ...state.flags,
-          'boss:ch1': true,
-        },
       },
     };
   }
   
   // Chapter 2 -> Chapter 3: Beat Chapter 2 boss
-  if (completedKey === 'boss:ch2' && state.chapter === 2) {
+  if ((completedKey === 'boss:ch2' || completedKey === 'c2_boss') && state.chapter === 2) {
+    const newState = setFlag(state, 'boss:ch2', true);
     return {
       ok: true,
       value: {
-        ...state,
+        ...newState,
         chapter: 3,
-        flags: {
-          ...state.flags,
-          'boss:ch2': true,
-        },
       },
     };
   }
   
   // Chapter 3 -> Credits: Beat Chapter 3 boss
-  if (completedKey === 'boss:ch3' && state.chapter === 3) {
+  if ((completedKey === 'boss:ch3' || completedKey === 'c3_boss') && state.chapter === 3) {
+    const newState = setFlag(state, 'boss:ch3', true);
     return {
       ok: true,
       value: {
-        ...state,
+        ...newState,
         chapter: 4, // Credits chapter
-        flags: {
-          ...state.flags,
-          'boss:ch3': true,
-        },
       },
     };
   }
@@ -87,9 +80,9 @@ export function processEncounterCompletion(
   let newState = state;
   
   // Map encounter IDs to flags
-  if (encounterId === 'c1_boss') {
+  if (encounterId === 'c1_boss' || encounterId === 'boss:ch1') {
     newState = setFlag(newState, 'boss:ch1', true);
-  } else if (encounterId === 'c1_mini_boss') {
+  } else if (encounterId === 'c1_mini_boss' || encounterId === 'c1_miniboss') {
     newState = setFlag(newState, 'miniboss:ch1', true);
   } else if (encounterId.startsWith('c1_normal_')) {
     // Track normal encounters

@@ -20,5 +20,6 @@ export type BattleEvent =
   | { type: 'status-expired'; targetId: string; status: StatusEffect }
   | { type: 'ko'; unitId: string }
   | { type: 'xp'; unitId: string; xp: number; levelUp?: { from: number; to: number } }
-  | { type: 'battle-end'; result: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE' };
+  | { type: 'battle-end'; result: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE' }
+  | { type: 'encounter-finished'; outcome: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE'; encounterId: string };
 

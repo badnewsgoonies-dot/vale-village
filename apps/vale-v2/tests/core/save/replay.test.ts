@@ -13,6 +13,7 @@ import { UNIT_DEFINITIONS } from '../../../src/data/definitions/units';
 import { enemyToUnit } from '../../../src/core/utils/enemyToUnit';
 import { ENEMIES } from '../../../src/data/definitions/enemies';
 import { CURRENT_SAVE_VERSION } from '../../../src/core/save/migrations';
+import { createStoryState } from '../../../src/core/models/story';
 
 describe('ReplayService', () => {
   it('should replay a simple battle deterministically', () => {
@@ -31,8 +32,7 @@ describe('ReplayService', () => {
     const initial: GameStateSnapshot = {
       battle: battleState,
       team,
-      chapter: 'c1',
-      flags: {},
+      story: createStoryState(1),
       gold: 0,
       unitsCollected: ['adept'],
     };
@@ -81,8 +81,7 @@ describe('ReplayService', () => {
     const initial: GameStateSnapshot = {
       battle: null,
       team: createTeam([unit1, unit2, unit3, unit4]),
-      chapter: 'c1',
-      flags: {},
+      story: createStoryState(1),
       gold: 0,
       unitsCollected: [],
     };
@@ -115,8 +114,7 @@ describe('ReplayService', () => {
     const initial: GameStateSnapshot = {
       battle: battleState,
       team,
-      chapter: 'c1',
-      flags: {},
+      story: createStoryState(1),
       gold: 0,
       unitsCollected: ['adept'],
     };

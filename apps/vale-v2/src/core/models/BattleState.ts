@@ -47,6 +47,15 @@ export interface BattleState {
 
   /** NPC ID that triggered this battle (for post-battle cutscene) */
   readonly npcId?: string;
+
+  /** Encounter ID for story progression */
+  encounterId?: string;
+
+  /** Battle metadata */
+  meta?: {
+    encounterId: string;
+    difficulty?: 'normal' | 'elite' | 'boss';
+  };
 }
 
 /**

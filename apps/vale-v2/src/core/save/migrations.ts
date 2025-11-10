@@ -15,14 +15,33 @@ export type Migrator = (old: any) => any;
  * Key format: "major.minor->major.minor"
  */
 const migrations: Record<string, Migrator> = {
-  // Example: '1.0->1.1': (s) => ({ ...s, schema: '1.1' }),
-  // Add migrations as schema evolves
+  // Migration from old chapter/flags structure to story object
+  '1.0->1.1': (old: any) => {
+    // If state has chapter/flags at top level, migrate to story object
+    if (old.state && (old.state.chapter || old.state.flags) && !old.state.story) {
+      return {
+        ...old,
+        state: {
+          ...old.state,
+          story: {
+            chapter: typeof old.state.chapter === 'number' ? old.state.chapter : 1,
+            flags: old.state.flags || {},
+          },
+          // Remove old fields
+          chapter: undefined,
+          flags: undefined,
+        },
+        version: { major: 1, minor: 1 },
+      };
+    }
+    return old;
+  },
 };
 
 /**
  * Current save version
  */
-export const CURRENT_SAVE_VERSION: SaveVersion = { major: 1, minor: 0 };
+export const CURRENT_SAVE_VERSION: SaveVersion = { major: 1, minor: 1 };
 
 /**
  * Compare two versions

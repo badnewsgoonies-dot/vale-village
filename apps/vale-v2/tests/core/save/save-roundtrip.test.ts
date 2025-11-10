@@ -10,6 +10,7 @@ import type { GameStateSnapshot } from '../../../src/core/save/types';
 import { createTeam } from '../../../src/core/models/Team';
 import { createUnit } from '../../../src/core/models/Unit';
 import { UNIT_DEFINITIONS } from '../../../src/data/definitions/units';
+import { createStoryState } from '../../../src/core/models/story';
 
 describe('Save Round-trip', () => {
   beforeEach(() => {
@@ -31,11 +32,14 @@ describe('Save Round-trip', () => {
     const snapshot: GameStateSnapshot = {
       battle: null,
       team,
-      chapter: 'c1',
-      flags: { 'test-flag': true, 'counter': 5 },
+      story: createStoryState(1),
       gold: 100,
       unitsCollected: ['adept', 'war_mage'],
     };
+    
+    // Set some flags
+    snapshot.story.flags['test-flag'] = true;
+    snapshot.story.flags['counter'] = 5;
 
     // Save
     const saveResult = await saveGame(port, snapshot, seed, 'Test save');
@@ -50,9 +54,9 @@ describe('Save Round-trip', () => {
       
       // Verify data integrity
       expect(loaded.seed).toBe(seed);
-      expect(loaded.state.chapter).toBe(snapshot.chapter);
+      expect(loaded.state.story.chapter).toBe(snapshot.story.chapter);
       expect(loaded.state.gold).toBe(snapshot.gold);
-      expect(loaded.state.flags).toEqual(snapshot.flags);
+      expect(loaded.state.story.flags).toEqual(snapshot.story.flags);
       expect(loaded.state.unitsCollected).toEqual(snapshot.unitsCollected);
       expect(loaded.state.team.units.length).toBe(snapshot.team.units.length);
       
@@ -91,8 +95,7 @@ describe('Save Round-trip', () => {
     const snapshot: GameStateSnapshot = {
       battle: null,
       team: createTeam([unit1, unit2, unit3, unit4]),
-      chapter: 'c1',
-      flags: {},
+      story: createStoryState(1),
       gold: 0,
       unitsCollected: [],
     };

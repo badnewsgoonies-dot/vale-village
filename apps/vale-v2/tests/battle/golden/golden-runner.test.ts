@@ -14,6 +14,7 @@ import { createUnit } from '../../../src/core/models/Unit';
 import { UNIT_DEFINITIONS } from '../../../src/data/definitions/units';
 import { enemyToUnit } from '../../../src/core/utils/enemyToUnit';
 import { ENEMIES } from '../../../src/data/definitions/enemies';
+import { createStoryState } from '../../../src/core/models/story';
 
 /**
  * Helper to create a minimal event log from battle events
@@ -69,8 +70,7 @@ describe('Golden Battles', () => {
       initial: {
         battle,
         team,
-        chapter: 'c1',
-        flags: {},
+        story: createStoryState(1),
         gold: 0,
         unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
       },
@@ -121,8 +121,7 @@ describe('Golden Battles', () => {
       initial: {
         battle,
         team,
-        chapter: 'c1',
-        flags: {},
+        story: createStoryState(1),
         gold: 0,
         unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
       },
@@ -178,8 +177,7 @@ describe('Golden Battles', () => {
       initial: {
         battle,
         team,
-        chapter: 'c1',
-        flags: {},
+        story: createStoryState(1),
         gold: 0,
         unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
       },

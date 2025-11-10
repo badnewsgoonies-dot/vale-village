@@ -55,6 +55,16 @@ function applyPlayerCommand(
         type: 'battle-end',
         result: battleEnd,
       });
+      
+      // Emit encounter-finished if we have encounterId
+      const encounterId = result.state.encounterId ?? result.state.meta?.encounterId;
+      if (encounterId) {
+        events.push({
+          type: 'encounter-finished',
+          outcome: battleEnd,
+          encounterId,
+        });
+      }
     }
 
     return { state: result.state, events };
@@ -137,6 +147,16 @@ function applySystemTick(
         type: 'battle-end',
         result: battleEnd,
       });
+      
+      // Emit encounter-finished if we have encounterId
+      const encounterId = result.state.encounterId ?? result.state.meta?.encounterId;
+      if (encounterId) {
+        events.push({
+          type: 'encounter-finished',
+          outcome: battleEnd,
+          encounterId,
+        });
+      }
     }
 
     return { state: result.state, events };

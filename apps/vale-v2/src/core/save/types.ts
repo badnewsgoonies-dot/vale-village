@@ -5,6 +5,7 @@
 
 import type { BattleState } from '../models/BattleState';
 import type { Team } from '../models/Team';
+import type { StoryState } from '../models/story';
 
 /**
  * Save version for migration tracking
@@ -25,11 +26,8 @@ export interface GameStateSnapshot {
   /** Player team */
   team: Team;
   
-  /** Current chapter/area */
-  chapter: string;
-  
-  /** Story flags */
-  flags: Record<string, boolean | number>;
+  /** Story state (chapter and flags) */
+  story: StoryState;
   
   /** Gold */
   gold: number;
