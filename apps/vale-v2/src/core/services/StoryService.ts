@@ -20,15 +20,17 @@ export function canAccess(state: StoryState, requirement: FlagId | FlagId[]): bo
 
 /**
  * Advance to next chapter
+ * Accepts either encounter ID (e.g., 'c1_boss') or flag key (e.g., 'boss:ch1')
  */
 export function advanceChapter(
   state: StoryState,
   completedKey: string
 ): Result<StoryState, string> {
+  // Normalize to flag key
+  const flagKey = encounterIdToFlagKey(completedKey);
+  
   // Chapter 1 -> Chapter 2: Beat Chapter 1 boss
-  // Accept both 'boss:ch1' (from flag) and 'c1_boss' (from encounter ID)
-  if ((completedKey === 'boss:ch1' || completedKey === 'c1_boss') && state.chapter === 1) {
-    // Ensure flag is set
+  if (flagKey === 'boss:ch1' && state.chapter === 1) {
     const newState = setFlag(state, 'boss:ch1', true);
     return {
       ok: true,
@@ -40,7 +42,7 @@ export function advanceChapter(
   }
   
   // Chapter 2 -> Chapter 3: Beat Chapter 2 boss
-  if ((completedKey === 'boss:ch2' || completedKey === 'c2_boss') && state.chapter === 2) {
+  if (flagKey === 'boss:ch2' && state.chapter === 2) {
     const newState = setFlag(state, 'boss:ch2', true);
     return {
       ok: true,
@@ -52,7 +54,7 @@ export function advanceChapter(
   }
   
   // Chapter 3 -> Credits: Beat Chapter 3 boss
-  if ((completedKey === 'boss:ch3' || completedKey === 'c3_boss') && state.chapter === 3) {
+  if (flagKey === 'boss:ch3' && state.chapter === 3) {
     const newState = setFlag(state, 'boss:ch3', true);
     return {
       ok: true,
@@ -65,8 +67,46 @@ export function advanceChapter(
   
   return {
     ok: false,
-    error: `No chapter transition available for ${completedKey} at chapter ${state.chapter}`,
+    error: `No chapter transition available for ${completedKey} (${flagKey}) at chapter ${state.chapter}`,
   };
+}
+
+/**
+ * Map encounter ID to flag key
+ * Centralized mapping for encounter IDs to story flag keys
+ */
+export function encounterIdToFlagKey(encounterId: string): string {
+  // Boss encounters
+  if (encounterId === 'c1_boss') return 'boss:ch1';
+  if (encounterId === 'c2_boss') return 'boss:ch2';
+  if (encounterId === 'c3_boss') return 'boss:ch3';
+  
+  // Mini-boss encounters
+  if (encounterId === 'c1_mini_boss' || encounterId === 'c1_miniboss') return 'miniboss:ch1';
+  if (encounterId === 'c2_mini_boss' || encounterId === 'c2_miniboss') return 'miniboss:ch2';
+  if (encounterId === 'c3_mini_boss' || encounterId === 'c3_miniboss') return 'miniboss:ch3';
+  
+  // Normal encounters (track by chapter and number)
+  if (encounterId.startsWith('c1_normal_')) {
+    const encounterNum = encounterId.replace('c1_normal_', '');
+    return `encounter:ch1:${encounterNum}`;
+  }
+  if (encounterId.startsWith('c2_normal_')) {
+    const encounterNum = encounterId.replace('c2_normal_', '');
+    return `encounter:ch2:${encounterNum}`;
+  }
+  if (encounterId.startsWith('c3_normal_')) {
+    const encounterNum = encounterId.replace('c3_normal_', '');
+    return `encounter:ch3:${encounterNum}`;
+  }
+  
+  // If already a flag key, return as-is
+  if (encounterId.startsWith('boss:') || encounterId.startsWith('miniboss:') || encounterId.startsWith('encounter:')) {
+    return encounterId;
+  }
+  
+  // Fallback: use encounter ID as flag key
+  return encounterId;
 }
 
 /**
@@ -77,19 +117,7 @@ export function processEncounterCompletion(
   state: StoryState,
   encounterId: string
 ): StoryState {
-  let newState = state;
-  
-  // Map encounter IDs to flags
-  if (encounterId === 'c1_boss' || encounterId === 'boss:ch1') {
-    newState = setFlag(newState, 'boss:ch1', true);
-  } else if (encounterId === 'c1_mini_boss' || encounterId === 'c1_miniboss') {
-    newState = setFlag(newState, 'miniboss:ch1', true);
-  } else if (encounterId.startsWith('c1_normal_')) {
-    // Track normal encounters
-    const encounterNum = encounterId.replace('c1_normal_', '');
-    newState = setFlag(newState, `encounter:ch1:${encounterNum}`, true);
-  }
-  
-  return newState;
+  const flagKey = encounterIdToFlagKey(encounterId);
+  return setFlag(state, flagKey, true);
 }
 

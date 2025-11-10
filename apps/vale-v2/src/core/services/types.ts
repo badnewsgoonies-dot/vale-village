@@ -9,6 +9,13 @@ import type { StatusEffect } from '../../data/schemas/UnitSchema';
 /**
  * Battle event discriminated union
  * Used for UI animation and logging
+ * 
+ * Event separation:
+ * - `battle-end`: Generic battle completion event, emitted for all battles (including test battles).
+ *   Use this for UI that needs to react to any battle ending (results screen, disable controls, etc.).
+ * - `encounter-finished`: Story-specific event emitted only when a battle has an encounterId.
+ *   Use this for story progression logic (flag updates, chapter advancement).
+ *   Always emitted alongside `battle-end` when an encounterId is present.
  */
 export type BattleEvent =
   | { type: 'turn-start'; actorId: string; turn: number }

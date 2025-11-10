@@ -5,6 +5,7 @@
 
 import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
+import { getEncounterId } from '../../core/models/BattleState';
 import type { BattleEvent } from '../../core/services/types';
 import { performAction, endTurn, checkBattleEnd } from '../../core/services/BattleService';
 import { makeAIDecision } from '../../core/services/AIService';
@@ -124,7 +125,8 @@ export const createBattleSlice: StateCreator<
       });
       
       // Emit encounter-finished event if we have an encounterId
-      const encounterId = battle.encounterId ?? battle.meta?.encounterId;
+      // This is a story-specific event, emitted alongside battle-end for story progression
+      const encounterId = getEncounterId(battle);
       if (encounterId) {
         newEvents.push({
           type: 'encounter-finished',
@@ -181,7 +183,14 @@ export const createBattleSlice: StateCreator<
       set({ battle: result.state, events: [...events, ...newEvents] });
       
       // Notify story slice of encounter completion
-      if (battleEnd && (battle.encounterId ?? battle.meta?.encounterId)) {
+      // Also emit encounter-finished event for story progression
+      const encounterId = getEncounterId(battle);
+      if (battleEnd && encounterId) {
+        newEvents.push({
+          type: 'encounter-finished',
+          outcome: battleEnd,
+          encounterId,
+        });
         const store = get() as any;
         if (store.onBattleEvents) {
           store.onBattleEvents(newEvents);

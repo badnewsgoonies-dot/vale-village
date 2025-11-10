@@ -48,12 +48,17 @@ export interface BattleState {
   /** NPC ID that triggered this battle (for post-battle cutscene) */
   readonly npcId?: string;
 
-  /** Encounter ID for story progression */
+  /** 
+   * Encounter ID for story progression
+   * @deprecated Use meta.encounterId instead. This field is kept for backward compatibility.
+   */
   encounterId?: string;
 
   /** Battle metadata */
   meta?: {
+    /** Canonical encounter ID for story progression */
     encounterId: string;
+    /** Encounter difficulty tier */
     difficulty?: 'normal' | 'elite' | 'boss';
   };
 }
@@ -82,5 +87,13 @@ export function createBattleState(
  */
 export function updateBattleState(state: BattleState, updates: Partial<BattleState>): BattleState {
   return { ...state, ...updates };
+}
+
+/**
+ * Get encounter ID from battle state
+ * Uses canonical meta.encounterId, falls back to deprecated encounterId field
+ */
+export function getEncounterId(battle: BattleState): string | undefined {
+  return battle.meta?.encounterId ?? battle.encounterId;
 }
 

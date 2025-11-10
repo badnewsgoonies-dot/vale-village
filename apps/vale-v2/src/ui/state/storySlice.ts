@@ -7,7 +7,7 @@ import type { StateCreator } from 'zustand';
 import type { BattleEvent } from '../../core/services/types';
 import type { StoryState } from '../../core/models/story';
 import { createStoryState } from '../../core/models/story';
-import { processEncounterCompletion, advanceChapter } from '../../core/services/StoryService';
+import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey } from '../../core/services/StoryService';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { SaveSlice } from './saveSlice';
@@ -31,12 +31,8 @@ export const createStorySlice: StateCreator<
     for (const e of events) {
       if (e.type === 'encounter-finished' && e.outcome === 'PLAYER_VICTORY') {
         st = processEncounterCompletion(st, e.encounterId);
-        // advanceChapter expects flag key, but we can derive it from encounter ID
-        // For c1_boss -> boss:ch1, c2_boss -> boss:ch2, etc.
-        const flagKey = e.encounterId === 'c1_boss' ? 'boss:ch1' :
-                       e.encounterId === 'c2_boss' ? 'boss:ch2' :
-                       e.encounterId === 'c3_boss' ? 'boss:ch3' :
-                       e.encounterId; // fallback to encounter ID itself
+        // Convert encounter ID to flag key for chapter advancement
+        const flagKey = encounterIdToFlagKey(e.encounterId);
         const adv = advanceChapter(st, flagKey);
         if (adv.ok) {
           st = adv.value;

@@ -5,6 +5,7 @@
 
 import type { ReplayTape, PlayerCommand, SystemTick, GameStateSnapshot } from './types';
 import type { BattleState } from '../models/BattleState';
+import { getEncounterId } from '../models/BattleState';
 import type { PRNG } from '../random/prng';
 import { makePRNG } from '../random/prng';
 import { performAction, endTurn, checkBattleEnd } from '../services/BattleService';
@@ -57,7 +58,7 @@ function applyPlayerCommand(
       });
       
       // Emit encounter-finished if we have encounterId
-      const encounterId = result.state.encounterId ?? result.state.meta?.encounterId;
+      const encounterId = getEncounterId(result.state);
       if (encounterId) {
         events.push({
           type: 'encounter-finished',
@@ -149,7 +150,7 @@ function applySystemTick(
       });
       
       // Emit encounter-finished if we have encounterId
-      const encounterId = result.state.encounterId ?? result.state.meta?.encounterId;
+      const encounterId = getEncounterId(result.state);
       if (encounterId) {
         events.push({
           type: 'encounter-finished',
