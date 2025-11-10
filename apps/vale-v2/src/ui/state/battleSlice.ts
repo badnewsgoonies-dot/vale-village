@@ -124,6 +124,15 @@ export const createBattleSlice: StateCreator<
         result: battleEnd,
       });
 
+      // If player victory, process rewards
+      if (battleEnd === 'PLAYER_VICTORY') {
+        const store = get() as any; // Access full store
+        if (store.processVictory) {
+          const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
+          store.processVictory(result.state, rngVictory);
+        }
+      }
+
       // Emit encounter-finished event if we have an encounterId
       // This is a story-specific event, emitted alongside battle-end for story progression
       const encounterId = getEncounterId(battle);
@@ -183,6 +192,15 @@ export const createBattleSlice: StateCreator<
           type: 'battle-end',
           result: battleEnd,
         });
+
+        // If player victory, process rewards
+        if (battleEnd === 'PLAYER_VICTORY') {
+          const store = get() as any; // Access full store
+          if (store.processVictory) {
+            const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
+            store.processVictory(result.state, rngVictory);
+          }
+        }
 
         // Emit encounter-finished event for story progression
         const encounterId = getEncounterId(battle);

@@ -1,0 +1,161 @@
+/* Post Battle Cutscene */
+
+.post-battle-cutscene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-battle-cutscene.victory {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(139, 195, 74, 0.9));
+}
+
+.post-battle-cutscene.defeat {
+  background: linear-gradient(135deg, rgba(158, 158, 158, 0.9), rgba(97, 97, 97, 0.9));
+}
+
+.cutscene-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cutscene-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.victory-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 215, 127, 0.3) 0%,
+    transparent 70%
+  );
+  animation: particlePulse 2s ease-in-out infinite;
+}
+
+@keyframes particlePulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.cutscene-message-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.85);
+  border: 3px solid #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.cutscene-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.cutscene-header h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cutscene-content {
+  margin-bottom: 1.5rem;
+  min-height: 60px;
+}
+
+.cutscene-text {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+}
+
+.cutscene-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progress-indicator {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s;
+}
+
+.progress-dot.active {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.progress-dot.completed {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.cutscene-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: #4CAF50;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.cutscene-button:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.cutscene-button:active {
+  transform: scale(0.95);
+}
+
+.cutscene-hint {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+

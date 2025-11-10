@@ -8,4 +8,5 @@ export * from './Equipment';
 export * from './Unit';
 export * from './Team';
 export * from './BattleState';
+export * from './Rewards';
 

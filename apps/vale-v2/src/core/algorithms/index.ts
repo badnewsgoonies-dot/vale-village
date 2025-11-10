@@ -10,4 +10,5 @@ export * from './djinn';
 export * from './targeting';
 export * from './xp';
 export * from './stats';
+export * from './rewards';
 

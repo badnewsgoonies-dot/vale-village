@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BattleView } from './ui/components/BattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
+import { RewardsScreen } from './ui/components/RewardsScreen';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -10,14 +11,31 @@ function App() {
   const story = useStore((s) => s.story);
   const showCredits = useStore((s) => s.showCredits);
   const setShowCredits = useStore((s) => s.setShowCredits);
+  const showRewards = useStore((s) => s.showRewards);
+  const lastBattleRewards = useStore((s) => s.lastBattleRewards);
+  const claimRewards = useStore((s) => s.claimRewards);
+  const setShowRewards = useStore((s) => s.setShowRewards);
+  const team = useStore((s) => s.team);
+  const setTeam = useStore((s) => s.setTeam);
 
   useEffect(() => {
     // Always recreate test battle on mount to get latest code changes
     const { battleState, seed } = createTestBattle();
     setBattle(battleState, seed);
-  }, [setBattle]);
+    // Also set team state for rewards screen
+    setTeam(battleState.playerTeam);
+  }, [setBattle, setTeam]);
 
   const canAccessCredits = story.chapter >= 4;
+
+  // Handle continue from rewards screen
+  const handleRewardsContinue = () => {
+    claimRewards(); // Add gold/equipment to inventory, clear rewards
+    setShowRewards(false); // Ensure rewards screen is hidden
+    const { battleState, seed } = createTestBattle();
+    setBattle(battleState, seed); // Restart test battle
+    setTeam(battleState.playerTeam); // Update team state
+  };
 
   return (
     <div>
@@ -46,7 +64,15 @@ function App() {
       {showCredits && (
         <CreditsScreen onExit={() => setShowCredits(false)} />
       )}
-      <BattleView />
+      {showRewards && lastBattleRewards && team ? (
+        <RewardsScreen
+          rewards={lastBattleRewards}
+          team={team}
+          onContinue={handleRewardsContinue}
+        />
+      ) : (
+        <BattleView />
+      )}
     </div>
   );
 }

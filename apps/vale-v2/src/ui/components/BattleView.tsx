@@ -3,13 +3,15 @@
  * Orchestrates battle UI and event handling
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 import { renderEventText } from '../utils/text';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { ActionBar } from './ActionBar';
 import { BattleLog } from './BattleLog';
 import { UnitCard } from './UnitCard';
+import { PostBattleCutscene } from './PostBattleCutscene';
+import { VictoryOverlay } from './VictoryOverlay';
 
 export function BattleView() {
   // Use narrow selectors to minimize re-renders
@@ -19,12 +21,30 @@ export function BattleView() {
   const dequeue = useStore((s) => s.dequeueEvent);
   const startTurnTick = useStore((s) => s.startTurnTick);
   const performAIAction = useStore((s) => s.performAIAction);
+  const setShowRewards = useStore((s) => s.setShowRewards);
+  
+  // Post-battle flow state
+  const [showCutscene, setShowCutscene] = useState(false);
+  const [showVictoryOverlay, setShowVictoryOverlay] = useState(false);
   
   // Check for battle end
   const battleEnded = useStore((s) => {
     if (!s.battle) return false;
     return s.events.some(e => e.type === 'battle-end');
   });
+
+  // Get battle result
+  const battleResult = useStore((s) => {
+    const endEvent = s.events.find(e => e.type === 'battle-end');
+    return endEvent && 'result' in endEvent ? endEvent.result : null;
+  });
+
+  // Detect battle end and trigger cutscene
+  useEffect(() => {
+    if (battleEnded && battleResult === 'PLAYER_VICTORY' && !showCutscene && !showVictoryOverlay) {
+      setShowCutscene(true);
+    }
+  }, [battleEnded, battleResult, showCutscene, showVictoryOverlay]);
 
   useEffect(() => {
     if (!battle) return;
@@ -53,6 +73,30 @@ export function BattleView() {
   }, [eventsLength, battleEnded, dequeue]); // Use eventsLength instead of events array
 
   if (!battle) return <div>No battle loaded.</div>;
+
+  // Post-battle flow: Cutscene → Overlay → Rewards (handled in App.tsx)
+  if (showCutscene) {
+    return (
+      <PostBattleCutscene
+        victory={battleResult === 'PLAYER_VICTORY'}
+        onComplete={() => {
+          setShowCutscene(false);
+          setShowVictoryOverlay(true);
+        }}
+      />
+    );
+  }
+
+  if (showVictoryOverlay) {
+    return (
+      <VictoryOverlay
+        onComplete={() => {
+          setShowVictoryOverlay(false);
+          setShowRewards(true);
+        }}
+      />
+    );
+  }
 
   const playerUnits = battle.playerTeam.units;
   const enemies = battle.enemies;

@@ -1,0 +1,400 @@
+/* Rewards Screen - Full viewport wrapper */
+.rewards-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  background: linear-gradient(180deg, #0F2550, #1A3560);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.rewards-container {
+  width: 800px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== VICTORY BANNER ===== */
+.rewards-container .victory-banner {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  padding: 24px;
+  text-align: center;
+  animation: victoryPulse 2s ease-in-out infinite;
+}
+
+@keyframes victoryPulse {
+  0%, 100% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 127, 0.5);
+  }
+}
+
+.rewards-container .victory-banner h1 {
+  font-size: 48px;
+  color: #FFD87F;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px #FFD87F;
+  animation: textGlow 1.5s ease-in-out infinite;
+  margin: 0;
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  50% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 15px #FFD87F;
+  }
+}
+
+/* ===== REWARDS GRID ===== */
+.rewards-container .rewards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.rewards-container .reward-card {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: cardFadeIn 0.5s ease-out backwards;
+}
+
+.rewards-container .reward-card:nth-child(1) { animation-delay: 0.1s; }
+.rewards-container .reward-card:nth-child(2) { animation-delay: 0.2s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rewards-container .reward-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.rewards-container .reward-details {
+  flex: 1;
+}
+
+.rewards-container .reward-label {
+  font-size: 12px;
+  color: #FFD87F;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.rewards-container .reward-value {
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.rewards-container .reward-value.highlight {
+  color: #FFD87F;
+  animation: valueCount 1s ease-out;
+}
+
+.rewards-container .reward-subtext {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+@keyframes valueCount {
+  from {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== ITEMS PANEL ===== */
+.rewards-container .items-panel {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  animation: cardFadeIn 0.5s ease-out 0.3s backwards;
+}
+
+.rewards-container .items-panel h2 {
+  font-size: 18px;
+  color: #FFD87F;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.rewards-container .items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.rewards-container .item-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.rewards-container .item-card:hover {
+  background: rgba(74, 122, 184, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.rewards-container .item-icon {
+  flex-shrink: 0;
+}
+
+.rewards-container .item-name {
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  flex: 1;
+}
+
+.rewards-container .item-quantity {
+  font-size: 12px;
+  color: #FFD87F;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== LEVEL UP NOTIFICATION ===== */
+.rewards-container .level-up-panel {
+  background: linear-gradient(135deg,
+    rgba(80, 216, 80, 0.3) 0%,
+    rgba(40, 176, 40, 0.3) 100%);
+  border: 3px solid #50D850;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 30px rgba(80, 216, 80, 0.5);
+  padding: 24px;
+  text-align: center;
+  animation: levelUpAppear 0.8s ease-out 0.5s backwards;
+}
+
+@keyframes levelUpAppear {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rewards-container .level-up-panel h2 {
+  font-size: 24px;
+  color: #50D850;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 15px #50D850;
+  margin-bottom: 16px;
+  animation: levelUpPulse 1s ease-in-out infinite;
+}
+
+@keyframes levelUpPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.rewards-container .level-up-units {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rewards-container .level-up-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.rewards-container .level-up-sprite {
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #50D850;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(80, 216, 80, 0.5);
+  animation: levelUpBounce 0.6s ease-out backwards;
+}
+
+@keyframes levelUpBounce {
+  0% {
+    transform: translateY(-30px) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(5px) scale(1.1);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.rewards-container .level-up-name {
+  font-size: 14px;
+  color: #50D850;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+}
+
+.rewards-container .level-up-arrow {
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.rewards-container .level-up-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.rewards-container .level-up-stats span {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.rewards-container .level-up-abilities {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ===== CONTINUE BUTTON ===== */
+.rewards-container .continue-container {
+  display: flex;
+  justify-content: center;
+  animation: cardFadeIn 0.5s ease-out 1s backwards;
+}
+
+.rewards-container .continue-btn {
+  background: rgba(20, 30, 50, 0.9);
+  border: 3px solid #FFD87F;
+  color: #FFD87F;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  animation: continuePulse 2s ease-in-out infinite;
+  text-transform: uppercase;
+}
+
+@keyframes continuePulse {
+  0%, 100% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border-color: #FFD87F;
+  }
+  50% {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 20px #FFD87F;
+    border-color: #fff;
+  }
+}
+
+.rewards-container .continue-btn:hover {
+  background: #FFD87F;
+  color: #0F2550;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(255, 215, 127, 0.5);
+}
+
+.rewards-container .continue-btn:active {
+  transform: translateY(-2px);
+}
+
+.rewards-container .continue-btn:focus {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+/* ===== ACCESSIBILITY: REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .rewards-container * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== RESPONSIVE LAYOUT ===== */
+@media (max-width: 768px) {
+  .rewards-container .rewards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rewards-container .items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rewards-container .level-up-units {
+    flex-direction: column;
+  }
+}
+
