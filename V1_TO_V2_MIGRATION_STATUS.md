@@ -95,6 +95,7 @@
 - Continue v2 development with clean architecture
 - Add enemies/overworld data incrementally as features are built
 - Reference archived design docs in `apps/vale-v2/docs/legacy/` if needed
+- See `MIGRATION_COMPLETE.md` for detailed migration summary and next steps
 
 ---
 
