@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GameContext } from './GameContext';
 import type { GameState, Screen, StoryFlags, AreaState } from './types';
 import type { PlayerData } from '@/types/PlayerData';
@@ -14,6 +14,7 @@ import type { UnitDefinition } from '@/types/Unit';
 import { createTeam } from '@/types/Team';
 import type { AreaId, ChestId, BossId } from '@/types/Area';
 import { ALL_AREAS } from '@/data/areas';
+import { useGameStore } from '@/state/store';
 
 // Convert Enemy to Unit for battles
 function enemyToUnit(enemy: Enemy): Unit {
@@ -106,6 +107,8 @@ function createInitialAreaState(): AreaState {
 }
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const setGameStoreState = useGameStore((store) => store.setState);
+  
   const [state, setState] = useState<GameState>({
     playerData: createInitialPlayerData(),
     currentBattle: null,
@@ -154,6 +157,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       house30_interior: createInitialAreaState(),
     },
   });
+  
+  // Sync Zustand store with GameProvider state
+  useEffect(() => {
+    setGameStoreState(state);
+  }, [state, setGameStoreState]);
 
   // Navigation
   const navigate = useCallback((screen: Screen) => {

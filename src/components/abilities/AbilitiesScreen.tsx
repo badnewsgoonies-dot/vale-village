@@ -4,11 +4,12 @@ import { Button, ElementIcon } from '../shared';
 import { BattleUnit } from '@/sprites/components/BattleUnit';
 import { getDjinnGrantedAbilities } from '@/utils/djinnCalculations';
 import type { Ability } from '@/types/Ability';
+import type { Unit } from '@/types/Unit';
 import './AbilitiesScreen.css';
 
 export const AbilitiesScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<any>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
 
   const allUnits = state.playerData.unitsCollected;

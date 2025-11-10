@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Type check
+        run: pnpm --filter vale-v2 typecheck
+      
+      - name: Lint
+        run: pnpm --filter vale-v2 lint
+      
+      - name: Validate data
+        run: pnpm --filter vale-v2 validate:data
+      
+      - name: Test
+        run: pnpm --filter vale-v2 test
+      
+      - name: Build
+        run: pnpm --filter vale-v2 build
+

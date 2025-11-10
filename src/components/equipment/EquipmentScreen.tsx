@@ -6,13 +6,14 @@ import { EquipmentIcon } from '@/sprites/components/EquipmentIcon';
 import { ABILITIES } from '@/data/abilities';
 import type { Equipment, EquipmentSlot } from '@/types/Equipment';
 import type { Ability } from '@/types/Ability';
+import type { Unit } from '@/types/Unit';
 import './EquipmentScreen.css';
 
 type InventoryFilter = 'all' | 'weapon' | 'armor' | 'helm' | 'boots' | 'accessory';
 
 export const EquipmentScreen: React.FC = () => {
   const { state, actions } = useGame();
-  const [selectedUnit, setSelectedUnit] = useState<Equipment['slot'] extends string ? any : null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
   // const [showAllUnits, setShowAllUnits] = useState(false); // Unused - reserved for future feature
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

@@ -1,0 +1,28 @@
+import { z } from 'zod';
+import { UnitSchema, DjinnStateSchema } from './UnitSchema';
+
+/**
+ * Zod schema for DjinnTracker
+ */
+export const DjinnTrackerSchema = z.object({
+  djinnId: z.string().min(1),
+  state: DjinnStateSchema,
+  lastActivatedTurn: z.number().int().min(0),
+});
+
+/**
+ * Zod schema for Team
+ */
+export const TeamSchema = z.object({
+  equippedDjinn: z.array(z.string().min(1)).max(3),  // Up to 3 Djinn slots (can be empty initially)
+  djinnTrackers: z.record(z.string(), DjinnTrackerSchema),
+  units: z.array(UnitSchema).length(4),  // Exactly 4 units
+  collectedDjinn: z.array(z.string().min(1)).max(12),  // Up to 12 Djinn
+  currentTurn: z.number().int().min(0),
+  activationsThisTurn: z.record(z.string(), z.number().int().min(0)),
+  djinnStates: z.record(z.string(), DjinnStateSchema),
+});
+
+export type Team = z.infer<typeof TeamSchema>;
+export type DjinnTracker = z.infer<typeof DjinnTrackerSchema>;
+

@@ -1,0 +1,45 @@
+import { z } from 'zod';
+import { UnitSchema } from './UnitSchema';
+import { EquipmentSchema } from './EquipmentSchema';
+
+/**
+ * Save file version 1 schema
+ * This is the initial save format for the v2 app
+ */
+export const SaveV1Schema = z.object({
+  version: z.literal('1.0.0'),
+  timestamp: z.number().int().positive(),
+
+  // Player progress
+  playerData: z.object({
+    unitsCollected: z.array(UnitSchema).max(10),  // Up to 10 units
+    activeParty: z.array(z.string().min(1)).length(4),  // Exactly 4 unit IDs
+    inventory: z.array(EquipmentSchema),  // Equipment inventory
+    gold: z.number().int().min(0),
+    djinnCollected: z.array(z.string().min(1)).max(12),  // Up to 12 Djinn IDs
+    recruitmentFlags: z.record(z.string(), z.boolean()),
+    storyFlags: z.record(z.string(), z.boolean()),
+  }),
+
+  // Overworld state
+  overworldState: z.object({
+    playerPosition: z.object({
+      x: z.number(),
+      y: z.number(),
+    }),
+    currentScene: z.string().min(1),
+    npcStates: z.record(z.string(), z.any()),  // NPC state is flexible
+  }),
+
+  // Statistics
+  stats: z.object({
+    battlesWon: z.number().int().min(0),
+    battlesLost: z.number().int().min(0),
+    totalDamageDealt: z.number().int().min(0),
+    totalHealingDone: z.number().int().min(0),
+    playtime: z.number().int().min(0),  // Seconds
+  }),
+});
+
+export type SaveV1 = z.infer<typeof SaveV1Schema>;
+

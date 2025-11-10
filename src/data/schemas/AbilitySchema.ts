@@ -1,0 +1,33 @@
+import { z } from 'zod';
+
+/**
+ * Zod schema for Ability validation
+ * Ensures no negative PP costs or base power
+ */
+export const AbilitySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  type: z.enum(['physical', 'psynergy', 'healing', 'buff', 'debuff', 'summon']),
+  element: z.enum(['Venus', 'Mars', 'Jupiter', 'Mercury', 'Neutral']).optional(),
+  manaCost: z.number().int().min(0).max(10), // Cannot be negative!
+  basePower: z.number().int().min(0), // Cannot be negative!
+  targets: z.enum(['single-enemy', 'all-enemies', 'single-ally', 'all-allies', 'self']),
+  unlockLevel: z.number().int().min(1).max(5),
+  description: z.string(),
+  
+  // Optional properties
+  chainDamage: z.boolean().optional(),
+  revivesFallen: z.boolean().optional(),
+  buffEffect: z.object({
+    atk: z.number().optional(),
+    def: z.number().optional(),
+    mag: z.number().optional(),
+    spd: z.number().optional(),
+    evasion: z.number().optional(),
+  }).optional(),
+  duration: z.number().int().min(1).optional(),
+});
+
+export type ValidatedAbility = z.infer<typeof AbilitySchema>;
+
+

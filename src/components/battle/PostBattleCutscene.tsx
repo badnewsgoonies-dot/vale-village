@@ -90,6 +90,15 @@ const PostBattleCutsceneContent: React.FC<PostBattleCutsceneProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMessageIndex, victory, npcId, isLastMessage]); // cameraControls is now a stable memoized object, but omit to be safe
 
+  // Process battle end and rewards when cutscene starts (only once)
+  useEffect(() => {
+    if (victory && currentMessageIndex === 0) {
+      // Process rewards immediately when cutscene starts
+      // This ensures equipment/gold/XP are added to inventory
+      actions.endBattle();
+    }
+  }, [victory, currentMessageIndex, actions]);
+
   // Auto-advance after delay or wait for player input
   const handleAdvance = () => {
     if (isLastMessage) {
@@ -98,6 +107,8 @@ const PostBattleCutsceneContent: React.FC<PostBattleCutsceneProps> = ({
         actions.navigate({ type: 'REWARDS' });
       } else {
         // On defeat, return to overworld
+        // Make sure to end battle even on defeat
+        actions.endBattle();
         actions.navigate({ type: 'OVERWORLD' });
       }
     } else {
