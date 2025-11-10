@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # STARTER UNITS - Vale Chronicles
 
 **Story Director Deliverable - Phase 1**
