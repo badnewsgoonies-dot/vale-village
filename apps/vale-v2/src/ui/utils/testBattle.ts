@@ -8,6 +8,7 @@ import { createTeam } from '../../core/models/Team';
 import { startBattle } from '../../core/services/BattleService';
 import { makePRNG } from '../../core/random/prng';
 import type { UnitDefinition } from '../../data/schemas/UnitSchema';
+import { STRIKE, FIREBALL, HEAL } from '../../data/definitions/abilities';
 
 // Simple test unit definition
 const testUnitDef: UnitDefinition = {
@@ -31,7 +32,7 @@ const testUnitDef: UnitDefinition = {
     mag: 2,
     spd: 1,
   },
-  abilities: ['strike', 'fireball', 'heal'], // Give players some abilities
+  abilities: [STRIKE, FIREBALL, HEAL], // Give players some abilities
   manaContribution: 1,
   description: 'A test warrior',
 };
@@ -58,7 +59,7 @@ const testEnemyDef: UnitDefinition = {
     mag: 1,
     spd: 1,
   },
-  abilities: ['strike'], // Give enemies basic strike ability
+  abilities: [STRIKE], // Give enemies basic strike ability
   manaContribution: 1,
   description: 'A test goblin',
 };

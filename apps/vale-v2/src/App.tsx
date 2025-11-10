@@ -13,12 +13,10 @@ function App() {
   const setShowCredits = useStore((s) => s.setShowCredits);
 
   useEffect(() => {
-    // Initialize test battle on mount
-    if (!battle) {
-      const { battleState, seed } = createTestBattle();
-      setBattle(battleState, seed);
-    }
-  }, [battle, setBattle]);
+    // Always recreate test battle on mount to get latest code changes
+    const { battleState, seed } = createTestBattle();
+    setBattle(battleState, seed);
+  }, [setBattle]);
 
   const canAccessCredits = story.chapter >= 4;
 
