@@ -1,8 +1,0 @@
-.panel {
-  background: var(--color-bg-panel);
-  border: 2px solid var(--color-border-light);
-  border-right-color: var(--color-border-dark);
-  border-bottom-color: var(--color-border-dark);
-  box-shadow: var(--shadow-panel);
-  padding: var(--space-md);
-}

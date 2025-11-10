@@ -1,6 +1,6 @@
-# 🚀 START HERE - Vale Chronicles
+# 🚀 START HERE - Vale Chronicles V2
 
-**Your first cursor chat prompt is ready to copy!**
+**Quick start guide for Vale Chronicles V2**
 
 ---
 
@@ -10,126 +10,108 @@
 /home/geni/Documents/vale-village
 ```
 
-**This is your project root. All 6 Claude Code sessions will work in this repository.**
+**Project root. All development happens in `apps/vale-v2/`**
 
 ---
 
-## 📝 SESSION 1: STORY DIRECTOR (Copy This Now!)
+## 🚀 QUICK START
 
-**In Cursor, start a NEW CHAT (Cmd/Ctrl + L) and paste this EXACT prompt:**
+### **1. Navigate to V2:**
 
-```markdown
-Repository: /home/geni/Documents/vale-village
+```bash
+cd apps/vale-v2
+```
 
-You are ROLE 1: STORY DIRECTOR for Vale Chronicles.
+### **2. Install Dependencies:**
 
-🚨 CRITICAL: Read this file FIRST (the entire file):
-/home/geni/Documents/vale-village/ROLE_1_STORY_DIRECTOR_ONBOARDING.md
+```bash
+pnpm install
+```
 
-After reading the COMPLETE onboarding document, confirm you understand your role.
+### **3. Start Development:**
 
-You are creating narrative content for Vale Chronicles - a Golden Sun-inspired RPG.
+```bash
+pnpm dev
+```
 
-Your deliverables:
-1. 10 Recruitable Unit Profiles
-   - Each with: Name, personality, element, combat role, backstory, dialogue samples
-   - Abilities Level 1-5 (FLAVOR TEXT only, not mechanics)
-   - Recruitment method
-   
-2. 50 NPC Dialogues
-   - 10 battle NPCs (recruitable units)
-   - 40 dialogue NPCs (story, shops, flavor)
-   - Before battle, after recruitment, various story states
-   
-3. 12 Djinn Lore
-   - 3 Venus, 3 Mars, 3 Mercury, 3 Jupiter
-   - Each with: Name, tier, personality, lore, flavor text
-   - How to obtain
-   
-4. Story Structure
-   - Beginning → middle → final boss
-   - Acts and beats
-   - Optional side content
+### **4. Run Tests:**
 
-5. Ability Flavor Text
-   - All Psynergy spells (Venus/Mars/Mercury/Jupiter)
-   - Descriptive, atmospheric, Golden Sun style
+```bash
+pnpm test
+```
 
-Output files go to: docs/story/
+### **5. Validate Data:**
 
-Branch: Create 'story-director' branch from main
-
-git checkout -b story-director
-[Create your story files]
-git add docs/story/
-git commit -m "Story Director: Complete narrative content"
-git push origin story-director
-
-After completion, your work passes to Graphics Mockup (Chat 2).
-
-Confirm you've read ROLE_1_STORY_DIRECTOR_ONBOARDING.md and are ready to begin.
+```bash
+pnpm validate:data
 ```
 
 ---
 
-## ⏭️ WHAT HAPPENS NEXT
+## 📚 ONBOARDING
 
-### **After Session 1 (Story Director) Completes:**
+**Read this first:** `apps/vale-v2/CLAUDE.md`
 
-1. **They'll create 5 files** in `docs/story/`
-2. **They'll commit** to `story-director` branch
-3. **You open Session 2** (Graphics Mockup) - NEW CHAT in Cursor (Cmd/Ctrl + L)
-4. **Use prompt from** `CLAUDE_CODE_HANDOFF_SEQUENCE.md`
-5. **Session 2 receives** the story files and creates mockups
-6. **Continue** through all 6 sessions
-
-**Full sequence:** See `CLAUDE_CODE_HANDOFF_SEQUENCE.md`
-
----
-
-## 🎯 KEY DOCUMENTS
-
-**Before Starting Any Session:**
-- Read: `CLAUDE_CODE_HANDOFF_SEQUENCE.md` (master handoff guide)
-- Read: `6_ROLE_WORKFLOW_README.md` (workflow overview)
-
-**For Each Role:**
-- Read: `ROLE_[N]_[ROLE_NAME]_ONBOARDING.md`
-
-**References:**
-- `VALE_CHRONICLES_ARCHITECTURE.md` (system architecture)
-- `MOCKUP_INVENTORY.md` (approved mockups)
+This file contains:
+- Complete architecture overview
+- Development commands
+- Testing philosophy
+- Critical guardrails
+- Game systems documentation
+- Common development tasks
 
 ---
 
-## ⚠️ IMPORTANT NOTES
+## 🎯 PROJECT STRUCTURE
 
-### **Each Chat Should:**
-✅ Read their specific onboarding doc
-✅ Work on their own branch
-✅ Receive outputs from prior chat
-✅ Create specific deliverables
-✅ Hand off to next chat
-
-### **Repository Structure:**
-✅ **vale-village/** - Your project (work here)
-❌ **MetaPrompt/** - Reference only (copy code from here)
-❌ **NextEraGame/** - Reference only (copy code from here)
-
-### **Testing Philosophy:**
-✅ Context-aware tests (prove game works)
-❌ NOT isolated unit tests (test nothing)
-
----
-
-## 🎮 READY TO START!
-
-**COPY THE PROMPT ABOVE** and paste into your first Cursor chat (Cmd/Ctrl + L) now!
+```
+vale-village/
+├── apps/vale-v2/          # Main codebase
+│   ├── src/
+│   │   ├── core/          # Pure game logic (NO React)
+│   │   ├── ui/            # React components
+│   │   ├── data/          # Game data + Zod schemas
+│   │   └── infra/         # Infrastructure
+│   ├── public/            # Sprites and assets
+│   ├── tests/             # Test suite
+│   └── CLAUDE.md          # Architecture guide
+├── docs/                  # Documentation
+├── story/                 # Story content
+└── mockups/               # Design mockups
+```
 
 ---
 
-**Next Session Prompts:** See `CLAUDE_CODE_HANDOFF_SEQUENCE.md` for Sessions 2-6
+## 🧪 TESTING
 
-**Questions?** Read `6_ROLE_WORKFLOW_README.md`
+**Context-aware testing** - Tests prove gameplay works, not isolated unit tests.
 
-**LET'S BUILD! 🚀**
+```bash
+pnpm test                  # Run all tests
+pnpm test:watch           # Watch mode
+```
+
+---
+
+## 📊 CURRENT STATUS
+
+- ✅ Core systems functional (battle, progression, equipment, djinn)
+- ✅ Assets migrated (2,572 sprites, 25 sprite sheets)
+- ✅ Equipment data migrated (58 items)
+- 🔄 Migration: ~80% complete (GameProvider → Zustand)
+- 📝 Recent: Post-battle rewards, victory UI, turn handling improvements
+
+---
+
+## 🎮 GAME FEATURES
+
+- 10 recruitable units (Levels 1-5)
+- 12 Djinn (3 per element)
+- 58 equipment items (4 slots)
+- Turn-based tactical combat
+- Elemental advantages
+- XP-based progression
+
+---
+
+**Ready to code? Read `apps/vale-v2/CLAUDE.md` for complete guidance!**
