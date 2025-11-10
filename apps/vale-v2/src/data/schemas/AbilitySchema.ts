@@ -4,8 +4,17 @@ import { z } from 'zod';
  * Zod schema for Ability validation
  * Single source of truth for ability data structure
  */
+
+/**
+ * Regex pattern for kebab-case ability IDs
+ * Enforces: lowercase alphanumerics and hyphens only
+ */
+export const abilityIdRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export const AbilitySchema = z.object({
-  id: z.string().min(1),
+  id: z.string().regex(abilityIdRegex, {
+    message: "Ability ID must be kebab-case (lowercase alphanumerics and hyphens only)",
+  }),
   name: z.string().min(1),
   type: z.enum(['physical', 'psynergy', 'healing', 'buff', 'debuff', 'summon']),
   element: z.enum(['Venus', 'Mars', 'Jupiter', 'Mercury', 'Neutral']).optional(),

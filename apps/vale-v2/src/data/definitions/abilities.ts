@@ -1,13 +1,13 @@
 /**
  * Ability definitions
  * These will be validated against AbilitySchema at startup
- * 
+ *
  * Golden Path (Chapter 1): 12 abilities
- * - Physical: strike, heavy_strike, guard_break, precise_jab
- * - Psynergy: fireball, ice_shard, quake, gust, chain_lightning
- * - Healing: heal, party_heal
- * - Buffs: boost_atk, boost_def
- * - Debuffs: weaken_def, blind
+ * - Physical: strike, heavy-strike, guard-break, precise-jab
+ * - Psynergy: fireball, ice-shard, quake, gust, chain-lightning
+ * - Healing: heal, party-heal
+ * - Buffs: boost-atk, boost-def
+ * - Debuffs: weaken-def, blind
  */
 import type { Ability } from '@/data/schemas/AbilitySchema';
 
@@ -27,7 +27,7 @@ export const STRIKE: Ability = {
 };
 
 export const HEAVY_STRIKE: Ability = {
-  id: 'heavy_strike',
+  id: 'heavy-strike',
   name: 'Heavy Strike',
   type: 'physical',
   manaCost: 0,
@@ -38,7 +38,7 @@ export const HEAVY_STRIKE: Ability = {
 };
 
 export const GUARD_BREAK: Ability = {
-  id: 'guard_break',
+  id: 'guard-break',
   name: 'Guard Break',
   type: 'physical',
   manaCost: 0,
@@ -53,7 +53,7 @@ export const GUARD_BREAK: Ability = {
 };
 
 export const PRECISE_JAB: Ability = {
-  id: 'precise_jab',
+  id: 'precise-jab',
   name: 'Precise Jab',
   type: 'physical',
   manaCost: 0,
@@ -80,7 +80,7 @@ export const FIREBALL: Ability = {
 };
 
 export const ICE_SHARD: Ability = {
-  id: 'ice_shard',
+  id: 'ice-shard',
   name: 'Ice Shard',
   type: 'psynergy',
   element: 'Mercury',
@@ -116,7 +116,7 @@ export const GUST: Ability = {
 };
 
 export const CHAIN_LIGHTNING: Ability = {
-  id: 'chain_lightning',
+  id: 'chain-lightning',
   name: 'Chain Lightning',
   type: 'psynergy',
   element: 'Jupiter',
@@ -144,7 +144,7 @@ export const HEAL: Ability = {
 };
 
 export const PARTY_HEAL: Ability = {
-  id: 'party_heal',
+  id: 'party-heal',
   name: 'Party Heal',
   type: 'healing',
   manaCost: 4,
@@ -159,7 +159,7 @@ export const PARTY_HEAL: Ability = {
 // ============================================================================
 
 export const BOOST_ATK: Ability = {
-  id: 'boost_atk',
+  id: 'boost-atk',
   name: 'Boost Attack',
   type: 'buff',
   manaCost: 2,
@@ -174,7 +174,7 @@ export const BOOST_ATK: Ability = {
 };
 
 export const BOOST_DEF: Ability = {
-  id: 'boost_def',
+  id: 'boost-def',
   name: 'Boost Defense',
   type: 'buff',
   manaCost: 2,
@@ -193,7 +193,7 @@ export const BOOST_DEF: Ability = {
 // ============================================================================
 
 export const WEAKEN_DEF: Ability = {
-  id: 'weaken_def',
+  id: 'weaken-def',
   name: 'Weaken Defense',
   type: 'debuff',
   manaCost: 2,
@@ -229,23 +229,23 @@ export const BLIND: Ability = {
 export const ABILITIES: Record<string, Ability> = {
   // Physical
   strike: STRIKE,
-  heavy_strike: HEAVY_STRIKE,
-  guard_break: GUARD_BREAK,
-  precise_jab: PRECISE_JAB,
+  'heavy-strike': HEAVY_STRIKE,
+  'guard-break': GUARD_BREAK,
+  'precise-jab': PRECISE_JAB,
   // Psynergy
   fireball: FIREBALL,
-  ice_shard: ICE_SHARD,
+  'ice-shard': ICE_SHARD,
   quake: QUAKE,
   gust: GUST,
-  chain_lightning: CHAIN_LIGHTNING,
+  'chain-lightning': CHAIN_LIGHTNING,
   // Healing
   heal: HEAL,
-  party_heal: PARTY_HEAL,
+  'party-heal': PARTY_HEAL,
   // Buffs
-  boost_atk: BOOST_ATK,
-  boost_def: BOOST_DEF,
+  'boost-atk': BOOST_ATK,
+  'boost-def': BOOST_DEF,
   // Debuffs
-  weaken_def: WEAKEN_DEF,
+  'weaken-def': WEAKEN_DEF,
   blind: BLIND,
 };
 
