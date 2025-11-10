@@ -27,7 +27,7 @@ const ELEMENT_ADVANTAGE: Record<string, number> = {
  * Get element modifier for attack
  * Returns 1.5 for advantage, 0.67 for disadvantage, 1.0 for neutral
  */
-function getElementModifier(attackElement: Element, defenseElement: Element): number {
+export function getElementModifier(attackElement: Element, defenseElement: Element): number {
   const key = `${attackElement}→${defenseElement}`;
   if (ELEMENT_ADVANTAGE[key]) {
     return 1.5; // +50% damage
