@@ -14,6 +14,8 @@ import type { SaveSlice } from './saveSlice';
 
 export interface StorySlice {
   story: StoryState;
+  showCredits: boolean;
+  setShowCredits: (show: boolean) => void;
   onBattleEvents: (events: readonly BattleEvent[]) => void;
 }
 
@@ -24,6 +26,9 @@ export const createStorySlice: StateCreator<
   StorySlice
 > = (_set, get) => ({
   story: createStoryState(1),
+  showCredits: false,
+  
+  setShowCredits: (show) => _set({ showCredits: show }),
 
   onBattleEvents: (events) => {
     let st = get().story;
@@ -36,6 +41,12 @@ export const createStorySlice: StateCreator<
         const adv = advanceChapter(st, flagKey);
         if (adv.ok) {
           st = adv.value;
+        }
+        
+        // Trigger credits screen when Chapter 3 boss is defeated
+        if (flagKey === 'boss:ch3' && st.chapter === 4) {
+          _set({ story: st, showCredits: true });
+          return; // Early return to avoid double set
         }
       }
     }
