@@ -7,6 +7,7 @@ import type { SaveEnvelope, GameStateSnapshot, ReplayTape } from './types';
 import type { SavePort } from './SavePort';
 import type { Result } from '../utils/result';
 import { migrateSave, CURRENT_SAVE_VERSION } from './migrations';
+import { SaveEnvelopeSchema, ReplayTapeSchema } from '../../data/schemas/ReplaySchema';
 
 /**
  * Create a save envelope from current game state
@@ -58,8 +59,17 @@ export async function loadGame(port: SavePort): Promise<Result<SaveEnvelope, str
 
     // Migrate if needed
     const migrated = migrateSave(envelope);
-    
-    return { ok: true, value: migrated };
+
+    // Validate migrated save envelope
+    const validationResult = SaveEnvelopeSchema.safeParse(migrated);
+    if (!validationResult.success) {
+      return {
+        ok: false,
+        error: `Save file validation failed: ${validationResult.error.message}`,
+      };
+    }
+
+    return { ok: true, value: validationResult.data as SaveEnvelope };
   } catch (error) {
     return {
       ok: false,
@@ -115,8 +125,18 @@ export async function loadReplay(_port: SavePort): Promise<Result<ReplayTape, st
       return { ok: false, error: 'No replay data found' };
     }
 
-    const tape = JSON.parse(tapeJson) as ReplayTape;
-    return { ok: true, value: tape };
+    const tapeData = JSON.parse(tapeJson);
+
+    // Validate replay tape
+    const validationResult = ReplayTapeSchema.safeParse(tapeData);
+    if (!validationResult.success) {
+      return {
+        ok: false,
+        error: `Replay tape validation failed: ${validationResult.error.message}`,
+      };
+    }
+
+    return { ok: true, value: validationResult.data as ReplayTape };
   } catch (error) {
     return {
       ok: false,

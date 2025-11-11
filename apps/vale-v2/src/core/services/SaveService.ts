@@ -5,7 +5,7 @@
 
 import type { Result } from '../utils/result';
 import { Ok, Err } from '../utils/result';
-import { SaveV1Schema } from '../../data/schemas/SaveV1Schema';
+import { SaveV1Schema, type SaveV1 } from '../../data/schemas/SaveV1Schema';
 import { migrateSaveData } from '../migrations';
 
 const SAVE_KEY = 'vale_chronicles_v2_save';
@@ -13,7 +13,7 @@ const SAVE_KEY = 'vale_chronicles_v2_save';
 /**
  * Save game state to localStorage
  */
-export function saveGame(data: unknown): Result<void, string> {
+export function saveGame(data: SaveV1): Result<void, string> {
   try {
     // Validate data matches SaveV1 schema
     const result = SaveV1Schema.safeParse(data);
@@ -33,7 +33,7 @@ export function saveGame(data: unknown): Result<void, string> {
  * Load game state from localStorage
  * Includes safety checks and validation with error recovery
  */
-export function loadGame(): Result<unknown, string> {
+export function loadGame(): Result<SaveV1, string> {
   try {
     const serialized = localStorage.getItem(SAVE_KEY);
     if (!serialized) {

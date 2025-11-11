@@ -62,21 +62,29 @@ describe('AI Scoring', () => {
 
   it('should prefer targeting weakest player unit when multiple options available', () => {
     const { rng } = makeTestCtx(100);
-    
+
     const weakPlayer = mkUnit({ id: 'u1', currentHp: 20 });
     const strongPlayer = mkUnit({ id: 'u2', currentHp: 80 });
-    
+
     const battle = mkBattle({
       party: [weakPlayer, strongPlayer],
       enemies: [mkEnemy('slime', { id: 'e1' })],
     });
 
-    const decision = makeAIDecision(battle, 'e1', rng);
-    
-    // Enemy should target player units (weakest if possible)
-    expect(decision.targetIds.length).toBeGreaterThan(0);
-    // Should target at least one player unit
-    expect(decision.targetIds.some(id => id === 'u1' || id === 'u2')).toBe(true);
+    // Run AI decision multiple times to verify consistency
+    const decisions = [];
+    for (let i = 0; i < 5; i++) {
+      const { rng: freshRng } = makeTestCtx(100 + i);
+      const decision = makeAIDecision(battle, 'e1', freshRng);
+      decisions.push(decision);
+    }
+
+    // Should mostly target the weaker unit
+    const weakTargetCount = decisions.filter(d => d.targetIds.includes('u1')).length;
+    const strongTargetCount = decisions.filter(d => d.targetIds.includes('u2')).length;
+
+    // Weak player should be targeted more often than strong player
+    expect(weakTargetCount).toBeGreaterThanOrEqual(strongTargetCount);
   });
 
   it('should make deterministic decisions given same seed', () => {

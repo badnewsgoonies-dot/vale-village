@@ -181,6 +181,7 @@ function selectTargets(
         });
 
         if (nonOverkill.length > 0) {
+          // Length check guarantees [0] exists
           return [nonOverkill[0]!.target.id];
         }
       }
@@ -189,22 +190,36 @@ function selectTargets(
       if (ability.targets === 'all-enemies' || ability.targets === 'all-allies') {
         return scored.map(s => s.target.id);
       }
-      return scored.length > 0 ? [scored[0]!.target.id] : [];
+      if (scored.length > 0) {
+        // Length check guarantees [0] exists
+        return [scored[0]!.target.id];
+      }
+      return [];
     }
 
     case 'lowestRes': {
       // Find target with lowest resistance to ability element
       if (!ability.element || validTargets.length === 0) {
-        return validTargets.length > 0 ? [validTargets[0]!.id] : [];
+        if (validTargets.length > 0) {
+          // Length check guarantees [0] exists
+          return [validTargets[0]!.id];
+        }
+        return [];
       }
 
+      // ability.element is guaranteed to be defined here
+      const abilityElement = ability.element;
       const scored = validTargets.map(target => {
-        const resistMod = getElementModifier(ability.element!, target.element);
+        const resistMod = getElementModifier(abilityElement, target.element);
         return { target, resistMod };
       });
 
       scored.sort((a, b) => a.resistMod - b.resistMod); // Lower = weaker resistance
-      return scored.length > 0 ? [scored[0]!.target.id] : [];
+      if (scored.length > 0) {
+        // Length check guarantees [0] exists
+        return [scored[0]!.target.id];
+      }
+      return [];
     }
 
     case 'healerFirst': {
@@ -213,9 +228,14 @@ function selectTargets(
         t.abilities.some(a => a.type === 'healing')
       );
       if (healers.length > 0) {
+        // Length check guarantees [0] exists
         return [healers[0]!.id];
       }
-      return validTargets.length > 0 ? [validTargets[0]!.id] : [];
+      if (validTargets.length > 0) {
+        // Length check guarantees [0] exists
+        return [validTargets[0]!.id];
+      }
+      return [];
     }
 
     case 'random': {
@@ -224,11 +244,16 @@ function selectTargets(
         return [];
       }
       const index = Math.floor(rng.next() * validTargets.length);
+      // Index is guaranteed to be valid since 0 <= index < length
       return [validTargets[index]!.id];
     }
 
     default:
-      return validTargets.length > 0 ? [validTargets[0]!.id] : [];
+      if (validTargets.length > 0) {
+        // Length check guarantees [0] exists
+        return [validTargets[0]!.id];
+      }
+      return [];
   }
 }
 
@@ -282,7 +307,10 @@ export function makeAIDecision(
   if (scored.length === 0) {
     throw new Error(`No scored abilities for ${actorId}`);
   }
+
+  // Length check guarantees [0] and potentially [1] exist
   let chosenAbility = scored[0]!.ability;
+
   if (scored.length > 1 && scored[0]!.score - scored[1]!.score < 2.0) {
     // Scores are close - randomize between top 2
     const topTwo = scored.slice(0, 2);

@@ -14,9 +14,9 @@ import { ActionQueuePanel } from './ActionQueuePanel';
 import { PostBattleCutscene } from './PostBattleCutscene';
 import { VictoryOverlay } from './VictoryOverlay';
 import { ABILITIES } from '../../data/definitions/abilities';
-import { resolveTargets } from '../../core/algorithms/targeting';
-import { canAffordAction, getAbilityManaCost } from '../../core/algorithms/mana';
 import { isUnitKO } from '../../core/models/Unit';
+import { getValidTargets } from '../../core/algorithms/targeting';
+import { MAX_QUEUE_SIZE } from '../../core/constants';
 
 export function QueueBattleView() {
   const battle = useStore((s) => s.battle);
@@ -121,22 +121,18 @@ export function QueueBattleView() {
     }
 
     const ability = selectedAbility ? currentUnit.abilities.find(a => a.id === selectedAbility) : undefined;
-    const manaCost = getAbilityManaCost(selectedAbility, ability);
 
-    if (!canAffordAction(battle.remainingMana, manaCost)) {
-      alert(`Cannot afford: need ${manaCost} mana, have ${battle.remainingMana}`);
-      return;
-    }
-
+    // Let the service validate (it checks mana affordability, etc.)
     try {
       queueUnitAction(selectedUnitIndex, selectedAbility, selectedTargets, ability);
       setSelectedAbility(null);
       setSelectedTargets([]);
       // Move to next unit if not last
-      if (selectedUnitIndex < 3) {
+      if (selectedUnitIndex < MAX_QUEUE_SIZE - 1) {
         setSelectedUnitIndex(selectedUnitIndex + 1);
       }
     } catch (error) {
+      // Service will throw descriptive errors for validation failures
       console.error('Failed to queue action:', error);
       alert(`Failed to queue action: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -290,23 +286,10 @@ export function QueueBattleView() {
                     <h4>Select Targets:</h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {(() => {
-                        // Determine available targets based on ability type
-                        if (selectedAbility === null) {
-                          // Basic attack targets enemies
-                          return battle.enemies.filter(e => !isUnitKO(e));
-                        }
-                        
-                        const ability = currentUnit.abilities.find(a => a.id === selectedAbility);
-                        if (!ability) return [];
-
-                        if (ability.targets === 'single-enemy' || ability.targets === 'all-enemies') {
-                          return battle.enemies.filter(e => !isUnitKO(e));
-                        } else if (ability.targets === 'single-ally' || ability.targets === 'all-allies') {
-                          return battle.playerTeam.units.filter(u => !isUnitKO(u) && u.id !== currentUnit.id);
-                        } else if (ability.targets === 'self') {
-                          return [currentUnit];
-                        }
-                        return [];
+                        const ability = selectedAbility
+                          ? currentUnit.abilities.find(a => a.id === selectedAbility)
+                          : null;
+                        return getValidTargets(ability, currentUnit, battle.playerTeam, battle.enemies);
                       })().map((target) => (
                         <button
                           key={target.id}

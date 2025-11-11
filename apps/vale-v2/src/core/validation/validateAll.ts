@@ -95,6 +95,15 @@ export function validateAllGameData(): void {
       }
     }
   });
+
+  // Check equipment unlocksAbility references exist
+  Object.entries(EQUIPMENT).forEach(([id, equipment]) => {
+    if (equipment.unlocksAbility) {
+      if (!ABILITIES[equipment.unlocksAbility]) {
+        errors.push(`Equipment ${id}: unlocksAbility "${equipment.unlocksAbility}" does not exist in ABILITIES`);
+      }
+    }
+  });
   
   if (errors.length > 0) {
     throw new Error(`Data validation failed:\n${errors.join('\n')}`);

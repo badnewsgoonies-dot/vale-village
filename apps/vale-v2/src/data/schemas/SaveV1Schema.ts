@@ -3,6 +3,18 @@ import { UnitSchema } from './UnitSchema';
 import { EquipmentSchema } from './EquipmentSchema';
 
 /**
+ * NPC State schema
+ * Defines valid states for NPCs in the overworld
+ */
+const NPCStateSchema = z.object({
+  defeated: z.boolean().optional(),
+  dialogueSeen: z.boolean().optional(),
+  questProgress: z.number().int().min(0).optional(),
+  lastInteraction: z.number().int().optional(),
+  customData: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+});
+
+/**
  * Save file version 1 schema
  * This is the initial save format for the v2 app
  */
@@ -28,7 +40,7 @@ export const SaveV1Schema = z.object({
       y: z.number(),
     }),
     currentScene: z.string().min(1),
-    npcStates: z.record(z.string(), z.any()),  // NPC state is flexible
+    npcStates: z.record(z.string(), NPCStateSchema),  // Properly typed NPC states
   }),
 
   // Statistics

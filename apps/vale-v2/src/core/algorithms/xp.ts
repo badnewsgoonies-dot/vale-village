@@ -94,10 +94,14 @@ export function addXp(
   newLevel: number;
   unlockedAbilities: readonly string[];
 } {
-  const newXp = unit.xp + xpGain;
+  // Clamp XP to minimum 0 to prevent negative values
+  const newXp = Math.max(0, unit.xp + xpGain);
   const oldLevel = unit.level;
   const newLevel = calculateLevelFromXp(newXp);
   const leveledUp = newLevel > oldLevel;
+  
+  // If XP loss causes level down, recalculate unlocked abilities
+  const leveledDown = newLevel < oldLevel;
 
   // Find abilities that should be unlocked at new level
   const unlockedAbilities: string[] = [];
@@ -110,13 +114,23 @@ export function addXp(
     }
   }
 
+  // If level decreased, remove abilities unlocked at higher levels
+  let finalUnlockedAbilities = unit.unlockedAbilityIds;
+  if (leveledDown) {
+    // Keep only abilities unlocked at or below the new level
+    finalUnlockedAbilities = unit.abilities
+      .filter(a => a.unlockLevel <= newLevel)
+      .map(a => a.id);
+  } else if (leveledUp) {
+    // Add newly unlocked abilities
+    finalUnlockedAbilities = [...unit.unlockedAbilityIds, ...unlockedAbilities];
+  }
+
   const updatedUnit: Unit = {
     ...unit,
     xp: newXp,
     level: newLevel,
-    unlockedAbilityIds: leveledUp
-      ? [...unit.unlockedAbilityIds, ...unlockedAbilities]
-      : unit.unlockedAbilityIds,
+    unlockedAbilityIds: finalUnlockedAbilities,
   };
 
   return {

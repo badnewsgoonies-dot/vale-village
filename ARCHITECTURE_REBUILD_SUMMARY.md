@@ -98,22 +98,22 @@ src/
 ## Remaining Work
 
 1. **Console.log Cleanup**: 17 files still have console statements (can be done incrementally)
-2. **Full Migration**: Components still use GameProvider actions (gradual migration planned)
-3. **Unit Class Deprecation**: Eventually migrate all code from Unit class to UnitModel
-4. **GameProvider Reduction**: Extract remaining logic from GameProvider to services
+2. **Queue Battle → Overworld**: Wire the queue-based battle flow into overworld/story navigation once UX is final
+3. **Unit Class Deprecation**: Eventually migrate all code from Unit class to plain models (some helpers still accept both)
+4. **Story/Data Expansion**: Add new encounters + story scenes as data rather than hardcoded helpers
 
 ## Next Steps
 
-1. Start using services in components (gradual migration)
+1. Keep battle/UI work in the queue sandbox until it is production-ready, then expose entry points from the overworld screens
 2. Remove console.logs from production code
-3. Migrate components to use new hooks
-4. Eventually reduce GameProvider to <200 lines
+3. Flesh out docs/tests for the new Zustand slices (`queueBattleSlice`, `rewardsSlice`, `storySlice`)
+4. Continue migrating any lingering Unit class usages to immutable models
 
 ## Notes
 
-- All services are backward compatible with existing Unit class
+- All services remain backward compatible with existing Unit class while we complete the final conversions
 - Validation runs at startup and catches data errors early
-- Zustand store is synced with GameProvider for gradual migration
+- Zustand store (`src/ui/state/`) is now the single source of truth for UI state
 - Architecture is ready for incremental adoption
 
 

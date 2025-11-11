@@ -4,11 +4,9 @@ This guide shows how to integrate the story narrator system into Vale Village's 
 
 ## Quick Start
 
-The story system is now fully integrated with the dialogue system. All story scenes can be triggered using:
-
-```typescript
-actions.navigate({ type: 'DIALOGUE', npcId: 'story-scene-id' });
-```
+- Story scenes live in `story/index.ts` as plain `DialogueTree` objects (`storyScenes` export).
+- `storySlice` (in `src/ui/state/storySlice.ts`) tracks chapter/flag state and exposes helpers such as `onBattleEvents` and `setShowCredits`.
+- Your UI is responsible for rendering a Dialogue screen; feed it the `DialogueTree` for the desired scene ID.
 
 ## Available Story Scenes
 
@@ -32,82 +30,67 @@ actions.navigate({ type: 'DIALOGUE', npcId: 'story-scene-id' });
 
 ### 1. Show Intro on First Game Start
 
-In `GameProvider.tsx` or `TitleScreen.tsx`:
+In your title screen component:
 
 ```typescript
-import { StoryManager } from '@/services/StoryManager';
+import { useStore } from '@/ui/state/store';
+import { storyScenes } from '@/story';
 
-// When starting new game
-const handleStartGame = () => {
-  if (StoryManager.shouldShowIntro(state)) {
-    // Show intro scene first
-    actions.navigate({ type: 'DIALOGUE', npcId: 'intro' });
-    // After intro, it will navigate to OVERWORLD via the scene's action
-  } else {
-    // Skip straight to gameplay
-    actions.navigate({ type: 'OVERWORLD' });
-  }
+const TitleScreen = () => {
+  const story = useStore(s => s.story);
+  const [screen, setScreen] = useScreenRouter(); // local router util
+
+  const handleStartGame = () => {
+    if (!story.flags.intro_seen) {
+      setScreen({ type: 'dialogue', scene: storyScenes['intro'] });
+    } else {
+      setScreen({ type: 'queue-battle' });
+    }
+  };
+
+  // ...
 };
 ```
 
 ### 2. Trigger Chapter Intros
 
-You can trigger chapters manually or based on game progression:
+Trigger from any UI control once the relevant flag is set:
 
 ```typescript
-// Manual trigger (e.g., from a button or after specific event)
-actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-1' });
+const story = useStore(s => s.story);
 
-// Or use StoryManager to auto-determine
-const nextChapter = StoryManager.getNextChapterScene(state);
-if (nextChapter) {
-  actions.navigate({ type: 'DIALOGUE', npcId: nextChapter });
-}
-```
-
-### 3. Show Battle Context Before Battles
-
-**Option A: Automatic Context Detection**
-
-```typescript
-import { getPreBattleStoryScene } from '@/services/StoryManager';
-
-// In your battle start function
-const startBattleWithContext = (enemyIds: string[]) => {
-  const battleIntro = getPreBattleStoryScene(enemyIds, state);
-
-  if (battleIntro) {
-    // Show battle context first, then battle starts via dialogue action
-    actions.navigate({ type: 'DIALOGUE', npcId: battleIntro });
-  } else {
-    // No context needed, start battle directly
-    actions.startBattle(enemyIds);
+const showNextChapter = () => {
+  const map = { 1: 'chapter-1', 2: 'chapter-2', 3: 'chapter-3' } as const;
+  const sceneId = map[story.chapter];
+  if (sceneId) {
+    setScreen({ type: 'dialogue', scene: storyScenes[sceneId] });
   }
 };
 ```
 
-**Option B: Explicit Context**
+### 3. Show Battle Context Before Battles
 
 ```typescript
-import { getPreBattleStoryScene } from '@/services/StoryManager';
+const pickBattleScene = (encounterId: string): string | null => {
+  if (encounterId.includes('boss')) return 'sanctum-challenge';
+  if (encounterId.includes('tournament')) return 'tournament';
+  return 'training-match';
+};
 
-// When starting a tournament battle
-const battleIntro = getPreBattleStoryScene(
-  enemyIds,
-  state,
-  'tournament' // Explicit context
-);
+const startBattleWithContext = (encounterId: string, enemyIds: string[]) => {
+  const sceneId = pickBattleScene(encounterId);
+  const scene = sceneId ? storyScenes[sceneId] : null;
 
-if (battleIntro) {
-  actions.navigate({ type: 'DIALOGUE', npcId: battleIntro });
-}
-```
-
-**Option C: Direct Scene ID**
-
-```typescript
-// Show specific battle intro
-actions.navigate({ type: 'DIALOGUE', npcId: 'tournament' });
+  if (scene) {
+    setScreen({
+      type: 'dialogue',
+      scene,
+      onComplete: () => beginBattle(enemyIds),
+    });
+  } else {
+    beginBattle(enemyIds);
+  }
+};
 ```
 
 ### 4. Chain Story Scenes with Battles
@@ -143,6 +126,11 @@ NPCs can trigger story scenes through their dialogue:
     npcId: 'chapter-2', // Trigger a story scene
   },
 }
+
+// Dialogue renderer example
+if (action.type === 'NAVIGATE' && action.screen === 'DIALOGUE') {
+  setScreen({ type: 'dialogue', scene: storyScenes[action.npcId] });
+}
 ```
 
 ## Story Scene Structure
@@ -173,73 +161,63 @@ export const myStoryScene: DialogueTree = {
 };
 ```
 
+## State Hooks
+
+- `src/ui/state/storySlice.ts` exposes `story`, `showCredits`, `setShowCredits`, and `onBattleEvents`.
+- Call `useStore.getState().onBattleEvents(events)` whenever `QueueBattleService` emits `encounter-finished`/`battle-end` events (already wired inside the queue battle slice). This unlocks chapters automatically via `advanceChapter`.
+- Use `story.flags` to gate UI (chapters, credits button, etc.).
+
 ## Practical Implementation Locations
 
 ### Title Screen (`TitleScreen.tsx`)
 ```typescript
-// Add "New Game" button that checks for intro
 const handleNewGame = () => {
-  if (!state.storyFlags.intro_seen) {
-    actions.navigate({ type: 'DIALOGUE', npcId: 'intro' });
+  if (!story.flags.intro_seen) {
+    setScreen({ type: 'dialogue', scene: storyScenes['intro'] });
   } else {
-    actions.navigate({ type: 'OVERWORLD' });
+    setScreen({ type: 'queue-battle' });
   }
 };
 ```
 
 ### Overworld (`ValeVillageOverworld.tsx`)
 ```typescript
-// Add an NPC or location that triggers chapters
-{
+const chapterTrigger = {
   id: 'chapter-trigger',
   x: 900,
   y: 700,
   sprite: '/sprites/interactive/book.gif',
-  type: 'interactive',
   onInteract: () => {
-    actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-2' });
+    setScreen({ type: 'dialogue', scene: storyScenes['chapter-2'] });
   },
-}
+};
 ```
 
-### Battle System (`GameContext.tsx` or `BattleScreen.tsx`)
+### Battle System (`QueueBattleView.tsx` integration)
 ```typescript
-// Enhance startBattle to include story context
-const enhancedStartBattle = (enemyIds: string[], context?: BattleContext) => {
-  const battleIntro = getPreBattleStoryScene(enemyIds, state, context);
-
-  if (battleIntro) {
-    // Show story first, battle starts via dialogue action
-    actions.navigate({ type: 'DIALOGUE', npcId: battleIntro });
-  } else {
-    // Direct battle
-    originalStartBattle(enemyIds);
-  }
+const startBattle = (encounterId: string, enemyIds: string[]) => {
+  startBattleWithContext(encounterId, enemyIds); // helper from earlier section
 };
 ```
 
 ## Testing the Story System
 
-### 1. Test the Intro
-```typescript
-// In browser console or test file
-actions.navigate({ type: 'DIALOGUE', npcId: 'intro' });
-```
-
-### 2. Test Chapters
-```typescript
-actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-1' });
-actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-2' });
-actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-3' });
-```
-
-### 3. Test Battle Intros
-```typescript
-actions.navigate({ type: 'DIALOGUE', npcId: 'first-battle' });
-actions.navigate({ type: 'DIALOGUE', npcId: 'training-match' });
-actions.navigate({ type: 'DIALOGUE', npcId: 'tournament' });
-actions.navigate({ type: 'DIALOGUE', npcId: 'sanctum-challenge' });
-```
+1. Render the dialogue UI with any scene ID:
+   ```typescript
+   setScreen({ type: 'dialogue', scene: storyScenes['intro'] });
+   ```
+2. Iterate through chapters:
+   ```typescript
+   ['chapter-1', 'chapter-2', 'chapter-3'].forEach(id => {
+     setScreen({ type: 'dialogue', scene: storyScenes[id] });
+   });
+   ```
+3. Verify battle intros by choosing each context scene:
+   ```typescript
+   ['first-battle', 'training-match', 'tournament', 'sanctum-challenge'].forEach(id => {
+     setScreen({ type: 'dialogue', scene: storyScenes[id] });
+   });
+   ```
 
 ## Typewriter Effect
 
@@ -264,6 +242,6 @@ No additional setup needed - it works automatically for all dialogue!
 
 1. Create file in `story/` directory
 2. Export from `story/index.ts`
-3. Use in game via `actions.navigate({ type: 'DIALOGUE', npcId: 'your-id' })`
+3. Use in game via `setScreen({ type: 'dialogue', scene: storyScenes['your-id'] })`
 
 See `story/README.md` for detailed instructions on creating new scenes.

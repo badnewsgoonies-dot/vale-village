@@ -47,6 +47,9 @@ describe('Save Round-trip', () => {
 
     // Load
     const loadResult = await loadGame(port);
+    if (!loadResult.ok) {
+      console.error('Load failed:', loadResult.error);
+    }
     expect(loadResult.ok).toBe(true);
     
     if (loadResult.ok) {
@@ -101,8 +104,11 @@ describe('Save Round-trip', () => {
     };
 
     await saveGame(port, snapshot, seed, notes);
-    
+
     const loadResult = await loadGame(port);
+    if (!loadResult.ok) {
+      console.error('Load failed:', loadResult.error);
+    }
     expect(loadResult.ok).toBe(true);
     if (loadResult.ok) {
       expect(loadResult.value.notes).toBe(notes);

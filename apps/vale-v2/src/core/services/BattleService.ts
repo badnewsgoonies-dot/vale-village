@@ -27,6 +27,7 @@ import {
   isFrozen,
 } from '../algorithms/status';
 import { resolveTargets, filterValidTargets } from '../algorithms/targeting';
+import { BATTLE_CONSTANTS } from '../constants';
 import type { BattleEvent } from './types';
 
 /**
@@ -250,9 +251,9 @@ function executeAbility(
         }
 
         // Check for dodge BEFORE calculating damage
-        // Default accuracy is 95% (abilities can override this in the future)
+        // Default accuracy (abilities can override this in the future)
         // Uses effective stats for both attacker and defender
-        const abilityAccuracy = 0.95; // TODO: Add accuracy property to Ability schema
+        const abilityAccuracy = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY; // TODO: Add accuracy property to Ability schema
         const dodged = checkDodge(caster, currentTarget, team, abilityAccuracy, rng);
         
         if (dodged) {
@@ -272,7 +273,7 @@ function executeAbility(
 
         // Apply critical hit multiplier
         if (isCritical) {
-          damage = Math.floor(damage * 2.0);
+          damage = Math.floor(damage * BATTLE_CONSTANTS.CRITICAL_HIT_MULTIPLIER);
         }
 
         const damagedUnit = applyDamage(currentTarget, damage);
@@ -328,7 +329,7 @@ function executeAbility(
           const maxHp = target.baseStats.hp + (target.level - 1) * target.growthRates.hp;
           const revivedUnit: Unit = {
             ...target,
-            currentHp: Math.floor(maxHp * 0.5),
+            currentHp: Math.floor(maxHp * BATTLE_CONSTANTS.REVIVE_HP_PERCENTAGE),
           };
           updatedUnits.push(revivedUnit);
           totalHealing += revivedUnit.currentHp;
@@ -400,12 +401,21 @@ function executeAbility(
       };
     }
 
-    default:
+    case 'summon': {
+      // Summon abilities are handled separately by the Djinn system
+      // This case exists for type safety but shouldn't be called directly
       return {
-        message: `${caster.name} uses ${ability.name}! (Effect not implemented)`,
+        message: `${caster.name} summons ${ability.name}!`,
         targetIds,
         updatedUnits: [...allUnits],
       };
+    }
+
+    default: {
+      // Exhaustive check - ensures all ability types are handled
+      const _exhaustive: never = ability.type;
+      throw new Error(`Unhandled ability type: ${_exhaustive}`);
+    }
   }
 }
 
@@ -485,9 +495,88 @@ export function checkBattleEnd(
   const allPlayerKO = state.playerTeam.units.every(u => isUnitKO(u));
   const allEnemiesKO = state.enemies.every(u => isUnitKO(u));
 
+  // If both teams are KO'd simultaneously, treat as defeat (player loses ties)
+  if (allEnemiesKO && allPlayerKO) {
+    return 'PLAYER_DEFEAT';
+  }
+
   if (allEnemiesKO) return 'PLAYER_VICTORY';
   if (allPlayerKO) return 'PLAYER_DEFEAT';
 
   return null;
+}
+
+/**
+ * Process status effects for current actor at turn start
+ * Returns updated battle state and events generated
+ */
+export function startTurnTick(
+  state: BattleState,
+  rng: PRNG
+): { updatedState: BattleState; events: readonly BattleEvent[] } {
+  const currentActorId = state.turnOrder[state.currentActorIndex];
+  if (!currentActorId) {
+    return { updatedState: state, events: [] };
+  }
+
+  const allUnits = [...state.playerTeam.units, ...state.enemies];
+  const currentActor = allUnits.find(u => u.id === currentActorId);
+
+  if (!currentActor) {
+    return { updatedState: state, events: [] };
+  }
+
+  // Process status effects
+  const statusResult = processStatusEffectTick(currentActor, rng);
+
+  // Update actor with status effects
+  const updatedAllUnits = allUnits.map(u =>
+    u.id === currentActorId ? statusResult.updatedUnit : u
+  );
+
+  const updatedPlayerUnits = updatedAllUnits.filter(u =>
+    state.playerTeam.units.some(pu => pu.id === u.id)
+  );
+  const updatedEnemies = updatedAllUnits.filter(u =>
+    state.enemies.some(e => e.id === u.id)
+  );
+
+  const updatedBattle: BattleState = {
+    ...state,
+    playerTeam: {
+      ...state.playerTeam,
+      units: updatedPlayerUnits,
+    },
+    enemies: updatedEnemies,
+  };
+
+  // Generate events for status effects
+  const newEvents: BattleEvent[] = [];
+
+  if (statusResult.damage > 0) {
+    newEvents.push({
+      type: 'hit',
+      targetId: currentActorId,
+      amount: statusResult.damage,
+      crit: false,
+    });
+  }
+
+  // Check for expired statuses by comparing old and new status effects
+  const oldStatusIds = new Set(currentActor.statusEffects.map(s => `${s.type}-${s.duration}`));
+  const newStatusIds = new Set(statusResult.updatedUnit.statusEffects.map(s => `${s.type}-${s.duration}`));
+
+  currentActor.statusEffects.forEach(status => {
+    const statusKey = `${status.type}-${status.duration}`;
+    if (oldStatusIds.has(statusKey) && !newStatusIds.has(statusKey)) {
+      newEvents.push({
+        type: 'status-expired',
+        targetId: currentActorId,
+        status,
+      });
+    }
+  });
+
+  return { updatedState: updatedBattle, events: newEvents };
 }
 

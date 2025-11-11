@@ -42,14 +42,9 @@ export type UnitRole =
 
 /**
  * Active status effect
+ * Re-exported from UnitSchema to ensure single source of truth with Zod validation
  */
-export interface StatusEffect {
-  type: 'buff' | 'debuff' | 'poison' | 'burn' | 'freeze' | 'paralyze';
-  stat?: keyof Stats;
-  modifier?: number;
-  damagePerTurn?: number;
-  duration: number;
-}
+export type { StatusEffect } from '../../data/schemas/UnitSchema';
 
 /**
  * Djinn states during battle

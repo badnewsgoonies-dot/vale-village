@@ -8,12 +8,7 @@ import type { BattleState } from '../../core/models/BattleState';
 import type { RewardDistribution } from '../../core/models/Rewards';
 import type { Team } from '../../core/models/Team';
 import type { PRNG } from '../../core/random/prng';
-import { isUnitKO } from '../../core/models/Unit';
-import {
-  calculateBattleRewards,
-  calculateEquipmentDrops,
-  distributeRewards,
-} from '../../core/algorithms/rewards';
+import { processVictory as rewardsServiceProcessVictory } from '../../core/services/RewardsService';
 import type { InventorySlice } from './inventorySlice';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
@@ -37,30 +32,15 @@ export const createRewardsSlice: StateCreator<
   showRewards: false,
 
   processVictory: (battle, rng) => {
-    // Calculate rewards
-    const enemies = battle.enemies;
-    const survivors = battle.playerTeam.units.filter(u => !isUnitKO(u));
-    const allSurvived = survivors.length === battle.playerTeam.units.length;
-    
-    // Calculate base rewards
-    const rewards = calculateBattleRewards(enemies, allSurvived, survivors.length, rng);
-    
-    // Calculate equipment drops (already included in rewards, but we need to ensure it's there)
-    const equipmentDrops = calculateEquipmentDrops(enemies, rng);
-    const rewardsWithDrops = { ...rewards, equipmentDrops };
-    
-    // Distribute rewards to team
-    const distribution = distributeRewards(battle.playerTeam, rewardsWithDrops);
-    
+    // Call service to process victory
+    const result = rewardsServiceProcessVictory(battle, rng);
+
     // Update team state with XP gains
-    const { updateTeam } = get() as any as { updateTeam: (updates: Partial<Team>) => void };
-    if (updateTeam) {
-      updateTeam({ units: distribution.updatedTeam.units });
-    }
-    
-    // Store distribution (without updatedTeam for serialization)
-    const { updatedTeam, ...distributionWithoutTeam } = distribution;
-    set({ lastBattleRewards: distributionWithoutTeam });
+    const { updateTeam } = get();
+    updateTeam({ units: result.updatedTeam.units });
+
+    // Store distribution for display
+    set({ lastBattleRewards: result.distribution });
   },
 
   claimRewards: () => {
@@ -68,7 +48,7 @@ export const createRewardsSlice: StateCreator<
     if (!lastBattleRewards) return;
 
     // Apply rewards to inventory
-    const { addGold, addEquipment } = get() as any as InventorySlice;
+    const { addGold, addEquipment } = get();
     addGold(lastBattleRewards.goldEarned);
     addEquipment([...lastBattleRewards.rewards.equipmentDrops]);
 

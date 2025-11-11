@@ -65,3 +65,37 @@ export function filterValidTargets(
   return targets;
 }
 
+/**
+ * Get valid targets for UI selection
+ * Simplified version for UI components that need to show selectable targets
+ * @param ability - Ability (null for basic attack)
+ * @param caster - Unit casting the ability
+ * @param playerTeam - Player team
+ * @param enemies - Enemy units
+ * @returns Array of valid target units for selection
+ */
+export function getValidTargets(
+  ability: Ability | null,
+  caster: Unit,
+  playerTeam: { units: readonly Unit[] },
+  enemies: readonly Unit[]
+): readonly Unit[] {
+  if (!ability) {
+    // Basic attack targets enemies
+    return enemies.filter(e => !isUnitKO(e));
+  }
+
+  switch (ability.targets) {
+    case 'single-enemy':
+    case 'all-enemies':
+      return enemies.filter(e => !isUnitKO(e));
+    case 'single-ally':
+    case 'all-allies':
+      return playerTeam.units.filter(u => !isUnitKO(u) && u.id !== caster.id);
+    case 'self':
+      return [caster];
+    default:
+      return [];
+  }
+}
+

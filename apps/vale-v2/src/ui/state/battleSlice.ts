@@ -7,10 +7,12 @@ import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
 import { getEncounterId } from '../../core/models/BattleState';
 import type { BattleEvent } from '../../core/services/types';
-import { performAction, endTurn, checkBattleEnd } from '../../core/services/BattleService';
+import { performAction, endTurn, checkBattleEnd, startTurnTick as battleServiceStartTurnTick } from '../../core/services/BattleService';
 import { makeAIDecision } from '../../core/services/AIService';
-import { processStatusEffectTick } from '../../core/algorithms/status';
 import { makePRNG } from '../../core/random/prng';
+import { createRNGStream, RNG_STREAMS } from '../../core/constants';
+import type { RewardsSlice } from './rewardsSlice';
+import type { StorySlice } from './storySlice';
 
 export interface BattleSlice {
   battle: BattleState | null;
@@ -32,7 +34,7 @@ export interface BattleSlice {
 }
 
 export const createBattleSlice: StateCreator<
-  BattleSlice,
+  BattleSlice & RewardsSlice & StorySlice,
   [['zustand/devtools', never]],
   [],
   BattleSlice
@@ -50,61 +52,12 @@ export const createBattleSlice: StateCreator<
     if (!battle) return;
 
     // Stable per-turn stream for status effects
-    const rng = makePRNG(rngSeed + turnNumber * 1_000_000);
-    const currentActorId = battle.turnOrder[battle.currentActorIndex];
-    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
-    const currentActor = allUnits.find(u => u.id === currentActorId);
+    const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.STATUS_EFFECTS));
 
-    if (currentActor && currentActorId) {
-      const statusResult = processStatusEffectTick(currentActor, rng);
-      // Update actor with status effects
-      const updatedAllUnits = allUnits.map(u =>
-        u.id === currentActorId ? statusResult.updatedUnit : u
-      );
+    // Call service to process status effects
+    const result = battleServiceStartTurnTick(battle, rng);
 
-      const updatedPlayerUnits = updatedAllUnits.filter(u =>
-        battle.playerTeam.units.some(pu => pu.id === u.id)
-      );
-      const updatedEnemies = updatedAllUnits.filter(u =>
-        battle.enemies.some(e => e.id === u.id)
-      );
-
-      const updatedBattle: BattleState = {
-        ...battle,
-        playerTeam: {
-          ...battle.playerTeam,
-          units: updatedPlayerUnits,
-        },
-        enemies: updatedEnemies,
-      };
-
-      // Generate events for status effects
-      const newEvents: BattleEvent[] = [];
-      if (statusResult.damage > 0) {
-        newEvents.push({
-          type: 'hit',
-          targetId: currentActorId,
-          amount: statusResult.damage,
-          crit: false,
-        });
-      }
-      // Check for expired statuses by comparing old and new status effects
-      const oldStatusIds = new Set(currentActor.statusEffects.map(s => `${s.type}-${s.duration}`));
-      const newStatusIds = new Set(statusResult.updatedUnit.statusEffects.map(s => `${s.type}-${s.duration}`));
-      currentActor.statusEffects.forEach(status => {
-        const statusKey = `${status.type}-${status.duration}`;
-        if (oldStatusIds.has(statusKey) && !newStatusIds.has(statusKey)) {
-          // StatusEffect is already compatible with BattleEvent status field
-          newEvents.push({
-            type: 'status-expired',
-            targetId: currentActorId,
-            status: status as any, // Type assertion needed due to discriminated union complexity
-          });
-        }
-      });
-
-      set({ battle: updatedBattle, events: [...events, ...newEvents] });
-    }
+    set({ battle: result.updatedState, events: [...events, ...result.events] });
   },
 
   perform: (casterId, abilityId, targetIds) => {
@@ -112,7 +65,7 @@ export const createBattleSlice: StateCreator<
     if (!battle) return;
 
     // Separate substream for actions
-    const rng = makePRNG(rngSeed + turnNumber * 1_000_000 + 7);
+    const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.ACTIONS));
     const result = performAction(battle, casterId, abilityId, targetIds, rng);
 
     // Check for battle end
@@ -126,11 +79,9 @@ export const createBattleSlice: StateCreator<
 
       // If player victory, process rewards
       if (battleEnd === 'PLAYER_VICTORY') {
-        const store = get() as any; // Access full store
-        if (store.processVictory) {
-          const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
-          store.processVictory(result.state, rngVictory);
-        }
+        const { processVictory } = get();
+        const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
+        processVictory(result.state, rngVictory);
       }
 
       // Emit encounter-finished event if we have an encounterId
@@ -147,7 +98,7 @@ export const createBattleSlice: StateCreator<
       set({ battle: result.state, events: [...events, ...newEvents] });
     } else {
       // Battle continues - advance to next turn
-      const rngEndTurn = makePRNG(rngSeed + turnNumber * 1_000_000);
+      const rngEndTurn = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
       const nextState = endTurn(result.state, rngEndTurn);
       set({ battle: nextState, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
     }
@@ -157,7 +108,7 @@ export const createBattleSlice: StateCreator<
     const { battle, rngSeed, turnNumber } = get();
     if (!battle) return;
 
-    const rng = makePRNG(rngSeed + turnNumber * 1_000_000);
+    const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
     const nextState = endTurn(battle, rng);
     set({ battle: nextState, turnNumber: turnNumber + 1 });
   },
@@ -177,7 +128,7 @@ export const createBattleSlice: StateCreator<
     if (isPlayerUnit) return; // Player turn - don't auto-execute
 
     // Make AI decision
-    const rng = makePRNG(rngSeed + turnNumber * 1_000_000 + 7);
+    const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.ACTIONS));
     try {
       const decision = makeAIDecision(battle, currentActorId, rng);
 
@@ -195,11 +146,9 @@ export const createBattleSlice: StateCreator<
 
         // If player victory, process rewards
         if (battleEnd === 'PLAYER_VICTORY') {
-          const store = get() as any; // Access full store
-          if (store.processVictory) {
-            const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
-            store.processVictory(result.state, rngVictory);
-          }
+          const { processVictory } = get();
+          const rngVictory = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.VICTORY));
+          processVictory(result.state, rngVictory);
         }
 
         // Emit encounter-finished event for story progression
@@ -216,9 +165,9 @@ export const createBattleSlice: StateCreator<
 
         // Notify story slice of encounter completion
         if (encounterId) {
-          const store = get() as any;
-          if (store.onBattleEvents) {
-            store.onBattleEvents(newEvents);
+          const { onBattleEvents } = get();
+          if (onBattleEvents) {
+            onBattleEvents(newEvents);
           }
         }
       } else {
@@ -230,7 +179,7 @@ export const createBattleSlice: StateCreator<
     } catch (error) {
       console.error('AI decision failed:', error);
       // Fallback: end turn
-      const rngFallback = makePRNG(rngSeed + turnNumber * 1_000_000);
+      const rngFallback = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
       const nextState = endTurn(battle, rngFallback);
       set({ battle: nextState, turnNumber: turnNumber + 1 });
     }

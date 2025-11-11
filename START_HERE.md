@@ -31,13 +31,13 @@ pnpm install
 ### **3. Start Development:**
 
 ```bash
-pnpm dev
+pnpm dev   # boots the queue battle sandbox via createTestBattle()
 ```
 
 ### **4. Run Tests:**
 
 ```bash
-pnpm test
+pnpm test  # executes suites under apps/vale-v2/tests
 ```
 
 ### **5. Validate Data:**
@@ -95,11 +95,11 @@ pnpm test:watch           # Watch mode
 
 ## 📊 CURRENT STATUS
 
-- ✅ Core systems functional (battle, progression, equipment, djinn)
+- ✅ Queue battle sandbox exercising battle/progression/equipment/djinn systems via Zustand slices
 - ✅ Assets migrated (2,572 sprites, 25 sprite sheets)
-- ✅ Equipment data migrated (58 items)
-- 🔄 Migration: ~80% complete (GameProvider → Zustand)
-- 📝 Recent: Post-battle rewards, victory UI, turn handling improvements
+- ✅ Equipment + data schemas validated (58 items)
+- 🧭 Overworld/story screens are staged separately; the shipped app focuses on deterministic battle iteration
+- 📝 Recent: Queue planning/execution flow, deterministic previews, storySlice event hooks, post-battle rewards UX
 
 ---
 

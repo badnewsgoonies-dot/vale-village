@@ -13,11 +13,11 @@ Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. This is a
 - Turn-based tactical combat with elemental advantages
 - XP-based leveling with non-linear curve: [0, 100, 350, 850, 1850]
 
-**Current Status:** Core systems (battle, progression, equipment, djinn) are complete and functional. The codebase underwent a greenfield rebuild to establish clean architecture patterns.
+**Current Status:** Core systems (battle, progression, equipment, djinn) run inside a deterministic queue-battle sandbox (`QueueBattleView`) that wires directly into the Zustand store.
 
 **Last Updated:** 2025-11-10
 
-**Migration Status:** ~80% complete - GameProvider → Zustand migration in progress. Post-battle rewards, victory UI, and turn handling improvements recently completed.
+**State Snapshot:** GameProvider has been fully sunset; all shared state lives in slices under `src/ui/state/`. Overworld/story screens are staged separately while the queue battle flow is hardened.
 
 ## Commands
 
@@ -31,11 +31,11 @@ pnpm lint             # Lint code
 
 ### Testing
 ```bash
-pnpm test                              # Run all tests with coverage
+pnpm test                              # Run all tests under apps/vale-v2/tests with coverage
 pnpm test:watch                        # Run tests in watch mode
-vitest run <path>                      # Run specific test file
-vitest run tests/core/algorithms/      # Run all algorithm tests
-vitest run tests/gameplay/             # Run gameplay scenario tests
+vitest run apps/vale-v2/tests/core/algorithms/damage.test.ts
+vitest run apps/vale-v2/tests/core/algorithms
+vitest run apps/vale-v2/tests/battle
 ```
 
 **Testing Philosophy:** Context-aware testing that proves gameplay works, not isolated unit tests. Tests focus on meaningful scenarios like "Level 1 loses, Level 5 wins" rather than "function returns number".
@@ -147,6 +147,13 @@ function someRandomOperation(rng: PRNG): Result {
 **Path Aliases:**
 Use `@/*` alias for imports: `import { createUnit } from '@/core/models/Unit'`
 
+### Queue Battle Sandbox
+
+- `src/ui/components/QueueBattleView.tsx` renders the planning UI, event log, Djinn/mana bars, and victory flow. It reads/writes the queue-specific slice (see below).
+- `src/ui/state/queueBattleSlice.ts` owns planning-phase state: queued actions, mana pool, Djinn activation, and round execution via `QueueBattleService`.
+- `src/ui/state/battleSlice.ts` remains for classic turn-by-turn flows (and is still used for deterministic previews), but `setBattle`/`perform` now drive the queue sandbox through `queueBattleSlice`.
+- `src/ui/utils/createTestBattle.ts` seeds `createTestBattle()` so the dev server always boots into a deterministic 4v2 fight for rapid iteration. Swap this helper out when wiring real encounters.
+
 ### Testing
 
 **Location:** Tests mirror `src/` structure in `tests/` directory.
@@ -236,11 +243,11 @@ All game data must validate against Zod schemas:
 1. Add ability data to `src/data/definitions/abilities.ts`
 2. Ensure it validates against `AbilitySchema` (manaCost ≥ 0, basePower ≥ 0, unlockLevel 1-5)
 3. Run `pnpm validate:data` to verify
-4. Add to unit's ability list in `src/data/definitions/unitDefinitions.ts`
-5. Test in battle: `vitest run tests/gameplay/EpicBattles.test.ts`
+4. Add to the relevant units' ability lists in `src/data/definitions/units.ts`
+5. Test in battle: `vitest run apps/vale-v2/tests/battle/invariants.test.ts`
 
 ### Adding a New Unit
-1. Add unit definition to `src/data/definitions/unitDefinitions.ts`
+1. Add unit definition to `src/data/definitions/units.ts`
 2. Follow stat balance: base ATK 8-19, HP 70-140, DEF 8-15
 3. Assign 5 abilities (one unlocks per level)
 4. Validate element is one of: Venus, Mars, Mercury, Jupiter
@@ -249,28 +256,28 @@ All game data must validate against Zod schemas:
 ### Adding New Equipment
 1. Add to `src/data/definitions/equipment.ts`
 2. Validate against `EquipmentSchema`
-3. Test stat bonuses: `vitest run tests/unit/Equipment.test.ts`
-4. Verify equipment changes battle outcomes in gameplay tests
+3. Test stat bonuses: `vitest run apps/vale-v2/tests/core/models/Equipment.test.ts`
+4. Verify equipment changes battle outcomes in battle tests (`apps/vale-v2/tests/battle/`)
 
 ### Debugging Battle Issues
-1. Use `SeededRNG` for reproducible battles: `new SeededRNG(42)`
+1. Use `makePRNG(seed)` for reproducible battles: `const rng = makePRNG(42)`
 2. Check damage calculations in `src/core/algorithms/damage.ts`
 3. Verify turn order in `src/core/algorithms/turnOrder.ts`
 4. Check element advantages in damage calculations (1.5× or 0.67×)
-5. Run integration tests: `vitest run tests/integration/`
+5. Run integration tests: `vitest run apps/vale-v2/tests/core/services/`
 
 ### Modifying Core Game Logic
 1. **Never** modify algorithms without updating tests
 2. Run full test suite before committing: `pnpm precommit`
-3. Check that gameplay tests still pass (not just unit tests)
-4. Verify no regressions in `tests/gameplay/GameBalance.test.ts`
+3. Check that battle tests (`apps/vale-v2/tests/battle/`) and service tests still pass (not just unit tests)
+4. Verify no regressions in deterministic queue-battle tests (`apps/vale-v2/tests/core/services/queue-battle.test.ts`)
 
 ## Current Status & Recent Progress
 
-- **Migration Status:** ~80% complete - GameProvider → Zustand migration ongoing
-- **Recent Work:** Post-battle rewards system, victory flow UI, battle turn handling improvements
-- **Core Systems:** Battle, progression, equipment, djinn systems functional
-- **Testing:** Context-aware test suite passing
+- **State Management:** Zustand slices power queue battle (`queueBattleSlice`, `battleSlice`, `rewardsSlice`, `storySlice`). GameProvider is removed.
+- **Recent Work:** Queue planning/execution service, deterministic preview seeds, post-battle rewards/victory overlay, storySlice hooks for encounter-finished events.
+- **Next Focus:** Wiring overworld/story navigation back in once queue battle + rewards UX solidifies.
+- **Testing:** Context-aware suites covering algorithms, services, and battle flows (`apps/vale-v2/tests/**`).
 
 ## Known Issues & TODOs
 

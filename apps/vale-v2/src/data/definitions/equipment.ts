@@ -79,7 +79,7 @@ export const SOL_BLADE: Equipment = {
   tier: 'artifact',
   cost: 15000,
   statBonus: { atk: 72 },
-  unlocksAbility: 'megiddo',
+  // Note: megiddo ability not yet implemented
 };
 
 // ========================================

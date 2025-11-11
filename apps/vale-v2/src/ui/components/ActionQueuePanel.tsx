@@ -53,7 +53,7 @@ export function ActionQueuePanel({ battle, onClearAction, className, style }: Ac
           if (!unit) return null;
 
           const ability = action?.abilityId
-            ? ABILITIES.find(a => a.id === action.abilityId)
+            ? ABILITIES[action.abilityId] ?? null
             : null;
 
           return (

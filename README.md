@@ -12,12 +12,15 @@ A clean architecture rebuild with React, TypeScript, Zustand, and Zod.
 
 ```bash
 cd apps/vale-v2
-pnpm dev              # Start dev server
-pnpm test             # Run tests
+pnpm dev              # Start dev server (loads the queue battle sandbox)
+pnpm test             # Run tests from apps/vale-v2/tests
 pnpm validate:data    # Validate game data
 pnpm typecheck        # Type check
 pnpm lint             # Lint code
 ```
+
+> ℹ️ The current `App` mounts a deterministic queue-battle playground via `createTestBattle()`.  
+> Story/overworld work is staged separately while the queue battle loop is being finalized.
 
 ### **For New Contributors:**
 
@@ -70,11 +73,11 @@ test('function returns number', () => {
 
 ## 📊 PROJECT STATUS
 
-**Current Status:** Core systems (battle, progression, equipment, djinn) are functional.
+**Current Status:** Core systems (battle, progression, equipment, djinn) run inside a queue-battle sandbox powered by the Zustand store.
 
-**Migration Status:** ~80% complete - GameProvider → Zustand migration ongoing.
+**State Management:** GameProvider has been fully retired; all state lives in slices under `apps/vale-v2/src/ui/state/`.
 
-**Recent Work:** Post-battle rewards system, victory flow UI, battle turn handling improvements.
+**Recent Work:** Queue-based planning/execution loop, post-battle rewards/victory UX, deterministic RNG previews, and story progression hooks via `storySlice`.
 
 ---
 

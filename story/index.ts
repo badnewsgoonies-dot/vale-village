@@ -2,7 +2,7 @@
  * Story Content Index
  *
  * Central registry for all story scenes (intro, chapters, battle contexts).
- * The StoryManager uses this to trigger appropriate scenes based on game events.
+ * Consumers (dialogue UI, storySlice helpers, etc.) use this to trigger scenes based on game events.
  */
 
 import type { DialogueTree } from '@/types/Dialogue';

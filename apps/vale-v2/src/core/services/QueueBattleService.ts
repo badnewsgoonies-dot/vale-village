@@ -13,7 +13,9 @@ import type { BattleEvent } from './types';
 import { updateBattleState } from '../models/BattleState';
 import { updateTeam } from '../models/Team';
 import { isUnitKO } from '../models/Unit';
+import { createEmptyQueue } from '../constants';
 import { getAbilityManaCost, canAffordAction, isQueueComplete, validateQueuedActions } from '../algorithms/mana';
+import { Result, Ok, Err } from '../utils/result';
 import { calculateSummonDamage, canActivateDjinn, getSetDjinnIds } from '../algorithms/djinn';
 import { calculateTurnOrder } from '../algorithms/turn-order';
 import { getEffectiveSPD } from '../algorithms/stats';
@@ -29,7 +31,7 @@ import { makeAIDecision } from './AIService';
  * @param abilityId - Ability ID (null for basic attack)
  * @param targetIds - Target unit IDs
  * @param ability - Ability definition (if not basic attack)
- * @returns Updated battle state
+ * @returns Result with updated battle state or error message
  */
 export function queueAction(
   state: BattleState,
@@ -37,41 +39,46 @@ export function queueAction(
   abilityId: string | null,
   targetIds: readonly string[],
   ability?: Ability
-): BattleState {
+): Result<BattleState, string> {
   if (state.phase !== 'planning') {
-    throw new Error('Can only queue actions during planning phase');
+    return Err('Can only queue actions during planning phase');
   }
 
   // Find unit index in team
   const unitIndex = state.playerTeam.units.findIndex(u => u.id === unitId);
   if (unitIndex === -1) {
-    throw new Error(`Unit ${unitId} not found in player team`);
+    return Err(`Unit ${unitId} not found in player team`);
   }
 
   // Calculate mana cost
-  const manaCost = getAbilityManaCost(abilityId, ability);
+  try {
+    const manaCost = getAbilityManaCost(abilityId, ability);
 
-  // Check if affordable
-  if (!canAffordAction(state.remainingMana, manaCost)) {
-    throw new Error(`Cannot afford action: need ${manaCost} mana, have ${state.remainingMana}`);
+    // Check if affordable
+    if (!canAffordAction(state.remainingMana, manaCost)) {
+      return Err(`Cannot afford action: need ${manaCost} mana, have ${state.remainingMana}`);
+    }
+
+    // Create queued action
+    const action: QueuedAction = {
+      unitId,
+      abilityId,
+      targetIds,
+      manaCost,
+    };
+
+    // Update queue
+    const newQueuedActions = [...state.queuedActions];
+    newQueuedActions[unitIndex] = action;
+
+    return Ok(updateBattleState(state, {
+      queuedActions: newQueuedActions,
+      remainingMana: state.remainingMana - manaCost,
+    }));
+  } catch (error) {
+    // Handle errors from getAbilityManaCost (e.g., missing ability)
+    return Err(error instanceof Error ? error.message : `Failed to queue action: ${String(error)}`);
   }
-
-  // Create queued action
-  const action: QueuedAction = {
-    unitId,
-    abilityId,
-    targetIds,
-    manaCost,
-  };
-
-  // Update queue
-  const newQueuedActions = [...state.queuedActions];
-  newQueuedActions[unitIndex] = action;
-
-  return updateBattleState(state, {
-    queuedActions: newQueuedActions,
-    remainingMana: state.remainingMana - manaCost,
-  });
 }
 
 /**
@@ -283,7 +290,7 @@ export function executeRound(
       phase: 'planning',
       roundNumber: currentState.roundNumber + 1,
       currentQueueIndex: 0,
-      queuedActions: [null, null, null, null],
+      queuedActions: createEmptyQueue(),
       queuedDjinn: [],
       executionIndex: 0,
     });
@@ -332,7 +339,9 @@ function executeDjinnSummons(
     playerTeam: updatedTeam,
   });
 
-  // Apply damage to enemies
+  // Apply damage to enemies and track targets hit
+  let targetsHit: string[] = [];
+
   if (djinnCount === 3) {
     // Mega summon hits all enemies
     const updatedEnemies = currentState.enemies.map(enemy => {
@@ -344,6 +353,7 @@ function executeDjinnSummons(
         amount: damage,
         crit: false,
       });
+      targetsHit.push(enemy.id);
       return { ...enemy, currentHp: newHp };
     });
     currentState = updateBattleState(currentState, {
@@ -354,7 +364,8 @@ function executeDjinnSummons(
     const aliveEnemies = currentState.enemies.filter(e => !isUnitKO(e));
     if (aliveEnemies.length > 0) {
       const targetIndex = Math.floor(rng.next() * aliveEnemies.length);
-      const target = aliveEnemies[targetIndex];
+      // Index is guaranteed valid since 0 <= targetIndex < length
+      const target = aliveEnemies[targetIndex]!;
       const newHp = Math.max(0, target.currentHp - damage);
       events.push({
         type: 'hit',
@@ -362,6 +373,7 @@ function executeDjinnSummons(
         amount: damage,
         crit: false,
       });
+      targetsHit.push(target.id);
       const updatedEnemies = currentState.enemies.map(e =>
         e.id === target.id ? { ...e, currentHp: newHp } : e
       );
@@ -371,12 +383,15 @@ function executeDjinnSummons(
     }
   }
 
-  events.push({
-    type: 'ability',
-    casterId: 'djinn-summon',
-    abilityId: `djinn-summon-${djinnCount}`,
-    targets: djinnCount === 3 ? currentState.enemies.map(e => e.id) : [currentState.enemies[0]?.id || ''],
-  });
+  // Only emit ability event if targets were actually hit
+  if (targetsHit.length > 0) {
+    events.push({
+      type: 'ability',
+      casterId: 'djinn-summon',
+      abilityId: `djinn-summon-${djinnCount}`,
+      targets: targetsHit,
+    });
+  }
 
   return { state: currentState, events };
 }
@@ -419,33 +434,69 @@ function sortActionsBySPD(
 
 /**
  * Resolve valid targets for an action
- * PR-QUEUE-BATTLE: Retargets if original target is KO'd
+ * PR-QUEUE-BATTLE: Retargets if original target is KO'd, preserving ability target type
  */
 function resolveValidTargets(
   action: QueuedAction,
   state: BattleState
 ): readonly string[] {
   const allUnits = [...state.playerTeam.units, ...state.enemies];
+  const actor = allUnits.find(u => u.id === action.unitId);
+  
+  // Filter out KO'd targets
   const validTargets = action.targetIds.filter(id => {
     const unit = allUnits.find(u => u.id === id);
     return unit && !isUnitKO(unit);
   });
 
-  // If no valid targets, try to retarget
-  if (validTargets.length === 0) {
-    const isPlayerAction = state.playerTeam.units.some(u => u.id === action.unitId);
-    if (isPlayerAction) {
-      // Player action: retarget to alive enemies
-      const aliveEnemies = state.enemies.filter(e => !isUnitKO(e));
-      return aliveEnemies.map(e => e.id);
+  // If we have valid targets, return them
+  if (validTargets.length > 0) {
+    return validTargets;
+  }
+
+  // No valid targets - need to retarget
+  // First, determine the ability's target type to preserve it
+  let targetType: 'single' | 'all' = 'single'; // Default to single-target
+  
+  if (actor && action.abilityId) {
+    const ability = actor.abilities.find(a => a.id === action.abilityId);
+    if (ability) {
+      // Determine if ability is single-target or multi-target
+      if (ability.targets === 'all-enemies' || ability.targets === 'all-allies') {
+        targetType = 'all';
+      } else {
+        targetType = 'single';
+      }
+    }
+  } else if (action.abilityId === null) {
+    // Basic attack is always single-target
+    targetType = 'single';
+  }
+
+  // Retarget based on action side and target type
+  const isPlayerAction = state.playerTeam.units.some(u => u.id === action.unitId);
+  
+  if (isPlayerAction) {
+    // Player action: retarget to alive enemies
+    const aliveEnemies = state.enemies.filter(e => !isUnitKO(e));
+    if (targetType === 'single' && aliveEnemies.length > 0) {
+      // Single-target: return first alive enemy
+      return [aliveEnemies[0]!.id];
     } else {
-      // Enemy action: retarget to alive player units
-      const alivePlayers = state.playerTeam.units.filter(u => !isUnitKO(u));
+      // Multi-target: return all alive enemies
+      return aliveEnemies.map(e => e.id);
+    }
+  } else {
+    // Enemy action: retarget to alive player units
+    const alivePlayers = state.playerTeam.units.filter(u => !isUnitKO(u));
+    if (targetType === 'single' && alivePlayers.length > 0) {
+      // Single-target: return first alive player
+      return [alivePlayers[0]!.id];
+    } else {
+      // Multi-target: return all alive players
       return alivePlayers.map(u => u.id);
     }
   }
-
-  return validTargets;
 }
 
 /**
@@ -461,14 +512,28 @@ function generateEnemyActions(
   for (const enemy of state.enemies) {
     if (isUnitKO(enemy)) continue;
 
-    const decision = makeAIDecision(state, enemy.id, rng);
-    if (decision) {
-      actions.push({
-        unitId: enemy.id,
-        abilityId: decision.abilityId,
-        targetIds: decision.targetIds,
-        manaCost: 0, // Enemies don't use mana
-      });
+    try {
+      const decision = makeAIDecision(state, enemy.id, rng);
+      if (decision) {
+        actions.push({
+          unitId: enemy.id,
+          abilityId: decision.abilityId,
+          targetIds: decision.targetIds,
+          manaCost: 0, // Enemies don't use mana
+        });
+      }
+    } catch (error) {
+      // Fallback to basic attack if AI decision fails (e.g., no usable abilities)
+      console.warn(`AI decision failed for enemy ${enemy.id}, using basic attack:`, error);
+      const alivePlayers = state.playerTeam.units.filter(u => !isUnitKO(u));
+      if (alivePlayers.length > 0) {
+        actions.push({
+          unitId: enemy.id,
+          abilityId: null,
+          targetIds: [alivePlayers[0]!.id],
+          manaCost: 0,
+        });
+      }
     }
   }
 

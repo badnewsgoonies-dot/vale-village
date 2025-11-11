@@ -17,6 +17,7 @@ import {
 } from '../../core/services/QueueBattleService';
 import { makePRNG } from '../../core/random/prng';
 import { getEncounterId } from '../../core/models/BattleState';
+import { createRNGStream, RNG_STREAMS } from '../../core/constants';
 
 export interface QueueBattleSlice {
   battle: BattleState | null;
@@ -62,13 +63,13 @@ export const createQueueBattleSlice: StateCreator<
       throw new Error(`Invalid unit index: ${unitIndex}`);
     }
 
-    try {
-      const updatedBattle = queueAction(battle, unit.id, abilityId, targetIds, ability);
-      set({ battle: updatedBattle });
-    } catch (error) {
-      console.error('Failed to queue action:', error);
-      throw error;
+    const result = queueAction(battle, unit.id, abilityId, targetIds, ability);
+    if (!result.ok) {
+      // Throw error for UI to handle (e.g., show alert)
+      throw new Error(result.error);
     }
+    
+    set({ battle: result.value });
   },
 
   clearUnitAction: (unitIndex) => {
@@ -111,7 +112,7 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    const rng = makePRNG(rngSeed + battle.roundNumber * 1000);
+    const rng = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.QUEUE_ROUND));
     const result = executeRound(battle, rng);
 
     // Update battle state
@@ -119,16 +120,14 @@ export const createQueueBattleSlice: StateCreator<
 
     // If player victory, process rewards
     if (result.state.phase === 'victory') {
-      const store = get() as any;
-      if (store.processVictory) {
-        const rngVictory = makePRNG(rngSeed + battle.roundNumber * 1_000_000 + 999);
-        store.processVictory(result.state, rngVictory);
-      }
+      const { processVictory, onBattleEvents } = get();
+      const rngVictory = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY));
+      processVictory(result.state, rngVictory);
 
       // Notify story slice
       const encounterId = getEncounterId(result.state);
-      if (encounterId && store.onBattleEvents) {
-        store.onBattleEvents([
+      if (encounterId && onBattleEvents) {
+        onBattleEvents([
           {
             type: 'battle-end',
             result: 'PLAYER_VICTORY',

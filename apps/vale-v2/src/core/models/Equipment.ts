@@ -63,16 +63,15 @@ export function createEmptyLoadout(): EquipmentLoadout {
  * Calculate total stat bonuses from equipment
  */
 export function calculateEquipmentBonuses(loadout: EquipmentLoadout): Partial<Stats> {
-  const totals: Partial<Stats> = {};
+  const totals: Partial<Record<keyof Stats, number>> = {};
 
   for (const item of Object.values(loadout)) {
     if (!item) continue;
 
-    for (const [stat, value] of Object.entries(item.statBonus)) {
+    for (const stat of Object.keys(item.statBonus) as Array<keyof Stats>) {
+      const value = item.statBonus[stat];
       if (value !== undefined && value !== null && typeof value === 'number') {
-        const key = stat as keyof Stats;
-        const currentValue = totals[key] as number | undefined;
-        (totals as any)[key] = (currentValue || 0) + value;
+        totals[stat] = (totals[stat] ?? 0) + value;
       }
     }
   }

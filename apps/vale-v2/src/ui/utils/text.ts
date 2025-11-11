@@ -27,8 +27,14 @@ export function renderEventText(e: BattleEvent): string {
       return `${e.unitId} gained ${e.xp} XP${e.levelUp ? ` (Lv ${e.levelUp.to})` : ''}`;
     case 'battle-end':
       return `Battle ended: ${e.result}`;
-    default:
+    case 'encounter-finished':
+      return `Encounter completed: ${e.outcome}`;
+    default: {
+      // Exhaustive check - ensures all event types are handled
+      const _exhaustive: never = e;
+      console.warn(`Unhandled event type:`, _exhaustive);
       return '';
+    }
   }
 }
 

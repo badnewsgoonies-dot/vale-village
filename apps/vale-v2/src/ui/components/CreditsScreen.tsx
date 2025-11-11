@@ -4,33 +4,43 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import creditsData from '../../data/credits.json';
+import { z } from 'zod';
+import creditsDataRaw from '../../data/credits.json';
 
 interface CreditsScreenProps {
   onExit: () => void;
 }
 
-interface CreditsSection {
-  title: string;
-  entries: string[];
-}
+// Zod schema for credits data validation
+const CreditsSectionSchema = z.object({
+  title: z.string(),
+  entries: z.array(z.string()),
+});
 
-interface CreditsData {
-  sections: CreditsSection[];
-  options: {
-    scrollSpeed: number;
-    music: string | null;
-  };
+const CreditsDataSchema = z.object({
+  sections: z.array(CreditsSectionSchema),
+  options: z.object({
+    scrollSpeed: z.number().positive(),
+    music: z.string().nullable(),
+  }),
+});
+
+type CreditsData = z.infer<typeof CreditsDataSchema>;
+
+// Validate credits data at module load
+const creditsDataResult = CreditsDataSchema.safeParse(creditsDataRaw);
+if (!creditsDataResult.success) {
+  throw new Error(`Invalid credits data: ${creditsDataResult.error.message}`);
 }
+const creditsData = creditsDataResult.data;
 
 export function CreditsScreen({ onExit }: CreditsScreenProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
-  
-  const data = creditsData as CreditsData;
-  const scrollSpeed = data.options.scrollSpeed || 40;
+
+  const scrollSpeed = creditsData.options.scrollSpeed || 40;
 
   // Auto-scroll animation
   useEffect(() => {
@@ -135,7 +145,7 @@ export function CreditsScreen({ onExit }: CreditsScreenProps) {
             Credits
           </h1>
 
-          {data.sections.map((section, idx) => (
+          {creditsData.sections.map((section, idx) => (
             <div
               key={idx}
               style={{

@@ -32,22 +32,29 @@ describe('AI Targeting', () => {
   });
 
   it('should prefer weakest effective HP target', () => {
-    const { rng } = makeTestCtx(100);
-    
-    // Create two enemies with different HP
-    const weakEnemy = mkEnemy('slime', { id: 'e1', currentHp: 15 });
-    const strongEnemy = mkEnemy('beetle', { id: 'e2', currentHp: 60 });
-    
+    // Note: AI targets enemies (not allies), so this test targets player units
+    const weakPlayer = mkUnit({ id: 'u1', currentHp: 15 });
+    const strongPlayer = mkUnit({ id: 'u2', currentHp: 60 });
+
     const battle = mkBattle({
-      party: [mkUnit({ id: 'u1' })],
-      enemies: [weakEnemy, strongEnemy],
+      party: [weakPlayer, strongPlayer],
+      enemies: [mkEnemy('slime', { id: 'e1' })],
     });
 
-    const decision = makeAIDecision(battle, 'e1', rng);
-    
-    // Should prefer targeting the weaker enemy
-    // (Note: This may vary based on ability selection, but should be consistent)
-    expect(decision.targetIds.length).toBeGreaterThan(0);
+    // Run multiple times to verify consistency
+    const decisions = [];
+    for (let i = 0; i < 5; i++) {
+      const { rng } = makeTestCtx(100 + i);
+      const decision = makeAIDecision(battle, 'e1', rng);
+      decisions.push(decision);
+    }
+
+    // Should mostly target the weaker player
+    const weakTargetCount = decisions.filter(d => d.targetIds.includes('u1')).length;
+    const strongTargetCount = decisions.filter(d => d.targetIds.includes('u2')).length;
+
+    // Weak player should be targeted more often
+    expect(weakTargetCount).toBeGreaterThanOrEqual(strongTargetCount);
   });
 
   it('should handle single target abilities correctly', () => {

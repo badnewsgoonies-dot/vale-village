@@ -1,5 +1,17 @@
 import { z } from 'zod';
-import { StatsSchema } from './StatsSchema';
+
+/**
+ * Stat bonus schema for equipment (allows negative values for penalties)
+ * Unlike StatsSchema, this allows negative values since equipment can have penalties
+ */
+export const EquipmentStatBonusSchema = z.object({
+  hp: z.number().int(),
+  pp: z.number().int(),
+  atk: z.number().int(),
+  def: z.number().int(),
+  mag: z.number().int(),
+  spd: z.number().int(),
+}).partial();
 
 /**
  * Zod schema for EquipmentSlot
@@ -29,7 +41,7 @@ export const EquipmentSchema = z.object({
   slot: EquipmentSlotSchema,
   tier: EquipmentTierSchema,
   cost: z.number().int().min(0),
-  statBonus: StatsSchema.partial(), // Allow sparse stats
+  statBonus: EquipmentStatBonusSchema, // Allows negative values (penalties)
   unlocksAbility: z.string().optional(),
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)

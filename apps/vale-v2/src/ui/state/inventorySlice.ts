@@ -29,13 +29,23 @@ export const createInventorySlice: StateCreator<
   },
 
   addEquipment: (items) => {
-    set((state) => ({ equipment: [...state.equipment, ...items] }));
+    // Deep clone equipment to avoid reference sharing issues with duplicates
+    set((state) => ({ 
+      equipment: [...state.equipment, ...items.map(item => ({ ...item }))] 
+    }));
   },
 
   removeEquipment: (itemId) => {
-    set((state) => ({ 
-      equipment: state.equipment.filter(e => e.id !== itemId) 
-    }));
+    set((state) => {
+      // Find first occurrence and remove only that one (preserves duplicates)
+      const index = state.equipment.findIndex(e => e.id === itemId);
+      if (index === -1) {
+        return state; // Item not found, no change
+      }
+      const newEquipment = [...state.equipment];
+      newEquipment.splice(index, 1);
+      return { equipment: newEquipment };
+    });
   },
 });
 

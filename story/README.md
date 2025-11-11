@@ -36,47 +36,51 @@ The narrative explains *why these warriors are fighting* without turning it into
 ### Showing the Game Intro
 
 ```typescript
-import { StoryManager } from '@/services/StoryManager';
+import { useStore } from '@/ui/state/store';
+import { storyScenes } from '@/story';
 
-// Check if intro should be shown
-if (StoryManager.shouldShowIntro(state)) {
-  actions.navigate({ type: 'DIALOGUE', npcId: 'intro' });
+const story = useStore(s => s.story);
+
+if (!story.flags.intro_seen) {
+  setScreen({ type: 'dialogue', scene: storyScenes['intro'] });
 }
 ```
 
 ### Showing a Chapter Introduction
 
 ```typescript
-// Manually trigger a chapter
-actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-1' });
+const story = useStore(s => s.story);
+const chapters: Record<number, string> = {
+  1: 'chapter-1',
+  2: 'chapter-2',
+  3: 'chapter-3',
+};
 
-// Or use StoryManager to determine next chapter
-const nextChapter = StoryManager.getNextChapterScene(state);
-if (nextChapter) {
-  actions.navigate({ type: 'DIALOGUE', npcId: nextChapter });
+const nextScene = chapters[story.chapter];
+if (nextScene) {
+  setScreen({ type: 'dialogue', scene: storyScenes[nextScene] });
 }
 ```
 
 ### Showing Pre-Battle Story
 
 ```typescript
-import { getPreBattleStoryScene } from '@/services/StoryManager';
+const pickBattleScene = (encounterId: string): string | null => {
+  if (encounterId.includes('boss')) return 'sanctum-challenge';
+  if (encounterId.includes('tournament')) return 'tournament';
+  return 'training-match';
+};
 
-// Before starting a battle
-const battleIntroSceneId = getPreBattleStoryScene(
-  enemyIds,
-  state,
-  'training-match' // Optional explicit context
-);
+const startBattleWithContext = (encounterId: string, enemyIds: string[]) => {
+  const sceneId = pickBattleScene(encounterId);
+  const scene = sceneId ? storyScenes[sceneId] : null;
 
-if (battleIntroSceneId) {
-  // Show battle intro first
-  actions.navigate({ type: 'DIALOGUE', npcId: battleIntroSceneId });
-  // Then start battle (battle will start after dialogue via action)
-} else {
-  // No intro needed, start battle directly
-  actions.startBattle(enemyIds);
-}
+  if (scene) {
+    setScreen({ type: 'dialogue', scene, onComplete: () => beginBattle(enemyIds) });
+  } else {
+    beginBattle(enemyIds);
+  }
+};
 ```
 
 ### Battle Contexts
@@ -136,7 +140,7 @@ The system recognizes different battle contexts:
 
 4. **Trigger it** in your game code:
    ```typescript
-   actions.navigate({ type: 'DIALOGUE', npcId: 'chapter-4' });
+   setScreen({ type: 'dialogue', scene: storyScenes['chapter-4'] });
    ```
 
 ## Integration with Dialogue System

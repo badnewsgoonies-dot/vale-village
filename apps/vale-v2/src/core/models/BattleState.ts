@@ -5,6 +5,7 @@
 
 import type { Team } from './Team';
 import type { Unit } from './Unit';
+import { createEmptyQueue } from '../constants';
 
 /**
  * Battle result types
@@ -145,7 +146,7 @@ export function createBattleState(
     log: [],
     // Queue-based fields
     currentQueueIndex: 0,
-    queuedActions: [null, null, null, null],
+    queuedActions: createEmptyQueue(),
     queuedDjinn: [],
     remainingMana: maxMana,
     maxMana,

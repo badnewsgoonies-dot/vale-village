@@ -17,16 +17,24 @@ interface RewardsScreenProps {
 
 export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps) {
   // Look up units for level-ups
-  const levelUpUnits = rewards.levelUps.map(levelUp => {
-    const unit = team.units.find(u => u.id === levelUp.unitId);
-    return unit ? { unit, oldLevel: levelUp.oldLevel, newLevel: levelUp.newLevel, statGains: levelUp.statGains, unlockedAbilities: levelUp.newAbilitiesUnlocked } : null;
-  }).filter(Boolean) as Array<{
-    unit: typeof team.units[0];
-    oldLevel: number;
-    newLevel: number;
-    statGains: typeof rewards.levelUps[0]['statGains'];
-    unlockedAbilities: readonly string[];
-  }>;
+  const levelUpUnits = rewards.levelUps
+    .map(levelUp => {
+      const unit = team.units.find(u => u.id === levelUp.unitId);
+      if (!unit) {
+        if (import.meta.env.DEV) {
+          console.warn(`Unit not found for level-up: ${levelUp.unitId}`);
+        }
+        return null;
+      }
+      return {
+        unit,
+        oldLevel: levelUp.oldLevel,
+        newLevel: levelUp.newLevel,
+        statGains: levelUp.statGains,
+        unlockedAbilities: levelUp.newAbilitiesUnlocked,
+      };
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 
   return (
     <div className="rewards-screen">
