@@ -23,13 +23,18 @@ function App() {
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
 
+  // Commented out test battle - now using overworld as entry point
+  // To test battles, trigger a battle from the overworld or use dev tools
+  // useEffect(() => {
+  //   const { battleState, seed } = createTestBattle();
+  //   setBattle(battleState, seed);
+  //   setTeam(battleState.playerTeam);
+  // }, [setBattle, setTeam]);
+
+  // Ensure app starts in overworld mode
   useEffect(() => {
-    // Always recreate test battle on mount to get latest code changes
-    const { battleState, seed } = createTestBattle();
-    setBattle(battleState, seed);
-    // Also set team state for rewards screen
-    setTeam(battleState.playerTeam);
-  }, [setBattle, setTeam]);
+    setMode('overworld');
+  }, [setMode]);
 
   const canAccessCredits = story.chapter >= 4;
 
