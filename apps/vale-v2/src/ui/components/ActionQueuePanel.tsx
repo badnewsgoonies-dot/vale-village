@@ -80,7 +80,7 @@ export function ActionQueuePanel({ battle, onClearAction, className, style }: Ac
                       <span style={{ color: '#888' }}>
                         {' → '}
                         {action.targetIds.length === 1
-                          ? `Target ${action.targetIds[0].slice(0, 8)}`
+                          ? `Target ${action.targetIds[0]?.slice(0, 8) || 'unknown'}`
                           : `${action.targetIds.length} targets`}
                       </span>
                     )}

@@ -25,7 +25,6 @@ const CreditsDataSchema = z.object({
   }),
 });
 
-type CreditsData = z.infer<typeof CreditsDataSchema>;
 
 // Validate credits data at module load
 const creditsDataResult = CreditsDataSchema.safeParse(creditsDataRaw);

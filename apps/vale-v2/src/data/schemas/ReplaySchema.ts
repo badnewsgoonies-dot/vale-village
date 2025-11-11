@@ -12,11 +12,11 @@ export const SaveVersionSchema = z.object({
 
 /**
  * Story State Schema
+ * Matches StoryState interface from core/models/story.ts
  */
 const StoryStateSchema = z.object({
-  currentChapter: z.number().int().min(0),
-  flags: z.record(z.string(), z.boolean()),
-  encountersCompleted: z.array(z.string()),
+  chapter: z.number().int().min(1),
+  flags: z.record(z.string(), z.union([z.boolean(), z.number()])),
 });
 
 /**

@@ -4,7 +4,6 @@
  */
 
 import type { Team } from '../models/Team';
-import type { Unit } from '../models/Unit';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import { calculateTeamManaPool } from '../models/BattleState';
 

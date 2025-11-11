@@ -8,7 +8,6 @@ import type { Unit } from '../models/Unit';
 import type { Team } from '../models/Team';
 import type { Equipment } from '../models/Equipment';
 import type { PRNG } from '../random/prng';
-import type { Enemy, EquipmentDrop } from '../../data/schemas/EnemySchema';
 import { addXp } from './xp';
 import { isUnitKO } from '../models/Unit';
 import { ENEMIES } from '../../data/definitions/enemies';
@@ -211,7 +210,6 @@ export function distributeRewards(
 
     // Track before state
     const oldLevel = unit.level;
-    const oldAbilities = new Set(unit.unlockedAbilityIds);
 
     // Give XP using addXp() function (returns new unit)
     const xpResult = addXp(unit, rewards.xpPerUnit);

@@ -46,6 +46,16 @@ export const BATTLE_CONSTANTS = {
   CRITICAL_HIT_MULTIPLIER: 2.0,
   /** Revive HP percentage (50% of max HP) */
   REVIVE_HP_PERCENTAGE: 0.5,
+  /** Base defense multiplier in damage formula */
+  DEFENSE_MULTIPLIER: 0.5,
+  /** Element advantage damage multiplier */
+  ELEMENT_ADVANTAGE_MULTIPLIER: 1.5,
+  /** Element disadvantage damage multiplier */
+  ELEMENT_DISADVANTAGE_MULTIPLIER: 0.67,
+  /** Normal battle equipment drop rate (10%) */
+  EQUIPMENT_DROP_RATE_NORMAL: 0.1,
+  /** Boss battle equipment drop rate (50%) */
+  EQUIPMENT_DROP_RATE_BOSS: 0.5,
 } as const;
 
 /**

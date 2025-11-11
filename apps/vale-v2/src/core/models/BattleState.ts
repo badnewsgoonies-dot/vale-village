@@ -37,10 +37,20 @@ export interface QueuedAction {
 }
 
 /**
+ * Unit index for O(1) lookups
+ * Maps unit ID -> unit and tracks which side they're on
+ */
+export interface UnitIndex {
+  readonly unit: Unit;
+  readonly isPlayer: boolean;
+}
+
+/**
  * Battle state
  * Tracks current battle state including units, turn order, and battle status
- * 
+ *
  * PR-QUEUE-BATTLE: Extended with queue-based battle system
+ * PERFORMANCE: Added unitById index for O(1) lookups
  */
 export interface BattleState {
   /** Player's team */
@@ -48,6 +58,12 @@ export interface BattleState {
 
   /** Enemy units */
   readonly enemies: readonly Unit[];
+
+  /**
+   * Unit index for O(1) lookups by ID
+   * PERFORMANCE: Eliminates repeated [...playerTeam.units, ...enemies].find() calls
+   */
+  readonly unitById: ReadonlyMap<string, UnitIndex>;
 
   /** Current turn number (for Djinn recovery tracking) */
   currentTurn: number;
@@ -117,6 +133,27 @@ export interface BattleState {
 }
 
 /**
+ * Build unit index for O(1) lookups
+ * PERFORMANCE: Eliminates O(n) array searches
+ */
+export function buildUnitIndex(
+  playerUnits: readonly Unit[],
+  enemyUnits: readonly Unit[]
+): ReadonlyMap<string, UnitIndex> {
+  const index = new Map<string, UnitIndex>();
+
+  for (const unit of playerUnits) {
+    index.set(unit.id, { unit, isPlayer: true });
+  }
+
+  for (const unit of enemyUnits) {
+    index.set(unit.id, { unit, isPlayer: false });
+  }
+
+  return index;
+}
+
+/**
  * Calculate team mana pool from unit contributions
  */
 export function calculateTeamManaPool(team: Team): number {
@@ -126,6 +163,7 @@ export function calculateTeamManaPool(team: Team): number {
 /**
  * Create initial battle state
  * PR-QUEUE-BATTLE: Initializes queue-based battle system
+ * PERFORMANCE: Builds unitById index for O(1) lookups
  */
 export function createBattleState(
   playerTeam: Team,
@@ -133,10 +171,12 @@ export function createBattleState(
   turnOrder: readonly string[] = []
 ): BattleState {
   const maxMana = calculateTeamManaPool(playerTeam);
+  const unitById = buildUnitIndex(playerTeam.units, enemies);
 
   return {
     playerTeam,
     enemies,
+    unitById,
     currentTurn: 0,
     roundNumber: 1,
     phase: 'planning',
@@ -157,9 +197,17 @@ export function createBattleState(
 
 /**
  * Update battle state (returns new object - immutability)
+ * PERFORMANCE: Automatically rebuilds unitById index when units change
  */
 export function updateBattleState(state: BattleState, updates: Partial<BattleState>): BattleState {
-  return { ...state, ...updates };
+  const newState = { ...state, ...updates };
+
+  // Rebuild index if units changed
+  if (updates.playerTeam || updates.enemies) {
+    newState.unitById = buildUnitIndex(newState.playerTeam.units, newState.enemies);
+  }
+
+  return newState;
 }
 
 /**

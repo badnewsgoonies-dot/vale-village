@@ -206,7 +206,7 @@ export const STAFF_OF_AGES: Equipment = {
   tier: 'artifact',
   cost: 18000,
   statBonus: { atk: 42, mag: 58, pp: 25 },
-  unlocksAbility: 'odyssey',
+  // Note: odyssey ability not yet implemented
 };
 
 // ========================================

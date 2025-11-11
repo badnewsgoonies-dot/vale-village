@@ -13,9 +13,8 @@ import { DjinnBar } from './DjinnBar';
 import { ActionQueuePanel } from './ActionQueuePanel';
 import { PostBattleCutscene } from './PostBattleCutscene';
 import { VictoryOverlay } from './VictoryOverlay';
-import { ABILITIES } from '../../data/definitions/abilities';
-import { isUnitKO } from '../../core/models/Unit';
 import { getValidTargets } from '../../core/algorithms/targeting';
+import { canAffordAction } from '../../core/algorithms/mana';
 import { MAX_QUEUE_SIZE } from '../../core/constants';
 
 export function QueueBattleView() {
@@ -287,7 +286,7 @@ export function QueueBattleView() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {(() => {
                         const ability = selectedAbility
-                          ? currentUnit.abilities.find(a => a.id === selectedAbility)
+                          ? currentUnit.abilities.find(a => a.id === selectedAbility) ?? null
                           : null;
                         return getValidTargets(ability, currentUnit, battle.playerTeam, battle.enemies);
                       })().map((target) => (

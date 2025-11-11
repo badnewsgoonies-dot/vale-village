@@ -61,6 +61,7 @@ export function startBattle(
 /**
  * Perform an action in battle
  * Executes ability and returns updated state and events
+ * PERFORMANCE: Uses unitById index for O(1) lookups
  */
 export function performAction(
   state: BattleState,
@@ -69,12 +70,12 @@ export function performAction(
   targetIds: readonly string[],
   rng: PRNG
 ): { state: BattleState; result: ActionResult; events: readonly BattleEvent[] } {
-  // Find actor
-  const allUnits = [...state.playerTeam.units, ...state.enemies];
-  const actor = allUnits.find(u => u.id === actorId);
-  if (!actor || isUnitKO(actor)) {
+  // Find actor using index (O(1) instead of O(n))
+  const actorEntry = state.unitById.get(actorId);
+  if (!actorEntry || isUnitKO(actorEntry.unit)) {
     throw new Error(`Invalid actor: ${actorId}`);
   }
+  const actor = actorEntry.unit;
 
   // Check if frozen
   if (isFrozen(actor)) {
@@ -89,7 +90,7 @@ export function performAction(
       result: {
         message: `${actor.name} is frozen and cannot act!`,
         targetIds: [],
-        updatedUnits: allUnits,
+        updatedUnits: [...state.playerTeam.units, ...state.enemies],
       },
       events,
     };
@@ -108,7 +109,7 @@ export function performAction(
       result: {
         message: `${actor.name} is paralyzed and cannot act!`,
         targetIds: [],
-        updatedUnits: allUnits,
+        updatedUnits: [...state.playerTeam.units, ...state.enemies],
       },
       events,
     };
@@ -147,6 +148,7 @@ export function performAction(
 
   // Execute ability with validated alive targets
   // Pass team for effective stats calculation
+  const allUnits = [...state.playerTeam.units, ...state.enemies];
   const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, rng);
 
   // Update battle state with new units
@@ -422,6 +424,7 @@ function executeAbility(
 /**
  * End turn and advance to next actor
  * Processes status effects and recalculates turn order if needed
+ * PERFORMANCE: Uses unitById index for O(1) lookup
  */
 export function endTurn(
   state: BattleState,
@@ -429,35 +432,45 @@ export function endTurn(
 ): BattleState {
   // Process status effects for current actor
   const currentActorId = state.turnOrder[state.currentActorIndex];
-  const allUnits = [...state.playerTeam.units, ...state.enemies];
-  const currentActor = allUnits.find(u => u.id === currentActorId);
+  if (!currentActorId) {
+    // No current actor, just advance
+    let nextIndex = state.currentActorIndex + 1;
+    if (nextIndex >= state.turnOrder.length) {
+      nextIndex = 0;
+    }
+    return updateBattleState(state, { currentActorIndex: nextIndex });
+  }
+
+  const currentActorEntry = state.unitById.get(currentActorId);
+  const currentActor = currentActorEntry?.unit;
 
   if (currentActor) {
     const statusResult = processStatusEffectTick(currentActor, rng);
-    // Update actor with status effects
-    const updatedAllUnits = allUnits.map(u =>
-      u.id === currentActorId ? statusResult.updatedUnit : u
-    );
 
-    const updatedPlayerUnits = updatedAllUnits.filter(u =>
-      state.playerTeam.units.some(pu => pu.id === u.id)
-    );
-    const updatedEnemies = updatedAllUnits.filter(u =>
-      state.enemies.some(e => e.id === u.id)
-    );
+    // Update actor in the appropriate array (player or enemy)
+    const isPlayer = currentActorEntry!.isPlayer;
 
-    const updatedTeam: Team = {
-      ...state.playerTeam,
-      units: updatedPlayerUnits,
-    };
-
-    state = updateBattleState(state, {
-      playerTeam: updatedTeam,
-      enemies: updatedEnemies,
-      log: statusResult.messages.length > 0
-        ? [...state.log, ...statusResult.messages]
-        : state.log,
-    });
+    if (isPlayer) {
+      const updatedPlayerUnits = state.playerTeam.units.map(u =>
+        u.id === currentActorId ? statusResult.updatedUnit : u
+      );
+      state = updateBattleState(state, {
+        playerTeam: { ...state.playerTeam, units: updatedPlayerUnits },
+        log: statusResult.messages.length > 0
+          ? [...state.log, ...statusResult.messages]
+          : state.log,
+      });
+    } else {
+      const updatedEnemies = state.enemies.map(u =>
+        u.id === currentActorId ? statusResult.updatedUnit : u
+      );
+      state = updateBattleState(state, {
+        enemies: updatedEnemies,
+        log: statusResult.messages.length > 0
+          ? [...state.log, ...statusResult.messages]
+          : state.log,
+      });
+    }
   }
 
   // Advance to next actor

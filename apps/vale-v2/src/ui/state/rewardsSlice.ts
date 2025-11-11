@@ -6,7 +6,6 @@
 import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
 import type { RewardDistribution } from '../../core/models/Rewards';
-import type { Team } from '../../core/models/Team';
 import type { PRNG } from '../../core/random/prng';
 import { processVictory as rewardsServiceProcessVictory } from '../../core/services/RewardsService';
 import type { InventorySlice } from './inventorySlice';

@@ -13,7 +13,6 @@ import {
   queueDjinn,
   unqueueDjinn,
   executeRound,
-  refreshMana,
 } from '../../core/services/QueueBattleService';
 import { makePRNG } from '../../core/random/prng';
 import { getEncounterId } from '../../core/models/BattleState';
