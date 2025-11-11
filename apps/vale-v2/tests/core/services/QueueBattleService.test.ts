@@ -67,16 +67,21 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('queueAction validates mana cost', () => {
     const chainLightning = ABILITIES['chain-lightning'];
+    const attack = ABILITIES.attack;
     if (!chainLightning) {
       throw new Error('Chain Lightning ability not found');
+    }
+
+    if (!attack) {
+      throw new Error('Attack ability not found');
     }
 
     const unit = mkUnit({ 
       id: 'isaac', 
       name: 'Isaac', 
       level: 5,
-      abilities: [chainLightning],
-      unlockedAbilityIds: [chainLightning.id],
+      abilities: [attack, chainLightning],
+      unlockedAbilityIds: [attack.id, chainLightning.id],
     });
 
     // Fill team to 4 units
@@ -88,8 +93,8 @@ describe('QueueBattleService - Queue Execution', () => {
     const rng = makePRNG(42);
     let battle = startBattle(playerTeam, enemies, rng);
 
-    // Set mana to less than Chain Lightning costs (costs 8 mana)
-    battle = { ...battle, remainingMana: 5 };
+    // Set mana to 0 so the heavy attack cannot be queued
+    battle = { ...battle, remainingMana: 0 };
 
     // Should return error Result - not enough mana
     const result = queueAction(battle, 'isaac', 'chain-lightning', ['enemy1'], chainLightning);
@@ -101,16 +106,21 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('clearQueuedAction refunds mana', () => {
     const earthquake = ABILITIES.quake;
+    const attack = ABILITIES.attack;
     if (!earthquake) {
       throw new Error('Quake ability not found');
+    }
+
+    if (!attack) {
+      throw new Error('Attack ability not found');
     }
 
     const unit = mkUnit({ 
       id: 'isaac', 
       name: 'Isaac', 
       level: 3,
-      abilities: [earthquake],
-      unlockedAbilityIds: [earthquake.id],
+      abilities: [attack, earthquake],
+      unlockedAbilityIds: [attack.id, earthquake.id],
     });
 
     // Fill team to 4 units

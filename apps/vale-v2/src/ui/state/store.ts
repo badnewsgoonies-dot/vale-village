@@ -14,8 +14,9 @@ import { createInventorySlice, type InventorySlice } from './inventorySlice';
 import { createRewardsSlice, type RewardsSlice } from './rewardsSlice';
 import { createGameFlowSlice, type GameFlowSlice } from './gameFlowSlice';
 import { createOverworldSlice, type OverworldStore } from './overworldSlice';
+import { createDialogueSlice, type DialogueSlice } from './dialogueSlice';
 
-export type Store = BattleSlice & QueueBattleSlice & TeamSlice & SaveSlice & StorySlice & InventorySlice & RewardsSlice & GameFlowSlice & OverworldStore;
+export type Store = BattleSlice & QueueBattleSlice & TeamSlice & SaveSlice & StorySlice & InventorySlice & RewardsSlice & GameFlowSlice & OverworldStore & DialogueSlice;
 
 // Store factory function to combine all slices
 const storeFactory = (set: any, get: any, api: any) => ({
@@ -28,6 +29,7 @@ const storeFactory = (set: any, get: any, api: any) => ({
   ...createRewardsSlice(set, get, api),
   ...createGameFlowSlice(set, get, api),
   ...createOverworldSlice(set, get, api),
+  ...createDialogueSlice(set, get, api),
 });
 
 // Only enable devtools in development to prevent state manipulation in production

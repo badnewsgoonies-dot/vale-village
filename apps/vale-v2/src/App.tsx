@@ -4,6 +4,7 @@ import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
 import { RewardsScreen } from './ui/components/RewardsScreen';
 import { OverworldMap } from './ui/components/OverworldMap';
+import { DialogueBox } from './ui/components/DialogueBox';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -79,6 +80,12 @@ function App() {
         <>
           {mode === 'overworld' && <OverworldMap />}
           {mode === 'battle' && <QueueBattleView />}
+          {mode === 'dialogue' && (
+            <>
+              <OverworldMap />
+              <DialogueBox />
+            </>
+          )}
         </>
       )}
     </div>

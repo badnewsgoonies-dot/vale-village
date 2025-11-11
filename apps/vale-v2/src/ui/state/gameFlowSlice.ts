@@ -2,7 +2,7 @@ import type { StateCreator } from 'zustand';
 import type { MapTrigger } from '@/core/models/overworld';
 
 export interface GameFlowSlice {
-  mode: 'overworld' | 'battle' | 'rewards';
+  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue';
   lastTrigger: MapTrigger | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   handleTrigger: (trigger: MapTrigger | null) => void;

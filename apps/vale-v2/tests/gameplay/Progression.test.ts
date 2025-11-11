@@ -12,6 +12,23 @@ import { makePRNG } from '../../src/core/random/prng';
 import { ABILITIES } from '../../src/data/definitions/abilities';
 import { ALL_EQUIPMENT } from '../../src/data/definitions/equipment';
 import { mkUnit, mkEnemy, mkTeam } from '../../src/test/factories';
+import type { Ability } from '../../src/data/schemas/AbilitySchema';
+
+function queuePlaceholders(
+  battle: ReturnType<typeof startBattle>,
+  targetId: string,
+  abilityId: string | null = null,
+  ability?: Ability
+) {
+  let state = battle;
+  for (let i = 0; i < 3; i++) {
+    const placeholderId = `placeholder_${i}`;
+    const result = queueAction(state, placeholderId, abilityId, [targetId], ability);
+    if (!result.ok) throw new Error(result.error);
+    state = result.value;
+  }
+  return state;
+}
 
 describe('Progression - Leveling Matters', () => {
   test('Level 1 Isaac loses to Level 5 Bandit, Level 5 Isaac wins', () => {
@@ -43,9 +60,10 @@ describe('Progression - Leveling Matters', () => {
         if (battle.phase !== 'planning') break;
 
         // Isaac attacks
-        const queueResult = queueAction(battle, 'isaac', null, ['bandit']);
+        let queueResult = queueAction(battle, 'isaac', null, ['bandit']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'bandit');
 
         // Execute round
         const result = executeRound(battle, rng);
@@ -76,9 +94,10 @@ describe('Progression - Leveling Matters', () => {
         if (battle.phase !== 'planning') break;
 
         // Isaac attacks
-        const queueResult = queueAction(battle, 'isaac', null, ['bandit']);
+        let queueResult = queueAction(battle, 'isaac', null, ['bandit']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'bandit');
 
         // Execute round
         const result = executeRound(battle, rng);
@@ -127,6 +146,7 @@ describe('Progression - Leveling Matters', () => {
         queueResult = queueAction(battle, 'u4', null, ['boss']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
 
         const result = executeRound(battle, rng);
         battle = result.state;
@@ -201,9 +221,10 @@ describe('Progression - Equipment Matters', () => {
       // Simulate battle
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
-        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        let queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -238,9 +259,10 @@ describe('Progression - Equipment Matters', () => {
       // Simulate battle
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
-        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        let queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -276,9 +298,10 @@ describe('Progression - Equipment Matters', () => {
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithBasic++;
-        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        let queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -304,9 +327,10 @@ describe('Progression - Equipment Matters', () => {
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithLegendary++;
-        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        let queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -346,9 +370,10 @@ describe('Progression - Abilities Matter', () => {
       for (let round = 0; round < 30; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithBasic++;
-        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        let queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         if (!queueResult.ok) throw new Error(queueResult.error);
         battle = queueResult.value;
+        battle = queuePlaceholders(battle, 'enemy');
         const result = executeRound(battle, rng);
         battle = result.state;
       }
