@@ -3,7 +3,7 @@
  * Tests that combat invariants hold across all valid states
  */
 
-import { describe, it } from 'vitest';
+import { describe, test } from 'vitest';
 import * as fc from 'fast-check';
 import { performAction } from '../../src/core/services/BattleService';
 import { makeTestCtx } from '../../src/test/testCtx';
@@ -12,7 +12,7 @@ import type { BattleEvent } from '../../src/core/services/types';
 import { isUnitKO } from '../../src/core/models/Unit';
 
 describe('Combat Invariants', () => {
-  it('damage never heals unless explicitly marked as healing', () => {
+  test('damage never heals unless explicitly marked as healing', () => {
     fc.assert(
       fc.property(arbBattleState, (battle) => {
         const { rng } = makeTestCtx(123);
@@ -54,7 +54,7 @@ describe('Combat Invariants', () => {
     );
   });
 
-  it('dead units cannot act', () => {
+  test('dead units cannot act', () => {
     fc.assert(
       fc.property(arbBattleState, (battle) => {
         const { rng } = makeTestCtx(456);
@@ -89,7 +89,7 @@ describe('Combat Invariants', () => {
     );
   });
 
-  it('healing never exceeds max HP', () => {
+  test('healing never exceeds max HP', () => {
     fc.assert(
       fc.property(arbBattleState, (battle) => {
         const { rng } = makeTestCtx(789);
@@ -141,7 +141,7 @@ describe('Combat Invariants', () => {
     );
   });
 
-  it('HP never goes negative', () => {
+  test('HP never goes negative', () => {
     fc.assert(
       fc.property(arbBattleState, (battle) => {
         const { rng } = makeTestCtx(321);

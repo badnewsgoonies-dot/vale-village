@@ -1,25 +1,91 @@
 import type { StateCreator } from 'zustand';
 import type { MapTrigger } from '@/core/models/overworld';
+import type { Encounter } from '@/data/schemas/EncounterSchema';
+import { ENCOUNTERS } from '@/data/definitions/encounters';
+import { createBattleFromEncounter } from '@/core/services/EncounterService';
+import { makePRNG } from '@/core/random/prng';
+import { DIALOGUES } from '@/data/definitions/dialogues';
+import type { QueueBattleSlice } from './queueBattleSlice';
+import type { TeamSlice } from './teamSlice';
+import type { DialogueSlice } from './dialogueSlice';
 
 export interface GameFlowSlice {
   mode: 'overworld' | 'battle' | 'rewards' | 'dialogue';
   lastTrigger: MapTrigger | null;
+  currentEncounter: Encounter | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   handleTrigger: (trigger: MapTrigger | null) => void;
   resetLastTrigger: () => void;
 }
 
-export const createGameFlowSlice: StateCreator<GameFlowSlice> = (set) => ({
+export const createGameFlowSlice: StateCreator<
+  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice,
+  [['zustand/devtools', never]],
+  [],
+  GameFlowSlice
+> = (set, get) => ({
   mode: 'overworld',
   lastTrigger: null,
+  currentEncounter: null,
   setMode: (mode) => set({ mode }),
   handleTrigger: (trigger) => {
     if (!trigger) {
       set({ lastTrigger: null });
       return;
     }
-    const nextMode = trigger.type === 'battle' ? 'battle' : 'overworld';
-    set({ lastTrigger: trigger, mode: nextMode });
+
+    if (trigger.type === 'battle') {
+      const encounterId = (trigger.data as { encounterId?: string }).encounterId;
+      if (encounterId) {
+        const encounter = ENCOUNTERS[encounterId];
+        if (!encounter) {
+          console.error(`Encounter ${encounterId} not found in ENCOUNTERS`);
+          return;
+        }
+
+        const team = get().team;
+        if (!team) {
+          console.error('No team available for battle');
+          return;
+        }
+
+        const seed = Date.now();
+        const rng = makePRNG(seed);
+        const result = createBattleFromEncounter(encounterId, team, rng);
+        if (!result) {
+          console.error(`Failed to create battle from encounter ${encounterId}`);
+          return;
+        }
+
+        get().setBattle(result.battle, seed);
+        set({
+          currentEncounter: encounter,
+          lastTrigger: trigger,
+          mode: 'battle',
+        });
+      }
+      return;
+    }
+
+    if (trigger.type === 'npc') {
+      const npcId = (trigger.data as { npcId?: string }).npcId;
+      if (npcId && DIALOGUES[npcId]) {
+        get().startDialogueTree(DIALOGUES[npcId]);
+      }
+      set({ lastTrigger: trigger });
+      return;
+    }
+
+    if (trigger.type === 'story') {
+      const storyId = (trigger.data as { storyId?: string }).storyId;
+      if (storyId && DIALOGUES[storyId]) {
+        get().startDialogueTree(DIALOGUES[storyId]);
+      }
+      set({ lastTrigger: trigger });
+      return;
+    }
+
+    set({ lastTrigger: trigger });
   },
   resetLastTrigger: () => set({ lastTrigger: null }),
 });

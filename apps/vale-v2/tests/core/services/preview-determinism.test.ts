@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
@@ -32,7 +32,7 @@ describe('Preview Determinism', () => {
     description: 'A test warrior',
   };
 
-  it('preview does not advance live RNG', () => {
+  test('preview does not advance live RNG', () => {
     const unit1 = createUnit(testUnitDef, 1, 0);
     const unit2 = createUnit({ ...testUnitDef, id: 'unit2', name: 'Unit 2' }, 1, 0);
     const unit3 = createUnit({ ...testUnitDef, id: 'unit3', name: 'Unit 3' }, 1, 0);
@@ -69,7 +69,7 @@ describe('Preview Determinism', () => {
     expect(afterSequence).toEqual(beforeSequence);
   });
 
-  it('preview produces consistent results', () => {
+  test('preview produces consistent results', () => {
     const unit1 = createUnit(testUnitDef, 1, 0);
     const unit2 = createUnit({ ...testUnitDef, id: 'unit2' }, 1, 0);
     const unit3 = createUnit({ ...testUnitDef, id: 'unit3' }, 1, 0);

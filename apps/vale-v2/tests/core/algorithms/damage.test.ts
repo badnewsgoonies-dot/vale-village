@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
@@ -77,7 +77,7 @@ describe('Damage Algorithms', () => {
     manaCost: 3,
   };
 
-  it('should calculate physical damage', () => {
+  test('should calculate physical damage', () => {
     const attacker = createSampleUnit('attacker', { atk: 15 });
     const defender = createSampleUnit('defender', { def: 10 });
     const team = createTeam([attacker, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
@@ -90,7 +90,7 @@ describe('Damage Algorithms', () => {
     expect(damage).toBeLessThan(100); // Sanity check
   });
 
-  it('should calculate psynergy damage', () => {
+  test('should calculate psynergy damage', () => {
     const attacker = createSampleUnit('attacker', { mag: 20 });
     const defender = createSampleUnit('defender', { def: 10 });
     const team = createTeam([attacker, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
@@ -101,7 +101,7 @@ describe('Damage Algorithms', () => {
     expect(damage).toBeGreaterThan(0);
   });
 
-  it('should calculate healing amount', () => {
+  test('should calculate healing amount', () => {
     const caster = createSampleUnit('caster', { mag: 15 });
     const team = createTeam([caster, createSampleUnit('u2', {}), createSampleUnit('u3', {}), createSampleUnit('u4', {})]);
     const rng = makePRNG(12345);
@@ -111,7 +111,7 @@ describe('Damage Algorithms', () => {
     expect(healing).toBeGreaterThanOrEqual(0);
   });
 
-  it('should apply damage to unit', () => {
+  test('should apply damage to unit', () => {
     const unit = createSampleUnit('unit', {});
     const initialHp = unit.currentHp;
     const damage = 20;
@@ -122,7 +122,7 @@ describe('Damage Algorithms', () => {
     expect(damaged.battleStats.damageTaken).toBe(damage);
   });
 
-  it('should not allow HP to go below 0', () => {
+  test('should not allow HP to go below 0', () => {
     const unit = createSampleUnit('unit', {});
     const massiveDamage = 1000;
 
@@ -131,7 +131,7 @@ describe('Damage Algorithms', () => {
     expect(damaged.currentHp).toBe(0);
   });
 
-  it('should apply healing to unit', () => {
+  test('should apply healing to unit', () => {
     const unit = createSampleUnit('unit', {});
     const damagedUnit = applyDamage(unit, 30);
     const healing = 20;
@@ -141,7 +141,7 @@ describe('Damage Algorithms', () => {
     expect(healed.currentHp).toBe(damagedUnit.currentHp + healing);
   });
 
-  it('should not allow HP to exceed max HP', () => {
+  test('should not allow HP to exceed max HP', () => {
     const unit = createSampleUnit('unit', {});
     const massiveHealing = 1000;
 

@@ -3,13 +3,13 @@
  * Tests story progression from battle events
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createStoryState } from '../../../src/core/models/story';
 import { processEncounterCompletion, advanceChapter } from '../../../src/core/services/StoryService';
 import type { BattleEvent } from '../../../src/core/services/types';
 
 describe('Story Integration', () => {
-  it('boss victory sets boss:ch1 flag and advances to chapter 2', () => {
+  test('boss victory sets boss:ch1 flag and advances to chapter 2', () => {
     let story = createStoryState(1);
     
     // Process boss encounter completion
@@ -26,7 +26,7 @@ describe('Story Integration', () => {
     }
   });
 
-  it('replaying cleared encounter does not regress flags', () => {
+  test('replaying cleared encounter does not regress flags', () => {
     let story = createStoryState(1);
     
     // First completion
@@ -44,7 +44,7 @@ describe('Story Integration', () => {
     }
   });
 
-  it('processes encounter-finished events correctly', () => {
+  test('processes encounter-finished events correctly', () => {
     let story = createStoryState(1);
     
     const events: BattleEvent[] = [

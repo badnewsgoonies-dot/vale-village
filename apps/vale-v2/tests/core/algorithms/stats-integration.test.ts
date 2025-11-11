@@ -4,7 +4,7 @@
  * Tests that effective stats affect combat outcomes
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makeTestCtx } from '../../../src/test/testCtx';
 import { mkUnit, mkEnemy, mkTeam, mkBattle } from '../../../src/test/factories';
 import { performAction } from '../../../src/core/services/BattleService';
@@ -14,7 +14,7 @@ import { UNIT_DEFINITIONS } from '../../../src/data/definitions/units';
 import { ABILITIES } from '../../../src/data/definitions/abilities';
 
 describe('Effective Stats Integration', () => {
-  it('should increase damage with equipment bonuses', () => {
+  test('should increase damage with equipment bonuses', () => {
     const ctx = makeTestCtx();
     const playerUnit = createUnit(UNIT_DEFINITIONS.adept, 5);
     const enemyUnit = mkEnemy('slime');
@@ -22,7 +22,7 @@ describe('Effective Stats Integration', () => {
     // Create team with 4 units
     const team = mkTeam([
       playerUnit,
-      createUnit(UNIT_DEFINITIONS.war_mage, 1),
+      createUnit(UNIT_DEFINITIONS['war-mage'], 1),
       createUnit(UNIT_DEFINITIONS.mystic, 1),
       createUnit(UNIT_DEFINITIONS.ranger, 1),
     ]);
@@ -53,14 +53,14 @@ describe('Effective Stats Integration', () => {
     expect(equippedEffective.atk).toBe(baseEffective.atk + 10);
   });
 
-  it('should increase damage with level bonuses', () => {
+  test('should increase damage with level bonuses', () => {
     const ctx = makeTestCtx();
     // Use createUnit directly to set level correctly
     const lowLevelUnit = createUnit(UNIT_DEFINITIONS.adept, 1);
     const highLevelUnit = createUnit(UNIT_DEFINITIONS.adept, 10);
     
-    const lowTeam = mkTeam([lowLevelUnit, createUnit(UNIT_DEFINITIONS.war_mage, 1), createUnit(UNIT_DEFINITIONS.mystic, 1), createUnit(UNIT_DEFINITIONS.ranger, 1)]);
-    const highTeam = mkTeam([highLevelUnit, createUnit(UNIT_DEFINITIONS.war_mage, 1), createUnit(UNIT_DEFINITIONS.mystic, 1), createUnit(UNIT_DEFINITIONS.ranger, 1)]);
+    const lowTeam = mkTeam([lowLevelUnit, createUnit(UNIT_DEFINITIONS['war-mage'], 1), createUnit(UNIT_DEFINITIONS.mystic, 1), createUnit(UNIT_DEFINITIONS.ranger, 1)]);
+    const highTeam = mkTeam([highLevelUnit, createUnit(UNIT_DEFINITIONS['war-mage'], 1), createUnit(UNIT_DEFINITIONS.mystic, 1), createUnit(UNIT_DEFINITIONS.ranger, 1)]);
     
     // Compare effective stats
     const lowEffective = calculateEffectiveStats(lowLevelUnit, lowTeam);
@@ -78,7 +78,7 @@ describe('Effective Stats Integration', () => {
     expect(highEffective.hp).toBeGreaterThan(lowEffective.hp);
   });
 
-  it('should affect turn order with effective SPD', () => {
+  test('should affect turn order with effective SPD', () => {
     const slowUnit = createUnit(UNIT_DEFINITIONS.adept, 1);
     const fastUnit = createUnit(UNIT_DEFINITIONS.ranger, 1);
     
@@ -95,7 +95,7 @@ describe('Effective Stats Integration', () => {
     const team = mkTeam([
       slowUnit,
       fastUnit,
-      createUnit(UNIT_DEFINITIONS.war_mage, 1),
+      createUnit(UNIT_DEFINITIONS['war-mage'], 1),
       createUnit(UNIT_DEFINITIONS.mystic, 1),
     ]);
     
@@ -109,7 +109,7 @@ describe('Effective Stats Integration', () => {
     // (This is tested more thoroughly in turn-order tests)
   });
 
-  it('should affect healing with effective MAG', () => {
+  test('should affect healing with effective MAG', () => {
     const healer = createUnit(UNIT_DEFINITIONS.mystic, 5);
     const target = createUnit(UNIT_DEFINITIONS.adept, 5);
     target.currentHp = 50; // Wounded
@@ -117,7 +117,7 @@ describe('Effective Stats Integration', () => {
     const team = mkTeam([
       healer,
       target,
-      createUnit(UNIT_DEFINITIONS.war_mage, 1),
+      createUnit(UNIT_DEFINITIONS['war-mage'], 1),
       createUnit(UNIT_DEFINITIONS.ranger, 1),
     ]);
     

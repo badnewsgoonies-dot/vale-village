@@ -3,12 +3,12 @@
  * PR-SCHEMA-20: Level cap 20, equipment.accessory field
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { migrateSave } from '../../../src/core/save/migrations';
 import type { SaveEnvelope } from '../../../src/core/save/types';
 
 describe('Migration 1.1 -> 1.2', () => {
-  it('should clamp unit levels > 20 to 20', () => {
+  test('should clamp unit levels > 20 to 20', () => {
     const oldSave: SaveEnvelope = {
       version: { major: 1, minor: 1 },
       state: {
@@ -57,7 +57,7 @@ describe('Migration 1.1 -> 1.2', () => {
     expect(migrated.state.team.units[0]?.level).toBe(20);
   });
 
-  it('should clamp enemy levels > 20 to 20', () => {
+  test('should clamp enemy levels > 20 to 20', () => {
     const oldSave: SaveEnvelope = {
       version: { major: 1, minor: 1 },
       state: {
@@ -114,7 +114,7 @@ describe('Migration 1.1 -> 1.2', () => {
     expect(migrated.state.battle?.enemies[0]?.level).toBe(20);
   });
 
-  it('should add equipment.accessory field if missing', () => {
+  test('should add equipment.accessory field if missing', () => {
     const oldSave: SaveEnvelope = {
       version: { major: 1, minor: 1 },
       state: {
@@ -164,7 +164,7 @@ describe('Migration 1.1 -> 1.2', () => {
     expect(migrated.state.team.units[0]?.equipment.accessory).toBeNull();
   });
 
-  it('should leave levels <= 20 unchanged', () => {
+  test('should leave levels <= 20 unchanged', () => {
     const oldSave: SaveEnvelope = {
       version: { major: 1, minor: 1 },
       state: {

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createUnit } from '../../../src/core/models/Unit';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
 import {
@@ -38,7 +38,7 @@ describe('XP Algorithms', () => {
     return createUnit(definition, level, xp);
   };
 
-  it('should get XP required for level', () => {
+  test('should get XP required for level', () => {
     expect(getXpForLevel(1)).toBe(0);
     expect(getXpForLevel(2)).toBe(100);
     expect(getXpForLevel(3)).toBe(350);
@@ -46,7 +46,7 @@ describe('XP Algorithms', () => {
     expect(getXpForLevel(5)).toBe(1850);
   });
 
-  it('should calculate level from XP', () => {
+  test('should calculate level from XP', () => {
     expect(calculateLevelFromXp(0)).toBe(1);
     expect(calculateLevelFromXp(50)).toBe(1);
     expect(calculateLevelFromXp(100)).toBe(2);
@@ -59,7 +59,7 @@ describe('XP Algorithms', () => {
     expect(calculateLevelFromXp(2000)).toBe(5);
   });
 
-  it('should add XP without leveling up', () => {
+  test('should add XP without leveling up', () => {
     const unit = createSampleUnit(1, 0);
     const result = addXp(unit, 50);
 
@@ -69,7 +69,7 @@ describe('XP Algorithms', () => {
     expect(result.newLevel).toBe(1);
   });
 
-  it('should level up when XP threshold is reached', () => {
+  test('should level up when XP threshold is reached', () => {
     const unit = createSampleUnit(1, 0);
     const result = addXp(unit, 100);
 
@@ -79,7 +79,7 @@ describe('XP Algorithms', () => {
     expect(result.newLevel).toBe(2);
   });
 
-  it('should handle multiple level ups', () => {
+  test('should handle multiple level ups', () => {
     const unit = createSampleUnit(1, 0);
     const result = addXp(unit, 350);
 

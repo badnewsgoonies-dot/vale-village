@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createEmptyLoadout, calculateEquipmentBonuses } from '../../../src/core/models/Equipment';
 import type { Equipment } from '../../../src/core/models/Equipment';
 import { EquipmentSchema, EquipmentLoadoutSchema } from '../../../src/data/schemas/EquipmentSchema';
 
 describe('Equipment Model', () => {
-  it('should create empty loadout', () => {
+  test('should create empty loadout', () => {
     const loadout = createEmptyLoadout();
 
     expect(loadout.weapon).toBeNull();
@@ -14,7 +14,7 @@ describe('Equipment Model', () => {
     expect(loadout.accessory).toBeNull();
   });
 
-  it('should calculate equipment bonuses correctly', () => {
+  test('should calculate equipment bonuses correctly', () => {
     const weapon: Equipment = {
       id: 'test-sword',
       name: 'Test Sword',
@@ -48,7 +48,7 @@ describe('Equipment Model', () => {
     expect(bonuses.hp).toBe(20);
   });
 
-  it('should validate equipment against schema', () => {
+  test('should validate equipment against schema', () => {
     const equipment: Equipment = {
       id: 'test-equipment',
       name: 'Test Equipment',
@@ -62,7 +62,7 @@ describe('Equipment Model', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should validate equipment loadout against schema', () => {
+  test('should validate equipment loadout against schema', () => {
     const loadout = createEmptyLoadout();
     const result = EquipmentLoadoutSchema.safeParse(loadout);
 

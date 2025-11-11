@@ -203,6 +203,172 @@ All game data must validate against Zod schemas:
 - Post-battle cutscenes triggered via `npcId` on `BattleState`
 - Use `getEncounterId(battle)` helper to access canonical encounter ID
 
+## Coding Conventions
+
+### Function Naming Prefixes
+
+Functions follow consistent naming patterns based on their purpose:
+
+- **`create*`** - Factory functions for production models (`createUnit`, `createTeam`, `createBattleState`)
+- **`mk*`** - Factory functions for tests only (`mkUnit`, `mkEnemy`, `mkTeam`) - located in `src/test/factories.ts`
+- **`make*`** - Alternative factories, usually for utilities (`makePRNG`)
+- **`calculate*`** - Pure mathematical computations (`calculateDamage`, `calculateMaxHp`, `calculateTurnOrder`)
+- **`check*`** - Boolean predicates that return true/false (`checkCriticalHit`, `checkDodge`)
+- **`get*`** - Accessor/getter functions (`getCurrentNode`, `getAvailableChoices`, `getElementModifier`)
+- **`apply*`** - Functions that transform state (`applyDamage`, `applyHealing`, `applyStatusEffect`)
+- **`is*`** - Type guards and boolean checks (`isUnitKO`, `isDialogueComplete`)
+- **`can*`** - Permission/validation checks (`canMoveTo`, `canAffordAction`, `canUseAbility`)
+
+### File Naming
+
+- **PascalCase**: Models and React components (`Unit.ts`, `BattleView.tsx`)
+- **kebab-case**: Algorithms and services (`damage.ts`, `turn-order.ts`)
+- **camelCase**: Utilities (`prng.ts`, `result.ts`)
+- **Slice suffix**: State slices (`battleSlice.ts`, `teamSlice.ts`)
+- **Schema suffix**: Zod schemas (`UnitSchema.ts`, `MapSchema.ts`) - **PascalCase**
+
+### Type vs Interface
+
+- Use `interface` for object/structural types:
+  ```typescript
+  export interface Unit {
+    id: string;
+    name: string;
+    // ...
+  }
+  ```
+
+- Use `type` for unions, literals, and type aliases:
+  ```typescript
+  export type Element = 'Venus' | 'Mars' | 'Mercury' | 'Jupiter';
+  export type BattlePhase = 'planning' | 'execution' | 'victory' | 'defeat';
+  ```
+
+- **Never use `enum`** - use string literal unions instead:
+  ```typescript
+  // ✓ Good
+  type Element = 'Venus' | 'Mars' | 'Mercury' | 'Jupiter';
+  
+  // ✗ Bad
+  enum Element { Venus, Mars, Mercury, Jupiter }
+  ```
+
+### Function Parameters
+
+Standard order: **subject → context → ability → rng (always last)**
+
+```typescript
+// ✓ Good
+function calculateDamage(
+  attacker: Unit,      // subject
+  defender: Unit,       // subject
+  team: Team,           // context
+  ability: Ability,     // action
+  rng: PRNG             // always last
+): number
+
+// ✗ Bad - rng in middle
+function calculateDamage(attacker: Unit, rng: PRNG, defender: Unit): number
+```
+
+### ID Formatting
+
+All IDs use **kebab-case**: `'adept'`, `'war-mage'`, `'heavy-strike'`, `'wooden-sword'`
+
+See `docs/NAMING_CONVENTIONS.md` for detailed ID formatting rules.
+
+### Import Ordering
+
+Imports should be ordered:
+
+1. **Type imports** (with `type` keyword)
+2. **Value imports** (without `type`)
+3. **Constants**
+4. **Algorithms/services**
+
+```typescript
+// 1. Type imports
+import type { Unit } from '../models/Unit';
+import type { BattleState } from '../models/BattleState';
+
+// 2. Value imports
+import { createUnit } from '../models/Unit';
+import { calculateDamage } from '../algorithms/damage';
+
+// 3. Constants
+import { BATTLE_CONSTANTS } from '../constants';
+
+// 4. Algorithms/services
+import { executeRound } from '../services/QueueBattleService';
+```
+
+### JSDoc Pattern
+
+Every exported function should have JSDoc with:
+- What it does
+- References to spec docs when relevant
+- Formulas/edge cases explained
+
+```typescript
+/**
+ * Calculate damage dealt by an attacker to a defender
+ * 
+ * Formula: (basePower + ATK - DEF×0.5) × randomMultiplier × elementAdvantage
+ * 
+ * @param attacker - Unit performing the attack
+ * @param defender - Unit receiving the attack
+ * @param ability - Ability being used
+ * @param rng - Seeded PRNG for deterministic randomness
+ * @returns Damage amount (always ≥ 0)
+ * 
+ * @see docs/architect/BATTLE_SYSTEM.md for full damage formula
+ */
+export function calculateDamage(
+  attacker: Unit,
+  defender: Unit,
+  ability: Ability,
+  rng: PRNG
+): number {
+  // ...
+}
+```
+
+### Test Conventions
+
+- Use `test()` for all test functions (not `it()`)
+- Test factories use `mk*` prefix
+- Located in `src/test/factories.ts`
+- Tests mirror `src/` structure in `tests/` directory
+
+```typescript
+import { describe, test, expect } from 'vitest';
+import { mkUnit } from '@/test/factories';
+
+describe('Damage Calculation', () => {
+  test('calculates physical damage correctly', () => {
+    const attacker = mkUnit({ level: 5 });
+    // ...
+  });
+});
+```
+
+### Component Props Naming
+
+All component props interfaces use `ComponentNameProps` pattern:
+
+```typescript
+// ✓ Good
+interface UnitCardProps {
+  unit: Unit;
+  isSelected?: boolean;
+}
+
+// ✗ Bad
+interface Props {
+  unit: Unit;
+}
+```
+
 ## Game Systems
 
 ### Battle System

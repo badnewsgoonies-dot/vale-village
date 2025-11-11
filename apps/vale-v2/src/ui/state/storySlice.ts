@@ -6,7 +6,7 @@
 import type { StateCreator } from 'zustand';
 import type { BattleEvent } from '../../core/services/types';
 import type { StoryState } from '../../core/models/story';
-import { createStoryState } from '../../core/models/story';
+import { createStoryState, setFlag } from '../../core/models/story';
 import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey } from '../../core/services/StoryService';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
@@ -16,6 +16,8 @@ export interface StorySlice {
   story: StoryState;
   showCredits: boolean;
   setShowCredits: (show: boolean) => void;
+  setStoryFlag: (key: string, value: boolean | number) => void;
+  getStoryFlag: (key: string) => boolean | number | undefined;
   onBattleEvents: (events: readonly BattleEvent[]) => void;
 }
 
@@ -29,6 +31,16 @@ export const createStorySlice: StateCreator<
   showCredits: false,
   
   setShowCredits: (show) => _set({ showCredits: show }),
+
+  setStoryFlag: (key, value) => {
+    const story = get().story;
+    const updatedStory = setFlag(story, key, value);
+    _set({ story: updatedStory });
+  },
+
+  getStoryFlag: (key) => {
+    return get().story.flags[key];
+  },
 
   onBattleEvents: (events) => {
     let st = get().story;

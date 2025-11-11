@@ -42,10 +42,8 @@ function App() {
   const handleRewardsContinue = () => {
     claimRewards(); // Add gold/equipment to inventory, clear rewards
     setShowRewards(false); // Ensure rewards screen is hidden
-    const { battleState, seed } = createTestBattle();
-    setBattle(battleState, seed); // Restart test battle
-    setTeam(battleState.playerTeam); // Update team state
-    setMode('battle');
+    setMode('overworld');
+    setBattle(null, 0);
   };
 
   return (
@@ -98,4 +96,3 @@ function App() {
 }
 
 export default App;
-

@@ -3,7 +3,7 @@
  * Tests for status effect application, ticking, and expiration
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { processStatusEffectTick, checkParalyzeFailure, isFrozen } from '../../../src/core/algorithms/status';
 import { performAction } from '../../../src/core/services/BattleService';
@@ -13,7 +13,7 @@ import { ABILITIES } from '../../../src/data/definitions/abilities';
 
 describe('Status Effects', () => {
   describe('On-Hit Status Application', () => {
-    it('should apply poison status on successful hit', () => {
+    test('should apply poison status on successful hit', () => {
       // Run multiple seeds to handle dodge flakiness (5% base miss chance)
       let statusApplied = false;
       
@@ -73,7 +73,7 @@ describe('Status Effects', () => {
       expect(statusApplied).toBe(true);
     });
     
-    it('should apply burn status on successful hit', () => {
+    test('should apply burn status on successful hit', () => {
       let statusApplied = false;
       
       for (let seed = 2000; seed < 2005; seed++) {
@@ -126,7 +126,7 @@ describe('Status Effects', () => {
   });
   
   describe('Stacking Prevention', () => {
-    it('should prevent status stacking (reapply replaces same type)', () => {
+    test('should prevent status stacking (reapply replaces same type)', () => {
       const unit = mkUnit({
         id: 'unit',
         statusEffects: [
@@ -149,7 +149,7 @@ describe('Status Effects', () => {
       expect(poisonStatuses[0]?.duration).toBe(3); // New duration replaces old
     });
     
-    it('should allow different status types to coexist', () => {
+    test('should allow different status types to coexist', () => {
       const unit = mkUnit({
         id: 'unit',
         statusEffects: [
@@ -174,7 +174,7 @@ describe('Status Effects', () => {
   });
   
   describe('Status Tick Damage', () => {
-    it('should deal 8% max HP poison damage per turn', () => {
+    test('should deal 8% max HP poison damage per turn', () => {
       const rng = makePRNG(12345);
       const unit = mkUnit({
         id: 'unit',
@@ -195,7 +195,7 @@ describe('Status Effects', () => {
       expect(result.messages.some(m => m.includes('poison damage'))).toBe(true);
     });
     
-    it('should deal 10% max HP burn damage per turn', () => {
+    test('should deal 10% max HP burn damage per turn', () => {
       const rng = makePRNG(12345);
       const unit = mkUnit({
         id: 'unit',
@@ -216,7 +216,7 @@ describe('Status Effects', () => {
       expect(result.messages.some(m => m.includes('burn damage'))).toBe(true);
     });
     
-    it('should decrement duration after tick', () => {
+    test('should decrement duration after tick', () => {
       const rng = makePRNG(12345);
       const unit = mkUnit({
         id: 'unit',
@@ -229,7 +229,7 @@ describe('Status Effects', () => {
       expect(poisonStatus?.duration).toBe(2);
     });
     
-    it('should remove status when duration reaches 0', () => {
+    test('should remove status when duration reaches 0', () => {
       const rng = makePRNG(12345);
       const unit = mkUnit({
         id: 'unit',
@@ -245,7 +245,7 @@ describe('Status Effects', () => {
   });
   
   describe('Freeze Status', () => {
-    it('should prevent unit from acting when frozen', () => {
+    test('should prevent unit from acting when frozen', () => {
       const unit = mkUnit({
         id: 'unit',
         statusEffects: [{ type: 'freeze' as const, duration: 2 }],
@@ -254,7 +254,7 @@ describe('Status Effects', () => {
       expect(isFrozen(unit)).toBe(true);
     });
     
-    it('should have ~30% break chance per turn', () => {
+    test('should have ~30% break chance per turn', () => {
       // Test over many trials to verify probability
       let breakCount = 0;
       const trials = 1000;
@@ -283,7 +283,7 @@ describe('Status Effects', () => {
   });
   
   describe('Paralyze Status', () => {
-    it('should have ~25% failure chance', () => {
+    test('should have ~25% failure chance', () => {
       // Test over many trials to verify probability
       let failureCount = 0;
       const trials = 1000;
@@ -306,7 +306,7 @@ describe('Status Effects', () => {
       expect(failureRate).toBeLessThan(0.30);
     });
     
-    it('should not fail actions when not paralyzed', () => {
+    test('should not fail actions when not paralyzed', () => {
       const rng = makePRNG(12345);
       const unit = mkUnit({ id: 'unit' });
       

@@ -3,7 +3,7 @@
  * Tests that canonical battles produce identical event logs on replay
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { playReplay } from '../../../src/core/save/ReplayService';
 import type { ReplayTape } from '../../../src/core/save/types';
 import { CURRENT_SAVE_VERSION } from '../../../src/core/save/migrations';
@@ -48,12 +48,12 @@ function createEventLog(events: readonly ReturnType<typeof playReplay>['events']
 }
 
 describe('Golden Battles', () => {
-  it('Chapter 1 normal encounter (Slime) produces stable log', () => {
+  test('Chapter 1 normal encounter (Slime) produces stable log', () => {
     const seed = 1001;
     
     // Create battle: 4 player units vs 2 slimes
     const player1 = createUnit(UNIT_DEFINITIONS.adept, 1, 0);
-    const player2 = createUnit(UNIT_DEFINITIONS.war_mage, 1, 0);
+    const player2 = createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0);
     const player3 = createUnit(UNIT_DEFINITIONS.mystic, 1, 0);
     const player4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     const team = createTeam([player1, player2, player3, player4]);
@@ -72,7 +72,7 @@ describe('Golden Battles', () => {
         team,
         story: createStoryState(1),
         gold: 0,
-        unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
+        unitsCollected: ['adept', 'war-mage', 'mystic', 'ranger'],
       },
       inputs: [
         {
@@ -101,7 +101,7 @@ describe('Golden Battles', () => {
     expect(log1).toEqual(log2);
   });
 
-  it('Mini-boss (Gladiator) produces stable log', () => {
+  test('Mini-boss (Gladiator) produces stable log', () => {
     const seed = 2002;
     
     const player1 = createUnit(UNIT_DEFINITIONS.adept, 2, 0);
@@ -123,7 +123,7 @@ describe('Golden Battles', () => {
         team,
         story: createStoryState(1),
         gold: 0,
-        unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
+        unitsCollected: ['adept', 'war-mage', 'mystic', 'ranger'],
       },
       inputs: [
         {
@@ -155,7 +155,7 @@ describe('Golden Battles', () => {
     expect(log1).toEqual(log2);
   });
 
-  it('Boss (Elemental Guardian) produces stable log', () => {
+  test('Boss (Elemental Guardian) produces stable log', () => {
     const seed = 3003;
     
     const player1 = createUnit(UNIT_DEFINITIONS.adept, 3, 0);
@@ -179,7 +179,7 @@ describe('Golden Battles', () => {
         team,
         story: createStoryState(1),
         gold: 0,
-        unitsCollected: ['adept', 'war_mage', 'mystic', 'ranger'],
+        unitsCollected: ['adept', 'war-mage', 'mystic', 'ranger'],
       },
       inputs: [
         {

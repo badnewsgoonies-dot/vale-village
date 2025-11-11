@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { calculateDjinnSynergy } from '../../../src/core/algorithms/djinn';
 import type { Element } from '../../../src/core/models/types';
 
 describe('Djinn Algorithms', () => {
-  it('should return base stats for no Djinn', () => {
+  test('should return base stats for no Djinn', () => {
     const synergy = calculateDjinnSynergy([]);
 
     expect(synergy.atk).toBe(0);
@@ -12,7 +12,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.abilitiesUnlocked).toEqual([]);
   });
 
-  it('should calculate synergy for 1 Djinn', () => {
+  test('should calculate synergy for 1 Djinn', () => {
     const synergy = calculateDjinnSynergy(['Venus']);
 
     expect(synergy.atk).toBe(4);
@@ -20,7 +20,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.classChange).toBe('Adept');
   });
 
-  it('should calculate synergy for 2 same-element Djinn', () => {
+  test('should calculate synergy for 2 same-element Djinn', () => {
     const synergy = calculateDjinnSynergy(['Venus', 'Venus']);
 
     expect(synergy.atk).toBe(8);
@@ -28,7 +28,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.classChange).toBe('Venus Warrior');
   });
 
-  it('should calculate synergy for 2 different-element Djinn', () => {
+  test('should calculate synergy for 2 different-element Djinn', () => {
     const synergy = calculateDjinnSynergy(['Venus', 'Mars']);
 
     expect(synergy.atk).toBe(5);
@@ -36,7 +36,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.classChange).toBe('Hybrid');
   });
 
-  it('should calculate synergy for 3 same-element Djinn', () => {
+  test('should calculate synergy for 3 same-element Djinn', () => {
     const synergy = calculateDjinnSynergy(['Venus', 'Venus', 'Venus']);
 
     expect(synergy.atk).toBe(12);
@@ -45,7 +45,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.abilitiesUnlocked).toContain('Venus-Ultimate');
   });
 
-  it('should calculate synergy for 3 mixed Djinn (2+1)', () => {
+  test('should calculate synergy for 3 mixed Djinn (2+1)', () => {
     const synergy = calculateDjinnSynergy(['Venus', 'Venus', 'Mars']);
 
     expect(synergy.atk).toBe(8);
@@ -54,7 +54,7 @@ describe('Djinn Algorithms', () => {
     expect(synergy.abilitiesUnlocked).toContain('Hybrid-Spell');
   });
 
-  it('should calculate synergy for 3 different-element Djinn', () => {
+  test('should calculate synergy for 3 different-element Djinn', () => {
     const synergy = calculateDjinnSynergy(['Venus', 'Mars', 'Mercury']);
 
     expect(synergy.atk).toBe(4);

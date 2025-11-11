@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { DialogueSlice as DialogueSliceModel, DialogueTree, DialogueState } from '@/core/models/dialogue';
+import type { DialogueTree, DialogueState } from '@/core/models/dialogue';
 import {
   startDialogue,
   selectChoice,
@@ -7,6 +7,7 @@ import {
   isDialogueComplete,
 } from '@/core/services/DialogueService';
 import type { GameFlowSlice } from './gameFlowSlice';
+import type { StorySlice } from './storySlice';
 
 export interface DialogueSlice {
   currentDialogueTree: DialogueTree | null;
@@ -17,7 +18,7 @@ export interface DialogueSlice {
   endDialogue: () => void;
 }
 
-export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice> = (set, get) => ({
+export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice> = (set, get) => ({
   currentDialogueTree: null,
   currentDialogueState: null,
 
@@ -36,6 +37,10 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice> = 
 
     const newState = selectChoice(currentDialogueTree, currentDialogueState, choiceId);
     set({ currentDialogueState: newState });
+
+    if (newState.variables && Object.keys(newState.variables).length > 0) {
+      processDialogueEffects(newState.variables, get);
+    }
 
     if (isDialogueComplete(currentDialogueTree, newState)) {
       get().endDialogue();
@@ -62,3 +67,23 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice> = 
     });
   },
 });
+
+function processDialogueEffects(effects: Record<string, unknown>, get: () => any) {
+  if (effects.questAccepted === true && typeof get().setStoryFlag === 'function') {
+    get().setStoryFlag('questAccepted', true);
+    console.log('Quest accepted!');
+  }
+
+  if (effects.openShop === true) {
+    console.log('Shop opened via dialogue (UI not implemented)');
+  }
+
+  if (typeof effects.startBattle === 'string') {
+    get().handleTrigger({
+      id: 'dialogue-battle',
+      type: 'battle',
+      position: { x: 0, y: 0 },
+      data: { encounterId: effects.startBattle },
+    });
+  }
+}

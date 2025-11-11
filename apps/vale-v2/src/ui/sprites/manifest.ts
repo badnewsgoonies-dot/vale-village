@@ -19,7 +19,7 @@ export const SPRITES: Record<string, SpriteDef> = {
     frameWidth: 32,
     frameHeight: 32,
   },
-  'unit:war_mage': {
+  'unit:war-mage': {
     src: '/sprites/placeholders/war_mage.png',
     frames: 8,
     fps: 12,

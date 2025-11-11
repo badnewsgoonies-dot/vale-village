@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
@@ -49,7 +49,7 @@ describe('Reward Algorithms', () => {
   };
 
   describe('calculateBattleRewards', () => {
-    it('should calculate rewards with survival bonus', () => {
+    test('should calculate rewards with survival bonus', () => {
       const rng = makePRNG(12345);
       const enemy1 = enemyToUnit(SLIME);
       const enemy2 = enemyToUnit(WOLF);
@@ -73,7 +73,7 @@ describe('Reward Algorithms', () => {
       expect(rewardsPartial.xpPerUnit).toBe(Math.floor(25 / 2)); // 12 XP per unit
     });
 
-    it('should handle no enemies', () => {
+    test('should handle no enemies', () => {
       const rng = makePRNG(12345);
       const rewards = calculateBattleRewards([], true, 4, rng);
       
@@ -83,7 +83,7 @@ describe('Reward Algorithms', () => {
       expect(rewards.enemiesDefeated).toBe(0);
     });
 
-    it('should handle no survivors', () => {
+    test('should handle no survivors', () => {
       const rng = makePRNG(12345);
       const enemy = enemyToUnit(SLIME);
       const rewards = calculateBattleRewards([enemy], false, 0, rng);
@@ -94,7 +94,7 @@ describe('Reward Algorithms', () => {
       expect(rewards.survivorCount).toBe(0);
     });
 
-    it('should calculate gold with variance', () => {
+    test('should calculate gold with variance', () => {
       const rng1 = makePRNG(11111);
       const rng2 = makePRNG(22222);
       const enemy = enemyToUnit(SLIME);
@@ -114,7 +114,7 @@ describe('Reward Algorithms', () => {
       expect(rewards1.totalGold).toBeGreaterThanOrEqual(5);
     });
 
-    it('should be deterministic with same seed', () => {
+    test('should be deterministic with same seed', () => {
       const seed = 99999;
       const enemy = enemyToUnit(SLIME);
       
@@ -130,7 +130,7 @@ describe('Reward Algorithms', () => {
   });
 
   describe('calculateEquipmentDrops', () => {
-    it('should roll for equipment drops', () => {
+    test('should roll for equipment drops', () => {
       const rng = makePRNG(12345);
       const enemy = enemyToUnit(SLIME);
       
@@ -139,7 +139,7 @@ describe('Reward Algorithms', () => {
       expect(drops).toEqual([]);
     });
 
-    it('should be deterministic with same seed', () => {
+    test('should be deterministic with same seed', () => {
       const seed = 55555;
       const enemy = enemyToUnit(SLIME);
       
@@ -154,7 +154,7 @@ describe('Reward Algorithms', () => {
   });
 
   describe('calculateStatGains', () => {
-    it('should calculate stat gains for level up', () => {
+    test('should calculate stat gains for level up', () => {
       const unit = createSampleUnit(1, 0);
       const gains = calculateStatGains(unit, 1, 3); // Level 1 → 3 (2 levels)
       
@@ -166,7 +166,7 @@ describe('Reward Algorithms', () => {
       expect(gains.spd).toBe(unit.growthRates.spd * 2); // 1 * 2 = 2
     });
 
-    it('should handle single level gain', () => {
+    test('should handle single level gain', () => {
       const unit = createSampleUnit(1, 0);
       const gains = calculateStatGains(unit, 1, 2); // Level 1 → 2 (1 level)
       
@@ -176,7 +176,7 @@ describe('Reward Algorithms', () => {
   });
 
   describe('distributeRewards', () => {
-    it('should skip KO\'d units', () => {
+    test('should skip KO\'d units', () => {
       const unit1 = createSampleUnit(1, 0, 50); // Alive
       const unit2 = createSampleUnit(1, 0, 0); // KO'd
       const unit3 = createSampleUnit(1, 0, 30); // Alive
@@ -204,7 +204,7 @@ describe('Reward Algorithms', () => {
       expect(distribution.updatedTeam.units.length).toBe(4);
     });
 
-    it('should detect level-ups', () => {
+    test('should detect level-ups', () => {
       const unit = createSampleUnit(1, 0, 100); // Level 1, 0 XP
       const team = createTeam([unit, unit, unit, unit]);
       
@@ -244,7 +244,7 @@ describe('Reward Algorithms', () => {
       expect(distribution2.updatedTeam.units.every(u => u.level === 2)).toBe(true);
     });
 
-    it('should skip max level units', () => {
+    test('should skip max level units', () => {
       const unit1 = createSampleUnit(20, 92800, 100); // Max level
       const unit2 = createSampleUnit(1, 0, 100); // Can level up
       const team = createTeam([unit1, unit2, unit2, unit2]);
@@ -266,7 +266,7 @@ describe('Reward Algorithms', () => {
       expect(distribution.updatedTeam).toBeDefined();
     });
 
-    it('should track stat gains and unlocked abilities', () => {
+    test('should track stat gains and unlocked abilities', () => {
       const unit = createSampleUnit(1, 0, 100);
       const team = createTeam([unit, unit, unit, unit]);
       

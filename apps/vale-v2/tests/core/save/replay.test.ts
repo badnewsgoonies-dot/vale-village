@@ -3,7 +3,7 @@
  * Tests for deterministic replay functionality
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { playReplay } from '../../../src/core/save/ReplayService';
 import type { ReplayTape, GameStateSnapshot, PlayerCommand } from '../../../src/core/save/types';
 import { createBattleState } from '../../../src/core/models/BattleState';
@@ -16,12 +16,12 @@ import { CURRENT_SAVE_VERSION } from '../../../src/core/save/migrations';
 import { createStoryState } from '../../../src/core/models/story';
 
 describe('ReplayService', () => {
-  it('should replay a simple battle deterministically', () => {
+  test('should replay a simple battle deterministically', () => {
     const seed = 1337;
     
     // Create initial state
     const playerUnit1 = createUnit(UNIT_DEFINITIONS.adept, 1, 0);
-    const playerUnit2 = createUnit(UNIT_DEFINITIONS.war_mage, 1, 0);
+    const playerUnit2 = createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0);
     const playerUnit3 = createUnit(UNIT_DEFINITIONS.mystic, 1, 0);
     const playerUnit4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     const enemyUnit = enemyToUnit(ENEMIES.slime);
@@ -69,12 +69,12 @@ describe('ReplayService', () => {
     expect(result2.events).toEqual(result1.events);
   });
 
-  it('should handle empty replay tape', () => {
+  test('should handle empty replay tape', () => {
     const seed = 1337;
     
     // Create a minimal team with 4 units
     const unit1 = createUnit(UNIT_DEFINITIONS.adept, 1, 0);
-    const unit2 = createUnit(UNIT_DEFINITIONS.war_mage, 1, 0);
+    const unit2 = createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0);
     const unit3 = createUnit(UNIT_DEFINITIONS.mystic, 1, 0);
     const unit4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     
@@ -99,11 +99,11 @@ describe('ReplayService', () => {
     expect(result.error).toContain('No battle state');
   });
 
-  it('should handle end-turn command', () => {
+  test('should handle end-turn command', () => {
     const seed = 1337;
     
     const playerUnit1 = createUnit(UNIT_DEFINITIONS.adept, 1, 0);
-    const playerUnit2 = createUnit(UNIT_DEFINITIONS.war_mage, 1, 0);
+    const playerUnit2 = createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0);
     const playerUnit3 = createUnit(UNIT_DEFINITIONS.mystic, 1, 0);
     const playerUnit4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     const enemyUnit = enemyToUnit(ENEMIES.slime);

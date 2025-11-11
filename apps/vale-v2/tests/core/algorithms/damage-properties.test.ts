@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
@@ -43,7 +43,7 @@ describe('Damage Algorithm Properties', () => {
     return createUnit(definition, 1, 0);
   };
 
-  it('should cap crit chance at 35% regardless of SPD', () => {
+  test('should cap crit chance at 35% regardless of SPD', () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 999 }), (spd) => {
         const unit = createSampleUnit(spd);
@@ -67,7 +67,7 @@ describe('Damage Algorithm Properties', () => {
     );
   });
 
-  it('should maintain hit chance bounds (5% to 95%)', () => {
+  test('should maintain hit chance bounds (5% to 95%)', () => {
     fc.assert(
       fc.property(
         fc.integer({ min: 0, max: 100 }), // attacker SPD
@@ -112,7 +112,7 @@ describe('Damage Algorithm Properties', () => {
     );
   });
 
-  it('should clamp healing to max HP', () => {
+  test('should clamp healing to max HP', () => {
     fc.assert(
       fc.property(fc.integer({ min: 1, max: 1000 }), (healingAmount) => {
         const unit = createSampleUnit(12);

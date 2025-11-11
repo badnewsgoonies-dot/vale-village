@@ -38,7 +38,7 @@ export interface QueueBattleSlice {
 }
 
 export const createQueueBattleSlice: StateCreator<
-  QueueBattleSlice & import('./rewardsSlice').RewardsSlice & import('./teamSlice').TeamSlice & import('./storySlice').StorySlice,
+  QueueBattleSlice & import('./rewardsSlice').RewardsSlice & import('./teamSlice').TeamSlice & import('./storySlice').StorySlice & import('./gameFlowSlice').GameFlowSlice,
   [['zustand/devtools', never]],
   [],
   QueueBattleSlice
@@ -117,13 +117,13 @@ export const createQueueBattleSlice: StateCreator<
     // Update battle state
     set({ battle: result.state, events: [...get().events, ...result.events] });
 
-    // If player victory, process rewards
-    if (result.state.phase === 'victory') {
-      const { processVictory, onBattleEvents } = get();
-      const rngVictory = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY));
-      processVictory(result.state, rngVictory);
+    const { processVictory, onBattleEvents, setMode, setShowRewards } = get();
+    const rngVictory = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY));
 
-      // Notify story slice
+    if (result.state.phase === 'victory') {
+      processVictory(result.state, rngVictory);
+      setMode('rewards');
+      setShowRewards(true);
       const encounterId = getEncounterId(result.state);
       if (encounterId && onBattleEvents) {
         onBattleEvents([
@@ -138,6 +138,11 @@ export const createQueueBattleSlice: StateCreator<
           },
         ]);
       }
+    }
+
+    if (result.state.phase === 'defeat') {
+      console.log('Battle lost - returning to overworld');
+      setMode('overworld');
     }
   },
 

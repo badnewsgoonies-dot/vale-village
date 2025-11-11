@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createBattleState, updateBattleState } from '../../../src/core/models/BattleState';
 import { createTeam } from '../../../src/core/models/Team';
 import { createUnit } from '../../../src/core/models/Unit';
@@ -36,7 +36,7 @@ describe('BattleState Model', () => {
     return createUnit(definition, 1, 0);
   };
 
-  it('should create battle state', () => {
+  test('should create battle state', () => {
     const playerUnits = [
       createSampleUnit('player1'),
       createSampleUnit('player2'),
@@ -57,7 +57,7 @@ describe('BattleState Model', () => {
     expect(battleState.log).toEqual([]);
   });
 
-  it('should update battle state immutably', () => {
+  test('should update battle state immutably', () => {
     const playerUnits = [
       createSampleUnit('player1'),
       createSampleUnit('player2'),
@@ -79,7 +79,7 @@ describe('BattleState Model', () => {
     expect(updated.currentTurn).toBe(5);
   });
 
-  it('should validate battle state against schema', () => {
+  test('should validate battle state against schema', () => {
     const playerUnits = [
       createSampleUnit('player1'),
       createSampleUnit('player2'),

@@ -3,13 +3,13 @@
  * Tests for AI ability scoring logic
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makeAIDecision } from '../../src/core/services/AIService';
 import { makeTestCtx } from '../../src/test/testCtx';
 import { mkBattle, mkUnit, mkEnemy } from '../../src/test/factories';
 
 describe('AI Scoring', () => {
-  it('should prefer abilities with higher damage potential', () => {
+  test('should prefer abilities with higher damage potential', () => {
     const { rng } = makeTestCtx(42);
     const battle = mkBattle({
       party: [mkUnit({ id: 'u1', currentHp: 50 })],
@@ -23,7 +23,7 @@ describe('AI Scoring', () => {
     expect(decision.targetIds.length).toBeGreaterThan(0);
   });
 
-  it('should not choose abilities the unit cannot afford (PP gate)', () => {
+  test('should not choose abilities the unit cannot afford (PP gate)', () => {
     const { rng } = makeTestCtx(7);
     
     // Create enemy with low PP
@@ -60,7 +60,7 @@ describe('AI Scoring', () => {
     }
   });
 
-  it('should prefer targeting weakest player unit when multiple options available', () => {
+  test('should prefer targeting weakest player unit when multiple options available', () => {
     const { rng } = makeTestCtx(100);
 
     const weakPlayer = mkUnit({ id: 'u1', currentHp: 20 });
@@ -87,7 +87,7 @@ describe('AI Scoring', () => {
     expect(weakTargetCount).toBeGreaterThanOrEqual(strongTargetCount);
   });
 
-  it('should make deterministic decisions given same seed', () => {
+  test('should make deterministic decisions given same seed', () => {
     const seed = 999;
     const { rng: rng1 } = makeTestCtx(seed);
     const { rng: rng2 } = makeTestCtx(seed);

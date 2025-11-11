@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { validateAllGameData } from '@/core/validation/validateAll';
 
 describe('validateAllGameData', () => {
-  it('should validate all game data successfully', () => {
+  test('should validate all game data successfully', () => {
     expect(() => validateAllGameData()).not.toThrow();
   });
   

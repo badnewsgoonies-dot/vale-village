@@ -3,7 +3,7 @@
  * PR-QUEUE-BATTLE: Tests for queue-based battle system
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createTeam } from '../../../src/core/models/Team';
 import { createBattleState } from '../../../src/core/models/BattleState';
@@ -103,7 +103,7 @@ describe('QueueBattleService', () => {
   };
 
   describe('queueAction', () => {
-    it('should queue an action and deduct mana', () => {
+    test('should queue an action and deduct mana', () => {
       const { battle } = createTestBattle();
       const initialMana = battle.remainingMana;
 
@@ -114,7 +114,7 @@ describe('QueueBattleService', () => {
       expect(updated.remainingMana).toBe(initialMana - STRIKE.manaCost);
     });
 
-    it('should throw if not enough mana', () => {
+    test('should throw if not enough mana', () => {
       const { battle } = createTestBattle();
       // Set remaining mana to 0
       const lowManaBattle = { ...battle, remainingMana: 0 };
@@ -126,7 +126,7 @@ describe('QueueBattleService', () => {
   });
 
   describe('clearQueuedAction', () => {
-    it('should clear action and refund mana', () => {
+    test('should clear action and refund mana', () => {
       const { battle } = createTestBattle();
       const initialMana = battle.remainingMana;
 
@@ -139,7 +139,7 @@ describe('QueueBattleService', () => {
   });
 
   describe('refreshMana', () => {
-    it('should reset mana to max', () => {
+    test('should reset mana to max', () => {
       const { battle } = createTestBattle();
       const spent = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
       const refreshed = refreshMana(spent);
@@ -149,14 +149,14 @@ describe('QueueBattleService', () => {
   });
 
   describe('isQueueComplete', () => {
-    it('should return false when queue is incomplete', () => {
+    test('should return false when queue is incomplete', () => {
       const { battle } = createTestBattle();
       const queued = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
 
       expect(isQueueComplete(queued.queuedActions)).toBe(false);
     });
 
-    it('should return true when all 4 actions are queued', () => {
+    test('should return true when all 4 actions are queued', () => {
       const { battle } = createTestBattle();
       let state = battle;
 
@@ -171,7 +171,7 @@ describe('QueueBattleService', () => {
   });
 
   describe('queueDjinn', () => {
-    it('should queue Djinn for activation', () => {
+    test('should queue Djinn for activation', () => {
       const { battle } = createTestBattle();
       const djinnId = 'flint'; // Venus Djinn
 
@@ -180,7 +180,7 @@ describe('QueueBattleService', () => {
       expect(updated.queuedDjinn).toContain(djinnId);
     });
 
-    it('should not queue same Djinn twice', () => {
+    test('should not queue same Djinn twice', () => {
       const { battle } = createTestBattle();
       const djinnId = 'flint';
 
@@ -191,7 +191,7 @@ describe('QueueBattleService', () => {
       expect(twice.queuedDjinn).toEqual([djinnId]);
     });
 
-    it('should throw if Djinn is not in Set state', () => {
+    test('should throw if Djinn is not in Set state', () => {
       const { battle } = createTestBattle();
       // Manually set Djinn to Standby
       const standbyBattle = {
@@ -212,7 +212,7 @@ describe('QueueBattleService', () => {
   });
 
   describe('executeRound', () => {
-    it('should execute a complete round with all actions', () => {
+    test('should execute a complete round with all actions', () => {
       const { battle, enemy } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -250,7 +250,7 @@ describe('QueueBattleService', () => {
       }
     });
 
-    it('should throw if queue is incomplete', () => {
+    test('should throw if queue is incomplete', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -264,7 +264,7 @@ describe('QueueBattleService', () => {
       }).toThrow('queue is not complete');
     });
 
-    it('should execute Djinn summons before player actions', () => {
+    test('should execute Djinn summons before player actions', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -294,7 +294,7 @@ describe('QueueBattleService', () => {
       expect(finalEnemyHp).toBeLessThan(initialEnemyHp);
     });
 
-    it('should handle KO\'d units by skipping their actions', () => {
+    test('should handle KO\'d units by skipping their actions', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -323,7 +323,7 @@ describe('QueueBattleService', () => {
       expect(missEvent).toBeDefined();
     });
 
-    it('should retarget if original target is KO\'d during round', () => {
+    test('should retarget if original target is KO\'d during round', () => {
       const { battle, enemy } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -350,7 +350,7 @@ describe('QueueBattleService', () => {
       expect(result.state.phase).toBe('victory');
     });
 
-    it('should detect player defeat when all units are KO\'d', () => {
+    test('should detect player defeat when all units are KO\'d', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -380,7 +380,7 @@ describe('QueueBattleService', () => {
       }
     });
 
-    it('should execute actions in SPD order', () => {
+    test('should execute actions in SPD order', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -402,7 +402,7 @@ describe('QueueBattleService', () => {
       expect(result.events.length).toBeGreaterThan(4);
     });
 
-    it('should execute enemy actions after player actions', () => {
+    test('should execute enemy actions after player actions', () => {
       const { battle, enemy } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -428,7 +428,7 @@ describe('QueueBattleService', () => {
       expect(abilityEvents.length).toBeGreaterThan(0);
     });
 
-    it('should activate multiple Djinn for mega summon', () => {
+    test('should activate multiple Djinn for mega summon', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -458,7 +458,7 @@ describe('QueueBattleService', () => {
       expect(djinnEvent).toBeDefined();
     });
 
-    it('should clear queued Djinn after execution', () => {
+    test('should clear queued Djinn after execution', () => {
       const { battle, enemy } = createTestBattle();
       const rng = makePRNG(12345);
 
@@ -484,7 +484,7 @@ describe('QueueBattleService', () => {
       }
     });
 
-    it('should increment round number after execution', () => {
+    test('should increment round number after execution', () => {
       const { battle } = createTestBattle();
       const rng = makePRNG(12345);
       const initialRound = battle.roundNumber;

@@ -3,7 +3,7 @@
  * Tests for save/load determinism and data integrity
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 import { createLocalStorageSavePort } from '../../../src/infra/save/LocalStorageSavePort';
 import { saveGame, loadGame, createSaveEnvelope } from '../../../src/core/save/SaveService';
 import type { GameStateSnapshot } from '../../../src/core/save/types';
@@ -18,13 +18,13 @@ describe('Save Round-trip', () => {
     localStorage.clear();
   });
 
-  it('should round-trip save data correctly', async () => {
+  test('should round-trip save data correctly', async () => {
     const port = createLocalStorageSavePort('test:save');
     const seed = 1337;
 
     const team = createTeam([
       createUnit(UNIT_DEFINITIONS.adept, 1, 0),
-      createUnit(UNIT_DEFINITIONS.war_mage, 1, 0),
+      createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0),
       createUnit(UNIT_DEFINITIONS.mystic, 1, 0),
       createUnit(UNIT_DEFINITIONS.ranger, 1, 0),
     ]);
@@ -34,7 +34,7 @@ describe('Save Round-trip', () => {
       team,
       story: createStoryState(1),
       gold: 100,
-      unitsCollected: ['adept', 'war_mage'],
+      unitsCollected: ['adept', 'war-mage'],
     };
     
     // Set some flags
@@ -72,7 +72,7 @@ describe('Save Round-trip', () => {
     }
   });
 
-  it('should handle missing save gracefully', async () => {
+  test('should handle missing save gracefully', async () => {
     const port = createLocalStorageSavePort('nonexistent:save');
     
     const loadResult = await loadGame(port);
@@ -82,7 +82,7 @@ describe('Save Round-trip', () => {
     }
   });
 
-  it('should save and load with notes', async () => {
+  test('should save and load with notes', async () => {
     const port = createLocalStorageSavePort('test:save:notes');
     const seed = 42;
     const notes = 'Test notes for debugging';

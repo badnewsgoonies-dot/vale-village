@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createTeam, updateTeam } from '../../../src/core/models/Team';
 import { createUnit } from '../../../src/core/models/Unit';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
@@ -35,7 +35,7 @@ describe('Team Model', () => {
     return createUnit(definition, 1, 0);
   };
 
-  it('should create a team with 4 units', () => {
+  test('should create a team with 4 units', () => {
     const units = [
       createSampleUnit('unit1'),
       createSampleUnit('unit2'),
@@ -51,13 +51,13 @@ describe('Team Model', () => {
     expect(team.currentTurn).toBe(0);
   });
 
-  it('should throw error if team does not have exactly 4 units', () => {
+  test('should throw error if team does not have exactly 4 units', () => {
     const units = [createSampleUnit('unit1')];
 
     expect(() => createTeam(units)).toThrow('Team must have exactly 4 units');
   });
 
-  it('should update team immutably', () => {
+  test('should update team immutably', () => {
     const units = [
       createSampleUnit('unit1'),
       createSampleUnit('unit2'),
@@ -72,7 +72,7 @@ describe('Team Model', () => {
     expect(updated.currentTurn).toBe(5); // New object updated
   });
 
-  it('should validate team against schema', () => {
+  test('should validate team against schema', () => {
     const units = [
       createSampleUnit('unit1'),
       createSampleUnit('unit2'),

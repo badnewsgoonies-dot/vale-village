@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { createUnit, updateUnit, calculateMaxHp, isUnitKO } from '../../../src/core/models/Unit';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
 import { UnitSchema } from '../../../src/data/schemas/UnitSchema';
@@ -31,7 +31,7 @@ describe('Unit Model', () => {
     description: 'A test unit',
   };
 
-  it('should create a unit from definition', () => {
+  test('should create a unit from definition', () => {
     const unit = createUnit(sampleDefinition, 1, 0);
 
     expect(unit.id).toBe('test-unit');
@@ -44,18 +44,18 @@ describe('Unit Model', () => {
     expect(unit.statusEffects).toEqual([]);
   });
 
-  it('should calculate max HP correctly for level 1', () => {
+  test('should calculate max HP correctly for level 1', () => {
     const unit = createUnit(sampleDefinition, 1, 0);
     expect(calculateMaxHp(unit)).toBe(100);
   });
 
-  it('should calculate max HP correctly for level 2', () => {
+  test('should calculate max HP correctly for level 2', () => {
     const unit = createUnit(sampleDefinition, 2, 0);
     // baseStats.hp (100) + (level - 1) * growthRates.hp (20) = 120
     expect(calculateMaxHp(unit)).toBe(120);
   });
 
-  it('should check if unit is KO', () => {
+  test('should check if unit is KO', () => {
     const unit = createUnit(sampleDefinition, 1, 0);
     expect(isUnitKO(unit)).toBe(false);
 
@@ -66,7 +66,7 @@ describe('Unit Model', () => {
     expect(isUnitKO(negativeHpUnit)).toBe(true);
   });
 
-  it('should update unit immutably', () => {
+  test('should update unit immutably', () => {
     const unit = createUnit(sampleDefinition, 1, 0);
     const updated = updateUnit(unit, { level: 2, xp: 100 });
 
@@ -75,7 +75,7 @@ describe('Unit Model', () => {
     expect(updated.xp).toBe(100);
   });
 
-  it('should validate unit against schema', () => {
+  test('should validate unit against schema', () => {
     const unit = createUnit(sampleDefinition, 1, 0);
     const result = UnitSchema.safeParse(unit);
 

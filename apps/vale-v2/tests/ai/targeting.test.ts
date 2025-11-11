@@ -3,7 +3,7 @@
  * Tests for AI target selection logic
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makeAIDecision } from '../../src/core/services/AIService';
 import { makeTestCtx } from '../../src/test/testCtx';
 import { mkBattle, mkUnit, mkEnemy } from '../../src/test/factories';
@@ -11,7 +11,7 @@ import { isUnitKO } from '../../src/core/models/Unit';
 import { ABILITIES } from '../../src/data/definitions/abilities';
 
 describe('AI Targeting', () => {
-  it('should not target KO\'d units', () => {
+  test('should not target KO\'d units', () => {
     const { rng } = makeTestCtx(42);
     
     const aliveEnemy = mkEnemy('slime', { id: 'e1', currentHp: 30 });
@@ -32,7 +32,7 @@ describe('AI Targeting', () => {
     expect(decision.targetIds.length).toBeGreaterThan(0);
   });
 
-  it('should prefer weakest effective HP target', () => {
+  test('should prefer weakest effective HP target', () => {
     // Note: AI targets enemies (not allies), so this test targets player units
     const weakPlayer = mkUnit({ id: 'u1', currentHp: 15 });
     const strongPlayer = mkUnit({ id: 'u2', currentHp: 60 });
@@ -58,7 +58,7 @@ describe('AI Targeting', () => {
     expect(weakTargetCount).toBeGreaterThanOrEqual(strongTargetCount);
   });
 
-  it('should handle single target abilities correctly', () => {
+  test('should handle single target abilities correctly', () => {
     const { rng } = makeTestCtx(50);
     
     const battle = mkBattle({
@@ -73,7 +73,7 @@ describe('AI Targeting', () => {
     expect(decision.targetIds.length).toBeGreaterThan(0);
   });
 
-  it('should make valid decisions even with low HP targets', () => {
+  test('should make valid decisions even with low HP targets', () => {
     const { rng } = makeTestCtx(200);
     
     // Create a very weak player unit
@@ -93,7 +93,7 @@ describe('AI Targeting', () => {
     expect(decision.targetIds).toContain('u1');
   });
 
-  it('should handle no valid targets gracefully', () => {
+  test('should handle no valid targets gracefully', () => {
     const { rng } = makeTestCtx(300);
     
     // Create battle with all enemies KO'd
@@ -112,7 +112,7 @@ describe('AI Targeting', () => {
   });
 
   describe('highestDef targeting', () => {
-    it('should target unit with highest DEF', () => {
+    test('should target unit with highest DEF', () => {
       // Create enemies with different DEF values
       const lowDefEnemy = mkEnemy('slime', { 
         id: 'e1', 
@@ -156,7 +156,7 @@ describe('AI Targeting', () => {
   });
 
   describe('avoidOverkill behavior', () => {
-    it('should avoid overkilling low HP targets when hint is set', () => {
+    test('should avoid overkilling low HP targets when hint is set', () => {
       // Create player units with different HP
       const lowHpPlayer = mkUnit({ id: 'u1', currentHp: 10 }); // Very low HP
       const highHpPlayer = mkUnit({ id: 'u2', currentHp: 80 });
@@ -191,7 +191,7 @@ describe('AI Targeting', () => {
   });
 
   describe('AoE ignores target hints', () => {
-    it('should target all enemies for AoE abilities even with random hint', () => {
+    test('should target all enemies for AoE abilities even with random hint', () => {
       const { rng } = makeTestCtx(700);
 
       const enemy1 = mkEnemy('slime', { id: 'e1' });

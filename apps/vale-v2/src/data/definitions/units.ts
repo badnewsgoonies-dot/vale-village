@@ -63,7 +63,7 @@ export const ADEPT: UnitDefinition = {
 };
 
 export const WAR_MAGE: UnitDefinition = {
-  id: 'war_mage',
+  id: 'war-mage',
   name: 'War Mage',
   element: 'Mars',
   role: 'Elemental Mage',
@@ -229,7 +229,7 @@ export const STORMCALLER: UnitDefinition = {
 
 export const UNIT_DEFINITIONS: Record<string, UnitDefinition> = {
   adept: ADEPT,
-  war_mage: WAR_MAGE,
+  'war-mage': WAR_MAGE,
   mystic: MYSTIC,
   ranger: RANGER,
   sentinel: SENTINEL,

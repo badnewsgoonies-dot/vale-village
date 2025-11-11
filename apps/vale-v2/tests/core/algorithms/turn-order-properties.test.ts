@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
@@ -56,7 +56,7 @@ describe('Turn Order Algorithm Properties', () => {
     return unit;
   };
 
-  it('should produce stable turn order with same seed and SPD', () => {
+  test('should produce stable turn order with same seed and SPD', () => {
     const units = [
       createSampleUnit('unit1', 15),
       createSampleUnit('unit2', 15), // Same SPD
@@ -76,7 +76,7 @@ describe('Turn Order Algorithm Properties', () => {
     expect(order1).toEqual(order2);
   });
 
-  it('should prioritize Hermes Sandals over higher SPD units', () => {
+  test('should prioritize Hermes Sandals over higher SPD units', () => {
     const units = [
       createSampleUnit('fast-unit', 50), // Very fast
       createSampleUnit('hermes-unit', 10, true), // Slow but has Hermes
@@ -96,7 +96,7 @@ describe('Turn Order Algorithm Properties', () => {
     expect(hermesIndex).toBeLessThan(fastIndex);
   });
 
-  it('should maintain determinism across turns', () => {
+  test('should maintain determinism across turns', () => {
     const units = [
       createSampleUnit('unit1', 15),
       createSampleUnit('unit2', 15),
