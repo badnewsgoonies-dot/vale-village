@@ -51,3 +51,8 @@ export type { StatusEffect } from '../../data/schemas/UnitSchema';
  */
 export type DjinnState = 'Set' | 'Standby' | 'Recovery';
 
+export interface Position {
+  x: number;
+  y: number;
+}
+

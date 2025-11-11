@@ -3,6 +3,7 @@ import { QueueBattleView } from './ui/components/QueueBattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
 import { RewardsScreen } from './ui/components/RewardsScreen';
+import { OverworldMap } from './ui/components/OverworldMap';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -18,6 +19,8 @@ function App() {
   const setShowRewards = useStore((s) => s.setShowRewards);
   const team = useStore((s) => s.team);
   const setTeam = useStore((s) => s.setTeam);
+  const mode = useStore((s) => s.mode);
+  const setMode = useStore((s) => s.setMode);
 
   useEffect(() => {
     // Always recreate test battle on mount to get latest code changes
@@ -36,6 +39,7 @@ function App() {
     const { battleState, seed } = createTestBattle();
     setBattle(battleState, seed); // Restart test battle
     setTeam(battleState.playerTeam); // Update team state
+    setMode('battle');
   };
 
   return (
@@ -72,7 +76,10 @@ function App() {
           onContinue={handleRewardsContinue}
         />
       ) : (
-        <QueueBattleView />
+        <>
+          {mode === 'overworld' && <OverworldMap />}
+          {mode === 'battle' && <QueueBattleView />}
+        </>
       )}
     </div>
   );
