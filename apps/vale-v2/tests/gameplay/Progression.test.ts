@@ -5,17 +5,18 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { initializeBattle, queueAction, executeRound } from '../../src/core/services/QueueBattleService';
-import { createUnit } from '../../src/core/models/Unit';
+import { queueAction, executeRound } from '../../src/core/services/QueueBattleService';
+import { startBattle } from '../../src/core/services/BattleService';
 import { createTeam } from '../../src/core/models/Team';
 import { makePRNG } from '../../src/core/random/prng';
 import { ABILITIES } from '../../src/data/definitions/abilities';
 import { ALL_EQUIPMENT } from '../../src/data/definitions/equipment';
+import { mkUnit, mkEnemy, mkTeam } from '../../src/test/factories';
 
 describe('Progression - Leveling Matters', () => {
   test('Level 1 Isaac loses to Level 5 Bandit, Level 5 Isaac wins', () => {
     // Create a tough enemy
-    const bandit = createUnit({
+    const bandit = mkEnemy('bandit', {
       id: 'bandit',
       name: 'Bandit',
       level: 5,
@@ -24,25 +25,27 @@ describe('Progression - Leveling Matters', () => {
 
     // Test with Level 1 Isaac
     {
-      const isaacLv1 = createUnit({
+      const isaacLv1 = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 1,
         baseStats: { hp: 70, atk: 8, def: 5, spd: 6 },
       });
 
-      const playerTeam = createTeam([isaacLv1]);
+      const playerTeam = mkTeam([isaacLv1]);
       const enemies = [{ ...bandit }];
 
       const rng = makePRNG(100);
-      let battle = initializeBattle(playerTeam, enemies, rng);
+      let battle = startBattle(playerTeam, enemies, rng);
 
       // Simulate 20 rounds (should lose before then)
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
 
         // Isaac attacks
-        battle = queueAction(battle, 'isaac', null, ['bandit']);
+        const queueResult = queueAction(battle, 'isaac', null, ['bandit']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
 
         // Execute round
         const result = executeRound(battle, rng);
@@ -55,25 +58,27 @@ describe('Progression - Leveling Matters', () => {
 
     // Test with Level 5 Isaac (same stats structure, higher level)
     {
-      const isaacLv5 = createUnit({
+      const isaacLv5 = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 5,
         baseStats: { hp: 110, atk: 16, def: 10, spd: 10 }, // Stat growth applied
       });
 
-      const playerTeam = createTeam([isaacLv5]);
+      const playerTeam = mkTeam([isaacLv5]);
       const enemies = [{ ...bandit }];
 
       const rng = makePRNG(100);
-      let battle = initializeBattle(playerTeam, enemies, rng);
+      let battle = startBattle(playerTeam, enemies, rng);
 
       // Simulate 20 rounds
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
 
         // Isaac attacks
-        battle = queueAction(battle, 'isaac', null, ['bandit']);
+        const queueResult = queueAction(battle, 'isaac', null, ['bandit']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
 
         // Execute round
         const result = executeRound(battle, rng);
@@ -86,7 +91,7 @@ describe('Progression - Leveling Matters', () => {
   });
 
   test('Weak party loses to boss, strong party wins', () => {
-    const boss = createUnit({
+    const boss = mkEnemy('gladiator', {
       id: 'boss',
       name: 'Fire Dragon',
       level: 10,
@@ -96,10 +101,10 @@ describe('Progression - Leveling Matters', () => {
     // Weak party (Level 1)
     {
       const weakParty = createTeam([
-        createUnit({ id: 'u1', name: 'Fighter', level: 1, baseStats: { hp: 60, atk: 8 } }),
-        createUnit({ id: 'u2', name: 'Mage', level: 1, baseStats: { hp: 50, atk: 6 } }),
-        createUnit({ id: 'u3', name: 'Cleric', level: 1, baseStats: { hp: 55, atk: 5 } }),
-        createUnit({ id: 'u4', name: 'Rogue', level: 1, baseStats: { hp: 65, atk: 9 } }),
+        mkUnit({ id: 'u1', name: 'Fighter', level: 1, baseStats: { hp: 60, atk: 8 } }),
+        mkUnit({ id: 'u2', name: 'Mage', level: 1, baseStats: { hp: 50, atk: 6 } }),
+        mkUnit({ id: 'u3', name: 'Cleric', level: 1, baseStats: { hp: 55, atk: 5 } }),
+        mkUnit({ id: 'u4', name: 'Rogue', level: 1, baseStats: { hp: 65, atk: 9 } }),
       ]);
 
       const rng = makePRNG(42);
@@ -110,10 +115,18 @@ describe('Progression - Leveling Matters', () => {
         if (battle.phase !== 'planning') break;
 
         // All units attack boss
-        battle = queueAction(battle, 'u1', null, ['boss']);
-        battle = queueAction(battle, 'u2', null, ['boss']);
-        battle = queueAction(battle, 'u3', null, ['boss']);
-        battle = queueAction(battle, 'u4', null, ['boss']);
+        let queueResult = queueAction(battle, 'u1', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u2', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u3', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u4', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
 
         const result = executeRound(battle, rng);
         battle = result.state;
@@ -126,10 +139,10 @@ describe('Progression - Leveling Matters', () => {
     // Strong party (Level 5)
     {
       const strongParty = createTeam([
-        createUnit({ id: 'u1', name: 'Fighter', level: 5, baseStats: { hp: 120, atk: 18 } }),
-        createUnit({ id: 'u2', name: 'Mage', level: 5, baseStats: { hp: 90, atk: 16 } }),
-        createUnit({ id: 'u3', name: 'Cleric', level: 5, baseStats: { hp: 100, atk: 14 } }),
-        createUnit({ id: 'u4', name: 'Rogue', level: 5, baseStats: { hp: 110, atk: 19 } }),
+        mkUnit({ id: 'u1', name: 'Fighter', level: 5, baseStats: { hp: 120, atk: 18 } }),
+        mkUnit({ id: 'u2', name: 'Mage', level: 5, baseStats: { hp: 90, atk: 16 } }),
+        mkUnit({ id: 'u3', name: 'Cleric', level: 5, baseStats: { hp: 100, atk: 14 } }),
+        mkUnit({ id: 'u4', name: 'Rogue', level: 5, baseStats: { hp: 110, atk: 19 } }),
       ]);
 
       const rng = makePRNG(42);
@@ -140,10 +153,18 @@ describe('Progression - Leveling Matters', () => {
         if (battle.phase !== 'planning') break;
 
         // All units attack boss
-        battle = queueAction(battle, 'u1', null, ['boss']);
-        battle = queueAction(battle, 'u2', null, ['boss']);
-        battle = queueAction(battle, 'u3', null, ['boss']);
-        battle = queueAction(battle, 'u4', null, ['boss']);
+        let queueResult = queueAction(battle, 'u1', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u2', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u3', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
+        queueResult = queueAction(battle, 'u4', null, ['boss']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
 
         const result = executeRound(battle, rng);
         battle = result.state;
@@ -157,7 +178,7 @@ describe('Progression - Leveling Matters', () => {
 
 describe('Progression - Equipment Matters', () => {
   test('Unequipped unit loses, fully equipped unit wins', () => {
-    const enemy = createUnit({
+    const enemy = mkEnemy('beetle', {
       id: 'enemy',
       name: 'Armored Knight',
       level: 3,
@@ -166,7 +187,7 @@ describe('Progression - Equipment Matters', () => {
 
     // Unequipped Isaac
     {
-      const isaacNaked = createUnit({
+      const isaacNaked = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 3,
@@ -175,12 +196,14 @@ describe('Progression - Equipment Matters', () => {
       });
 
       const rng = makePRNG(200);
-      let battle = initializeBattle(createTeam([isaacNaked]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaacNaked]), [{ ...enemy }], rng);
 
       // Simulate battle
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
-        battle = queueAction(battle, 'isaac', null, ['enemy']);
+        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -196,7 +219,7 @@ describe('Progression - Equipment Matters', () => {
       const warriorsHelm = ALL_EQUIPMENT.find(e => e.id === 'warriors-helm');
       const hypersBoots = ALL_EQUIPMENT.find(e => e.id === 'hypers-boots');
 
-      const isaacEquipped = createUnit({
+      const isaacEquipped = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 3,
@@ -210,12 +233,14 @@ describe('Progression - Equipment Matters', () => {
       });
 
       const rng = makePRNG(200);
-      let battle = initializeBattle(createTeam([isaacEquipped]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaacEquipped]), [{ ...enemy }], rng);
 
       // Simulate battle
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
-        battle = queueAction(battle, 'isaac', null, ['enemy']);
+        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -226,7 +251,7 @@ describe('Progression - Equipment Matters', () => {
   });
 
   test('Better weapon = faster kill', () => {
-    const enemy = createUnit({
+    const enemy = mkEnemy('slime', {
       id: 'enemy',
       name: 'Target Dummy',
       level: 2,
@@ -237,7 +262,7 @@ describe('Progression - Equipment Matters', () => {
     let roundsWithBasic = 0;
     {
       const ironSword = ALL_EQUIPMENT.find(e => e.id === 'iron-sword');
-      const isaac = createUnit({
+      const isaac = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 3,
@@ -246,12 +271,14 @@ describe('Progression - Equipment Matters', () => {
       });
 
       const rng = makePRNG(300);
-      let battle = initializeBattle(createTeam([isaac]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaac]), [{ ...enemy }], rng);
 
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithBasic++;
-        battle = queueAction(battle, 'isaac', null, ['enemy']);
+        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -263,7 +290,7 @@ describe('Progression - Equipment Matters', () => {
     let roundsWithLegendary = 0;
     {
       const legendarySword = ALL_EQUIPMENT.find(e => e.id === 'legendary-sword');
-      const isaac = createUnit({
+      const isaac = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 3,
@@ -272,12 +299,14 @@ describe('Progression - Equipment Matters', () => {
       });
 
       const rng = makePRNG(300);
-      let battle = initializeBattle(createTeam([isaac]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaac]), [{ ...enemy }], rng);
 
       for (let round = 0; round < 20; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithLegendary++;
-        battle = queueAction(battle, 'isaac', null, ['enemy']);
+        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -292,7 +321,7 @@ describe('Progression - Equipment Matters', () => {
 
 describe('Progression - Abilities Matter', () => {
   test('Unit with strong abilities beats unit with only basic attack', () => {
-    const enemy = createUnit({
+    const enemy = mkEnemy('gladiator', {
       id: 'enemy',
       name: 'Tough Golem',
       level: 5,
@@ -302,21 +331,24 @@ describe('Progression - Abilities Matter', () => {
     // Unit with only basic attack
     let roundsWithBasic = 0;
     {
-      const isaac = createUnit({
+      const isaac = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 5,
         baseStats: { hp: 110, atk: 16, def: 10, spd: 10 },
         abilities: [], // No special abilities
+        unlockedAbilityIds: [],
       });
 
       const rng = makePRNG(400);
-      let battle = initializeBattle(createTeam([isaac]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaac]), [{ ...enemy }], rng);
 
       for (let round = 0; round < 30; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithBasic++;
-        battle = queueAction(battle, 'isaac', null, ['enemy']);
+        const queueResult = queueAction(battle, 'isaac', null, ['enemy']);
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
         const result = executeRound(battle, rng);
         battle = result.state;
       }
@@ -325,30 +357,38 @@ describe('Progression - Abilities Matter', () => {
     // Unit with powerful abilities
     let roundsWithAbilities = 0;
     {
-      const ragnarok = ABILITIES.find(a => a.id === 'ragnarok');
-      const earthquake = ABILITIES.find(a => a.id === 'earthquake');
+      const chainLightning = ABILITIES['chain-lightning'];
+      const quake = ABILITIES.quake;
 
-      const isaac = createUnit({
+      if (!chainLightning || !quake) {
+        throw new Error('Required abilities not found');
+      }
+
+      const isaac = mkUnit({
         id: 'isaac',
         name: 'Isaac',
         level: 5,
         baseStats: { hp: 110, atk: 16, def: 10, spd: 10 },
-        abilities: [ragnarok, earthquake].filter(Boolean) as any[],
+        abilities: [chainLightning, quake],
+        unlockedAbilityIds: [chainLightning.id, quake.id],
       });
 
       const rng = makePRNG(400);
-      let battle = initializeBattle(createTeam([isaac]), [{ ...enemy }], rng);
+      let battle = startBattle(mkTeam([isaac]), [{ ...enemy }], rng);
 
       for (let round = 0; round < 30; round++) {
         if (battle.phase !== 'planning') break;
         roundsWithAbilities++;
 
         // Use powerful ability if enough mana
-        if (battle.remainingMana >= 15 && ragnarok) {
-          battle = queueAction(battle, 'isaac', 'ragnarok', ['enemy'], ragnarok);
+        let queueResult: ReturnType<typeof queueAction>;
+        if (battle.remainingMana >= chainLightning.manaCost && chainLightning) {
+          queueResult = queueAction(battle, 'isaac', 'chain-lightning', ['enemy'], chainLightning);
         } else {
-          battle = queueAction(battle, 'isaac', null, ['enemy']);
+          queueResult = queueAction(battle, 'isaac', null, ['enemy']);
         }
+        if (!queueResult.ok) throw new Error(queueResult.error);
+        battle = queueResult.value;
 
         const result = executeRound(battle, rng);
         battle = result.state;

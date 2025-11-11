@@ -86,8 +86,13 @@ infra/        # Infrastructure (save system, localStorage)
 
 ### 2. Critical Guardrails (ESLint Enforced)
 
-- **No React in `core/**`** - Core logic must be React-free for testability
-- **No `any` types in `core/**`** - Error-level enforcement
+- **No React in `core/**`** - Core logic must be React-free for testability (enforced via code review)
+- **No `any` types in `core/**`** - Error-level enforcement (`@typescript-eslint/no-explicit-any`)
+- **Import restrictions** (ESLint enforced):
+  - ❌ UI cannot import core directly (use services/hooks)
+  - ❌ Algorithms cannot import services (services use algorithms, not vice versa)
+  - ✅ State slices can import from `core/services/`
+- **No `console.log`** - Only `console.warn` and `console.error` allowed (ESLint enforced)
 - **Seeded RNG only** - Use `PRNG` interface, never `Math.random()` in core
 - **Immutable updates** - Models are POJOs with factory functions, no classes
 - **Zod schemas are source of truth** - All data validated at startup
@@ -189,7 +194,7 @@ The battle system uses a **queue-based turn order**:
 
 ## Migration Status
 
-~80% complete - GameProvider → Zustand migration ongoing. Core systems (battle, progression, equipment, djinn) are functional.
+GameProvider → Zustand migration is **complete**. All state now lives in Zustand slices (`battleSlice`, `teamSlice`, `saveSlice`, `storySlice`, `queueBattleSlice`, `rewardsSlice`). Core systems (battle, progression, equipment, djinn) are functional.
 
 ## Project Status
 

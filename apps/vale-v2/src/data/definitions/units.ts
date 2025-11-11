@@ -21,6 +21,10 @@ import {
   BLIND,
   BOOST_DEF,
   CHAIN_LIGHTNING,
+  POISON_STRIKE,
+  BURN_TOUCH,
+  FREEZE_BLAST,
+  PARALYZE_SHOCK,
 } from './abilities';
 
 // ============================================================================
@@ -52,6 +56,7 @@ export const ADEPT: UnitDefinition = {
     { ...STRIKE, unlockLevel: 1 },
     { ...GUARD_BREAK, unlockLevel: 2 },
     { ...QUAKE, unlockLevel: 3 },
+    { ...POISON_STRIKE, unlockLevel: 4 },
   ],
   manaContribution: 1,
   description: 'A sturdy Earth adept who breaks through enemy defenses',
@@ -82,6 +87,7 @@ export const WAR_MAGE: UnitDefinition = {
     { ...STRIKE, unlockLevel: 1 },
     { ...FIREBALL, unlockLevel: 1 },
     { ...BOOST_ATK, unlockLevel: 2 },
+    { ...BURN_TOUCH, unlockLevel: 3 },
   ],
   manaContribution: 2,
   description: 'A fire mage who burns enemies with powerful psynergy',
@@ -113,6 +119,7 @@ export const MYSTIC: UnitDefinition = {
     { ...HEAL, unlockLevel: 1 },
     { ...PARTY_HEAL, unlockLevel: 2 },
     { ...ICE_SHARD, unlockLevel: 3 },
+    { ...FREEZE_BLAST, unlockLevel: 4 },
   ],
   manaContribution: 2,
   description: 'A water mystic who heals allies and freezes enemies',
@@ -144,6 +151,7 @@ export const RANGER: UnitDefinition = {
     { ...PRECISE_JAB, unlockLevel: 1 },
     { ...GUST, unlockLevel: 2 },
     { ...BLIND, unlockLevel: 2 },
+    { ...PARALYZE_SHOCK, unlockLevel: 3 },
   ],
   manaContribution: 1,
   description: 'A swift wind ranger who strikes with precision and blinds foes',

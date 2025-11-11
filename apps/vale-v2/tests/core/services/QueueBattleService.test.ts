@@ -5,32 +5,32 @@
 
 import { describe, test, expect } from 'vitest';
 import {
-  initializeBattle,
   queueAction,
   clearQueuedAction,
   executeRound,
 } from '../../../src/core/services/QueueBattleService';
-import { createUnit } from '../../../src/core/models/Unit';
+import { startBattle } from '../../../src/core/services/BattleService';
 import { createTeam } from '../../../src/core/models/Team';
 import { makePRNG } from '../../../src/core/random/prng';
 import { ABILITIES } from '../../../src/data/definitions/abilities';
+import { mkUnit, mkEnemy } from '../../../src/test/factories';
 
 describe('QueueBattleService - Queue Execution', () => {
   test('initializeBattle creates valid queue battle state', () => {
     const playerTeam = createTeam([
-      createUnit({ id: 'isaac', name: 'Isaac', level: 1 }),
-      createUnit({ id: 'garet', name: 'Garet', level: 1 }),
-      createUnit({ id: 'ivan', name: 'Ivan', level: 1 }),
-      createUnit({ id: 'mia', name: 'Mia', level: 1 }),
+      mkUnit({ id: 'isaac', name: 'Isaac', level: 1 }),
+      mkUnit({ id: 'garet', name: 'Garet', level: 1 }),
+      mkUnit({ id: 'ivan', name: 'Ivan', level: 1 }),
+      mkUnit({ id: 'mia', name: 'Mia', level: 1 }),
     ]);
 
     const enemies = [
-      createUnit({ id: 'enemy1', name: 'Goblin', level: 1 }),
-      createUnit({ id: 'enemy2', name: 'Orc', level: 1 }),
+      mkEnemy('slime', { id: 'enemy1', name: 'Goblin', level: 1 }),
+      mkEnemy('slime', { id: 'enemy2', name: 'Orc', level: 1 }),
     ];
 
     const rng = makePRNG(42);
-    const battle = initializeBattle(playerTeam, enemies, rng);
+    const battle = startBattle(playerTeam, enemies, rng);
 
     expect(battle.phase).toBe('planning');
     expect(battle.queuedActions).toHaveLength(4);
@@ -42,20 +42,22 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('queueAction adds action and deducts mana', () => {
     const playerTeam = createTeam([
-      createUnit({ id: 'isaac', name: 'Isaac', level: 1 }),
-      createUnit({ id: 'garet', name: 'Garet', level: 1 }),
-      createUnit({ id: 'ivan', name: 'Ivan', level: 1 }),
-      createUnit({ id: 'mia', name: 'Mia', level: 1 }),
+      mkUnit({ id: 'isaac', name: 'Isaac', level: 1 }),
+      mkUnit({ id: 'garet', name: 'Garet', level: 1 }),
+      mkUnit({ id: 'ivan', name: 'Ivan', level: 1 }),
+      mkUnit({ id: 'mia', name: 'Mia', level: 1 }),
     ]);
 
-    const enemies = [createUnit({ id: 'enemy1', name: 'Goblin', level: 1 })];
+    const enemies = [mkEnemy('slime', { id: 'enemy1', name: 'Goblin', level: 1 })];
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
     const initialMana = battle.remainingMana;
 
     // Queue a basic attack (0 mana cost)
-    battle = queueAction(battle, 'isaac', null, ['enemy1']);
+    const queueResult = queueAction(battle, 'isaac', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
 
     expect(battle.queuedActions[0]).not.toBeNull();
     expect(battle.queuedActions[0]?.unitId).toBe('isaac');
@@ -64,48 +66,68 @@ describe('QueueBattleService - Queue Execution', () => {
   });
 
   test('queueAction validates mana cost', () => {
-    const unit = createUnit({ id: 'isaac', name: 'Isaac', level: 5 });
-    const ragnarok = ABILITIES.find(a => a.id === 'ragnarok');
-
-    if (!ragnarok) {
-      throw new Error('Ragnarok ability not found');
+    const chainLightning = ABILITIES['chain-lightning'];
+    if (!chainLightning) {
+      throw new Error('Chain Lightning ability not found');
     }
 
-    unit.abilities.push(ragnarok);
+    const unit = mkUnit({ 
+      id: 'isaac', 
+      name: 'Isaac', 
+      level: 5,
+      abilities: [chainLightning],
+      unlockedAbilityIds: [chainLightning.id],
+    });
 
-    const playerTeam = createTeam([unit]);
-    const enemies = [createUnit({ id: 'enemy1', name: 'Goblin', level: 1 })];
+    // Fill team to 4 units
+    const unit2 = mkUnit({ id: 'unit2' });
+    const unit3 = mkUnit({ id: 'unit3' });
+    const unit4 = mkUnit({ id: 'unit4' });
+    const playerTeam = createTeam([unit, unit2, unit3, unit4]);
+    const enemies = [mkEnemy('slime', { id: 'enemy1', name: 'Goblin', level: 1 })];
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
-    // Set mana to less than Ragnarok costs
+    // Set mana to less than Chain Lightning costs (costs 8 mana)
     battle = { ...battle, remainingMana: 5 };
 
-    // Should throw error - not enough mana
-    expect(() => {
-      queueAction(battle, 'isaac', 'ragnarok', ['enemy1'], ragnarok);
-    }).toThrow(/cannot afford/i);
+    // Should return error Result - not enough mana
+    const result = queueAction(battle, 'isaac', 'chain-lightning', ['enemy1'], chainLightning);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toMatch(/cannot afford/i);
+    }
   });
 
   test('clearQueuedAction refunds mana', () => {
-    const unit = createUnit({ id: 'isaac', name: 'Isaac', level: 3 });
-    const earthquake = ABILITIES.find(a => a.id === 'earthquake');
-
+    const earthquake = ABILITIES.quake;
     if (!earthquake) {
-      throw new Error('Earthquake ability not found');
+      throw new Error('Quake ability not found');
     }
 
-    unit.abilities.push(earthquake);
+    const unit = mkUnit({ 
+      id: 'isaac', 
+      name: 'Isaac', 
+      level: 3,
+      abilities: [earthquake],
+      unlockedAbilityIds: [earthquake.id],
+    });
 
-    const playerTeam = createTeam([unit]);
-    const enemies = [createUnit({ id: 'enemy1', name: 'Goblin', level: 1 })];
+    // Fill team to 4 units
+    const unit2 = mkUnit({ id: 'unit2' });
+    const unit3 = mkUnit({ id: 'unit3' });
+    const unit4 = mkUnit({ id: 'unit4' });
+    const playerTeam = createTeam([unit, unit2, unit3, unit4]);
+    const enemies = [mkEnemy('slime', { id: 'enemy1', name: 'Goblin', level: 1 })];
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
     const initialMana = battle.remainingMana;
 
     // Queue an ability
-    battle = queueAction(battle, 'isaac', 'earthquake', ['enemy1'], earthquake);
+    const queueResult = queueAction(battle, 'isaac', 'quake', ['enemy1'], earthquake);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
     const manaAfterQueue = battle.remainingMana;
 
     expect(manaAfterQueue).toBeLessThan(initialMana);
@@ -120,24 +142,32 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('executeRound processes all queued actions', () => {
     const playerTeam = createTeam([
-      createUnit({ id: 'isaac', name: 'Isaac', level: 5 }),
-      createUnit({ id: 'garet', name: 'Garet', level: 5 }),
-      createUnit({ id: 'ivan', name: 'Ivan', level: 5 }),
-      createUnit({ id: 'mia', name: 'Mia', level: 5 }),
+      mkUnit({ id: 'isaac', name: 'Isaac', level: 5 }),
+      mkUnit({ id: 'garet', name: 'Garet', level: 5 }),
+      mkUnit({ id: 'ivan', name: 'Ivan', level: 5 }),
+      mkUnit({ id: 'mia', name: 'Mia', level: 5 }),
     ]);
 
     const enemies = [
-      createUnit({ id: 'enemy1', name: 'Goblin', level: 1, currentHp: 50 }),
+      mkEnemy('slime', { id: 'enemy1', name: 'Goblin', level: 1, currentHp: 50 }),
     ];
 
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
     // Queue all 4 units to attack the goblin
-    battle = queueAction(battle, 'isaac', null, ['enemy1']);
-    battle = queueAction(battle, 'garet', null, ['enemy1']);
-    battle = queueAction(battle, 'ivan', null, ['enemy1']);
-    battle = queueAction(battle, 'mia', null, ['enemy1']);
+    let queueResult = queueAction(battle, 'isaac', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'garet', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'ivan', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'mia', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
 
     expect(battle.queuedActions.every(a => a !== null)).toBe(true);
 
@@ -161,24 +191,32 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('executeRound detects victory when all enemies KO', () => {
     const playerTeam = createTeam([
-      createUnit({ id: 'isaac', name: 'Isaac', level: 10, baseStats: { atk: 50 } }),
-      createUnit({ id: 'garet', name: 'Garet', level: 10, baseStats: { atk: 50 } }),
-      createUnit({ id: 'ivan', name: 'Ivan', level: 10, baseStats: { atk: 50 } }),
-      createUnit({ id: 'mia', name: 'Mia', level: 10, baseStats: { atk: 50 } }),
+      mkUnit({ id: 'isaac', name: 'Isaac', level: 10, baseStats: { atk: 50 } }),
+      mkUnit({ id: 'garet', name: 'Garet', level: 10, baseStats: { atk: 50 } }),
+      mkUnit({ id: 'ivan', name: 'Ivan', level: 10, baseStats: { atk: 50 } }),
+      mkUnit({ id: 'mia', name: 'Mia', level: 10, baseStats: { atk: 50 } }),
     ]);
 
     const enemies = [
-      createUnit({ id: 'enemy1', name: 'Weak Goblin', level: 1, currentHp: 5 }),
+      mkEnemy('slime', { id: 'enemy1', name: 'Weak Goblin', level: 1, currentHp: 5 }),
     ];
 
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
     // Queue attacks
-    battle = queueAction(battle, 'isaac', null, ['enemy1']);
-    battle = queueAction(battle, 'garet', null, ['enemy1']);
-    battle = queueAction(battle, 'ivan', null, ['enemy1']);
-    battle = queueAction(battle, 'mia', null, ['enemy1']);
+    let queueResult = queueAction(battle, 'isaac', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'garet', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'ivan', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'mia', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
 
     const result = executeRound(battle, rng);
 
@@ -189,25 +227,33 @@ describe('QueueBattleService - Queue Execution', () => {
 
   test('executeRound retargets when original target dies mid-round', () => {
     const playerTeam = createTeam([
-      createUnit({ id: 'isaac', name: 'Isaac', level: 10, baseStats: { atk: 100 } }),
-      createUnit({ id: 'garet', name: 'Garet', level: 10, baseStats: { atk: 100 } }),
-      createUnit({ id: 'ivan', name: 'Ivan', level: 10, baseStats: { atk: 100 } }),
-      createUnit({ id: 'mia', name: 'Mia', level: 10, baseStats: { atk: 100 } }),
+      mkUnit({ id: 'isaac', name: 'Isaac', level: 10, baseStats: { atk: 100 } }),
+      mkUnit({ id: 'garet', name: 'Garet', level: 10, baseStats: { atk: 100 } }),
+      mkUnit({ id: 'ivan', name: 'Ivan', level: 10, baseStats: { atk: 100 } }),
+      mkUnit({ id: 'mia', name: 'Mia', level: 10, baseStats: { atk: 100 } }),
     ]);
 
     const enemies = [
-      createUnit({ id: 'enemy1', name: 'Weak Goblin', level: 1, currentHp: 10 }),
-      createUnit({ id: 'enemy2', name: 'Orc', level: 5, currentHp: 100 }),
+      mkEnemy('slime', { id: 'enemy1', name: 'Weak Goblin', level: 1, currentHp: 10 }),
+      mkEnemy('wolf', { id: 'enemy2', name: 'Orc', level: 5, currentHp: 100 }),
     ];
 
     const rng = makePRNG(42);
-    let battle = initializeBattle(playerTeam, enemies, rng);
+    let battle = startBattle(playerTeam, enemies, rng);
 
     // All units target enemy1 (will die after first hit)
-    battle = queueAction(battle, 'isaac', null, ['enemy1']);
-    battle = queueAction(battle, 'garet', null, ['enemy1']);
-    battle = queueAction(battle, 'ivan', null, ['enemy1']);
-    battle = queueAction(battle, 'mia', null, ['enemy1']);
+    let queueResult = queueAction(battle, 'isaac', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'garet', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'ivan', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
+    queueResult = queueAction(battle, 'mia', null, ['enemy1']);
+    if (!queueResult.ok) throw new Error(queueResult.error);
+    battle = queueResult.value;
 
     const result = executeRound(battle, rng);
 

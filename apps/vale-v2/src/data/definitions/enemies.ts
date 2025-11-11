@@ -19,6 +19,10 @@ import {
   ICE_SHARD,
   QUAKE,
   BOOST_ATK,
+  POISON_STRIKE,
+  BURN_TOUCH,
+  FREEZE_BLAST,
+  PARALYZE_SHOCK,
 } from './abilities';
 
 // ============================================================================
@@ -82,6 +86,7 @@ export const BANDIT: Enemy = {
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
     { ...HEAVY_STRIKE, unlockLevel: 1 },
+    { ...POISON_STRIKE, unlockLevel: 2 },
   ],
   baseXp: 20,
   baseGold: 12,
@@ -103,6 +108,7 @@ export const SPRITE: Enemy = {
   abilities: [
     { ...GUST, unlockLevel: 1 },
     { ...BLIND, unlockLevel: 1 },
+    { ...PARALYZE_SHOCK, unlockLevel: 1 },
   ],
   baseXp: 18,
   baseGold: 10,
@@ -124,6 +130,7 @@ export const BEETLE: Enemy = {
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
     { ...GUARD_BREAK, unlockLevel: 1 },
+    { ...POISON_STRIKE, unlockLevel: 2 },
   ],
   baseXp: 22,
   baseGold: 12,
@@ -203,6 +210,7 @@ export const GUARDIAN_SHARD_FIRE: Enemy = {
   },
   abilities: [
     { ...FIREBALL, unlockLevel: 1 },
+    { ...BURN_TOUCH, unlockLevel: 1 },
   ],
   baseXp: 15,
   baseGold: 10,
@@ -223,6 +231,7 @@ export const GUARDIAN_SHARD_WATER: Enemy = {
   },
   abilities: [
     { ...ICE_SHARD, unlockLevel: 1 },
+    { ...FREEZE_BLAST, unlockLevel: 1 },
   ],
   baseXp: 15,
   baseGold: 10,

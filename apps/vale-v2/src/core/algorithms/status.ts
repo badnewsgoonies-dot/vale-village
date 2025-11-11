@@ -76,15 +76,15 @@ export function processStatusEffectTick(
 /**
  * Check if unit's action fails due to paralyze
  * From GAME_MECHANICS.md Section 5.3
- * Paralyze: 50% chance action fails
+ * Paralyze: 25% chance action fails
  */
 export function checkParalyzeFailure(
   unit: Unit,
   rng: PRNG
 ): boolean {
   const paralyzed = unit.statusEffects.find(e => e.type === 'paralyze');
-  if (paralyzed && rng.next() < 0.5) {
-    return true; // Action fails (50% chance)
+  if (paralyzed && rng.next() < 0.25) {
+    return true; // Action fails (25% chance)
   }
   return false;
 }

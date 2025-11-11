@@ -19,7 +19,7 @@ import { calculateMaxHp } from '../models/Unit';
  */
 export interface AIHints {
   priority?: number; // Baseline weight (0-3, higher = prefer)
-  target?: 'weakest' | 'random' | 'lowestRes' | 'healerFirst';
+  target?: 'weakest' | 'random' | 'lowestRes' | 'healerFirst' | 'highestDef';
   avoidOverkill?: boolean; // Penalize heavy hits on low HP targets
   opener?: boolean; // Prefer in first N turns
 }
@@ -243,9 +243,34 @@ function selectTargets(
       if (validTargets.length === 0) {
         return [];
       }
+      // AoE abilities ignore random single-target selection and hit everyone
+      if (ability.targets === 'all-enemies' || ability.targets === 'all-allies') {
+        return validTargets.map(t => t.id);
+      }
       const index = Math.floor(rng.next() * validTargets.length);
       // Index is guaranteed to be valid since 0 <= index < length
       return [validTargets[index]!.id];
+    }
+
+    case 'highestDef': {
+      // Find target with highest DEF (single-target only)
+      if (validTargets.length === 0) {
+        return [];
+      }
+      
+      const scored = validTargets.map(target => {
+        // Use base DEF (AI doesn't have access to effective stats here)
+        // Could be enhanced later to use effective DEF if team is passed
+        const def = target.baseStats.def;
+        return { target, def };
+      });
+      
+      scored.sort((a, b) => b.def - a.def); // Highest DEF first
+      if (scored.length > 0) {
+        // Length check guarantees [0] exists
+        return [scored[0]!.target.id];
+      }
+      return [];
     }
 
     default:

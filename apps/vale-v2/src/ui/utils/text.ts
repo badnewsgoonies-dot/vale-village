@@ -17,10 +17,26 @@ export function renderEventText(e: BattleEvent): string {
       return `${e.targetId} dodged!`;
     case 'heal':
       return `${e.targetId} recovered ${e.amount} HP`;
-    case 'status-applied':
-      return `${e.targetId} is ${e.status.type}`;
-    case 'status-expired':
-      return `${e.targetId} is no longer ${e.status.type}`;
+    case 'status-applied': {
+      const statusNames: Record<string, string> = {
+        poison: 'Poisoned',
+        burn: 'Burned',
+        freeze: 'Frozen',
+        paralyze: 'Paralyzed',
+      };
+      const statusName = statusNames[e.status.type] || e.status.type;
+      return `${e.targetId} is ${statusName}!`;
+    }
+    case 'status-expired': {
+      const recoveryNames: Record<string, string> = {
+        poison: 'Poison',
+        burn: 'Burn',
+        freeze: 'Freeze',
+        paralyze: 'Paralysis',
+      };
+      const recoveryName = recoveryNames[e.status.type] || e.status.type;
+      return `${e.targetId} recovered from ${recoveryName}`;
+    }
     case 'ko':
       return `${e.unitId} is down!`;
     case 'xp':

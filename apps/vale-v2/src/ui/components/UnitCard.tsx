@@ -112,19 +112,74 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
 
       {unit.statusEffects.length > 0 && (
         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-          {unit.statusEffects.map((status, idx) => (
-            <span
-              key={idx}
-              style={{
-                fontSize: '0.75rem',
-                padding: '0.125rem 0.25rem',
-                backgroundColor: '#FFEB3B',
-                borderRadius: '4px',
-              }}
-            >
-              {status.type} ({status.duration})
-            </span>
-          ))}
+          {unit.statusEffects.map((status, idx) => {
+            const statusConfig: Record<string, { icon: string; bgColor: string; textColor: string }> = {
+              poison: { icon: '☠️', bgColor: '#4CAF50', textColor: '#fff' },
+              burn: { icon: '🔥', bgColor: '#F44336', textColor: '#fff' },
+              freeze: { icon: '❄️', bgColor: '#2196F3', textColor: '#fff' },
+              paralyze: { icon: '⚡', bgColor: '#FFEB3B', textColor: '#000' },
+              buff: { icon: '⬆️', bgColor: '#2E7D32', textColor: '#fff' },
+              debuff: { icon: '⬇️', bgColor: '#BF360C', textColor: '#fff' },
+            };
+
+            const statLabels: Record<string, string> = {
+              atk: 'ATK',
+              def: 'DEF',
+              mag: 'MAG',
+              spd: 'SPD',
+              hp: 'HP',
+              pp: 'PP',
+              evasion: 'EVA',
+            };
+
+            const config = statusConfig[status.type] || {
+              icon: '⚠️',
+              bgColor: '#FFEB3B',
+              textColor: '#000',
+            };
+
+            const statusName = status.type.charAt(0).toUpperCase() + status.type.slice(1);
+
+            const badgeLabel = (() => {
+              if (status.type === 'buff' || status.type === 'debuff') {
+                const statLabel = statLabels[status.stat] || status.stat.toUpperCase();
+                const modifier = status.modifier ?? 0;
+                const formatted = `${modifier >= 0 ? '+' : ''}${modifier}`;
+                return `${statLabel}${formatted} ${status.duration}`;
+              }
+              return `${statusName} ${status.duration}`;
+            })();
+
+            const tooltip = (() => {
+              if (status.type === 'buff' || status.type === 'debuff') {
+                const statLabel = statLabels[status.stat] || status.stat.toUpperCase();
+                const modifier = status.modifier ?? 0;
+                return `${status.type === 'buff' ? 'Buff' : 'Debuff'}: ${statLabel}${modifier >= 0 ? '+' : ''}${modifier} (${status.duration} turn${status.duration !== 1 ? 's' : ''} remaining)`;
+              }
+              return `${statusName} (${status.duration} turn${status.duration !== 1 ? 's' : ''} remaining)`;
+            })();
+
+            return (
+              <span
+                key={idx}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '0.125rem 0.375rem',
+                  backgroundColor: config.bgColor,
+                  color: config.textColor,
+                  borderRadius: '4px',
+                  fontWeight: '500',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                }}
+                title={tooltip}
+              >
+                <span>{config.icon}</span>
+                <span>{badgeLabel}</span>
+              </span>
+            );
+          })}
         </div>
       )}
 

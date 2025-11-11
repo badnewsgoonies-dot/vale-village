@@ -37,10 +37,16 @@ export const AbilitySchema = z.object({
   }).optional(),
   duration: z.number().int().min(1).optional(),
   
+  // Status effect applied on hit (for physical/psynergy abilities)
+  statusEffect: z.object({
+    type: z.enum(['poison', 'burn', 'freeze', 'paralyze']),
+    duration: z.number().int().min(1),
+  }).optional(),
+  
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
     priority: z.number().min(0).max(3).optional(),
-    target: z.enum(['weakest', 'random', 'lowestRes', 'healerFirst']).optional(),
+    target: z.enum(['weakest', 'random', 'lowestRes', 'healerFirst', 'highestDef']).optional(),
     avoidOverkill: z.boolean().optional(),
     opener: z.boolean().optional(),
   }).optional(),

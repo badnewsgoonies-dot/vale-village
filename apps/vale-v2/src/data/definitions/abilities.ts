@@ -24,6 +24,11 @@ export const STRIKE: Ability = {
   targets: 'single-enemy',
   unlockLevel: 1,
   description: 'Basic physical attack',
+  aiHints: {
+    priority: 1.0,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
 };
 
 export const HEAVY_STRIKE: Ability = {
@@ -35,6 +40,11 @@ export const HEAVY_STRIKE: Ability = {
   targets: 'single-enemy',
   unlockLevel: 2,
   description: 'Powerful physical strike',
+  aiHints: {
+    priority: 2.0,
+    target: 'weakest',
+    avoidOverkill: true,
+  },
 };
 
 export const GUARD_BREAK: Ability = {
@@ -50,6 +60,11 @@ export const GUARD_BREAK: Ability = {
     def: -6,
   },
   duration: 2,
+  aiHints: {
+    priority: 2.5,
+    target: 'highestDef',
+    avoidOverkill: false,
+  },
 };
 
 export const PRECISE_JAB: Ability = {
@@ -61,6 +76,11 @@ export const PRECISE_JAB: Ability = {
   targets: 'single-enemy',
   unlockLevel: 1,
   description: 'High accuracy attack that cannot crit',
+  aiHints: {
+    priority: 1.5,
+    target: 'weakest',
+    avoidOverkill: true,
+  },
 };
 
 // ============================================================================
@@ -77,6 +97,11 @@ export const FIREBALL: Ability = {
   targets: 'single-enemy',
   unlockLevel: 1,
   description: 'Fire elemental attack',
+  aiHints: {
+    priority: 2.0,
+    target: 'lowestRes',
+    avoidOverkill: false,
+  },
 };
 
 export const ICE_SHARD: Ability = {
@@ -89,6 +114,11 @@ export const ICE_SHARD: Ability = {
   targets: 'single-enemy',
   unlockLevel: 1,
   description: 'Ice elemental attack',
+  aiHints: {
+    priority: 2.0,
+    target: 'lowestRes',
+    avoidOverkill: false,
+  },
 };
 
 export const QUAKE: Ability = {
@@ -101,6 +131,11 @@ export const QUAKE: Ability = {
   targets: 'all-enemies',
   unlockLevel: 2,
   description: 'Earth elemental attack hitting all enemies',
+  aiHints: {
+    priority: 2.5,
+    target: 'random',
+    avoidOverkill: false,
+  },
 };
 
 export const GUST: Ability = {
@@ -113,6 +148,11 @@ export const GUST: Ability = {
   targets: 'single-enemy',
   unlockLevel: 1,
   description: 'Wind elemental attack',
+  aiHints: {
+    priority: 1.5,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
 };
 
 export const CHAIN_LIGHTNING: Ability = {
@@ -126,6 +166,11 @@ export const CHAIN_LIGHTNING: Ability = {
   unlockLevel: 3,
   description: 'Lightning that chains between all enemies',
   chainDamage: true,
+  aiHints: {
+    priority: 3.0,
+    target: 'random',
+    avoidOverkill: false,
+  },
 };
 
 // ============================================================================
@@ -141,6 +186,11 @@ export const HEAL: Ability = {
   targets: 'single-ally',
   unlockLevel: 1,
   description: 'Restores HP to a single ally',
+  aiHints: {
+    priority: 2.5,
+    target: 'healerFirst',
+    avoidOverkill: false,
+  },
 };
 
 export const PARTY_HEAL: Ability = {
@@ -152,6 +202,11 @@ export const PARTY_HEAL: Ability = {
   targets: 'all-allies',
   unlockLevel: 2,
   description: 'Restores HP to all allies',
+  aiHints: {
+    priority: 3.0,
+    target: 'random',
+    avoidOverkill: false,
+  },
 };
 
 // ============================================================================
@@ -171,6 +226,11 @@ export const BOOST_ATK: Ability = {
     atk: 8,
   },
   duration: 3,
+  aiHints: {
+    priority: 1.5,
+    target: 'random',
+    opener: true,
+  },
 };
 
 export const BOOST_DEF: Ability = {
@@ -186,6 +246,11 @@ export const BOOST_DEF: Ability = {
     def: 8,
   },
   duration: 3,
+  aiHints: {
+    priority: 1.5,
+    target: 'random',
+    opener: true,
+  },
 };
 
 // ============================================================================
@@ -205,6 +270,11 @@ export const WEAKEN_DEF: Ability = {
     def: -6,
   },
   duration: 2,
+  aiHints: {
+    priority: 2.0,
+    target: 'lowestRes',
+    avoidOverkill: false,
+  },
 };
 
 export const BLIND: Ability = {
@@ -220,6 +290,98 @@ export const BLIND: Ability = {
     evasion: -20, // Negative evasion = accuracy debuff
   },
   duration: 2,
+  aiHints: {
+    priority: 2.0,
+    target: 'random',
+    avoidOverkill: false,
+  },
+};
+
+// ============================================================================
+// Status Effect Abilities (4)
+// ============================================================================
+
+export const POISON_STRIKE: Ability = {
+  id: 'poison-strike',
+  name: 'Poison Strike',
+  type: 'physical',
+  manaCost: 1,
+  basePower: 10,
+  targets: 'single-enemy',
+  unlockLevel: 2,
+  description: 'Physical attack that poisons the target',
+  statusEffect: {
+    type: 'poison',
+    duration: 3,
+  },
+  aiHints: {
+    priority: 2.0,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
+};
+
+export const BURN_TOUCH: Ability = {
+  id: 'burn-touch',
+  name: 'Burn Touch',
+  type: 'psynergy',
+  element: 'Mars',
+  manaCost: 2,
+  basePower: 25,
+  targets: 'single-enemy',
+  unlockLevel: 2,
+  description: 'Fire psynergy that burns the target',
+  statusEffect: {
+    type: 'burn',
+    duration: 3,
+  },
+  aiHints: {
+    priority: 2.0,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
+};
+
+export const FREEZE_BLAST: Ability = {
+  id: 'freeze-blast',
+  name: 'Freeze Blast',
+  type: 'psynergy',
+  element: 'Mercury',
+  manaCost: 2,
+  basePower: 20,
+  targets: 'single-enemy',
+  unlockLevel: 3,
+  description: 'Ice psynergy that freezes the target',
+  statusEffect: {
+    type: 'freeze',
+    duration: 2,
+  },
+  aiHints: {
+    priority: 2.5,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
+};
+
+export const PARALYZE_SHOCK: Ability = {
+  id: 'paralyze-shock',
+  name: 'Paralyze Shock',
+  type: 'psynergy',
+  element: 'Jupiter',
+  manaCost: 2,
+  basePower: 15,
+  targets: 'single-enemy',
+  unlockLevel: 3,
+  description: 'Lightning psynergy that paralyzes the target',
+  statusEffect: {
+    type: 'paralyze',
+    duration: 2,
+  },
+  aiHints: {
+    priority: 2.0,
+    target: 'healerFirst',
+    avoidOverkill: false,
+  },
 };
 
 // ============================================================================
@@ -232,12 +394,16 @@ export const ABILITIES: Record<string, Ability> = {
   'heavy-strike': HEAVY_STRIKE,
   'guard-break': GUARD_BREAK,
   'precise-jab': PRECISE_JAB,
+  'poison-strike': POISON_STRIKE,
   // Psynergy
   fireball: FIREBALL,
   'ice-shard': ICE_SHARD,
   quake: QUAKE,
   gust: GUST,
   'chain-lightning': CHAIN_LIGHTNING,
+  'burn-touch': BURN_TOUCH,
+  'freeze-blast': FREEZE_BLAST,
+  'paralyze-shock': PARALYZE_SHOCK,
   // Healing
   heal: HEAL,
   'party-heal': PARTY_HEAL,

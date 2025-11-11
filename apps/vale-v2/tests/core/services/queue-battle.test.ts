@@ -5,7 +5,6 @@
 
 import { describe, it, expect } from 'vitest';
 import { makePRNG } from '../../../src/core/random/prng';
-import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
 import { createBattleState } from '../../../src/core/models/BattleState';
 import {
@@ -15,70 +14,75 @@ import {
   executeRound,
   refreshMana,
 } from '../../../src/core/services/QueueBattleService';
+import { startBattle } from '../../../src/core/services/BattleService';
 import { isQueueComplete, validateQueuedActions } from '../../../src/core/algorithms/mana';
 import { STRIKE, FIREBALL } from '../../../src/data/definitions/abilities';
+import { mkUnit } from '../../../src/test/factories';
 
 describe('QueueBattleService', () => {
+  // Helper to unwrap queueAction Result
+  const queueActionUnwrap = (
+    state: ReturnType<typeof createBattleState>,
+    unitId: string,
+    abilityId: string | null,
+    targetIds: readonly string[],
+    ability?: typeof STRIKE | typeof FIREBALL
+  ) => {
+    const result = queueAction(state, unitId, abilityId, targetIds, ability);
+    if (!result.ok) throw new Error(result.error);
+    return result.value;
+  };
+
   const createTestBattle = () => {
-    const unit1 = createUnit({
+    const unit1 = mkUnit({
       id: 'unit1',
       name: 'Unit 1',
       element: 'Venus',
       role: 'Warrior',
       baseStats: { hp: 100, pp: 20, atk: 10, def: 10, mag: 5, spd: 10 },
-      growthRates: { hp: 10, pp: 2, atk: 2, def: 2, mag: 1, spd: 1 },
       abilities: [STRIKE, FIREBALL],
-      manaContribution: 2,
-      description: 'Test unit',
-    }, 1, 0);
+      unlockedAbilityIds: [STRIKE.id, FIREBALL.id],
+    });
 
-    const unit2 = createUnit({
+    const unit2 = mkUnit({
       id: 'unit2',
       name: 'Unit 2',
       element: 'Mars',
       role: 'Mage',
       baseStats: { hp: 80, pp: 30, atk: 5, def: 5, mag: 15, spd: 12 },
-      growthRates: { hp: 8, pp: 3, atk: 1, def: 1, mag: 3, spd: 2 },
       abilities: [STRIKE, FIREBALL],
-      manaContribution: 3,
-      description: 'Test unit',
-    }, 1, 0);
+      unlockedAbilityIds: [STRIKE.id, FIREBALL.id],
+    });
 
-    const unit3 = createUnit({
+    const unit3 = mkUnit({
       id: 'unit3',
       name: 'Unit 3',
       element: 'Mercury',
       role: 'Healer',
       baseStats: { hp: 90, pp: 25, atk: 6, def: 8, mag: 12, spd: 11 },
-      growthRates: { hp: 9, pp: 2, atk: 1, def: 2, mag: 2, spd: 1 },
       abilities: [STRIKE],
-      manaContribution: 2,
-      description: 'Test unit',
-    }, 1, 0);
+      unlockedAbilityIds: [STRIKE.id],
+    });
 
-    const unit4 = createUnit({
+    const unit4 = mkUnit({
       id: 'unit4',
       name: 'Unit 4',
       element: 'Jupiter',
       role: 'Ranger',
       baseStats: { hp: 85, pp: 22, atk: 12, def: 7, mag: 8, spd: 14 },
-      growthRates: { hp: 8, pp: 2, atk: 3, def: 1, mag: 1, spd: 3 },
       abilities: [STRIKE],
-      manaContribution: 1,
-      description: 'Test unit',
-    }, 1, 0);
+      unlockedAbilityIds: [STRIKE.id],
+    });
 
-    const enemy = createUnit({
+    const enemy = mkUnit({
       id: 'enemy1',
       name: 'Enemy',
       element: 'Neutral',
       role: 'Warrior',
       baseStats: { hp: 50, pp: 10, atk: 8, def: 5, mag: 2, spd: 8 },
-      growthRates: { hp: 5, pp: 1, atk: 1, def: 1, mag: 1, spd: 1 },
       abilities: [STRIKE],
-      manaContribution: 0,
-      description: 'Test enemy',
-    }, 1, 0);
+      unlockedAbilityIds: [STRIKE.id],
+    });
 
     // Setup team with Djinn
     const team = createTeam([unit1, unit2, unit3, unit4]);
@@ -103,7 +107,7 @@ describe('QueueBattleService', () => {
       const { battle } = createTestBattle();
       const initialMana = battle.remainingMana;
 
-      const updated = queueAction(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      const updated = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
 
       expect(updated.queuedActions[0]).toBeDefined();
       expect(updated.queuedActions[0]?.unitId).toBe('unit1');
@@ -115,10 +119,9 @@ describe('QueueBattleService', () => {
       // Set remaining mana to 0
       const lowManaBattle = { ...battle, remainingMana: 0 };
 
-      // FIREBALL costs 3 mana, so this should throw
-      expect(() => {
-        queueAction(lowManaBattle, 'unit1', FIREBALL.id, ['enemy1'], FIREBALL);
-      }).toThrow();
+      // FIREBALL costs 3 mana, so this should return error Result
+      const result = queueAction(lowManaBattle, 'unit1', FIREBALL.id, ['enemy1'], FIREBALL);
+      expect(result.ok).toBe(false);
     });
   });
 
@@ -127,7 +130,7 @@ describe('QueueBattleService', () => {
       const { battle } = createTestBattle();
       const initialMana = battle.remainingMana;
 
-      const queued = queueAction(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      const queued = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
       const cleared = clearQueuedAction(queued, 0);
 
       expect(cleared.queuedActions[0]).toBeNull();
@@ -138,7 +141,7 @@ describe('QueueBattleService', () => {
   describe('refreshMana', () => {
     it('should reset mana to max', () => {
       const { battle } = createTestBattle();
-      const spent = queueAction(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      const spent = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
       const refreshed = refreshMana(spent);
 
       expect(refreshed.remainingMana).toBe(refreshed.maxMana);
@@ -148,7 +151,7 @@ describe('QueueBattleService', () => {
   describe('isQueueComplete', () => {
     it('should return false when queue is incomplete', () => {
       const { battle } = createTestBattle();
-      const queued = queueAction(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      const queued = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
 
       expect(isQueueComplete(queued.queuedActions)).toBe(false);
     });
@@ -158,10 +161,10 @@ describe('QueueBattleService', () => {
       let state = battle;
 
       // Queue all 4 actions
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE); // Basic attack
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE); // Basic attack
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       expect(isQueueComplete(state.queuedActions)).toBe(true);
     });
@@ -221,10 +224,10 @@ describe('QueueBattleService', () => {
 
       // Queue all 4 player actions
       let state = strongerEnemyBattle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -253,8 +256,8 @@ describe('QueueBattleService', () => {
 
       // Only queue 2 actions
       let state = battle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
 
       expect(() => {
         executeRound(state, rng);
@@ -268,10 +271,10 @@ describe('QueueBattleService', () => {
       // Queue actions and Djinn
       let state = battle;
       state = queueDjinn(state, 'flint'); // Venus Djinn
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -308,10 +311,10 @@ describe('QueueBattleService', () => {
 
       // Queue actions including the KO'd unit
       let state = koState;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -332,10 +335,10 @@ describe('QueueBattleService', () => {
 
       // Queue all 4 actions targeting the same enemy
       let state = weakEnemyBattle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -362,10 +365,10 @@ describe('QueueBattleService', () => {
 
       // Queue actions
       let state = weakPlayerBattle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -383,10 +386,10 @@ describe('QueueBattleService', () => {
 
       // Queue all actions
       let state = battle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE); // SPD 10
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE); // SPD 12 (fastest)
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE); // SPD 11
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE); // SPD 14 (fastest)
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE); // SPD 10
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE); // SPD 12 (fastest)
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE); // SPD 11
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE); // SPD 14 (fastest)
 
       const result = executeRound(state, rng);
 
@@ -411,10 +414,10 @@ describe('QueueBattleService', () => {
 
       // Queue all player actions
       let state = strongerEnemyBattle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -436,10 +439,10 @@ describe('QueueBattleService', () => {
       state = queueDjinn(state, 'forge');   // Mars
 
       // Queue player actions
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -468,10 +471,10 @@ describe('QueueBattleService', () => {
       // Queue Djinn and actions
       let state = strongerEnemyBattle;
       state = queueDjinn(state, 'flint');
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 
@@ -488,10 +491,10 @@ describe('QueueBattleService', () => {
 
       // Queue actions
       let state = battle;
-      state = queueAction(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
-      state = queueAction(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
+      state = queueActionUnwrap(state, 'unit4', STRIKE.id, ['enemy1'], STRIKE);
 
       const result = executeRound(state, rng);
 

@@ -146,6 +146,12 @@ export function performAction(
     throw new Error(`All targets are KO'd or invalid`);
   }
 
+  // Store status effects before execution (for status-applied event detection)
+  const statusEffectsBefore = new Map<string, typeof aliveTargets[number]['statusEffects']>();
+  aliveTargets.forEach(target => {
+    statusEffectsBefore.set(target.id, target.statusEffects);
+  });
+
   // Execute ability with validated alive targets
   // Pass team for effective stats calculation
   const allUnits = [...state.playerTeam.units, ...state.enemies];
@@ -210,6 +216,30 @@ export function performAction(
         targetId,
         amount: result.healing || 0,
       });
+    });
+  }
+
+  // Emit status-applied events for newly added status effects (on-hit statuses)
+  if (!result.dodged && ability.statusEffect) {
+    targetIds.forEach(targetId => {
+      const beforeStatuses = statusEffectsBefore.get(targetId) || [];
+      const afterUnit = result.updatedUnits.find(u => u.id === targetId);
+      if (afterUnit) {
+        const afterStatuses = afterUnit.statusEffects;
+        
+        // Find newly added statuses (compare by type)
+        const beforeTypes = new Set(beforeStatuses.map(s => s.type));
+        const newStatuses = afterStatuses.filter(s => !beforeTypes.has(s.type));
+        
+        // Emit event for each newly applied status
+        newStatuses.forEach(status => {
+          events.push({
+            type: 'status-applied',
+            targetId,
+            status,
+          });
+        });
+      }
     });
   }
 
@@ -278,7 +308,51 @@ function executeAbility(
           damage = Math.floor(damage * BATTLE_CONSTANTS.CRITICAL_HIT_MULTIPLIER);
         }
 
-        const damagedUnit = applyDamage(currentTarget, damage);
+        let damagedUnit = applyDamage(currentTarget, damage);
+        
+        // Apply status effect if ability has one (only on successful hit, not dodged)
+        if (ability.statusEffect) {
+          const statusType = ability.statusEffect.type;
+          const statusDuration = ability.statusEffect.duration;
+          
+          // Remove existing same-type status (prevent stacking)
+          const filteredStatuses = damagedUnit.statusEffects.filter(
+            s => s.type !== statusType
+          );
+          
+          // Create new status effect based on type
+          let newStatus: typeof damagedUnit.statusEffects[number];
+          if (statusType === 'poison') {
+            newStatus = {
+              type: 'poison',
+              damagePerTurn: 8,
+              duration: statusDuration,
+            };
+          } else if (statusType === 'burn') {
+            newStatus = {
+              type: 'burn',
+              damagePerTurn: 10,
+              duration: statusDuration,
+            };
+          } else if (statusType === 'freeze') {
+            newStatus = {
+              type: 'freeze',
+              duration: statusDuration,
+            };
+          } else { // paralyze
+            newStatus = {
+              type: 'paralyze',
+              duration: statusDuration,
+            };
+          }
+          
+          // Apply new status
+          damagedUnit = {
+            ...damagedUnit,
+            statusEffects: [...filteredStatuses, newStatus],
+          };
+        }
+        
         // Update or add to updatedUnits
         const existingIndex = updatedUnits.findIndex(u => u.id === damagedUnit.id);
         if (existingIndex >= 0) {

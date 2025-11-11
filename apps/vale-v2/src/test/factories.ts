@@ -21,16 +21,28 @@ export function mkUnit(overrides?: Partial<Unit>): Unit {
   if (!baseDef) {
     throw new Error('UNIT_DEFINITIONS.adept not found');
   }
-  const base = createUnit(baseDef, 1, 0);
+  
+  // Extract level and xp from overrides if provided
+  const level = overrides?.level ?? 1;
+  const xp = overrides?.xp ?? 0;
+  
+  // Create base unit at specified level
+  const base = createUnit(baseDef, level, xp);
   if (!overrides) return base;
+  
+  // Apply overrides, but exclude level/xp since they're already applied
+  const { level: _, xp: __, ...restOverrides } = overrides;
   
   return {
     ...base,
-    ...overrides,
+    ...restOverrides,
     // Deep merge for nested objects
-    baseStats: overrides.baseStats ? { ...base.baseStats, ...overrides.baseStats } : base.baseStats,
-    equipment: overrides.equipment ?? base.equipment,
-    statusEffects: overrides.statusEffects ?? base.statusEffects,
+    baseStats: restOverrides.baseStats ? { ...base.baseStats, ...restOverrides.baseStats } : base.baseStats,
+    equipment: restOverrides.equipment ?? base.equipment,
+    statusEffects: restOverrides.statusEffects ?? base.statusEffects,
+    // Preserve level/xp from createUnit call
+    level: base.level,
+    xp: base.xp,
   };
 }
 

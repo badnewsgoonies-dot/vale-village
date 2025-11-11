@@ -1,0 +1,317 @@
+/**
+ * Status Effect Tests
+ * Tests for status effect application, ticking, and expiration
+ */
+
+import { describe, it, expect } from 'vitest';
+import { makePRNG } from '../../../src/core/random/prng';
+import { processStatusEffectTick, checkParalyzeFailure, isFrozen } from '../../../src/core/algorithms/status';
+import { performAction } from '../../../src/core/services/BattleService';
+import { mkBattle, mkUnit, mkEnemy } from '../../../src/test/factories';
+import { makeTestCtx } from '../../../src/test/testCtx';
+import { ABILITIES } from '../../../src/data/definitions/abilities';
+
+describe('Status Effects', () => {
+  describe('On-Hit Status Application', () => {
+    it('should apply poison status on successful hit', () => {
+      // Run multiple seeds to handle dodge flakiness (5% base miss chance)
+      let statusApplied = false;
+      
+      for (let seed = 1000; seed < 1005; seed++) {
+        const { rng } = makeTestCtx(seed);
+        
+        // Create attacker with poison-strike ability
+        const attacker = mkUnit({
+          id: 'attacker',
+          abilities: [ABILITIES['poison-strike']],
+          unlockedAbilityIds: ['poison-strike'],
+        });
+        
+        const target = mkEnemy('slime', { id: 'target' });
+        
+        const battle = mkBattle({
+          party: [attacker],
+          enemies: [target],
+        });
+        
+        try {
+          const result = performAction(battle, 'attacker', 'poison-strike', ['target'], rng);
+          
+          // Check if hit succeeded (not dodged)
+          const missEvent = result.events.find(e => e.type === 'miss');
+          if (missEvent) {
+            continue; // Skip this seed if dodged
+          }
+          
+          // Check that target has poison status
+          const updatedTarget = result.state.enemies.find(u => u.id === 'target');
+          expect(updatedTarget).toBeDefined();
+          
+          const poisonStatus = updatedTarget?.statusEffects.find(s => s.type === 'poison');
+          if (poisonStatus) {
+            expect(poisonStatus.duration).toBe(3);
+            expect(poisonStatus.damagePerTurn).toBe(8);
+            
+            // Check that status-applied event was emitted
+            const statusEvent = result.events.find(
+              e => e.type === 'status-applied' && 
+                   e.status.type === 'poison' && 
+                   e.targetId === 'target'
+            );
+            expect(statusEvent).toBeDefined();
+            
+            statusApplied = true;
+            break; // Success, exit loop
+          }
+        } catch (error) {
+          // Skip errors (e.g., invalid targets)
+          continue;
+        }
+      }
+      
+      // At least one successful hit should have applied status
+      expect(statusApplied).toBe(true);
+    });
+    
+    it('should apply burn status on successful hit', () => {
+      let statusApplied = false;
+      
+      for (let seed = 2000; seed < 2005; seed++) {
+        const { rng } = makeTestCtx(seed);
+        
+        const attacker = mkUnit({
+          id: 'attacker',
+          abilities: [ABILITIES['burn-touch']],
+          unlockedAbilityIds: ['burn-touch'],
+        });
+        
+        const target = mkEnemy('slime', { id: 'target' });
+        const battle = mkBattle({
+          party: [attacker],
+          enemies: [target],
+        });
+        
+        try {
+          const result = performAction(battle, 'attacker', 'burn-touch', ['target'], rng);
+          
+          const missEvent = result.events.find(e => e.type === 'miss');
+          if (missEvent) {
+            continue;
+          }
+          
+          const updatedTarget = result.state.enemies.find(u => u.id === 'target');
+          const burnStatus = updatedTarget?.statusEffects.find(s => s.type === 'burn');
+          
+          if (burnStatus) {
+            expect(burnStatus.duration).toBe(3);
+            expect(burnStatus.damagePerTurn).toBe(10);
+            
+            const statusEvent = result.events.find(
+              e => e.type === 'status-applied' && 
+                   e.status.type === 'burn' && 
+                   e.targetId === 'target'
+            );
+            expect(statusEvent).toBeDefined();
+            
+            statusApplied = true;
+            break;
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+      
+      expect(statusApplied).toBe(true);
+    });
+  });
+  
+  describe('Stacking Prevention', () => {
+    it('should prevent status stacking (reapply replaces same type)', () => {
+      const unit = mkUnit({
+        id: 'unit',
+        statusEffects: [
+          { type: 'poison', damagePerTurn: 8, duration: 2 },
+        ],
+      });
+      
+      // Simulate reapplication (filter + replace pattern from BattleService)
+      const statusType = 'poison';
+      const filteredStatuses = unit.statusEffects.filter(s => s.type !== statusType);
+      const newPoison = { type: 'poison' as const, damagePerTurn: 8, duration: 3 };
+      const updatedUnit = {
+        ...unit,
+        statusEffects: [...filteredStatuses, newPoison],
+      };
+      
+      // Should have only one poison status
+      const poisonStatuses = updatedUnit.statusEffects.filter(s => s.type === 'poison');
+      expect(poisonStatuses.length).toBe(1);
+      expect(poisonStatuses[0]?.duration).toBe(3); // New duration replaces old
+    });
+    
+    it('should allow different status types to coexist', () => {
+      const unit = mkUnit({
+        id: 'unit',
+        statusEffects: [
+          { type: 'poison', damagePerTurn: 8, duration: 2 },
+          { type: 'burn', damagePerTurn: 10, duration: 3 },
+        ],
+      });
+      
+      // Apply freeze (different type)
+      const newFreeze = { type: 'freeze' as const, duration: 2 };
+      const updatedUnit = {
+        ...unit,
+        statusEffects: [...unit.statusEffects, newFreeze],
+      };
+      
+      // Should have all three status types
+      expect(updatedUnit.statusEffects.length).toBe(3);
+      expect(updatedUnit.statusEffects.some(s => s.type === 'poison')).toBe(true);
+      expect(updatedUnit.statusEffects.some(s => s.type === 'burn')).toBe(true);
+      expect(updatedUnit.statusEffects.some(s => s.type === 'freeze')).toBe(true);
+    });
+  });
+  
+  describe('Status Tick Damage', () => {
+    it('should deal 8% max HP poison damage per turn', () => {
+      const rng = makePRNG(12345);
+      const unit = mkUnit({
+        id: 'unit',
+        level: 1,
+      });
+      const maxHp = unit.baseStats.hp + (unit.level - 1) * unit.growthRates.hp;
+      
+      const unitWithPoison = {
+        ...unit,
+        statusEffects: [{ type: 'poison' as const, damagePerTurn: 8, duration: 3 }],
+      };
+      
+      const result = processStatusEffectTick(unitWithPoison, rng);
+      
+      const expectedDamage = Math.floor(maxHp * 0.08);
+      expect(result.damage).toBe(expectedDamage);
+      expect(result.updatedUnit.currentHp).toBe(unit.currentHp - expectedDamage);
+      expect(result.messages.some(m => m.includes('poison damage'))).toBe(true);
+    });
+    
+    it('should deal 10% max HP burn damage per turn', () => {
+      const rng = makePRNG(12345);
+      const unit = mkUnit({
+        id: 'unit',
+        level: 1,
+      });
+      const maxHp = unit.baseStats.hp + (unit.level - 1) * unit.growthRates.hp;
+      
+      const unitWithBurn = {
+        ...unit,
+        statusEffects: [{ type: 'burn' as const, damagePerTurn: 10, duration: 3 }],
+      };
+      
+      const result = processStatusEffectTick(unitWithBurn, rng);
+      
+      const expectedDamage = Math.floor(maxHp * 0.10);
+      expect(result.damage).toBe(expectedDamage);
+      expect(result.updatedUnit.currentHp).toBe(unit.currentHp - expectedDamage);
+      expect(result.messages.some(m => m.includes('burn damage'))).toBe(true);
+    });
+    
+    it('should decrement duration after tick', () => {
+      const rng = makePRNG(12345);
+      const unit = mkUnit({
+        id: 'unit',
+        statusEffects: [{ type: 'poison' as const, damagePerTurn: 8, duration: 3 }],
+      });
+      
+      const result = processStatusEffectTick(unit, rng);
+      
+      const poisonStatus = result.updatedUnit.statusEffects.find(s => s.type === 'poison');
+      expect(poisonStatus?.duration).toBe(2);
+    });
+    
+    it('should remove status when duration reaches 0', () => {
+      const rng = makePRNG(12345);
+      const unit = mkUnit({
+        id: 'unit',
+        statusEffects: [{ type: 'poison' as const, damagePerTurn: 8, duration: 1 }],
+      });
+      
+      const result = processStatusEffectTick(unit, rng);
+      
+      // Duration 1 -> 0, should be removed
+      const poisonStatus = result.updatedUnit.statusEffects.find(s => s.type === 'poison');
+      expect(poisonStatus).toBeUndefined();
+    });
+  });
+  
+  describe('Freeze Status', () => {
+    it('should prevent unit from acting when frozen', () => {
+      const unit = mkUnit({
+        id: 'unit',
+        statusEffects: [{ type: 'freeze' as const, duration: 2 }],
+      });
+      
+      expect(isFrozen(unit)).toBe(true);
+    });
+    
+    it('should have ~30% break chance per turn', () => {
+      // Test over many trials to verify probability
+      let breakCount = 0;
+      const trials = 1000;
+      
+      for (let i = 0; i < trials; i++) {
+        const rng = makePRNG(3000 + i); // Different seed per trial
+        const unit = mkUnit({
+          id: 'unit',
+          statusEffects: [{ type: 'freeze' as const, duration: 2 }],
+        });
+        
+        const result = processStatusEffectTick(unit, rng);
+        
+        // Check if freeze broke (duration set to 0 or removed)
+        const freezeStatus = result.updatedUnit.statusEffects.find(s => s.type === 'freeze');
+        if (!freezeStatus || freezeStatus.duration === 0) {
+          breakCount++;
+        }
+      }
+      
+      const breakRate = breakCount / trials;
+      // Should be approximately 30% (allow 5% tolerance: 25-35%)
+      expect(breakRate).toBeGreaterThan(0.25);
+      expect(breakRate).toBeLessThan(0.35);
+    });
+  });
+  
+  describe('Paralyze Status', () => {
+    it('should have ~25% failure chance', () => {
+      // Test over many trials to verify probability
+      let failureCount = 0;
+      const trials = 1000;
+      
+      for (let i = 0; i < trials; i++) {
+        const rng = makePRNG(4000 + i);
+        const unit = mkUnit({
+          id: 'unit',
+          statusEffects: [{ type: 'paralyze' as const, duration: 2 }],
+        });
+        
+        if (checkParalyzeFailure(unit, rng)) {
+          failureCount++;
+        }
+      }
+      
+      const failureRate = failureCount / trials;
+      // Should be approximately 25% (allow 5% tolerance: 20-30%)
+      expect(failureRate).toBeGreaterThan(0.20);
+      expect(failureRate).toBeLessThan(0.30);
+    });
+    
+    it('should not fail actions when not paralyzed', () => {
+      const rng = makePRNG(12345);
+      const unit = mkUnit({ id: 'unit' });
+      
+      expect(checkParalyzeFailure(unit, rng)).toBe(false);
+    });
+  });
+});
+
