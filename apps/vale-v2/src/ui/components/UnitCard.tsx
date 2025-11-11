@@ -14,9 +14,10 @@ interface UnitCardProps {
   unit: Unit;
   isPlayer: boolean;
   team?: Team; // Optional team for effective stats calculation (only needed for player units)
+  hideHp?: boolean; // PR-QUEUE-BATTLE: Hide HP bar (for enemies)
 }
 
-export function UnitCard({ unit, isPlayer, team }: UnitCardProps) {
+export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps) {
   const maxHp = calculateMaxHp(unit);
   const hpPercent = (unit.currentHp / maxHp) * 100;
   
@@ -55,33 +56,36 @@ export function UnitCard({ unit, isPlayer, team }: UnitCardProps) {
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div>HP: {unit.currentHp} / {maxHp}</div>
+          {!hideHp && <div>HP: {unit.currentHp} / {maxHp}</div>}
+          {hideHp && <div>HP: ???</div>}
           <div>PP: {currentPp} / {maxPp}</div>
         </div>
       </div>
 
       <div style={{ marginTop: '0.5rem' }}>
-        <div style={{ marginBottom: '0.25rem' }}>
-          <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem' }}>HP</div>
-          <div
-            style={{
-              width: '100%',
-              height: '12px',
-              backgroundColor: '#e0e0e0',
-              borderRadius: '4px',
-              overflow: 'hidden',
-            }}
-          >
+        {!hideHp && (
+          <div style={{ marginBottom: '0.25rem' }}>
+            <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem' }}>HP</div>
             <div
               style={{
-                width: `${hpPercent}%`,
-                height: '100%',
-                backgroundColor: hpPercent > 50 ? '#4CAF50' : hpPercent > 25 ? '#FF9800' : '#F44336',
-                transition: 'width 0.3s ease',
+                width: '100%',
+                height: '12px',
+                backgroundColor: '#e0e0e0',
+                borderRadius: '4px',
+                overflow: 'hidden',
               }}
-            />
+            >
+              <div
+                style={{
+                  width: `${hpPercent}%`,
+                  height: '100%',
+                  backgroundColor: hpPercent > 50 ? '#4CAF50' : hpPercent > 25 ? '#FF9800' : '#F44336',
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem' }}>PP</div>

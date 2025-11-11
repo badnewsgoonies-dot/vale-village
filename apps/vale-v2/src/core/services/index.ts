@@ -7,5 +7,6 @@ export * from './BattleService';
 export * from './RngService';
 export * from './SaveService';
 export * from './AIService';
+export * from './QueueBattleService';
 export * from './types';
 

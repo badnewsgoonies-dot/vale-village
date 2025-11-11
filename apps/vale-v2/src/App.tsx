@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BattleView } from './ui/components/BattleView';
+import { QueueBattleView } from './ui/components/QueueBattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
 import { RewardsScreen } from './ui/components/RewardsScreen';
@@ -7,6 +7,7 @@ import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
 function App() {
+  // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);
   const story = useStore((s) => s.story);
   const showCredits = useStore((s) => s.showCredits);
@@ -71,7 +72,7 @@ function App() {
           onContinue={handleRewardsContinue}
         />
       ) : (
-        <BattleView />
+        <QueueBattleView />
       )}
     </div>
   );

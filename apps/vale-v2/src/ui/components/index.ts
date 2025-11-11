@@ -3,6 +3,7 @@
  */
 
 export { BattleView } from './BattleView';
+export { QueueBattleView } from './QueueBattleView';
 export { TurnOrderStrip } from './TurnOrderStrip';
 export { ActionBar } from './ActionBar';
 export { UnitCard } from './UnitCard';
@@ -14,4 +15,7 @@ export { EquipmentIcon } from './EquipmentIcon';
 export { VictoryOverlay } from './VictoryOverlay';
 export { PostBattleCutscene } from './PostBattleCutscene';
 export { RewardsScreen } from './RewardsScreen';
+export { ManaCirclesBar } from './ManaCirclesBar';
+export { DjinnBar } from './DjinnBar';
+export { ActionQueuePanel } from './ActionQueuePanel';
 
