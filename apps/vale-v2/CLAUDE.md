@@ -6,6 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. This is a Golden Sun-inspired turn-based RPG built with React, TypeScript, Zustand, and Zod.
 
+**Game Features:**
+- 10 recruitable units with 5 levels of progression (abilities unlock per level)
+- 12 collectible Djinn (3 per element: Venus/Mars/Mercury/Jupiter) providing team-wide buffs
+- 4-slot equipment system (weapon/armor/helm/boots)
+- Turn-based tactical combat with elemental advantages
+- XP-based leveling with non-linear curve: [0, 100, 350, 850, 1850]
+
+**Current Status:** Core systems (battle, progression, equipment, djinn) are complete and functional. The codebase underwent a greenfield rebuild to establish clean architecture patterns.
+
+**Last Updated:** 2025-11-10
+
+**Migration Status:** ~80% complete - GameProvider → Zustand migration in progress. Post-battle rewards, victory UI, and turn handling improvements recently completed.
+
 ## Commands
 
 ### Development
@@ -18,10 +31,14 @@ pnpm lint             # Lint code
 
 ### Testing
 ```bash
-pnpm test             # Run all tests with coverage
-pnpm test:watch       # Run tests in watch mode
-vitest run <path>     # Run specific test file
+pnpm test                              # Run all tests with coverage
+pnpm test:watch                        # Run tests in watch mode
+vitest run <path>                      # Run specific test file
+vitest run tests/core/algorithms/      # Run all algorithm tests
+vitest run tests/gameplay/             # Run gameplay scenario tests
 ```
+
+**Testing Philosophy:** Context-aware testing that proves gameplay works, not isolated unit tests. Tests focus on meaningful scenarios like "Level 1 loses, Level 5 wins" rather than "function returns number".
 
 ### Data Validation
 ```bash
@@ -179,9 +196,92 @@ All game data must validate against Zod schemas:
 - Post-battle cutscenes triggered via `npcId` on `BattleState`
 - Use `getEncounterId(battle)` helper to access canonical encounter ID
 
+## Game Systems
+
+### Battle System
+- **Damage Formula:** `(basePower + ATK - DEF×0.5) × randomMultiplier × elementAdvantage`
+- **Element Advantages:** 1.5× damage when strong, 0.67× when weak (Venus > Mars > Jupiter > Mercury > Venus)
+- **Turn Order:** Speed-based with turn queue, recalculated each round
+- **Critical Hits:** Chance based on unit level and luck
+- **Status Effects:** Buffs/debuffs tracked per unit with duration counters
+
+### Djinn System
+- **Team-Wide:** 3 Djinn slots affect entire party (not per-unit)
+- **Synergy Bonuses:** All same element = +12 ATK/+8 DEF, mixed = balanced bonuses
+- **Activation:** Using a Djinn in battle enters "Standby" mode (loses passive, recovers after turns)
+- **Location:** Core logic in `src/core/algorithms/djinnCalculations.ts` and `src/data/djinn.ts`
+
+### Leveling System
+- **XP Curve:** Non-linear [0, 100, 350, 850, 1850] for levels 1-5
+- **Ability Unlocks:** Each level unlocks new abilities (defined in unit data)
+- **Stat Growth:** Base stats + (level × growthRates) + equipment + djinn
+- **Level-Up:** Restores HP to full, persists across battles
+
+### Equipment System
+- **4 Slots:** Weapon (ATK), Armor (DEF/HP), Helm (DEF/RES), Boots (SPD/EVA)
+- **Stat Bonuses:** Applied during `Unit.calculateStats()` calculation
+- **Some weapons unlock abilities** (checked during ability validation)
+- **Drop System:** 10% chance from normal battles, 50% from bosses
+
 ## TypeScript Configuration
 
 - Strict mode enabled
 - `noUncheckedIndexedAccess: true` - All array/object access returns `T | undefined`
 - `noImplicitReturns: true` - All code paths must return
 - Path alias: `@/*` → `./src/*`
+
+## Common Development Tasks
+
+### Adding a New Ability
+1. Add ability data to `src/data/definitions/abilities.ts`
+2. Ensure it validates against `AbilitySchema` (manaCost ≥ 0, basePower ≥ 0, unlockLevel 1-5)
+3. Run `pnpm validate:data` to verify
+4. Add to unit's ability list in `src/data/definitions/unitDefinitions.ts`
+5. Test in battle: `vitest run tests/gameplay/EpicBattles.test.ts`
+
+### Adding a New Unit
+1. Add unit definition to `src/data/definitions/unitDefinitions.ts`
+2. Follow stat balance: base ATK 8-19, HP 70-140, DEF 8-15
+3. Assign 5 abilities (one unlocks per level)
+4. Validate element is one of: Venus, Mars, Mercury, Jupiter
+5. Run `pnpm validate:data`
+
+### Adding New Equipment
+1. Add to `src/data/definitions/equipment.ts`
+2. Validate against `EquipmentSchema`
+3. Test stat bonuses: `vitest run tests/unit/Equipment.test.ts`
+4. Verify equipment changes battle outcomes in gameplay tests
+
+### Debugging Battle Issues
+1. Use `SeededRNG` for reproducible battles: `new SeededRNG(42)`
+2. Check damage calculations in `src/core/algorithms/damage.ts`
+3. Verify turn order in `src/core/algorithms/turnOrder.ts`
+4. Check element advantages in damage calculations (1.5× or 0.67×)
+5. Run integration tests: `vitest run tests/integration/`
+
+### Modifying Core Game Logic
+1. **Never** modify algorithms without updating tests
+2. Run full test suite before committing: `pnpm precommit`
+3. Check that gameplay tests still pass (not just unit tests)
+4. Verify no regressions in `tests/gameplay/GameBalance.test.ts`
+
+## Current Status & Recent Progress
+
+- **Migration Status:** ~80% complete - GameProvider → Zustand migration ongoing
+- **Recent Work:** Post-battle rewards system, victory flow UI, battle turn handling improvements
+- **Core Systems:** Battle, progression, equipment, djinn systems functional
+- **Testing:** Context-aware test suite passing
+
+## Known Issues & TODOs
+
+- **Console Logs:** Some files still have console statements (cleanup needed)
+- **Overworld Integration:** Battle transition system not yet connected to overworld
+- **Data Migration:** Enemy/overworld data to be added incrementally as features are built
+
+## Important Files for Context
+
+- `README.md` - Project overview (v2-only)
+- `VALE_CHRONICLES_ARCHITECTURE.md` - Complete system architecture
+- `ARCHITECTURE_REBUILD_SUMMARY.md` - Recent refactoring summary
+- `START_HERE.md` - Quick start guide for v2
+- `V1_TO_V2_MIGRATION_STATUS.md` - Migration completion summary
