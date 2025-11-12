@@ -12,6 +12,9 @@
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "validate:data": "tsx src/core/validation/validateAll.ts",
+    "generate:sprites": "node scripts/generate-sprite-manifest.cjs",
+    "validate:sprites": "node scripts/validate-sprites.cjs",
+    "test:sprites": "node scripts/test-sprite-catalog.cjs",
     "precommit": "pnpm typecheck && pnpm lint && pnpm test && pnpm validate:data"
   },
   "dependencies": {
