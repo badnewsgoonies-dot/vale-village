@@ -123,65 +123,78 @@
 #### 1.1 Create Comprehensive Sprite Catalog
 **Action:** Generate complete sprite manifest from actual files
 
-**Script to Run:**
+**Reference Implementation:** `dinerdash` repo already has this!
+
+**Script to Adapt:**
 ```bash
-# Create sprite catalog script
-node scripts/generate-sprite-manifest.ts
+# Adapt dinerdash's sprite generation script for vale-v2
+# Source: /workspace/dinerdash/scripts/generate-sprite-list.js
+cp /workspace/dinerdash/scripts/generate-sprite-list.js /workspace/apps/vale-v2/scripts/generate-sprite-manifest.js
 ```
 
-**Output:** `/workspace/apps/vale-v2/src/ui/sprites/manifest-generated.ts`
-
-**What It Does:**
-- Scans `/public/sprites/` directory
-- Reads each GIF's dimensions (using image-size library)
-- Detects animation frames (GIFs are multi-frame)
-- Generates TypeScript manifest with actual paths
-
-**Example Entry:**
-```typescript
-export const BATTLE_PARTY_SPRITES = {
-  'isaac-idle-front': {
-    src: '/sprites/battle/party/isaac/Isaac_lBlade_Front.gif',
-    frames: 8,           // Auto-detected from GIF
-    fps: 12,
-    frameWidth: 48,      // Auto-detected
-    frameHeight: 64,
-    category: 'battle-party',
-    states: ['idle'],
-  },
-  'isaac-attack': {
-    src: '/sprites/battle/party/isaac/Isaac_lBlade_Attack1.gif',
-    frames: 12,
-    fps: 15,
-    frameWidth: 64,
-    frameHeight: 64,
-    category: 'battle-party',
-    states: ['attack'],
-  },
-  // ... 292 party sprites auto-generated
+**Dinerdash Approach (Proven Working):**
+```javascript
+// Scans directory structure
+const categories = {
+  'buildings': ['vale', 'bilibin', 'xian'],
+  'plants': ['.'],
+  'furniture': ['.'],
+  'terrain': ['terrain-curated']
 };
+
+// Auto-generates manifest
+spriteList.push({
+  name,           // Human-readable name
+  path: relativePath,  // Asset path
+  category        // Category for filtering
+});
 ```
 
-#### 1.2 Use Sprite Map JSONs as Reference
-**Action:** Cross-reference with approved mockup sprite maps
-
-**Files to Parse:**
-- `mockups/battle-screen-sprite-map.json`
-- `mockups/djinn-menu/sprite_map.json`
-- `mockups/equipment-screen-sprite-map.json`
-
-**Why:** These contain design-approved sprite mappings:
-```json
-{
-  "party": {
-    "isaac": {
-      "idle": { "front": "Sprites!/battle/party/isaac/Isaac_lBlade_Front.gif" }
-    }
-  }
-}
+**What We'll Generate:**
+```typescript
+export const SPRITE_LIST = [
+  {
+    "name": "Isaac Battle Idle Front",
+    "path": "/sprites/battle/party/isaac/Isaac_lBlade_Front.gif",
+    "category": "battle-party"
+  },
+  {
+    "name": "Isaac Battle Attack",
+    "path": "/sprites/battle/party/isaac/Isaac_lBlade_Attack1.gif",
+    "category": "battle-party"
+  },
+  // ... 2,572 sprites auto-generated
+];
 ```
 
-We can programmatically merge these into our manifest.
+**Why This Works:**
+- ✅ Dinerdash successfully uses this for 800+ sprites
+- ✅ No manual entry/typos possible
+- ✅ Easy to regenerate when sprites change
+- ✅ Category-based organization built-in
+
+#### 1.2 Use Dinerdash Terrain System
+**Action:** Leverage dinerdash's curated terrain tiles
+
+**Available Assets from Dinerdash:**
+- 323 curated terrain tiles (PNG format)
+- 2,584 full terrain tiles (if needed)
+- Organized naming: `indoor-tile-00-00.png`, `outdoor-tile-01-05.png`
+
+**Integration Strategy:**
+```bash
+# Copy curated terrain tiles to vale-v2
+cp -r /workspace/dinerdash/assets/terrain-curated/* /workspace/apps/vale-v2/public/sprites/terrain/
+
+# Use dinerdash's sprite list as reference
+# Contains ~800 sprites with proven organization
+```
+
+**Why Dinerdash Matters:**
+- ✅ Already has working sprite generation script
+- ✅ Proven category-based organization
+- ✅ 323 curated tiles ready to use
+- ✅ Same Golden Sun sprite source as vale-v2
 
 #### 1.3 Deliverable
 ✅ Complete, type-safe sprite manifest with **2,572 entries**  
