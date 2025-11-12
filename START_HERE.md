@@ -105,9 +105,9 @@ pnpm test:watch           # Watch mode
 
 ## 🎮 GAME FEATURES
 
-- 10 recruitable units (Levels 1-5)
+- 10 recruitable units (Levels 1-20)
 - 12 Djinn (3 per element)
-- 58 equipment items (4 slots)
+- 58 equipment items (5 slots, unit-locked)
 - Turn-based tactical combat
 - Elemental advantages
 - XP-based progression

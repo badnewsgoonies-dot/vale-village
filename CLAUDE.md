@@ -10,6 +10,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **For detailed development guidance**, see `apps/vale-v2/CLAUDE.md` - it contains comprehensive architecture details, testing philosophy, and development workflows.
 
+## What's New (Last Updated: 2025-11-12)
+
+### Recent Critical Changes
+
+**⚠️ Breaking Changes (Nov 11, 2025):**
+- **Healing API Changed** - `applyHealing()` now requires 3rd parameter `abilityRevivesFallen`
+  - Old: `applyHealing(unit, amount)`
+  - New: `applyHealing(unit, amount, abilityRevivesFallen: boolean)`
+  - Prevents healing KO'd units without revival flag
+  - See [CHANGELOG.md](CHANGELOG.md) for migration guide
+
+- **PRNG Validation Enforced** - Negative seeds now rejected (throws Error), zero seeds converted to 1
+  - Critical for determinism guarantees
+  - Update any test code using negative seeds
+
+- **Team Djinn Validation** - Duplicate Djinn prevention and 3-Djinn limit enforced
+  - `addDjinn()` now validates uniqueness and slot limits
+  - Affects team management and save/load logic
+
+### Recent Improvements
+
+- **QueueBattleService Refactored** (Nov 2025)
+  - `executeRound()` split into composable phases (~38 lines, down from 120+)
+  - New phase functions: `validateQueueForExecution()`, `executePlayerActionsPhase()`, `executeEnemyActionsPhase()`, `checkBattleEndPhase()`, `transitionToPlanningPhase()`
+  - Better testability and maintainability
+
+- **AbilityId Type Safety** (Nov 2025)
+  - New [data/types/AbilityId.ts](apps/vale-v2/src/data/types/AbilityId.ts) union type
+  - Compile-time validation of ability IDs
+  - Replaces stringly-typed ability references
+
+- **Equipment Schema Default** - `statBonus` now defaults to `{}` instead of undefined
+
+**For complete change history**, see [CHANGELOG.md](CHANGELOG.md)
+
+## Prerequisites
+
+Before working with this codebase, ensure you have:
+
+- **Node.js 18+** - Verify with `node -v`
+- **pnpm 8.15.0+** - Install with `npm install -g pnpm`
+
+### First-Time Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Verify setup works
+pnpm test             # Should run test suite
+pnpm validate:data    # Should validate game data
+pnpm typecheck        # Should pass type checking
+```
+
+**Note:** You may see a pnpm workspace warning - this is non-blocking and can be ignored.
+
 ## Quick Start Commands
 
 All commands from the root delegate to the vale-v2 app:
@@ -99,17 +155,33 @@ infra/        # Infrastructure (save system, localStorage)
 
 ### 3. State Management
 
-Uses **Zustand** with feature-based slices:
-- `battleSlice` - Battle state and turn progression
-- `teamSlice` - Player team management
-- `saveSlice` - Save/load operations
-- `storySlice` - Story progression
+Uses **Zustand** with feature-based slices (11 total):
+
+**Battle System:**
+- `battleSlice.ts` - Classic turn-by-turn battle state
+- `queueBattleSlice.ts` - Queue-based battle planning and execution
+- `rewardsSlice.ts` - Post-battle rewards and victory flow
+
+**Game World:**
+- `overworldSlice.ts` - Map state, player position, visited locations
+- `dialogueSlice.ts` - Dialogue state and progression
+- `gameFlowSlice.ts` - High-level game flow (menu, overworld, battle transitions)
+- `storySlice.ts` - Story progression and flags
+
+**Player State:**
+- `teamSlice.ts` - Player team management (units, Djinn, party composition)
+- `inventorySlice.ts` - Equipment inventory and item management
+- `saveSlice.ts` - Save/load operations and persistence
+
+**Store:**
+- `store.ts` - Combines all slices into unified store
 
 **Pattern:** State slices contain only state and setters. Business logic lives in `core/services/`.
 
 ### 4. Deterministic Game Logic
 
 All randomness uses **seeded PRNG** for:
+
 - Reproducible battles
 - Save/load consistency
 - Bug reproduction
@@ -125,11 +197,11 @@ function calculateDamage(attacker: Unit, defender: Unit, rng: PRNG): number {
 
 ## Game Systems
 
-- **10 recruitable units** with 5 levels of progression
-- **12 Djinn** (3 per element: Venus/Mars/Mercury/Jupiter) with team-wide buffs
-- **4-slot equipment system** (Weapon/Armor/Helm/Boots)
+- **10 recruitable units** with 20 levels of progression
+- **12 Djinn** (3 per element: Venus/Mars/Mercury/Jupiter) with team-wide buffs and ability unlocking
+- **5-slot equipment system** (Weapon/Armor/Helm/Boots/Accessory) - unit-locked
 - **Turn-based battles** with queue system, elemental advantages, mana management
-- **XP curve:** [0, 100, 350, 850, 1850] for levels 1-5
+- **XP curve:** [0, 100, 350, 850, 1850, 3100...92,800] for levels 1-20
 
 ## Testing Philosophy
 
@@ -149,15 +221,44 @@ test('function returns number', () => {
 
 Run gameplay tests: `vitest run tests/gameplay/`
 
-## Key Documentation
+## Documentation Index
 
-- **`apps/vale-v2/CLAUDE.md`** - Detailed development guide (READ THIS FIRST)
-- **`VALE_CHRONICLES_ARCHITECTURE.md`** - Complete system architecture
-- **`ARCHITECTURE_REBUILD_SUMMARY.md`** - Recent refactoring summary
-- **`docs/adr/`** - Architecture Decision Records
-  - `001-layering-and-boundaries.md` - Layer rules
-  - `002-state-management.md` - Zustand patterns
-  - `004-rng-and-determinism.md` - PRNG usage
+### Start Here (New Contributors)
+
+1. **This file** ([CLAUDE.md](CLAUDE.md)) - High-level overview and commands
+2. **[apps/vale-v2/CLAUDE.md](apps/vale-v2/CLAUDE.md)** - Detailed architecture and development patterns (READ THIS NEXT)
+3. **[COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md)** - Current state audit & 6-month roadmap
+4. **[docs/adr/000-architecture-goals.md](docs/adr/000-architecture-goals.md)** - Core design principles
+
+### Architecture & Design
+
+- **[VALE_CHRONICLES_ARCHITECTURE.md](VALE_CHRONICLES_ARCHITECTURE.md)** - Complete system architecture reference
+- **[ARCHITECTURE_REBUILD_SUMMARY.md](ARCHITECTURE_REBUILD_SUMMARY.md)** - Recent migration summary (GameProvider → Zustand)
+- **[docs/adr/](docs/adr/)** - Architecture Decision Records
+  - [000-architecture-goals.md](docs/adr/000-architecture-goals.md) - Overall architecture goals
+  - [001-layering-and-boundaries.md](docs/adr/001-layering-and-boundaries.md) - Layer rules and import restrictions
+  - [002-state-management.md](docs/adr/002-state-management.md) - Zustand patterns and conventions
+  - [003-model-conventions.md](docs/adr/003-model-conventions.md) - Model patterns (POJOs, factories)
+  - [004-rng-and-determinism.md](docs/adr/004-rng-and-determinism.md) - PRNG usage and seeding
+  - [005-validation-strategy.md](docs/adr/005-validation-strategy.md) - Data validation with Zod
+
+### Current State & Planning
+
+- **[CHANGELOG.md](CHANGELOG.md)** - Recent changes and breaking changes (check this after git pull!)
+- **[COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md)** - Detailed content audit and roadmap
+  - Current metrics: units, abilities, equipment, enemies, encounters, maps
+  - Known issues and test status
+  - 6-week demo timeline
+  - 6-month full game plan
+- **[SYSTEMS_AUDIT_AND_IMPLEMENTATION_PROMPTS.md](SYSTEMS_AUDIT_AND_IMPLEMENTATION_PROMPTS.md)** - 6 systems needing work with implementation guides
+- **[apps/vale-v2/docs/NAMING_CONVENTIONS.md](apps/vale-v2/docs/NAMING_CONVENTIONS.md)** - ID formatting rules (kebab-case required)
+
+### Game Design
+
+- **[docs/architect/](docs/architect/)** - Technical specifications for game systems
+- **[docs/story/](docs/story/)** - Story documentation and world-building
+- **[mockups/](mockups/)** - Approved UI mockups and designs
+- **[story/](story/)** - Game story framework and narrative design
 
 ## TypeScript Configuration
 
@@ -187,20 +288,138 @@ Run gameplay tests: `vitest run tests/gameplay/`
 ### Working with Battle System
 
 The battle system uses a **queue-based turn order**:
+
 - Implemented in `core/services/QueueBattleService.ts`
 - Mana system for abilities (costs mana, regenerates each turn)
 - Djinn can be used for powerful effects but enter standby mode
 - All battle logic is deterministic (uses seeded PRNG)
 
+## Troubleshooting
+
+### pnpm workspace warning
+
+**Symptom:** `WARN The "workspaces" field in package.json is not supported by pnpm`
+
+**Solution:** This is a non-blocking warning and can be safely ignored. The project uses `pnpm-workspace.yaml` correctly.
+
+### Tests failing after git pull
+
+**Symptom:** Tests that previously passed now fail after pulling latest changes
+
+**Solution:**
+1. Check [CHANGELOG.md](CHANGELOG.md) for breaking changes (e.g., `applyHealing()` signature change)
+2. Run `pnpm install` - dependencies may have changed
+3. Check [COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md) for known failing tests (currently 10 known failures)
+4. Ensure you're not using deprecated APIs
+
+### Battle results not deterministic
+
+**Symptom:** Same seed produces different battle results across runs
+
+**Solution:**
+1. Verify using `PRNG` from `core/random/prng.ts`, not `Math.random()`
+2. Check seed is non-negative (negative seeds now throw Error as of Nov 11, 2025)
+3. Zero seeds are automatically converted to 1
+4. Ensure no async operations in battle logic (breaks determinism)
+5. Verify PRNG is passed through all function parameters, not created mid-battle
+
+### Data validation errors when adding content
+
+**Symptom:** `pnpm validate:data` fails with schema validation errors
+
+**Solution:**
+1. Check corresponding Zod schema in `data/schemas/` for required fields
+2. Verify ID formatting follows kebab-case convention (see [NAMING_CONVENTIONS.md](apps/vale-v2/docs/NAMING_CONVENTIONS.md))
+3. Check schema documentation comments for field examples
+4. Common issues:
+   - Missing required fields (`id`, `name`, `type`)
+   - Incorrect ID format (use `kebab-case-ids`, not `camelCase` or `PascalCase`)
+   - Invalid enum values (check schema for allowed values)
+   - Missing nested required fields (e.g., `statBonus` structure)
+
+### Type errors about undefined array/object access
+
+**Symptom:** TypeScript errors like "Object is possibly 'undefined'"
+
+**Solution:** This codebase uses `noUncheckedIndexedAccess: true`, which means array/object access returns `T | undefined`. This is intentional for safety.
+
+```typescript
+// ❌ Unsafe
+const item = array[0];
+
+// ✅ Safe - check first
+const item = array[0];
+if (item) {
+  // use item
+}
+
+// ✅ Or use optional chaining
+const item = array[0]?.property;
+```
+
+### Healing not working on KO'd units
+
+**Symptom:** Healing abilities don't revive fallen units
+
+**Solution:** As of Nov 11, 2025, `applyHealing()` requires `abilityRevivesFallen` parameter. Only abilities with revival flags can heal KO'd units. This is intentional to prevent unintended revival. Check your ability definition has the revival flag if intended.
+
 ## Migration Status
 
-GameProvider → Zustand migration is **complete**. All state now lives in Zustand slices (`battleSlice`, `teamSlice`, `saveSlice`, `storySlice`, `queueBattleSlice`, `rewardsSlice`). Core systems (battle, progression, equipment, djinn) are functional.
+GameProvider → Zustand migration is **complete**. All state now lives in Zustand slices (see State Management section). Core systems (battle, progression, equipment, djinn) are functional.
 
 ## Project Status
 
-- **Core Systems:** Battle, progression, equipment, djinn are complete
-- **Testing:** Context-aware test suite passing
-- **Recent Work:** Queue-based battle system with mana and Djinn integration
+### Core Systems: ✅ Complete
+
+- **Battle System** - Queue-based planning/execution with mana and elemental advantages
+- **Progression System** - XP, leveling (20 levels), ability unlocks
+- **Equipment System** - 5 slots (Weapon/Armor/Helm/Boots/Accessory) with stat bonuses, unit-locked
+- **Djinn System Architecture** - Activation, synergy, summons (system complete, see content status below)
+- **Save/Load System** - Versioned schemas with migration support
+- **State Management** - 11 Zustand slices managing all game state
+
+### Content Volume (Updated: 2025-11-12)
+
+| Type | Current | Target (Ch 1) | Status |
+|------|---------|---------------|---------|
+| Recruitable Units | 6 | 10 | 🟡 60% |
+| Abilities | 18 | 40 | 🟡 45% |
+| Equipment | 58 | 80 | 🟢 73% |
+| Enemies | 9 | 25 | 🟡 36% |
+| Encounters | 5 | 30 | 🔴 17% |
+| Maps | 2 | 10 | 🔴 20% |
+| **Djinn Data** | **0** | **12** | **🔴 0%** |
+| Dialogue Trees | 2 | 40 | 🔴 5% |
+
+**Note:** Djinn **system architecture** is complete (activation, synergy, summons work), but **0/12 Djinn data** exists. Priority content gap.
+
+### Testing Status: 🟡 Needs Attention
+
+- **37 test files** covering core algorithms and services
+- **Core algorithms well-covered** (damage, stats, XP, turn order)
+- **Known issues:**
+  - 10 failing tests (progression, golden tests, save roundtrip)
+  - Test status needs verification after QueueBattleService refactoring
+  - Zero UI component tests (25 components untested)
+- **See [COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md) for detailed test status**
+
+### Known Gaps & Issues
+
+**Critical:**
+- 🔴 Djinn content missing (0/12) - system works but nothing to collect
+- 🔴 10 failing tests need fixing
+
+**High Priority:**
+- 🟡 Missing UI screens: character screen, party management, Djinn collection, main menu
+- 🟡 Encounter/map content thin (5/30 encounters, 2/10 maps)
+- 🟡 Dialogue system needs content (2/40 trees)
+
+**See [SYSTEMS_AUDIT_AND_IMPLEMENTATION_PROMPTS.md](SYSTEMS_AUDIT_AND_IMPLEMENTATION_PROMPTS.md) for fix prompts and implementation guides.**
+
+### Roadmap
+
+- **6-week demo target** - See [COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md) Part III
+- **6-month full game plan** - See [COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md) Part IV
 
 ---
 

@@ -46,10 +46,10 @@ Read `apps/vale-v2/CLAUDE.md` for complete architecture guide and development wo
 
 **Core Features:**
 - **Battles:** 4v4 turn-based combat with elemental advantages
-- **Units:** 10 recruitable, Levels 1-5, ability unlocks
-- **Djinn:** 12 collectible (3 per element), team synergy bonuses
-- **Equipment:** 4 slots (Weapon/Armor/Helm/Boots) - 58 items available
-- **Progression:** XP-based leveling with curve [0, 100, 350, 850, 1850]
+- **Units:** 10 recruitable, Levels 1-20, ability unlocks
+- **Djinn:** 12 collectible (3 per element), team synergy bonuses + ability unlocking (~180 unique abilities)
+- **Equipment:** 5 slots (Weapon/Armor/Helm/Boots/Accessory) - 58 items available, unit-locked
+- **Progression:** XP-based leveling with curve [0, 100, 350...92,800] for levels 1-20
 
 ---
 

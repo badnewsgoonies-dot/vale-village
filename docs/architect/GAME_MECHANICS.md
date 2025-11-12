@@ -23,18 +23,34 @@ This document contains ALL game mechanics with EXACT formulas. NO VAGUENESS - ev
 
 ### 1.1 XP Requirements
 
-**Formula:** Exponential curve with base 100
+**Formula:** Exponential curve with base 100, extended to level 20
 
 ```typescript
 const XP_CURVE = {
   1: 0,      // Starting XP
   2: 100,    // Level 1 → 2
-  3: 250,    // Level 2 → 3  (base * 2.5)
-  4: 500,    // Level 3 → 4  (base * 5)
-  5: 1000    // Level 4 → 5  (base * 10)
+  3: 350,    // Level 1 → 3  (100 + 250)
+  4: 850,    // Level 1 → 4  (100 + 250 + 500)
+  5: 1850,   // Level 1 → 5  (100 + 250 + 500 + 1000)
+  6: 3100,   // Level 1 → 6
+  7: 4700,   // Level 1 → 7
+  8: 6700,   // Level 1 → 8
+  9: 9200,   // Level 1 → 9
+  10: 12300, // Level 1 → 10
+  11: 16000, // Level 1 → 11
+  12: 20400, // Level 1 → 12
+  13: 25600, // Level 1 → 13
+  14: 31700, // Level 1 → 14
+  15: 38800, // Level 1 → 15
+  16: 47000, // Level 1 → 16
+  17: 56400, // Level 1 → 17
+  18: 67100, // Level 1 → 18
+  19: 79200, // Level 1 → 19
+  20: 92800, // Level 1 → 20
 };
 
-// Total XP needed to reach level 5: 1850 XP
+// Total XP needed to reach level 20: 92,800 XP
+// See: apps/vale-v2/src/core/algorithms/xp.ts
 ```
 
 ### 1.2 Stat Growth Formulas
@@ -535,34 +551,49 @@ const DJINN_CATALOG = {
 
 ## 3. EQUIPMENT SYSTEM
 
-### 3.1 Equipment Tiers & Stat Bonuses
+### 3.1 Equipment System
 
-**WEAPONS:**
+**🚨 CRITICAL: Unit-Locked Equipment**
+
+All equipment is UNIT-SPECIFIC. Each character has their own exclusive
+equipment that only they can use (no sharing between units).
+
+**Equipment Slots:** 5 per unit
+- Weapon (typically ATK boost)
+- Armor (typically DEF + HP boost)
+- Helm (typically DEF boost)
+- Boots (typically SPD boost)
+- Accessory (various bonuses)
+
+**Important:** Rare and legendary equipment can provide ANY stat combinations,
+not just their typical stats. All equipment has special effects.
+
+**Example Tiers (Unit-Specific Names Vary):**
 ```typescript
-const WEAPONS = {
+const EQUIPMENT_TIERS = {
   basic: {
-    name: "Wooden Sword",
-    atk: +5,
-    unlocksAbility: null,
-    cost: 50
+    weapon: "+5-7 ATK",
+    armor: "+6 DEF, +10 HP",
+    helm: "+4 DEF",
+    boots: "+2 SPD",
+    accessory: "Small stat boost",
+    cost: "50-100g per piece"
   },
   iron: {
-    name: "Iron Sword",
-    atk: +12,
-    unlocksAbility: null,
-    cost: 200
-  },
-  steel: {
-    name: "Steel Sword",
-    atk: +20,
-    unlocksAbility: null,
-    cost: 500
+    weapon: "+12-16 ATK",
+    armor: "+10 DEF, +20 HP",
+    helm: "+5 DEF",
+    boots: "+3 SPD",
+    accessory: "Moderate stat boost",
+    cost: "150-400g per piece"
   },
   legendary: {
-    name: "Sol Blade",
-    atk: +30,
-    unlocksAbility: "Megiddo",  // 150 damage, costs 25 PP
-    cost: 10000
+    weapon: "+50-72 ATK, unlocks abilities",
+    armor: "+35 DEF, +60 HP, multi-stat bonuses",
+    helm: "+25 DEF, +10 MAG, special effects",
+    boots: "+10 SPD, always acts first",
+    accessory: "Unique powerful effects",
+    cost: "5,000-15,000g per piece"
   }
 };
 ```
@@ -768,31 +799,45 @@ function calculateBattleGold(enemyLevel: number): number {
 // Level 5 enemy: 25 + (15 * 5) = 100 gold
 ```
 
-### 4.3 Drop Rates
+### 4.3 Equipment Rewards
 
-**🚨 DESIGN NOTE:** Enemies drop equipment only (no consumable items).
+**🚨 DESIGN NOTE:** Equipment rewards are predetermined (no RNG).
 
 ```typescript
-const DROP_RATES = {
-  common: {
-    chance: 0.30,  // 30%
-    items: ["Iron Sword", "Iron Armor", "Cloth Cap", "Leather Boots"]
+const EQUIPMENT_REWARDS = {
+  mode: "PREDETERMINED",  // Each NPC has fixed reward pool
+  
+  rewardTypes: {
+    fixedReward: {
+      description: "Specific item guaranteed",
+      example: "Tutorial Goblin always gives Wooden Sword"
+    },
+    
+    choiceReward: {
+      description: "Player picks 1 of 3 options",
+      example: "Boss offers choice: Steel Sword OR Steel Armor OR Steel Helm",
+      encouragesReplay: true
+    }
   },
-  rare: {
-    chance: 0.10,  // 10%
-    items: ["Steel Sword", "Steel Armor", "Steel Helm", "Hyper Boots"]
-  },
-  legendary: {
-    chance: 0.02,  // 2%
-    items: ["Sol Blade", "Dragon Scales", "Oracle's Crown", "Hermes' Sandals"]
-  }
+  
+  noRNG: true  // All rewards are planned and balanced
 };
+```
 
-// Boss battles have guaranteed drops:
-const BOSS_DROP_RATES = {
-  common: { chance: 0.80 },  // 80%
-  rare: { chance: 0.50 },    // 50%
-  legendary: { chance: 0.15 } // 15%
+**Example Reward Setups:**
+```typescript
+const NPC_REWARDS = {
+  "tutorial-goblin": {
+    xp: 60,
+    gold: 40,
+    equipment: { fixed: "wooden-sword" }
+  },
+  
+  "first-boss": {
+    xp: 200,
+    gold: 150,
+    equipment: { choice: ["steel-sword", "steel-armor", "steel-helm"] }
+  }
 };
 ```
 
@@ -953,47 +998,61 @@ function calculateHealAmount(
 }
 ```
 
-### 5.2.6 PP/MP Regeneration
+### 5.2.6 Mana System
 
-**🚨 CRITICAL: How units regain PP**
+**🚨 CRITICAL: Mana-based ability system (NO PP)**
 
 ```typescript
-const PP_REGEN = {
-  afterBattle: 1.0,        // Full PP restore after battle ends
-  innRest: 1.0,            // Full PP restore at inn (costs gold)
-  perTurnInBattle: 0.0,    // NO regen during battle
-  abilityRestoration: true // Healing abilities can restore PP (e.g., Wish, Glacial Blessing)
+const MANA_SYSTEM = {
+  poolType: "TEAM_SHARED",      // All 4 units share one mana pool
+  poolCalculation: "SUM_OF_UNIT_CONTRIBUTIONS",  // Each unit contributes different amounts
+  regeneration: "FULL_EACH_PLANNING_PHASE",  // Refills completely every round
+  
+  abilityCosts: {
+    basicAttack: 0,    // Free
+    lowCost: 1,        // Simple abilities
+    midTier: 2-3,      // Powerful abilities
+    ultimate: 4        // Most powerful
+  },
+  
+  manaGeneration: {
+    basicAttackHit: +1,  // Gain +1 mana when basic attack hits
+    timing: "IMMEDIATE_ON_HIT",  // During execution phase, can help slower units
+    missOrDodge: 0  // No mana if attack misses
+  },
+  
+  noPerBattleLimit: true  // Abilities unlimited, only limited by mana per round
 };
 ```
 
-**Why No In-Battle Regen:**
-- Encourages strategic PP management
-- Makes high-PP-cost abilities risky in long battles
-- Forces choice between healing and damage dealing
-- Standard JRPG balance (Golden Sun model)
+**Why Mana Instead of PP:**
+- Simplifies resource management (no cross-battle conservation)
+- Focus on tactical round planning, not resource hoarding
+- Mana generation creates interesting turn order decisions
+- Faster gameplay (no running out of resources mid-battle)
 
-**Inn Rest:**
+**Mana Pool Calculation:**
 ```typescript
-function innRest(units: Unit[], cost: number = 10): void {
-  if (game.gold < cost) return;  // Can't afford
-
-  units.forEach(unit => {
-    unit.currentHp = unit.maxHp;  // Full HP
-    unit.currentPp = unit.maxPp;  // Full PP
-    unit.statusAilments = [];     // Cure all ailments
-  });
-
-  game.gold -= cost;
+function calculateTeamManaPool(team: Team): number {
+  // Each unit contributes different amounts based on their role
+  return team.units.reduce((total, unit) => {
+    return total + unit.manaContribution;  // Varies: 1-3 per unit
+  }, 0);
+  
+  // Typical party: 1 + 2 + 2 + 3 = 8 mana pool
 }
 ```
 
 **Post-Battle:**
 ```typescript
-function onBattleVictory(units: Unit[]): void {
+function onBattleEnd(units: Unit[], battleResult: "victory" | "defeat"): void {
   units.forEach(unit => {
-    unit.currentPp = unit.maxPp;  // ✅ Restore PP
-    // HP stays as-is (must heal manually)
+    unit.currentHp = unit.maxHp;  // ✅ Auto-heal
+    unit.statusAilments = [];     // ✅ Cure all status
   });
+  
+  // No PP to restore (mana-only system)
+  // Mana automatically resets to max at start of next battle's planning phase
 }
 ```
 
@@ -1008,7 +1067,7 @@ const VENUS_ABILITIES = {
     name: "Quake",
     type: "psynergy",
     element: "Venus",
-    ppCost: 5,
+    manaCost: 1,
     basePower: 30,
     targets: "all-enemies",
     unlockLevel: 2
@@ -1017,7 +1076,7 @@ const VENUS_ABILITIES = {
     name: "Clay Spire",
     type: "psynergy",
     element: "Venus",
-    ppCost: 10,
+    manaCost: 2,
     basePower: 60,
     targets: "single-enemy",
     unlockLevel: 3
@@ -1026,7 +1085,7 @@ const VENUS_ABILITIES = {
     name: "Ragnarok",
     type: "psynergy",
     element: "Venus",
-    ppCost: 15,
+    manaCost: 3,
     basePower: 100,
     targets: "single-enemy",
     unlockLevel: 4
@@ -1035,7 +1094,7 @@ const VENUS_ABILITIES = {
     name: "Judgment",
     type: "psynergy",
     element: "Venus",
-    ppCost: 25,
+    manaCost: 4,
     basePower: 150,
     targets: "all-enemies",
     unlockLevel: 5
@@ -1050,7 +1109,7 @@ const MARS_ABILITIES = {
     name: "Fireball",
     type: "psynergy",
     element: "Mars",
-    ppCost: 5,
+    manaCost: 1,
     basePower: 32,  // Slightly higher than Quake (glass cannon)
     targets: "single-enemy",
     unlockLevel: 2
@@ -1059,7 +1118,7 @@ const MARS_ABILITIES = {
     name: "Volcano",
     type: "psynergy",
     element: "Mars",
-    ppCost: 12,
+    manaCost: 3,
     basePower: 65,
     targets: "all-enemies",
     unlockLevel: 3
@@ -1068,7 +1127,7 @@ const MARS_ABILITIES = {
     name: "Meteor Strike",
     type: "psynergy",
     element: "Mars",
-    ppCost: 18,
+    manaCost: 3,
     basePower: 110,
     targets: "single-enemy",
     unlockLevel: 4
@@ -1077,7 +1136,7 @@ const MARS_ABILITIES = {
     name: "Pyroclasm",
     type: "psynergy",
     element: "Mars",
-    ppCost: 30,
+    manaCost: 4,
     basePower: 170,
     targets: "all-enemies",
     unlockLevel: 5
@@ -1092,7 +1151,7 @@ const MERCURY_ABILITIES = {
     name: "Ply",
     type: "healing",
     element: "Mercury",
-    ppCost: 4,
+    manaCost: 1,
     basePower: 40,  // Base heal amount
     targets: "single-ally",
     unlockLevel: 1  // Healers get healing at level 1
@@ -1101,7 +1160,7 @@ const MERCURY_ABILITIES = {
     name: "Frost",
     type: "psynergy",
     element: "Mercury",
-    ppCost: 6,
+    manaCost: 1,
     basePower: 28,  // Lower damage (support focus)
     targets: "all-enemies",
     unlockLevel: 2
@@ -1110,7 +1169,7 @@ const MERCURY_ABILITIES = {
     name: "Ice Horn",
     type: "psynergy",
     element: "Mercury",
-    ppCost: 11,
+    manaCost: 2,
     basePower: 58,
     targets: "single-enemy",
     unlockLevel: 3
@@ -1119,7 +1178,7 @@ const MERCURY_ABILITIES = {
     name: "Wish",
     type: "healing",
     element: "Mercury",
-    ppCost: 15,
+    manaCost: 3,
     basePower: 70,
     targets: "all-allies",
     unlockLevel: 4
@@ -1128,7 +1187,7 @@ const MERCURY_ABILITIES = {
     name: "Glacial Blessing",
     type: "healing",
     element: "Mercury",
-    ppCost: 35,
+    manaCost: 4,
     basePower: 120,
     targets: "all-allies",
     revivesFallen: true,  // Can revive KO'd units
@@ -1144,7 +1203,7 @@ const JUPITER_ABILITIES = {
     name: "Gust",
     type: "psynergy",
     element: "Jupiter",
-    ppCost: 4,
+    manaCost: 1,
     basePower: 25,
     targets: "single-enemy",
     unlockLevel: 2
@@ -1153,7 +1212,7 @@ const JUPITER_ABILITIES = {
     name: "Plasma",
     type: "psynergy",
     element: "Jupiter",
-    ppCost: 10,
+    manaCost: 2,
     basePower: 55,
     targets: "all-enemies",
     chainDamage: true,  // Hits each enemy once, damage chains
@@ -1163,7 +1222,7 @@ const JUPITER_ABILITIES = {
     name: "Thunderclap",
     type: "psynergy",
     element: "Jupiter",
-    ppCost: 16,
+    manaCost: 3,
     basePower: 95,
     targets: "all-enemies",
     unlockLevel: 4
@@ -1172,7 +1231,7 @@ const JUPITER_ABILITIES = {
     name: "Tempest",
     type: "psynergy",
     element: "Jupiter",
-    ppCost: 28,
+    manaCost: 4,
     basePower: 160,
     targets: "all-enemies",
     unlockLevel: 5
@@ -1186,7 +1245,7 @@ const BUFF_ABILITIES = {
   blessing: {
     name: "Blessing",
     type: "buff",
-    ppCost: 8,
+    manaCost: 2,
     targets: "all-allies",
     effect: { atk: 1.25, def: 1.25 },  // +25% stats
     duration: 3,  // Lasts 3 turns
@@ -1195,7 +1254,7 @@ const BUFF_ABILITIES = {
   guardiansStance: {
     name: "Guardian's Stance",
     type: "buff",
-    ppCost: 6,
+    manaCost: 2,
     targets: "all-allies",
     effect: { def: 1.5 },  // +50% defense
     duration: 2,
@@ -1204,9 +1263,9 @@ const BUFF_ABILITIES = {
   windsFavor: {
     name: "Wind's Favor",
     type: "buff",
-    ppCost: 10,
+    manaCost: 2,
     targets: "all-allies",
-    effect: { spd: 1.4, evasion: +20 },  // +40% speed, +20% dodge
+    effect: { spd: 1.4 },  // +40% speed
     duration: 3,
     unlockLevel: 3
   }
@@ -1233,20 +1292,10 @@ function calculateTurnOrder(units: Unit[]): Unit[] {
 // Turn order: Isaac → Garet → Enemy
 ```
 
-### 6.2 Critical Hit System
+### 6.2 Combat Mechanics
 
-```typescript
-function checkCriticalHit(attacker: Unit): boolean {
-  const BASE_CRIT_CHANCE = 0.05;  // 5%
-  const SPEED_BONUS = attacker.stats.spd * 0.002;  // +0.2% per SPD point
-
-  const totalChance = BASE_CRIT_CHANCE + SPEED_BONUS;
-
-  return Math.random() < totalChance;
-}
-
-// Critical hit multiplier: 2.0x damage
-```
+**🚨 NOTE:** Critical hit system has been removed for simplicity.
+Damage is consistent based on stats and formulas only.
 
 ### 6.3 Battle End Conditions
 
@@ -2383,36 +2432,44 @@ const STARTING_RESOURCES = {
 };
 ```
 
-### 14.3 Selling System
+### 14.3 Equipment Unlock System
+
+**🚨 CRITICAL: No Selling - Permanent Unlocks**
 
 ```typescript
-const SELLING_SYSTEM = {
-  enabled: true,  // Players can sell equipment
+const UNLOCK_SYSTEM = {
+  enabled: true,  // Players unlock equipment permanently
 
-  sellPriceFormula: (item) => Math.floor(item.baseCost * 0.5),  // 50% back
-
-  canSell: {
-    equipment: true,    // Can sell weapons, armor, helms, boots
-    keyItems: false     // Cannot sell quest items
+  unlockMechanic: "PERMANENT",  // Once unlocked, always available
+  
+  starterKits: {
+    description: "Full equipment set for new recruits",
+    contents: "Weapon + Armor + Helm + Boots + Accessory",
+    cost: "Varies by unit (200-500g typical)",
+    unlocks: "That unit's full equipment store"
   },
 
-  transaction: {
-    goldAdded: "IMMEDIATELY",
-    itemRemoved: "IMMEDIATELY"
+  unitStores: {
+    description: "Unit-specific equipment catalog",
+    access: "After purchasing Starter Kit",
+    items: "All tiers (Basic → Artifact)",
+    noSelling: true  // Cannot sell or undo unlocks
   }
 };
 ```
 
 **Example:**
 ```typescript
-// Buy Iron Sword for 200g
-player.gold -= 200;
-player.equipment.push({ type: "weapon", id: "iron-sword" });
+// Recruit Isaac → Starter Kit available
+// Buy Isaac's Starter Kit (350g)
+player.gold -= 350;
+isaac.equipment = { weapon: "basic-sword", armor: "basic-mail", ... };
+isaac.storeUnlocked = true;
 
-// Later, sell Iron Sword
-const sellPrice = Math.floor(200 * 0.5);  // 100g
-player.gold += 100;
-player.equipment.remove("iron-sword");
+// Browse Isaac's store → Unlock Sol Blade
+player.gold -= 15000;
+isaac.availableEquipment.push("sol-blade");
+// Equipment permanently unlocked, can equip anytime
 ```
 
 ### 14.4 Shop Inventory by Location
@@ -2453,143 +2510,85 @@ const SHOP_INVENTORY = {
 
 ---
 
-## 15. INN SYSTEM
+## 15. POST-BATTLE AUTO-HEAL
 
-### 15.1 Inn Rest Mechanics
+### 15.1 Auto-Heal Mechanics
 
-**🚨 CRITICAL: How inns work**
+**🚨 CRITICAL: Automatic healing after every battle**
 
 ```typescript
-const INN_SYSTEM = {
-  cost: 10,  // 10 gold per rest
-
+const AUTO_HEAL_SYSTEM = {
+  triggers: ["BATTLE_VICTORY", "BATTLE_DEFEAT"],
+  
   effects: {
-    restoreHP: 1.0,      // Full HP restore (100%)
-    restorePP: 1.0,      // Full PP restore (100%)
-    cureStatusAilments: true,  // Remove poison, burn, freeze, paralyze
-    autoSave: true       // Triggers auto-save after rest
+    restoreHP: 1.0,              // Full HP restore (100%)
+    cureStatusAilments: true,    // Remove poison, burn, freeze, paralyze
   },
 
-  requirements: {
-    goldCheck: true,     // Must have at least 10 gold
-    canUseWhen: "OVERWORLD_ONLY"  // Cannot use during battle
-  },
-
-  dialogue: {
-    greeting: "Welcome to the inn! Rest is 10 gold. Would you like to stay?",
-    success: "Have a good rest! (HP/PP fully restored, game saved)",
-    insufficient: "Sorry, you need at least 10 gold to rest here."
-  }
+  timing: "IMMEDIATE_AFTER_REWARDS",  // After rewards screen, before returning to overworld
+  
+  noManualHealing: true  // No inns, no healing items needed
 };
 ```
 
-### 15.2 Inn Rest Implementation
+### 15.2 Implementation
 
 ```typescript
-function innRest(units: Unit[], playerGold: number): { success: boolean, message: string } {
-  // Check gold requirement
-  if (playerGold < 10) {
-    return {
-      success: false,
-      message: "Insufficient gold. Need 10 gold to rest."
-    };
-  }
-
-  // Deduct cost
-  playerGold -= 10;
-
-  // Restore all units
+function onBattleEnd(units: Unit[], battleResult: "victory" | "defeat"): void {
+  // Restore all units (win or lose)
   units.forEach(unit => {
     unit.currentHp = unit.maxHp;  // Full HP
-    unit.currentPp = unit.maxPp;  // Full PP
     unit.statusAilments = [];     // Clear all status effects
   });
-
-  // Auto-save
-  saveGame();
-
-  return {
-    success: true,
-    message: "You feel refreshed! HP/PP restored, game saved."
-  };
+  
+  // No PP to restore (mana-only system)
+  // No gold cost
+  // Always triggers (cannot be disabled)
 }
 ```
 
-### 15.3 Inn Locations
-
-```typescript
-const INN_LOCATIONS = {
-  "vale-village-inn": {
-    name: "Vale Inn",
-    location: "vale-village",
-    cost: 10,
-    npcKeeper: "Innkeeper Martha",
-    unlockCondition: "ALWAYS"
-  },
-
-  "sol-sanctum-rest-area": {
-    name: "Sanctum Rest Shrine",
-    location: "sol-sanctum",
-    cost: 10,
-    npcKeeper: "Priestess Aria",
-    unlockCondition: "AFTER_COMPLETING_FIRST_QUEST"
-  }
-
-  // More inns can be added as needed
-};
-```
-
-### 15.4 Free Healing Alternatives
-
-**For player convenience:**
-
-```typescript
-const FREE_HEALING = {
-  homeVisit: {
-    location: "Player's house in Vale Village",
-    effect: "Full HP/PP restore + auto-save",
-    cost: 0,
-    limitation: "Only available at start of game"
-  },
-
-  healerNPC: {
-    location: "Healing House (after recruiting Mia)",
-    effect: "Full HP restore only (no PP)",
-    cost: 0,
-    limitation: "Does not save game"
-  }
-};
-```
+**Design Rationale:**
+- Simplifies resource management (focus on battle tactics, not healing logistics)
+- Removes tedious inn visits
+- Allows continuous battle progression
+- Losing a battle doesn't require backtracking to heal
 
 ---
 
 ## SUMMARY: KEY NUMBERS
 
 **Leveling:**
-- XP to Level 5: 1850 total
-- 5 abilities per unit (unlock at levels 1-5)
+- XP to Level 20: 92,800 total
+- Abilities unlock progressively at levels 1-20
 
 **Djinn:**
 - 12 total collectible (3 per element: Venus, Mars, Mercury, Jupiter)
 - 3 team slots (GLOBAL - affects all 4 party members)
 - Choose 3 from 12 collected (strategic depth!)
-- All same element: ALL units get +12 ATK, +8 DEF
-- Mixed elements: ALL units get balanced bonuses
-- Activation: Powerful effect but team-wide stat penalty for 2 turns
+- Element compatibility: Same=best bonus+2 abilities, Counter=penalty+2 abilities, Neutral=moderate+1 ability
+- ~180 unique Djinn-granted abilities total across all combinations
+- Activation: Powerful summon effect but lose stat bonuses AND abilities until recovery
+- Recovery: 1 Djinn=2 turns, 2 Djinn=3 turns, 3 Djinn=4 turns
 
 **Equipment:**
-- 4 slots: Weapon, Armor, Helm, Boots
-- Legendary tier: +30 ATK (weapon), +35 DEF (armor)
+- 5 slots: Weapon, Armor, Helm, Boots, Accessory
+- Unit-locked (each character has exclusive equipment)
+- All equipment has special effects
+- Rare items can provide any stat combinations
 
 **Battle:**
-- XP: 50 + (level × 10)
+- XP: 50 + (level × 10), ×0.8 for parties
 - Gold: 25 + (level × 15)
-- Drop rates: 30% common, 10% rare, 2% legendary
+- Equipment rewards: Predetermined (no RNG), may offer choice of 1 of 3
+- Auto-heal after every battle (win or lose)
 
 **Abilities:**
-- Basic spells: 4-6 PP
-- Mid-tier: 10-16 PP
-- Ultimate: 25-35 PP
+- Mana-based system (no PP)
+- Basic attack: 0 mana
+- Low-cost: 1 mana
+- Mid-tier: 2-3 mana
+- Ultimate: 4 mana
+- Mana refills each planning phase
 
 ---
 

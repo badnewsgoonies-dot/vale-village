@@ -171,7 +171,7 @@ describe('SCENARIO: First Battle with Village Guard', () => {
 
 **Responsibilities:**
 - 10 unique recruitable units
-- Levels 1-5 progression
+- Levels 1-20 progression
 - Ability unlocks per level
 - Stat scaling
 
@@ -279,11 +279,14 @@ describe('PROGRESSION: Garet Level 1 to 5', () => {
 
 ### **SYSTEM 4: EQUIPMENT SYSTEM**
 
-**4 Equipment Slots:**
-- **Weapon** - Increases attack, some unlock abilities
-- **Armor** - Increases defense/HP
-- **Helm** - Increases defense/resistances  
-- **Boots** - Increases speed/evasion
+**5 Equipment Slots (Unit-Locked):**
+- **Weapon** - Typically increases ATK, legendary items unlock abilities
+- **Armor** - Typically increases DEF/HP
+- **Helm** - Typically increases DEF
+- **Boots** - Typically increases SPD
+- **Accessory** - Various bonuses
+- **Note:** Each unit has exclusive equipment (no sharing between units)
+- **Note:** Rare items can provide any stat combinations
 
 **Files to Reuse:**
 ```

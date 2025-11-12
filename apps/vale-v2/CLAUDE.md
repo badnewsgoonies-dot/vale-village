@@ -7,11 +7,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. This is a Golden Sun-inspired turn-based RPG built with React, TypeScript, Zustand, and Zod.
 
 **Game Features:**
-- 10 recruitable units with 5 levels of progression (abilities unlock per level)
-- 12 collectible Djinn (3 per element: Venus/Mars/Mercury/Jupiter) providing team-wide buffs
-- 4-slot equipment system (weapon/armor/helm/boots)
-- Turn-based tactical combat with elemental advantages
-- XP-based leveling with non-linear curve: [0, 100, 350, 850, 1850]
+- 10 recruitable units with 20 levels of progression (abilities unlock per level)
+- 12 collectible Djinn (3 per element: Venus/Mars/Mercury/Jupiter) providing team-wide buffs and ability unlocking
+- 5-slot equipment system (weapon/armor/helm/boots/accessory) - unit-locked
+- Turn-based tactical combat with elemental advantages, mana-based abilities
+- XP-based leveling with non-linear curve: [0, 100, 350...92,800] for levels 1-20
 
 **Current Status:** Core systems (battle, progression, equipment, djinn) run inside a deterministic queue-battle sandbox (`QueueBattleView`) that wires directly into the Zustand store.
 
@@ -385,16 +385,17 @@ interface Props {
 - **Location:** Core logic in `src/core/algorithms/djinnCalculations.ts` and `src/data/djinn.ts`
 
 ### Leveling System
-- **XP Curve:** Non-linear [0, 100, 350, 850, 1850] for levels 1-5
+- **XP Curve:** Non-linear [0, 100, 350, 850, 1850...92,800] for levels 1-20
 - **Ability Unlocks:** Each level unlocks new abilities (defined in unit data)
 - **Stat Growth:** Base stats + (level × growthRates) + equipment + djinn
 - **Level-Up:** Restores HP to full, persists across battles
 
 ### Equipment System
-- **4 Slots:** Weapon (ATK), Armor (DEF/HP), Helm (DEF/RES), Boots (SPD/EVA)
+- **5 Slots:** Weapon (ATK), Armor (DEF/HP), Helm (DEF), Boots (SPD), Accessory (various)
+- **Unit-Locked:** Each character has exclusive equipment (no sharing)
 - **Stat Bonuses:** Applied during `Unit.calculateStats()` calculation
 - **Some weapons unlock abilities** (checked during ability validation)
-- **Drop System:** 10% chance from normal battles, 50% from bosses
+- **Reward System:** Predetermined rewards (no RNG), may offer choice of 1 of 3 items
 
 ## TypeScript Configuration
 
@@ -407,7 +408,7 @@ interface Props {
 
 ### Adding a New Ability
 1. Add ability data to `src/data/definitions/abilities.ts`
-2. Ensure it validates against `AbilitySchema` (manaCost ≥ 0, basePower ≥ 0, unlockLevel 1-5)
+2. Ensure it validates against `AbilitySchema` (manaCost ≥ 0, basePower ≥ 0, unlockLevel 1-20)
 3. Run `pnpm validate:data` to verify
 4. Add to the relevant units' ability lists in `src/data/definitions/units.ts`
 5. Test in battle: `vitest run apps/vale-v2/tests/battle/invariants.test.ts`
