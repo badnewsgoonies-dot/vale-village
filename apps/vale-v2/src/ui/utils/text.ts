@@ -15,6 +15,10 @@ export function renderEventText(e: BattleEvent): string {
       return `${e.targetId} took ${e.amount}${e.element ? ` [${e.element}]` : ''}`;
     case 'heal':
       return `${e.targetId} recovered ${e.amount} HP`;
+    case 'auto-heal':
+      return `✨ ${e.message}`;
+    case 'mana-generated':
+      return `⚡ ${e.source} generated +${e.amount} mana! (${e.newTotal} total)`;
     case 'status-applied': {
       const statusNames: Record<string, string> = {
         poison: 'Poisoned',

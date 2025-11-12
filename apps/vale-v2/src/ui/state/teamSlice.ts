@@ -5,11 +5,14 @@
 
 import type { StateCreator } from 'zustand';
 import type { Team } from '../../core/models/Team';
+import type { Unit } from '../../core/models/Unit';
+import { updateTeam } from '../../core/models/Team';
 
 export interface TeamSlice {
   team: Team | null;
   setTeam: (team: Team) => void;
   updateTeam: (updates: Partial<Team>) => void;
+  updateTeamUnits: (units: readonly Unit[]) => void;
 }
 
 export const createTeamSlice: StateCreator<
@@ -32,5 +35,12 @@ export const createTeamSlice: StateCreator<
         },
       };
     }),
-});
 
+  updateTeamUnits: (units) =>
+    set((state) => {
+      if (!state.team) return state;
+      return {
+        team: updateTeam(state.team, { units }),
+      };
+    }),
+});

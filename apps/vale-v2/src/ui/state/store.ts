@@ -33,8 +33,11 @@ const storeFactory = (set: SetState<Store>, get: GetState<Store>, api: StoreApi<
   ...createDialogueSlice(set, get, api),
 });
 
+export function createStore() {
+  return create<Store>()(storeFactory);
+}
+
 // Only enable devtools in development to prevent state manipulation in production
 export const useStore = import.meta.env.DEV
   ? create<Store>()(devtools(storeFactory, { name: 'vale-v2' }))
-  : create<Store>()(storeFactory);
-
+  : createStore();

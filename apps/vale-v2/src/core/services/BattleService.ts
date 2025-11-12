@@ -37,6 +37,7 @@ export interface ActionResult {
   message: string;
   targetIds: readonly string[];
   updatedUnits: readonly Unit[];
+  hit?: boolean;
 }
 
 /**
@@ -65,7 +66,7 @@ export function performAction(
   abilityId: string,
   targetIds: readonly string[],
   rng: PRNG
-): { state: BattleState; result: ActionResult; events: readonly BattleEvent[] } {
+): { state: BattleState; result: ActionResult; events: readonly BattleEvent[]; hit: boolean } {
   // Find actor using index (O(1) instead of O(n))
   const actorEntry = state.unitById.get(actorId);
   if (!actorEntry || isUnitKO(actorEntry.unit)) {
@@ -231,7 +232,7 @@ export function performAction(
     });
   }
 
-  return { state: updatedState, result, events };
+  return { state: updatedState, result, events, hit: result.hit ?? false };
 }
 
 /**
@@ -328,6 +329,7 @@ function executeAbility(
         message,
         targetIds,
         updatedUnits: finalUnits,
+        hit: totalDamage > 0,
       };
     }
 
@@ -366,6 +368,7 @@ function executeAbility(
         message,
         targetIds,
         updatedUnits: finalUnits,
+        hit: false,
       };
     }
 
@@ -408,6 +411,7 @@ function executeAbility(
         message,
         targetIds,
         updatedUnits: finalUnits,
+        hit: false,
       };
     }
 
@@ -418,6 +422,7 @@ function executeAbility(
         message: `${caster.name} summons ${ability.name}!`,
         targetIds,
         updatedUnits: [...allUnits],
+        hit: false,
       };
     }
 

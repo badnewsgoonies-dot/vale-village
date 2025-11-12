@@ -22,6 +22,8 @@ export type BattleEvent =
   | { type: 'ability'; casterId: string; abilityId: string; targets: readonly string[] }
   | { type: 'hit'; targetId: string; amount: number; element?: Element }
   | { type: 'heal'; targetId: string; amount: number }
+  | { type: 'auto-heal'; message: string }
+  | { type: 'mana-generated'; amount: number; source: string; newTotal: number }
   | { type: 'status-applied'; targetId: string; status: StatusEffect }
   | { type: 'status-expired'; targetId: string; status: StatusEffect }
   | { type: 'ko'; unitId: string }

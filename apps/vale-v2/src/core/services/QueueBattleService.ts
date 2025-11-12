@@ -21,6 +21,19 @@ import { getEffectiveSPD } from '../algorithms/stats';
 import { performAction } from './BattleService';
 import { makeAIDecision } from './AIService';
 
+type PerformActionResult = ReturnType<typeof performAction>;
+
+function isBasicAttack(action: QueuedAction): boolean {
+  return action.abilityId === null;
+}
+
+function shouldGenerateMana(
+  action: QueuedAction,
+  actionResult: PerformActionResult
+): boolean {
+  return isBasicAttack(action) && actionResult.hit;
+}
+
 /**
  * Queue an action for a unit
  * PR-QUEUE-BATTLE: Adds action to queue and deducts mana
@@ -232,6 +245,21 @@ function executePlayerActionsPhase(
 
     currentState = actionResult.state;
     events.push(...actionResult.events);
+
+    if (shouldGenerateMana(action, actionResult)) {
+      const manaGained = 1;
+      const newMana = Math.min(currentState.remainingMana + manaGained, currentState.maxMana);
+      currentState = updateBattleState(currentState, {
+        remainingMana: newMana,
+      });
+
+      events.push({
+        type: 'mana-generated',
+        amount: manaGained,
+        source: action.unitId,
+        newTotal: newMana,
+      });
+    }
   }
 
   return { state: currentState, events };

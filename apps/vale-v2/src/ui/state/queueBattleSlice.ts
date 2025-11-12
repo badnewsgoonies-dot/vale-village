@@ -20,7 +20,12 @@ import {
   executeRound,
 } from '../../core/services/QueueBattleService';
 import { makePRNG } from '../../core/random/prng';
-import { getEncounterId } from '../../core/models/BattleState';
+import { autoHealUnits } from '../../core/algorithms/healing';
+import { updateTeam } from '../../core/models/Team';
+import {
+  getEncounterId,
+  updateBattleState,
+} from '../../core/models/BattleState';
 import { createRNGStream, RNG_STREAMS } from '../../core/constants';
 
 export interface QueueBattleSlice {
@@ -132,22 +137,41 @@ export const createQueueBattleSlice: StateCreator<
 
     const rng = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.QUEUE_ROUND));
     const result = executeRound(battle, rng);
+    const previousEvents = get().events;
+    const battleEvents = [...previousEvents, ...result.events];
 
-    // Update battle state
-    set({ battle: result.state, events: [...get().events, ...result.events] });
+    // Update battle state with fresh events (pre-heal)
+    set({ battle: result.state, events: battleEvents });
 
     if (result.state.phase === 'victory') {
-      const { 
-        processVictory, 
-        onBattleEvents, 
-        setMode, 
-        setShowRewards 
+      const {
+        processVictory,
+        onBattleEvents,
+        setMode,
+        setShowRewards,
+        updateTeamUnits,
       } = get();
+
       const rngVictory = makePRNG(
         createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY)
       );
 
-      processVictory(result.state, rngVictory);
+      const healedUnits = autoHealUnits(result.state.playerTeam.units);
+      const healedTeam = updateTeam(result.state.playerTeam, { units: healedUnits });
+      const healedState = updateBattleState(result.state, { playerTeam: healedTeam });
+
+      const healEvent: BattleEvent = {
+        type: 'auto-heal',
+        message: 'All units restored to full health!',
+      };
+
+      set({
+        battle: healedState,
+        events: [...battleEvents, healEvent],
+      });
+
+      updateTeamUnits(healedUnits);
+      processVictory(healedState, rngVictory);
       setMode('rewards');
       setShowRewards(true);
 
@@ -158,7 +182,7 @@ export const createQueueBattleSlice: StateCreator<
         console.warn('Auto-save failed after battle victory:', error);
       }
 
-      const encounterId = getEncounterId(result.state);
+      const encounterId = getEncounterId(healedState);
       if (encounterId && onBattleEvents) {
         onBattleEvents([
           {
@@ -177,9 +201,25 @@ export const createQueueBattleSlice: StateCreator<
     }
 
     if (result.state.phase === 'defeat') {
-      const { returnToOverworld, onBattleEvents } = get();
+      const { returnToOverworld, onBattleEvents, updateTeamUnits } = get();
 
-      const encounterId = getEncounterId(result.state);
+      const healedUnits = autoHealUnits(result.state.playerTeam.units);
+      const healedTeam = updateTeam(result.state.playerTeam, { units: healedUnits });
+      const healedState = updateBattleState(result.state, { playerTeam: healedTeam });
+
+      const healEvent: BattleEvent = {
+        type: 'auto-heal',
+        message: 'All units restored to full health!',
+      };
+
+      set({
+        battle: healedState,
+        events: [...battleEvents, healEvent],
+      });
+
+      updateTeamUnits(healedUnits);
+
+      const encounterId = getEncounterId(healedState);
       if (encounterId && onBattleEvents) {
         onBattleEvents([
           {
@@ -194,7 +234,6 @@ export const createQueueBattleSlice: StateCreator<
         ]);
       }
 
-      // Return to pre-battle position
       returnToOverworld();
 
       return;
@@ -209,4 +248,3 @@ export const createQueueBattleSlice: StateCreator<
     set({ events: events.slice(1) });
   },
 });
-
