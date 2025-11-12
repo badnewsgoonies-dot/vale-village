@@ -4,7 +4,9 @@ function getTile(map: GameMap, position: Position): Tile | undefined {
   const withinX = position.x >= 0 && position.x < map.width;
   const withinY = position.y >= 0 && position.y < map.height;
   if (!withinX || !withinY) return undefined;
-  return map.tiles[position.y][position.x];
+  const row = map.tiles[position.y];
+  if (!row) return undefined;
+  return row[position.x];
 }
 
 export function canMoveTo(map: GameMap, position: Position): boolean {

@@ -18,7 +18,8 @@ export interface DialogueSlice {
   endDialogue: () => void;
 }
 
-export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice> = (set, get) => ({
+export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice> = (set, get) =>
+  ({
   currentDialogueTree: null,
   currentDialogueState: null,
 
@@ -66,7 +67,7 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
       mode: 'overworld',
     });
   },
-});
+} as DialogueSlice & GameFlowSlice & StorySlice);
 
 /**
  * Process dialogue effects (quest flags, shop openings, battle triggers)

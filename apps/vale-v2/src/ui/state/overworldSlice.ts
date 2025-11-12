@@ -19,41 +19,46 @@ export interface OverworldSlice {
 
 export type OverworldStore = OverworldSlice;
 
+const STARTING_MAP = MAPS['vale-village'];
+if (!STARTING_MAP) {
+  throw new Error('Starting map "vale-village" not found');
+}
+
 export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => {
   const getStore = () => get() as OverworldSlice & GameFlowSlice & DialogueSlice;
 
   return {
     currentMapId: 'vale-village',
-    playerPosition: MAPS['vale-village'].spawnPoint,
+    playerPosition: STARTING_MAP.spawnPoint,
     facing: 'down',
     currentTrigger: null,
 
-  setFacing: (direction) => set({ facing: direction }),
+    setFacing: (direction) => set({ facing: direction }),
 
-  movePlayer: (direction) => {
-    const store = getStore();
-    const map = MAPS[store.currentMapId];
-    if (!map) return;
+    movePlayer: (direction) => {
+      const store = getStore();
+      const map = MAPS[store.currentMapId];
+      if (!map) return;
 
-    const result = processMovement(map, store.playerPosition, direction);
-    if (!result.blocked) {
-      set({ playerPosition: result.newPos, facing: direction, currentTrigger: result.trigger ?? null });
-      const trigger = result.trigger ?? null;
-      if (trigger?.type === 'npc') {
-        const npcId = (trigger.data as { npcId?: string }).npcId;
-        if (npcId && DIALOGUES[npcId]) {
-          store.startDialogueTree(DIALOGUES[npcId]);
+      const result = processMovement(map, store.playerPosition, direction);
+      if (!result.blocked) {
+        set({ playerPosition: result.newPos, facing: direction, currentTrigger: result.trigger ?? null });
+        const trigger = result.trigger ?? null;
+        if (trigger?.type === 'npc') {
+          const npcId = (trigger.data as { npcId?: string }).npcId;
+          if (npcId && DIALOGUES[npcId]) {
+            store.startDialogueTree(DIALOGUES[npcId]);
+          }
         }
+        store.handleTrigger(trigger);
       }
-      store.handleTrigger(trigger);
-    }
-  },
+    },
 
-  teleportPlayer: (mapId, position) => {
-    if (!MAPS[mapId]) return;
-    set({ currentMapId: mapId, playerPosition: position, facing: 'down' });
-  },
+    teleportPlayer: (mapId, position) => {
+      if (!MAPS[mapId]) return;
+      set({ currentMapId: mapId, playerPosition: position, facing: 'down' });
+    },
 
-  clearTrigger: () => set({ currentTrigger: null }),
+    clearTrigger: () => set({ currentTrigger: null }),
   };
 };

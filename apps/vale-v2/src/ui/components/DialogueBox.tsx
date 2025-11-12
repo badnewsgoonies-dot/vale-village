@@ -53,7 +53,10 @@ export function DialogueBox() {
       }
       const num = parseInt(event.key, 10);
       if (!Number.isNaN(num) && num >= 1 && num <= availableChoices.length) {
-        makeChoice(availableChoices[num - 1].id);
+        const selected = availableChoices[num - 1];
+        if (selected) {
+          makeChoice(selected.id);
+        }
       }
     };
 
