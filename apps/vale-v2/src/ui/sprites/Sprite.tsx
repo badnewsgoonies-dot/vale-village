@@ -6,6 +6,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { loadSprite } from './loader';
 import { getSpriteDef } from './manifest';
+import { getSpriteByPath, getSpriteById } from './catalog';
 import type { SpriteState } from './types';
 
 interface SpriteProps {
@@ -50,7 +51,22 @@ export function Sprite({
   const frameRef = useRef(0);
   const animationRef = useRef<number | null>(null);
   
-  const def = getSpriteDef(id);
+  // Try new catalog first, fall back to old manifest
+  let def = getSpriteDef(id);
+  
+  // If not found in old manifest, try catalog
+  if (!def) {
+    const catalogEntry = id.startsWith('/') 
+      ? getSpriteByPath(id)
+      : getSpriteById(id);
+    
+    if (catalogEntry) {
+      // Use catalog sprite directly - it's a GIF, render as simple img
+      // For now, just render the GIF directly (GIFs have built-in animation)
+      // Future: could extract frames for frame-by-frame control
+    }
+  }
+  
   const fps = def?.fps ?? 12;
   const totalFrames = typeof def?.frames === 'number' ? def.frames : 8;
   
