@@ -7,6 +7,10 @@ import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
 import type { BattleEvent } from '../../core/services/types';
 import type { Ability } from '../../data/schemas/AbilitySchema';
+import type { GameFlowSlice } from './gameFlowSlice';
+import type { RewardsSlice } from './rewardsSlice';
+import type { StorySlice } from './storySlice';
+import type { TeamSlice } from './teamSlice';
 import {
   queueAction,
   clearQueuedAction,
@@ -23,7 +27,7 @@ export interface QueueBattleSlice {
   events: BattleEvent[];
   rngSeed: number;
 
-  setBattle: (battle: BattleState, seed: number) => void;
+  setBattle: (battle: BattleState | null, seed: number) => void;
   queueUnitAction: (
     unitIndex: number,
     abilityId: string | null,
@@ -38,7 +42,7 @@ export interface QueueBattleSlice {
 }
 
 export const createQueueBattleSlice: StateCreator<
-  QueueBattleSlice & import('./rewardsSlice').RewardsSlice & import('./teamSlice').TeamSlice & import('./storySlice').StorySlice & import('./gameFlowSlice').GameFlowSlice,
+  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice,
   [['zustand/devtools', never]],
   [],
   QueueBattleSlice
@@ -117,13 +121,21 @@ export const createQueueBattleSlice: StateCreator<
     // Update battle state
     set({ battle: result.state, events: [...get().events, ...result.events] });
 
-    const { processVictory, onBattleEvents, setMode, setShowRewards } = get();
-    const rngVictory = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY));
-
     if (result.state.phase === 'victory') {
+      const { 
+        processVictory, 
+        onBattleEvents, 
+        setMode, 
+        setShowRewards 
+      } = get();
+      const rngVictory = makePRNG(
+        createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY)
+      );
+
       processVictory(result.state, rngVictory);
       setMode('rewards');
       setShowRewards(true);
+
       const encounterId = getEncounterId(result.state);
       if (encounterId && onBattleEvents) {
         onBattleEvents([
@@ -138,11 +150,32 @@ export const createQueueBattleSlice: StateCreator<
           },
         ]);
       }
+
+      console.log('Victory! Switching to rewards screen');
+      return;
     }
 
     if (result.state.phase === 'defeat') {
+      const { setMode, onBattleEvents } = get();
       console.log('Battle lost - returning to overworld');
       setMode('overworld');
+
+      const encounterId = getEncounterId(result.state);
+      if (encounterId && onBattleEvents) {
+        onBattleEvents([
+          {
+            type: 'battle-end',
+            result: 'PLAYER_DEFEAT',
+          },
+          {
+            type: 'encounter-finished',
+            outcome: 'PLAYER_DEFEAT',
+            encounterId,
+          },
+        ]);
+      }
+
+      return;
     }
   },
 

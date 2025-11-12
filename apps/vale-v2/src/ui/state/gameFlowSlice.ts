@@ -34,57 +34,94 @@ export const createGameFlowSlice: StateCreator<
       return;
     }
 
+    // ========================================
+    // BATTLE TRIGGERS
+    // ========================================
     if (trigger.type === 'battle') {
       const encounterId = (trigger.data as { encounterId?: string }).encounterId;
-      if (encounterId) {
-        const encounter = ENCOUNTERS[encounterId];
-        if (!encounter) {
-          console.error(`Encounter ${encounterId} not found in ENCOUNTERS`);
-          return;
-        }
+      if (!encounterId) {
+        console.error('Battle trigger missing encounterId');
+        return;
+      }
 
-        const team = get().team;
-        if (!team) {
-          console.error('No team available for battle');
-          return;
-        }
+      const encounter = ENCOUNTERS[encounterId];
+      if (!encounter) {
+        console.error(`Encounter ${encounterId} not found in ENCOUNTERS`);
+        return;
+      }
 
-        const seed = Date.now();
-        const rng = makePRNG(seed);
+      const team = get().team;
+      if (!team) {
+        console.error('No team available for battle');
+        return;
+      }
+
+      const seed = Date.now();
+      const rng = makePRNG(seed);
+
+      try {
         const result = createBattleFromEncounter(encounterId, team, rng);
-        if (!result) {
+        if (!result || !result.battle) {
           console.error(`Failed to create battle from encounter ${encounterId}`);
           return;
         }
 
         get().setBattle(result.battle, seed);
+
         set({
           currentEncounter: encounter,
           lastTrigger: trigger,
           mode: 'battle',
         });
+
+        console.log(`Battle started: ${encounter.name}`);
+      } catch (error) {
+        console.error('Error creating battle:', error);
+        return;
       }
+
       return;
     }
 
+    // ========================================
+    // NPC TRIGGERS
+    // ========================================
     if (trigger.type === 'npc') {
       const npcId = (trigger.data as { npcId?: string }).npcId;
       if (npcId && DIALOGUES[npcId]) {
         get().startDialogueTree(DIALOGUES[npcId]);
+      } else if (npcId) {
+        console.warn(`Dialogue ${npcId} not found`);
       }
+
       set({ lastTrigger: trigger });
       return;
     }
 
+    // ========================================
+    // STORY TRIGGERS
+    // ========================================
     if (trigger.type === 'story') {
       const storyId = (trigger.data as { storyId?: string }).storyId;
       if (storyId && DIALOGUES[storyId]) {
         get().startDialogueTree(DIALOGUES[storyId]);
+      } else if (storyId) {
+        console.warn(`Story dialogue ${storyId} not found`);
       }
+
       set({ lastTrigger: trigger });
       return;
     }
 
+    // ========================================
+    // TRANSITION TRIGGERS
+    // ========================================
+    if (trigger.type === 'transition') {
+      set({ lastTrigger: trigger });
+      return;
+    }
+
+    // Default: just track trigger
     set({ lastTrigger: trigger });
   },
   resetLastTrigger: () => set({ lastTrigger: null }),

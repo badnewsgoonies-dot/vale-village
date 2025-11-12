@@ -23,13 +23,14 @@ function App() {
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
 
-  // Commented out test battle - now using overworld as entry point
-  // To test battles, trigger a battle from the overworld or use dev tools
-  // useEffect(() => {
-  //   const { battleState, seed } = createTestBattle();
-  //   setBattle(battleState, seed);
-  //   setTeam(battleState.playerTeam);
-  // }, [setBattle, setTeam]);
+  // Initialize team on app startup (needed for battle triggers)
+  useEffect(() => {
+    // Only initialize if team doesn't exist
+    if (!team) {
+      const { battleState } = createTestBattle();
+      setTeam(battleState.playerTeam);
+    }
+  }, [team, setTeam]);
 
   // Ensure app starts in overworld mode
   useEffect(() => {

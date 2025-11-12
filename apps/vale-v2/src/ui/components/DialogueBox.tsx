@@ -4,14 +4,25 @@ import { getCurrentNode, getAvailableChoices } from '@/core/services/DialogueSer
 import './DialogueBox.css';
 
 export function DialogueBox() {
-  const { currentDialogueTree, currentDialogueState, makeChoice, advanceCurrentDialogue, endDialogue, story, inventory, team } = useStore(state => ({
+  const {
+    currentDialogueTree,
+    currentDialogueState,
+    makeChoice,
+    advanceCurrentDialogue,
+    endDialogue,
+    story,
+    gold,
+    equipment,
+    team,
+  } = useStore((state) => ({
     currentDialogueTree: state.currentDialogueTree,
     currentDialogueState: state.currentDialogueState,
     makeChoice: state.makeChoice,
     advanceCurrentDialogue: state.advanceCurrentDialogue,
     endDialogue: state.endDialogue,
     story: state.story,
-    inventory: state.inventory,
+    gold: state.gold,
+    equipment: state.equipment,
     team: state.team,
   }));
 
@@ -22,9 +33,11 @@ export function DialogueBox() {
 
   const availableChoices = getAvailableChoices(currentNode, {
     flags: (story.flags || {}) as Record<string, boolean>,
-    inventory: { items: inventory.equipment.map(item => item.id) },
-    gold: inventory.gold,
-    level: team?.activeParty[0]?.level || 1,
+    inventory: {
+      items: equipment.map((item) => item.id),
+    },
+    gold,
+    level: team?.units?.[0]?.level || 1,
   });
   const hasChoices = availableChoices.length > 0;
 

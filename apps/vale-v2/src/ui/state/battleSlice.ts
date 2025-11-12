@@ -20,7 +20,7 @@ export interface BattleSlice {
   rngSeed: number;
   turnNumber: number;
   
-  setBattle: (battle: BattleState, seed: number) => void;
+  setBattle: (battle: BattleState | null, seed: number) => void;
   startTurnTick: () => void;
   perform: (casterId: string, abilityId: string, targetIds: readonly string[]) => void;
   endTurn: () => void;

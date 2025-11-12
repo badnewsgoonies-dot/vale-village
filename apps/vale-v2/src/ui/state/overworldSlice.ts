@@ -19,27 +19,33 @@ export interface OverworldSlice {
 
 export type OverworldStore = OverworldSlice;
 
-export const createOverworldSlice: StateCreator<OverworldSlice & GameFlowSlice & DialogueSlice> = (set, get) => ({
-  currentMapId: 'vale-village',
-  playerPosition: MAPS['vale-village'].spawnPoint,
-  facing: 'down',
-  currentTrigger: null,
+export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => {
+  const getStore = () => get() as OverworldSlice & GameFlowSlice & DialogueSlice;
+
+  return {
+    currentMapId: 'vale-village',
+    playerPosition: MAPS['vale-village'].spawnPoint,
+    facing: 'down',
+    currentTrigger: null,
 
   setFacing: (direction) => set({ facing: direction }),
 
   movePlayer: (direction) => {
-    const map = MAPS[get().currentMapId];
-    const result = processMovement(map, get().playerPosition, direction);
+    const store = getStore();
+    const map = MAPS[store.currentMapId];
+    if (!map) return;
+
+    const result = processMovement(map, store.playerPosition, direction);
     if (!result.blocked) {
       set({ playerPosition: result.newPos, facing: direction, currentTrigger: result.trigger ?? null });
       const trigger = result.trigger ?? null;
       if (trigger?.type === 'npc') {
         const npcId = (trigger.data as { npcId?: string }).npcId;
         if (npcId && DIALOGUES[npcId]) {
-          get().startDialogueTree(DIALOGUES[npcId]);
+          store.startDialogueTree(DIALOGUES[npcId]);
         }
       }
-      get().handleTrigger(trigger);
+      store.handleTrigger(trigger);
     }
   },
 
@@ -49,4 +55,5 @@ export const createOverworldSlice: StateCreator<OverworldSlice & GameFlowSlice &
   },
 
   clearTrigger: () => set({ currentTrigger: null }),
-});
+  };
+};

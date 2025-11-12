@@ -34,15 +34,17 @@ export function createBattleFromEncounter(
     return null;
   }
 
-  // Convert enemy IDs to Unit instances
+  // Convert enemy IDs to Unit instances with unique IDs
   const enemyUnits = encounter.enemies
-    .map((enemyId) => {
+    .map((enemyId, index) => {
       const enemyDef = ENEMIES[enemyId];
       if (!enemyDef) {
         console.error(`Enemy not found: ${enemyId}`);
         return null;
       }
-      return enemyToUnit(enemyDef);
+      const enemy = enemyToUnit(enemyDef);
+      // Give each enemy a unique ID (e.g., wolf_0, wolf_1)
+      return { ...enemy, id: `${enemy.id}_${index}` };
     })
     .filter((u): u is ReturnType<typeof enemyToUnit> => u !== null);
 

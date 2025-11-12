@@ -1,4 +1,6 @@
-import type { GameMap, TileType } from '../../core/models/overworld';
+import type { GameMap } from '../../core/models/overworld';
+
+type TileType = GameMap['tiles'][number][number]['type'];
 
 const createTile = (type: TileType): { type: TileType; walkable: boolean } => ({
   type,
