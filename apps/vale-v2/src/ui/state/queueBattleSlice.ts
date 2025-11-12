@@ -11,6 +11,7 @@ import type { GameFlowSlice } from './gameFlowSlice';
 import type { RewardsSlice } from './rewardsSlice';
 import type { StorySlice } from './storySlice';
 import type { TeamSlice } from './teamSlice';
+import type { SaveSlice } from './saveSlice';
 import {
   queueAction,
   clearQueuedAction,
@@ -42,7 +43,7 @@ export interface QueueBattleSlice {
 }
 
 export const createQueueBattleSlice: StateCreator<
-  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice,
+  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice & SaveSlice,
   [['zustand/devtools', never]],
   [],
   QueueBattleSlice
@@ -136,6 +137,13 @@ export const createQueueBattleSlice: StateCreator<
       setMode('rewards');
       setShowRewards(true);
 
+      // Auto-save after battle victory
+      try {
+        get().autoSave();
+      } catch (error) {
+        console.warn('Auto-save failed after battle victory:', error);
+      }
+
       const encounterId = getEncounterId(result.state);
       if (encounterId && onBattleEvents) {
         onBattleEvents([
@@ -151,13 +159,11 @@ export const createQueueBattleSlice: StateCreator<
         ]);
       }
 
-      console.log('Victory! Switching to rewards screen');
       return;
     }
 
     if (result.state.phase === 'defeat') {
       const { setMode, onBattleEvents } = get();
-      console.log('Battle lost - returning to overworld');
       setMode('overworld');
 
       const encounterId = getEncounterId(result.state);

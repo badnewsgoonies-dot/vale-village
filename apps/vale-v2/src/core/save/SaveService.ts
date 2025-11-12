@@ -118,6 +118,7 @@ export async function saveReplay(
  * Load replay tape
  */
 export async function loadReplay(_port: SavePort): Promise<Result<ReplayTape, string>> {
+  void _port;
   try {
     // Load tape from separate storage
     const tapeJson = localStorage.getItem('vale:replay:tape');

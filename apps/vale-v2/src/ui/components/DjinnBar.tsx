@@ -3,7 +3,7 @@
  * PR-DJINN-CORE: Displays team Djinn and allows activation during planning
  */
 
-import React from 'react';
+import * as React from 'react';
 import type { Team } from '../../core/models/Team';
 import { canActivateDjinn } from '../../core/algorithms/djinn';
 

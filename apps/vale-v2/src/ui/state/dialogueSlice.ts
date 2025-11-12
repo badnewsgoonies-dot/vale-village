@@ -8,6 +8,7 @@ import {
 } from '@/core/services/DialogueService';
 import type { GameFlowSlice } from './gameFlowSlice';
 import type { StorySlice } from './storySlice';
+import type { SaveSlice } from './saveSlice';
 
 export interface DialogueSlice {
   currentDialogueTree: DialogueTree | null;
@@ -18,7 +19,7 @@ export interface DialogueSlice {
   endDialogue: () => void;
 }
 
-export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice> = (set, get) =>
+export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice & SaveSlice> = (set, get) =>
   ({
   currentDialogueTree: null,
   currentDialogueState: null,
@@ -67,32 +68,35 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
       mode: 'overworld',
     });
   },
-} as DialogueSlice & GameFlowSlice & StorySlice);
+} as DialogueSlice & GameFlowSlice & StorySlice & SaveSlice);
 
 /**
  * Process dialogue effects (quest flags, shop openings, battle triggers)
  * Called after a choice updates dialogue state
  */
-function processDialogueEffects(effects: Record<string, unknown>, get: () => any) {
+function processDialogueEffects(
+  effects: Record<string, unknown>,
+  get: () => DialogueSlice & GameFlowSlice & StorySlice & SaveSlice
+) {
   const store = get();
   const canSetStoryFlag = typeof store.setStoryFlag === 'function';
 
   if (effects.questAccepted === true) {
     if (canSetStoryFlag) {
       store.setStoryFlag('questAccepted', true);
-      console.log('Quest accepted!');
+      console.warn('Quest accepted!');
     } else {
       console.warn('setStoryFlag not available - quest flag not saved');
     }
   }
 
   if (effects.openShop === true) {
-    console.log('Shop opened via dialogue (UI not implemented yet)');
+    console.warn('Shop opened via dialogue (UI not implemented yet)');
   }
 
   if (typeof effects.startBattle === 'string') {
     const encounterId = effects.startBattle;
-    console.log(`Starting battle from dialogue: ${encounterId}`);
+    console.warn(`Starting battle from dialogue: ${encounterId}`);
     store.handleTrigger({
       id: 'dialogue-battle',
       type: 'battle',
@@ -101,6 +105,7 @@ function processDialogueEffects(effects: Record<string, unknown>, get: () => any
     });
   }
 
+  let storyFlagSet = false;
   Object.entries(effects).forEach(([key, value]) => {
     if (
       typeof value === 'boolean' &&
@@ -109,7 +114,20 @@ function processDialogueEffects(effects: Record<string, unknown>, get: () => any
       canSetStoryFlag
     ) {
       store.setStoryFlag(key, value);
-      console.log(`Story flag set via dialogue: ${key} = ${value}`);
+      console.warn(`Story flag set via dialogue: ${key} = ${value}`);
+      storyFlagSet = true;
     }
   });
+
+  // Auto-save after dialogue that sets story flags
+  if (storyFlagSet || effects.questAccepted === true) {
+    try {
+      const saveSlice = get();
+      if (typeof saveSlice.autoSave === 'function') {
+        saveSlice.autoSave();
+      }
+    } catch (error) {
+      console.warn('Auto-save failed after dialogue:', error);
+    }
+  }
 }

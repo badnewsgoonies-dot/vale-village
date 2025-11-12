@@ -87,7 +87,7 @@ function applyPlayerCommand(
     };
   }
 
-  throw new Error(`Unknown command type: ${(command as any).type}`);
+  throw new Error(`Unknown command type: ${command.type}`);
 }
 
 /**

@@ -53,7 +53,7 @@ export function calculateDjinnSynergy(djinnElements: readonly Element[]): DjinnS
   const uniqueElements = elementCounts.size;
   const maxCount = Math.max(...Array.from(elementCounts.values()));
   const primaryElement = Array.from(elementCounts.entries())
-    .find(([_, count]) => count === maxCount)?.[0];
+    .find(([, count]) => count === maxCount)?.[0];
 
   // 1 Djinn (any element)
   if (djinnElements.length === 1) {

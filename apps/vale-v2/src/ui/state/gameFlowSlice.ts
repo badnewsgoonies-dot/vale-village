@@ -10,9 +10,10 @@ import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
 
 export interface GameFlowSlice {
-  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue';
+  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
+  currentShopId: string | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   handleTrigger: (trigger: MapTrigger | null) => void;
   resetLastTrigger: () => void;
@@ -27,6 +28,7 @@ export const createGameFlowSlice: StateCreator<
   mode: 'overworld',
   lastTrigger: null,
   currentEncounter: null,
+  currentShopId: null,
   setMode: (mode) => set({ mode }),
   handleTrigger: (trigger) => {
     if (!trigger) {
@@ -74,7 +76,6 @@ export const createGameFlowSlice: StateCreator<
           mode: 'battle',
         });
 
-        console.log(`Battle started: ${encounter.name}`);
       } catch (error) {
         console.error('Error creating battle:', error);
         return;
@@ -110,6 +111,24 @@ export const createGameFlowSlice: StateCreator<
       }
 
       set({ lastTrigger: trigger });
+      return;
+    }
+
+    // ========================================
+    // SHOP TRIGGERS
+    // ========================================
+    if (trigger.type === 'shop') {
+      const shopId = (trigger.data as { shopId?: string }).shopId;
+      if (!shopId) {
+        console.error('Shop trigger missing shopId');
+        return;
+      }
+
+      set({
+        lastTrigger: trigger,
+        currentShopId: shopId,
+        mode: 'shop',
+      });
       return;
     }
 

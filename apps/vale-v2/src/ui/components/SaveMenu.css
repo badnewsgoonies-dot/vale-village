@@ -1,0 +1,332 @@
+/* Save Menu - Full overlay */
+.save-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.save-menu-container {
+  width: 800px;
+  max-width: 100%;
+  max-height: 90vh;
+  background: linear-gradient(180deg, #0F2550, #1A3560);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.save-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 16px;
+}
+
+.save-menu-header h1 {
+  font-size: 32px;
+  color: #FFD87F;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #FFD87F;
+  color: #FFD87F;
+}
+
+/* Error/Loading Messages */
+.save-menu-error {
+  background: rgba(200, 50, 50, 0.3);
+  border: 2px solid #C83232;
+  color: #fff;
+  padding: 12px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.save-menu-loading {
+  background: rgba(74, 122, 184, 0.3);
+  border: 2px solid #4A7AB8;
+  color: #FFD87F;
+  padding: 12px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+/* Action Buttons */
+.save-menu-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.action-btn {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: rgba(74, 122, 184, 0.3);
+  border-color: #4A7AB8;
+}
+
+.action-btn.active {
+  background: #4A7AB8;
+  border-color: #FFD87F;
+  color: #FFD87F;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Save Slots */
+.save-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.save-slot {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-slot:hover:not(.empty) {
+  background: rgba(74, 122, 184, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateX(4px);
+}
+
+.save-slot.selected {
+  border-color: #FFD87F;
+  background: rgba(255, 215, 127, 0.1);
+  box-shadow: 0 0 20px rgba(255, 215, 127, 0.3);
+}
+
+.save-slot.empty {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.save-slot.empty:hover {
+  transform: none;
+}
+
+.save-slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.save-slot-header h2 {
+  font-size: 20px;
+  color: #FFD87F;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.action-indicator {
+  font-size: 12px;
+  color: #4A7AB8;
+  text-transform: uppercase;
+}
+
+.save-slot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.save-slot-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.save-slot-empty {
+  text-align: center;
+  padding: 24px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* Delete Confirmation */
+.delete-confirmation {
+  background: rgba(200, 50, 50, 0.2);
+  border: 2px solid #C83232;
+  padding: 16px;
+  text-align: center;
+}
+
+.delete-confirmation p {
+  color: #fff;
+  margin: 0 0 16px 0;
+  font-size: 16px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirm-btn,
+.cancel-btn {
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid;
+}
+
+.confirm-btn {
+  background: #C83232;
+  border-color: #C83232;
+  color: #fff;
+}
+
+.confirm-btn:hover {
+  background: #E04040;
+  border-color: #E04040;
+}
+
+.cancel-btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Footer */
+.save-menu-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.delete-action-btn {
+  background: rgba(200, 50, 50, 0.2);
+  border: 2px solid #C83232;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.delete-action-btn:hover:not(:disabled) {
+  background: rgba(200, 50, 50, 0.4);
+  border-color: #E04040;
+}
+
+.delete-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .save-menu-container {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .save-slot-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .save-menu-actions {
+    flex-direction: column;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .save-menu-container,
+  .save-slot {
+    animation: none;
+    transition: none;
+  }
+}
+

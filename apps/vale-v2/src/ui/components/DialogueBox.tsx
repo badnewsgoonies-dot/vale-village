@@ -26,19 +26,21 @@ export function DialogueBox() {
     team: state.team,
   }));
 
-  if (!currentDialogueTree || !currentDialogueState) return null;
+  const currentNode =
+    currentDialogueTree && currentDialogueState
+      ? getCurrentNode(currentDialogueTree, currentDialogueState)
+      : null;
 
-  const currentNode = getCurrentNode(currentDialogueTree, currentDialogueState);
-  if (!currentNode) return null;
-
-  const availableChoices = getAvailableChoices(currentNode, {
-    flags: (story.flags || {}) as Record<string, boolean>,
-    inventory: {
-      items: equipment.map((item) => item.id),
-    },
-    gold,
-    level: team?.units?.[0]?.level || 1,
-  });
+  const availableChoices = currentNode
+    ? getAvailableChoices(currentNode, {
+        flags: (story.flags || {}) as Record<string, boolean>,
+        inventory: {
+          items: equipment.map((item) => item.id),
+        },
+        gold,
+        level: team?.units?.[0]?.level || 1,
+      })
+    : [];
   const hasChoices = availableChoices.length > 0;
 
   useEffect(() => {
@@ -63,6 +65,10 @@ export function DialogueBox() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [availableChoices, hasChoices, advanceCurrentDialogue, makeChoice, endDialogue]);
+
+  if (!currentDialogueTree || !currentDialogueState) return null;
+
+  if (!currentNode) return null;
 
   return (
     <div className="dialogue-overlay">

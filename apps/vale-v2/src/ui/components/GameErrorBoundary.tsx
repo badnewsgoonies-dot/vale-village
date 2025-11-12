@@ -3,11 +3,11 @@
  * Catches React errors and displays fallback UI instead of blank screen
  */
 
-import React, { Component, type ReactNode } from 'react';
+import * as React from 'react';
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 interface State {
@@ -15,7 +15,7 @@ interface State {
   error: Error | null;
 }
 
-export class GameErrorBoundary extends Component<Props, State> {
+export class GameErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {

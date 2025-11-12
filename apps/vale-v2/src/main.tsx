@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import * as React from 'react';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 import { validateAllGameData } from './core/validation/validateAll';
@@ -23,7 +23,7 @@ if (!rootElement) {
 
 // If validation failed, render error screen instead of app
 if (validationError) {
-  ReactDOM.createRoot(rootElement).render(
+  createRoot(rootElement).render(
     <div style={{
       display: 'flex',
       flexDirection: 'column',
@@ -59,7 +59,7 @@ if (validationError) {
     </div>
   );
 } else {
-  ReactDOM.createRoot(rootElement).render(
+  createRoot(rootElement).render(
     <React.StrictMode>
       <GameErrorBoundary>
         <App />

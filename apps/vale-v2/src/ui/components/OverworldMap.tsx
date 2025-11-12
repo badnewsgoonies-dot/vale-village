@@ -33,9 +33,6 @@ export function OverworldMap() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [movePlayer]);
 
-  if (!map) {
-    return <div>No overworld map loaded.</div>;
-  }
 
   useEffect(() => {
     if (!currentTrigger) return;
@@ -50,6 +47,10 @@ export function OverworldMap() {
     clearTrigger();
     resetLastTrigger();
   }, [currentTrigger, clearTrigger, teleportPlayer, resetLastTrigger]);
+
+  if (!map) {
+    return <div>No overworld map loaded.</div>;
+  }
 
   return (
     <div className="overworld-container">

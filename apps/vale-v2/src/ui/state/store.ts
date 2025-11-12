@@ -4,6 +4,7 @@
  */
 
 import { create } from 'zustand';
+import type { GetState, SetState, StoreApi } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createBattleSlice, type BattleSlice } from './battleSlice';
 import { createQueueBattleSlice, type QueueBattleSlice } from './queueBattleSlice';
@@ -19,7 +20,7 @@ import { createDialogueSlice, type DialogueSlice } from './dialogueSlice';
 export type Store = BattleSlice & QueueBattleSlice & TeamSlice & SaveSlice & StorySlice & InventorySlice & RewardsSlice & GameFlowSlice & OverworldStore & DialogueSlice;
 
 // Store factory function to combine all slices
-const storeFactory = (set: any, get: any, api: any) => ({
+const storeFactory = (set: SetState<Store>, get: GetState<Store>, api: StoreApi<Store>) => ({
   ...createTeamSlice(set, get, api),
   ...createBattleSlice(set, get, api),
   ...createQueueBattleSlice(set, get, api),

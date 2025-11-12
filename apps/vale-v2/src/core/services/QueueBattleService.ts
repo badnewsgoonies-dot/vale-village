@@ -339,7 +339,7 @@ function executeDjinnSummons(
   });
 
   // Apply damage to enemies and track targets hit
-  let targetsHit: string[] = [];
+  const targetsHit: string[] = [];
 
   if (djinnCount === 3) {
     // Mega summon hits all enemies

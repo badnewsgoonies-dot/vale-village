@@ -19,10 +19,11 @@ export interface OverworldSlice {
 
 export type OverworldStore = OverworldSlice;
 
-const STARTING_MAP = MAPS['vale-village'];
-if (!STARTING_MAP) {
+const startMap = MAPS['vale-village'];
+if (!startMap) {
   throw new Error('Starting map "vale-village" not found');
 }
+const STARTING_MAP = startMap;
 
 export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => {
   const getStore = () => get() as OverworldSlice & GameFlowSlice & DialogueSlice;

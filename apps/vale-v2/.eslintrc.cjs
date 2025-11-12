@@ -41,6 +41,7 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: false }],
     'import/no-unresolved': 'error',
+    'react/react-in-jsx-scope': 'off',
     'import/no-restricted-paths': [
       'error',
       {

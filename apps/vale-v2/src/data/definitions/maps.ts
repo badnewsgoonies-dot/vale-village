@@ -56,6 +56,7 @@ const buildTriggers = (): GameMap['triggers'] => [
   { id: 'battle-1', type: 'battle', position: { x: 7, y: 10 }, data: { encounterId: 'c1_normal_3' } },
   { id: 'battle-2', type: 'battle', position: { x: 10, y: 10 }, data: { encounterId: 'c1_normal_2' } },
   { id: 'npc-elder', type: 'npc', position: { x: 15, y: 5 }, data: { npcId: 'elder-vale' } },
+  { id: 'shop-vale-armory', type: 'shop', position: { x: 12, y: 5 }, data: { shopId: 'vale-armory' } },
   { id: 'shop-weapons', type: 'transition', position: { x: 8, y: 6 }, data: { targetMap: 'weapon-shop-interior', targetPos: { x: 5, y: 7 } } },
   { id: 'shop-weapons-exit', type: 'transition', position: { x: 5, y: 7 }, data: { targetMap: 'vale-village', targetPos: { x: 8, y: 6 } } },
 ];

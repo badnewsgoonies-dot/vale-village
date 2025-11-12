@@ -3,7 +3,7 @@
  * PR-MANA-QUEUE: Displays team mana pool with filled/empty circles
  */
 
-import React from 'react';
+import * as React from 'react';
 
 interface ManaCirclesBarProps {
   remainingMana: number;

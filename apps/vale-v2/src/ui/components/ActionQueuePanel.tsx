@@ -3,7 +3,7 @@
  * PR-QUEUE-BATTLE: Displays all 4 queued actions
  */
 
-import React from 'react';
+import * as React from 'react';
 import type { BattleState } from '../../core/models/BattleState';
 import { ABILITIES } from '../../data/definitions/abilities';
 

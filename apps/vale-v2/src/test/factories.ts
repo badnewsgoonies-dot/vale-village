@@ -31,8 +31,10 @@ export function mkUnit(overrides?: Partial<Unit>): Unit {
   if (!overrides) return base;
   
   // Apply overrides, but exclude level/xp since they're already applied
-  const { level: _, xp: __, ...restOverrides } = overrides;
-  
+  const { level: omitLevel, xp: omitXp, ...restOverrides } = overrides;
+  void omitLevel;
+  void omitXp;
+
   return {
     ...base,
     ...restOverrides,
@@ -40,6 +42,8 @@ export function mkUnit(overrides?: Partial<Unit>): Unit {
     baseStats: restOverrides.baseStats ? { ...base.baseStats, ...restOverrides.baseStats } : base.baseStats,
     equipment: restOverrides.equipment ?? base.equipment,
     statusEffects: restOverrides.statusEffects ?? base.statusEffects,
+    abilities: restOverrides.abilities ?? base.abilities, // Preserve abilities if not overridden
+    unlockedAbilityIds: restOverrides.unlockedAbilityIds ?? base.unlockedAbilityIds, // Preserve unlocked abilities
     // Preserve level/xp from createUnit call
     level: base.level,
     xp: base.xp,

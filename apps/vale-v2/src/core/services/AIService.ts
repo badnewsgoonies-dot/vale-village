@@ -8,10 +8,9 @@ import type { Unit } from '../models/Unit';
 import type { BattleState } from '../models/BattleState';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { PRNG } from '../random/prng';
-import { isUnitKO } from '../models/Unit';
+import { calculateMaxHp, isUnitKO } from '../models/Unit';
 import { getElementModifier } from '../algorithms/damage';
 import { resolveTargets } from '../algorithms/targeting';
-import { calculateMaxHp } from '../models/Unit';
 
 /**
  * AI hints for abilities (optional metadata)

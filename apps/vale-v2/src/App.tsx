@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { QueueBattleView } from './ui/components/QueueBattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
 import { RewardsScreen } from './ui/components/RewardsScreen';
 import { OverworldMap } from './ui/components/OverworldMap';
 import { DialogueBox } from './ui/components/DialogueBox';
+import { SaveMenu } from './ui/components/SaveMenu';
+import { ShopScreen } from './ui/components/ShopScreen';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -22,6 +24,8 @@ function App() {
   const setTeam = useStore((s) => s.setTeam);
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
+  const currentShopId = useStore((s) => s.currentShopId);
+  const [showSaveMenu, setShowSaveMenu] = useState(false);
 
   // Initialize team on app startup (needed for battle triggers)
   useEffect(() => {
@@ -54,12 +58,12 @@ function App() {
           <h1 style={{ margin: 0 }}>Vale Chronicles V2</h1>
           <ChapterIndicator chapter={story.chapter} />
         </div>
-        {canAccessCredits && (
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
-            onClick={() => setShowCredits(true)}
+            onClick={() => setShowSaveMenu(true)}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#2196F3',
+              backgroundColor: '#4CAF50',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
@@ -67,12 +71,31 @@ function App() {
               fontSize: '0.9rem',
             }}
           >
-            View Credits
+            Save Game
           </button>
-        )}
+          {canAccessCredits && (
+            <button
+              onClick={() => setShowCredits(true)}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#2196F3',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              View Credits
+            </button>
+          )}
+        </div>
       </div>
       {showCredits && (
         <CreditsScreen onExit={() => setShowCredits(false)} />
+      )}
+      {showSaveMenu && (
+        <SaveMenu onClose={() => setShowSaveMenu(false)} />
       )}
       {showRewards && lastBattleRewards && team ? (
         <RewardsScreen
@@ -89,6 +112,9 @@ function App() {
               <OverworldMap />
               <DialogueBox />
             </>
+          )}
+          {mode === 'shop' && currentShopId && (
+            <ShopScreen shopId={currentShopId} onClose={() => setMode('overworld')} />
           )}
         </>
       )}
