@@ -2,7 +2,25 @@
 
 **Date:** November 12, 2025  
 **Status:** Shell → Fully Rendered Graphics  
-**Goal:** 100% successful transformation using existing 2,572 GIF assets
+**Goal:** Make all 2,572 sprite assets loadable, renderable, and usable (mechanics-agnostic)
+
+---
+
+## SCOPE: PURE SPRITE INFRASTRUCTURE
+
+**What This Strategy Does:**
+- ✅ Catalogues all 2,572 existing sprite assets
+- ✅ Creates a robust sprite loading and rendering system
+- ✅ Makes sprites accessible for ANY future mechanic implementation
+- ✅ Ensures all sprites can be displayed, animated, and integrated
+
+**What This Strategy Does NOT Do:**
+- ❌ Assume specific game mechanics
+- ❌ Hard-code sprite-to-game-feature mappings
+- ❌ Implement specific abilities, units, or systems
+- ❌ Make gameplay decisions
+
+**Philosophy:** Build a flexible sprite engine that can support whatever mechanics you decide on later.
 
 ---
 
@@ -173,374 +191,440 @@ We can programmatically merge these into our manifest.
 
 ---
 
-### Phase 2: Battle Screen Graphics (High Impact)
+### Phase 2: Sprite Rendering System (High Impact)
 **Duration:** 4-6 hours  
-**Risk:** Low (well-documented in sprite maps)
+**Risk:** Low (assets already exist)
 
-#### 2.1 Battle Backgrounds
-**Current:** Plain colored div  
-**Target:** 72 authentic Golden Sun backgrounds
+**Goal:** Make sprites actually render on screen instead of placeholders
 
-**Implementation:**
-```typescript
-// src/ui/components/BattleView.tsx
-import { getBattleBackground } from '@/ui/sprites/backgrounds';
-
-export function BattleView() {
-  const battleBg = getBattleBackground(battle.locationId);
-  
-  return (
-    <div 
-      className="battle-root"
-      style={{
-        backgroundImage: `url(${battleBg.src})`,
-        backgroundSize: 'cover',
-        width: '720px',
-        height: '480px', // 3× GBA resolution
-      }}
-    >
-      {/* ... */}
-    </div>
-  );
-}
-```
-
-**Backgrounds Available:**
-- Vale Village: `/sprites/backgrounds/gs1/Vale.gif`
-- Forest: `/sprites/backgrounds/gs1/Kolima_Forest.gif`
-- Cave: `/sprites/backgrounds/gs1/Cave.gif`
-- Desert: `/sprites/backgrounds/gs1/Desert.gif`
-- *+ 68 more*
-
-#### 2.2 Player Unit Sprites
-**Current:** Text labels (`"Isaac: 100 HP"`)  
-**Target:** Animated battle sprites with proper states
+#### 2.1 Background Sprite Loader
+**Current:** Plain colored divs  
+**Target:** Any of 72 background sprites can be displayed
 
 **Implementation:**
 ```typescript
-// src/ui/components/BattleUnitSprite.tsx
-import { Sprite } from '@/ui/sprites/Sprite';
-
-export function BattleUnitSprite({ unit, state }: Props) {
-  const spriteId = `${unit.id}-battle-${state}`;
-  // Examples: 'isaac-battle-idle', 'isaac-battle-attack', 'garet-battle-cast'
-  
-  return (
-    <div className="battle-unit">
-      <Sprite 
-        id={spriteId}
-        state={state}
-        animate={true}
-        className="unit-sprite"
-      />
-      <div className="unit-hp-bar">{/* HP bar */}</div>
-    </div>
-  );
+// src/ui/sprites/backgrounds.ts
+export function getBackgroundSprite(id: string) {
+  return SPRITES[`bg-${id}`];
 }
+
+// Usage (mechanics-agnostic):
+<div style={{ backgroundImage: `url(${getBackgroundSprite('vale').src})` }} />
 ```
 
-**States to Implement:**
-- `idle` - Standing ready (looping animation)
-- `attack` - Physical attack swing
-- `cast` - Psynergy casting pose
-- `hit` - Taking damage flinch
-- `downed` - KO'd state
+**What This Enables:**
+- Any screen can use any background
+- Backgrounds loadable by ID
+- 72 backgrounds available for use
+- No assumptions about WHEN or WHERE backgrounds are used
 
-**Sprites Available (per unit):**
-- Isaac: 51 animations (idle, attack, cast, hit, downed × weapon variants)
-- Garet: 51 animations
-- Ivan: 51 animations
-- Mia: 51 animations
-- *Total: 292 party sprites*
+#### 2.2 Character Sprite Renderer
+**Current:** Text labels or colored boxes  
+**Target:** Any character sprite from 292 available can render with animation
 
-#### 2.3 Enemy Sprites
+**Implementation:**
+```typescript
+// src/ui/sprites/character.ts
+export interface CharacterSpriteProps {
+  spriteId: string;      // e.g., 'isaac-lblade-front'
+  animate?: boolean;     // Whether to loop animation
+  onFrame?: (frame: number) => void; // Optional frame callback
+}
+
+// Flexible sprite component
+<Sprite 
+  id={spriteId}
+  animate={animate}
+  className="character-sprite"
+/>
+```
+
+**What This Enables:**
+- Render any of 292 party sprites
+- Animation control (play, pause, loop)
+- Frame-by-frame control if needed
+- Works for battle, overworld, menus - anywhere
+- No hard-coded unit names or states
+
+#### 2.3 Entity Sprite System (Enemies/NPCs/Objects)
 **Current:** Colored boxes  
-**Target:** 173 enemy sprites with idle animations
+**Target:** Any entity sprite can be rendered
 
 **Implementation:**
 ```typescript
-// src/data/definitions/enemies.ts
-export const ENEMY_CATALOG = {
-  goblin: {
-    // ... stats
-    spriteId: 'enemy-goblin', // Maps to manifest
-  },
-  slime: {
-    spriteId: 'enemy-slime',
-  },
-  // ... 30 enemies defined
-};
-
-// Manifest entry
-SPRITES['enemy-goblin'] = {
-  src: '/sprites/battle/enemies/Alec_Goblin.gif',
-  frames: 6,
-  fps: 10,
-  frameWidth: 64,
-  frameHeight: 64,
-};
+// src/ui/sprites/entity.ts
+export function renderEntitySprite(spriteId: string, options?: SpriteOptions) {
+  const sprite = SPRITES[spriteId];
+  if (!sprite) {
+    console.warn(`Sprite not found: ${spriteId}`);
+    return <PlaceholderSprite />;
+  }
+  
+  return <Sprite id={spriteId} {...options} />;
+}
 ```
 
-**Result:** All 30 implemented enemies + 143 bonus sprites available for future expansions.
+**What This Enables:**
+- 173 enemy sprites renderable
+- 187 NPC sprites renderable
+- Flexible usage (battle, overworld, cutscenes)
+- Fallback to placeholder if sprite missing
 
-#### 2.4 Battle UI Buttons
+#### 2.4 Icon Sprite System (UI Elements)
 **Current:** HTML buttons with text  
-**Target:** Authentic Golden Sun button sprites
+**Target:** Any UI icon/button sprite can be used
 
 **Implementation:**
 ```typescript
-// src/ui/components/ActionBar.tsx
-<button className="battle-command" onClick={handleFight}>
-  <img src="/sprites/icons/buttons/Fight.gif" alt="Fight" />
-</button>
-<button className="battle-command" onClick={handlePsynergy}>
-  <img src="/sprites/icons/buttons/Psynergy.gif" alt="Psynergy" />
-</button>
-<button className="battle-command" onClick={handleDjinn}>
-  <img src="/sprites/icons/buttons/Djinni.gif" alt="Djinni" />
-</button>
+// src/ui/sprites/icons.ts
+export function getIconSprite(category: string, name: string) {
+  return SPRITES[`icon-${category}-${name}`];
+}
+
+// Usage examples:
+<img src={getIconSprite('button', 'fight').src} />
+<img src={getIconSprite('item', 'sword').src} />
+<img src={getIconSprite('element', 'venus').src} />
 ```
 
-**Buttons Available:**
-- Fight.gif
-- Psynergy.gif
-- Djinni.gif
-- Item.gif
-- Run.gif
-- *+ 50 more UI buttons*
+**What This Enables:**
+- 55 button sprites usable
+- 366 item icons accessible
+- 214 ability icons available
+- Flexible icon system for ANY UI need
 
 #### 2.5 Deliverable
-✅ Battle screen fully rendered with authentic sprites  
-✅ All 4 party members animated  
-✅ All 30 enemies rendered  
-✅ Battle backgrounds rotate by location  
-✅ UI buttons are pixel-perfect Golden Sun style
+✅ Sprite rendering system that works with ANY sprite ID  
+✅ All 2,572 sprites loadable via manifest  
+✅ Fallback system for missing sprites  
+✅ Animation controls (play, pause, loop, frame)  
+✅ No hard-coded assumptions about game mechanics
 
 ---
 
-### Phase 3: Overworld Graphics (High Complexity)
-**Duration:** 8-12 hours  
-**Risk:** Medium (tile system needs overhaul)
+### Phase 3: Tile & Scenery Sprite System
+**Duration:** 6-8 hours  
+**Risk:** Medium (tile system architecture)
 
-#### 3.1 Tile-Based Rendering Overhaul
-**Current Problem:** CSS classes only
+**Goal:** Make tile and scenery sprites renderable without assuming specific map layouts
+
+#### 3.1 Tile Sprite Registry
+**Current Problem:** CSS classes only (no actual images)
+
+**Solution:** Tile sprite lookup system
 ```typescript
-<div className="tile tile-grass" />  // ❌ Just green background color
+// src/ui/sprites/tiles.ts
+export interface TileSprite {
+  id: string;
+  src: string;
+  width: number;
+  height: number;
+  category: 'outdoor' | 'indoor' | 'building';
+}
+
+export function getTileSprite(tileId: string): TileSprite | null {
+  return SPRITES[`tile-${tileId}`] ?? null;
+}
+
+// Usage (flexible):
+const grassSprite = getTileSprite('outdoor-grass-01');
+<div style={{ backgroundImage: `url(${grassSprite.src})` }} />
 ```
 
-**Solution:** Render actual sprite tiles
+**What This Enables:**
+- 144 outdoor tile sprites accessible
+- 241 indoor tile sprites accessible
+- 130 building sprites accessible
+- Any component can render any tile
+- No assumptions about map structure
+
+#### 3.2 Directional Sprite System
+**Current:** No support for direction-based sprites
+
+**Solution:** Directional sprite resolver
 ```typescript
-<div 
-  className="tile"
-  style={{
-    backgroundImage: `url(/sprites/scenery/outdoor/grass_01.gif)`,
-    backgroundSize: 'cover',
-    width: '16px',
-    height: '16px',
-  }}
-/>
+// src/ui/sprites/directional.ts
+export function getDirectionalSprite(
+  baseId: string, 
+  direction: 'north' | 'south' | 'east' | 'west'
+) {
+  return SPRITES[`${baseId}-${direction}`];
+}
+
+// Usage:
+const sprite = getDirectionalSprite('character-isaac', 'north');
+<Sprite id={sprite.id} animate={true} />
 ```
 
-**Tile Sprites Available:**
-- Outdoor: 144 tiles (grass, dirt, water, rocks, paths)
-- Indoor: 241 tiles (floors, walls, doors, furniture)
-- Buildings: 130 sprites (houses, shops, inns)
+**What This Enables:**
+- 120 protagonist directional sprites usable
+- 187 NPC directional sprites available
+- Works for ANY directional sprite need
+- Not tied to specific overworld mechanics
 
-#### 3.2 Create Tile Palette System
-**Action:** Generate tile ID → sprite mappings
+#### 3.3 Layered Sprite Renderer
+**Current:** Single-layer rendering only
 
-**Data Structure:**
+**Solution:** Multi-layer sprite compositor
 ```typescript
-// src/data/definitions/tiles.ts
-export const TILE_PALETTE = {
-  grass: {
-    id: 'grass',
-    sprite: '/sprites/scenery/outdoor/grass_01.gif',
-    walkable: true,
-  },
-  water: {
-    id: 'water',
-    sprite: '/sprites/scenery/outdoor/water_01.gif',
-    walkable: false,
-  },
-  path: {
-    id: 'path',
-    sprite: '/sprites/scenery/outdoor/stone_path_01.gif',
-    walkable: true,
-  },
-  // ... 300+ tiles
-};
+// src/ui/sprites/layers.ts
+export interface LayerConfig {
+  ground?: string;    // Tile sprite ID
+  scenery?: string;   // Decoration sprite ID
+  entity?: string;    // Character/NPC sprite ID
+  effects?: string;   // Effect sprite ID
+}
+
+export function LayeredSprite({ layers }: { layers: LayerConfig }) {
+  return (
+    <div className="layered-sprite">
+      {layers.ground && <Sprite id={layers.ground} layer={0} />}
+      {layers.scenery && <Sprite id={layers.scenery} layer={1} />}
+      {layers.entity && <Sprite id={layers.entity} layer={2} />}
+      {layers.effects && <Sprite id={layers.effects} layer={3} />}
+    </div>
+  );
+}
 ```
 
-**Map Data Update:**
-```typescript
-// src/data/definitions/maps.ts
-export const MAPS = {
-  'vale-village': {
-    tiles: [
-      [{ type: 'grass' }, { type: 'grass' }, { type: 'path' }],
-      [{ type: 'path' }, { type: 'path' }, { type: 'building:house' }],
-      // ... map grid
-    ],
-  },
-};
-```
+**What This Enables:**
+- Composite multiple sprites at once
+- Z-ordering (ground < scenery < characters < effects)
+- Flexible for any scene composition
+- Works for overworld, cutscenes, etc.
 
-#### 3.3 Character Sprites (Player & NPCs)
-**Current:** CSS `<div className="player-sprite" />` (just a colored square)  
-**Target:** Animated walk cycles for 10 protagonists + NPCs
+#### 3.4 Scenery Sprite Catalog
+**Action:** Make all scenery sprites accessible
+
+**Categories:**
+- Plants: 47 sprites
+- Statues: 27 sprites  
+- Buildings: 130 sprites
+- Indoor furniture: 241 sprites
 
 **Implementation:**
 ```typescript
-// src/ui/components/OverworldMap.tsx
-{isPlayer && (
-  <Sprite 
-    id={`${currentUnit.id}-overworld-${direction}`}
-    animate={isMoving}
-    className="player-sprite"
-  />
-)}
+// Simple lookup by category + name
+export function getScenerySprite(category: string, name: string) {
+  return SPRITES[`scenery-${category}-${name}`];
+}
 ```
-
-**Sprites Available:**
-- **Protagonists:** 120 GIFs (Isaac, Garet, Ivan, Mia walk cycles: N/S/E/W)
-- **Major NPCs:** 54 GIFs (quest givers, merchants)
-- **Minor NPCs:** 112 GIFs (townsfolk, background characters)
-
-**Walk Cycle Directions:**
-- `isaac-overworld-north` (8 frames)
-- `isaac-overworld-south` (8 frames)
-- `isaac-overworld-east` (8 frames)
-- `isaac-overworld-west` (8 frames)
-
-#### 3.4 Buildings & Scenery Layers
-**Action:** Render buildings as sprites over tiles
-
-**Layering System:**
-```
-Layer 0: Ground tiles (grass, water, paths)
-Layer 1: Scenery (plants, rocks, statues)
-Layer 2: Buildings (houses, shops, inns)
-Layer 3: Characters (player, NPCs)
-Layer 4: Effects (weather, particles)
-```
-
-**Buildings Available:**
-- Houses: 40 variants
-- Shops: 20 variants
-- Inns: 15 variants
-- Special: 55 variants (temples, towers, gates)
 
 #### 3.5 Deliverable
-✅ Tile-based overworld with 300+ authentic tiles  
-✅ Player character with 4-direction walk cycle  
-✅ NPCs rendered with proper sprites  
-✅ Buildings rendered as sprite layers  
-✅ Vegetation and decoration sprites
+✅ All 515+ tile/scenery sprites loadable by ID  
+✅ Directional sprite system for 307+ directional sprites  
+✅ Layered rendering for composite scenes  
+✅ Flexible enough for any map/scene implementation  
+✅ No hard-coded map layouts or tile positions
 
 ---
 
-### Phase 4: Menu Screen Graphics (Polish)
+### Phase 4: Animation & Effect Sprites
 **Duration:** 3-4 hours  
-**Risk:** Low (mockups already exist)
+**Risk:** Low (straightforward sprite playback)
 
-#### 4.1 Djinn Menu
-**Mockup:** `mockups/djinn-menu/` (already approved!)
+**Goal:** Make animation sprites playable (abilities, effects, etc.)
+
+#### 4.1 Animation Sprite Player
+**Current:** No animation playback system
+
+**Solution:** Sprite animation component
+```typescript
+// src/ui/sprites/animation.ts
+export interface AnimationOptions {
+  spriteId: string;
+  loop?: boolean;
+  onComplete?: () => void;
+  speed?: number; // FPS multiplier
+}
+
+export function AnimationSprite({ spriteId, loop, onComplete, speed }: AnimationOptions) {
+  // Plays sprite animation, calls onComplete when done
+  return <Sprite id={spriteId} animate={true} onAnimationEnd={onComplete} />;
+}
+```
+
+**What This Enables:**
+- 19 ability animation GIFs playable
+- 62 summon animation GIFs playable
+- Any animation sprite can be triggered
+- Not tied to specific abilities or summons
+
+#### 4.2 Multi-Sprite Effect System
+**Current:** Single sprite rendering only
+
+**Solution:** Composite effect renderer
+```typescript
+// src/ui/sprites/effects.ts
+export function EffectComposite({ effects }: { effects: string[] }) {
+  return (
+    <div className="effect-composite">
+      {effects.map(spriteId => (
+        <Sprite key={spriteId} id={spriteId} animate={true} />
+      ))}
+    </div>
+  );
+}
+```
+
+**What This Enables:**
+- Play multiple sprite animations simultaneously
+- Layer effects (explosion + smoke + particles)
+- Flexible for any visual effect composition
+
+#### 4.3 Sprite Font System
+**Action:** Make text sprite rendering possible
+
+**Assets:**
+- 90 text/number GIFs
 
 **Implementation:**
-1. Port HTML/CSS from mockup to React component
-2. Use sprite paths from `sprite_map.json`
-3. Replace static images with `<Sprite>` components
+```typescript
+// src/ui/sprites/text.ts
+export function SpriteText({ text, fontId }: { text: string, fontId: string }) {
+  return (
+    <div className="sprite-text">
+      {text.split('').map(char => (
+        <Sprite id={`${fontId}-${char}`} key={char} />
+      ))}
+    </div>
+  );
+}
+```
 
-**Assets:**
-- Character portraits: `/sprites/overworld/protagonists/Isaac_Overworld.gif`
-- Djinn sprites: `/sprites/battle/djinn/Venus_Djinn_Front.gif`
-- Element icons: `/sprites/icons/misc/venus_icon.gif`
+**What This Enables:**
+- Render text using sprite fonts
+- Damage numbers, UI text, etc.
+- Authentic pixel font rendering
 
-#### 4.2 Equipment Screen
-**Mockup:** `equipment-screen-sprite-map.json`
-
-**Assets:**
-- Equipment icons: 366 GIFs (weapons, armor, accessories)
-- Character portraits: 100 GIFs
-- Stat icons: 31 GIFs
-
-#### 4.3 Shop Screen
-**Implementation:**
-- Item icons from `/sprites/icons/items/`
-- Gold counter sprites from `/sprites/text/`
-- Buy/Sell buttons from `/sprites/icons/buttons/`
-
-#### 4.4 Rewards Screen
-**Mockup:** `rewards-screen-sprite-map.json`
-
-**Assets:**
-- Treasure chest: `/sprites/scenery/chest.gif` (closed), `chest_open.gif` (open)
-- Item icons: 366 available
-- Gold coins: `/sprites/icons/misc/gold_coin.gif`
-
-#### 4.5 Deliverable
-✅ All menu screens use authentic sprites  
-✅ Djinn menu matches approved mockup  
-✅ Equipment screen shows all 366 item icons  
-✅ Shop UI is pixel-perfect Golden Sun style  
-✅ Rewards screen has animated treasure chest
+#### 4.4 Deliverable
+✅ Animation playback system for 81+ animation sprites  
+✅ Multi-sprite effect compositor  
+✅ Sprite font text renderer for 90 text sprites  
+✅ Flexible enough for any visual effect need  
+✅ Not tied to specific game features
 
 ---
 
-### Phase 5: Polish & Effects (Final Touch)
-**Duration:** 4-6 hours  
-**Risk:** Low (bonus polish)
+### Phase 5: Sprite Inspector & Debugger (Developer Tools)
+**Duration:** 2-3 hours  
+**Risk:** Low (quality of life tooling)
 
-#### 5.1 Psynergy Animations
-**Assets:** 19 ability animations + 214 ability icons
+**Goal:** Tools to verify all sprites work correctly
 
-**Examples:**
-- Ragnarok: `/sprites/psynergy/Grand_Gaia.gif`
-- Pyroclasm: `/sprites/psynergy/Pyroclasm.gif`
-- Glacial Blessing: `/sprites/psynergy/Freeze_Prism.gif`
+#### 5.1 Sprite Browser Component
+**Action:** Build dev tool to browse all 2,572 sprites
 
 **Implementation:**
 ```typescript
-// Play ability animation during battle
-<AbilityAnimation 
-  abilityId="ragnarok"
-  src="/sprites/psynergy/Grand_Gaia.gif"
-  onComplete={applyDamage}
-/>
+// src/ui/dev/SpriteBrowser.tsx
+export function SpriteBrowser() {
+  const [category, setCategory] = useState('all');
+  const [search, setSearch] = useState('');
+  
+  const sprites = Object.entries(SPRITES)
+    .filter(([id]) => !search || id.includes(search))
+    .filter(([id]) => category === 'all' || id.startsWith(category));
+  
+  return (
+    <div className="sprite-browser">
+      <input value={search} onChange={e => setSearch(e.target.value)} />
+      <select value={category} onChange={e => setCategory(e.target.value)}>
+        <option value="all">All Sprites</option>
+        <option value="battle">Battle</option>
+        <option value="overworld">Overworld</option>
+        <option value="icon">Icons</option>
+        <option value="tile">Tiles</option>
+      </select>
+      
+      <div className="sprite-grid">
+        {sprites.map(([id, def]) => (
+          <div key={id} className="sprite-item">
+            <Sprite id={id} animate={true} />
+            <span>{id}</span>
+            <span>{def.frameWidth}x{def.frameHeight}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 ```
 
-#### 5.2 Summon Animations
-**Assets:** 62 summon GIFs
+**What This Enables:**
+- Visually inspect every sprite
+- Search sprites by ID
+- Filter by category
+- Verify all sprites load correctly
+
+#### 5.2 Sprite Performance Monitor
+**Action:** Track sprite loading and rendering performance
 
 **Implementation:**
 ```typescript
-// Render summon cutscene when Djinn unleashed
-<SummonCutscene 
-  djinnCount={3}
-  element="venus"
-  animationSrc="/sprites/battle/summons/Judgment.gif"
-/>
+// src/ui/sprites/monitor.ts
+export const SpriteMonitor = {
+  loadedSprites: new Set<string>(),
+  failedSprites: new Set<string>(),
+  loadTimes: new Map<string, number>(),
+  
+  trackLoad(spriteId: string, loadTime: number) {
+    this.loadedSprites.add(spriteId);
+    this.loadTimes.set(spriteId, loadTime);
+  },
+  
+  trackFail(spriteId: string) {
+    this.failedSprites.add(spriteId);
+  },
+  
+  getStats() {
+    return {
+      total: SPRITES.length,
+      loaded: this.loadedSprites.size,
+      failed: this.failedSprites.size,
+      avgLoadTime: Array.from(this.loadTimes.values())
+        .reduce((a, b) => a + b, 0) / this.loadTimes.size,
+    };
+  },
+};
 ```
 
-#### 5.3 UI Text & Numbers
-**Assets:** 90 text GIFs (damage numbers, floating text)
+#### 5.3 Sprite Manifest Validator
+**Action:** Verify all sprite paths exist and are valid
 
-**Implementation:**
+**Script:**
 ```typescript
-// Render damage numbers with authentic sprites
-<DamageNumber 
-  value={47}
-  isCritical={false}
-  spriteFont="/sprites/text/"
-/>
+// scripts/validate-sprite-manifest.ts
+import fs from 'fs';
+import { SPRITES } from '../src/ui/sprites/manifest-generated';
+
+let errors = 0;
+
+Object.entries(SPRITES).forEach(([id, def]) => {
+  const fullPath = `./public${def.src}`;
+  
+  if (!fs.existsSync(fullPath)) {
+    console.error(`❌ Missing sprite: ${id} -> ${def.src}`);
+    errors++;
+  }
+});
+
+if (errors === 0) {
+  console.log(`✅ All ${Object.keys(SPRITES).length} sprites validated!`);
+} else {
+  console.error(`❌ ${errors} sprite(s) failed validation`);
+  process.exit(1);
+}
 ```
+
+**Run:** `npm run validate:sprites`
 
 #### 5.4 Deliverable
-✅ All abilities have visual effects  
-✅ Summons play full animations  
-✅ Damage numbers use sprite fonts  
-✅ Game feels authentic to Golden Sun
+✅ Sprite browser for visual inspection  
+✅ Performance monitoring for sprite loading  
+✅ Automated validation script  
+✅ Tools to ensure all 2,572 sprites work correctly  
+✅ Developer confidence in sprite system
 
 ---
 
