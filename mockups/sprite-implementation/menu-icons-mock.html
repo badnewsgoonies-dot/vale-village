@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Icons Sprite Mock - Vale Chronicles</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #1a1a1a;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      color: white;
+      padding: 20px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .header p {
+      font-size: 8px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .menu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .menu-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .menu-panel h2 {
+      font-size: 10px;
+      margin-bottom: 15px;
+      color: #ffd700;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+    }
+
+    /* Equipment Section */
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .equipment-slot {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .equipment-slot:hover {
+      border-color: #ffd700;
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .equipment-icon {
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+    }
+
+    .equipment-info {
+      flex: 1;
+    }
+
+    .equipment-name {
+      font-size: 7px;
+      margin-bottom: 5px;
+    }
+
+    .equipment-stats {
+      font-size: 6px;
+      color: #888;
+    }
+
+    /* Character Portraits */
+    .character-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .character-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.2s;
+    }
+
+    .character-card:hover {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .character-portrait {
+      width: 48px;
+      height: 48px;
+      image-rendering: pixelated;
+    }
+
+    .character-stats {
+      flex: 1;
+    }
+
+    .character-name {
+      font-size: 8px;
+      margin-bottom: 5px;
+    }
+
+    .character-level {
+      font-size: 6px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+
+    .stat-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 6px;
+    }
+
+    .stat-bar-fill {
+      width: 80px;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stat-bar-inner {
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    /* Ability Icons */
+    .ability-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .ability-button {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ability-button:hover {
+      border-color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .ability-icon {
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+    }
+
+    .ability-details {
+      flex: 1;
+    }
+
+    .ability-name {
+      font-size: 7px;
+      margin-bottom: 3px;
+    }
+
+    .ability-cost {
+      font-size: 6px;
+      color: #3b82f6;
+    }
+
+    .ability-element {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 5px;
+      margin-top: 3px;
+    }
+
+    .element-venus { background: #16a34a; }
+    .element-mars { background: #dc2626; }
+    .element-mercury { background: #3b82f6; }
+    .element-jupiter { background: #a855f7; }
+
+    /* Djinn Section */
+    .djinn-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .djinn-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .djinn-card:hover {
+      border-color: #ffd700;
+      transform: scale(1.05);
+    }
+
+    .djinn-sprite {
+      width: 48px;
+      height: 48px;
+      image-rendering: pixelated;
+      margin: 0 auto 8px;
+    }
+
+    .djinn-name {
+      font-size: 7px;
+      margin-bottom: 5px;
+    }
+
+    .djinn-state {
+      font-size: 6px;
+      color: #888;
+    }
+
+    .implementation-notes {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .implementation-notes h3 {
+      font-size: 10px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .implementation-notes ul {
+      font-size: 8px;
+      line-height: 1.8;
+      list-style-position: inside;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 Menu Icons Sprite Implementation Mock</h1>
+    <p>Equipment, Character Portraits, Ability Icons, and Djinn Sprites</p>
+  </div>
+
+  <div class="menu-container">
+    <!-- Equipment Panel -->
+    <div class="menu-panel">
+      <h2>⚔️ Equipment</h2>
+      <div class="equipment-grid">
+        <div class="equipment-slot">
+          <img class="equipment-icon" src="../../apps/vale-v2/public/sprites/icons/items/Broad_Sword.gif" alt="Weapon">
+          <div class="equipment-info">
+            <div class="equipment-name">Broad Sword</div>
+            <div class="equipment-stats">ATK +18</div>
+          </div>
+        </div>
+        <div class="equipment-slot">
+          <img class="equipment-icon" src="../../apps/vale-v2/public/sprites/icons/items/Iron_Shield.gif" alt="Armor">
+          <div class="equipment-info">
+            <div class="equipment-name">Iron Shield</div>
+            <div class="equipment-stats">DEF +12</div>
+          </div>
+        </div>
+        <div class="equipment-slot">
+          <img class="equipment-icon" src="../../apps/vale-v2/public/sprites/icons/items/Iron_Helm.gif" alt="Helm">
+          <div class="equipment-info">
+            <div class="equipment-name">Iron Helm</div>
+            <div class="equipment-stats">DEF +8</div>
+          </div>
+        </div>
+        <div class="equipment-slot">
+          <img class="equipment-icon" src="../../apps/vale-v2/public/sprites/icons/items/Fur_Boots.gif" alt="Boots">
+          <div class="equipment-info">
+            <div class="equipment-name">Fur Boots</div>
+            <div class="equipment-stats">AGI +5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Character Portraits Panel -->
+    <div class="menu-panel">
+      <h2>👥 Party Members</h2>
+      <div class="character-list">
+        <div class="character-card">
+          <img class="character-portrait" src="../../apps/vale-v2/public/sprites/icons/characters/Isaac.gif" alt="Isaac">
+          <div class="character-stats">
+            <div class="character-name">Isaac</div>
+            <div class="character-level">Venus Adept - Lv.5</div>
+            <div class="stat-bars">
+              <div class="stat-bar">
+                <span>HP</span>
+                <div class="stat-bar-fill">
+                  <div class="stat-bar-inner" style="width: 85%; background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                </div>
+              </div>
+              <div class="stat-bar">
+                <span>PP</span>
+                <div class="stat-bar-fill">
+                  <div class="stat-bar-inner" style="width: 60%; background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="character-card">
+          <img class="character-portrait" src="../../apps/vale-v2/public/sprites/icons/characters/Garet.gif" alt="Garet">
+          <div class="character-stats">
+            <div class="character-name">Garet</div>
+            <div class="character-level">Mars Adept - Lv.4</div>
+            <div class="stat-bars">
+              <div class="stat-bar">
+                <span>HP</span>
+                <div class="stat-bar-fill">
+                  <div class="stat-bar-inner" style="width: 90%; background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                </div>
+              </div>
+              <div class="stat-bar">
+                <span>PP</span>
+                <div class="stat-bar-fill">
+                  <div class="stat-bar-inner" style="width: 45%; background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ability Icons Panel -->
+    <div class="menu-panel">
+      <h2>✨ Psynergy Abilities</h2>
+      <div class="ability-grid">
+        <div class="ability-button">
+          <img class="ability-icon" src="../../apps/vale-v2/public/sprites/icons/psynergy/Ragnarok.gif" alt="Ragnarok">
+          <div class="ability-details">
+            <div class="ability-name">Ragnarok</div>
+            <div class="ability-cost">7 PP</div>
+            <span class="ability-element element-venus">Venus</span>
+          </div>
+        </div>
+
+        <div class="ability-button">
+          <img class="ability-icon" src="../../apps/vale-v2/public/sprites/icons/psynergy/Volcano.gif" alt="Volcano">
+          <div class="ability-details">
+            <div class="ability-name">Volcano</div>
+            <div class="ability-cost">6 PP</div>
+            <span class="ability-element element-mars">Mars</span>
+          </div>
+        </div>
+
+        <div class="ability-button">
+          <img class="ability-icon" src="../../apps/vale-v2/public/sprites/icons/psynergy/Ice.gif" alt="Ice">
+          <div class="ability-details">
+            <div class="ability-name">Ice</div>
+            <div class="ability-cost">5 PP</div>
+            <span class="ability-element element-mercury">Mercury</span>
+          </div>
+        </div>
+
+        <div class="ability-button">
+          <img class="ability-icon" src="../../apps/vale-v2/public/sprites/icons/psynergy/Thunderclap.gif" alt="Thunder">
+          <div class="ability-details">
+            <div class="ability-name">Thunderclap</div>
+            <div class="ability-cost">5 PP</div>
+            <span class="ability-element element-jupiter">Jupiter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Djinn Panel -->
+    <div class="menu-panel">
+      <h2>🌟 Djinn</h2>
+      <div class="djinn-list">
+        <div class="djinn-card">
+          <img class="djinn-sprite" src="../../apps/vale-v2/public/sprites/battle/djinn/Venus_Djinn_Front.gif" alt="Flint">
+          <div class="djinn-name">Flint</div>
+          <div class="djinn-state">Ready</div>
+        </div>
+
+        <div class="djinn-card">
+          <img class="djinn-sprite" src="../../apps/vale-v2/public/sprites/battle/djinn/Mars_Djinn_Front.gif" alt="Forge">
+          <div class="djinn-name">Forge</div>
+          <div class="djinn-state">Ready</div>
+        </div>
+
+        <div class="djinn-card">
+          <img class="djinn-sprite" src="../../apps/vale-v2/public/sprites/battle/djinn/Mercury_Djinn_Front.gif" alt="Fizz">
+          <div class="djinn-name">Fizz</div>
+          <div class="djinn-state">Standby</div>
+        </div>
+
+        <div class="djinn-card">
+          <img class="djinn-sprite" src="../../apps/vale-v2/public/sprites/battle/djinn/Jupiter_Djinn_Front.gif" alt="Gust">
+          <div class="djinn-name">Gust</div>
+          <div class="djinn-state">Ready</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="implementation-notes">
+    <h3>✅ Menu Icon Implementation Strategy:</h3>
+    <ul>
+      <li><strong>Equipment Icons:</strong> Direct ID mapping (366 item sprites available)</li>
+      <li><strong>Character Portraits:</strong> 100 character icons for menus/dialogs</li>
+      <li><strong>Ability Icons:</strong> 214 psynergy sprites with element colors</li>
+      <li><strong>Djinn Sprites:</strong> 8 total (4 elements × 2 views)</li>
+      <li><strong>Fallback System:</strong> When sprite not found, use emoji or colored div</li>
+      <li><strong>Hover Effects:</strong> CSS transitions for polish</li>
+    </ul>
+  </div>
+</body>
+</html>

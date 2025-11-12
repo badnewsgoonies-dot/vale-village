@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overworld Character Sprites Mock - Vale Chronicles</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #1a1a1a;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      color: white;
+      padding: 20px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .header p {
+      font-size: 8px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .controls h3 {
+      font-size: 10px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .direction-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .direction-buttons button {
+      font-size: 8px;
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: 2px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .direction-buttons button:hover {
+      background: #444;
+      border-color: #ffd700;
+    }
+
+    .direction-buttons button.active {
+      background: #ffd700;
+      color: #000;
+      border-color: #ffd700;
+    }
+
+    .character-select {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .character-select button {
+      font-size: 7px;
+      padding: 8px 16px;
+      background: #333;
+      color: white;
+      border: 2px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .character-select button:hover {
+      background: #444;
+    }
+
+    /* Overworld Container */
+    .overworld-container {
+      width: 800px;
+      height: 600px;
+      margin: 0 auto;
+      position: relative;
+      background: linear-gradient(135deg, #2d5016 0%, #4a7c2c 50%, #2d5016 100%);
+      border: 4px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Simple tile grid background */
+    .tile-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px),
+        repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px);
+    }
+
+    /* Town overlay */
+    .town-overlay {
+      position: absolute;
+      top: 50px;
+      left: 50px;
+      width: 200px;
+      height: 150px;
+      background: rgba(139, 69, 19, 0.3);
+      border: 2px solid rgba(139, 69, 19, 0.6);
+      border-radius: 8px;
+    }
+
+    .town-label {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 5px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Character sprites */
+    .character-sprite {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      transition: all 0.3s;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .character-sprite img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .sprite-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 6px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 3px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    /* Player (controllable) */
+    .player-sprite {
+      top: 284px;
+      left: 384px;
+      z-index: 10;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    }
+
+    /* NPCs */
+    .npc-sprite {
+      z-index: 5;
+    }
+
+    .npc-1 { top: 100px; left: 120px; }
+    .npc-2 { top: 180px; left: 300px; }
+    .npc-3 { top: 350px; left: 200px; }
+    .npc-4 { top: 450px; left: 500px; }
+
+    /* Direction showcase */
+    .direction-showcase {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+    }
+
+    .showcase-title {
+      font-size: 8px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #ffd700;
+    }
+
+    .showcase-grid {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
+
+    .showcase-item {
+      text-align: center;
+    }
+
+    .showcase-sprite {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 8px;
+      image-rendering: pixelated;
+    }
+
+    .showcase-label {
+      font-size: 6px;
+      color: #aaa;
+    }
+
+    .implementation-notes {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .implementation-notes h3 {
+      font-size: 10px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .implementation-notes ul {
+      font-size: 8px;
+      line-height: 1.8;
+      list-style-position: inside;
+    }
+
+    .sprite-gallery {
+      margin-top: 20px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .sprite-gallery h3 {
+      font-size: 10px;
+      margin-bottom: 15px;
+      color: #ffd700;
+      text-align: center;
+    }
+
+    .sprite-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 15px;
+    }
+
+    .sprite-grid-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #555;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .sprite-grid-item:hover {
+      border-color: #ffd700;
+      transform: scale(1.05);
+    }
+
+    .sprite-grid-item img {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 5px;
+      image-rendering: pixelated;
+    }
+
+    .sprite-grid-item span {
+      font-size: 5px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 Overworld Character Sprite Implementation Mock</h1>
+    <p>Protagonist walk cycles, NPC sprites, and direction-based rendering</p>
+  </div>
+
+  <div class="controls">
+    <h3>🎮 Player Controls</h3>
+    <div class="direction-buttons">
+      <button onclick="changeDirection('North')" id="btnNorth">⬆️ North</button>
+      <button onclick="changeDirection('South')" id="btnSouth" class="active">⬇️ South</button>
+      <button onclick="changeDirection('East')" id="btnEast">➡️ East</button>
+      <button onclick="changeDirection('West')" id="btnWest">⬅️ West</button>
+    </div>
+    <div class="character-select">
+      <button onclick="changeCharacter('isaac')">Isaac</button>
+      <button onclick="changeCharacter('garet')">Garet</button>
+      <button onclick="changeCharacter('ivan')">Ivan</button>
+      <button onclick="changeCharacter('mia')">Mia</button>
+      <button onclick="changeCharacter('felix')">Felix</button>
+      <button onclick="changeCharacter('jenna')">Jenna</button>
+    </div>
+  </div>
+
+  <div class="overworld-container">
+    <div class="tile-grid"></div>
+    
+    <!-- Town Area -->
+    <div class="town-overlay">
+      <div class="town-label">Vale Village</div>
+    </div>
+
+    <!-- Player -->
+    <div class="character-sprite player-sprite" id="playerSprite">
+      <img src="" alt="Player">
+      <div class="sprite-label">Isaac (Player)</div>
+    </div>
+
+    <!-- NPCs -->
+    <div class="character-sprite npc-sprite npc-1">
+      <img src="../../apps/vale-v2/public/sprites/overworld/majornpcs/Dora_South.gif" alt="NPC">
+      <div class="sprite-label">Elder</div>
+    </div>
+
+    <div class="character-sprite npc-sprite npc-2">
+      <img src="../../apps/vale-v2/public/sprites/overworld/minornpcs/Boy_Brown_South.gif" alt="NPC">
+      <div class="sprite-label">Villager</div>
+    </div>
+
+    <div class="character-sprite npc-sprite npc-3">
+      <img src="../../apps/vale-v2/public/sprites/overworld/minornpcs/Woman_Brown_South.gif" alt="NPC">
+      <div class="sprite-label">Merchant</div>
+    </div>
+
+    <div class="character-sprite npc-sprite npc-4">
+      <img src="../../apps/vale-v2/public/sprites/overworld/minornpcs/Man_Green_South.gif" alt="NPC">
+      <div class="sprite-label">Guard</div>
+    </div>
+
+    <!-- Direction Showcase -->
+    <div class="direction-showcase">
+      <div class="showcase-title">All 4 Directions (GIFs Auto-Animate Walk Cycles)</div>
+      <div class="showcase-grid" id="showcaseGrid"></div>
+    </div>
+  </div>
+
+  <div class="implementation-notes">
+    <h3>✅ Overworld Sprite Implementation Strategy:</h3>
+    <ul>
+      <li><strong>Direction System:</strong> 4 sprites per character (North, South, East, West)</li>
+      <li><strong>Auto-Animation:</strong> GIFs handle walk cycles automatically</li>
+      <li><strong>120 Protagonist Sprites:</strong> 4 directions × 30 characters</li>
+      <li><strong>166 NPC Sprites:</strong> majornpcs + minornpcs folders</li>
+      <li><strong>Simple Rendering:</strong> Show correct direction sprite, GIF does the rest</li>
+      <li><strong>Performance:</strong> Preload current area sprites only</li>
+    </ul>
+  </div>
+
+  <div class="sprite-gallery">
+    <h3>📦 Available Protagonist Sprites (Sample)</h3>
+    <div class="sprite-grid" id="spriteGallery"></div>
+  </div>
+
+  <script>
+    const SPRITE_BASE = '../../apps/vale-v2/public/sprites';
+    let currentCharacter = 'isaac';
+    let currentDirection = 'South';
+
+    const protagonists = [
+      'Isaac', 'Garet', 'Ivan', 'Mia', 'Felix', 'Jenna', 'Sheba', 'Piers'
+    ];
+
+    const directions = ['North', 'South', 'East', 'West'];
+
+    function changeDirection(direction) {
+      currentDirection = direction;
+      updatePlayerSprite();
+      
+      // Update button states
+      document.querySelectorAll('.direction-buttons button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`btn${direction}`).classList.add('active');
+    }
+
+    function changeCharacter(character) {
+      currentCharacter = character;
+      updatePlayerSprite();
+      updateShowcase();
+    }
+
+    function updatePlayerSprite() {
+      const charName = currentCharacter.charAt(0).toUpperCase() + currentCharacter.slice(1);
+      const spritePath = `${SPRITE_BASE}/overworld/protagonists/${charName}_${currentDirection}.gif`;
+      document.querySelector('#playerSprite img').src = spritePath;
+      document.querySelector('#playerSprite .sprite-label').textContent = `${charName} (Player)`;
+    }
+
+    function updateShowcase() {
+      const charName = currentCharacter.charAt(0).toUpperCase() + currentCharacter.slice(1);
+      const showcaseGrid = document.getElementById('showcaseGrid');
+      
+      showcaseGrid.innerHTML = directions.map(dir => `
+        <div class="showcase-item">
+          <img class="showcase-sprite" src="${SPRITE_BASE}/overworld/protagonists/${charName}_${dir}.gif" alt="${dir}">
+          <div class="showcase-label">${dir}</div>
+        </div>
+      `).join('');
+    }
+
+    function initSpriteGallery() {
+      const gallery = document.getElementById('spriteGallery');
+      
+      gallery.innerHTML = protagonists.map(char => `
+        <div class="sprite-grid-item">
+          <img src="${SPRITE_BASE}/overworld/protagonists/${char}_South.gif" alt="${char}">
+          <span>${char}</span>
+        </div>
+      `).join('');
+    }
+
+    // Initialize
+    updatePlayerSprite();
+    updateShowcase();
+    initSpriteGallery();
+
+    // Simulate movement
+    let position = { x: 384, y: 284 };
+    let isMoving = false;
+
+    document.addEventListener('keydown', (e) => {
+      if (isMoving) return;
+      
+      const moveSpeed = 32;
+      let newX = position.x;
+      let newY = position.y;
+      let newDir = currentDirection;
+
+      switch(e.key) {
+        case 'ArrowUp':
+        case 'w':
+          newY -= moveSpeed;
+          newDir = 'North';
+          break;
+        case 'ArrowDown':
+        case 's':
+          newY += moveSpeed;
+          newDir = 'South';
+          break;
+        case 'ArrowLeft':
+        case 'a':
+          newX -= moveSpeed;
+          newDir = 'West';
+          break;
+        case 'ArrowRight':
+        case 'd':
+          newX += moveSpeed;
+          newDir = 'East';
+          break;
+        default:
+          return;
+      }
+
+      // Bounds check
+      if (newX < 0 || newX > 768 || newY < 0 || newY > 568) return;
+
+      isMoving = true;
+      position = { x: newX, y: newY };
+      
+      if (newDir !== currentDirection) {
+        changeDirection(newDir);
+      }
+
+      const player = document.getElementById('playerSprite');
+      player.style.left = `${newX}px`;
+      player.style.top = `${newY}px`;
+
+      setTimeout(() => {
+        isMoving = false;
+      }, 300);
+    });
+  </script>
+</body>
+</html>
