@@ -12,7 +12,6 @@ export interface InventorySlice {
   
   addGold: (amount: number) => void;
   addEquipment: (items: Equipment[]) => void;
-  removeEquipment: (itemId: string) => void;
 }
 
 export const createInventorySlice: StateCreator<
@@ -34,18 +33,4 @@ export const createInventorySlice: StateCreator<
       equipment: [...state.equipment, ...items.map(item => ({ ...item }))] 
     }));
   },
-
-  removeEquipment: (itemId) => {
-    set((state) => {
-      // Find first occurrence and remove only that one (preserves duplicates)
-      const index = state.equipment.findIndex(e => e.id === itemId);
-      if (index === -1) {
-        return state; // Item not found, no change
-      }
-      const newEquipment = [...state.equipment];
-      newEquipment.splice(index, 1);
-      return { equipment: newEquipment };
-    });
-  },
 });
-

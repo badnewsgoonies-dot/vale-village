@@ -14,114 +14,66 @@ import { ABILITIES } from '../../../src/data/definitions/abilities';
 describe('Status Effects', () => {
   describe('On-Hit Status Application', () => {
     test('should apply poison status on successful hit', () => {
-      // Run multiple seeds to handle dodge flakiness (5% base miss chance)
-      let statusApplied = false;
-      
-      for (let seed = 1000; seed < 1005; seed++) {
-        const { rng } = makeTestCtx(seed);
-        
-        // Create attacker with poison-strike ability
-        const attacker = mkUnit({
-          id: 'attacker',
-          abilities: [ABILITIES['poison-strike']],
-          unlockedAbilityIds: ['poison-strike'],
-        });
-        
-        const target = mkEnemy('slime', { id: 'target' });
-        
-        const battle = mkBattle({
-          party: [attacker],
-          enemies: [target],
-        });
-        
-        try {
-          const result = performAction(battle, 'attacker', 'poison-strike', ['target'], rng);
-          
-          // Check if hit succeeded (not dodged)
-          const missEvent = result.events.find(e => e.type === 'miss');
-          if (missEvent) {
-            continue; // Skip this seed if dodged
-          }
-          
-          // Check that target has poison status
-          const updatedTarget = result.state.enemies.find(u => u.id === 'target');
-          expect(updatedTarget).toBeDefined();
-          
-          const poisonStatus = updatedTarget?.statusEffects.find(s => s.type === 'poison');
-          if (poisonStatus) {
-            expect(poisonStatus.duration).toBe(3);
-            expect(poisonStatus.damagePerTurn).toBe(8);
-            
-            // Check that status-applied event was emitted
-            const statusEvent = result.events.find(
-              e => e.type === 'status-applied' && 
-                   e.status.type === 'poison' && 
-                   e.targetId === 'target'
-            );
-            expect(statusEvent).toBeDefined();
-            
-            statusApplied = true;
-            break; // Success, exit loop
-          }
-        } catch (error) {
-          // Skip errors (e.g., invalid targets)
-          continue;
-        }
-      }
-      
-      // At least one successful hit should have applied status
-      expect(statusApplied).toBe(true);
+      const { rng } = makeTestCtx(1000);
+      const attacker = mkUnit({
+        id: 'attacker',
+        abilities: [ABILITIES['poison-strike']],
+        unlockedAbilityIds: ['poison-strike'],
+      });
+
+      const target = mkEnemy('slime', { id: 'target' });
+      const battle = mkBattle({
+        party: [attacker],
+        enemies: [target],
+      });
+
+      const result = performAction(battle, 'attacker', 'poison-strike', ['target'], rng);
+
+      const updatedTarget = result.state.enemies.find(u => u.id === 'target');
+      expect(updatedTarget).toBeDefined();
+
+      const poisonStatus = updatedTarget?.statusEffects.find(s => s.type === 'poison');
+      expect(poisonStatus).toBeDefined();
+      expect(poisonStatus?.duration).toBe(3);
+      expect(poisonStatus?.damagePerTurn).toBe(8);
+
+      const statusEvent = result.events.find(
+        e => e.type === 'status-applied' &&
+             e.status.type === 'poison' &&
+             e.targetId === 'target'
+      );
+      expect(statusEvent).toBeDefined();
     });
     
     test('should apply burn status on successful hit', () => {
-      let statusApplied = false;
-      
-      for (let seed = 2000; seed < 2005; seed++) {
-        const { rng } = makeTestCtx(seed);
-        
-        const attacker = mkUnit({
-          id: 'attacker',
-          abilities: [ABILITIES['burn-touch']],
-          unlockedAbilityIds: ['burn-touch'],
-        });
-        
-        const target = mkEnemy('slime', { id: 'target' });
-        const battle = mkBattle({
-          party: [attacker],
-          enemies: [target],
-        });
-        
-        try {
-          const result = performAction(battle, 'attacker', 'burn-touch', ['target'], rng);
-          
-          const missEvent = result.events.find(e => e.type === 'miss');
-          if (missEvent) {
-            continue;
-          }
-          
-          const updatedTarget = result.state.enemies.find(u => u.id === 'target');
-          const burnStatus = updatedTarget?.statusEffects.find(s => s.type === 'burn');
-          
-          if (burnStatus) {
-            expect(burnStatus.duration).toBe(3);
-            expect(burnStatus.damagePerTurn).toBe(10);
-            
-            const statusEvent = result.events.find(
-              e => e.type === 'status-applied' && 
-                   e.status.type === 'burn' && 
-                   e.targetId === 'target'
-            );
-            expect(statusEvent).toBeDefined();
-            
-            statusApplied = true;
-            break;
-          }
-        } catch (error) {
-          continue;
-        }
-      }
-      
-      expect(statusApplied).toBe(true);
+      const { rng } = makeTestCtx(2000);
+      const attacker = mkUnit({
+        id: 'attacker',
+        abilities: [ABILITIES['burn-touch']],
+        unlockedAbilityIds: ['burn-touch'],
+      });
+
+      const target = mkEnemy('slime', { id: 'target' });
+      const battle = mkBattle({
+        party: [attacker],
+        enemies: [target],
+      });
+
+      const result = performAction(battle, 'attacker', 'burn-touch', ['target'], rng);
+
+      const updatedTarget = result.state.enemies.find(u => u.id === 'target');
+      const burnStatus = updatedTarget?.statusEffects.find(s => s.type === 'burn');
+
+      expect(burnStatus).toBeDefined();
+      expect(burnStatus?.duration).toBe(3);
+      expect(burnStatus?.damagePerTurn).toBe(10);
+
+      const statusEvent = result.events.find(
+        e => e.type === 'status-applied' &&
+             e.status.type === 'burn' &&
+             e.targetId === 'target'
+      );
+      expect(statusEvent).toBeDefined();
     });
   });
   
@@ -314,4 +266,3 @@ describe('Status Effects', () => {
     });
   });
 });
-

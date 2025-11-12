@@ -133,7 +133,6 @@ function applySystemTick(
         type: 'hit',
         targetId: tick.actorId,
         amount: statusResult.damage,
-        crit: false,
       });
     }
 
@@ -224,4 +223,3 @@ export function playReplay(tape: ReplayTape): ReplayResult {
     };
   }
 }
-

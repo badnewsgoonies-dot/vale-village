@@ -75,7 +75,7 @@ export const PRECISE_JAB: Ability = {
   basePower: 12,
   targets: 'single-enemy',
   unlockLevel: 1,
-  description: 'High accuracy attack that cannot crit',
+  description: 'High accuracy physical attack',
   aiHints: {
     priority: 1.5,
     target: 'weakest',
@@ -285,9 +285,9 @@ export const BLIND: Ability = {
   basePower: 0,
   targets: 'single-enemy',
   unlockLevel: 2,
-  description: 'Reduces enemy accuracy',
+  description: 'Reduces enemy speed',
   buffEffect: {
-    evasion: -20, // Negative evasion = accuracy debuff
+    spd: -3,
   },
   duration: 2,
   aiHints: {

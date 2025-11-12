@@ -31,7 +31,6 @@ export interface Equipment {
   // Special properties
   readonly unlocksAbility?: string;      // Legendary equipment unlocks abilities
   readonly elementalResist?: number;     // e.g., 0.2 = 20% reduction
-  readonly evasion?: number;             // Dodge chance bonus (percentage)
   readonly alwaysFirstTurn?: boolean;    // Hermes' Sandals property
 }
 
@@ -78,4 +77,3 @@ export function calculateEquipmentBonuses(loadout: EquipmentLoadout): Partial<St
 
   return totals;
 }
-

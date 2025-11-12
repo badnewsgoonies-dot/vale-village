@@ -59,7 +59,7 @@ function scoreAbility(
   let estimatedValue = 0;
 
   if (ability.type === 'physical' || ability.type === 'psynergy') {
-    // Estimate damage using effective stats (simplified - doesn't account for crit/dodge variance)
+    // Estimate damage using effective stats (simplified - ignores global modifiers)
     // Note: We need team for effective stats, but scoreAbility doesn't have it
     // For now, use base stats + level bonuses (equipment/Djinn/status will be handled in actual execution)
     // TODO: Pass team to scoreAbility for accurate effective stats
@@ -350,4 +350,3 @@ export function makeAIDecision(
     targetIds,
   };
 }
-

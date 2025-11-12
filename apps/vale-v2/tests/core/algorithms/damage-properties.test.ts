@@ -1,12 +1,10 @@
 import { describe, test, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { makePRNG } from '../../../src/core/random/prng';
 import { createUnit } from '../../../src/core/models/Unit';
 import { createTeam } from '../../../src/core/models/Team';
 import type { UnitDefinition } from '../../../src/core/models/Unit';
+import type { Ability } from '../../../src/data/schemas/AbilitySchema';
 import {
-  checkCriticalHit,
-  checkDodge,
   calculatePhysicalDamage,
   applyHealing,
 } from '../../../src/core/algorithms/damage';
@@ -43,73 +41,33 @@ describe('Damage Algorithm Properties', () => {
     return createUnit(definition, 1, 0);
   };
 
-  test('should cap crit chance at 35% regardless of SPD', () => {
-    fc.assert(
-      fc.property(fc.integer({ min: 0, max: 999 }), (spd) => {
-        const unit = createSampleUnit(spd);
-        const team = createTeam([unit, createSampleUnit(10), createSampleUnit(10), createSampleUnit(10)]);
-        const rng = makePRNG(12345);
-        
-        // Test multiple times to get average
-        let critCount = 0;
-        const trials = 1000;
-        for (let i = 0; i < trials; i++) {
-          const testRng = makePRNG(12345 + i);
-          if (checkCriticalHit(unit, team, testRng)) {
-            critCount++;
-          }
-        }
-        
-        const critRate = critCount / trials;
-        // Should be capped at 35% (with some variance for randomness)
-        expect(critRate).toBeLessThanOrEqual(0.40); // Allow 5% variance
-      })
-    );
-  });
+  const physicalAbility: Ability = {
+    id: 'test-strike',
+    name: 'Test Strike',
+    type: 'physical',
+    manaCost: 0,
+    basePower: 10,
+    targets: 'single-enemy',
+    unlockLevel: 1,
+    description: 'Test strike ability',
+  };
 
-  test('should maintain hit chance bounds (5% to 95%)', () => {
-    fc.assert(
-      fc.property(
-        fc.integer({ min: 0, max: 100 }), // attacker SPD
-        fc.integer({ min: 0, max: 100 }), // defender SPD
-        fc.integer({ min: 0, max: 100 }), // equipment evasion %
-        fc.float({ min: 0.5, max: 1.0 }).filter(x => !isNaN(x) && isFinite(x)), // ability accuracy
-        (attackerSpd, defenderSpd, equipmentEvasion, abilityAccuracy) => {
-          // Skip invalid inputs
-          if (isNaN(abilityAccuracy) || !isFinite(abilityAccuracy)) {
-            return true;
-          }
+  test('physical damage is deterministic given the same inputs', () => {
+    const attacker = createSampleUnit(15);
+    const defender = createSampleUnit(12);
+    const team = createTeam([
+      attacker,
+      createSampleUnit(10),
+      createSampleUnit(11),
+      createSampleUnit(9),
+    ]);
 
-          const attacker = createSampleUnit(attackerSpd);
-          const defender = createSampleUnit(defenderSpd);
-          
-          // Set equipment evasion
-          defender.equipment = {
-            ...defender.equipment,
-            boots: {
-              id: 'test-boots',
-              name: 'Test Boots',
-              slot: 'boots',
-              tier: 'basic',
-              cost: 100,
-              statBonus: {},
-              evasion: equipmentEvasion,
-            },
-          };
-          
-          const team = createTeam([attacker, createSampleUnit(10), createSampleUnit(10), createSampleUnit(10)]);
-          
-          // Calculate hit chance (same logic as checkDodge)
-          const BASE_EVASION = 0.05;
-          const speedBonus = (defenderSpd - attackerSpd) * 0.01;
-          const evasion = Math.min(0.40, BASE_EVASION + (equipmentEvasion / 100) + speedBonus);
-          const hitChance = Math.max(0.05, Math.min(0.95, abilityAccuracy * (1 - evasion)));
-          
-          expect(hitChance).toBeGreaterThanOrEqual(0.05);
-          expect(hitChance).toBeLessThanOrEqual(0.95);
-        }
-      )
-    );
+    const firstPass = calculatePhysicalDamage(attacker, defender, team, physicalAbility);
+    const secondPass = calculatePhysicalDamage(attacker, defender, team, physicalAbility);
+
+    expect(firstPass).toBeGreaterThanOrEqual(1);
+    expect(secondPass).toBeGreaterThanOrEqual(1);
+    expect(secondPass).toBe(firstPass);
   });
 
   test('should clamp healing to max HP', () => {
@@ -126,4 +84,3 @@ describe('Damage Algorithm Properties', () => {
     );
   });
 });
-

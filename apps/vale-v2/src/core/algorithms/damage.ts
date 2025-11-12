@@ -6,7 +6,6 @@
 import type { Unit } from '../models/Unit';
 import type { Team } from '../models/Team';
 import type { Ability } from '../../data/schemas/AbilitySchema';
-import type { PRNG } from '../random/prng';
 import type { Element } from '../models/types';
 import { calculateMaxHp, isUnitKO } from '../models/Unit';
 import { calculateEffectiveStats } from './stats';
@@ -45,75 +44,9 @@ export function getElementModifier(attackElement: Element, defenseElement: Eleme
 }
 
 /**
- * Get random damage multiplier (±10% variance)
- * From GAME_MECHANICS.md Section 5.2
- * Returns value in [0.9, 1.1)
- */
-export function getRandomMultiplier(rng: PRNG): number {
-  return BATTLE_CONSTANTS.DAMAGE_VARIANCE_MIN + (rng.next() * BATTLE_CONSTANTS.DAMAGE_VARIANCE_RANGE);
-}
-
-/**
- * Check for critical hit
- * From GAME_MECHANICS.md Section 6.2
- * Base 5% + sqrt(effective SPD) scaling (sublinear growth)
- * Capped at 35% to prevent crit explosion at high SPD
- * Critical hits deal 2.0x damage
- * Uses effective SPD (base + level + equipment + Djinn + status)
- */
-export function checkCriticalHit(attacker: Unit, team: Team, rng: PRNG): boolean {
-  const effectiveStats = calculateEffectiveStats(attacker, team);
-  const spdBonus = Math.sqrt(effectiveStats.spd) / BATTLE_CONSTANTS.CRIT_SPD_SCALING; // ~0.07 at SPD=200
-
-  const totalChance = Math.min(
-    BATTLE_CONSTANTS.BASE_CRIT_CHANCE + spdBonus,
-    BATTLE_CONSTANTS.MAX_CRIT_CHANCE
-  ); // Hard cap at 35%
-
-  return rng.next() < totalChance;
-}
-
-/**
- * Check if defender dodges attacker's ability
- * From GAME_MECHANICS.md Section 5.1.4
- * Separates accuracy (ability property) from evasion (defender property)
- * Multiplicative combination with hard cap evasion at 40%
- * Minimum hit chance floor of 5%
- * Uses effective stats for both attacker and defender
- */
-export function checkDodge(
-  attacker: Unit,
-  defender: Unit,
-  team: Team,
-  abilityAccuracy: number = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY,
-  rng: PRNG
-): boolean {
-  const attackerEffective = calculateEffectiveStats(attacker, team);
-  const defenderEffective = calculateEffectiveStats(defender, team);
-
-  const equipmentEvasion = defender.equipment.boots?.evasion || 0;
-  const speedBonus = (defenderEffective.spd - attackerEffective.spd) * BATTLE_CONSTANTS.SPD_TO_EVASION_RATE;
-
-  // Hard cap evasion at 40%
-  const evasion = Math.min(
-    BATTLE_CONSTANTS.MAX_EVASION,
-    BATTLE_CONSTANTS.BASE_EVASION + (equipmentEvasion / 100) + speedBonus
-  );
-
-  // Multiplicative: hitChance = accuracy * (1 - evasion)
-  // Clamp between 5% and 95%
-  const hitChance = Math.max(
-    BATTLE_CONSTANTS.MIN_HIT_CHANCE,
-    Math.min(BATTLE_CONSTANTS.MAX_HIT_CHANCE, abilityAccuracy * (1 - evasion))
-  );
-
-  return rng.next() >= hitChance; // Returns true if dodged (missed)
-}
-
-/**
  * Calculate physical damage
  * From GAME_MECHANICS.md Section 5.2
- * Formula: (basePower + effective ATK - (effective DEF × 0.5)) × randomMultiplier
+ * Formula: basePower + effective ATK - (effective DEF × 0.5)
  * Always returns at least 1 damage
  * Uses effective stats (base + level + equipment + Djinn + status)
  */
@@ -121,8 +54,7 @@ export function calculatePhysicalDamage(
   attacker: Unit,
   defender: Unit,
   team: Team,
-  ability: Ability,
-  rng: PRNG
+  ability: Ability
 ): number {
   const attackerEffective = calculateEffectiveStats(attacker, team);
   const defenderEffective = calculateEffectiveStats(defender, team);
@@ -131,7 +63,7 @@ export function calculatePhysicalDamage(
   const attackPower = attackerEffective.atk;
   const defense = defenderEffective.def;
 
-  const rawDamage = (baseDamage + attackPower - (defense * BATTLE_CONSTANTS.DEFENSE_MULTIPLIER)) * getRandomMultiplier(rng);
+  const rawDamage = baseDamage + attackPower - (defense * BATTLE_CONSTANTS.DEFENSE_MULTIPLIER);
   const damage = Math.max(BATTLE_CONSTANTS.MINIMUM_DAMAGE, Math.floor(rawDamage));
 
   return damage;
@@ -140,7 +72,7 @@ export function calculatePhysicalDamage(
 /**
  * Calculate Psynergy (magic) damage
  * From GAME_MECHANICS.md Section 5.2
- * Formula: (basePower + effective MAG - (effective DEF × 0.3)) × elementModifier × randomMultiplier
+ * Formula: (basePower + effective MAG - (effective DEF × 0.3)) × elementModifier
  * Always returns at least 1 damage
  * Uses effective stats (base + level + equipment + Djinn + status)
  */
@@ -148,8 +80,7 @@ export function calculatePsynergyDamage(
   attacker: Unit,
   defender: Unit,
   team: Team,
-  ability: Ability,
-  rng: PRNG
+  ability: Ability
 ): number {
   const attackerEffective = calculateEffectiveStats(attacker, team);
   const defenderEffective = calculateEffectiveStats(defender, team);
@@ -163,7 +94,7 @@ export function calculatePsynergyDamage(
     ? getElementModifier(ability.element, defender.element)
     : 1.0;
 
-  let rawDamage = (basePower + magicPower - magicDefense) * elementModifier * getRandomMultiplier(rng);
+  let rawDamage = (basePower + magicPower - magicDefense) * elementModifier;
 
   // Apply elemental resist from armor (e.g., Dragon Scales)
   const resist = defender.equipment.armor?.elementalResist || 0;
@@ -179,15 +110,14 @@ export function calculatePsynergyDamage(
 /**
  * Calculate healing amount
  * From GAME_MECHANICS.md Section 5.2
- * Formula: (basePower + effective MAG) × randomMultiplier
+ * Formula: basePower + effective MAG
  * Always returns at least 1 healing (if basePower > 0)
  * Uses effective MAG (base + level + equipment + Djinn + status)
  */
 export function calculateHealAmount(
   caster: Unit,
   team: Team,
-  ability: Ability,
-  rng: PRNG
+  ability: Ability
 ): number {
   const baseHeal = ability.basePower || 0;
 
@@ -203,7 +133,7 @@ export function calculateHealAmount(
   const casterEffective = calculateEffectiveStats(caster, team);
   const magicPower = casterEffective.mag;
 
-  const rawHeal = (baseHeal + magicPower) * getRandomMultiplier(rng);
+  const rawHeal = baseHeal + magicPower;
   const healAmount = Math.max(BATTLE_CONSTANTS.MINIMUM_HEALING, Math.floor(rawHeal));
 
   return healAmount;

@@ -973,7 +973,9 @@ Before marking complete, verify:
 
 ---
 
-## ESTIMATED TIMELINE
+## IMPLEMENTATION ROADMAP
+
+Delivering the eight phases listed above (removal of deprecated systems, auto-heal, mana generation, predetermined rewards, djinn recovery, unit-locked equipment, djinn abilities, and djinn mechanics update) completes the full overhaul in ~21 days (3 weeks).
 
 | Phase | Days | Priority |
 |-------|------|----------|
@@ -990,4 +992,3 @@ Before marking complete, verify:
 ---
 
 **Ready to start? Begin with Phase 1 (Remove Deprecated Systems) - highest value, lowest risk!**
-

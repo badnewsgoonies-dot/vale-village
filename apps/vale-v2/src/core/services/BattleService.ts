@@ -17,8 +17,6 @@ import {
   calculateHealAmount,
   applyDamage,
   applyHealing,
-  checkCriticalHit,
-  checkDodge,
 } from '../algorithms/damage';
 import { calculateTurnOrder } from '../algorithms/turn-order';
 import {
@@ -36,8 +34,6 @@ import type { BattleEvent } from './types';
 export interface ActionResult {
   damage?: number;
   healing?: number;
-  critical?: boolean;
-  dodged?: boolean;
   message: string;
   targetIds: readonly string[];
   updatedUnits: readonly Unit[];
@@ -155,7 +151,7 @@ export function performAction(
   // Execute ability with validated alive targets
   // Pass team for effective stats calculation
   const allUnits = [...state.playerTeam.units, ...state.enemies];
-  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, rng);
+  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam);
 
   // Update battle state with new units
   const updatedPlayerUnits = state.playerTeam.units.map(u => {
@@ -186,27 +182,19 @@ export function performAction(
     targets: targetIds,
   }];
 
-  // Add hit/miss/heal events
+  // Add hit/heal events
   if (result.damage !== undefined) {
-    if (result.dodged) {
-      events.push({
-        type: 'miss',
-        targetId: targetIds[0] || '',
-      });
-    } else {
-      targetIds.forEach(targetId => {
-        const target = targets.find(t => t.id === targetId);
-        if (target) {
-          events.push({
-            type: 'hit',
-            targetId,
-            amount: result.damage || 0,
-            crit: result.critical || false,
-            element: ability.element,
-          });
-        }
-      });
-    }
+    targetIds.forEach(targetId => {
+      const target = targets.find(t => t.id === targetId);
+      if (target) {
+        events.push({
+          type: 'hit',
+          targetId,
+          amount: result.damage || 0,
+          element: ability.element,
+        });
+      }
+    });
   }
 
   if (result.healing !== undefined) {
@@ -220,7 +208,7 @@ export function performAction(
   }
 
   // Emit status-applied events for newly added status effects (on-hit statuses)
-  if (!result.dodged && ability.statusEffect) {
+  if (ability.statusEffect) {
     targetIds.forEach(targetId => {
       const beforeStatuses = statusEffectsBefore.get(targetId) || [];
       const afterUnit = result.updatedUnits.find(u => u.id === targetId);
@@ -254,73 +242,40 @@ function executeAbility(
   ability: Ability,
   targets: readonly Unit[],
   allUnits: readonly Unit[],
-  team: Team,
-  rng: PRNG
+  team: Team
 ): ActionResult {
   const targetIds = targets.map(t => t.id);
   let message = `${caster.name} uses ${ability.name}!`;
   const updatedUnits: Unit[] = [];
-
-  // Check for critical hit (physical and psynergy only)
-  // Uses effective SPD for crit chance calculation
-  const isCritical = (ability.type === 'physical' || ability.type === 'psynergy')
-    && checkCriticalHit(caster, team, rng);
 
   // Execute based on ability type
   switch (ability.type) {
     case 'physical':
     case 'psynergy': {
       let totalDamage = 0;
-      let anyDodged = false;
 
       for (const target of targets) {
         // Re-validate target exists and is alive (may have been KO'd by previous hits)
-        const currentTarget = updatedUnits.find(u => u.id === target.id) || 
+        const currentTarget = updatedUnits.find(u => u.id === target.id) ||
                              allUnits.find(u => u.id === target.id);
         if (!currentTarget || isUnitKO(currentTarget)) {
-          // Target already KO'd, skip
           continue;
         }
 
-        // Check for dodge BEFORE calculating damage
-        // Default accuracy (abilities can override this in the future)
-        // Uses effective stats for both attacker and defender
-        const abilityAccuracy = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY; // TODO: Add accuracy property to Ability schema
-        const dodged = checkDodge(caster, currentTarget, team, abilityAccuracy, rng);
-        
-        if (dodged) {
-          anyDodged = true;
-          // Keep current state (may have been updated by previous hits)
-          const existingUnit = updatedUnits.find(u => u.id === currentTarget.id) || currentTarget;
-          if (existingUnit) {
-            updatedUnits.push(existingUnit);
-          }
-          continue;
-        }
-
-        // Use effective stats for damage calculation
-        let damage = ability.type === 'physical'
-          ? calculatePhysicalDamage(caster, currentTarget, team, ability, rng)
-          : calculatePsynergyDamage(caster, currentTarget, team, ability, rng);
-
-        // Apply critical hit multiplier
-        if (isCritical) {
-          damage = Math.floor(damage * BATTLE_CONSTANTS.CRITICAL_HIT_MULTIPLIER);
-        }
+        const damage = ability.type === 'physical'
+          ? calculatePhysicalDamage(caster, currentTarget, team, ability)
+          : calculatePsynergyDamage(caster, currentTarget, team, ability);
 
         let damagedUnit = applyDamage(currentTarget, damage);
-        
-        // Apply status effect if ability has one (only on successful hit, not dodged)
+
         if (ability.statusEffect) {
           const statusType = ability.statusEffect.type;
           const statusDuration = ability.statusEffect.duration;
-          
-          // Remove existing same-type status (prevent stacking)
+
           const filteredStatuses = damagedUnit.statusEffects.filter(
             s => s.type !== statusType
           );
-          
-          // Create new status effect based on type
+
           let newStatus: typeof damagedUnit.statusEffects[number];
           if (statusType === 'poison') {
             newStatus = {
@@ -339,21 +294,19 @@ function executeAbility(
               type: 'freeze',
               duration: statusDuration,
             };
-          } else { // paralyze
+          } else {
             newStatus = {
               type: 'paralyze',
               duration: statusDuration,
             };
           }
-          
-          // Apply new status
+
           damagedUnit = {
             ...damagedUnit,
             statusEffects: [...filteredStatuses, newStatus],
           };
         }
-        
-        // Update or add to updatedUnits
+
         const existingIndex = updatedUnits.findIndex(u => u.id === damagedUnit.id);
         if (existingIndex >= 0) {
           updatedUnits[existingIndex] = damagedUnit;
@@ -363,25 +316,7 @@ function executeAbility(
         totalDamage += damage;
       }
 
-      // Build message
-      if (anyDodged && totalDamage === 0) {
-        message += ' Miss!';
-        return {
-          message,
-          targetIds,
-          dodged: true,
-          damage: 0,
-          updatedUnits: updatedUnits.length > 0 ? updatedUnits : [...allUnits],
-        };
-      }
-
-      if (anyDodged && totalDamage > 0) {
-        message += isCritical ? ' Critical hit!' : '';
-        message += ` Deals ${totalDamage} damage! (Some attacks missed)`;
-      } else {
-        message += isCritical ? ' Critical hit!' : '';
-        message += ` Deals ${totalDamage} damage!`;
-      }
+      message += ` Deals ${totalDamage} damage!`;
 
       const finalUnits = allUnits.map(u => {
         const updated = updatedUnits.find(up => up.id === u.id);
@@ -390,7 +325,6 @@ function executeAbility(
 
       return {
         damage: totalDamage,
-        critical: isCritical,
         message,
         targetIds,
         updatedUnits: finalUnits,
@@ -411,7 +345,7 @@ function executeAbility(
           totalHealing += revivedUnit.currentHp;
         } else if (!isUnitKO(target)) {
           // Use effective MAG for healing calculation
-          const healAmount = calculateHealAmount(caster, team, ability, rng);
+          const healAmount = calculateHealAmount(caster, team, ability);
           const healedUnit = applyHealing(target, healAmount, ability.revivesFallen || false);
           updatedUnits.push(healedUnit);
           totalHealing += healedUnit.currentHp - target.currentHp;
@@ -645,7 +579,6 @@ export function startTurnTick(
       type: 'hit',
       targetId: currentActorId,
       amount: statusResult.damage,
-      crit: false,
     });
   }
 
@@ -666,4 +599,3 @@ export function startTurnTick(
 
   return { updatedState: updatedBattle, events: newEvents };
 }
-

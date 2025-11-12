@@ -1,13 +1,13 @@
 /**
  * ShopScreen Component
- * Buy and sell equipment
+ * Unlock equipment
  */
 
 import { useState } from 'react';
 import { useStore } from '../state/store';
 import { SHOPS } from '../../data/definitions/shops';
 import { EQUIPMENT } from '../../data/definitions/equipment';
-import { buyItem, sellItem, getSellPrice, canAffordItem } from '../../core/services/ShopService';
+import { buyItem, canAffordItem } from '../../core/services/ShopService';
 import { EquipmentIcon } from './EquipmentIcon';
 import './ShopScreen.css';
 import type { Equipment } from '../../core/models/Equipment';
@@ -17,22 +17,16 @@ interface ShopScreenProps {
   onClose: () => void;
 }
 
-type Tab = 'buy' | 'sell';
-
 export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
-  const { gold, equipment, addGold, addEquipment, removeEquipment } = useStore((s) => ({
+  const { gold, addGold, addEquipment } = useStore((s) => ({
     gold: s.gold,
-    equipment: s.equipment,
     addGold: s.addGold,
     addEquipment: s.addEquipment,
-    removeEquipment: s.removeEquipment,
   }));
 
   const storyFlags = useStore((s) => s.story.flags);
 
-  const [activeTab, setActiveTab] = useState<Tab>('buy');
   const [error, setError] = useState<string | null>(null);
-  const [sellingItemId, setSellingItemId] = useState<string | null>(null);
 
   const shop = SHOPS[shopId];
   if (!shop) {
@@ -54,7 +48,7 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
         .filter((item): item is Equipment => Boolean(item))
     : [];
 
-  const handleBuy = (itemId: string) => {
+  const handleUnlock = (itemId: string) => {
     setError(null);
     const result = buyItem(gold, itemId);
     if (!result.ok) {
@@ -64,29 +58,6 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
 
     addGold(-EQUIPMENT[itemId]!.cost);
     addEquipment([result.value.item]);
-  };
-
-  const handleSellClick = (itemId: string) => {
-    setSellingItemId(itemId);
-  };
-
-  const handleConfirmSell = () => {
-    if (!sellingItemId) return;
-
-    setError(null);
-    const result = sellItem(gold, sellingItemId);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-
-    addGold(result.value.sellPrice);
-    removeEquipment(sellingItemId);
-    setSellingItemId(null);
-  };
-
-  const handleCancelSell = () => {
-    setSellingItemId(null);
   };
 
   return (
@@ -110,128 +81,50 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="shop-tabs">
-          <button
-            className={`tab-btn ${activeTab === 'buy' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('buy');
-              setError(null);
-            }}
-          >
-            Buy
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'sell' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('sell');
-              setError(null);
-            }}
-          >
-            Sell
-          </button>
-        </div>
-
-        {/* Buy Tab */}
-        {activeTab === 'buy' && (
-          <div className="shop-content">
-            {!isUnlocked ? (
-              <div className="shop-locked">
-                This shop is not yet available.
-              </div>
-            ) : availableItems.length === 0 ? (
-              <div className="shop-empty">No items available.</div>
-            ) : (
-              <div className="shop-items-grid">
-                {availableItems.map((item) => {
-                  const affordable = canAffordItem(gold, item.id);
-                  return (
-                    <div
-                      key={item.id}
-                      className={`shop-item-card ${!affordable ? 'unaffordable' : ''}`}
+        <div className="shop-content">
+          {!isUnlocked ? (
+            <div className="shop-locked">
+              This shop is not yet available.
+            </div>
+          ) : availableItems.length === 0 ? (
+            <div className="shop-empty">No items available.</div>
+          ) : (
+            <div className="shop-items-grid">
+              {availableItems.map((item) => {
+                const affordable = canAffordItem(gold, item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className={`shop-item-card ${!affordable ? 'unaffordable' : ''}`}
+                  >
+                    <div className="item-icon">
+                      <EquipmentIcon equipment={item} />
+                    </div>
+                    <div className="item-details">
+                      <div className="item-name">{item.name}</div>
+                      <div className="item-stats">
+                        {Object.entries(item.statBonus).map(([stat, value]) => (
+                          <span key={stat} className="stat-badge">
+                            +{value} {stat.toUpperCase()}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="item-price">{item.cost}g</div>
+                    </div>
+                    <button
+                      className="buy-btn"
+                      onClick={() => handleUnlock(item.id)}
+                      disabled={!affordable}
                     >
-                      <div className="item-icon">
-                        <EquipmentIcon equipment={item} />
-                      </div>
-                      <div className="item-details">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-stats">
-                          {Object.entries(item.statBonus).map(([stat, value]) => (
-                            <span key={stat} className="stat-badge">
-                              +{value} {stat.toUpperCase()}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="item-price">{item.cost}g</div>
-                      </div>
-                      <button
-                        className="buy-btn"
-                        onClick={() => handleBuy(item.id)}
-                        disabled={!affordable}
-                      >
-                        Buy
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Sell Tab */}
-        {activeTab === 'sell' && (
-          <div className="shop-content">
-            {equipment.length === 0 ? (
-              <div className="shop-empty">No items to sell.</div>
-            ) : (
-              <div className="shop-items-grid">
-                {equipment.map((item) => {
-                  const sellPrice = getSellPrice(item.id);
-                  const isConfirming = sellingItemId === item.id;
-                  return (
-                    <div key={item.id} className="shop-item-card">
-                      <div className="item-icon">
-                        <EquipmentIcon equipment={item} />
-                      </div>
-                      <div className="item-details">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-stats">
-                          {Object.entries(item.statBonus).map(([stat, value]) => (
-                            <span key={stat} className="stat-badge">
-                              +{value} {stat.toUpperCase()}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="item-price">Sell: {sellPrice}g</div>
-                      </div>
-                      {isConfirming ? (
-                        <div className="sell-confirm">
-                          <button className="confirm-btn" onClick={handleConfirmSell}>
-                            Confirm
-                          </button>
-                          <button className="cancel-btn" onClick={handleCancelSell}>
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="sell-btn"
-                          onClick={() => handleSellClick(item.id)}
-                        >
-                          Sell
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                      Unlock Equipment
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
-

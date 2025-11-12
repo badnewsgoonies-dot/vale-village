@@ -330,9 +330,10 @@ describe('QueueBattleService', () => {
 
       const result = executeRound(state, rng);
 
-      // Should have miss event for KO'd unit
-      const missEvent = result.events.find(e => e.type === 'miss');
-      expect(missEvent).toBeDefined();
+      const hitsAgainstEnemy = result.events.filter(
+        e => e.type === 'hit' && e.targetId === 'enemy1'
+      );
+      expect(hitsAgainstEnemy.length).toBe(3);
     });
 
     test('should retarget if original target is KO\'d during round', () => {
@@ -527,4 +528,3 @@ describe('QueueBattleService', () => {
     });
   });
 });
-

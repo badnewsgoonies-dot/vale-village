@@ -501,7 +501,6 @@ export const LUCKY_MEDAL: Equipment = {
   tier: 'silver',
   cost: 1800,
   statBonus: { spd: 5 },
-  evasion: 10, // 10% dodge chance
 };
 
 export const ELEMENTAL_STAR: Equipment = {

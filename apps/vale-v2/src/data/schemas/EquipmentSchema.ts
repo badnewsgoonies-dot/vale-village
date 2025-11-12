@@ -45,7 +45,6 @@ export const EquipmentSchema = z.object({
   unlocksAbility: z.string().optional(),
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)
-  evasion: z.number().min(0).max(100).optional(), // 0-100 percentage
   alwaysFirstTurn: z.boolean().optional(),
 });
 
@@ -63,4 +62,3 @@ export const EquipmentLoadoutSchema = z.object({
 });
 
 export type EquipmentLoadout = z.infer<typeof EquipmentLoadoutSchema>;
-

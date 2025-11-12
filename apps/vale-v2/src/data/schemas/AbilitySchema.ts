@@ -33,7 +33,6 @@ export const AbilitySchema = z.object({
     def: z.number().optional(),
     mag: z.number().optional(),
     spd: z.number().optional(),
-    evasion: z.number().optional(),
   }).optional(),
   duration: z.number().int().min(1).optional(),
   
@@ -53,4 +52,3 @@ export const AbilitySchema = z.object({
 });
 
 export type Ability = z.infer<typeof AbilitySchema>;
-

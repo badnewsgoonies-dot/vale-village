@@ -123,7 +123,6 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
               spd: 'SPD',
               hp: 'HP',
               pp: 'PP',
-              evasion: 'EVA',
             };
 
             const config = statusConfig[status.type] || {
@@ -189,4 +188,3 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
     </div>
   );
 }
-

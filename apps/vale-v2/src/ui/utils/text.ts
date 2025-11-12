@@ -12,9 +12,7 @@ export function renderEventText(e: BattleEvent): string {
     case 'ability':
       return `${e.casterId} used ${e.abilityId}`;
     case 'hit':
-      return `${e.targetId} took ${e.amount}${e.crit ? ' (CRIT)' : ''}${e.element ? ` [${e.element}]` : ''}`;
-    case 'miss':
-      return `${e.targetId} dodged!`;
+      return `${e.targetId} took ${e.amount}${e.element ? ` [${e.element}]` : ''}`;
     case 'heal':
       return `${e.targetId} recovered ${e.amount} HP`;
     case 'status-applied': {
@@ -53,4 +51,3 @@ export function renderEventText(e: BattleEvent): string {
     }
   }
 }
-

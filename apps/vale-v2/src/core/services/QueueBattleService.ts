@@ -214,11 +214,7 @@ function executePlayerActionsPhase(
         abilityId: action.abilityId || 'strike',
         targets: action.targetIds,
       });
-      events.push({
-        type: 'miss',
-        targetId: action.targetIds[0] || '',
-      });
-      continue;
+    continue;
     }
 
     const validTargets = resolveValidTargets(action, currentState);
@@ -413,7 +409,6 @@ function executeDjinnSummons(
         type: 'hit',
         targetId: enemy.id,
         amount: damage,
-        crit: false,
       });
       targetsHit.push(enemy.id);
       return { ...enemy, currentHp: newHp };
@@ -433,7 +428,6 @@ function executeDjinnSummons(
         type: 'hit',
         targetId: target.id,
         amount: damage,
-        crit: false,
       });
       targetsHit.push(target.id);
       const updatedEnemies = currentState.enemies.map(e =>
