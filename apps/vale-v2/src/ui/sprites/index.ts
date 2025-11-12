@@ -1,9 +1,10 @@
 /**
- * Sprite System Exports
+ * Sprite Components
+ * Export all sprite-related components
  */
 
-export * from './types';
-export * from './manifest';
-export * from './loader';
 export { Sprite } from './Sprite';
-
+export { SimpleSprite } from './SimpleSprite';
+export { BackgroundSprite } from './BackgroundSprite';
+export * from './catalog';
+export * from './types';

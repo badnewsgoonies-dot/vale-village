@@ -12,6 +12,7 @@ import { BattleLog } from './BattleLog';
 import { UnitCard } from './UnitCard';
 import { PostBattleCutscene } from './PostBattleCutscene';
 import { VictoryOverlay } from './VictoryOverlay';
+import { BackgroundSprite } from '../sprites/BackgroundSprite';
 
 export function BattleView() {
   // Use narrow selectors to minimize re-renders
@@ -102,33 +103,50 @@ export function BattleView() {
   const enemies = battle.enemies;
 
   return (
-    <div className="battle-root" style={{ padding: '1rem' }}>
-      <TurnOrderStrip state={battle} />
+    <div className="battle-root" style={{ position: 'relative', width: '100%', minHeight: '600px' }}>
+      {/* Battle Background */}
+      <BackgroundSprite 
+        id="random"
+        category="backgrounds-gs1"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+        }}
+      />
       
-      <div className="stage" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
-        <div className="player-side" style={{ flex: 1 }}>
-          <h3>Player Team</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {playerUnits.map((unit) => (
-              <UnitCard key={unit.id} unit={unit} isPlayer={true} team={battle.playerTeam} />
-            ))}
+      {/* Battle UI Overlay */}
+      <div style={{ position: 'relative', zIndex: 1, padding: '1rem' }}>
+        <TurnOrderStrip state={battle} />
+        
+        <div className="stage" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
+          <div className="player-side" style={{ flex: 1 }}>
+            <h3 style={{ color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>Player Team</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {playerUnits.map((unit) => (
+                <UnitCard key={unit.id} unit={unit} isPlayer={true} team={battle.playerTeam} />
+              ))}
+            </div>
+          </div>
+
+          <div className="enemy-side" style={{ flex: 1 }}>
+            <h3 style={{ color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>Enemies</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* PR-STATS-EFFECTIVE: Enemies also need team for effective stats (Djinn bonuses apply to all units) */}
+              {enemies.map((unit) => (
+                <UnitCard key={unit.id} unit={unit} isPlayer={false} team={battle.playerTeam} />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="enemy-side" style={{ flex: 1 }}>
-          <h3>Enemies</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* PR-STATS-EFFECTIVE: Enemies also need team for effective stats (Djinn bonuses apply to all units) */}
-            {enemies.map((unit) => (
-              <UnitCard key={unit.id} unit={unit} isPlayer={false} team={battle.playerTeam} />
-            ))}
-          </div>
-        </div>
+        <ActionBar disabled={battleEnded} />
+
+        <BattleLog events={events} renderText={renderEventText} />
       </div>
-
-      <ActionBar disabled={battleEnded} />
-
-      <BattleLog events={events} renderText={renderEventText} />
     </div>
   );
 }

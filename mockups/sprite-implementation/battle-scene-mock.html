@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Scene Sprite Mock - Vale Chronicles</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #1a1a1a;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      color: white;
+      padding: 20px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .header p {
+      font-size: 8px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .controls label {
+      font-size: 8px;
+      margin-right: 5px;
+    }
+
+    .controls select, .controls button {
+      font-size: 8px;
+      padding: 8px;
+      background: #333;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background: #444;
+    }
+
+    /* Battle Container */
+    .battle-container {
+      width: 960px;
+      height: 640px;
+      margin: 0 auto;
+      position: relative;
+      border: 4px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Background */
+    .battle-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Battle Arena */
+    .battle-arena {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 160px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 80px;
+    }
+
+    /* Party Column */
+    .party-column {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    /* Enemy Column */
+    .enemy-column {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: flex-end;
+    }
+
+    /* Unit Sprite */
+    .unit-sprite {
+      position: relative;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .unit-sprite img {
+      display: block;
+      width: auto;
+      height: 80px;
+      image-rendering: pixelated;
+    }
+
+    .unit-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 160px;
+      background: rgba(0, 0, 0, 0.9);
+      border-top: 4px solid #ffd700;
+      padding: 20px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .action-button {
+      background: none;
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .action-button:hover {
+      border-color: #ffd700;
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+
+    .action-button img {
+      display: block;
+      width: 48px;
+      height: 48px;
+      image-rendering: pixelated;
+    }
+
+    .action-button-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    /* Stats Display */
+    .stats-display {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      font-size: 8px;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+
+    /* Info Panel */
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 8px;
+    }
+
+    .hp-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hp-bar-fill {
+      width: 100px;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .hp-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      transition: width 0.3s;
+    }
+
+    .implementation-notes {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+    }
+
+    .implementation-notes h3 {
+      font-size: 10px;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .implementation-notes ul {
+      font-size: 8px;
+      line-height: 1.8;
+      list-style-position: inside;
+    }
+
+    .implementation-notes li {
+      margin-bottom: 5px;
+    }
+
+    .sprite-path {
+      font-size: 7px;
+      color: #888;
+      font-family: 'Courier New', monospace;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎮 Battle Scene Sprite Implementation Mock</h1>
+    <p>Demonstrating real sprite integration - backgrounds, party members, enemies, and action buttons</p>
+  </div>
+
+  <div class="controls">
+    <label>Background:</label>
+    <select id="bgSelect" onchange="changeBackground()">
+      <option value="Cave.gif">Cave</option>
+      <option value="Desert.gif">Desert</option>
+      <option value="Kolima_Forest.gif">Kolima Forest</option>
+      <option value="Dark_Sky.gif">Dark Sky</option>
+      <option value="Vale.gif">Vale</option>
+      <option value="Colosso.gif">Colosso Arena</option>
+    </select>
+
+    <label>Party Member:</label>
+    <select id="partySelect" onchange="changePartySprite()">
+      <option value="Isaac_Axe_Front.gif">Isaac (Axe)</option>
+      <option value="Isaac_lBlade_Front.gif">Isaac (L.Blade)</option>
+      <option value="Garet_Axe_Front.gif">Garet (Axe)</option>
+      <option value="Ivan_Staff_Front.gif">Ivan (Staff)</option>
+      <option value="Mia_Staff_Front.gif">Mia (Staff)</option>
+    </select>
+
+    <label>Enemy:</label>
+    <select id="enemySelect" onchange="changeEnemySprite()">
+      <option value="Bat.gif">Bat</option>
+      <option value="Alec_Goblin.gif">Goblin</option>
+      <option value="Wild_Wolf.gif">Wolf</option>
+      <option value="Skeleton.gif">Skeleton</option>
+      <option value="Zombie.gif">Zombie</option>
+    </select>
+
+    <button onclick="randomizeAll()">🎲 Randomize All</button>
+  </div>
+
+  <div class="battle-container">
+    <!-- Background Layer -->
+    <div class="battle-background" id="battleBg"></div>
+
+    <!-- Info Panel -->
+    <div class="info-panel">
+      <div class="info-row">
+        <div class="hp-bar">
+          <span>Isaac HP:</span>
+          <div class="hp-bar-fill">
+            <div class="hp-bar-inner" style="width: 80%"></div>
+          </div>
+          <span>45/56</span>
+        </div>
+        <div class="hp-bar">
+          <span>PP:</span>
+          <div class="hp-bar-fill" style="width: 60px;">
+            <div class="hp-bar-inner" style="width: 60%; background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
+          </div>
+          <span>18/30</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battle Arena -->
+    <div class="battle-arena">
+      <!-- Player Party -->
+      <div class="party-column">
+        <div class="unit-sprite">
+          <img id="partySprite" src="" alt="Party Member">
+          <div class="unit-label">Isaac Lv.3</div>
+        </div>
+      </div>
+
+      <!-- Enemies -->
+      <div class="enemy-column">
+        <div class="unit-sprite">
+          <img id="enemySprite" src="" alt="Enemy">
+          <div class="unit-label">Bat</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-buttons">
+        <button class="action-button" onclick="alert('Attack!')">
+          <img src="../../apps/vale-v2/public/sprites/icons/buttons/Attack.gif" alt="Attack">
+          <div class="action-button-label">Attack</div>
+        </button>
+        <button class="action-button">
+          <img src="../../apps/vale-v2/public/sprites/icons/buttons/Psynergy.gif" alt="Psynergy">
+          <div class="action-button-label">Psynergy</div>
+        </button>
+        <button class="action-button">
+          <img src="../../apps/vale-v2/public/sprites/icons/buttons/Djinni.gif" alt="Djinn">
+          <div class="action-button-label">Djinn</div>
+        </button>
+        <button class="action-button">
+          <img src="../../apps/vale-v2/public/sprites/icons/buttons/Item.gif" alt="Item">
+          <div class="action-button-label">Item</div>
+        </button>
+        <button class="action-button">
+          <img src="../../apps/vale-v2/public/sprites/icons/buttons/Defend.gif" alt="Defend">
+          <div class="action-button-label">Defend</div>
+        </button>
+      </div>
+
+      <div class="stats-display">
+        <div class="stat-item">⚔️ ATK: 42</div>
+        <div class="stat-item">🛡️ DEF: 35</div>
+        <div class="stat-item">⚡ AGI: 28</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="implementation-notes">
+    <h3>✅ Implementation Strategy Proven Here:</h3>
+    <ul>
+      <li><strong>Background:</strong> Single GIF, backgroundSize: cover</li>
+      <li><strong>Unit Sprites:</strong> Simple &lt;img&gt; tags, GIFs auto-animate</li>
+      <li><strong>Positioning:</strong> Fixed layout (party left, enemies right)</li>
+      <li><strong>Action Buttons:</strong> Icon sprites with hover effects</li>
+      <li><strong>Performance:</strong> All sprites preloaded, cached by browser</li>
+    </ul>
+    <div class="sprite-path" id="spritePaths">
+      Background: /sprites/backgrounds/gs1/Cave.gif<br>
+      Party: /sprites/battle/party/isaac/Isaac_Axe_Front.gif<br>
+      Enemy: /sprites/battle/enemies/Bat.gif
+    </div>
+  </div>
+
+  <script>
+    const SPRITE_BASE = '../../apps/vale-v2/public/sprites';
+    
+    // Initialize
+    changeBackground();
+    changePartySprite();
+    changeEnemySprite();
+
+    function changeBackground() {
+      const bg = document.getElementById('bgSelect').value;
+      const bgPath = `${SPRITE_BASE}/backgrounds/gs1/${bg}`;
+      document.getElementById('battleBg').style.backgroundImage = `url('${bgPath}')`;
+      updatePaths();
+    }
+
+    function changePartySprite() {
+      const sprite = document.getElementById('partySelect').value;
+      const folder = sprite.split('_')[0].toLowerCase();
+      const spritePath = `${SPRITE_BASE}/battle/party/${folder}/${sprite}`;
+      document.getElementById('partySprite').src = spritePath;
+      updatePaths();
+    }
+
+    function changeEnemySprite() {
+      const sprite = document.getElementById('enemySelect').value;
+      const spritePath = `${SPRITE_BASE}/battle/enemies/${sprite}`;
+      document.getElementById('enemySprite').src = spritePath;
+      updatePaths();
+    }
+
+    function updatePaths() {
+      const bg = document.getElementById('bgSelect').value;
+      const party = document.getElementById('partySelect').value;
+      const enemy = document.getElementById('enemySelect').value;
+      
+      document.getElementById('spritePaths').innerHTML = `
+        Background: /sprites/backgrounds/gs1/${bg}<br>
+        Party: /sprites/battle/party/${party.split('_')[0].toLowerCase()}/${party}<br>
+        Enemy: /sprites/battle/enemies/${enemy}
+      `;
+    }
+
+    function randomizeAll() {
+      const bgSelect = document.getElementById('bgSelect');
+      const partySelect = document.getElementById('partySelect');
+      const enemySelect = document.getElementById('enemySelect');
+      
+      bgSelect.selectedIndex = Math.floor(Math.random() * bgSelect.options.length);
+      partySelect.selectedIndex = Math.floor(Math.random() * partySelect.options.length);
+      enemySelect.selectedIndex = Math.floor(Math.random() * enemySelect.options.length);
+      
+      changeBackground();
+      changePartySprite();
+      changeEnemySprite();
+    }
+  </script>
+</body>
+</html>
