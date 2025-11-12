@@ -83,79 +83,79 @@ export function queueAction(
 /**
  * Clear a queued action (refund mana)
  * PR-QUEUE-BATTLE: Removes action from queue and refunds mana
- * 
+ *
  * @param state - Current battle state
  * @param unitIndex - Index of unit (0-3)
- * @returns Updated battle state
+ * @returns Result with updated battle state or error message
  */
-export function clearQueuedAction(state: BattleState, unitIndex: number): BattleState {
+export function clearQueuedAction(state: BattleState, unitIndex: number): Result<BattleState, string> {
   if (state.phase !== 'planning') {
-    throw new Error('Can only clear actions during planning phase');
+    return Err('Can only clear actions during planning phase');
   }
 
   const action = state.queuedActions[unitIndex];
   if (!action) {
-    return state; // Nothing to clear
+    return Ok(state); // Nothing to clear
   }
 
   // Refund mana
   const newQueuedActions = [...state.queuedActions];
   newQueuedActions[unitIndex] = null;
 
-  return updateBattleState(state, {
+  return Ok(updateBattleState(state, {
     queuedActions: newQueuedActions,
     remainingMana: state.remainingMana + action.manaCost,
-  });
+  }));
 }
 
 /**
  * Queue Djinn activation
  * PR-DJINN-CORE: Adds Djinn to activation queue
- * 
+ *
  * @param state - Current battle state
  * @param djinnId - Djinn ID to activate
- * @returns Updated battle state
+ * @returns Result with updated battle state or error message
  */
-export function queueDjinn(state: BattleState, djinnId: string): BattleState {
+export function queueDjinn(state: BattleState, djinnId: string): Result<BattleState, string> {
   if (state.phase !== 'planning') {
-    throw new Error('Can only queue Djinn during planning phase');
+    return Err('Can only queue Djinn during planning phase');
   }
 
   if (!canActivateDjinn(state.playerTeam, djinnId)) {
-    throw new Error(`Djinn ${djinnId} cannot be activated (not Set)`);
+    return Err(`Djinn ${djinnId} cannot be activated (not Set)`);
   }
 
   if (state.queuedDjinn.includes(djinnId)) {
-    return state; // Already queued
+    return Ok(state); // Already queued
   }
 
-  return updateBattleState(state, {
+  return Ok(updateBattleState(state, {
     queuedDjinn: [...state.queuedDjinn, djinnId],
-  });
+  }));
 }
 
 /**
  * Unqueue Djinn activation
  * PR-DJINN-CORE: Removes Djinn from activation queue
- * 
+ *
  * @param state - Current battle state
  * @param djinnId - Djinn ID to unqueue
- * @returns Updated battle state
+ * @returns Result with updated battle state or error message
  */
-export function unqueueDjinn(state: BattleState, djinnId: string): BattleState {
+export function unqueueDjinn(state: BattleState, djinnId: string): Result<BattleState, string> {
   if (state.phase !== 'planning') {
-    throw new Error('Can only unqueue Djinn during planning phase');
+    return Err('Can only unqueue Djinn during planning phase');
   }
 
-  return updateBattleState(state, {
+  return Ok(updateBattleState(state, {
     queuedDjinn: state.queuedDjinn.filter(id => id !== djinnId),
-  });
+  }));
 }
 
 /**
  * Refresh mana pool at start of planning phase
  * PR-MANA-QUEUE: Resets mana to max
- * 
+ *
  * @param state - Current battle state
  * @returns Updated battle state
  */
@@ -166,88 +166,94 @@ export function refreshMana(state: BattleState): BattleState {
 }
 
 /**
- * Execute a complete round
- * PR-QUEUE-BATTLE: Executes Djinn → player actions (SPD order) → enemy actions
- * 
- * @param state - Current battle state
- * @param rng - PRNG instance
- * @returns Updated battle state and events
+ * Validate queue is ready for execution
+ * Throws if validation fails
  */
-export function executeRound(
-  state: BattleState,
-  rng: PRNG
-): { state: BattleState; events: readonly BattleEvent[] } {
+function validateQueueForExecution(state: BattleState): void {
   if (state.phase !== 'planning') {
     throw new Error('Can only execute round from planning phase');
   }
-
-  // Validate queue is complete
   if (!isQueueComplete(state.queuedActions)) {
     throw new Error('Cannot execute: queue is not complete');
   }
-
-  // Validate mana budget
   if (!validateQueuedActions(state.remainingMana, state.queuedActions)) {
     throw new Error('Cannot execute: actions exceed mana budget');
   }
+}
 
-  let currentState = updateBattleState(state, {
+/**
+ * Transition battle state to executing phase
+ */
+function transitionToExecutingPhase(state: BattleState): BattleState {
+  return updateBattleState(state, {
     phase: 'executing',
     executionIndex: 0,
   });
+}
 
-  const allEvents: BattleEvent[] = [];
-
-  // 1. Execute Djinn summons (if any)
-  if (currentState.queuedDjinn.length > 0) {
-    const djinnResult = executeDjinnSummons(currentState, rng);
-    currentState = djinnResult.state;
-    allEvents.push(...djinnResult.events);
-  }
-
-  // 2. Execute player actions in SPD order
+/**
+ * Execute player actions phase
+ * Processes all queued player actions in SPD order
+ */
+function executePlayerActionsPhase(
+  state: BattleState,
+  rng: PRNG
+): { state: BattleState; events: readonly BattleEvent[] } {
   const playerActions = state.queuedActions.filter((a): a is QueuedAction => a !== null);
-  const sortedPlayerActions = sortActionsBySPD(playerActions, currentState.playerTeam, currentState.enemies);
-  
+  const sortedPlayerActions = sortActionsBySPD(playerActions, state.playerTeam, state.enemies);
+
+  let currentState = state;
+  const events: BattleEvent[] = [];
+
   for (const action of sortedPlayerActions) {
-    // Check if unit is still alive
     const actor = currentState.playerTeam.units.find(u => u.id === action.unitId);
     if (!actor || isUnitKO(actor)) {
-      allEvents.push({
+      events.push({
         type: 'ability',
         casterId: action.unitId,
-        abilityId: action.abilityId || 'attack',
+        abilityId: action.abilityId || 'strike',
         targets: action.targetIds,
       });
-      allEvents.push({
+      events.push({
         type: 'miss',
         targetId: action.targetIds[0] || '',
       });
       continue;
     }
 
-    // Resolve targets (may need retargeting if original target is KO'd)
     const validTargets = resolveValidTargets(action, currentState);
     if (validTargets.length === 0) {
-      continue; // Skip if no valid targets
+      continue;
     }
 
-    // Execute action
     const actionResult = performAction(
       currentState,
       action.unitId,
-      action.abilityId || 'attack',
+      action.abilityId || 'strike',
       validTargets,
       rng
     );
 
     currentState = actionResult.state;
-    allEvents.push(...actionResult.events);
+    events.push(...actionResult.events);
   }
 
-  // 3. Execute enemy actions (SPD order)
-  const enemyActions = generateEnemyActions(currentState, rng);
-  const sortedEnemyActions = sortActionsBySPD(enemyActions, currentState.playerTeam, currentState.enemies);
+  return { state: currentState, events };
+}
+
+/**
+ * Execute enemy actions phase
+ * Generates and processes all enemy actions in SPD order
+ */
+function executeEnemyActionsPhase(
+  state: BattleState,
+  rng: PRNG
+): { state: BattleState; events: readonly BattleEvent[] } {
+  const enemyActions = generateEnemyActions(state, rng);
+  const sortedEnemyActions = sortActionsBySPD(enemyActions, state.playerTeam, state.enemies);
+
+  let currentState = state;
+  const events: BattleEvent[] = [];
 
   for (const action of sortedEnemyActions) {
     const actor = currentState.enemies.find(u => u.id === action.unitId);
@@ -263,37 +269,94 @@ export function executeRound(
     const actionResult = performAction(
       currentState,
       action.unitId,
-      action.abilityId || 'attack',
+      action.abilityId || 'strike',
       validTargets,
       rng
     );
 
     currentState = actionResult.state;
-    allEvents.push(...actionResult.events);
+    events.push(...actionResult.events);
   }
 
-  // 4. Check victory/defeat
-  const battleEnd = checkBattleEnd(currentState);
+  return { state: currentState, events };
+}
+
+/**
+ * Check if battle has ended (victory or defeat)
+ * Returns battle result or null if battle continues
+ */
+function checkBattleEndPhase(state: BattleState): 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | null {
+  return checkBattleEnd(state);
+}
+
+/**
+ * Transition to victory or defeat phase
+ */
+function transitionToVictoryOrDefeat(
+  state: BattleState,
+  result: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT'
+): BattleState {
+  return updateBattleState(state, {
+    phase: result === 'PLAYER_VICTORY' ? 'victory' : 'defeat',
+    status: result,
+  });
+}
+
+/**
+ * Transition back to planning phase for next round
+ */
+function transitionToPlanningPhase(state: BattleState): BattleState {
+  const nextState = updateBattleState(state, {
+    phase: 'planning',
+    roundNumber: state.roundNumber + 1,
+    currentQueueIndex: 0,
+    queuedActions: createEmptyQueue(),
+    queuedDjinn: [],
+    executionIndex: 0,
+  });
+  return refreshMana(nextState);
+}
+
+/**
+ * Execute a complete round
+ * PR-QUEUE-BATTLE: Executes Djinn → player actions (SPD order) → enemy actions
+ *
+ * @param state - Current battle state
+ * @param rng - PRNG instance
+ * @returns Updated battle state and events
+ */
+export function executeRound(
+  state: BattleState,
+  rng: PRNG
+): { state: BattleState; events: readonly BattleEvent[] } {
+  validateQueueForExecution(state);
+
+  let currentState = transitionToExecutingPhase(state);
+  const allEvents: BattleEvent[] = [];
+
+  if (currentState.queuedDjinn.length > 0) {
+    const djinnResult = executeDjinnSummons(currentState, rng);
+    currentState = djinnResult.state;
+    allEvents.push(...djinnResult.events);
+  }
+
+  const playerResult = executePlayerActionsPhase(currentState, rng);
+  currentState = playerResult.state;
+  allEvents.push(...playerResult.events);
+
+  const enemyResult = executeEnemyActionsPhase(currentState, rng);
+  currentState = enemyResult.state;
+  allEvents.push(...enemyResult.events);
+
+  const battleEnd = checkBattleEndPhase(currentState);
   if (battleEnd) {
-    currentState = updateBattleState(currentState, {
-      phase: battleEnd === 'PLAYER_VICTORY' ? 'victory' : 'defeat',
-      status: battleEnd,
-    });
+    currentState = transitionToVictoryOrDefeat(currentState, battleEnd);
     allEvents.push({
       type: 'battle-end',
       result: battleEnd,
     });
   } else {
-    // Return to planning phase
-    currentState = updateBattleState(currentState, {
-      phase: 'planning',
-      roundNumber: currentState.roundNumber + 1,
-      currentQueueIndex: 0,
-      queuedActions: createEmptyQueue(),
-      queuedDjinn: [],
-      executionIndex: 0,
-    });
-    currentState = refreshMana(currentState);
+    currentState = transitionToPlanningPhase(currentState);
   }
 
   return {
@@ -547,6 +610,11 @@ function checkBattleEnd(state: BattleState): 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' 
   const allEnemiesKO = state.enemies.every(e => isUnitKO(e));
   const allPlayersKO = state.playerTeam.units.every(u => isUnitKO(u));
 
+  // Check for simultaneous wipe-out (rare but possible)
+  if (allEnemiesKO && allPlayersKO) {
+    return 'PLAYER_DEFEAT'; // Treat simultaneous wipe-out as defeat
+  }
+
   if (allEnemiesKO) {
     return 'PLAYER_VICTORY';
   }
@@ -556,3 +624,12 @@ function checkBattleEnd(state: BattleState): 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' 
   return null;
 }
 
+export const queueBattleServiceInternals = {
+  validateQueueForExecution,
+  transitionToExecutingPhase,
+  executePlayerActionsPhase,
+  executeEnemyActionsPhase,
+  checkBattleEndPhase,
+  transitionToVictoryOrDefeat,
+  transitionToPlanningPhase,
+};

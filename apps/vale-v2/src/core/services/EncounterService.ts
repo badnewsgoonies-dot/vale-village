@@ -95,3 +95,50 @@ export function isBossEncounter(encounterId: string): boolean {
   return encounter?.id.includes('boss') ?? false;
 }
 
+/**
+ * Roll for a random encounter based on map encounter rate
+ * Returns true if an encounter should trigger
+ */
+export function rollForRandomEncounter(encounterRate: number, rng: PRNG): boolean {
+  if (encounterRate <= 0) return false;
+  const roll = rng.next();
+  return roll < encounterRate;
+}
+
+/**
+ * Select a random encounter from a pool of encounter IDs
+ * Returns null if pool is empty or invalid
+ */
+export function selectRandomEncounter(
+  encounterPool: readonly string[],
+  rng: PRNG
+): string | null {
+  if (!encounterPool || encounterPool.length === 0) {
+    return null;
+  }
+
+  const index = Math.floor(rng.next() * encounterPool.length);
+  const encounterId = encounterPool[index];
+  return encounterId ?? null;
+}
+
+/**
+ * Process random encounter logic for a map
+ * Returns encounter ID if one triggers, null otherwise
+ */
+export function processRandomEncounter(
+  mapEncounterRate: number | undefined,
+  mapEncounterPool: readonly string[] | undefined,
+  rng: PRNG
+): string | null {
+  if (!mapEncounterRate || !mapEncounterPool) {
+    return null;
+  }
+
+  if (!rollForRandomEncounter(mapEncounterRate, rng)) {
+    return null;
+  }
+
+  return selectRandomEncounter(mapEncounterPool, rng);
+}
+

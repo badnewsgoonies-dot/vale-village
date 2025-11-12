@@ -8,8 +8,9 @@ import type { Team } from '../models/Team';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { PRNG } from '../random/prng';
 import type { Element } from '../models/types';
-import { calculateMaxHp } from '../models/Unit';
+import { calculateMaxHp, isUnitKO } from '../models/Unit';
 import { calculateEffectiveStats } from './stats';
+import { BATTLE_CONSTANTS } from '../constants';
 
 /**
  * Element advantage triangle (from GAME_MECHANICS.md Section 5.2)
@@ -18,11 +19,11 @@ import { calculateEffectiveStats } from './stats';
  * - Mercury → Mars (Water strong vs Fire)
  * - Jupiter → Mercury (Wind strong vs Water)
  */
-const ELEMENT_ADVANTAGE: Record<string, number> = {
-  'Venus→Jupiter': 1.5,
-  'Mars→Venus': 1.5,
-  'Mercury→Mars': 1.5,
-  'Jupiter→Mercury': 1.5,
+const ELEMENT_ADVANTAGE: Record<string, boolean> = {
+  'Venus→Jupiter': true,
+  'Mars→Venus': true,
+  'Mercury→Mars': true,
+  'Jupiter→Mercury': true,
 };
 
 /**
@@ -32,12 +33,12 @@ const ELEMENT_ADVANTAGE: Record<string, number> = {
 export function getElementModifier(attackElement: Element, defenseElement: Element): number {
   const key = `${attackElement}→${defenseElement}`;
   if (ELEMENT_ADVANTAGE[key]) {
-    return 1.5; // +50% damage
+    return BATTLE_CONSTANTS.ELEMENT_ADVANTAGE_MULTIPLIER; // +50% damage
   }
 
   const reverseKey = `${defenseElement}→${attackElement}`;
   if (ELEMENT_ADVANTAGE[reverseKey]) {
-    return 0.67; // -33% damage
+    return BATTLE_CONSTANTS.ELEMENT_DISADVANTAGE_MULTIPLIER; // -33% damage
   }
 
   return 1.0; // Neutral
@@ -49,7 +50,7 @@ export function getElementModifier(attackElement: Element, defenseElement: Eleme
  * Returns value in [0.9, 1.1)
  */
 export function getRandomMultiplier(rng: PRNG): number {
-  return 0.9 + (rng.next() * 0.2);
+  return BATTLE_CONSTANTS.DAMAGE_VARIANCE_MIN + (rng.next() * BATTLE_CONSTANTS.DAMAGE_VARIANCE_RANGE);
 }
 
 /**
@@ -61,11 +62,13 @@ export function getRandomMultiplier(rng: PRNG): number {
  * Uses effective SPD (base + level + equipment + Djinn + status)
  */
 export function checkCriticalHit(attacker: Unit, team: Team, rng: PRNG): boolean {
-  const BASE_CRIT_CHANCE = 0.05; // 5%
   const effectiveStats = calculateEffectiveStats(attacker, team);
-  const spdBonus = Math.sqrt(effectiveStats.spd) / 200; // ~0.07 at SPD=200
-  
-  const totalChance = Math.min(BASE_CRIT_CHANCE + spdBonus, 0.35); // Hard cap at 35%
+  const spdBonus = Math.sqrt(effectiveStats.spd) / BATTLE_CONSTANTS.CRIT_SPD_SCALING; // ~0.07 at SPD=200
+
+  const totalChance = Math.min(
+    BATTLE_CONSTANTS.BASE_CRIT_CHANCE + spdBonus,
+    BATTLE_CONSTANTS.MAX_CRIT_CHANCE
+  ); // Hard cap at 35%
 
   return rng.next() < totalChance;
 }
@@ -82,23 +85,28 @@ export function checkDodge(
   attacker: Unit,
   defender: Unit,
   team: Team,
-  abilityAccuracy: number = 0.95, // Default 95% accuracy
+  abilityAccuracy: number = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY,
   rng: PRNG
 ): boolean {
-  const BASE_EVASION = 0.05; // 5% base
   const attackerEffective = calculateEffectiveStats(attacker, team);
   const defenderEffective = calculateEffectiveStats(defender, team);
-  
+
   const equipmentEvasion = defender.equipment.boots?.evasion || 0;
-  const speedBonus = (defenderEffective.spd - attackerEffective.spd) * 0.01; // 1% per SPD point
-  
+  const speedBonus = (defenderEffective.spd - attackerEffective.spd) * BATTLE_CONSTANTS.SPD_TO_EVASION_RATE;
+
   // Hard cap evasion at 40%
-  const evasion = Math.min(0.40, BASE_EVASION + (equipmentEvasion / 100) + speedBonus);
-  
+  const evasion = Math.min(
+    BATTLE_CONSTANTS.MAX_EVASION,
+    BATTLE_CONSTANTS.BASE_EVASION + (equipmentEvasion / 100) + speedBonus
+  );
+
   // Multiplicative: hitChance = accuracy * (1 - evasion)
   // Clamp between 5% and 95%
-  const hitChance = Math.max(0.05, Math.min(0.95, abilityAccuracy * (1 - evasion)));
-  
+  const hitChance = Math.max(
+    BATTLE_CONSTANTS.MIN_HIT_CHANCE,
+    Math.min(BATTLE_CONSTANTS.MAX_HIT_CHANCE, abilityAccuracy * (1 - evasion))
+  );
+
   return rng.next() >= hitChance; // Returns true if dodged (missed)
 }
 
@@ -118,13 +126,13 @@ export function calculatePhysicalDamage(
 ): number {
   const attackerEffective = calculateEffectiveStats(attacker, team);
   const defenderEffective = calculateEffectiveStats(defender, team);
-  
+
   const baseDamage = ability.basePower > 0 ? ability.basePower : attackerEffective.atk;
   const attackPower = attackerEffective.atk;
   const defense = defenderEffective.def;
 
-  const rawDamage = (baseDamage + attackPower - (defense * 0.5)) * getRandomMultiplier(rng);
-  const damage = Math.max(1, Math.floor(rawDamage)); // Floor at 1
+  const rawDamage = (baseDamage + attackPower - (defense * BATTLE_CONSTANTS.DEFENSE_MULTIPLIER)) * getRandomMultiplier(rng);
+  const damage = Math.max(BATTLE_CONSTANTS.MINIMUM_DAMAGE, Math.floor(rawDamage));
 
   return damage;
 }
@@ -145,10 +153,10 @@ export function calculatePsynergyDamage(
 ): number {
   const attackerEffective = calculateEffectiveStats(attacker, team);
   const defenderEffective = calculateEffectiveStats(defender, team);
-  
+
   const basePower = ability.basePower || 0;
   const magicPower = attackerEffective.mag;
-  const magicDefense = defenderEffective.def * 0.3;
+  const magicDefense = defenderEffective.def * BATTLE_CONSTANTS.PSYNERGY_DEFENSE_MULTIPLIER;
 
   // Element advantage/disadvantage (1.5x / 0.67x / 1.0x)
   const elementModifier = ability.element
@@ -163,7 +171,7 @@ export function calculatePsynergyDamage(
     rawDamage = rawDamage * (1 - resist);
   }
 
-  const damage = Math.max(1, Math.floor(rawDamage)); // Floor at 1
+  const damage = Math.max(BATTLE_CONSTANTS.MINIMUM_DAMAGE, Math.floor(rawDamage));
 
   return damage;
 }
@@ -196,7 +204,7 @@ export function calculateHealAmount(
   const magicPower = casterEffective.mag;
 
   const rawHeal = (baseHeal + magicPower) * getRandomMultiplier(rng);
-  const healAmount = Math.max(1, Math.floor(rawHeal)); // Floor at 1 if healing
+  const healAmount = Math.max(BATTLE_CONSTANTS.MINIMUM_HEALING, Math.floor(rawHeal));
 
   return healAmount;
 }
@@ -223,8 +231,24 @@ export function applyDamage(unit: Unit, damage: number): Unit {
  * Apply healing to unit (returns new unit with updated HP)
  * Clamps HP to [0, maxHp]
  * Never exceeds max HP
+ * 
+ * @param unit - Unit to heal
+ * @param healing - Amount to heal (must be non-negative)
+ * @param abilityRevivesFallen - Whether the ability can revive fallen units (default: false)
+ * @returns New unit with updated HP, or throws error if invalid
+ * @throws Error if healing is negative or unit is KO'd without revivesFallen
  */
-export function applyHealing(unit: Unit, healing: number): Unit {
+export function applyHealing(unit: Unit, healing: number, abilityRevivesFallen: boolean = false): Unit {
+  // Validate healing amount is non-negative
+  if (healing < 0) {
+    throw new Error(`Cannot apply negative healing: ${healing}`);
+  }
+
+  // Check if unit is KO'd and ability cannot revive
+  if (isUnitKO(unit) && !abilityRevivesFallen) {
+    throw new Error(`Cannot heal KO'd unit without revivesFallen ability`);
+  }
+
   const maxHp = calculateMaxHp(unit);
   const newHp = Math.min(maxHp, Math.max(0, unit.currentHp + healing)); // Clamp to [0, maxHp]
   

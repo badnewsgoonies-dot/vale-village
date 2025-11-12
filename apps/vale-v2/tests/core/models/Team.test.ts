@@ -85,5 +85,49 @@ describe('Team Model', () => {
 
     expect(result.success).toBe(true);
   });
+
+  test('should reject duplicate Djinn when updating team', () => {
+    const units = [
+      createSampleUnit('unit1'),
+      createSampleUnit('unit2'),
+      createSampleUnit('unit3'),
+      createSampleUnit('unit4'),
+    ];
+
+    const team = createTeam(units);
+
+    expect(() => {
+      updateTeam(team, { equippedDjinn: ['flint', 'flint', 'granite'] });
+    }).toThrow('Cannot equip duplicate Djinn');
+  });
+
+  test('should reject more than 3 Djinn when updating team', () => {
+    const units = [
+      createSampleUnit('unit1'),
+      createSampleUnit('unit2'),
+      createSampleUnit('unit3'),
+      createSampleUnit('unit4'),
+    ];
+
+    const team = createTeam(units);
+
+    expect(() => {
+      updateTeam(team, { equippedDjinn: ['flint', 'granite', 'bane', 'flash'] });
+    }).toThrow('Cannot equip more than 3 Djinn');
+  });
+
+  test('should allow valid Djinn equipments', () => {
+    const units = [
+      createSampleUnit('unit1'),
+      createSampleUnit('unit2'),
+      createSampleUnit('unit3'),
+      createSampleUnit('unit4'),
+    ];
+
+    const team = createTeam(units);
+    const updated = updateTeam(team, { equippedDjinn: ['flint', 'granite', 'bane'] });
+
+    expect(updated.equippedDjinn).toEqual(['flint', 'granite', 'bane']);
+  });
 });
 

@@ -127,12 +127,75 @@ export const createSaveSlice: StateCreator<
       return;
     }
 
-    // TODO: Hydrate team and battle from save data
     const saveData = result.value;
-    void saveData;
-    void saveData;
-    void saveData;
-    void saveData;
+    const state = get();
+
+    // Hydrate team from save data
+    const activeUnits = saveData.playerData.activeParty
+      .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
+      .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
+
+    if (activeUnits.length > 0) {
+      // Pad to 4 units if needed (in case save has fewer)
+      while (activeUnits.length < 4 && activeUnits.length < saveData.playerData.unitsCollected.length) {
+        const nextUnit = saveData.playerData.unitsCollected.find(
+          u => !activeUnits.some(active => active.id === u.id)
+        );
+        if (nextUnit) activeUnits.push(nextUnit);
+      }
+
+      // Create team (will use first 4 units)
+      const team = {
+        units: activeUnits.slice(0, 4),
+        equippedDjinn: [], // Initialize empty, Djinn are on units
+        djinnTrackers: {},
+        collectedDjinn: saveData.playerData.djinnCollected,
+        currentTurn: 0,
+        activationsThisTurn: {},
+        djinnStates: {},
+      };
+
+      state.setTeam(team);
+    }
+
+    // Hydrate inventory
+    _set({
+      gold: saveData.playerData.gold,
+      equipment: saveData.playerData.inventory,
+    });
+
+    // Hydrate story state
+    _set({
+      story: {
+        chapter: 1, // Will be updated when chapter tracking is added
+        flags: saveData.playerData.storyFlags,
+        currentEncounter: null,
+        encountersCompleted: [],
+      },
+    });
+
+    // Hydrate overworld state
+    state.teleportPlayer(
+      saveData.overworldState.currentScene,
+      saveData.overworldState.playerPosition
+    );
+
+    // Hydrate battle state from localStorage
+    const battleStateJson = localStorage.getItem('vale-v2/battle-state');
+    if (battleStateJson) {
+      try {
+        const battleState = JSON.parse(battleStateJson);
+        if (battleState.battle && battleState.rngSeed !== undefined) {
+          _set({
+            battle: battleState.battle,
+            rngSeed: battleState.rngSeed,
+            turnNumber: battleState.turnNumber ?? 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to parse battle state:', error);
+      }
+    }
   },
 
   saveGame: () => {
@@ -207,9 +270,75 @@ export const createSaveSlice: StateCreator<
       return;
     }
 
-    // TODO: Hydrate all state from save data
     const saveData = result.value;
-    void saveData;
+    const state = get();
+
+    // Hydrate team from save data
+    const activeUnits = saveData.playerData.activeParty
+      .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
+      .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
+
+    if (activeUnits.length > 0) {
+      // Pad to 4 units if needed (in case save has fewer)
+      while (activeUnits.length < 4 && activeUnits.length < saveData.playerData.unitsCollected.length) {
+        const nextUnit = saveData.playerData.unitsCollected.find(
+          u => !activeUnits.some(active => active.id === u.id)
+        );
+        if (nextUnit) activeUnits.push(nextUnit);
+      }
+
+      // Create team (will use first 4 units)
+      const team = {
+        units: activeUnits.slice(0, 4),
+        equippedDjinn: [], // Initialize empty, Djinn are on units
+        djinnTrackers: {},
+        collectedDjinn: saveData.playerData.djinnCollected,
+        currentTurn: 0,
+        activationsThisTurn: {},
+        djinnStates: {},
+      };
+
+      state.setTeam(team);
+    }
+
+    // Hydrate inventory
+    _set({
+      gold: saveData.playerData.gold,
+      equipment: saveData.playerData.inventory,
+    });
+
+    // Hydrate story state
+    _set({
+      story: {
+        chapter: 1, // Will be updated when chapter tracking is added
+        flags: saveData.playerData.storyFlags,
+        currentEncounter: null,
+        encountersCompleted: [],
+      },
+    });
+
+    // Hydrate overworld state
+    state.teleportPlayer(
+      saveData.overworldState.currentScene,
+      saveData.overworldState.playerPosition
+    );
+
+    // Hydrate battle state from localStorage
+    const battleStateJson = localStorage.getItem(`vale-v2/battle-state-slot-${slot}`);
+    if (battleStateJson) {
+      try {
+        const battleState = JSON.parse(battleStateJson);
+        if (battleState.battle && battleState.rngSeed !== undefined) {
+          _set({
+            battle: battleState.battle,
+            rngSeed: battleState.rngSeed,
+            turnNumber: battleState.turnNumber ?? 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to parse battle state:', error);
+      }
+    }
   },
 
   hasSaveSlot: (slot: number) => hasSaveSlot(slot),

@@ -46,8 +46,10 @@ export const BATTLE_CONSTANTS = {
   CRITICAL_HIT_MULTIPLIER: 2.0,
   /** Revive HP percentage (50% of max HP) */
   REVIVE_HP_PERCENTAGE: 0.5,
-  /** Base defense multiplier in damage formula */
+  /** Base defense multiplier in damage formula (physical) */
   DEFENSE_MULTIPLIER: 0.5,
+  /** Base defense multiplier for psynergy damage */
+  PSYNERGY_DEFENSE_MULTIPLIER: 0.3,
   /** Element advantage damage multiplier */
   ELEMENT_ADVANTAGE_MULTIPLIER: 1.5,
   /** Element disadvantage damage multiplier */
@@ -56,6 +58,36 @@ export const BATTLE_CONSTANTS = {
   EQUIPMENT_DROP_RATE_NORMAL: 0.1,
   /** Boss battle equipment drop rate (50%) */
   EQUIPMENT_DROP_RATE_BOSS: 0.5,
+  /** Minimum damage floor (all attacks deal at least this much) */
+  MINIMUM_DAMAGE: 1,
+  /** Minimum healing amount (all heals restore at least this much if basePower > 0) */
+  MINIMUM_HEALING: 1,
+
+  // Damage variance constants
+  /** Minimum damage variance multiplier (90%) */
+  DAMAGE_VARIANCE_MIN: 0.9,
+  /** Damage variance range (20% total: ±10%) */
+  DAMAGE_VARIANCE_RANGE: 0.2,
+
+  // Critical hit constants
+  /** Base critical hit chance (5%) */
+  BASE_CRIT_CHANCE: 0.05,
+  /** Maximum critical hit chance cap (35%) */
+  MAX_CRIT_CHANCE: 0.35,
+  /** SPD scaling denominator for critical hit calculation */
+  CRIT_SPD_SCALING: 200,
+
+  // Evasion/accuracy constants
+  /** Base evasion chance (5%) */
+  BASE_EVASION: 0.05,
+  /** Maximum evasion cap (40%) */
+  MAX_EVASION: 0.40,
+  /** SPD difference to evasion conversion rate (1% per SPD point) */
+  SPD_TO_EVASION_RATE: 0.01,
+  /** Minimum hit chance floor (5%) */
+  MIN_HIT_CHANCE: 0.05,
+  /** Maximum hit chance cap (95%) */
+  MAX_HIT_CHANCE: 0.95,
 } as const;
 
 /**

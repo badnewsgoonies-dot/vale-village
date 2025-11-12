@@ -41,7 +41,7 @@ export const EquipmentSchema = z.object({
   slot: EquipmentSlotSchema,
   tier: EquipmentTierSchema,
   cost: z.number().int().min(0),
-  statBonus: EquipmentStatBonusSchema, // Allows negative values (penalties)
+  statBonus: EquipmentStatBonusSchema.default({}), // Default to empty object if missing
   unlocksAbility: z.string().optional(),
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)

@@ -46,5 +46,31 @@ describe('PRNG', () => {
       expect(value).toBeLessThan(1);
     }
   });
+
+  test('should reject negative seeds', () => {
+    expect(() => {
+      makePRNG(-1);
+    }).toThrow('PRNG seed must be non-negative');
+
+    expect(() => {
+      makePRNG(-100);
+    }).toThrow('PRNG seed must be non-negative');
+  });
+
+  test('should accept zero seed (converted to 1)', () => {
+    // Zero seed should be converted to 1 internally
+    expect(() => {
+      const rng = makePRNG(0);
+      expect(rng.getSeed()).toBe(1);
+    }).not.toThrow();
+  });
+
+  test('should accept positive seeds', () => {
+    expect(() => {
+      makePRNG(1);
+      makePRNG(12345);
+      makePRNG(999999);
+    }).not.toThrow();
+  });
 });
 

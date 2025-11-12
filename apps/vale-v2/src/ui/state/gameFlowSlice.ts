@@ -8,19 +8,22 @@ import { DIALOGUES } from '@/data/definitions/dialogues';
 import type { QueueBattleSlice } from './queueBattleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
+import type { OverworldSlice } from './overworldSlice';
 
 export interface GameFlowSlice {
   mode: 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
   currentShopId: string | null;
+  preBattlePosition: { mapId: string; position: { x: number; y: number } } | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   handleTrigger: (trigger: MapTrigger | null) => void;
   resetLastTrigger: () => void;
+  returnToOverworld: () => void;
 }
 
 export const createGameFlowSlice: StateCreator<
-  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice,
+  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice & OverworldSlice,
   [['zustand/devtools', never]],
   [],
   GameFlowSlice
@@ -29,6 +32,7 @@ export const createGameFlowSlice: StateCreator<
   lastTrigger: null,
   currentEncounter: null,
   currentShopId: null,
+  preBattlePosition: null,
   setMode: (mode) => set({ mode }),
   handleTrigger: (trigger) => {
     if (!trigger) {
@@ -58,6 +62,13 @@ export const createGameFlowSlice: StateCreator<
         return;
       }
 
+      // Save current overworld position before entering battle
+      const { currentMapId, playerPosition } = get();
+      const preBattlePosition = {
+        mapId: currentMapId,
+        position: { x: playerPosition.x, y: playerPosition.y },
+      };
+
       const seed = Date.now();
       const rng = makePRNG(seed);
 
@@ -74,6 +85,7 @@ export const createGameFlowSlice: StateCreator<
           currentEncounter: encounter,
           lastTrigger: trigger,
           mode: 'battle',
+          preBattlePosition,
         });
 
       } catch (error) {
@@ -144,4 +156,21 @@ export const createGameFlowSlice: StateCreator<
     set({ lastTrigger: trigger });
   },
   resetLastTrigger: () => set({ lastTrigger: null }),
+
+  returnToOverworld: () => {
+    const { preBattlePosition, teleportPlayer } = get();
+
+    // Restore to pre-battle position if available
+    if (preBattlePosition) {
+      teleportPlayer(preBattlePosition.mapId, preBattlePosition.position);
+    }
+
+    // Clear battle state and return to overworld
+    set({
+      mode: 'overworld',
+      preBattlePosition: null,
+      currentEncounter: null,
+      lastTrigger: null,
+    });
+  },
 });

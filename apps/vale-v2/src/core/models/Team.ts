@@ -68,8 +68,25 @@ export function createTeam(units: readonly Unit[]): Team {
 /**
  * Update team (returns new object - immutability)
  * Handles nested objects properly
+ * Validates Djinn equipments for duplicates
+ * 
+ * @throws Error if equippedDjinn contains duplicates or exceeds 3 slots
  */
 export function updateTeam(team: Team, updates: Partial<Team>): Team {
+  // Validate equippedDjinn if being updated
+  if (updates.equippedDjinn !== undefined) {
+    // Check for duplicates
+    const djinnSet = new Set(updates.equippedDjinn);
+    if (djinnSet.size !== updates.equippedDjinn.length) {
+      throw new Error(`Cannot equip duplicate Djinn. Equipped: ${updates.equippedDjinn.join(', ')}`);
+    }
+    
+    // Check max slots (3)
+    if (updates.equippedDjinn.length > 3) {
+      throw new Error(`Cannot equip more than 3 Djinn. Attempted: ${updates.equippedDjinn.length}`);
+    }
+  }
+
   return {
     ...team,
     ...updates,

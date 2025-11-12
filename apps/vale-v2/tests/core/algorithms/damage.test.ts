@@ -149,5 +149,32 @@ describe('Damage Algorithms', () => {
 
     expect(healed.currentHp).toBeLessThanOrEqual(100); // Max HP for level 1
   });
+
+  test('should reject negative healing values', () => {
+    const unit = createSampleUnit('unit', {});
+
+    expect(() => {
+      applyHealing(unit, -10);
+    }).toThrow('Cannot apply negative healing');
+  });
+
+  test('should reject healing KO\'d unit without revivesFallen', () => {
+    const unit = createSampleUnit('unit', {});
+    const koUnit = applyDamage(unit, 1000); // KO the unit
+
+    expect(() => {
+      applyHealing(koUnit, 50, false);
+    }).toThrow('Cannot heal KO\'d unit without revivesFallen ability');
+  });
+
+  test('should allow healing KO\'d unit with revivesFallen', () => {
+    const unit = createSampleUnit('unit', {});
+    const koUnit = applyDamage(unit, 1000); // KO the unit
+
+    // Should not throw when revivesFallen is true
+    expect(() => {
+      applyHealing(koUnit, 50, true);
+    }).not.toThrow();
+  });
 });
 

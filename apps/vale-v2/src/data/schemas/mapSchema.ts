@@ -35,6 +35,8 @@ export const MapSchema = z.object({
   npcs: z.array(NPCSchema),
   triggers: z.array(MapTriggerSchema),
   spawnPoint: PositionSchema,
+  encounterRate: z.number().min(0).max(1).optional(), // 0-1 probability per step
+  encounterPool: z.array(z.string()).optional(), // Array of encounter IDs
 });
 
 export type GameMap = z.infer<typeof MapSchema>;

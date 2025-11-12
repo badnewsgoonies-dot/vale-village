@@ -27,8 +27,14 @@ export class XorShiftPRNG implements PRNG {
   private readonly initialSeed: number;
 
   constructor(seed: number) {
-    this.initialSeed = seed;
-    this.state = seed || 1;
+    // Validate seed is non-negative
+    if (seed < 0) {
+      throw new Error(`PRNG seed must be non-negative, got: ${seed}`);
+    }
+    
+    // Use 1 as default if seed is 0 (0 would cause issues with XorShift)
+    this.initialSeed = seed || 1;
+    this.state = this.initialSeed;
     
     // Warm up the generator
     for (let i = 0; i < 10; i++) {
@@ -59,8 +65,13 @@ export class XorShiftPRNG implements PRNG {
 
 /**
  * Create a new PRNG from seed
+ * @param seed - Non-negative integer seed (0 is converted to 1)
+ * @throws Error if seed is negative
  */
 export function makePRNG(seed: number): PRNG {
+  if (seed < 0) {
+    throw new Error(`PRNG seed must be non-negative, got: ${seed}`);
+  }
   return new XorShiftPRNG(seed);
 }
 

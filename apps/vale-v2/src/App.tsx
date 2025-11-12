@@ -43,12 +43,14 @@ function App() {
 
   const canAccessCredits = story.chapter >= 4;
 
+  const returnToOverworld = useStore((s) => s.returnToOverworld);
+
   // Handle continue from rewards screen
   const handleRewardsContinue = () => {
     claimRewards(); // Add gold/equipment to inventory, clear rewards
     setShowRewards(false); // Ensure rewards screen is hidden
-    setMode('overworld');
     setBattle(null, 0);
+    returnToOverworld();
   };
 
   return (

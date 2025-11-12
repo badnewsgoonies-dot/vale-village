@@ -20,13 +20,7 @@ interface UnitCardProps {
 export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps) {
   const maxHp = calculateMaxHp(unit);
   const hpPercent = (unit.currentHp / maxHp) * 100;
-  
-  // TODO: Migrate PP to team mana in PR-MANA-QUEUE
-  // For now, calculate PP from base stats + level
-  const maxPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
-  const currentPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp; // TODO: Track PP separately
-  const ppPercent = maxPp > 0 ? (currentPp / maxPp) * 100 : 0;
-  
+
   // Calculate effective stats (memoized for performance)
   // PR-STATS-EFFECTIVE: Effective stats include base + level + equipment + Djinn + status
   // Both player and enemy units use player team for Djinn bonuses (team-wide effect)

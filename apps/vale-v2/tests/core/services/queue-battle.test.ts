@@ -131,7 +131,10 @@ describe('QueueBattleService', () => {
       const initialMana = battle.remainingMana;
 
       const queued = queueActionUnwrap(battle, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
-      const cleared = clearQueuedAction(queued, 0);
+      const result = clearQueuedAction(queued, 0);
+
+      if (!result.ok) throw new Error(result.error);
+      const cleared = result.value;
 
       expect(cleared.queuedActions[0]).toBeNull();
       expect(cleared.remainingMana).toBe(initialMana);
@@ -175,7 +178,10 @@ describe('QueueBattleService', () => {
       const { battle } = createTestBattle();
       const djinnId = 'flint'; // Venus Djinn
 
-      const updated = queueDjinn(battle, djinnId);
+      const result = queueDjinn(battle, djinnId);
+
+      if (!result.ok) throw new Error(result.error);
+      const updated = result.value;
 
       expect(updated.queuedDjinn).toContain(djinnId);
     });
@@ -184,14 +190,19 @@ describe('QueueBattleService', () => {
       const { battle } = createTestBattle();
       const djinnId = 'flint';
 
-      const once = queueDjinn(battle, djinnId);
-      const twice = queueDjinn(once, djinnId);
+      const onceResult = queueDjinn(battle, djinnId);
+      if (!onceResult.ok) throw new Error(onceResult.error);
+      const once = onceResult.value;
+
+      const twiceResult = queueDjinn(once, djinnId);
+      if (!twiceResult.ok) throw new Error(twiceResult.error);
+      const twice = twiceResult.value;
 
       expect(twice.queuedDjinn.length).toBe(1);
       expect(twice.queuedDjinn).toEqual([djinnId]);
     });
 
-    test('should throw if Djinn is not in Set state', () => {
+    test('should return error if Djinn is not in Set state', () => {
       const { battle } = createTestBattle();
       // Manually set Djinn to Standby
       const standbyBattle = {
@@ -205,9 +216,8 @@ describe('QueueBattleService', () => {
         },
       };
 
-      expect(() => {
-        queueDjinn(standbyBattle, 'flint');
-      }).toThrow();
+      const result = queueDjinn(standbyBattle, 'flint');
+      expect(result.ok).toBe(false);
     });
   });
 
@@ -270,7 +280,9 @@ describe('QueueBattleService', () => {
 
       // Queue actions and Djinn
       let state = battle;
-      state = queueDjinn(state, 'flint'); // Venus Djinn
+      const djinnResult = queueDjinn(state, 'flint'); // Venus Djinn
+      if (!djinnResult.ok) throw new Error(djinnResult.error);
+      state = djinnResult.value;
       state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
       state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
       state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);
@@ -434,9 +446,17 @@ describe('QueueBattleService', () => {
 
       // Queue 3 Djinn for mega summon
       let state = battle;
-      state = queueDjinn(state, 'flint');   // Venus
-      state = queueDjinn(state, 'granite'); // Venus
-      state = queueDjinn(state, 'forge');   // Mars
+      const djinn1 = queueDjinn(state, 'flint');   // Venus
+      if (!djinn1.ok) throw new Error(djinn1.error);
+      state = djinn1.value;
+
+      const djinn2 = queueDjinn(state, 'granite'); // Venus
+      if (!djinn2.ok) throw new Error(djinn2.error);
+      state = djinn2.value;
+
+      const djinn3 = queueDjinn(state, 'forge');   // Mars
+      if (!djinn3.ok) throw new Error(djinn3.error);
+      state = djinn3.value;
 
       // Queue player actions
       state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
@@ -470,7 +490,9 @@ describe('QueueBattleService', () => {
 
       // Queue Djinn and actions
       let state = strongerEnemyBattle;
-      state = queueDjinn(state, 'flint');
+      const djinnResult = queueDjinn(state, 'flint');
+      if (!djinnResult.ok) throw new Error(djinnResult.error);
+      state = djinnResult.value;
       state = queueActionUnwrap(state, 'unit1', STRIKE.id, ['enemy1'], STRIKE);
       state = queueActionUnwrap(state, 'unit2', STRIKE.id, ['enemy1'], STRIKE);
       state = queueActionUnwrap(state, 'unit3', STRIKE.id, ['enemy1'], STRIKE);

@@ -412,7 +412,7 @@ function executeAbility(
         } else if (!isUnitKO(target)) {
           // Use effective MAG for healing calculation
           const healAmount = calculateHealAmount(caster, team, ability, rng);
-          const healedUnit = applyHealing(target, healAmount);
+          const healedUnit = applyHealing(target, healAmount, ability.revivesFallen || false);
           updatedUnits.push(healedUnit);
           totalHealing += healedUnit.currentHp - target.currentHp;
         } else {

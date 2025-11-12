@@ -46,13 +46,78 @@ export interface UnitIndex {
 }
 
 /**
+ * Turn order tracking
+ * Manages the sequence of unit actions in battle
+ */
+export interface BattleTurnOrder {
+  /** Turn order (SPD-sorted) - array of unit IDs */
+  readonly turnOrder: readonly string[];
+  /** Index of current acting unit in turnOrder (legacy, for old system compatibility) */
+  currentActorIndex: number;
+}
+
+/**
+ * Queue-based battle system state
+ * Tracks queued actions and execution progress
+ */
+export interface BattleQueue {
+  /** Which unit we're currently selecting action for (0-3) */
+  currentQueueIndex: number;
+  /** All 4 queued actions (null if not queued yet) */
+  queuedActions: readonly (QueuedAction | null)[];
+  /** Djinn IDs marked for activation this round */
+  queuedDjinn: readonly string[];
+  /** Index of action currently executing (during execution phase) */
+  executionIndex: number;
+}
+
+/**
+ * Battle progress tracking
+ * Tracks current phase, status, and turn/round counters
+ */
+export interface BattleProgress {
+  /** Battle phase (planning/executing/victory/defeat) */
+  phase: BattlePhase;
+  /** Battle status (ongoing or result) */
+  status: BattleStatus;
+  /** Current turn number (for Djinn recovery tracking) */
+  currentTurn: number;
+  /** Current round number (increments each planning phase) */
+  roundNumber: number;
+}
+
+/**
+ * Battle metadata
+ * Context information about the battle encounter
+ */
+export interface BattleMetadata {
+  /** Is this a boss battle? (cannot flee) */
+  readonly isBossBattle?: boolean;
+  /** NPC ID that triggered this battle (for post-battle cutscene) */
+  readonly npcId?: string;
+  /**
+   * Encounter ID for story progression
+   * @deprecated Use meta.encounterId instead. This field is kept for backward compatibility.
+   */
+  encounterId?: string;
+  /** Battle metadata */
+  meta?: {
+    /** Canonical encounter ID for story progression */
+    encounterId: string;
+    /** Encounter difficulty tier */
+    difficulty?: 'normal' | 'elite' | 'boss';
+  };
+}
+
+/**
  * Battle state
  * Tracks current battle state including units, turn order, and battle status
  *
  * PR-QUEUE-BATTLE: Extended with queue-based battle system
  * PERFORMANCE: Added unitById index for O(1) lookups
+ * REFACTOR: Split into focused sub-interfaces for better organization
  */
-export interface BattleState {
+export interface BattleState extends BattleTurnOrder, BattleQueue, BattleProgress, BattleMetadata {
   /** Player's team */
   readonly playerTeam: Team;
 
@@ -65,37 +130,8 @@ export interface BattleState {
    */
   readonly unitById: ReadonlyMap<string, UnitIndex>;
 
-  /** Current turn number (for Djinn recovery tracking) */
-  currentTurn: number;
-
-  /** Current round number (increments each planning phase) */
-  roundNumber: number;
-
-  /** Battle phase (planning/executing/victory/defeat) */
-  phase: BattlePhase;
-
-  /** Turn order (SPD-sorted) - array of unit IDs */
-  readonly turnOrder: readonly string[];  // Unit IDs
-
-  /** Index of current acting unit in turnOrder (legacy, for old system compatibility) */
-  currentActorIndex: number;
-
-  /** Battle status */
-  status: BattleStatus;
-
   /** Battle log (for UI display) */
   log: readonly string[];
-
-  // ===== QUEUE-BASED BATTLE SYSTEM FIELDS =====
-  
-  /** Which unit we're currently selecting action for (0-3) */
-  currentQueueIndex: number;
-
-  /** All 4 queued actions (null if not queued yet) */
-  queuedActions: readonly (QueuedAction | null)[];
-
-  /** Djinn IDs marked for activation this round */
-  queuedDjinn: readonly string[];
 
   /** Mana remaining in team pool */
   remainingMana: number;
@@ -103,33 +139,8 @@ export interface BattleState {
   /** Maximum mana pool (sum of all units' manaContribution) */
   maxMana: number;
 
-  /** Index of action currently executing (during execution phase) */
-  executionIndex: number;
-
   /** Djinn recovery timers: djinnId → turns until recovery */
   djinnRecoveryTimers: Record<string, number>; // Plain object instead of Map
-
-  // ===== LEGACY FIELDS (for backward compatibility) =====
-
-  /** Is this a boss battle? (cannot flee) */
-  readonly isBossBattle?: boolean;
-
-  /** NPC ID that triggered this battle (for post-battle cutscene) */
-  readonly npcId?: string;
-
-  /** 
-   * Encounter ID for story progression
-   * @deprecated Use meta.encounterId instead. This field is kept for backward compatibility.
-   */
-  encounterId?: string;
-
-  /** Battle metadata */
-  meta?: {
-    /** Canonical encounter ID for story progression */
-    encounterId: string;
-    /** Encounter difficulty tier */
-    difficulty?: 'normal' | 'elite' | 'boss';
-  };
 }
 
 /**

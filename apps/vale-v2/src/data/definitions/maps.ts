@@ -71,6 +71,8 @@ export const MAPS: Record<string, GameMap> = {
     npcs: buildNPCs(),
     triggers: buildTriggers(),
     spawnPoint: { x: 15, y: 10 },
+    encounterRate: 0.05, // 5% chance per step
+    encounterPool: ['c1_normal_1', 'c1_normal_2'], // Random encounters from pool
   },
   'weapon-shop-interior': {
     id: 'weapon-shop-interior',

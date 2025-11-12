@@ -59,20 +59,23 @@ export const createQueueBattleSlice: StateCreator<
   queueUnitAction: (unitIndex, abilityId, targetIds, ability) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
-      throw new Error('Can only queue actions during planning phase');
+      console.warn('Cannot queue action: not in planning phase');
+      return;
     }
 
     const unit = battle.playerTeam.units[unitIndex];
     if (!unit) {
-      throw new Error(`Invalid unit index: ${unitIndex}`);
+      console.warn(`Cannot queue action: invalid unit index ${unitIndex}`);
+      return;
     }
 
     const result = queueAction(battle, unit.id, abilityId, targetIds, ability);
     if (!result.ok) {
-      // Throw error for UI to handle (e.g., show alert)
-      throw new Error(result.error);
+      // Log error for UI feedback (could be enhanced with toast notifications)
+      console.warn(`Failed to queue action: ${result.error}`);
+      return;
     }
-    
+
     set({ battle: result.value });
   },
 
@@ -82,8 +85,13 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    const updatedBattle = clearQueuedAction(battle, unitIndex);
-    set({ battle: updatedBattle });
+    const result = clearQueuedAction(battle, unitIndex);
+    if (!result.ok) {
+      console.warn(`Failed to clear action: ${result.error}`);
+      return;
+    }
+
+    set({ battle: result.value });
   },
 
   queueDjinnActivation: (djinnId) => {
@@ -92,12 +100,13 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    try {
-      const updatedBattle = queueDjinn(battle, djinnId);
-      set({ battle: updatedBattle });
-    } catch (error) {
-      console.error('Failed to queue Djinn:', error);
+    const result = queueDjinn(battle, djinnId);
+    if (!result.ok) {
+      console.warn(`Failed to queue Djinn: ${result.error}`);
+      return;
     }
+
+    set({ battle: result.value });
   },
 
   unqueueDjinnActivation: (djinnId) => {
@@ -106,8 +115,13 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    const updatedBattle = unqueueDjinn(battle, djinnId);
-    set({ battle: updatedBattle });
+    const result = unqueueDjinn(battle, djinnId);
+    if (!result.ok) {
+      console.warn(`Failed to unqueue Djinn: ${result.error}`);
+      return;
+    }
+
+    set({ battle: result.value });
   },
 
   executeQueuedRound: () => {
@@ -163,8 +177,7 @@ export const createQueueBattleSlice: StateCreator<
     }
 
     if (result.state.phase === 'defeat') {
-      const { setMode, onBattleEvents } = get();
-      setMode('overworld');
+      const { returnToOverworld, onBattleEvents } = get();
 
       const encounterId = getEncounterId(result.state);
       if (encounterId && onBattleEvents) {
@@ -180,6 +193,9 @@ export const createQueueBattleSlice: StateCreator<
           },
         ]);
       }
+
+      // Return to pre-battle position
+      returnToOverworld();
 
       return;
     }

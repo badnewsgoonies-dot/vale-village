@@ -391,6 +391,7 @@ export const PARALYZE_SHOCK: Ability = {
 export const ABILITIES: Record<string, Ability> = {
   // Physical
   strike: STRIKE,
+  attack: STRIKE,
   'heavy-strike': HEAVY_STRIKE,
   'guard-break': GUARD_BREAK,
   'precise-jab': PRECISE_JAB,
@@ -414,4 +415,3 @@ export const ABILITIES: Record<string, Ability> = {
   'weaken-def': WEAKEN_DEF,
   blind: BLIND,
 };
-
