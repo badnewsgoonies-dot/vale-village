@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overworld Companion Sprites - Golden Sun</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: var(--font-primary), var(--font-fallback);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Overworld container - GBA resolution 240x160 @4x */
+    .overworld-container {
+      width: var(--scale-4x);
+      height: var(--scale-height-4x);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ===== TILED GRASS BACKGROUND ===== */
+    .grass-terrain {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px),
+        repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(104, 160, 80, 0.3) 15px, rgba(104, 160, 80, 0.3) 16px);
+      background-color: var(--color-grass-mid);
+      background-size: 16px 16px;
+      z-index: var(--z-ground);
+    }
+
+    /* ===== PATH ===== */
+    .path {
+      position: absolute;
+      background: var(--color-path);
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0, 0, 0, 0.05) 4px, rgba(0, 0, 0, 0.05) 8px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: calc(var(--z-ground) + 2);
+    }
+
+    .path-vertical {
+      width: 80px;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* ===== ENTITIES (Player + Companions) ===== */
+    .entity {
+      position: absolute;
+      text-align: center;
+      z-index: var(--z-entity);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .entity-sprite {
+      font-size: 40px;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+      position: relative;
+      z-index: var(--z-entity);
+      image-rendering: pixelated;
+    }
+
+    .entity-shadow {
+      width: 32px;
+      height: 10px;
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5), transparent);
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: var(--z-entity-shadow);
+    }
+
+    .entity-label {
+      font-size: 8px;
+      color: var(--color-text-primary);
+      text-shadow: 1px 1px 2px #000;
+      margin-top: 6px;
+      white-space: nowrap;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* Player styling */
+    .player {
+      animation: bob 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* Companion styling */
+    .companion {
+      animation: subtle-bob 1.8s ease-in-out infinite;
+      opacity: 0.95;
+    }
+
+    @keyframes subtle-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .companion-1 {
+      animation-delay: 0.2s;
+    }
+
+    .companion-2 {
+      animation-delay: 0.4s;
+    }
+
+    .companion-3 {
+      animation-delay: 0.6s;
+    }
+
+    /* ===== HUD ===== */
+    .hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: var(--z-ui);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .hud-panel {
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 8px 12px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      box-shadow: var(--shadow-panel);
+    }
+
+    .location-name {
+      color: var(--color-text-gold);
+      font-size: var(--font-size-sm);
+      margin-bottom: 4px;
+    }
+
+    .party-indicator {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .party-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border-light);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .party-dot.leader {
+      background: var(--color-venus);
+      box-shadow: 0 0 8px var(--color-venus);
+    }
+
+    .party-dot.companion {
+      background: var(--color-mercury);
+    }
+
+    /* ===== INFO BOX ===== */
+    .info-box {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: var(--color-bg-panel);
+      border: 3px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: var(--space-md);
+      z-index: var(--z-ui);
+      box-shadow: var(--shadow-panel);
+      max-width: 280px;
+    }
+
+    .info-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-gold);
+      text-shadow: var(--shadow-text);
+      margin-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border-light);
+      padding-bottom: 6px;
+    }
+
+    .info-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      text-shadow: var(--shadow-text);
+      line-height: 1.8;
+      margin-bottom: var(--space-xs);
+    }
+
+    .info-label {
+      color: var(--color-text-gold);
+      display: block;
+      margin-top: 8px;
+    }
+
+    /* Animation demo controls */
+    .demo-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: var(--z-ui);
+      display: flex;
+      gap: 10px;
+    }
+
+    .demo-button {
+      background: var(--color-bg-panel);
+      border: 2px solid var(--color-border-light);
+      border-right-color: var(--color-border-dark);
+      border-bottom-color: var(--color-border-dark);
+      padding: 8px 16px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--timing-fast);
+    }
+
+    .demo-button:hover {
+      background: rgba(30, 40, 80, 0.95);
+      border-color: var(--color-text-gold);
+      color: var(--color-text-gold);
+    }
+
+    .demo-button:active {
+      transform: translateY(2px);
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .player,
+      .companion {
+        animation: none;
+      }
+      
+      .entity {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overworld-container" role="application" aria-label="Overworld with companion sprites demonstration">
+    
+    <!-- Background -->
+    <div class="grass-terrain"></div>
+    
+    <!-- Path -->
+    <div class="path path-vertical"></div>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-panel">
+        <div class="location-name">Vale Village</div>
+        <div>Party: 4/4</div>
+        <div class="party-indicator">
+          <div class="party-dot leader" title="Isaac (Leader)"></div>
+          <div class="party-dot companion" title="Garet"></div>
+          <div class="party-dot companion" title="Ivan"></div>
+          <div class="party-dot companion" title="Mia"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <div class="info-title">Companion Sprites</div>
+      <div class="info-text">
+        This mockup demonstrates the "follow-the-leader" pattern used in Golden Sun.
+      </div>
+      <div class="info-label">Pattern:</div>
+      <div class="info-text">
+        • Leader (Isaac) at front<br>
+        • 3 companions follow in line<br>
+        • Each delayed by ~40px<br>
+        • Smooth transitions<br>
+        • Subtle animation offset
+      </div>
+      <div class="info-label">Implementation:</div>
+      <div class="info-text">
+        • Track position history<br>
+        • Each companion follows<br>
+        • Delay based on index<br>
+        • 8-direction support
+      </div>
+    </div>
+
+    <!-- Player (Leader) - Isaac -->
+    <div class="entity player" style="left: 440px; top: 200px;">
+      <div class="entity-sprite">🧙‍♂️</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Isaac</div>
+    </div>
+
+    <!-- Companion 1 - Garet -->
+    <div class="entity companion companion-1" style="left: 440px; top: 250px;">
+      <div class="entity-sprite">⚔️</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Garet</div>
+    </div>
+
+    <!-- Companion 2 - Ivan -->
+    <div class="entity companion companion-2" style="left: 440px; top: 300px;">
+      <div class="entity-sprite">🏹</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Ivan</div>
+    </div>
+
+    <!-- Companion 3 - Mia -->
+    <div class="entity companion companion-3" style="left: 440px; top: 350px;">
+      <div class="entity-sprite">🔮</div>
+      <div class="entity-shadow"></div>
+      <div class="entity-label">Mia</div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+      <button class="demo-button" onclick="moveParty('up')">↑ Move Up</button>
+      <button class="demo-button" onclick="moveParty('left')">← Move Left</button>
+      <button class="demo-button" onclick="moveParty('right')">→ Move Right</button>
+      <button class="demo-button" onclick="moveParty('down')">↓ Move Down</button>
+    </div>
+
+  </div>
+
+  <script>
+    // Simple demo movement (for mockup demonstration only)
+    let positions = [
+      { x: 440, y: 200 },  // Isaac
+      { x: 440, y: 250 },  // Garet
+      { x: 440, y: 300 },  // Ivan
+      { x: 440, y: 350 }   // Mia
+    ];
+
+    const entities = document.querySelectorAll('.entity');
+    const moveDistance = 50;
+
+    function moveParty(direction) {
+      // Move leader
+      switch(direction) {
+        case 'up':
+          positions[0].y -= moveDistance;
+          break;
+        case 'down':
+          positions[0].y += moveDistance;
+          break;
+        case 'left':
+          positions[0].x -= moveDistance;
+          break;
+        case 'right':
+          positions[0].x += moveDistance;
+          break;
+      }
+
+      // Keep within bounds
+      positions[0].x = Math.max(100, Math.min(860, positions[0].x));
+      positions[0].y = Math.max(100, Math.min(540, positions[0].y));
+
+      // Update leader position immediately
+      entities[0].style.left = positions[0].x + 'px';
+      entities[0].style.top = positions[0].y + 'px';
+
+      // Move companions to follow with delay
+      for (let i = 1; i < positions.length; i++) {
+        setTimeout(() => {
+          // Store old position for next companion
+          const oldPos = { ...positions[i] };
+          
+          // Move to previous character's old position
+          positions[i] = { ...positions[i - 1] };
+          
+          // Update position
+          if (entities[i]) {
+            entities[i].style.left = positions[i].x + 'px';
+            entities[i].style.top = positions[i].y + 'px';
+          }
+
+          // Pass old position to next companion
+          if (i < positions.length - 1) {
+            positions[i + 1] = oldPos;
+          }
+        }, i * 150); // Staggered delay
+      }
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      switch(e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          e.preventDefault();
+          moveParty('up');
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          e.preventDefault();
+          moveParty('down');
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          e.preventDefault();
+          moveParty('left');
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          e.preventDefault();
+          moveParty('right');
+          break;
+      }
+    });
+  </script>
+
+</body>
+</html>
