@@ -44,8 +44,10 @@
 
 ### **New System (1-10):**
 - **Max Level: 10** (option to reduce to 7 later)
-- Units have 4-5 abilities each (unlocked at various levels 1-4)
-- Result: Focused ability kits, clear progression
+- Units unlock 1 ability per level = 10 base abilities per unit
+- Djinn grant ~22 additional abilities per unit (2/1/2 same/neutral/counter × 12 Djinn)
+- Total ability pool per unit: ~32 abilities (10 base + 22 Djinn)
+- Result: Focused progression, Djinn choices matter
 
 ### **XP Curve Adjustment:**
 ```
@@ -58,10 +60,10 @@ Chapter 3: Levels 8-10 (mastery)
 ```
 
 ### **Benefits:**
-- ✅ Fewer abilities to balance (4-5 per unit)
-- ✅ Clearer progression (each level feels impactful)
-- ✅ Faster to max level (less grinding)
-- ✅ Build choices matter more (limited ability slots)
+- ✅ Clear progression (1 ability per level)
+- ✅ Faster to max level (10 vs 20)
+- ✅ Djinn choices matter (22 Djinn abilities vs 10 base)
+- ✅ Build variety (32 total abilities per unit to choose from)
 
 ---
 
@@ -160,7 +162,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 | **Core Enemies** | 50 | Full design (sprites, AI, abilities) |
 | **Elite Variants** | 30 | +25% stats, +1 ability |
 | **Djinn Collection** | 4 | Granite (T2), Corona (T2), Tonic (T2), Squall (T2) |
-| **New Abilities** | 24-30 | 6 new units × 4-5 abilities each |
+| **New Abilities** | 60 | 6 new units × 10 abilities each (1 per level) |
 | **New Equipment** | 25-30 | Weapons, armor, accessories |
 | **Maps** | 1 | Shadow Fortress region only |
 
@@ -207,7 +209,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 2. Generate 50 core enemies + 30 elite variants
 3. Design 15 linear story battles
 4. Create 1 map for Shadow Fortress region
-5. Write 24-30 new abilities (6 units × 4-5 each)
+5. Write 60 new abilities (6 units × 10 each, 1 per level)
 6. Generate 25-30 equipment items
 7. Update XP curve for max level 10
 8. **Estimated Time:** 8-10 hours
@@ -215,7 +217,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 ### **Phase 3: Testing & Balancing**
 1. Playtest story progression (15 battles)
 2. Balance level curve (1-10 feels right)
-3. Test new unit abilities (24-30 abilities)
+3. Test new unit abilities (60 abilities)
 4. Tune enemy difficulty
 5. **Estimated Time:** 3-4 hours
 
