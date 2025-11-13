@@ -254,70 +254,152 @@ function executeAbility(
     case 'physical':
     case 'psynergy': {
       let totalDamage = 0;
+      const hitCount = ability.hitCount || 1; // Multi-hit support
 
       for (const target of targets) {
         // Re-validate target exists and is alive (may have been KO'd by previous hits)
-        const currentTarget = updatedUnits.find(u => u.id === target.id) ||
+        let currentTarget = updatedUnits.find(u => u.id === target.id) ||
                              allUnits.find(u => u.id === target.id);
         if (!currentTarget || isUnitKO(currentTarget)) {
           continue;
         }
 
-        const damage = ability.type === 'physical'
-          ? calculatePhysicalDamage(caster, currentTarget, team, ability)
-          : calculatePsynergyDamage(caster, currentTarget, team, ability);
+        let targetDamage = 0;
 
-        let damagedUnit = applyDamage(currentTarget, damage);
+        // Multi-hit logic
+        for (let hit = 0; hit < hitCount; hit++) {
+          if (isUnitKO(currentTarget)) break; // Stop hitting if target is KO'd
 
+          const damage = ability.type === 'physical'
+            ? calculatePhysicalDamage(caster, currentTarget, team, ability)
+            : calculatePsynergyDamage(caster, currentTarget, team, ability);
+
+          currentTarget = applyDamage(currentTarget, damage);
+          targetDamage += damage;
+
+          // Update in the working set
+          const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+          if (existingIndex >= 0) {
+            updatedUnits[existingIndex] = currentTarget;
+          } else {
+            updatedUnits.push(currentTarget);
+          }
+        }
+
+        totalDamage += targetDamage;
+
+        // Apply status effect (if any)
         if (ability.statusEffect) {
           const statusType = ability.statusEffect.type;
           const statusDuration = ability.statusEffect.duration;
+          const statusChance = ability.statusEffect.chance ?? 1.0; // Default 100% chance
 
-          const filteredStatuses = damagedUnit.statusEffects.filter(
-            s => s.type !== statusType
-          );
+          // TODO: Add RNG for chance check (requires passing PRNG to executeAbility)
+          // For now, always apply if chance >= 1.0
+          if (statusChance >= 1.0) {
+            const filteredStatuses = currentTarget.statusEffects.filter(
+              s => s.type !== statusType
+            );
 
-          let newStatus: typeof damagedUnit.statusEffects[number];
-          if (statusType === 'poison') {
-            newStatus = {
-              type: 'poison',
-              damagePerTurn: 8,
-              duration: statusDuration,
+            let newStatus: typeof currentTarget.statusEffects[number];
+            if (statusType === 'poison') {
+              newStatus = {
+                type: 'poison',
+                damagePerTurn: 8,
+                duration: statusDuration,
+              };
+            } else if (statusType === 'burn') {
+              newStatus = {
+                type: 'burn',
+                damagePerTurn: 10,
+                duration: statusDuration,
+              };
+            } else if (statusType === 'freeze') {
+              newStatus = {
+                type: 'freeze',
+                duration: statusDuration,
+              };
+            } else if (statusType === 'stun') {
+              newStatus = {
+                type: 'stun',
+                duration: statusDuration,
+              };
+            } else if (statusType === 'blind') {
+              newStatus = {
+                type: 'blind',
+                duration: statusDuration,
+              };
+            } else {
+              newStatus = {
+                type: 'paralyze',
+                duration: statusDuration,
+              };
+            }
+
+            currentTarget = {
+              ...currentTarget,
+              statusEffects: [...filteredStatuses, newStatus],
             };
-          } else if (statusType === 'burn') {
-            newStatus = {
-              type: 'burn',
-              damagePerTurn: 10,
-              duration: statusDuration,
-            };
-          } else if (statusType === 'freeze') {
-            newStatus = {
-              type: 'freeze',
-              duration: statusDuration,
-            };
-          } else {
-            newStatus = {
-              type: 'paralyze',
-              duration: statusDuration,
-            };
+
+            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+            if (existingIndex >= 0) {
+              updatedUnits[existingIndex] = currentTarget;
+            } else {
+              updatedUnits.push(currentTarget);
+            }
+          }
+        }
+
+        // Apply debuff effect (if any)
+        if (ability.debuffEffect) {
+          const newDebuffs: typeof currentTarget.statusEffects = [];
+          const validStats: Array<keyof typeof caster.baseStats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
+
+          for (const [stat, modifier] of Object.entries(ability.debuffEffect)) {
+            if (typeof modifier === 'number' && validStats.includes(stat as keyof typeof caster.baseStats)) {
+              newDebuffs.push({
+                type: 'debuff',
+                stat: stat as keyof typeof caster.baseStats,
+                modifier: -Math.abs(modifier), // Ensure negative for debuff
+                duration: ability.duration || 3,
+              });
+            }
           }
 
-          damagedUnit = {
-            ...damagedUnit,
-            statusEffects: [...filteredStatuses, newStatus],
-          };
-        }
+          if (newDebuffs.length > 0) {
+            currentTarget = {
+              ...currentTarget,
+              statusEffects: [...currentTarget.statusEffects, ...newDebuffs],
+            };
 
-        const existingIndex = updatedUnits.findIndex(u => u.id === damagedUnit.id);
-        if (existingIndex >= 0) {
-          updatedUnits[existingIndex] = damagedUnit;
-        } else {
-          updatedUnits.push(damagedUnit);
+            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+            if (existingIndex >= 0) {
+              updatedUnits[existingIndex] = currentTarget;
+            } else {
+              updatedUnits.push(currentTarget);
+            }
+          }
         }
-        totalDamage += damage;
+      }
+
+      // Apply drain healing to caster (if any)
+      let drainHealing = 0;
+      if (ability.drainPercentage && totalDamage > 0) {
+        drainHealing = Math.floor(totalDamage * ability.drainPercentage);
+        const healedCaster = applyHealing(caster, drainHealing, false);
+
+        const existingIndex = updatedUnits.findIndex(u => u.id === caster.id);
+        if (existingIndex >= 0) {
+          updatedUnits[existingIndex] = healedCaster;
+        } else {
+          updatedUnits.push(healedCaster);
+        }
       }
 
       message += ` Deals ${totalDamage} damage!`;
+      if (drainHealing > 0) {
+        message += ` ${caster.name} drains ${drainHealing} HP!`;
+      }
 
       const finalUnits = allUnits.map(u => {
         const updated = updatedUnits.find(up => up.id === u.id);
@@ -337,23 +419,42 @@ function executeAbility(
       let totalHealing = 0;
 
       for (const target of targets) {
-        if (ability.revivesFallen && isUnitKO(target)) {
+        let currentTarget = target;
+
+        // Handle revive
+        if ((ability.revivesFallen || ability.revive) && isUnitKO(target)) {
           const maxHp = target.baseStats.hp + (target.level - 1) * target.growthRates.hp;
-          const revivedUnit: Unit = {
+          const reviveHPPercent = ability.reviveHPPercent ?? BATTLE_CONSTANTS.REVIVE_HP_PERCENTAGE;
+          currentTarget = {
             ...target,
-            currentHp: Math.floor(maxHp * BATTLE_CONSTANTS.REVIVE_HP_PERCENTAGE),
+            currentHp: Math.floor(maxHp * reviveHPPercent),
           };
-          updatedUnits.push(revivedUnit);
-          totalHealing += revivedUnit.currentHp;
+          totalHealing += currentTarget.currentHp;
         } else if (!isUnitKO(target)) {
           // Use effective MAG for healing calculation
           const healAmount = calculateHealAmount(caster, team, ability);
-          const healedUnit = applyHealing(target, healAmount, ability.revivesFallen || false);
-          updatedUnits.push(healedUnit);
-          totalHealing += healedUnit.currentHp - target.currentHp;
-        } else {
-          updatedUnits.push(target);
+          currentTarget = applyHealing(target, healAmount, ability.revivesFallen || ability.revive || false);
+          totalHealing += currentTarget.currentHp - target.currentHp;
         }
+
+        // Apply heal-over-time effect (if any)
+        if (ability.healOverTime && !isUnitKO(currentTarget)) {
+          const hotEffect: Extract<typeof currentTarget.statusEffects[number], { type: 'healOverTime' }> = {
+            type: 'healOverTime',
+            healPerTurn: ability.healOverTime.amount,
+            duration: ability.healOverTime.duration,
+          };
+
+          // Remove existing heal-over-time effects
+          const filteredStatuses = currentTarget.statusEffects.filter(s => s.type !== 'healOverTime');
+
+          currentTarget = {
+            ...currentTarget,
+            statusEffects: [...filteredStatuses, hotEffect],
+          };
+        }
+
+        updatedUnits.push(currentTarget);
       }
 
       message += ` Restores ${totalHealing} HP!`;

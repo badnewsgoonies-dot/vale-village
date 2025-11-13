@@ -62,7 +62,12 @@ export const StatusEffectSchema = z.discriminatedUnion('type', [
     duration: z.number().int().positive(),
   }),
   z.object({
-    type: z.enum(['freeze', 'paralyze']),
+    type: z.enum(['freeze', 'paralyze', 'stun', 'blind']),
+    duration: z.number().int().positive(),
+  }),
+  z.object({
+    type: z.literal('healOverTime'),
+    healPerTurn: z.number().int().positive(),
     duration: z.number().int().positive(),
   }),
 ]);

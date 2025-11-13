@@ -18,7 +18,7 @@ export const AbilitySchema = z.object({
   name: z.string().min(1),
   type: z.enum(['physical', 'psynergy', 'healing', 'buff', 'debuff', 'summon']),
   element: z.enum(['Venus', 'Mars', 'Jupiter', 'Mercury', 'Neutral']).optional(),
-  manaCost: z.number().int().min(0).max(10), // Cannot be negative!
+  manaCost: z.number().int().min(0).max(50), // Cannot be negative! Increased for T3 abilities
   basePower: z.number().int().min(0), // Cannot be negative!
   targets: z.enum(['single-enemy', 'all-enemies', 'single-ally', 'all-allies', 'self']),
   unlockLevel: z.number().int().min(1).max(20),
@@ -38,10 +38,36 @@ export const AbilitySchema = z.object({
   
   // Status effect applied on hit (for physical/psynergy abilities)
   statusEffect: z.object({
-    type: z.enum(['poison', 'burn', 'freeze', 'paralyze']),
+    type: z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'blind']),
     duration: z.number().int().min(1),
+    chance: z.number().min(0).max(1).optional(), // Probability of applying (0-1), defaults to 1.0
   }).optional(),
-  
+
+  // Debuff effects (stat reductions applied to targets)
+  debuffEffect: z.object({
+    atk: z.number().optional(),
+    def: z.number().optional(),
+    mag: z.number().optional(),
+    spd: z.number().optional(),
+    hp: z.number().optional(), // Max HP reduction
+  }).optional(),
+
+  // Heal over time effect
+  healOverTime: z.object({
+    amount: z.number().int().min(1), // HP restored per turn
+    duration: z.number().int().min(1), // Number of turns
+  }).optional(),
+
+  // Multi-hit attacks
+  hitCount: z.number().int().min(1).max(10).optional(), // Number of hits (2-4 typical)
+
+  // Revive mechanics
+  revive: z.boolean().optional(), // Can revive KO'd units
+  reviveHPPercent: z.number().min(0).max(1).optional(), // HP% restored when reviving (0-1)
+
+  // Drain mechanics (damage dealt heals attacker)
+  drainPercentage: z.number().min(0).max(1).optional(), // Percentage of damage dealt converted to healing (0-1)
+
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
     priority: z.number().min(0).max(3).optional(),
