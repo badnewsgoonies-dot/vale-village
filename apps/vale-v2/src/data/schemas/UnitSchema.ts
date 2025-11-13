@@ -100,7 +100,7 @@ export const StatusEffectSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('immunity'),
     all: z.boolean(), // If true, immune to all negative statuses
-    types: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun'])).optional(), // Specific immunities
+    types: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'])).optional(), // Specific immunities
     duration: z.number().int().positive(),
   }),
   // Phase 2: Auto-revive (uses-based, not time-based)

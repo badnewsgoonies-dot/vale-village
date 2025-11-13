@@ -89,9 +89,11 @@ export function applyDamageModifiers(
   const damageReductionPercents = damageReductionEffects.map(effect => effect.percent);
 
   const totalDamageReduction = damageReductionPercents.reduce((sum, pct) => sum + pct, 0);
+  // Clamp to [0, 1] to prevent negative damage or > 100% reduction
+  const clampedReduction = Math.min(1, Math.max(0, totalDamageReduction));
 
   // Damage reduction: reduce by percentage (e.g., 0.3 = 30% reduction → × 0.7)
-  modifiedDamage *= (1 - totalDamageReduction);
+  modifiedDamage *= (1 - clampedReduction);
 
   return modifiedDamage;
 }
@@ -117,8 +119,8 @@ export function calculatePhysicalDamage(
   const baseDamage = ability.basePower > 0 ? ability.basePower : attackerEffective.atk;
   const attackPower = attackerEffective.atk;
 
-  // Phase 2: Apply ignore defense percentage
-  const ignoreDefensePercent = ability.ignoreDefensePercent || 0;
+  // Phase 2: Apply ignore defense percentage (clamp to [0, 1] for safety)
+  const ignoreDefensePercent = Math.min(1, Math.max(0, ability.ignoreDefensePercent || 0));
   const effectiveDefense = defenderEffective.def * (1 - ignoreDefensePercent);
 
   const rawDamage = baseDamage + attackPower - (effectiveDefense * BATTLE_CONSTANTS.DEFENSE_MULTIPLIER);
@@ -152,8 +154,8 @@ export function calculatePsynergyDamage(
   const basePower = ability.basePower || 0;
   const magicPower = attackerEffective.mag;
 
-  // Phase 2: Apply ignore defense percentage
-  const ignoreDefensePercent = ability.ignoreDefensePercent || 0;
+  // Phase 2: Apply ignore defense percentage (clamp to [0, 1] for safety)
+  const ignoreDefensePercent = Math.min(1, Math.max(0, ability.ignoreDefensePercent || 0));
   const effectiveDefense = defenderEffective.def * (1 - ignoreDefensePercent);
   const magicDefense = effectiveDefense * BATTLE_CONSTANTS.PSYNERGY_DEFENSE_MULTIPLIER;
 

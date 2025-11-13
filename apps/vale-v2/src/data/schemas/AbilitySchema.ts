@@ -78,7 +78,7 @@ export const AbilitySchema = z.object({
     z.object({ type: z.literal('negative') }),
     z.object({
       type: z.literal('byType'),
-      statuses: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun'])),
+      statuses: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'])),
     }),
   ]).optional(),
 
