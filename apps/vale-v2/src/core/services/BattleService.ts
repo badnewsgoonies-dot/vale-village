@@ -324,11 +324,6 @@ function executeAbility(
                 type: 'stun',
                 duration: statusDuration,
               };
-            } else if (statusType === 'blind') {
-              newStatus = {
-                type: 'blind',
-                duration: statusDuration,
-              };
             } else {
               newStatus = {
                 type: 'paralyze',
@@ -382,24 +377,7 @@ function executeAbility(
         }
       }
 
-      // Apply drain healing to caster (if any)
-      let drainHealing = 0;
-      if (ability.drainPercentage && totalDamage > 0) {
-        drainHealing = Math.floor(totalDamage * ability.drainPercentage);
-        const healedCaster = applyHealing(caster, drainHealing, false);
-
-        const existingIndex = updatedUnits.findIndex(u => u.id === caster.id);
-        if (existingIndex >= 0) {
-          updatedUnits[existingIndex] = healedCaster;
-        } else {
-          updatedUnits.push(healedCaster);
-        }
-      }
-
       message += ` Deals ${totalDamage} damage!`;
-      if (drainHealing > 0) {
-        message += ` ${caster.name} drains ${drainHealing} HP!`;
-      }
 
       const finalUnits = allUnits.map(u => {
         const updated = updatedUnits.find(up => up.id === u.id);

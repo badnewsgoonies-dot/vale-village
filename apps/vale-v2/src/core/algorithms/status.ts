@@ -17,15 +17,14 @@ import { applyDamage } from './damage';
  * 3. Heal-over-time - applied after decay
  * 4. Status expiration events emitted for effects that reached duration 0
  *
- * Note: Freeze, Stun, Blind, and Paralyze are checked separately before action execution
- * (freeze/stun in isFrozen(), paralyze in checkParalyzeFailure(), blind in damage calculation)
+ * Note: Freeze, Stun, and Paralyze are checked separately before action execution
+ * (freeze/stun in isFrozen(), paralyze in checkParalyzeFailure())
  *
  * Poison: 8% max HP damage per turn
  * Burn: 10% max HP damage per turn
  * HealOverTime: Fixed HP heal per turn (specified in effect)
  * Freeze: Skip turn, 30% break chance per turn (checked in isFrozen())
  * Stun: Skip turn completely
- * Blind: Reduces hit chance (checked in damage calculation)
  * Paralyze: 25% failure chance (checked in checkParalyzeFailure())
  */
 export function processStatusEffectTick(
@@ -64,9 +63,6 @@ export function processStatusEffectTick(
       }
     } else if (effect.type === 'stun') {
       messages.push(`${unit.name} is stunned and cannot act!`);
-      return { ...effect, duration: effect.duration - 1 };
-    } else if (effect.type === 'blind') {
-      // Blind just decrements - effect is handled in damage calculation
       return { ...effect, duration: effect.duration - 1 };
     }
     // Buff/debuff/paralyze just decrement duration
@@ -116,12 +112,5 @@ export function checkParalyzeFailure(
  */
 export function isFrozen(unit: Unit): boolean {
   return unit.statusEffects.some(e => e.type === 'freeze' || e.type === 'stun');
-}
-
-/**
- * Check if unit is blinded (reduced hit chance)
- */
-export function isBlind(unit: Unit): boolean {
-  return unit.statusEffects.some(e => e.type === 'blind');
 }
 

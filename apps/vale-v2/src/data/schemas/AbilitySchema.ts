@@ -38,7 +38,7 @@ export const AbilitySchema = z.object({
   
   // Status effect applied on hit (for physical/psynergy abilities)
   statusEffect: z.object({
-    type: z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'blind']),
+    type: z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun']),
     duration: z.number().int().min(1),
     chance: z.number().min(0).max(1).optional(), // Probability of applying (0-1), defaults to 1.0
   }).optional(),
@@ -64,9 +64,6 @@ export const AbilitySchema = z.object({
   // Revive mechanics
   revive: z.boolean().optional(), // Can revive KO'd units
   reviveHPPercent: z.number().min(0).max(1).optional(), // HP% restored when reviving (0-1)
-
-  // Drain mechanics (damage dealt heals attacker)
-  drainPercentage: z.number().min(0).max(1).optional(), // Percentage of damage dealt converted to healing (0-1)
 
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
