@@ -24,6 +24,7 @@ export interface Equipment {
   readonly slot: EquipmentSlot;
   readonly tier: EquipmentTier;
   readonly cost: number;
+  readonly allowedUnits: string[];
 
   // Stat bonuses
   readonly statBonus: Partial<Stats>;

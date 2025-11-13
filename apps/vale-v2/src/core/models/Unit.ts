@@ -48,6 +48,7 @@ export interface Unit {
   djinnStates: Record<string, 'Set' | 'Standby' | 'Recovery'>; // Plain object instead of Map
   abilities: readonly Ability[];
   unlockedAbilityIds: readonly string[]; // Array instead of Set
+  storeUnlocked: boolean;
 
   // Battle state
   statusEffects: readonly StatusEffect[];
@@ -107,6 +108,7 @@ export function createUnit(
       boots: null,
       accessory: null,
     },
+    storeUnlocked: false,
     djinn: [],
     djinnStates: {},
     abilities: definition.abilities,
@@ -132,4 +134,3 @@ export function updateUnit(unit: Unit, updates: Partial<Unit>): Unit {
     battleStats: updates.battleStats ? { ...unit.battleStats, ...updates.battleStats } : unit.battleStats,
   };
 }
-

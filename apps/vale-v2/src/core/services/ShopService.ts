@@ -6,7 +6,10 @@
 import type { Result } from '../utils/result';
 import { Ok, Err } from '../utils/result';
 import type { Equipment } from '../models/Equipment';
+import type { Unit } from '../models/Unit';
 import { EQUIPMENT } from '../../data/definitions/equipment';
+import { getStarterKit } from '../../data/definitions/starterKits';
+import { canEquipItem } from '../algorithms/equipment';
 
 /**
  * Check if player can afford an item
@@ -35,6 +38,60 @@ export function buyItem(gold: number, itemId: string): Result<{ success: boolean
 
   return Ok({
     success: true,
+    newGold: gold - item.cost,
+    item,
+  });
+}
+
+export function purchaseStarterKit(
+  unitId: string,
+  currentGold: number
+): Result<{ newGold: number; equipment: Equipment[] }, string> {
+  const kit = getStarterKit(unitId);
+
+  if (!kit) {
+    return Err(`Starter Kit not found for unit: ${unitId}`);
+  }
+
+  if (currentGold < kit.cost) {
+    return Err(`Insufficient gold. Need ${kit.cost}g, have ${currentGold}g`);
+  }
+
+  const equipmentIds = Object.values(kit.equipment);
+  const equipmentList: Equipment[] = [];
+  for (const id of equipmentIds) {
+    const item = EQUIPMENT[id];
+    if (!item) {
+      return Err(`Equipment ${id} not found for Starter Kit ${unitId}`);
+    }
+    equipmentList.push(item);
+  }
+
+  return Ok({
+    newGold: currentGold - kit.cost,
+    equipment: equipmentList,
+  });
+}
+
+export function purchaseUnitEquipment(
+  unit: Unit,
+  gold: number,
+  itemId: string
+): Result<{ newGold: number; item: Equipment }, string> {
+  const item = EQUIPMENT[itemId];
+  if (!item) {
+    return Err(`Item ${itemId} not found`);
+  }
+
+  if (!canEquipItem(unit, item)) {
+    return Err(`${unit.name} cannot equip ${item.name}`);
+  }
+
+  if (gold < item.cost) {
+    return Err(`Cannot afford ${item.name}. Need ${item.cost}g, have ${gold}g`);
+  }
+
+  return Ok({
     newGold: gold - item.cost,
     item,
   });

@@ -6,19 +6,20 @@
 import type { StateCreator } from 'zustand';
 import type { BattleState } from '../../core/models/BattleState';
 import type { RewardDistribution } from '../../core/models/Rewards';
-import type { PRNG } from '../../core/random/prng';
 import { processVictory as rewardsServiceProcessVictory } from '../../core/services/RewardsService';
 import type { InventorySlice } from './inventorySlice';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
+import type { Equipment } from '../../data/schemas/EquipmentSchema';
 
 export interface RewardsSlice {
   lastBattleRewards: RewardDistribution | null;
   showRewards: boolean;
-  
-  processVictory: (battle: BattleState, rng: PRNG) => void;
+
+  processVictory: (battle: BattleState) => void;
   claimRewards: () => void;
   setShowRewards: (visible: boolean) => void;
+  selectEquipmentChoice: (equipment: Equipment) => void;
 }
 
 export const createRewardsSlice: StateCreator<
@@ -30,15 +31,12 @@ export const createRewardsSlice: StateCreator<
   lastBattleRewards: null,
   showRewards: false,
 
-  processVictory: (battle, rng) => {
-    // Call service to process victory
-    const result = rewardsServiceProcessVictory(battle, rng);
+  processVictory: (battle) => {
+    const result = rewardsServiceProcessVictory(battle);
 
-    // Update team state with XP gains
     const { updateTeam } = get();
     updateTeam({ units: result.updatedTeam.units });
 
-    // Store distribution for display
     set({ lastBattleRewards: result.distribution });
   },
 
@@ -46,17 +44,38 @@ export const createRewardsSlice: StateCreator<
     const { lastBattleRewards } = get();
     if (!lastBattleRewards) return;
 
-    // Apply rewards to inventory
     const { addGold, addEquipment } = get();
     addGold(lastBattleRewards.goldEarned);
-    addEquipment([...lastBattleRewards.rewards.equipmentDrops]);
 
-    // Clear rewards and hide screen
+    const equipmentToAdd: Equipment[] = [];
+    if (lastBattleRewards.fixedEquipment) {
+      equipmentToAdd.push(lastBattleRewards.fixedEquipment);
+    }
+    if (lastBattleRewards.choiceSelected) {
+      equipmentToAdd.push(lastBattleRewards.choiceSelected);
+    }
+
+    if (equipmentToAdd.length > 0) {
+      addEquipment(equipmentToAdd);
+    }
+
     set({ lastBattleRewards: null, showRewards: false });
   },
 
   setShowRewards: (visible) => {
     set({ showRewards: visible });
   },
-});
 
+  selectEquipmentChoice: (equipment) => {
+    set((state) => {
+      if (!state.lastBattleRewards?.equipmentChoice) return state;
+      return {
+        lastBattleRewards: {
+          ...state.lastBattleRewards,
+          choiceSelected: equipment,
+          equipmentChoice: undefined,
+        },
+      };
+    });
+  },
+});

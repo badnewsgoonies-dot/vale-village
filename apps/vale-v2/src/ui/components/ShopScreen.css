@@ -308,6 +308,24 @@
   border-color: rgba(255, 255, 255, 0.5);
 }
 
+.starter-kits-section,
+.unit-store-section,
+.shop-general-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.starter-kits-section h2,
+.unit-store-section h2,
+.shop-general-section h2 {
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #FFD87F;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .shop-screen-container {

@@ -49,10 +49,9 @@ export type { StatusEffect } from '../../data/schemas/UnitSchema';
 /**
  * Djinn states during battle
  */
-export type DjinnState = 'Set' | 'Standby' | 'Recovery';
+export type DjinnState = 'Set' | 'Standby' | 'Recovery'; // Recovery state exists for compatibility but current flow is Set ↔ Standby
 
 export interface Position {
   x: number;
   y: number;
 }
-

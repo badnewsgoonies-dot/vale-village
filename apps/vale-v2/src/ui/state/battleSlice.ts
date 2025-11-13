@@ -80,8 +80,7 @@ export const createBattleSlice: StateCreator<
       // If player victory, process rewards
       if (battleEnd === 'PLAYER_VICTORY') {
         const { processVictory } = get();
-        const rngVictory = makePRNG(rngSeed + turnNumber * 1_000_000 + 999);
-        processVictory(result.state, rngVictory);
+        processVictory(result.state);
       }
 
       // Emit encounter-finished event if we have an encounterId
@@ -147,8 +146,7 @@ export const createBattleSlice: StateCreator<
         // If player victory, process rewards
         if (battleEnd === 'PLAYER_VICTORY') {
           const { processVictory } = get();
-          const rngVictory = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.VICTORY));
-          processVictory(result.state, rngVictory);
+          processVictory(result.state);
         }
 
         // Emit encounter-finished event for story progression
@@ -231,4 +229,3 @@ export const createBattleSlice: StateCreator<
     return { avg: Math.round(sum / N), min, max };
   },
 });
-

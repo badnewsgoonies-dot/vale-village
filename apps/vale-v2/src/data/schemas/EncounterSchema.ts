@@ -14,28 +14,45 @@ export const EncounterRulesSchema = z.object({
   fleeDisabled: z.boolean().optional(),
 });
 
-/**
- * Zod schema for Encounter rewards
- */
-export const EncounterRewardSchema = z.object({
-  gold: z.number().int().min(0).optional(),
-  unlockUnit: z.string().min(1).optional(), // Unit ID to unlock
-  unlockAbility: z.string().min(1).optional(), // Ability ID to unlock for all units
+const equipmentOptionsUnique = (options: readonly string[]) => new Set(options).size === options.length;
+
+export const EquipmentRewardSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('none'),
+  }),
+  z.object({
+    type: z.literal('fixed'),
+    itemId: z.string().min(1),
+  }),
+  z.object({
+    type: z.literal('choice'),
+    options: z
+      .array(z.string().min(1))
+      .length(3)
+      .refine(equipmentOptionsUnique, {
+        message: 'Choice options must be unique',
+      }),
+  }),
+]);
+
+export const EncounterRewardsSchema = z.object({
+  xp: z.number().int().min(0),
+  gold: z.number().int().min(0),
+  equipment: EquipmentRewardSchema,
+  unlockUnit: z.string().min(1).optional(),
+  unlockAbility: z.string().min(1).optional(), // Future: apply unlocks in RewardsService/Store
 });
 
-/**
- * Zod schema for Encounter
- * Defines a battle encounter with enemies and special rules
- */
 export const EncounterSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  enemies: z.array(z.string().min(1)).min(1), // Array of enemy IDs
+  enemies: z.array(z.string().min(1)).min(1),
+  difficulty: z.enum(['easy', 'medium', 'hard', 'boss']).optional(),
   rules: EncounterRulesSchema.optional(),
-  reward: EncounterRewardSchema.optional(),
+  reward: EncounterRewardsSchema,
 });
 
 export type Encounter = z.infer<typeof EncounterSchema>;
 export type EncounterRules = z.infer<typeof EncounterRulesSchema>;
-export type EncounterReward = z.infer<typeof EncounterRewardSchema>;
-
+export type EncounterRewards = z.infer<typeof EncounterRewardsSchema>;
+export type EquipmentReward = z.infer<typeof EquipmentRewardSchema>;

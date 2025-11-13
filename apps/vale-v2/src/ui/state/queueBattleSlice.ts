@@ -152,10 +152,6 @@ export const createQueueBattleSlice: StateCreator<
         updateTeamUnits,
       } = get();
 
-      const rngVictory = makePRNG(
-        createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.VICTORY)
-      );
-
       const healedUnits = autoHealUnits(result.state.playerTeam.units);
       const healedTeam = updateTeam(result.state.playerTeam, { units: healedUnits });
       const healedState = updateBattleState(result.state, { playerTeam: healedTeam });
@@ -171,7 +167,7 @@ export const createQueueBattleSlice: StateCreator<
       });
 
       updateTeamUnits(healedUnits);
-      processVictory(healedState, rngVictory);
+      processVictory(healedState);
       setMode('rewards');
       setShowRewards(true);
 

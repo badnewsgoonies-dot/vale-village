@@ -42,6 +42,7 @@ export const EquipmentSchema = z.object({
   tier: EquipmentTierSchema,
   cost: z.number().int().min(0),
   statBonus: EquipmentStatBonusSchema.default({}), // Default to empty object if missing
+  allowedUnits: z.array(z.string().min(1)).min(1), // Unit IDs permitted to equip
   unlocksAbility: z.string().optional(),
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)

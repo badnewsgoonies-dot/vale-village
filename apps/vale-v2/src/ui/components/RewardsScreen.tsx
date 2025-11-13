@@ -5,14 +5,17 @@
 
 import type { RewardDistribution } from '../../core/models/Rewards';
 import type { Team } from '../../core/models/Team';
+import type { Equipment } from '../../data/schemas/EquipmentSchema';
 import { BattleUnitSprite } from './BattleUnitSprite';
 import { EquipmentIcon } from './EquipmentIcon';
+import { EquipmentChoicePicker } from './EquipmentChoicePicker';
 import './RewardsScreen.css';
 
 interface RewardsScreenProps {
   rewards: RewardDistribution;
   team: Team;
   onContinue: () => void;
+  onSelectEquipment: (equipment: Equipment) => void;
 }
 
 export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps) {
@@ -35,6 +38,13 @@ export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps)
       };
     })
     .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
+
+  const hasPendingChoice = rewards.equipmentChoice && !rewards.choiceSelected;
+  const obtainedEquipment = rewards.choiceSelected
+    ? [rewards.choiceSelected]
+    : rewards.fixedEquipment
+      ? [rewards.fixedEquipment]
+      : [];
 
   return (
     <div className="rewards-screen">
@@ -68,12 +78,18 @@ export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps)
           </div>
         </div>
 
-        {/* Items Dropped */}
-        {rewards.rewards.equipmentDrops.length > 0 && (
-          <section className="items-panel" aria-label="Items obtained">
-            <h2>ITEMS OBTAINED</h2>
+        {hasPendingChoice && (
+          <EquipmentChoicePicker
+            options={rewards.equipmentChoice!}
+            onSelect={onSelectEquipment}
+          />
+        )}
+
+        {obtainedEquipment.length > 0 && (
+          <section className="items-panel" aria-label="Equipment obtained">
+            <h2>EQUIPMENT OBTAINED</h2>
             <div className="items-grid">
-              {rewards.rewards.equipmentDrops.map(item => (
+              {obtainedEquipment.map(item => (
                 <div key={item.id} className="item-card">
                   <EquipmentIcon equipment={item} size="small" className="item-icon" />
                   <div className="item-name">{item.name}</div>
@@ -120,12 +136,16 @@ export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps)
             onClick={onContinue}
             className="continue-btn"
             aria-label="Continue to next screen"
+            disabled={hasPendingChoice && !rewards.choiceSelected}
+            style={{
+              opacity: hasPendingChoice && !rewards.choiceSelected ? 0.5 : 1,
+              cursor: hasPendingChoice && !rewards.choiceSelected ? 'not-allowed' : 'pointer',
+            }}
           >
-            CONTINUE
+            {hasPendingChoice && !rewards.choiceSelected ? 'SELECT EQUIPMENT FIRST' : 'CONTINUE'}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

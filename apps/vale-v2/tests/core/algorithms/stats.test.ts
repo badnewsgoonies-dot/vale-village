@@ -93,7 +93,7 @@ describe('Effective Stats Pipeline', () => {
         createUnit(UNIT_DEFINITIONS.ranger, 1),
       ];
       const team = createTeam(units);
-      const bonuses = calculateDjinnBonuses(team);
+      const bonuses = calculateDjinnBonuses(units[0], team);
       
       expect(bonuses).toEqual({});
     });
@@ -106,7 +106,6 @@ describe('Effective Stats Pipeline', () => {
         createUnit(UNIT_DEFINITIONS.ranger, 1),
       ];
       const team = createTeam(units);
-      // Add Set Djinn
       team.equippedDjinn = ['flint'];
       team.djinnTrackers = {
         flint: {
@@ -116,7 +115,7 @@ describe('Effective Stats Pipeline', () => {
         },
       };
       
-      const bonuses = calculateDjinnBonuses(team);
+      const bonuses = calculateDjinnBonuses(units[0], team);
       
       // Should have synergy bonuses (at least ATK/DEF)
       expect(bonuses.atk).toBeGreaterThan(0);
@@ -140,7 +139,7 @@ describe('Effective Stats Pipeline', () => {
         },
       };
       
-      const bonuses = calculateDjinnBonuses(team);
+      const bonuses = calculateDjinnBonuses(units[0], team);
       
       // Standby Djinn should not contribute bonuses
       expect(bonuses).toEqual({});
@@ -347,4 +346,3 @@ describe('Effective Stats Pipeline', () => {
     });
   });
 });
-

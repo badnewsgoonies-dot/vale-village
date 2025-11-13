@@ -98,6 +98,7 @@ export const UnitSchema = z.object({
   xp: z.number().int().min(0),
   currentHp: z.number().int().min(0),
   equipment: EquipmentLoadoutSchema,
+  storeUnlocked: z.boolean(),
   djinn: z.array(z.string().min(1)),
   djinnStates: z.record(z.string(), DjinnStateSchema),
   abilities: z.array(AbilitySchema),
@@ -123,4 +124,3 @@ export const UnitSchema = z.object({
 export type Unit = z.infer<typeof UnitSchema>;
 export type UnitDefinition = z.infer<typeof UnitDefinitionSchema>;
 export type StatusEffect = z.infer<typeof StatusEffectSchema>;
-

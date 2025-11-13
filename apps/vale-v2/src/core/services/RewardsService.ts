@@ -1,45 +1,68 @@
 /**
  * Rewards Service
- * Handles post-battle reward calculation and distribution
- * Pure functions, deterministic with PRNG
+ * Handles post-battle reward processing (no RNG)
  */
 
 import type { BattleState } from '../models/BattleState';
 import type { RewardDistribution } from '../models/Rewards';
 import type { Team } from '../models/Team';
-import type { PRNG } from '../random/prng';
 import { isUnitKO } from '../models/Unit';
-import {
-  calculateBattleRewards,
-  calculateEquipmentDrops,
-  distributeRewards,
-} from '../algorithms/rewards';
+import { calculateBattleRewards, distributeRewards } from '../algorithms/rewards';
+import { getEncounterId } from '../models/BattleState';
+import { EQUIPMENT } from '../../data/definitions/equipment';
+import type { EquipmentReward } from '../../data/schemas/EncounterSchema';
 
-/**
- * Process victory rewards after a battle
- * Calculates base rewards, equipment drops, and distributes to team
- */
+type EquipmentResolution =
+  | { type: 'none' }
+  | { type: 'fixed'; equipment: typeof EQUIPMENT[keyof typeof EQUIPMENT] }
+  | { type: 'choice'; options: (typeof EQUIPMENT[keyof typeof EQUIPMENT])[] };
+
 export function processVictory(
-  battle: BattleState,
-  rng: PRNG
+  battle: BattleState
 ): { distribution: RewardDistribution; updatedTeam: Team } {
-  // Calculate rewards
-  const enemies = battle.enemies;
+  const encounterId = getEncounterId(battle);
+  if (!encounterId) {
+    throw new Error('Cannot process victory without encounter ID');
+  }
+
   const survivors = battle.playerTeam.units.filter(u => !isUnitKO(u));
-  const allSurvived = survivors.length === battle.playerTeam.units.length;
+  const rewards = calculateBattleRewards(encounterId, survivors.length);
 
-  // Calculate base rewards
-  const rewards = calculateBattleRewards(enemies, allSurvived, survivors.length, rng);
+  const distribution = distributeRewards(battle.playerTeam, rewards);
+  const equipmentResolution = resolveEquipmentReward(rewards.equipmentReward);
 
-  // Calculate equipment drops
-  const equipmentDrops = calculateEquipmentDrops(enemies, rng);
-  const rewardsWithDrops = { ...rewards, equipmentDrops };
-
-  // Distribute rewards to team
-  const distribution = distributeRewards(battle.playerTeam, rewardsWithDrops);
+  const resolvedDistribution: RewardDistribution = {
+    ...distribution,
+    fixedEquipment: equipmentResolution.type === 'fixed' ? equipmentResolution.equipment : undefined,
+    equipmentChoice: equipmentResolution.type === 'choice' ? equipmentResolution.options : undefined,
+  };
 
   return {
-    distribution,
+    distribution: resolvedDistribution,
     updatedTeam: distribution.updatedTeam,
   };
+}
+
+export function resolveEquipmentReward(reward: EquipmentReward): EquipmentResolution {
+  switch (reward.type) {
+    case 'none':
+      return { type: 'none' };
+    case 'fixed': {
+      const equipment = EQUIPMENT[reward.itemId];
+      if (!equipment) {
+        throw new Error(`Equipment ${reward.itemId} not found`);
+      }
+      return { type: 'fixed', equipment };
+    }
+    case 'choice': {
+      const options = reward.options.map(id => {
+        const equipment = EQUIPMENT[id];
+        if (!equipment) {
+          throw new Error(`Equipment ${id} not found`);
+        }
+        return equipment;
+      });
+      return { type: 'choice', options };
+    }
+  }
 }

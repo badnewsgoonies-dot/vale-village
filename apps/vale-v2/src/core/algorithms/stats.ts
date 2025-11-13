@@ -10,7 +10,7 @@ import type { Team } from '../models/Team';
 import type { Stats } from '../models/types';
 import type { EquipmentLoadout } from '../models/Equipment';
 import { calculateEquipmentBonuses } from '../models/Equipment';
-import { calculateDjinnSynergy } from './djinn';
+import { calculateDjinnBonusesForUnit } from './djinnAbilities';
 
 /**
  * Calculate level-based stat bonuses
@@ -48,26 +48,6 @@ export function calculateEquipmentBonusesFromLoadout(loadout: EquipmentLoadout):
  * Maps common Djinn IDs to their elements
  * TODO: Replace with proper Djinn registry when available
  */
-function getDjinnElement(djinnId: string): 'Venus' | 'Mars' | 'Mercury' | 'Jupiter' | null {
-  // Venus Djinn
-  if (djinnId.includes('flint') || djinnId.includes('granite') || djinnId.includes('bane')) {
-    return 'Venus';
-  }
-  // Mars Djinn
-  if (djinnId.includes('forge') || djinnId.includes('corona') || djinnId.includes('fury')) {
-    return 'Mars';
-  }
-  // Mercury Djinn
-  if (djinnId.includes('fizz') || djinnId.includes('tonic') || djinnId.includes('crystal')) {
-    return 'Mercury';
-  }
-  // Jupiter Djinn
-  if (djinnId.includes('breeze') || djinnId.includes('squall') || djinnId.includes('storm')) {
-    return 'Jupiter';
-  }
-  return null;
-}
-
 /**
  * Calculate Djinn synergy bonuses
  * Only applies when Djinn state is 'Set'
@@ -76,33 +56,8 @@ function getDjinnElement(djinnId: string): 'Venus' | 'Mars' | 'Mercury' | 'Jupit
  * @param team - Team with Djinn trackers
  * @returns Partial stats with Djinn bonuses
  */
-export function calculateDjinnBonuses(team: Team): Partial<Stats> {
-  // Get all Set Djinn elements
-  const setDjinnElements: Array<'Venus' | 'Mars' | 'Mercury' | 'Jupiter'> = [];
-  
-  for (const djinnId of team.equippedDjinn) {
-    const tracker = team.djinnTrackers[djinnId];
-    if (tracker && tracker.state === 'Set') {
-      const element = getDjinnElement(djinnId);
-      if (element) {
-        setDjinnElements.push(element);
-      }
-    }
-  }
-  
-  // If no Set Djinn, return empty bonuses
-  if (setDjinnElements.length === 0) {
-    return {};
-  }
-  
-  // Calculate synergy
-  const synergy = calculateDjinnSynergy(setDjinnElements);
-  
-  return {
-    atk: synergy.atk,
-    def: synergy.def,
-    spd: synergy.spd,
-  };
+export function calculateDjinnBonuses(unit: Unit, team: Team): Partial<Stats> {
+  return calculateDjinnBonusesForUnit(unit, team);
 }
 
 /**
@@ -146,7 +101,7 @@ export function calculateEffectiveStats(unit: Unit, team: Team): Stats {
   const base = unit.baseStats;
   const level = calculateLevelBonuses(unit);
   const equipment = calculateEquipmentBonusesFromLoadout(unit.equipment);
-  const djinn = calculateDjinnBonuses(team);
+  const djinn = calculateDjinnBonuses(unit, team);
   const status = calculateStatusModifiers(unit);
   
   // Combine all bonuses
@@ -174,4 +129,3 @@ export function getEffectiveSPD(unit: Unit, team: Team): number {
   const effective = calculateEffectiveStats(unit, team);
   return effective.spd;
 }
-

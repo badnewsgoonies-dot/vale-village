@@ -7,7 +7,6 @@ import { OverworldMap } from './ui/components/OverworldMap';
 import { DialogueBox } from './ui/components/DialogueBox';
 import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopScreen } from './ui/components/ShopScreen';
-import { SpriteMockup } from './ui/components/SpriteMockup';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -21,6 +20,7 @@ function App() {
   const lastBattleRewards = useStore((s) => s.lastBattleRewards);
   const claimRewards = useStore((s) => s.claimRewards);
   const setShowRewards = useStore((s) => s.setShowRewards);
+  const selectEquipmentChoice = useStore((s) => s.selectEquipmentChoice);
   const team = useStore((s) => s.team);
   const setTeam = useStore((s) => s.setTeam);
   const mode = useStore((s) => s.mode);
@@ -105,12 +105,10 @@ function App() {
           rewards={lastBattleRewards}
           team={team}
           onContinue={handleRewardsContinue}
+          onSelectEquipment={selectEquipmentChoice}
         />
       ) : (
         <>
-          {/* TEMPORARY: Show sprite mockup - remove this to restore normal game */}
-          <SpriteMockup />
-          {/* 
           {mode === 'overworld' && <OverworldMap />}
           {mode === 'battle' && <QueueBattleView />}
           {mode === 'dialogue' && (
@@ -122,7 +120,6 @@ function App() {
           {mode === 'shop' && currentShopId && (
             <ShopScreen shopId={currentShopId} onClose={() => setMode('overworld')} />
           )}
-          */}
         </>
       )}
     </div>

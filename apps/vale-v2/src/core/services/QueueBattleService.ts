@@ -20,6 +20,7 @@ import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
 import { getEffectiveSPD } from '../algorithms/stats';
 import { performAction } from './BattleService';
 import { makeAIDecision } from './AIService';
+import { mergeDjinnAbilitiesIntoUnit } from '../algorithms/djinnAbilities';
 
 type PerformActionResult = ReturnType<typeof performAction>;
 
@@ -330,6 +331,39 @@ function transitionToVictoryOrDefeat(
  * Transition back to planning phase for next round
  */
 function transitionToPlanningPhase(state: BattleState): BattleState {
+  const updatedTimers = { ...state.djinnRecoveryTimers };
+  const updatedTrackers = { ...state.playerTeam.djinnTrackers };
+
+  for (const [djinnId, timer] of Object.entries(updatedTimers)) {
+    if (timer > 0) {
+      updatedTimers[djinnId] = timer - 1;
+      if (updatedTimers[djinnId] === 0) {
+        delete updatedTimers[djinnId];
+        const tracker = updatedTrackers[djinnId];
+        if (tracker) {
+          updatedTrackers[djinnId] = {
+            ...tracker,
+            state: 'Set',
+          };
+        }
+      }
+    } else {
+      delete updatedTimers[djinnId];
+    }
+  }
+
+  let updatedTeam = updateTeam(state.playerTeam, {
+    djinnTrackers: updatedTrackers,
+  });
+
+  const unitsWithUpdatedAbilities = updatedTeam.units.map(unit =>
+    mergeDjinnAbilitiesIntoUnit(unit, updatedTeam)
+  );
+
+  updatedTeam = updateTeam(updatedTeam, {
+    units: unitsWithUpdatedAbilities,
+  });
+
   const nextState = updateBattleState(state, {
     phase: 'planning',
     roundNumber: state.roundNumber + 1,
@@ -337,6 +371,8 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     queuedActions: createEmptyQueue(),
     queuedDjinn: [],
     executionIndex: 0,
+    playerTeam: updatedTeam,
+    djinnRecoveryTimers: updatedTimers,
   });
   return refreshMana(nextState);
 }
@@ -404,6 +440,13 @@ function executeDjinnSummons(
   const djinnCount = state.queuedDjinn.length as 1 | 2 | 3;
   const damage = calculateSummonDamage(djinnCount);
 
+  if (state.queuedDjinn.length === 0) {
+    return { state, events };
+  }
+
+  const activationCount = state.queuedDjinn.length;
+  const recoveryTime = activationCount + 1;
+
   // Update Djinn states to Standby
   const updatedTrackers = { ...updatedTeam.djinnTrackers };
   for (const djinnId of state.queuedDjinn) {
@@ -421,8 +464,22 @@ function executeDjinnSummons(
     djinnTrackers: updatedTrackers,
   });
 
+  const unitsWithUpdatedAbilities = updatedTeam.units.map(unit =>
+    mergeDjinnAbilitiesIntoUnit(unit, updatedTeam)
+  );
+
+  updatedTeam = updateTeam(updatedTeam, {
+    units: unitsWithUpdatedAbilities,
+  });
+
+  const newRecoveryTimers = { ...state.djinnRecoveryTimers };
+  for (const djinnId of state.queuedDjinn) {
+    newRecoveryTimers[djinnId] = recoveryTime;
+  }
+
   currentState = updateBattleState(currentState, {
     playerTeam: updatedTeam,
+    djinnRecoveryTimers: newRecoveryTimers,
   });
 
   // Apply damage to enemies and track targets hit

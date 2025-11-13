@@ -3,7 +3,8 @@
  * Ported from original Vale Chronicles, adapted for vale-v2
  */
 
-import type { Equipment } from './Equipment';
+import type { Equipment } from '../../data/schemas/EquipmentSchema';
+import type { EquipmentReward } from '../../data/schemas/EncounterSchema';
 
 /**
  * Stat gains from a level up
@@ -39,8 +40,8 @@ export interface BattleRewards {
   /** Number of enemies defeated */
   readonly enemiesDefeated: number;
 
-  /** Equipment dropped from enemies */
-  readonly equipmentDrops: readonly Equipment[];
+  /** Predetermined equipment reward definition */
+  readonly equipmentReward: EquipmentReward;
 }
 
 /**
@@ -62,5 +63,7 @@ export interface RewardDistribution {
   readonly rewards: BattleRewards;
   readonly levelUps: readonly LevelUpEvent[];
   readonly goldEarned: number;
+  readonly fixedEquipment?: Equipment;
+  readonly equipmentChoice?: Equipment[];
+  readonly choiceSelected?: Equipment;
 }
-

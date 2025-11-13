@@ -16,6 +16,7 @@ export const WOODEN_SWORD: Equipment = {
   tier: 'basic',
   cost: 50,
   statBonus: { atk: 5 },
+  allowedUnits: ['adept', 'sentinel', 'ranger'],
 };
 
 export const BRONZE_SWORD: Equipment = {
@@ -25,6 +26,7 @@ export const BRONZE_SWORD: Equipment = {
   tier: 'bronze',
   cost: 120,
   statBonus: { atk: 9 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const IRON_SWORD: Equipment = {
@@ -34,6 +36,7 @@ export const IRON_SWORD: Equipment = {
   tier: 'iron',
   cost: 200,
   statBonus: { atk: 14 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const STEEL_SWORD: Equipment = {
@@ -43,6 +46,7 @@ export const STEEL_SWORD: Equipment = {
   tier: 'steel',
   cost: 500,
   statBonus: { atk: 22 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const SILVER_BLADE: Equipment = {
@@ -52,6 +56,7 @@ export const SILVER_BLADE: Equipment = {
   tier: 'silver',
   cost: 1200,
   statBonus: { atk: 32 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const MYTHRIL_BLADE: Equipment = {
@@ -61,6 +66,7 @@ export const MYTHRIL_BLADE: Equipment = {
   tier: 'mythril',
   cost: 3000,
   statBonus: { atk: 45 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const GAIA_BLADE: Equipment = {
@@ -70,6 +76,7 @@ export const GAIA_BLADE: Equipment = {
   tier: 'legendary',
   cost: 7500,
   statBonus: { atk: 58 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const SOL_BLADE: Equipment = {
@@ -79,6 +86,7 @@ export const SOL_BLADE: Equipment = {
   tier: 'artifact',
   cost: 15000,
   statBonus: { atk: 72 },
+  allowedUnits: ['adept', 'sentinel'],
   // Note: megiddo ability not yet implemented
 };
 
@@ -92,6 +100,7 @@ export const WOODEN_AXE: Equipment = {
   tier: 'basic',
   cost: 60,
   statBonus: { atk: 7, spd: -1 },
+  allowedUnits: ['war-mage'],
 };
 
 export const BATTLE_AXE: Equipment = {
@@ -101,6 +110,7 @@ export const BATTLE_AXE: Equipment = {
   tier: 'iron',
   cost: 280,
   statBonus: { atk: 18, spd: -2 },
+  allowedUnits: ['war-mage'],
 };
 
 export const GREAT_AXE: Equipment = {
@@ -110,6 +120,7 @@ export const GREAT_AXE: Equipment = {
   tier: 'steel',
   cost: 800,
   statBonus: { atk: 30, spd: -3 },
+  allowedUnits: ['war-mage'],
 };
 
 export const TITANS_AXE: Equipment = {
@@ -119,6 +130,7 @@ export const TITANS_AXE: Equipment = {
   tier: 'legendary',
   cost: 9000,
   statBonus: { atk: 65, def: 10, spd: -2 },
+  allowedUnits: ['war-mage'],
 };
 
 // ========================================
@@ -131,6 +143,7 @@ export const MACE: Equipment = {
   tier: 'bronze',
   cost: 150,
   statBonus: { atk: 11, def: 2 },
+  allowedUnits: ['war-mage'],
 };
 
 export const HEAVY_MACE: Equipment = {
@@ -140,6 +153,7 @@ export const HEAVY_MACE: Equipment = {
   tier: 'steel',
   cost: 650,
   statBonus: { atk: 26, def: 5 },
+  allowedUnits: ['war-mage'],
 };
 
 export const DEMON_MACE: Equipment = {
@@ -149,6 +163,7 @@ export const DEMON_MACE: Equipment = {
   tier: 'mythril',
   cost: 3500,
   statBonus: { atk: 48, def: 8 },
+  allowedUnits: ['war-mage'],
 };
 
 // ========================================
@@ -161,6 +176,7 @@ export const WOODEN_STAFF: Equipment = {
   tier: 'basic',
   cost: 40,
   statBonus: { atk: 3, mag: 4 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const MAGIC_ROD: Equipment = {
@@ -170,6 +186,7 @@ export const MAGIC_ROD: Equipment = {
   tier: 'bronze',
   cost: 180,
   statBonus: { atk: 6, mag: 8 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const SHAMAN_ROD: Equipment = {
@@ -179,6 +196,7 @@ export const SHAMAN_ROD: Equipment = {
   tier: 'iron',
   cost: 400,
   statBonus: { atk: 10, mag: 14 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const CRYSTAL_ROD: Equipment = {
@@ -188,6 +206,7 @@ export const CRYSTAL_ROD: Equipment = {
   tier: 'silver',
   cost: 1500,
   statBonus: { atk: 18, mag: 24 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const ZODIAC_WAND: Equipment = {
@@ -197,6 +216,7 @@ export const ZODIAC_WAND: Equipment = {
   tier: 'mythril',
   cost: 4000,
   statBonus: { atk: 28, mag: 38 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const STAFF_OF_AGES: Equipment = {
@@ -206,6 +226,7 @@ export const STAFF_OF_AGES: Equipment = {
   tier: 'artifact',
   cost: 18000,
   statBonus: { atk: 42, mag: 58, pp: 25 },
+  allowedUnits: ['mystic', 'stormcaller'],
   // Note: odyssey ability not yet implemented
 };
 
@@ -219,6 +240,7 @@ export const COTTON_SHIRT: Equipment = {
   tier: 'basic',
   cost: 30,
   statBonus: { def: 3, hp: 5 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const LEATHER_VEST: Equipment = {
@@ -228,6 +250,7 @@ export const LEATHER_VEST: Equipment = {
   tier: 'basic',
   cost: 80,
   statBonus: { def: 6, hp: 10 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage', 'ranger'],
 };
 
 export const BRONZE_ARMOR: Equipment = {
@@ -237,6 +260,7 @@ export const BRONZE_ARMOR: Equipment = {
   tier: 'bronze',
   cost: 200,
   statBonus: { def: 10, hp: 15 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const IRON_ARMOR: Equipment = {
@@ -246,6 +270,7 @@ export const IRON_ARMOR: Equipment = {
   tier: 'iron',
   cost: 350,
   statBonus: { def: 15, hp: 25 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage'],
 };
 
 export const STEEL_ARMOR: Equipment = {
@@ -255,6 +280,7 @@ export const STEEL_ARMOR: Equipment = {
   tier: 'steel',
   cost: 800,
   statBonus: { def: 24, hp: 40 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const SILVER_ARMOR: Equipment = {
@@ -264,6 +290,7 @@ export const SILVER_ARMOR: Equipment = {
   tier: 'silver',
   cost: 2000,
   statBonus: { def: 35, hp: 60 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const MYTHRIL_ARMOR: Equipment = {
@@ -273,6 +300,7 @@ export const MYTHRIL_ARMOR: Equipment = {
   tier: 'mythril',
   cost: 5000,
   statBonus: { def: 48, hp: 85 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const DRAGON_SCALES: Equipment = {
@@ -282,6 +310,7 @@ export const DRAGON_SCALES: Equipment = {
   tier: 'legendary',
   cost: 10000,
   statBonus: { def: 62, hp: 110 },
+  allowedUnits: ['adept', 'sentinel'],
   elementalResist: 0.25,
 };
 
@@ -292,6 +321,7 @@ export const VALKYRIE_MAIL: Equipment = {
   tier: 'artifact',
   cost: 20000,
   statBonus: { def: 78, hp: 140 },
+  allowedUnits: ['adept', 'sentinel'],
   elementalResist: 0.3,
 };
 
@@ -305,6 +335,7 @@ export const LEATHER_CAP: Equipment = {
   tier: 'basic',
   cost: 25,
   statBonus: { def: 2 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage', 'ranger'],
 };
 
 export const CLOTH_CAP: Equipment = {
@@ -314,6 +345,7 @@ export const CLOTH_CAP: Equipment = {
   tier: 'basic',
   cost: 60,
   statBonus: { def: 4 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const BRONZE_HELM: Equipment = {
@@ -323,6 +355,7 @@ export const BRONZE_HELM: Equipment = {
   tier: 'bronze',
   cost: 140,
   statBonus: { def: 6 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage'],
 };
 
 export const IRON_HELM: Equipment = {
@@ -332,6 +365,7 @@ export const IRON_HELM: Equipment = {
   tier: 'iron',
   cost: 220,
   statBonus: { def: 9 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const STEEL_HELM: Equipment = {
@@ -341,6 +375,7 @@ export const STEEL_HELM: Equipment = {
   tier: 'steel',
   cost: 500,
   statBonus: { def: 14 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const SILVER_CIRCLET: Equipment = {
@@ -350,6 +385,7 @@ export const SILVER_CIRCLET: Equipment = {
   tier: 'silver',
   cost: 1300,
   statBonus: { def: 20, mag: 5 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const MYTHRIL_CROWN: Equipment = {
@@ -359,6 +395,7 @@ export const MYTHRIL_CROWN: Equipment = {
   tier: 'mythril',
   cost: 3200,
   statBonus: { def: 28, mag: 8 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const ORACLES_CROWN: Equipment = {
@@ -368,6 +405,7 @@ export const ORACLES_CROWN: Equipment = {
   tier: 'legendary',
   cost: 8000,
   statBonus: { def: 38, mag: 14, pp: 20 },
+  allowedUnits: ['stormcaller'],
 };
 
 export const GLORY_HELM: Equipment = {
@@ -377,6 +415,7 @@ export const GLORY_HELM: Equipment = {
   tier: 'artifact',
   cost: 16000,
   statBonus: { def: 50, mag: 18, pp: 30 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 // ========================================
@@ -389,6 +428,7 @@ export const LEATHER_BOOTS: Equipment = {
   tier: 'basic',
   cost: 70,
   statBonus: { spd: 2 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage', 'ranger'],
 };
 
 export const IRON_BOOTS: Equipment = {
@@ -398,6 +438,7 @@ export const IRON_BOOTS: Equipment = {
   tier: 'iron',
   cost: 150,
   statBonus: { spd: 3, def: 2 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const STEEL_GREAVES: Equipment = {
@@ -407,6 +448,7 @@ export const STEEL_GREAVES: Equipment = {
   tier: 'steel',
   cost: 400,
   statBonus: { spd: 5, def: 4 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const SILVER_GREAVES: Equipment = {
@@ -416,6 +458,7 @@ export const SILVER_GREAVES: Equipment = {
   tier: 'silver',
   cost: 1100,
   statBonus: { spd: 7, def: 6 },
+  allowedUnits: ['adept', 'sentinel'],
 };
 
 export const HYPER_BOOTS: Equipment = {
@@ -425,6 +468,7 @@ export const HYPER_BOOTS: Equipment = {
   tier: 'mythril',
   cost: 2800,
   statBonus: { spd: 10, def: 8 },
+  allowedUnits: ['ranger', 'stormcaller'],
 };
 
 export const QUICK_BOOTS: Equipment = {
@@ -434,6 +478,7 @@ export const QUICK_BOOTS: Equipment = {
   tier: 'legendary',
   cost: 6500,
   statBonus: { spd: 14, def: 10 },
+  allowedUnits: ['ranger', 'stormcaller'],
 };
 
 export const HERMES_SANDALS: Equipment = {
@@ -443,6 +488,7 @@ export const HERMES_SANDALS: Equipment = {
   tier: 'artifact',
   cost: 14000,
   statBonus: { spd: 20, def: 12 },
+  allowedUnits: ['ranger', 'stormcaller'],
   alwaysFirstTurn: true,
 };
 
@@ -456,6 +502,7 @@ export const POWER_RING: Equipment = {
   tier: 'basic',
   cost: 100,
   statBonus: { atk: 5 },
+  allowedUnits: ['adept', 'sentinel', 'war-mage', 'ranger'],
 };
 
 export const GUARDIAN_RING: Equipment = {
@@ -465,6 +512,7 @@ export const GUARDIAN_RING: Equipment = {
   tier: 'basic',
   cost: 120,
   statBonus: { def: 5 },
+  allowedUnits: ['adept', 'sentinel', 'ranger'],
 };
 
 export const ADEPTS_RING: Equipment = {
@@ -474,6 +522,7 @@ export const ADEPTS_RING: Equipment = {
   tier: 'bronze',
   cost: 250,
   statBonus: { mag: 6, pp: 5 },
+  allowedUnits: ['adept'],
 };
 
 export const WAR_GLOVES: Equipment = {
@@ -483,6 +532,7 @@ export const WAR_GLOVES: Equipment = {
   tier: 'iron',
   cost: 400,
   statBonus: { atk: 10, def: 3 },
+  allowedUnits: ['war-mage'],
 };
 
 export const SPIRIT_GLOVES: Equipment = {
@@ -492,6 +542,7 @@ export const SPIRIT_GLOVES: Equipment = {
   tier: 'steel',
   cost: 900,
   statBonus: { mag: 12, pp: 10 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const LUCKY_MEDAL: Equipment = {
@@ -501,6 +552,7 @@ export const LUCKY_MEDAL: Equipment = {
   tier: 'silver',
   cost: 1800,
   statBonus: { spd: 5 },
+  allowedUnits: ['ranger'],
 };
 
 export const ELEMENTAL_STAR: Equipment = {
@@ -510,6 +562,7 @@ export const ELEMENTAL_STAR: Equipment = {
   tier: 'mythril',
   cost: 4500,
   statBonus: { mag: 18, pp: 20 },
+  allowedUnits: ['mystic', 'stormcaller'],
   elementalResist: 0.15,
 };
 
@@ -520,6 +573,7 @@ export const DRAGONS_EYE: Equipment = {
   tier: 'legendary',
   cost: 8500,
   statBonus: { atk: 15, mag: 15, def: 10 },
+  allowedUnits: ['adept', 'sentinel', 'ranger'],
 };
 
 export const CLERIC_RING: Equipment = {
@@ -529,6 +583,7 @@ export const CLERIC_RING: Equipment = {
   tier: 'legendary',
   cost: 9000,
   statBonus: { pp: 30, mag: 12 },
+  allowedUnits: ['mystic', 'stormcaller'],
 };
 
 export const IRIS_ROBE: Equipment = {
@@ -538,6 +593,7 @@ export const IRIS_ROBE: Equipment = {
   tier: 'artifact',
   cost: 12000,
   statBonus: { def: 20, mag: 20 },
+  allowedUnits: ['mystic', 'stormcaller'],
   elementalResist: 0.2,
 };
 
@@ -548,6 +604,7 @@ export const COSMOS_SHIELD: Equipment = {
   tier: 'artifact',
   cost: 17000,
   statBonus: { def: 30, hp: 50 },
+  allowedUnits: ['adept', 'sentinel'],
   elementalResist: 0.25,
 };
 

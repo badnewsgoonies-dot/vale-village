@@ -6,6 +6,8 @@
 import type { Team } from './Team';
 import type { Unit } from './Unit';
 import { createEmptyQueue } from '../constants';
+import { updateTeam } from './Team';
+import { mergeDjinnAbilitiesIntoUnit } from '../algorithms/djinnAbilities';
 
 /**
  * Battle result types
@@ -181,11 +183,17 @@ export function createBattleState(
   enemies: readonly Unit[],
   turnOrder: readonly string[] = []
 ): BattleState {
-  const maxMana = calculateTeamManaPool(playerTeam);
-  const unitById = buildUnitIndex(playerTeam.units, enemies);
+  const unitsWithDjinnAbilities = playerTeam.units.map(unit =>
+    mergeDjinnAbilitiesIntoUnit(unit, playerTeam)
+  );
+  const updatedTeam = updateTeam(playerTeam, {
+    units: unitsWithDjinnAbilities,
+  });
+  const maxMana = calculateTeamManaPool(updatedTeam);
+  const unitById = buildUnitIndex(updatedTeam.units, enemies);
 
   return {
-    playerTeam,
+    playerTeam: updatedTeam,
     enemies,
     unitById,
     currentTurn: 0,
@@ -228,4 +236,3 @@ export function updateBattleState(state: BattleState, updates: Partial<BattleSta
 export function getEncounterId(battle: BattleState): string | undefined {
   return battle.meta?.encounterId ?? battle.encounterId;
 }
-
