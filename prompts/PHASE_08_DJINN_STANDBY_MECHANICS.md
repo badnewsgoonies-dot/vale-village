@@ -1,0 +1,1010 @@
+# PHASE 8: DJINN STANDBY MECHANICS (FINAL PHASE)
+
+**Date:** November 12, 2025  
+**Priority:** HIGH (Completes game mechanics overhaul)  
+**Estimated Effort:** 1-2 days (8-16 hours)  
+**Model:** Codex with Extended Thinking  
+**Prerequisites:** Phases 1-7 complete (especially Phase 7 - Djinn abilities)
+
+---
+
+## CONTEXT
+
+This is the **FINAL PHASE** of the game mechanics overhaul. When complete, all mechanics from the instruction booklet will be implemented.
+
+**From VALE_CHRONICLES_INSTRUCTION_BOOKLET.md (Lines 394-442):**
+
+```
+THE TRADE-OFF
+
+When you activate a Djinn, it moves to "Standby" state:
+
+WHAT YOU LOSE (Until Recovery):
+  ❌ That Djinn's stat bonuses/penalties
+  ❌ All abilities that Djinn unlocked for your team
+  
+  These losses affect YOUR ENTIRE PARTY immediately!
+
+WHEN RECOVERED:
+  ✅ Djinn returns to "Set" state
+  ✅ All stat bonuses/penalties restored
+  ✅ All abilities unlocked again
+```
+
+**Strategic Example:**
+```
+Round 1 - Before Activation:
+  Flint is Set
+  Isaac: +4 ATK, +3 DEF, has "Stone Fist" ability
+  Garet: -3 ATK, -2 DEF (counter penalty), has "Lava Stone" ability
+
+Round 1 - Activate Flint:
+  Flint → Standby (2-turn recovery)
+  Isaac: LOSES +4 ATK, +3 DEF, loses "Stone Fist"
+  Garet: LOSES -3 ATK, -2 DEF penalty (temp boost!), loses "Lava Stone"
+
+Round 4 - Flint Recovers:
+  Flint returns to Set
+  Isaac: REGAINS +4 ATK, +3 DEF, "Stone Fist" back
+  Garet: REGAINS -3 ATK, -2 DEF penalty, "Lava Stone" back
+```
+
+---
+
+## CURRENT STATE
+
+**What Exists (Phase 7):**
+- ✅ Djinn ability unlocking system (180 abilities)
+- ✅ Element compatibility (same/counter/neutral)
+- ✅ `getDjinnGrantedAbilities()` returns abilities based on Set Djinn
+- ✅ Djinn states tracked: 'Set' | 'Standby' | 'Recovery'
+- ✅ Recovery timers work (1→2, 2→3, 3→4 turns)
+
+**What's Missing (Phase 8):**
+- ❌ Stat bonuses don't update when Djinn enters/exits Standby
+- ❌ Abilities don't disappear when Djinn in Standby
+- ❌ No real-time recalculation when state changes
+
+**The Gap:**
+Currently, Djinn bonuses/abilities are calculated at battle start and don't change mid-battle when Djinn are activated/recovered.
+
+---
+
+## OBJECTIVES
+
+1. **Remove bonuses when Djinn activated** - Stat bonuses lost immediately
+2. **Remove abilities when Djinn activated** - Abilities become unavailable
+3. **Restore bonuses when Djinn recovers** - Stats return when timer expires
+4. **Restore abilities when Djinn recovers** - Abilities become available again
+5. **Real-time updates** - Effective stats recalculate during battle
+6. **UI feedback** - Players see stat changes and ability locks
+
+---
+
+## ARCHITECTURAL CHALLENGE
+
+### **The Core Problem:**
+
+**Effective stats are cached:**
+```typescript
+// Current: Calculated once at battle start
+const effectiveStats = calculateEffectiveStats(unit, team);
+```
+
+**When Djinn activated:**
+- Djinn state changes: Set → Standby
+- But `calculateEffectiveStats()` doesn't re-run
+- Stats stay the same (wrong!)
+
+**Solution:**
+`calculateEffectiveStats()` must filter Djinn by state:
+```typescript
+// Only count Djinn in 'Set' state
+const setDjinn = team.equippedDjinn.filter(id => 
+  team.djinnTrackers[id]?.state === 'Set'
+);
+const djinnBonuses = calculateDjinnBonuses(setDjinn, unit);
+```
+
+---
+
+## IMPLEMENTATION TASKS
+
+### **Task 8.1: Update Djinn Bonus Calculation to Filter by State**
+
+**File:** `apps/vale-v2/src/core/algorithms/stats.ts`
+
+**Current Code (Around line 79):**
+```typescript
+export function calculateDjinnBonuses(team: Team): Partial<Stats> {
+  if (team.equippedDjinn.length === 0) {
+    return { atk: 0, def: 0, spd: 0 };
+  }
+
+  const djinnElements = team.equippedDjinn.map(id => getDjinnElement(id));
+  const synergy = calculateDjinnSynergy(djinnElements);
+  
+  return {
+    atk: synergy.atk,
+    def: synergy.def,
+    spd: synergy.spd,
+  };
+}
+```
+
+**Updated Code (Filter by State):**
+```typescript
+export function calculateDjinnBonuses(team: Team): Partial<Stats> {
+  if (team.equippedDjinn.length === 0) {
+    return { atk: 0, def: 0, spd: 0 };
+  }
+
+  // CRITICAL: Only count Djinn in 'Set' state
+  // Djinn in Standby/Recovery don't provide bonuses
+  const setDjinn = team.equippedDjinn.filter(djinnId => {
+    const tracker = team.djinnTrackers[djinnId];
+    return tracker?.state === 'Set';
+  });
+
+  if (setDjinn.length === 0) {
+    return { atk: 0, def: 0, spd: 0 };
+  }
+
+  const djinnElements = setDjinn.map(id => getDjinnElement(id));
+  const synergy = calculateDjinnSynergy(djinnElements);
+  
+  return {
+    atk: synergy.atk,
+    def: synergy.def,
+    spd: synergy.spd,
+  };
+}
+```
+
+**Success Criteria:**
+- Bonuses calculated only from Set Djinn
+- Standby/Recovery Djinn ignored
+- Returns { atk: 0, def: 0, spd: 0 } if all Djinn in Standby
+
+---
+
+### **Task 8.2: Update Per-Unit Djinn Bonuses (Phase 7 Feature)**
+
+**File:** `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+
+**Current Code:**
+```typescript
+export function calculateDjinnBonusesForUnit(
+  unit: Unit,
+  equippedDjinn: readonly Djinn[]
+): Partial<Stats> {
+  // Calculates per-unit bonuses based on element compatibility
+  // ...
+}
+```
+
+**Updated Code (Filter by State):**
+```typescript
+export function calculateDjinnBonusesForUnit(
+  unit: Unit,
+  equippedDjinn: readonly Djinn[],
+  djinnStates: Record<string, 'Set' | 'Standby' | 'Recovery'>
+): Partial<Stats> {
+  let totalBonus: Partial<Stats> = { atk: 0, def: 0, spd: 0 };
+  
+  for (const djinn of equippedDjinn) {
+    // CRITICAL: Skip Djinn not in Set state
+    if (djinnStates[djinn.id] !== 'Set') continue;
+    
+    const compatibility = getElementCompatibility(unit.element, djinn.element);
+    
+    switch (compatibility) {
+      case 'same':
+        totalBonus.atk! += 4;
+        totalBonus.def! += 3;
+        break;
+      case 'counter':
+        totalBonus.atk! -= 3;  // PENALTY
+        totalBonus.def! -= 2;
+        break;
+      case 'neutral':
+        totalBonus.atk! += 2;
+        totalBonus.def! += 2;
+        break;
+    }
+  }
+  
+  return totalBonus;
+}
+```
+
+**Success Criteria:**
+- Djinn state parameter added
+- Only Set Djinn contribute bonuses
+- Counter penalties also removed when in Standby
+
+---
+
+### **Task 8.3: Update Ability Unlocking to Filter by State**
+
+**File:** `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+
+**Current Code:**
+```typescript
+export function getDjinnGrantedAbilities(
+  unit: Unit,
+  equippedDjinn: readonly Djinn[]
+): string[] {
+  const abilities: string[] = [];
+  
+  for (const djinn of equippedDjinn) {
+    const compatibility = getElementCompatibility(unit.element, djinn.element);
+    const granted = djinn.grantedAbilities[unit.id];
+    
+    // Add abilities based on compatibility
+    // ...
+  }
+  
+  return abilities;
+}
+```
+
+**Updated Code (Filter by State):**
+```typescript
+export function getDjinnGrantedAbilities(
+  unit: Unit,
+  equippedDjinn: readonly Djinn[],
+  djinnStates: Record<string, 'Set' | 'Standby' | 'Recovery'>
+): string[] {
+  const abilities: string[] = [];
+  
+  for (const djinn of equippedDjinn) {
+    // CRITICAL: Only grant abilities if Djinn is Set
+    if (djinnStates[djinn.id] !== 'Set') continue;
+    
+    const compatibility = getElementCompatibility(unit.element, djinn.element);
+    const granted = djinn.grantedAbilities[unit.id];
+    
+    if (!granted) continue;
+    
+    switch (compatibility) {
+      case 'same':
+        abilities.push(...granted.same);
+        break;
+      case 'counter':
+        abilities.push(...granted.counter);
+        break;
+      case 'neutral':
+        abilities.push(...granted.neutral);
+        break;
+    }
+  }
+  
+  return abilities;
+}
+```
+
+**Success Criteria:**
+- Djinn state parameter added
+- Only Set Djinn grant abilities
+- Abilities disappear when Djinn in Standby
+- Abilities return when Djinn recovers
+
+---
+
+### **Task 8.4: Update calculateEffectiveStats to Use State**
+
+**File:** `apps/vale-v2/src/core/algorithms/stats.ts`
+
+**Current Code (Around line 145):**
+```typescript
+export function calculateEffectiveStats(unit: Unit, team: Team): Stats {
+  const base = unit.baseStats;
+  const levelBonus = calculateLevelBonuses(unit);
+  const equipment = calculateEquipmentBonuses(unit);
+  const djinn = calculateDjinnBonuses(team);  // Uses all equipped Djinn
+  const status = calculateStatusModifiers(unit);
+
+  return {
+    hp: base.hp + levelBonus.hp + (equipment.hp ?? 0),
+    pp: base.pp + levelBonus.pp + (equipment.pp ?? 0),
+    atk: base.atk + levelBonus.atk + (equipment.atk ?? 0) + (djinn.atk ?? 0) + (status.atk ?? 0),
+    def: base.def + levelBonus.def + (equipment.def ?? 0) + (djinn.def ?? 0) + (status.def ?? 0),
+    mag: base.mag + levelBonus.mag + (equipment.mag ?? 0) + (status.mag ?? 0),
+    spd: base.spd + levelBonus.spd + (equipment.spd ?? 0) + (djinn.spd ?? 0) + (status.spd ?? 0),
+  };
+}
+```
+
+**No Changes Needed!**
+
+`calculateDjinnBonuses(team)` already uses `team` parameter. Once we update that function (Task 8.1), this will automatically use the filtered bonuses.
+
+**Verify:**
+- `calculateDjinnBonuses()` is the only source of Djinn bonuses
+- It's called every time stats are calculated
+- No caching issues
+
+---
+
+### **Task 8.5: Trigger Stat Recalculation When Djinn State Changes**
+
+**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+
+**Location:** When Djinn states change
+
+**Two Critical Moments:**
+
+**A) When Djinn Activated (executeDjinnSummons):**
+```typescript
+function executeDjinnSummons(
+  state: BattleState,
+  rng: PRNG
+): { state: BattleState; events: readonly BattleEvent[] } {
+  // ... existing summon logic ...
+  
+  // After setting Djinn to Standby:
+  // Team's djinnTrackers now have Djinn in Standby state
+  // calculateEffectiveStats() will automatically recalculate with filtered bonuses
+  
+  // Add event to show stat changes
+  const statChangeEvents: BattleEvent[] = [];
+  for (const unit of state.playerTeam.units) {
+    const oldStats = calculateEffectiveStats(unit, state.playerTeam); // Before
+    // (Actually, stats already changed since djinnTrackers updated)
+    // Just log that bonuses were lost
+    
+    statChangeEvents.push({
+      type: 'djinn-bonus-lost',
+      unitId: unit.id,
+      djinnIds: [...state.queuedDjinn],
+    });
+  }
+  
+  return { state: currentState, events: [...events, ...statChangeEvents] };
+}
+```
+
+**B) When Djinn Recovers (transitionToPlanningPhase):**
+```typescript
+function transitionToPlanningPhase(state: BattleState): BattleState {
+  // ... timer decrement logic ...
+  
+  for (const [djinnId, timer] of Object.entries(updatedTimers)) {
+    if (timer === 1) {  // Will be 0 after decrement
+      // Djinn recovering - update state to Set
+      const tracker = updatedTrackers[djinnId];
+      if (tracker) {
+        updatedTrackers[djinnId] = {
+          ...tracker,
+          state: 'Set',  // Recovered!
+        };
+        
+        // Add event showing bonuses restored
+        recoveryEvents.push({
+          type: 'djinn-bonus-restored',
+          djinnId,
+        });
+      }
+    }
+  }
+  
+  // Stats will automatically recalculate when accessed
+  // because calculateEffectiveStats() uses updated djinnTrackers
+  
+  return updatedState;
+}
+```
+
+**Success Criteria:**
+- Stats recalculate automatically (no manual triggers needed)
+- Events logged for UI feedback
+- No performance issues (stats calculated on-demand)
+
+---
+
+### **Task 8.6: Update Ability Availability Checking**
+
+**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts` or ability checking logic
+
+**Current:**
+Abilities are available if unlocked by level/equipment/Djinn.
+
+**Update:**
+Check Djinn state when determining Djinn-granted ability availability.
+
+**Implementation:**
+```typescript
+function getAvailableAbilities(unit: Unit, team: Team): Ability[] {
+  const abilities: Ability[] = [];
+  
+  // Level-unlocked abilities
+  const levelAbilities = unit.abilities.filter(a => 
+    unit.unlockedAbilityIds.includes(a.id)
+  );
+  abilities.push(...levelAbilities);
+  
+  // Equipment-unlocked abilities
+  const equipmentAbilities = getEquipmentAbilities(unit);
+  abilities.push(...equipmentAbilities);
+  
+  // Djinn-granted abilities (filtered by state)
+  const djinnData = team.equippedDjinn.map(id => DJINN[id]).filter(Boolean);
+  const djinnAbilities = getDjinnGrantedAbilities(
+    unit,
+    djinnData,
+    team.djinnTrackers  // Pass state tracking
+  );
+  
+  const djinnAbilityObjects = djinnAbilities
+    .map(id => DJINN_ABILITIES[id])
+    .filter(Boolean);
+  abilities.push(...djinnAbilityObjects);
+  
+  return abilities;
+}
+```
+
+**Success Criteria:**
+- Djinn abilities disappear from ability list when Djinn in Standby
+- Abilities reappear when Djinn recovers
+- UI updates immediately
+
+---
+
+### **Task 8.7: Add BattleEvent Types for Stat Changes**
+
+**File:** `apps/vale-v2/src/core/services/types.ts`
+
+**Add Events:**
+```typescript
+export type BattleEvent =
+  | { type: 'turn-start'; actorId: string; turn: number }
+  | { type: 'ability'; casterId: string; abilityId: string; targets: readonly string[] }
+  | { type: 'hit'; targetId: string; amount: number; element?: Element }
+  | { type: 'heal'; targetId: string; amount: number }
+  | { type: 'auto-heal'; message: string }
+  | { type: 'mana-generated'; amount: number; source: string; newTotal: number }
+  | { type: 'djinn-activated'; djinnIds: readonly string[]; recoveryTime: number }
+  | { type: 'djinn-recovered'; djinnId: string }
+  | { type: 'djinn-bonus-lost'; unitId: string; djinnIds: readonly string[] }  // NEW
+  | { type: 'djinn-bonus-restored'; djinnId: string }  // NEW
+  | { type: 'status-applied'; targetId: string; status: StatusEffect }
+  // ... rest
+```
+
+**Update Renderer:**
+```typescript
+// In text.ts
+case 'djinn-bonus-lost':
+  return `⚠️ Team loses bonuses from ${e.djinnIds.join(', ')}!`;
+case 'djinn-bonus-restored':
+  return `✨ ${e.djinnId} bonuses restored!`;
+```
+
+**Success Criteria:**
+- Events logged when bonuses lost/restored
+- Battle log shows stat changes
+- Players understand the trade-off
+
+---
+
+### **Task 8.8: Update UI to Show Ability Locks**
+
+**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx` (or ability selection UI)
+
+**Enhancement:**
+When displaying abilities, show which are locked due to Djinn in Standby.
+
+**Implementation:**
+```typescript
+// In ability list rendering
+{abilities.map(ability => {
+  const isDjinnAbility = ability.id.startsWith('flint-') || 
+                         ability.id.startsWith('granite-') ||
+                         // ... check all Djinn prefixes
+  
+  const grantingDjinn = isDjinnAbility ? findDjinnForAbility(ability.id) : null;
+  const isLocked = grantingDjinn && 
+                   team.djinnTrackers[grantingDjinn.id]?.state !== 'Set';
+  
+  return (
+    <button
+      disabled={isLocked}
+      style={{
+        opacity: isLocked ? 0.5 : 1,
+        cursor: isLocked ? 'not-allowed' : 'pointer',
+      }}
+      title={isLocked ? `Locked: ${grantingDjinn.name} is in Standby` : ability.description}
+    >
+      {ability.name}
+      {isLocked && ' 🔒'}
+    </button>
+  );
+})}
+```
+
+**Success Criteria:**
+- Locked abilities visually distinct (grayed out, lock icon)
+- Tooltip explains why locked
+- Cannot queue locked abilities
+
+---
+
+## TESTING REQUIREMENTS
+
+### **Test 8.1: Stat Loss on Activation**
+
+**File:** `apps/vale-v2/tests/core/algorithms/djinnStandby.test.ts` (NEW)
+
+```typescript
+import { describe, test, expect } from 'vitest';
+import { createTeam, updateTeam } from '@/core/models/Team';
+import { mkUnit } from '@/test/factories';
+import { calculateEffectiveStats } from '@/core/algorithms/stats';
+import { DJINN } from '@/data/definitions/djinn';
+
+describe('Djinn Standby - Stat Bonuses', () => {
+  test('activating Djinn removes stat bonuses', () => {
+    const isaac = mkUnit({ id: 'adept', element: 'Venus' });
+    let team = createTeam([isaac]);
+    
+    // Equip Flint (Venus Djinn)
+    team = updateTeam(team, {
+      equippedDjinn: ['flint'],
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 0 },
+      },
+    });
+    
+    // Stats with Flint Set (Isaac is Venus = same element)
+    const statsWithFlint = calculateEffectiveStats(isaac, team);
+    expect(statsWithFlint.atk).toBe(isaac.baseStats.atk + 4); // +4 from Flint
+    expect(statsWithFlint.def).toBe(isaac.baseStats.def + 3); // +3 from Flint
+    
+    // Activate Flint (Set → Standby)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Stats with Flint in Standby (bonuses lost)
+    const statsWithoutFlint = calculateEffectiveStats(isaac, team);
+    expect(statsWithoutFlint.atk).toBe(isaac.baseStats.atk); // No bonus!
+    expect(statsWithoutFlint.def).toBe(isaac.baseStats.def); // No bonus!
+  });
+  
+  test('counter element unit loses penalty when Djinn in Standby', () => {
+    const garet = mkUnit({ id: 'war-mage', element: 'Mars' });
+    let team = createTeam([garet]);
+    
+    // Equip Flint (Venus Djinn, counter to Mars)
+    team = updateTeam(team, {
+      equippedDjinn: ['flint'],
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 0 },
+      },
+    });
+    
+    // Stats with Flint Set (Garet is Mars = counter element = PENALTY)
+    const statsWithPenalty = calculateEffectiveStats(garet, team);
+    expect(statsWithPenalty.atk).toBe(garet.baseStats.atk - 3); // -3 penalty
+    expect(statsWithPenalty.def).toBe(garet.baseStats.def - 2); // -2 penalty
+    
+    // Activate Flint (penalty removed temporarily!)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Stats with Flint in Standby (penalty lost = temporary boost!)
+    const statsWithoutPenalty = calculateEffectiveStats(garet, team);
+    expect(statsWithoutPenalty.atk).toBe(garet.baseStats.atk); // No penalty!
+    expect(statsWithoutPenalty.def).toBe(garet.baseStats.def); // No penalty!
+  });
+  
+  test('recovering Djinn restores bonuses', () => {
+    const isaac = mkUnit({ id: 'adept', element: 'Venus' });
+    let team = createTeam([isaac]);
+    
+    // Equip Flint in Standby
+    team = updateTeam(team, {
+      equippedDjinn: ['flint'],
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Stats without bonuses
+    const statsInStandby = calculateEffectiveStats(isaac, team);
+    const baseAtk = isaac.baseStats.atk;
+    expect(statsInStandby.atk).toBe(baseAtk);
+    
+    // Djinn recovers (Standby → Set)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Stats with bonuses restored
+    const statsRecovered = calculateEffectiveStats(isaac, team);
+    expect(statsRecovered.atk).toBe(baseAtk + 4); // Bonus back!
+    expect(statsRecovered.def).toBe(isaac.baseStats.def + 3); // Bonus back!
+  });
+});
+```
+
+---
+
+### **Test 8.2: Ability Loss on Activation**
+
+```typescript
+describe('Djinn Standby - Ability Availability', () => {
+  test('activating Djinn removes granted abilities', () => {
+    const isaac = mkUnit({ id: 'adept', element: 'Venus' });
+    let team = createTeam([isaac]);
+    
+    const flint = DJINN['flint'];
+    
+    // Equip Flint in Set state
+    team = updateTeam(team, {
+      equippedDjinn: ['flint'],
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 0 },
+      },
+    });
+    
+    // Abilities with Flint Set
+    const abilitiesWithFlint = getDjinnGrantedAbilities(
+      isaac,
+      [flint],
+      team.djinnTrackers
+    );
+    expect(abilitiesWithFlint).toContain('flint-stone-fist'); // Has ability
+    expect(abilitiesWithFlint.length).toBeGreaterThan(0);
+    
+    // Activate Flint (Set → Standby)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Abilities with Flint in Standby (abilities lost)
+    const abilitiesWithoutFlint = getDjinnGrantedAbilities(
+      isaac,
+      [flint],
+      team.djinnTrackers
+    );
+    expect(abilitiesWithoutFlint).not.toContain('flint-stone-fist'); // Lost!
+    expect(abilitiesWithoutFlint).toHaveLength(0); // All Flint abilities gone
+  });
+  
+  test('recovering Djinn restores abilities', () => {
+    const isaac = mkUnit({ id: 'adept', element: 'Venus' });
+    let team = createTeam([isaac]);
+    
+    const flint = DJINN['flint'];
+    
+    // Start with Flint in Standby
+    team = updateTeam(team, {
+      equippedDjinn: ['flint'],
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // No abilities while in Standby
+    const abilitiesLost = getDjinnGrantedAbilities(isaac, [flint], team.djinnTrackers);
+    expect(abilitiesLost).toHaveLength(0);
+    
+    // Djinn recovers (Standby → Set)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 1 },
+      },
+    });
+    
+    // Abilities restored
+    const abilitiesRestored = getDjinnGrantedAbilities(isaac, [flint], team.djinnTrackers);
+    expect(abilitiesRestored).toContain('flint-stone-fist'); // Back!
+    expect(abilitiesRestored.length).toBeGreaterThan(0);
+  });
+});
+```
+
+---
+
+### **Test 8.3: Multiple Djinn Staggered Activation**
+
+```typescript
+describe('Djinn Standby - Strategic Scenarios', () => {
+  test('staggered activation maintains some bonuses', () => {
+    const isaac = mkUnit({ id: 'adept', element: 'Venus' });
+    let team = createTeam([isaac]);
+    
+    // Equip 3 Venus Djinn (all Set)
+    team = updateTeam(team, {
+      equippedDjinn: ['flint', 'granite', 'bane'],
+      djinnTrackers: {
+        'flint': { state: 'Set', lastActivatedTurn: 0 },
+        'granite': { state: 'Set', lastActivatedTurn: 0 },
+        'bane': { state: 'Set', lastActivatedTurn: 0 },
+      },
+    });
+    
+    // With all 3 Set: +12 ATK, +8 DEF
+    const statsAll = calculateEffectiveStats(isaac, team);
+    expect(statsAll.atk).toBe(isaac.baseStats.atk + 12);
+    expect(statsAll.def).toBe(isaac.baseStats.def + 8);
+    
+    // Activate Flint only (other 2 still Set)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 1 },
+        'granite': { state: 'Set', lastActivatedTurn: 0 },
+        'bane': { state: 'Set', lastActivatedTurn: 0 },
+      },
+    });
+    
+    // With 2 Set (Granite + Bane): +8 ATK, +5 DEF
+    const statsPartial = calculateEffectiveStats(isaac, team);
+    expect(statsPartial.atk).toBe(isaac.baseStats.atk + 8);
+    expect(statsPartial.def).toBe(isaac.baseStats.def + 5);
+    
+    // Activate all 3 (none Set)
+    team = updateTeam(team, {
+      djinnTrackers: {
+        'flint': { state: 'Standby', lastActivatedTurn: 2 },
+        'granite': { state: 'Standby', lastActivatedTurn: 2 },
+        'bane': { state: 'Standby', lastActivatedTurn: 2 },
+      },
+    });
+    
+    // With 0 Set: +0 ATK, +0 DEF
+    const statsNone = calculateEffectiveStats(isaac, team);
+    expect(statsNone.atk).toBe(isaac.baseStats.atk); // No bonuses!
+    expect(statsNone.def).toBe(isaac.baseStats.def); // No bonuses!
+  });
+});
+```
+
+---
+
+## EDGE CASES
+
+### **Edge Case 1: All Djinn in Standby**
+```typescript
+// All 3 Djinn activated together
+// Team has ZERO Djinn bonuses
+// calculateDjinnBonuses() returns { atk: 0, def: 0, spd: 0 }
+// Units use base stats only
+```
+
+**Handle:** Already handled by filtering (returns empty bonuses)
+
+---
+
+### **Edge Case 2: Djinn Recovers Mid-Round**
+```typescript
+// Djinn recovers during enemy action phase
+// Player abilities are already queued for this round
+// Recovered abilities become available NEXT round
+```
+
+**Handle:** Abilities checked at planning phase, so this is fine.
+
+---
+
+### **Edge Case 3: Trying to Use Locked Ability**
+```typescript
+// Player queued ability while Djinn was Set
+// Djinn goes to Standby before ability executes
+// Ability should still execute (queued when valid)
+```
+
+**Handle:** Queue validation happens at planning phase, execution uses queued actions.
+
+---
+
+### **Edge Case 4: Counter Unit Mid-Battle**
+```typescript
+// Garet has -3 ATK penalty from Venus Djinn
+// Venus Djinn activated
+// Garet's ATK increases mid-battle (penalty removed)
+// Then Djinn recovers
+// Garet's ATK decreases again (penalty restored)
+```
+
+**Handle:** This is intentional and strategic! Document in booklet as feature.
+
+---
+
+## VALIDATION CHECKLIST
+
+Before marking Phase 8 complete:
+
+### **Functional:**
+- [ ] Djinn in Set state: Provide bonuses + abilities
+- [ ] Djinn in Standby: No bonuses, no abilities
+- [ ] Djinn in Recovery: No bonuses, no abilities (same as Standby)
+- [ ] Djinn recovered: Bonuses + abilities restored
+- [ ] Real-time stat updates during battle
+- [ ] Ability availability updates when state changes
+
+### **Strategic:**
+- [ ] Counter units get temporary stat boost when Djinn in Standby
+- [ ] Staggered activation maintains some bonuses
+- [ ] All-in activation removes all bonuses (high risk/reward)
+
+### **Events:**
+- [ ] `djinn-bonus-lost` logged on activation
+- [ ] `djinn-bonus-restored` logged on recovery
+- [ ] Battle log shows stat changes
+
+### **UI:**
+- [ ] Locked abilities visually distinct
+- [ ] Tooltips explain why locked
+- [ ] Cannot queue locked abilities
+
+### **Testing:**
+- [ ] All Phase 8 tests pass
+- [ ] All existing tests still pass
+- [ ] Data validation passes
+- [ ] TypeScript compiles
+
+---
+
+## EXPECTED CHANGES
+
+**Files Modified:** 4-5  
+**Lines Added:** ~100-150  
+**Lines Removed:** ~10-20  
+**Net Change:** +80-130 lines
+
+**New Test File:** 1  
+**Test Cases Added:** 5-7
+
+**Small change!** Mostly parameter additions and filtering logic.
+
+---
+
+## ARCHITECTURE COMPLIANCE
+
+**Must Follow:**
+- ✅ Pure functions (calculateDjinnBonuses, getDjinnGrantedAbilities)
+- ✅ Immutable updates (don't mutate djinnTrackers)
+- ✅ State-driven (djinnTrackers is source of truth)
+- ✅ Event sourcing (log bonus changes)
+
+**Must Not:**
+- ❌ Cache effective stats (must recalculate when state changes)
+- ❌ Mutate team or unit objects
+- ❌ Put game logic in UI
+- ❌ Break existing Djinn system
+
+---
+
+## SUCCESS METRICS
+
+**Gameplay:**
+- ✅ Activating 1 Djinn: Lose ~⅓ of bonuses
+- ✅ Activating 2 Djinn: Lose ~⅔ of bonuses
+- ✅ Activating 3 Djinn: Lose ALL bonuses (team crippled!)
+- ✅ Recovery: Bonuses come back
+- ✅ Strategic depth: Timing matters
+
+**Technical:**
+- ✅ Stats recalculate automatically
+- ✅ Abilities filter by state
+- ✅ No performance issues
+- ✅ Tests pass
+
+**Booklet Alignment:**
+- ✅ Matches lines 394-442 exactly
+- ✅ Example scenarios work in-game
+- ✅ Trade-off is meaningful
+
+---
+
+## INTEGRATION POINTS
+
+### **With Phase 5 (Djinn Recovery):**
+When recovery timer expires:
+1. Update djinnTrackers (Standby → Set)
+2. calculateEffectiveStats() automatically recalculates
+3. getDjinnGrantedAbilities() returns abilities
+4. UI updates
+
+### **With Phase 7 (Djinn Abilities):**
+- Uses same `getDjinnGrantedAbilities()` function
+- Just adds state filtering
+- No conflicts
+
+### **With Battle System:**
+- Stats calculated every action
+- No caching issues
+- Real-time updates
+
+---
+
+## ROLLBACK PLAN
+
+If issues arise:
+
+```bash
+# Revert changes
+git checkout apps/vale-v2/src/core/algorithms/stats.ts
+git checkout apps/vale-v2/src/core/algorithms/djinnAbilities.ts
+# ... other files
+
+# Or revert entire phase
+git revert HEAD
+```
+
+**Low Risk:** Additive changes, well-tested pattern from Phase 7.
+
+---
+
+## TIMELINE
+
+**Day 1 (4-6 hours):**
+- Tasks 8.1-8.4: Core implementation
+- State filtering in bonus/ability calculations
+- Basic tests passing
+
+**Day 2 (4-6 hours):**
+- Tasks 8.5-8.8: Events and UI
+- Integration testing
+- Edge cases
+- Final validation
+
+**Total:** 8-12 hours (1-1.5 days)
+
+---
+
+## COMPLETION CRITERIA
+
+Phase 8 is complete when:
+
+1. ✅ Activating Djinn removes bonuses/abilities
+2. ✅ Recovering Djinn restores bonuses/abilities
+3. ✅ Battle log shows stat changes
+4. ✅ UI shows locked abilities
+5. ✅ All tests pass
+6. ✅ Matches instruction booklet behavior
+
+**Then the entire 8-phase overhaul is COMPLETE!** 🎉
+
+---
+
+## READY TO IMPLEMENT
+
+**Priority:** HIGH (final phase!)  
+**Complexity:** MEDIUM (state filtering + UI updates)  
+**Risk:** LOW (builds on Phase 7 foundation)  
+**Value:** VERY HIGH (completes core strategic mechanic)
+
+**Start with Task 8.1** (filter Djinn bonuses by state), then 8.2-8.3 (filter abilities), then 8.4-8.8 (events/UI/tests).
+
+**This is the final push to complete the game mechanics overhaul!** 💪
+
+---
+
+## CODEX THINKING POINTS
+
+When implementing with extended thinking, consider:
+
+1. **Performance:** Stats are calculated frequently - ensure filtering is efficient
+2. **State consistency:** djinnTrackers must always be in sync with BattleState
+3. **UI reactivity:** Stats/abilities must update immediately when state changes
+4. **Testing strategy:** Cover all state transitions (Set→Standby, Standby→Set)
+5. **Edge cases:** What if djinnTrackers missing? What if state is undefined?
+
+The implementation is straightforward, but the strategic implications are deep. Extended thinking will help ensure all edge cases are covered.
+
+Good luck with the final phase! 🚀
+
