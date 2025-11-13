@@ -64,10 +64,22 @@ export function processStatusEffectTick(
     } else if (effect.type === 'stun') {
       messages.push(`${unit.name} is stunned and cannot act!`);
       return { ...effect, duration: effect.duration - 1 };
+    } else if (effect.type === 'autoRevive') {
+      // Auto-revive is uses-based, not time-based - keep as-is
+      return effect;
     }
-    // Buff/debuff/paralyze just decrement duration
-    return { ...effect, duration: effect.duration - 1 };
-  }).filter(effect => effect.duration > 0);
+    // Buff/debuff/paralyze/other duration-based effects - decrement duration
+    if ('duration' in effect) {
+      return { ...effect, duration: effect.duration - 1 };
+    }
+    return effect;
+  }).filter(effect => {
+    // Remove effects with duration <= 0 (skip autoRevive which doesn't have duration)
+    if ('duration' in effect) {
+      return effect.duration > 0;
+    }
+    return true;
+  });
 
   let modifiedUnit = unit;
   if (totalDamage > 0) {
@@ -100,7 +112,11 @@ export function checkParalyzeFailure(
   unit: Unit,
   rng: PRNG
 ): boolean {
-  const paralyzed = unit.statusEffects.find(e => e.type === 'paralyze');
+  const paralyzeEffects = unit.statusEffects.filter(
+    e => e.type === 'paralyze'
+  ) as Array<Extract<typeof unit.statusEffects[number], { type: 'paralyze' }>>;
+
+  const paralyzed = paralyzeEffects[0];
   if (paralyzed && rng.next() < 0.25) {
     return true; // Action fails (25% chance)
   }
@@ -112,5 +128,59 @@ export function checkParalyzeFailure(
  */
 export function isFrozen(unit: Unit): boolean {
   return unit.statusEffects.some(e => e.type === 'freeze' || e.type === 'stun');
+}
+
+/**
+ * Phase 2: Check if unit is immune to a specific status type
+ */
+export function isImmuneToStatus(unit: Unit, statusType: string): boolean {
+  const immunities = unit.statusEffects.filter(s => s.type === 'immunity');
+
+  // Check if any immunity grants "all" protection
+  if (immunities.some(s => s.all)) {
+    return true;
+  }
+
+  // Check if any immunity specifically lists this status type
+  return immunities.some(s => s.types?.includes(statusType as any));
+}
+
+/**
+ * Phase 2: Check if a status effect is negative (can be cleansed)
+ * Negative statuses: poison, burn, freeze, paralyze, stun, debuffs
+ * NOT negative: buffs, healOverTime, shields, resistance buffs
+ */
+export function isNegativeStatus(status: { type: string; [key: string]: any }): boolean {
+  // Damage-over-time and action-preventing statuses
+  if (['poison', 'burn', 'freeze', 'paralyze', 'stun'].includes(status.type)) {
+    return true;
+  }
+
+  // Debuffs (negative stat modifiers)
+  if (status.type === 'debuff') {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Phase 2: Apply a status to a unit (with immunity check)
+ * This is the canonical way to add statuses; centralizes immunity logic
+ */
+export function applyStatusToUnit(
+  unit: Unit,
+  newStatus: typeof unit.statusEffects[number]
+): Unit {
+  // Check immunity
+  if (isImmuneToStatus(unit, newStatus.type)) {
+    return unit; // No change
+  }
+
+  // Add status to unit
+  return {
+    ...unit,
+    statusEffects: [...unit.statusEffects, newStatus],
+  };
 }
 

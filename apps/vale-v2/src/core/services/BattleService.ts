@@ -16,6 +16,7 @@ import {
   calculatePsynergyDamage,
   calculateHealAmount,
   applyDamage,
+  applyDamageWithShields,
   applyHealing,
 } from '../algorithms/damage';
 import { calculateTurnOrder } from '../algorithms/turn-order';
@@ -23,6 +24,8 @@ import {
   processStatusEffectTick,
   checkParalyzeFailure,
   isFrozen,
+  isNegativeStatus,
+  applyStatusToUnit,
 } from '../algorithms/status';
 import { resolveTargets, filterValidTargets } from '../algorithms/targeting';
 import { BATTLE_CONSTANTS } from '../constants';
@@ -150,9 +153,9 @@ export function performAction(
   });
 
   // Execute ability with validated alive targets
-  // Pass team for effective stats calculation
+  // Pass team for effective stats calculation and RNG for status chance rolls
   const allUnits = [...state.playerTeam.units, ...state.enemies];
-  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam);
+  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, state.enemies, rng);
 
   // Update battle state with new units
   const updatedPlayerUnits = state.playerTeam.units.map(u => {
@@ -236,14 +239,69 @@ export function performAction(
 }
 
 /**
+ * Phase 2: Apply shield granting and status cleanse to targets
+ * This processes optional Phase 2 ability effects after main ability execution
+ */
+function applyPhase2Effects(
+  ability: Ability,
+  targets: Unit[]
+): Unit[] {
+  return targets.map(target => {
+    let modifiedTarget = target;
+
+    // 1. Shield granting
+    if (ability.shieldCharges) {
+      const shieldStatus: Extract<typeof target.statusEffects[number], { type: 'shield' }> = {
+        type: 'shield',
+        remainingCharges: ability.shieldCharges,
+        duration: ability.duration || 3, // Default 3 turns if not specified
+      };
+
+      modifiedTarget = {
+        ...modifiedTarget,
+        statusEffects: [...modifiedTarget.statusEffects, shieldStatus],
+      };
+    }
+
+    // 2. Status cleanse
+    if (ability.removeStatusEffects) {
+      const removeSpec = ability.removeStatusEffects;
+      let filteredStatuses = modifiedTarget.statusEffects;
+
+      if (removeSpec.type === 'all') {
+        // Remove all status effects
+        filteredStatuses = [];
+      } else if (removeSpec.type === 'negative') {
+        // Remove only negative status effects
+        filteredStatuses = filteredStatuses.filter(s => !isNegativeStatus(s));
+      } else if (removeSpec.type === 'byType') {
+        // Remove specific status types
+        const typesToRemove = removeSpec.statuses;
+        filteredStatuses = filteredStatuses.filter(s => !typesToRemove.includes(s.type as any));
+      }
+
+      modifiedTarget = {
+        ...modifiedTarget,
+        statusEffects: filteredStatuses,
+      };
+    }
+
+    return modifiedTarget;
+  });
+}
+
+/**
  * Execute an ability in battle (internal helper)
+ * Phase 2: Added enemies parameter for splash damage targeting, added rng for status chance rolls
  */
 function executeAbility(
   caster: Unit,
   ability: Ability,
   targets: readonly Unit[],
   allUnits: readonly Unit[],
-  team: Team
+  team: Team,
+  enemies: readonly Unit[],
+  rng: PRNG
 ): ActionResult {
   const targetIds = targets.map(t => t.id);
   let message = `${caster.name} uses ${ability.name}!`;
@@ -274,8 +332,10 @@ function executeAbility(
             ? calculatePhysicalDamage(caster, currentTarget, team, ability)
             : calculatePsynergyDamage(caster, currentTarget, team, ability);
 
-          currentTarget = applyDamage(currentTarget, damage);
-          targetDamage += damage;
+          // Phase 2: Apply damage with shield/invulnerability checks
+          const { updatedUnit, actualDamage } = applyDamageWithShields(currentTarget, damage);
+          currentTarget = updatedUnit;
+          targetDamage += actualDamage;
 
           // Update in the working set
           const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
@@ -294,13 +354,19 @@ function executeAbility(
           const statusDuration = ability.statusEffect.duration;
           const statusChance = ability.statusEffect.chance ?? 1.0; // Default 100% chance
 
-          // TODO: Add RNG for chance check (requires passing PRNG to executeAbility)
-          // For now, always apply if chance >= 1.0
-          if (statusChance >= 1.0) {
+          // Phase 2: Use RNG for status chance roll
+          const roll = rng.next(); // Returns [0, 1)
+          if (roll < statusChance) {
+            // First, remove existing status of the same type
             const filteredStatuses = currentTarget.statusEffects.filter(
               s => s.type !== statusType
             );
+            currentTarget = {
+              ...currentTarget,
+              statusEffects: filteredStatuses,
+            };
 
+            // Create new status
             let newStatus: typeof currentTarget.statusEffects[number];
             if (statusType === 'poison') {
               newStatus = {
@@ -331,10 +397,8 @@ function executeAbility(
               };
             }
 
-            currentTarget = {
-              ...currentTarget,
-              statusEffects: [...filteredStatuses, newStatus],
-            };
+            // Phase 2: Apply status with immunity check
+            currentTarget = applyStatusToUnit(currentTarget, newStatus);
 
             const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
             if (existingIndex >= 0) {
@@ -347,7 +411,7 @@ function executeAbility(
 
         // Apply debuff effect (if any)
         if (ability.debuffEffect) {
-          const newDebuffs: typeof currentTarget.statusEffects = [];
+          const newDebuffs: Array<typeof currentTarget.statusEffects[number]> = [];
           const validStats: Array<keyof typeof caster.baseStats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
 
           for (const [stat, modifier] of Object.entries(ability.debuffEffect)) {
@@ -361,11 +425,11 @@ function executeAbility(
             }
           }
 
+          // Phase 2: Apply each debuff with immunity check
           if (newDebuffs.length > 0) {
-            currentTarget = {
-              ...currentTarget,
-              statusEffects: [...currentTarget.statusEffects, ...newDebuffs],
-            };
+            for (const debuff of newDebuffs) {
+              currentTarget = applyStatusToUnit(currentTarget, debuff);
+            }
 
             const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
             if (existingIndex >= 0) {
@@ -376,6 +440,51 @@ function executeAbility(
           }
         }
       }
+
+      // Phase 2: Splash damage for single-target abilities
+      if (ability.splashDamagePercent && ability.targets === 'single-enemy' && targets.length === 1) {
+        const primaryTargetId = targets[0]?.id;
+        const splashPercent = ability.splashDamagePercent;
+
+        // Find all alive enemies excluding primary target
+        const secondaryTargets = enemies.filter(enemy =>
+          enemy.id !== primaryTargetId && !isUnitKO(enemy)
+        );
+
+        for (const secondaryTarget of secondaryTargets) {
+          // Get current state of secondary target
+          let currentSecondary = updatedUnits.find(u => u.id === secondaryTarget.id) ||
+                                   allUnits.find(u => u.id === secondaryTarget.id);
+
+          if (!currentSecondary || isUnitKO(currentSecondary)) {
+            continue;
+          }
+
+          // Calculate splash damage (reduced by splashPercent)
+          const baseDamage = ability.type === 'physical'
+            ? calculatePhysicalDamage(caster, currentSecondary, team, ability)
+            : calculatePsynergyDamage(caster, currentSecondary, team, ability);
+
+          const splashDamage = Math.floor(baseDamage * splashPercent);
+
+          // Apply splash damage with shields/invulnerability
+          const { updatedUnit, actualDamage } = applyDamageWithShields(currentSecondary, splashDamage);
+          currentSecondary = updatedUnit;
+          totalDamage += actualDamage;
+
+          // Update in the working set
+          const existingIndex = updatedUnits.findIndex(u => u.id === currentSecondary.id);
+          if (existingIndex >= 0) {
+            updatedUnits[existingIndex] = currentSecondary;
+          } else {
+            updatedUnits.push(currentSecondary);
+          }
+        }
+      }
+
+      // Phase 2: Apply shield granting and status cleanse to affected units
+      const unitsWithPhase2Effects = applyPhase2Effects(ability, updatedUnits);
+      updatedUnits.splice(0, updatedUnits.length, ...unitsWithPhase2Effects);
 
       message += ` Deals ${totalDamage} damage!`;
 
@@ -435,6 +544,10 @@ function executeAbility(
         updatedUnits.push(currentTarget);
       }
 
+      // Phase 2: Apply shield granting and status cleanse
+      const unitsWithPhase2Effects = applyPhase2Effects(ability, updatedUnits);
+      updatedUnits.splice(0, updatedUnits.length, ...unitsWithPhase2Effects);
+
       message += ` Restores ${totalHealing} HP!`;
 
       const finalUnits = allUnits.map(u => {
@@ -455,29 +568,32 @@ function executeAbility(
     case 'debuff': {
       for (const target of targets) {
         if (ability.buffEffect) {
-          const statusEffects = [...target.statusEffects];
-          
+          let modifiedTarget = target;
+
           const validStats: Array<keyof typeof target.baseStats> = ['hp', 'pp', 'atk', 'def', 'mag', 'spd'];
           for (const [stat, modifier] of Object.entries(ability.buffEffect)) {
             if (typeof modifier === 'number' && validStats.includes(stat as keyof typeof target.baseStats)) {
-              statusEffects.push({
+              const newStatus: typeof target.statusEffects[number] = {
                 type: ability.type === 'buff' ? 'buff' : 'debuff',
                 stat: stat as keyof typeof target.baseStats,
                 modifier: modifier as number,
                 duration: ability.duration || 3,
-              });
+              };
+
+              // Phase 2: Apply status with immunity check
+              modifiedTarget = applyStatusToUnit(modifiedTarget, newStatus);
             }
           }
 
-          const buffedUnit: Unit = {
-            ...target,
-            statusEffects,
-          };
-          updatedUnits.push(buffedUnit);
+          updatedUnits.push(modifiedTarget);
         } else {
           updatedUnits.push(target);
         }
       }
+
+      // Phase 2: Apply shield granting and status cleanse
+      const unitsWithPhase2Effects = applyPhase2Effects(ability, updatedUnits);
+      updatedUnits.splice(0, updatedUnits.length, ...unitsWithPhase2Effects);
 
       message += ` Applied ${ability.type}!`;
 

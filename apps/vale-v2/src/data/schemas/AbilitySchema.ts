@@ -65,6 +65,23 @@ export const AbilitySchema = z.object({
   revive: z.boolean().optional(), // Can revive KO'd units
   reviveHPPercent: z.number().min(0).max(1).optional(), // HP% restored when reviving (0-1)
 
+  // Phase 2: Advanced offense mechanics
+  ignoreDefensePercent: z.number().min(0).max(1).optional(), // % of target DEF to ignore (default 0)
+  splashDamagePercent: z.number().min(0).max(1).optional(), // % damage dealt to non-primary targets (default 0)
+
+  // Phase 2: Shield granting
+  shieldCharges: z.number().int().min(1).max(99).optional(), // Number of hit charges granted when cast
+
+  // Phase 2: Status cleanse
+  removeStatusEffects: z.union([
+    z.object({ type: z.literal('all') }),
+    z.object({ type: z.literal('negative') }),
+    z.object({
+      type: z.literal('byType'),
+      statuses: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun'])),
+    }),
+  ]).optional(),
+
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
     priority: z.number().min(0).max(3).optional(),

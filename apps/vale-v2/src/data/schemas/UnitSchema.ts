@@ -70,6 +70,45 @@ export const StatusEffectSchema = z.discriminatedUnion('type', [
     healPerTurn: z.number().int().positive(),
     duration: z.number().int().positive(),
   }),
+  // Phase 2: Elemental resistance/weakness
+  // Convention: modifier > 0 = resistance (reduces damage), modifier < 0 = weakness (increases damage)
+  // Damage factor = 1 - modifier: 0.4 = 40% resist → damage × 0.6, -0.2 = 20% weakness → damage × 1.2
+  z.object({
+    type: z.literal('elementalResistance'),
+    element: ElementSchema,
+    modifier: z.number(), // Can be positive (resist) or negative (weakness)
+    duration: z.number().int().positive(),
+  }),
+  // Phase 2: Global damage reduction
+  z.object({
+    type: z.literal('damageReduction'),
+    percent: z.number().min(0).max(1), // 0-1, e.g. 0.3 = 30% reduction
+    duration: z.number().int().positive(),
+  }),
+  // Phase 2: Hit-based shield
+  z.object({
+    type: z.literal('shield'),
+    remainingCharges: z.number().int().min(0), // Consumed per hit
+    duration: z.number().int().positive(),
+  }),
+  // Phase 2: Invulnerability (blocks damage only, NOT statuses)
+  z.object({
+    type: z.literal('invulnerable'),
+    duration: z.number().int().positive(),
+  }),
+  // Phase 2: Status immunity
+  z.object({
+    type: z.literal('immunity'),
+    all: z.boolean(), // If true, immune to all negative statuses
+    types: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun'])).optional(), // Specific immunities
+    duration: z.number().int().positive(),
+  }),
+  // Phase 2: Auto-revive (uses-based, not time-based)
+  z.object({
+    type: z.literal('autoRevive'),
+    hpPercent: z.number().min(0).max(1), // HP% restored when triggered
+    usesRemaining: z.number().int().min(1), // Usually 1
+  }),
 ]);
 
 /**
