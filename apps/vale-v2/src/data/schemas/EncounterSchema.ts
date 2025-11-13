@@ -39,6 +39,7 @@ export const EncounterRewardsSchema = z.object({
   xp: z.number().int().min(0),
   gold: z.number().int().min(0),
   equipment: EquipmentRewardSchema,
+  djinn: z.string().min(1).optional(), // Djinn ID to award
   unlockUnit: z.string().min(1).optional(),
   unlockAbility: z.string().min(1).optional(), // Future: apply unlocks in RewardsService/Store
 });
