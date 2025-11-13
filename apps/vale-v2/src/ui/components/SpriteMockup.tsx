@@ -293,26 +293,47 @@ export function SpriteMockup() {
           ))}
         </div>
         
-        {/* Toggle Button */}
-        <button
-          onClick={() => setShowBattleScene(false)}
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
-            padding: '8px 16px',
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            color: '#fff',
-            border: '1px solid #fff',
-            borderRadius: '2px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            zIndex: 20,
-            fontFamily: 'monospace',
-          }}
-        >
-          Gallery
-        </button>
+        {/* Control Buttons */}
+        <div style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          display: 'flex',
+          gap: '10px',
+          zIndex: 20,
+        }}>
+          <button
+            onClick={() => setShowBattleScene(false)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              color: '#fff',
+              border: '1px solid #fff',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+            }}
+          >
+            Gallery
+          </button>
+          <button
+            onClick={() => window.open('#storyboards', '_self')}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'rgba(255,215,0,0.9)',
+              color: '#000',
+              border: '1px solid #FFD700',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+              fontWeight: 'bold',
+            }}
+          >
+            🎨 Storyboards
+          </button>
+        </div>
       </div>
     );
   }

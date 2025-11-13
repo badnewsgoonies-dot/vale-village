@@ -18,4 +18,12 @@ export { RewardsScreen } from './RewardsScreen';
 export { ManaCirclesBar } from './ManaCirclesBar';
 export { DjinnBar } from './DjinnBar';
 export { ActionQueuePanel } from './ActionQueuePanel';
+export { SpriteMockup } from './SpriteMockup';
+export { StoryboardGallery } from './StoryboardGallery';
+export { BattleSceneStoryboard } from './BattleSceneStoryboard';
+export { OverworldStoryboard } from './OverworldStoryboard';
+export { RewardsStoryboard } from './RewardsStoryboard';
+export { ShopStoryboard } from './ShopStoryboard';
+export { DialogueStoryboard } from './DialogueStoryboard';
+export { MenuStoryboard } from './MenuStoryboard';
 
