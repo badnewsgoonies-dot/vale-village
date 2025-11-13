@@ -58,23 +58,42 @@ export function validateSaveFile(data: unknown): Result<unknown, SaveFileValidat
 }
 
 /**
- * TODO (Issue #20): Calculate checksum for save data
+ * Calculate checksum for save data (synchronous hash)
+ *
+ * Uses a simple but deterministic hash function for save file integrity.
+ * For full cryptographic security, use crypto.subtle.digest (async).
  *
  * @param data - Save data to checksum
- * @returns Checksum string (e.g., SHA-256 hash)
- *
- * Implementation notes:
- * - Use consistent serialization (sorted keys)
- * - Use crypto.subtle.digest('SHA-256', ...) for browser
- * - Store checksum separately from data
+ * @returns Checksum string (hex hash)
  */
 export function calculateChecksum(data: unknown): string {
-  // TODO: Implement checksum calculation
-  return '';
+  // Serialize with sorted keys at all levels for deterministic output
+  const serialized = JSON.stringify(data, (key, value) => {
+    // Sort object keys recursively
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.keys(value)
+        .sort()
+        .reduce((sorted: Record<string, unknown>, k) => {
+          sorted[k] = value[k];
+          return sorted;
+        }, {});
+    }
+    return value;
+  });
+
+  // Simple hash function (FNV-1a 32-bit)
+  let hash = 2166136261;
+  for (let i = 0; i < serialized.length; i++) {
+    hash ^= serialized.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  // Convert to unsigned 32-bit and hex
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
- * TODO (Issue #20): Verify save file checksum
+ * Verify save file checksum
  *
  * @param data - Save data
  * @param expectedChecksum - Stored checksum
