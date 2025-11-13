@@ -651,7 +651,6 @@ const HELMS = {
     name: "Oracle's Crown",
     def: +25,
     mag: +10,  // Also boosts magic
-    pp: +15,   // Extra Psynergy Points
     cost: 3500
   }
 };
@@ -890,9 +889,11 @@ function calculatePhysicalDamage(
   return Math.max(1, damage);  // Minimum 1 damage
 }
 
-// Random multiplier: 0.9 to 1.1 (±10% variance)
-function getRandomMultiplier(): number {
-  return 0.9 + (Math.random() * 0.2);
+// NOTE: Random damage variance removed in Phase 1
+// Damage is now fully deterministic
+function getRandomMultiplier(rng: PRNG): number {
+  // Placeholder for future variance if needed
+  return 1.0;  // No variance
 }
 ```
 
@@ -949,12 +950,12 @@ const AOE_DAMAGE_RULE = {
   // NOT: 47 divided by 3 = 15 each ❌
   // NOT: 47 with penalty = 35 each ❌
 
-  reasoning: "Higher PP cost balances full damage to each target"
+  reasoning: "Higher mana cost balances full damage to each target"
 };
 ```
 
 **Why Full Damage:**
-- AOE abilities cost more PP (Quake 5 PP vs basic attack 0 PP)
+- AOE abilities cost more mana (Quake 1 mana vs basic attack 0 mana)
 - Battles have 1-3 enemies typically (not 10+)
 - Golden Sun model (standard JRPG practice)
 - Makes AOE abilities worth their cost
@@ -971,12 +972,12 @@ goblin2.hp -= 47;  // ✅ Full damage
 goblin3.hp -= 47;  // ✅ Full damage
 
 // Total damage dealt: 141
-// PP cost: 5 (balanced!)
+// Mana cost: 1 (balanced!)
 ```
 
 **Balance:**
-- Single-target (Clay Spire): 60 base, 10 PP, 1 target = 60 damage/10PP = 6.0 efficiency
-- Multi-target (Quake): 30 base, 5 PP, 3 targets = 90 damage/5PP = 18.0 efficiency
+- Single-target (Clay Spire): 60 base, 2 mana, 1 target = 60 damage/2mana = 30 efficiency
+- Multi-target (Quake): 30 base, 1 mana, 3 targets = 90 damage/1mana = 90 efficiency
 - **AOE is 3× better ONLY when hitting 3 targets** (situational advantage)
 
 ---
@@ -1320,22 +1321,10 @@ function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleResult |
 ### 6.4 Flee Mechanics
 
 ```typescript
-function attemptFlee(playerAverageSpd: number, enemyAverageSpd: number): boolean {
-  const BASE_FLEE_CHANCE = 0.5;  // 50%
-  const speedRatio = playerAverageSpd / enemyAverageSpd;
-
-  // If player is faster: Higher chance
-  // If enemy is faster: Lower chance
-  const fleeChance = BASE_FLEE_CHANCE * speedRatio;
-
-  // Clamp between 10% and 90%
-  const finalChance = Math.max(0.1, Math.min(0.9, fleeChance));
-
-  return Math.random() < finalChance;
-}
-
-// Cannot flee from boss battles
-// Cannot flee from recruitment battles
+// FLEEING SYSTEM REMOVED
+// Game design: No fleeing from battles
+// All battles are NPC-triggered and intentional
+// Players can prepare before each battle
 ```
 
 ---
@@ -1701,14 +1690,14 @@ const NOX_TYPHON = {
     {
       name: "Elemental Fury",
       basePower: 80,
-      ppCost: 20,
+      manaCost: 4,
       targets: "all-allies",
       element: "Neutral"
     },
     {
       name: "Void Strike",
       basePower: 100,
-      ppCost: 25,
+      manaCost: 4,
       targets: "single-ally",
       ignoresDefense: true,  // Bypasses DEF entirely!
       element: "Neutral"
@@ -1716,13 +1705,13 @@ const NOX_TYPHON = {
     {
       name: "Dark Heal",
       heals: 150,
-      ppCost: 30,
+      manaCost: 4,
       targets: "self"
     },
     {
       name: "Elemental Chaos",  // Ultimate
       basePower: 150,
-      ppCost: 50,
+      manaCost: 4,
       targets: "all-allies",
       element: "Neutral"
     }
@@ -1999,39 +1988,18 @@ const speedBonus = attacker.stats.spd * 0.002;  // 0.2 percentage points per SPD
 
 ---
 
-### 11.3 Flee System with Boss Check
+### 11.3 Battle Design Principles
 
-**🚨 FIXED: Boss battles prevent fleeing**
+**🚨 NO FLEEING SYSTEM**
 
-```typescript
-function attemptFlee(battle: Battle, rng: SeededRNG): boolean {
-  // Boss battles cannot be fled
-  if (battle.isBossBattle || battle.isRecruitmentBattle) {
-    displayMessage("You can't escape!");
-    return false;
-  }
+Vale Chronicles does not include a flee/escape mechanic:
 
-  const playerAvgSpd = calculateAverageSpeed(battle.playerParty);
-  const enemyAvgSpd = calculateAverageSpeed(battle.enemies);
-
-  const baseFleeChance = 0.5;
-  const speedRatio = playerAvgSpd / enemyAvgSpd;
-  let fleeChance = baseFleeChance * speedRatio;
-
-  // Clamp between 10% and 90%
-  fleeChance = Math.max(0.1, Math.min(0.9, fleeChance));
-
-  const success = rng.float() < fleeChance;
-
-  if (success) {
-    displayMessage("Got away safely!");
-    return true;
-  } else {
-    displayMessage("Couldn't escape!");
-    return false;  // Wasted turn
-  }
-}
-```
+**Design Rationale:**
+- All battles are NPC-triggered (no random encounters)
+- Players can prepare before each battle (team, Djinn, equipment)
+- Auto-heal after every battle (no attrition penalty for losing)
+- Cleaner battle flow (no escape option UI needed)
+- Encourages tactical planning over risk avoidance
 
 ---
 

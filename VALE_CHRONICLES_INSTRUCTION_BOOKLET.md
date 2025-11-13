@@ -135,8 +135,9 @@ MANA SYSTEM
 
 Your team shares a MANA POOL for queuing actions.
 
-• Each unit contributes mana circles (varies by unit)
+• Each unit contributes mana circles (varies by unit: 1-3 per unit)
 • Total pool = sum of all 4 units' contributions
+• Typical party: 1 + 2 + 2 + 3 = 8 mana total
 • Mana fully regenerates each planning phase
 • Basic attacks: 0 mana to queue
 • Abilities: 0-4 mana to queue (varies by ability)
@@ -334,6 +335,10 @@ Examples:
 
 Total possible Djinn-granted abilities: ~180 unique abilities
 across all combinations!
+
+Note: The full Djinn ability system is in development. Current
+implementation uses simplified ability unlocking. See game
+updates for current status.
 
 ═══════════════════════════════════════════════════════════════
 
@@ -647,12 +652,22 @@ and stat combinations.
 
 SPECIAL PROPERTIES
 
-All equipment has special effects. Common examples:
+Higher-tier equipment (Steel, Silver, Mythril, Legendary, Artifact)
+typically has special effects:
 
-  • Ability Unlocks: Grants new abilities (legendary weapons)
-  • Always First: Guaranteed first turn (Hermes' Sandals)
-  • Multi-Stat Bonuses: Rare items boost multiple stats
-  • Unique Effects: Varies by equipment
+COMMON SPECIAL PROPERTIES:
+  • Ability Unlocks: Legendary weapons grant unique abilities
+  • Always First Turn: Guarantees acting first in battle
+  • Multi-Stat Bonuses: Boosts 3-4 different stats simultaneously
+  • Percentage Bonuses: Multipliers instead of flat bonuses
+  • Element Synergies: Enhanced effects with matching element
+  • Combat Modifiers: Special battle mechanics when equipped
+
+EQUIPMENT TIERS WITH SPECIAL EFFECTS:
+  • Basic/Bronze: Stat bonuses only (no special effects)
+  • Iron: Mostly stat bonuses, occasional special effect
+  • Steel/Silver: Often have 1 special effect
+  • Mythril/Legendary/Artifact: Always have special effects
 
 ═══════════════════════════════════════════════════════════════
 
@@ -721,6 +736,42 @@ efficiently, not conserving resources across the entire battle.
 
 ═══════════════════════════════════════════════════════════════
 
+ABILITY EXAMPLES BY ELEMENT
+
+VENUS (Earth) Abilities:
+  • Quake (Level 2): 1 mana, ~30 base power, all enemies
+  • Clay Spire (Level 3): 2 mana, ~60 power, single target
+  • Ragnarok (Level 4): 3 mana, ~100 power, single target
+  • Judgment (Level 5): 4 mana, ~150 power, all enemies
+
+MARS (Fire) Abilities:
+  • Fireball (Level 2): 1 mana, ~32 power, single target
+  • Volcano (Level 3): 3 mana, ~65 power, all enemies
+  • Meteor Strike (Level 4): 3 mana, ~110 power, single target
+  • Pyroclasm (Level 5): 4 mana, ~170 power, all enemies
+
+MERCURY (Water) Abilities:
+  • Ply (Level 1): 1 mana, heals ~50 HP, single ally
+  • Frost (Level 2): 1 mana, ~28 power, all enemies
+  • Ice Horn (Level 3): 2 mana, ~58 power, single target
+  • Wish (Level 4): 3 mana, heals ~90 HP, all allies
+  • Glacial Blessing (Level 5): 4 mana, ~140 HP + revive, all allies
+
+JUPITER (Wind) Abilities:
+  • Gust (Level 2): 1 mana, ~25 power, single target
+  • Plasma (Level 3): 2 mana, ~55 power, all enemies (chain)
+  • Thunderclap (Level 4): 3 mana, ~95 power, all enemies
+  • Tempest (Level 5): 4 mana, ~160 power, all enemies
+
+BUFF/DEBUFF Examples:
+  • Blessing: 2 mana, +25% ATK/DEF to all allies, 3 turns
+  • Guardian Stance: 2 mana, +50% DEF to all allies, 2 turns
+  • Wind's Favor: 2 mana, +40% SPD to all allies, 3 turns
+
+Note: Power values are approximate and subject to balancing.
+
+═══════════════════════════════════════════════════════════════
+
 ABILITY SOURCES
 
 Abilities come from three sources:
@@ -780,31 +831,65 @@ Note: Element advantage values are placeholders for testing.
 
 STATUS EFFECTS
 
+Note: All status effect values below are placeholders for
+testing and subject to balancing adjustments.
+
 ┌─────────────────────────────────────────────────────────┐
 │ POISON:                                                 │
-│   8% max HP damage per turn                            │
-│   Duration: 5 turns                                     │
+│   8% max HP damage per turn (placeholder)              │
+│   Duration: 5 turns (placeholder)                       │
 │   Cured by: Heal abilities, Wish, auto-heal            │
 │                                                         │
 │ BURN:                                                   │
-│   10% max HP damage per turn                            │
-│   Duration: 3 turns                                    │
+│   10% max HP damage per turn (placeholder)              │
+│   Duration: 3 turns (placeholder)                      │
 │   Cured by: Heal abilities, Wish, auto-heal            │
 │                                                         │
 │ FREEZE:                                                 │
 │   Unit cannot act                                       │
-│   30% chance to break free each turn                    │
+│   30% chance to break free each turn (placeholder)      │
 │   Cured by: Fire spells, auto-heal                     │
 │   Frozen units take no damage                          │
 │                                                         │
 │ PARALYZE:                                               │
-│   50% chance to fail action each turn                   │
-│   Duration: 2 turns                                    │
+│   50% chance to fail action each turn (placeholder)     │
+│   Duration: 2 turns (placeholder)                      │
 │   Cured by: Restore ability, Wish, auto-heal           │
 └─────────────────────────────────────────────────────────┘
 
-Note: Status effect values are placeholders and subject to
-balancing adjustments.
+═══════════════════════════════════════════════════════════════
+
+BUFF & DEBUFF MECHANICS
+
+DURATION COUNTDOWN:
+  Buffs and debuffs count down at the END of the affected
+  unit's turn (not at round start).
+  
+  Example: Isaac casts Blessing (duration 3) on himself
+    • Isaac's turn: Buff applied, duration = 3
+    • Garet's turn: Buff still active (3)
+    • Enemy's turn: Buff still active (3)
+    • Isaac's turn ends: Duration decrements to 2
+    • Next round: Buff still active (2)
+    • Continues for 3 of Isaac's turns total
+
+STACKING RULES:
+  • Same Buff: Recasting refreshes duration (doesn't stack)
+    - Blessing active with 1 turn left
+    - Cast Blessing again → Duration resets to 3
+    - Does NOT become 2× bonus (no double-stacking)
+  
+  • Different Buffs: Stack multiplicatively (max 5 buffs active)
+    - Blessing (+25% ATK) + another ATK buff
+    - Both bonuses apply simultaneously
+  
+  • Buff + Debuff: Can have both on same unit
+
+REMOVAL:
+  • Duration expires (reaches 0)
+  • Dispel abilities remove all buffs
+  • Death removes all buffs/debuffs
+  • Auto-heal after battle clears all
 
 ═══════════════════════════════════════════════════════════════
 
@@ -922,7 +1007,22 @@ Units join your party through various methods:
   • Finding them in the overworld
 
 Recruitment Levels:
-  Units join at various levels (1-5 based on story progression)
+  Units join at specific levels based on story progression:
+  
+  Early Recruits (Tutorial):
+    • Starter units: Level 1 (Isaac, Garet, Ivan)
+  
+  Early Game:
+    • Mia: Level 2
+  
+  Mid Game:
+    • Felix, Jenna, Sheba: Level 3
+  
+  Late Game:
+    • Piers, Kraden: Level 4
+  
+  Final Recruitment:
+    • Kyle: Level 5 (hardest recruitment battle)
 
 Recruitment Battles:
   Must defeat to recruit
@@ -971,14 +1071,27 @@ MOVEMENT
 
 ENCOUNTERS
 
+NO RANDOM ENCOUNTERS:
+  Vale Chronicles has NO random encounters anywhere in the game.
+  You will never be ambushed while exploring (not in towns,
+  dungeons, forests, or any area).
+
+ALL BATTLES ARE NPC-TRIGGERED:
+  Every battle is triggered by talking to specific NPCs:
+  • Walk up to NPC marked with exclamation mark (!)
+  • Press interact button (Enter/Space) to start battle
+  • You have complete control over when to fight
+  • Plan your party/equipment before each battle
+
 GUIDED PATH:
   Exploration follows a guided path. You'll encounter specific
   NPCs in a set order as you progress through the story.
 
-ENCOUNTER TRIGGERS:
-  All battles are triggered by talking to specific NPCs.
-  Walk up to NPC and press interact button. Visual indicator
-  (exclamation mark) shows battle NPCs.
+STRATEGIC ADVANTAGE:
+  • No grinding required
+  • Predictable difficulty progression
+  • Can explore safely between battles
+  • Return to prepare if NPC looks too tough
 
 PRE-BATTLE SETUP:
   Before entering battle, you'll be prompted to:
@@ -1235,12 +1348,20 @@ PSYNERGY DAMAGE
 
 AOE DAMAGE RULE
 
-  Mode: Split evenly among targets (for testing)
-  Example: Quake (100 power) vs 3 enemies
-    → Each enemy takes 33 damage (100 ÷ 3)
-    → Total 99 damage dealt
-
-  Note: May vary by ability in final version.
+  Mode: Damage distribution varies by ability (in development)
+  
+  Current Testing Behavior:
+    • Split evenly among targets
+    • Example: Quake (100 power) vs 3 enemies = 33 each
+    • Total 99 damage dealt
+  
+  Final Design (TBD):
+    • May vary by ability type
+    • Some abilities: Full damage to each target
+    • Some abilities: Split evenly among targets
+    • Some abilities: Weighted (front takes more, back less)
+  
+  Note: AoE mechanics subject to balancing during development.
 
 ═══════════════════════════════════════════════════════════════
 
