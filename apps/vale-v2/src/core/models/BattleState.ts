@@ -217,6 +217,7 @@ export function createBattleState(
 /**
  * Update battle state (returns new object - immutability)
  * PERFORMANCE: Automatically rebuilds unitById index when units change
+ * DEV MODE: Validates state invariants to catch impossible states early
  */
 export function updateBattleState(state: BattleState, updates: Partial<BattleState>): BattleState {
   const newState = { ...state, ...updates };
@@ -224,6 +225,24 @@ export function updateBattleState(state: BattleState, updates: Partial<BattleSta
   // Rebuild index if units changed
   if (updates.playerTeam || updates.enemies) {
     newState.unitById = buildUnitIndex(newState.playerTeam.units, newState.enemies);
+  }
+
+  // Validate invariants in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      // Dynamic import to avoid bundling in production
+      const { validateBattleState } = require('../validation/battleStateInvariants');
+      validateBattleState(newState);
+    } catch (error) {
+      // Re-throw validation errors
+      if (error instanceof Error && error.name === 'BattleStateInvariantError') {
+        throw error;
+      }
+      // Ignore module loading errors (validation module might not exist in some builds)
+      if (error instanceof Error && !error.message.includes('Cannot find module')) {
+        console.warn('Battle state validation failed:', error);
+      }
+    }
   }
 
   return newState;
