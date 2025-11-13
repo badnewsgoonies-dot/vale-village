@@ -18,4 +18,5 @@ export { RewardsScreen } from './RewardsScreen';
 export { ManaCirclesBar } from './ManaCirclesBar';
 export { DjinnBar } from './DjinnBar';
 export { ActionQueuePanel } from './ActionQueuePanel';
+export { StoryboardGallery } from './StoryboardGallery';
 

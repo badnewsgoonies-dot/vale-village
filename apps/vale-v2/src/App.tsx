@@ -8,6 +8,7 @@ import { DialogueBox } from './ui/components/DialogueBox';
 import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopScreen } from './ui/components/ShopScreen';
 import { SpriteMockup } from './ui/components/SpriteMockup';
+import { StoryboardGallery } from './ui/components/StoryboardGallery';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -27,6 +28,7 @@ function App() {
   const setMode = useStore((s) => s.setMode);
   const currentShopId = useStore((s) => s.currentShopId);
   const [showSaveMenu, setShowSaveMenu] = useState(false);
+  const [showStoryboards, setShowStoryboards] = useState(false);
 
   // Initialize team on app startup (needed for battle triggers)
   useEffect(() => {
@@ -92,6 +94,20 @@ function App() {
               View Credits
             </button>
           )}
+          <button
+            onClick={() => setShowStoryboards(!showStoryboards)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: showStoryboards ? '#FF6B6B' : '#9C27B0',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            {showStoryboards ? 'Hide' : 'Show'} Storyboards
+          </button>
         </div>
       </div>
       {showCredits && (
@@ -108,21 +124,27 @@ function App() {
         />
       ) : (
         <>
-          {/* TEMPORARY: Show sprite mockup - remove this to restore normal game */}
-          <SpriteMockup />
-          {/* 
-          {mode === 'overworld' && <OverworldMap />}
-          {mode === 'battle' && <QueueBattleView />}
-          {mode === 'dialogue' && (
+          {showStoryboards ? (
+            <StoryboardGallery />
+          ) : (
             <>
-              <OverworldMap />
-              <DialogueBox />
+              {/* TEMPORARY: Show sprite mockup - remove this to restore normal game */}
+              <SpriteMockup />
+              {/* 
+              {mode === 'overworld' && <OverworldMap />}
+              {mode === 'battle' && <QueueBattleView />}
+              {mode === 'dialogue' && (
+                <>
+                  <OverworldMap />
+                  <DialogueBox />
+                </>
+              )}
+              {mode === 'shop' && currentShopId && (
+                <ShopScreen shopId={currentShopId} onClose={() => setMode('overworld')} />
+              )}
+              */}
             </>
           )}
-          {mode === 'shop' && currentShopId && (
-            <ShopScreen shopId={currentShopId} onClose={() => setMode('overworld')} />
-          )}
-          */}
         </>
       )}
     </div>
