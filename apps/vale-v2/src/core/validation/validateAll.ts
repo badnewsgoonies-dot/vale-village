@@ -10,6 +10,7 @@ import { ABILITIES } from '../../data/definitions/abilities';
 import { EQUIPMENT } from '../../data/definitions/equipment';
 import { UNIT_DEFINITIONS } from '../../data/definitions/units';
 import { ENEMIES } from '../../data/definitions/enemies';
+import { validateContentBalance, formatBalanceWarnings } from './balanceValidation';
 
 export function validateAllGameData(): void {
   const errors: string[] = [];
@@ -108,8 +109,22 @@ export function validateAllGameData(): void {
   if (errors.length > 0) {
     throw new Error(`Data validation failed:\n${errors.join('\n')}`);
   }
-  
+
   // Use console.warn instead of console.log (allowed in validation)
   console.warn('✅ All game data validated successfully');
+
+  // Validate content balance (warnings, not errors)
+  const balanceWarnings = validateContentBalance({
+    enemies: ENEMIES,
+    abilities: ABILITIES,
+    equipment: EQUIPMENT,
+  });
+
+  if (balanceWarnings.length > 0) {
+    console.warn('⚠️  Balance warnings detected:');
+    console.warn(formatBalanceWarnings(balanceWarnings));
+  } else {
+    console.warn('✅ No balance issues detected');
+  }
 }
 
