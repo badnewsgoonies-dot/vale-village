@@ -39,13 +39,13 @@
 ## 📐 **LEVEL SYSTEM REVISION**
 
 ### **Old System (1-20):**
-- 20 levels = 20 ability unlocks per unit
-- Problem: Too many abilities to manage
+- Max level 20
+- Problem: Too many levels, too many abilities per unit
 
 ### **New System (1-10):**
 - **Max Level: 10** (option to reduce to 7 later)
-- 10 levels = 10 ability unlocks per unit
-- Result: Half the abilities, more focused builds
+- Units have 4-5 abilities each (unlocked at various levels 1-4)
+- Result: Focused ability kits, clear progression
 
 ### **XP Curve Adjustment:**
 ```
@@ -58,7 +58,7 @@ Chapter 3: Levels 8-10 (mastery)
 ```
 
 ### **Benefits:**
-- ✅ Fewer abilities to balance (10 instead of 20 per unit)
+- ✅ Fewer abilities to balance (4-5 per unit)
 - ✅ Clearer progression (each level feels impactful)
 - ✅ Faster to max level (less grinding)
 - ✅ Build choices matter more (limited ability slots)
@@ -160,7 +160,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 | **Core Enemies** | 50 | Full design (sprites, AI, abilities) |
 | **Elite Variants** | 30 | +25% stats, +1 ability |
 | **Djinn Collection** | 4 | Granite (T2), Corona (T2), Tonic (T2), Squall (T2) |
-| **New Abilities** | 60 | 6 new units × 10 abilities each |
+| **New Abilities** | 24-30 | 6 new units × 4-5 abilities each |
 | **New Equipment** | 25-30 | Weapons, armor, accessories |
 | **Maps** | 1 | Shadow Fortress region only |
 
@@ -207,7 +207,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 2. Generate 50 core enemies + 30 elite variants
 3. Design 15 linear story battles
 4. Create 1 map for Shadow Fortress region
-5. Write 60 new abilities (6 units × 10 each)
+5. Write 24-30 new abilities (6 units × 4-5 each)
 6. Generate 25-30 equipment items
 7. Update XP curve for max level 10
 8. **Estimated Time:** 8-10 hours
@@ -215,7 +215,7 @@ Chapter 3: Collect Bane (T3), Fury (T3), Crystal (T3), Storm (T3)
 ### **Phase 3: Testing & Balancing**
 1. Playtest story progression (15 battles)
 2. Balance level curve (1-10 feels right)
-3. Test new unit abilities (60 abilities)
+3. Test new unit abilities (24-30 abilities)
 4. Tune enemy difficulty
 5. **Estimated Time:** 3-4 hours
 
