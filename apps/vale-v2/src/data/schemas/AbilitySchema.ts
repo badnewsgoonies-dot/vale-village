@@ -18,7 +18,7 @@ export const AbilitySchema = z.object({
   name: z.string().min(1),
   type: z.enum(['physical', 'psynergy', 'healing', 'buff', 'debuff', 'summon']),
   element: z.enum(['Venus', 'Mars', 'Jupiter', 'Mercury', 'Neutral']).optional(),
-  manaCost: z.number().int().min(0).max(50), // Cannot be negative! Increased for T3 abilities
+  manaCost: z.number().int().min(0).max(5), // Cannot be negative! Max 5 for mana pool system
   basePower: z.number().int().min(0), // Cannot be negative!
   targets: z.enum(['single-enemy', 'all-enemies', 'single-ally', 'all-allies', 'self']),
   unlockLevel: z.number().int().min(1).max(20),
