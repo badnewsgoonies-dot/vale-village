@@ -107,15 +107,14 @@ export const FLINT_TERRA_REGENERATION = makeAbility({
 export const FLINT_ROCK_THORNS = makeAbility({
   id: 'flint-rock-thorns',
   name: 'Rock Thorns',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Venus',
   manaCost: 5,
-  basePower: 0,
-  targets: 'self',
+  basePower: 30,
+  targets: 'all-enemies',
   unlockLevel: 3,
-  description: 'Surround self with rock thorns that damage attackers.',
-  counterDamage: 15,
-  duration: 3,
+  description: 'Launch rock thorns at all foes multiple times.',
+  hitCount: 2,
 });
 
 export const FLINT_CRUSHING_WEIGHT = makeAbility({
@@ -264,25 +263,24 @@ export const GRANITE_STONE_SIPHON = makeAbility({
   type: 'psynergy',
   element: 'Venus',
   manaCost: 8,
-  basePower: 60,
+  basePower: 35,
   targets: 'single-enemy',
   unlockLevel: 3,
-  description: 'Drain foe\'s strength through earth, stealing attack.',
-  stealStat: { stat: 'atk', amount: 3, duration: 3 },
+  description: 'Multi-strike earth attack crushing foe.',
+  hitCount: 3,
 });
 
 export const GRANITE_EARTHQUAKE_SHIELD = makeAbility({
   id: 'granite-earthquake-shield',
   name: 'Earthquake Shield',
-  type: 'buff',
+  type: 'healing',
   element: 'Venus',
   manaCost: 7,
-  basePower: 0,
-  targets: 'self',
+  basePower: 40,
+  targets: 'party',
   unlockLevel: 3,
-  description: 'When hit, trigger earthquake damaging all attackers.',
-  counterDamageAOE: 20,
-  duration: 3,
+  description: 'Heal all allies with earth energy over time.',
+  healOverTime: { amount: 15, duration: 3 },
 });
 
 export const GRANITE_TERRA_CURSE = makeAbility({
@@ -646,15 +644,14 @@ export const FORGE_BURN_CURSE = makeAbility({
 export const FORGE_FLAME_WALL = makeAbility({
   id: 'forge-flame-wall',
   name: 'Flame Wall',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Mars',
   manaCost: 6,
-  basePower: 0,
-  targets: 'party',
+  basePower: 40,
+  targets: 'all-enemies',
   unlockLevel: 1,
-  description: 'Create wall of flames that damages attackers.',
-  counterDamage: 12,
-  duration: 3,
+  description: 'Wall of flames burning all foes over time.',
+  statusEffect: { type: 'burn', duration: 3, chance: 0.7 },
 });
 
 export const FORGE_HEAT_DRAIN = makeAbility({
@@ -808,14 +805,14 @@ export const FORGE_INFERNO_BLAST = makeAbility({
 export const FORGE_FIRE_SIPHON = makeAbility({
   id: 'forge-fire-siphon',
   name: 'Fire Siphon',
-  type: 'psynergy',
+  type: 'healing',
   element: 'Mars',
   manaCost: 9,
-  basePower: 60,
-  targets: 'single-enemy',
+  basePower: 55,
+  targets: 'single-ally',
   unlockLevel: 4,
-  description: 'Drain fire from foe, stealing magic power.',
-  stealStat: { stat: 'mag', amount: 4, duration: 3 },
+  description: 'Channel fire energy to fully restore ally HP.',
+  healOverTime: { amount: 20, duration: 3 },
 });
 
 export const FORGE_COMBUSTION = makeAbility({
@@ -998,16 +995,14 @@ export const CORONA_PHOENIX_RISE = makeAbility({
 export const CORONA_INFERNO_SHIELD = makeAbility({
   id: 'corona-inferno-shield',
   name: 'Inferno Shield',
-  type: 'buff',
+  type: 'healing',
   element: 'Mars',
   manaCost: 12,
-  basePower: 0,
-  targets: 'self',
+  basePower: 60,
+  targets: 'party',
   unlockLevel: 5,
-  description: 'Immune to fire, counter with flames.',
-  elementalResistance: { Mars: 1.0 },
-  counterDamage: 25,
-  duration: 3,
+  description: 'Warm healing flames restore party over time.',
+  healOverTime: { amount: 18, duration: 3 },
 });
 
 export const CORONA_SOLAR_SIPHON = makeAbility({
@@ -1016,13 +1011,11 @@ export const CORONA_SOLAR_SIPHON = makeAbility({
   type: 'psynergy',
   element: 'Mars',
   manaCost: 11,
-  basePower: 70,
-  targets: 'single-enemy',
+  basePower: 35,
+  targets: 'all-enemies',
   unlockLevel: 5,
-  description: 'Drain foe, stealing all stats.',
-  stealStat: { stat: 'atk', amount: 3, duration: 3 },
-  debuffEffect: { def: -3, spd: -3 },
-  duration: 3,
+  description: 'Solar rays striking all foes repeatedly.',
+  hitCount: 3,
 });
 
 export const CORONA_SUPERNOVA = makeAbility({
@@ -1141,16 +1134,14 @@ export const FURY_SOLAR_ECLIPSE = makeAbility({
 export const FURY_MAGMA_ARMOR = makeAbility({
   id: 'fury-magma-armor',
   name: 'Magma Armor',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Mars',
   manaCost: 16,
-  basePower: 0,
-  targets: 'party',
+  basePower: 50,
+  targets: 'all-enemies',
   unlockLevel: 7,
-  description: 'Party immune to physical attacks, counter with fire.',
-  physicalImmunity: true,
-  counterDamage: 30,
-  duration: 2,
+  description: 'Molten magma burning all foes persistently.',
+  statusEffect: { type: 'burn', duration: 4, chance: 1.0 },
 });
 
 export const FURY_DRAIN_INFERNO = makeAbility({
@@ -1169,16 +1160,14 @@ export const FURY_DRAIN_INFERNO = makeAbility({
 export const FURY_FLAME_EMPEROR = makeAbility({
   id: 'fury-flame-emperor',
   name: 'Flame Emperor',
-  type: 'buff',
+  type: 'healing',
   element: 'Mars',
   manaCost: 18,
-  basePower: 0,
-  targets: 'self',
+  basePower: 80,
+  targets: 'party',
   unlockLevel: 8,
-  description: 'Become fire emperor with massive stat boost.',
-  buffEffect: { atk: 12, def: 8, mag: 12, spd: 8 },
-  counterDamage: 25,
-  duration: 4,
+  description: 'Emperor\'s flames heal party massively over time.',
+  healOverTime: { amount: 25, duration: 4 },
 });
 
 export const FURY_PYROCLASTIC_DESTRUCTION = makeAbility({
@@ -1225,16 +1214,14 @@ export const FURY_CINDER_STORM = makeAbility({
 export const FURY_MOLTEN_CORE = makeAbility({
   id: 'fury-molten-core',
   name: 'Molten Core',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Mars',
   manaCost: 20,
-  basePower: 0,
-  targets: 'party',
+  basePower: 45,
+  targets: 'all-enemies',
   unlockLevel: 10,
-  description: 'Party gains molten core defense.',
-  buffEffect: { def: 12 },
-  counterDamageAOE: 35,
-  duration: 3,
+  description: 'Multi-hit molten core explosions.',
+  hitCount: 4,
 });
 
 export const FURY_ARMAGEDDON = makeAbility({
@@ -1337,15 +1324,14 @@ export const FIZZ_MIST_HEAL = makeAbility({
 export const FIZZ_ICE_SPIKES = makeAbility({
   id: 'fizz-ice-spikes',
   name: 'Ice Spikes',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Mercury',
   manaCost: 5,
-  basePower: 0,
-  targets: 'self',
+  basePower: 30,
+  targets: 'all-enemies',
   unlockLevel: 3,
-  description: 'Surround with ice spikes that damage attackers.',
-  counterDamage: 15,
-  duration: 3,
+  description: 'Launch ice spikes at all foes multiple times.',
+  hitCount: 2,
 });
 
 export const FIZZ_FROZEN_PRISON = makeAbility({
@@ -1406,16 +1392,14 @@ export const FIZZ_ICE_RAIN = makeAbility({
 export const FIZZ_FROZEN_ARMOR = makeAbility({
   id: 'fizz-frozen-armor',
   name: 'Frozen Armor',
-  type: 'buff',
+  type: 'healing',
   element: 'Mercury',
   manaCost: 7,
-  basePower: 0,
+  basePower: 50,
   targets: 'single-ally',
   unlockLevel: 4,
-  description: 'Encase ally in ice armor.',
-  buffEffect: { def: 12 },
-  counterDamage: 18,
-  duration: 3,
+  description: 'Heal ally with cold mist over time.',
+  healOverTime: { amount: 18, duration: 3 },
 });
 
 export const FIZZ_GLACIAL_SIPHON = makeAbility({
@@ -1424,11 +1408,11 @@ export const FIZZ_GLACIAL_SIPHON = makeAbility({
   type: 'psynergy',
   element: 'Mercury',
   manaCost: 8,
-  basePower: 60,
+  basePower: 35,
   targets: 'single-enemy',
   unlockLevel: 4,
-  description: 'Drain foe, stealing speed.',
-  stealStat: { stat: 'spd', amount: 4, duration: 3 },
+  description: 'Multi-strike glacial attack.',
+  hitCount: 3,
 });
 
 export const FIZZ_BLIZZARD = makeAbility({
@@ -1543,16 +1527,14 @@ export const TONIC_PURIFYING_WATER = makeAbility({
 export const TONIC_ICE_MIRROR = makeAbility({
   id: 'tonic-ice-mirror',
   name: 'Ice Mirror',
-  type: 'buff',
+  type: 'psynergy',
   element: 'Mercury',
   manaCost: 8,
-  basePower: 0,
-  targets: 'self',
+  basePower: 40,
+  targets: 'all-enemies',
   unlockLevel: 3,
-  description: 'Reflect next attack back.',
-  shieldCharges: 1,
-  counterDamage: 50,
-  duration: 2,
+  description: 'Ice shards strike all foes multiple times.',
+  hitCount: 2,
 });
 
 export const TONIC_TSUNAMI = makeAbility({
@@ -1613,14 +1595,14 @@ export const TONIC_GLACIER_SHIELD = makeAbility({
 export const TONIC_FROST_SIPHON = makeAbility({
   id: 'tonic-frost-siphon',
   name: 'Frost Siphon',
-  type: 'psynergy',
+  type: 'healing',
   element: 'Mercury',
   manaCost: 10,
-  basePower: 70,
-  targets: 'single-enemy',
+  basePower: 65,
+  targets: 'party',
   unlockLevel: 5,
-  description: 'Drain and steal magic.',
-  stealStat: { stat: 'mag', amount: 5, duration: 3 },
+  description: 'Restore all allies with frost healing.',
+  healOverTime: { amount: 20, duration: 3 },
 });
 
 export const TONIC_TIDAL_WAVE = makeAbility({
@@ -1795,14 +1777,11 @@ export const CRYSTAL_CRYSTAL_DRAIN = makeAbility({
   type: 'psynergy',
   element: 'Mercury',
   manaCost: 18,
-  basePower: 90,
-  targets: 'single-enemy',
+  basePower: 50,
+  targets: 'all-enemies',
   unlockLevel: 8,
-  description: 'Drain and steal all stats.',
-  drainPercentage: 0.75,
-  stealStat: { stat: 'atk', amount: 5, duration: 3 },
-  debuffEffect: { def: -5, mag: -5 },
-  duration: 3,
+  description: 'Crystal shards strike all foes repeatedly.',
+  hitCount: 3,
 });
 
 export const CRYSTAL_FROZEN_TIME = makeAbility({
@@ -1974,15 +1953,14 @@ export const BREEZE_ZEPHYR_HEAL = makeAbility({
 export const BREEZE_LIGHTNING_COUNTER = makeAbility({
   id: 'breeze-lightning-counter',
   name: 'Lightning Counter',
-  type: 'buff',
+  type: 'healing',
   element: 'Jupiter',
   manaCost: 5,
-  basePower: 0,
-  targets: 'self',
+  basePower: 40,
+  targets: 'party',
   unlockLevel: 3,
-  description: 'Counter attacks with lightning.',
-  counterDamage: 18,
-  duration: 3,
+  description: 'Restore party with lightning energy.',
+  healOverTime: { amount: 12, duration: 3 },
 });
 
 export const BREEZE_WHIRLWIND = makeAbility({
@@ -2046,11 +2024,11 @@ export const BREEZE_THUNDER_SIPHON = makeAbility({
   type: 'psynergy',
   element: 'Jupiter',
   manaCost: 8,
-  basePower: 60,
+  basePower: 35,
   targets: 'single-enemy',
   unlockLevel: 4,
-  description: 'Drain and steal attack.',
-  stealStat: { stat: 'atk', amount: 4, duration: 3 },
+  description: 'Multi-strike thunder attack.',
+  hitCount: 3,
 });
 
 export const BREEZE_TEMPEST = makeAbility({
@@ -2098,16 +2076,14 @@ export const SQUALL_LIGHTNING_STORM = makeAbility({
 export const SQUALL_STORM_SHIELD = makeAbility({
   id: 'squall-storm-shield',
   name: 'Storm Shield',
-  type: 'buff',
+  type: 'healing',
   element: 'Jupiter',
   manaCost: 8,
-  basePower: 0,
+  basePower: 50,
   targets: 'party',
   unlockLevel: 2,
-  description: 'Shield reducing damage and countering.',
-  damageReduction: 0.3,
-  counterDamage: 15,
-  duration: 3,
+  description: 'Storm energy heals party over time.',
+  healOverTime: { amount: 15, duration: 3 },
 });
 
 export const SQUALL_VOLT_DRAIN = makeAbility({
@@ -2236,13 +2212,11 @@ export const SQUALL_VOLT_SIPHON = makeAbility({
   type: 'psynergy',
   element: 'Jupiter',
   manaCost: 11,
-  basePower: 70,
-  targets: 'single-enemy',
+  basePower: 40,
+  targets: 'all-enemies',
   unlockLevel: 5,
-  description: 'Drain and steal speed and attack.',
-  stealStat: { stat: 'spd', amount: 5, duration: 3 },
-  debuffEffect: { atk: -4 },
-  duration: 3,
+  description: 'Voltage strikes all foes multiple times.',
+  hitCount: 3,
 });
 
 export const SQUALL_THUNDER_CRASH = makeAbility({
@@ -2345,16 +2319,14 @@ export const STORM_PERFECT_STORM = makeAbility({
 export const STORM_THUNDER_GOD = makeAbility({
   id: 'storm-thunder-god',
   name: 'Thunder God',
-  type: 'buff',
+  type: 'healing',
   element: 'Jupiter',
   manaCost: 18,
-  basePower: 0,
-  targets: 'self',
+  basePower: 75,
+  targets: 'party',
   unlockLevel: 7,
-  description: 'Become thunder god with massive power.',
-  buffEffect: { atk: 12, mag: 10, spd: 12 },
-  counterDamage: 30,
-  duration: 4,
+  description: 'Thunder god energy heals party massively.',
+  healOverTime: { amount: 22, duration: 4 },
 });
 
 export const STORM_TYPHOON = makeAbility({
