@@ -43,6 +43,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Equipment Schema Default** - `statBonus` now defaults to `{}` instead of undefined
 
+- **Phase 7: Djinn Ability Unlocking System** (Nov 12, 2025) ✅ COMPLETE
+  - Element compatibility logic (same/counter/neutral)
+  - Per-unit stat bonuses based on Djinn compatibility
+  - 180 Djinn-granted abilities across 12 Djinn (15 per Djinn)
+  - Full battle integration with ability unlocking/unlocking on Djinn state changes
+  - Complete test coverage and data validation
+  - See [docs/PHASE_07_COMPLETION_SUMMARY.md](docs/PHASE_07_COMPLETION_SUMMARY.md) for details
+
 **For complete change history**, see [CHANGELOG.md](CHANGELOG.md)
 
 ## Prerequisites

@@ -5,6 +5,9 @@
 
 import { useState } from 'react';
 import { useStore } from '../state/store';
+import { DJINN } from '../../data/definitions/djinn';
+import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
+import { getLockedDjinnAbilityMetadataForUnit } from '../../core/algorithms/djinnAbilities';
 
 interface ActionBarProps {
   disabled?: boolean;
@@ -51,6 +54,16 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
     currentActor.unlockedAbilityIds.includes(a.id) &&
     currentPp >= a.manaCost
   );
+  const lockedDjinnAbilities = getLockedDjinnAbilityMetadataForUnit(currentActor, battle.playerTeam);
+
+  const formatLockedReason = (meta: { djinnId: string }) => {
+    const tracker = battle.playerTeam.djinnTrackers[meta.djinnId];
+    const djinnName = DJINN[meta.djinnId]?.name ?? meta.djinnId;
+    const state = tracker?.state ?? 'Unknown';
+    const timer = battle.djinnRecoveryTimers[meta.djinnId];
+    const countdownText = timer !== undefined ? ` (${timer} rounds left)` : '';
+    return `${djinnName} is ${state}${countdownText}`;
+  };
 
   const handleAbilitySelect = (abilityId: string) => {
     setSelectedAbility(abilityId);
@@ -100,24 +113,54 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
       
       <div style={{ marginBottom: '1rem' }}>
         <h4>Abilities:</h4>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {availableAbilities.map((ability) => (
-            <button
-              key={ability.id}
-              onClick={() => handleAbilitySelect(ability.id)}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: selectedAbility === ability.id ? '#4CAF50' : '#2196F3',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              {ability.name} (PP: {ability.manaCost})
-            </button>
-          ))}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {availableAbilities.map((ability) => (
+              <button
+                key={ability.id}
+                onClick={() => handleAbilitySelect(ability.id)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: selectedAbility === ability.id ? '#4CAF50' : '#2196F3',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                {ability.name} (PP: {ability.manaCost})
+              </button>
+            ))}
+          </div>
         </div>
+
+        {lockedDjinnAbilities.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ margin: '0 0 0.25rem 0' }}>Locked Djinn Abilities</h4>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {lockedDjinnAbilities.map((meta) => {
+                const ability = DJINN_ABILITIES[meta.abilityId];
+                if (!ability) return null;
+                return (
+                  <button
+                    key={`${meta.abilityId}-${meta.djinnId}`}
+                    disabled
+                    title={`${ability.name} locked because ${formatLockedReason(meta)}`}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      backgroundColor: '#2f2f2f',
+                      color: '#aaa',
+                      border: '1px dashed #666',
+                      borderRadius: '4px',
+                      cursor: 'not-allowed',
+                    }}
+                  >
+                    {ability.name} (PP: {ability.manaCost ?? 0}) — {formatLockedReason(meta)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {selectedAbility && (
@@ -214,4 +257,3 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
     </div>
   );
 }
-

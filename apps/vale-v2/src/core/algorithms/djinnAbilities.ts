@@ -118,3 +118,61 @@ export function mergeDjinnAbilitiesIntoUnit(unit: Unit, team: Team): Unit {
     unlockedAbilityIds: mergedUnlocked,
   };
 }
+
+export interface DjinnAbilityMetadata {
+  abilityId: string;
+  djinnId: string;
+  compatibility: ElementCompatibility;
+}
+
+export function getDjinnAbilityMetadataForUnit(
+  unit: Unit,
+  team: Team,
+  djinnIds?: readonly string[]
+): DjinnAbilityMetadata[] {
+  const targetDjinn = djinnIds ?? team.equippedDjinn;
+  const seen = new Set<string>();
+  const metadata: DjinnAbilityMetadata[] = [];
+
+  for (const djinnId of targetDjinn) {
+    const djinn = DJINN[djinnId];
+    if (!djinn) continue;
+
+    const abilityGroup = djinn.grantedAbilities[unit.id];
+    if (!abilityGroup) continue;
+
+    const compatibility = getElementCompatibility(unit.element, djinn.element);
+    const abilityList =
+      compatibility === 'same'
+        ? abilityGroup.same
+        : compatibility === 'counter'
+          ? abilityGroup.counter
+          : abilityGroup.neutral;
+
+    for (const abilityId of abilityList) {
+      if (seen.has(abilityId)) continue;
+      seen.add(abilityId);
+      metadata.push({
+        abilityId,
+        djinnId,
+        compatibility,
+      });
+    }
+  }
+
+  return metadata;
+}
+
+export function getLockedDjinnAbilityMetadataForUnit(unit: Unit, team: Team): DjinnAbilityMetadata[] {
+  const lockedDjinnIds = team.equippedDjinn.filter((djinnId) => {
+    const tracker = team.djinnTrackers[djinnId];
+    return tracker?.state !== 'Set';
+  });
+
+  if (lockedDjinnIds.length === 0) {
+    return [];
+  }
+
+  const lockedSet = new Set(lockedDjinnIds);
+  return getDjinnAbilityMetadataForUnit(unit, team).filter((meta) => lockedSet.has(meta.djinnId));
+}

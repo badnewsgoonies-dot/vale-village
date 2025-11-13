@@ -15,6 +15,9 @@ import { PostBattleCutscene } from './PostBattleCutscene';
 import { VictoryOverlay } from './VictoryOverlay';
 import { getValidTargets } from '../../core/algorithms/targeting';
 import { canAffordAction } from '../../core/algorithms/mana';
+import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
+import { DJINN } from '../../data/definitions/djinn';
+import { getLockedDjinnAbilityMetadataForUnit } from '../../core/algorithms/djinnAbilities';
 import { MAX_QUEUE_SIZE } from '../../core/constants';
 
 export function QueueBattleView() {
@@ -80,6 +83,17 @@ export function QueueBattleView() {
   }
 
   const currentUnit = selectedUnitIndex !== null ? battle.playerTeam.units[selectedUnitIndex] : null;
+  const lockedDjinnAbilitiesForCurrentUnit = currentUnit
+    ? getLockedDjinnAbilityMetadataForUnit(currentUnit, battle.playerTeam)
+    : [];
+  const formatLockedReason = (meta: { djinnId: string }) => {
+    const tracker = battle.playerTeam.djinnTrackers[meta.djinnId];
+    const djinnName = DJINN[meta.djinnId]?.name ?? meta.djinnId;
+    const state = tracker?.state ?? 'Unknown';
+    const timer = battle.djinnRecoveryTimers[meta.djinnId];
+    const countdownText = timer !== undefined ? ` (${timer} rounds left)` : '';
+    return `${djinnName} is ${state}${countdownText}`;
+  };
   const isQueueComplete = battle.queuedActions.every(a => a !== null);
 
   const handleAbilitySelect = (abilityId: string | null) => {
@@ -235,7 +249,6 @@ export function QueueBattleView() {
                 <h3 style={{ marginTop: 0, color: '#FFD87F' }}>
                   Current: {currentUnit.name}
                 </h3>
-
                 {/* Abilities */}
                 <div style={{ marginBottom: '1rem' }}>
                   <h4>Abilities:</h4>
@@ -278,6 +291,36 @@ export function QueueBattleView() {
                       })}
                   </div>
                 </div>
+
+                {lockedDjinnAbilitiesForCurrentUnit.length > 0 && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#ccc' }}>Locked Djinn Abilities</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {lockedDjinnAbilitiesForCurrentUnit.map((meta) => {
+                        const ability = DJINN_ABILITIES[meta.abilityId];
+                        if (!ability) return null;
+                        return (
+                          <button
+                            key={`${meta.abilityId}-${meta.djinnId}`}
+                            disabled
+                            title={`${ability.name} locked because ${formatLockedReason(meta)}`}
+                            style={{
+                              padding: '0.5rem',
+                              backgroundColor: '#222',
+                              color: '#888',
+                              border: '1px dashed #555',
+                              borderRadius: '4px',
+                              cursor: 'not-allowed',
+                              textAlign: 'left',
+                            }}
+                          >
+                            {ability.name} [{ability.manaCost ?? 0}○] — {formatLockedReason(meta)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Target Selection */}
                 {selectedAbility !== undefined && currentUnit && (
@@ -363,4 +406,3 @@ export function QueueBattleView() {
     </div>
   );
 }
-

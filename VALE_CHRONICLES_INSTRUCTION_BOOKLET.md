@@ -261,9 +261,9 @@ Each Djinn provides bonuses and abilities to ALL party members,
 but effectiveness varies based on element compatibility:
 
 ELEMENT COMPATIBILITY:
-  • Same Element: Best stat bonuses + 2 abilities unlocked
-  • Counter Element: Stat penalty + 2 abilities unlocked
-  • Neutral Element: Moderate bonuses + 1 ability unlocked
+  • Same Element: Best stat bonuses + 3-5 abilities unlocked
+  • Counter Element: Stat penalty + 1-2 abilities unlocked
+  • Neutral Element: Moderate bonuses + 4-5 abilities unlocked
 
 ┌─────────────────────────────────────────────────────────┐
 │ EXAMPLE: Flint (Venus Djinn) Equipped                  │
@@ -271,20 +271,26 @@ ELEMENT COMPATIBILITY:
 │                                                         │
 │ Isaac (Venus - Same Element):                          │
 │   Stats: +4 ATK, +3 DEF                                │
-│   Abilities: "Stone Fist", "Granite Guard"             │
+│   Abilities: "Stone Fist", "Granite Guard",            │
+│              "Stone Spike", "Terra Armor",              │
+│              "Earthquake Punch" (5 abilities)          │
 │                                                         │
 │ Garet (Mars - Counter Element):                        │
 │   Stats: -3 ATK, -2 DEF (PENALTY!)                    │
-│   Abilities: "Lava Stone", "Magma Shield"              │
+│   Abilities: "Lava Stone", "Magma Shield",             │
+│              "Molten Burst", "Volcanic Guard"          │
+│              (4 abilities)                             │
 │   Trade-off: Lose stats, gain earth abilities!         │
 │                                                         │
 │ Ivan (Jupiter - Neutral):                              │
 │   Stats: +2 ATK, +2 DEF                                │
-│   Abilities: "Gale Crush"                              │
+│   Abilities: "Earth Pulse", "Ground Shield",            │
+│              "Rock Barrage" (3 abilities)              │
 │                                                         │
 │ Mia (Mercury - Neutral):                               │
 │   Stats: +2 ATK, +2 DEF                                │
-│   Abilities: "Tidal Stone"                             │
+│   Abilities: "Earth Pulse", "Ground Shield",            │
+│              "Rock Barrage" (3 abilities)              │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 
@@ -309,17 +315,20 @@ When equipping 2-3 Djinn, bonuses stack:
 │ 3 VENUS DJINN (Flint + Granite + Bane):                │
 │                                                         │
 │ Isaac (Venus):                                          │
-│   Stats: +12 ATK, +8 DEF (3× same bonus)              │
-│   Abilities: 6 earth abilities unlocked                │
+│   Stats: +12 ATK, +9 DEF (3× same bonus)              │
+│   Abilities: ~15 earth abilities unlocked              │
+│              (5 per Djinn × 3 Djinn)                   │
 │                                                         │
 │ Garet (Mars):                                           │
 │   Stats: -9 ATK, -6 DEF (3× counter penalty)          │
-│   Abilities: 6 earth abilities unlocked                │
+│   Abilities: ~12 earth abilities unlocked               │
+│              (4 per Djinn × 3 Djinn)                   │
 │   Strategy: Huge penalty but rare ability access!      │
 │                                                         │
 │ Ivan (Jupiter):                                         │
 │   Stats: +6 ATK, +6 DEF (3× neutral)                  │
-│   Abilities: 3 earth abilities unlocked                │
+│   Abilities: ~9 earth abilities unlocked               │
+│              (3 per Djinn × 3 Djinn)                   │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 
@@ -333,12 +342,14 @@ Examples:
   • 3 Mars Djinn = Fire specialization
   • Mixed (Venus + Mars + Jupiter) = Versatility
 
-Total possible Djinn-granted abilities: ~180 unique abilities
+Total possible Djinn-granted abilities: 180 unique abilities
 across all combinations!
 
-Note: The full Djinn ability system is in development. Current
-implementation uses simplified ability unlocking. See game
-updates for current status.
+✅ **COMPLETE:** The full Djinn ability system is now fully implemented.
+Each of the 12 Djinn grants 15 unique abilities (180 total), distributed
+across same/counter/neutral element compatibility. Abilities unlock
+automatically when Djinn are equipped and are removed when Djinn enter
+Standby state, then restored when they recover.
 
 ═══════════════════════════════════════════════════════════════
 

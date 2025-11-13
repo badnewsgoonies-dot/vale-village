@@ -3,6 +3,7 @@
  * Converts BattleEvent discriminated union to display strings
  */
 
+import { DJINN } from '../../data/definitions/djinn';
 import type { BattleEvent } from '../../core/services/types';
 
 export function renderEventText(e: BattleEvent): string {
@@ -47,6 +48,16 @@ export function renderEventText(e: BattleEvent): string {
       return `Battle ended: ${e.result}`;
     case 'encounter-finished':
       return `Encounter completed: ${e.outcome}`;
+    case 'djinn-standby':
+    case 'djinn-recovered': {
+      const djinnNames = e.djinnIds
+        .map((id) => DJINN[id]?.name ?? id)
+        .filter(Boolean)
+        .join(', ') || 'Djinn';
+      const stateText = e.type === 'djinn-standby' ? 'Standby' : 'Recovered';
+      const formatDelta = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
+      return `${djinnNames} ${stateText} — ${e.unitId} ATK ${formatDelta(e.atkDelta)}, DEF ${formatDelta(e.defDelta)}`;
+    }
     default: {
       // Exhaustive check - ensures all event types are handled
       const _exhaustive: never = e;

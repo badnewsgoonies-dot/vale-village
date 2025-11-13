@@ -7,6 +7,7 @@
 import type { BattleState, QueuedAction } from '../models/BattleState';
 import type { Team } from '../models/Team';
 import type { Unit } from '../models/Unit';
+import type { Stats } from '../models/types';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { PRNG } from '../random/prng';
 import type { BattleEvent } from './types';
@@ -20,7 +21,10 @@ import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
 import { getEffectiveSPD } from '../algorithms/stats';
 import { performAction } from './BattleService';
 import { makeAIDecision } from './AIService';
-import { mergeDjinnAbilitiesIntoUnit } from '../algorithms/djinnAbilities';
+import {
+  mergeDjinnAbilitiesIntoUnit,
+  calculateDjinnBonusesForUnit,
+} from '../algorithms/djinnAbilities';
 
 type PerformActionResult = ReturnType<typeof performAction>;
 
@@ -416,7 +420,24 @@ export function executeRound(
       result: battleEnd,
     });
   } else {
+    const prePlanningState = currentState;
     currentState = transitionToPlanningPhase(currentState);
+    const recoveredDjinnIds = getRecoveredDjinnIds(
+      prePlanningState.playerTeam,
+      currentState.playerTeam
+    );
+    if (recoveredDjinnIds.length > 0) {
+      const preBonuses = snapshotDjinnBonuses(prePlanningState.playerTeam);
+      const postBonuses = snapshotDjinnBonuses(currentState.playerTeam);
+      const recoveryEvents = buildDjinnStateChangeEvents(
+        preBonuses,
+        postBonuses,
+        currentState.playerTeam.units,
+        'djinn-recovered',
+        recoveredDjinnIds
+      );
+      allEvents.push(...recoveryEvents);
+    }
   }
 
   return {
@@ -437,12 +458,13 @@ function executeDjinnSummons(
   let currentState = state;
   let updatedTeam = state.playerTeam;
 
-  const djinnCount = state.queuedDjinn.length as 1 | 2 | 3;
-  const damage = calculateSummonDamage(djinnCount);
-
   if (state.queuedDjinn.length === 0) {
     return { state, events };
   }
+
+  const djinnCount = state.queuedDjinn.length as 1 | 2 | 3;
+  const damage = calculateSummonDamage(djinnCount);
+  const preBonuses = snapshotDjinnBonuses(state.playerTeam);
 
   const activationCount = state.queuedDjinn.length;
   const recoveryTime = activationCount + 1;
@@ -471,6 +493,17 @@ function executeDjinnSummons(
   updatedTeam = updateTeam(updatedTeam, {
     units: unitsWithUpdatedAbilities,
   });
+
+  const postBonuses = snapshotDjinnBonuses(updatedTeam);
+  const standbyEvents = buildDjinnStateChangeEvents(
+    preBonuses,
+    postBonuses,
+    updatedTeam.units,
+    'djinn-standby',
+    state.queuedDjinn
+  );
+
+  events.push(...standbyEvents);
 
   const newRecoveryTimers = { ...state.djinnRecoveryTimers };
   for (const djinnId of state.queuedDjinn) {
@@ -701,6 +734,60 @@ function checkBattleEnd(state: BattleState): 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' 
     return 'PLAYER_DEFEAT';
   }
   return null;
+}
+
+type DjinnStateChange = 'djinn-standby' | 'djinn-recovered';
+
+function snapshotDjinnBonuses(team: Team): Record<string, Partial<Stats>> {
+  const snapshot: Record<string, Partial<Stats>> = {};
+  for (const unit of team.units) {
+    snapshot[unit.id] = calculateDjinnBonusesForUnit(unit, team);
+  }
+  return snapshot;
+}
+
+function buildDjinnStateChangeEvents(
+  before: Record<string, Partial<Stats>>,
+  after: Record<string, Partial<Stats>>,
+  units: readonly Unit[],
+  type: DjinnStateChange,
+  djinnIds: readonly string[]
+): BattleEvent[] {
+  if (djinnIds.length === 0) {
+    return [];
+  }
+
+  const events: BattleEvent[] = [];
+  for (const unit of units) {
+    const prev = before[unit.id];
+    const next = after[unit.id];
+    const atkDelta = (next?.atk ?? 0) - (prev?.atk ?? 0);
+    const defDelta = (next?.def ?? 0) - (prev?.def ?? 0);
+    if (atkDelta === 0 && defDelta === 0) {
+      continue;
+    }
+
+    events.push({
+      type,
+      unitId: unit.id,
+      djinnIds,
+      atkDelta,
+      defDelta,
+    });
+  }
+
+  return events;
+}
+
+function getRecoveredDjinnIds(before: Team, after: Team): string[] {
+  const recovered: string[] = [];
+  for (const [djinnId, tracker] of Object.entries(after.djinnTrackers)) {
+    const previousState = before.djinnTrackers[djinnId]?.state;
+    if (previousState && previousState !== 'Set' && tracker.state === 'Set') {
+      recovered.push(djinnId);
+    }
+  }
+  return recovered;
 }
 
 export const queueBattleServiceInternals = {

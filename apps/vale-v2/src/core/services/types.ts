@@ -29,4 +29,18 @@ export type BattleEvent =
   | { type: 'ko'; unitId: string }
   | { type: 'xp'; unitId: string; xp: number; levelUp?: { from: number; to: number } }
   | { type: 'battle-end'; result: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE' }
-  | { type: 'encounter-finished'; outcome: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE'; encounterId: string };
+  | { type: 'encounter-finished'; outcome: 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE'; encounterId: string }
+  | {
+      type: 'djinn-standby';
+      unitId: string;
+      djinnIds: readonly string[];
+      atkDelta: number;
+      defDelta: number;
+    }
+  | {
+      type: 'djinn-recovered';
+      unitId: string;
+      djinnIds: readonly string[];
+      atkDelta: number;
+      defDelta: number;
+    };
