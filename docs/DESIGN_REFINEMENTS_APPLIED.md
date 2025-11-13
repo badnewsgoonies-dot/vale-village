@@ -6,14 +6,15 @@
 
 ## 🎯 **REFINEMENT SUMMARY**
 
-Based on the game design assessment, these 2 key refinements were applied:
+Production optimizations applied:
 
 1. **Elite Enemy Variants** - Efficient enemy diversity without explosion
-2. **Promotion Gating** - Prevent early power spikes
+2. **Single Map Focus** - 1 polished map instead of 3-5
 
 **Removed Refinements:**
 - ❌ Evolution Triggers (Djinn evolution removed from scope)
 - ❌ Side Quest Integration (no side quests in game)
+- ❌ Promotion Gating (no promotions in game)
 
 ---
 
@@ -88,74 +89,37 @@ export const BANDIT_ELITE: Enemy = {
 
 ---
 
-## 🔒 **REFINEMENT 2: PROMOTION GATING**
+## 🗺️ **REFINEMENT 2: SINGLE MAP FOCUS**
 
 ### **Problem**
-- Without gates: Players promote at Lv 10, break balance immediately
-- Power spike: Promoted units dominate Chapter 2 content
-- Sequence breaking: Promote in Chapter 1, trivialize Chapter 2
+- Original plan: 3-5 maps = fragmented effort
+- Each map needs: terrain, NPCs, triggers, testing
+- Risk: Multiple shallow maps instead of one deep map
 
-### **Solution: Three-Gate System**
+### **Solution**
+Instead of 3-5 maps:
+- **1 focused map** (Shadow Fortress region)
+- All 15 story battles take place in this region
+- More detailed, polished, cohesive
 
-**ALL THREE gates must pass for promotion:**
+### **Benefits**
 
-1. **Level Gate** - Ensures proper power curve
-   ```typescript
-   if (unit.level < 10) {
-     return "Unit must reach Level 10 first";
-   }
-   ```
+**Production Efficiency:**
+- Concentrated design effort (1 map = 100% polish)
+- Single terrain tileset
+- Cohesive art direction
+- Less context switching
 
-2. **Story Gate** - Ties to narrative progression
-   ```typescript
-   if (!storyFlags.includes('defeated_shadow_fortress_boss')) {
-     return "Complete Chapter 2 main story first";
-   }
-   ```
+**Player Experience:**
+- Geographic consistency
+- Clearer sense of place
+- More memorable locations
+- Easier navigation
 
-3. **Resource Gate** - Creates strategic choice
-   ```typescript
-   if (gold < 1000 && !inventory.includes('promotion-seal-venus')) {
-     return "Requires 1000 gold OR Promotion Seal (Venus)";
-   }
-   ```
-
-### **Why All Three?**
-
-**Example Scenario:**
-```
-Player reaches Level 10 in Chapter 1
-- ✅ Level Gate: Passed
-- ❌ Story Gate: FAILED (Chapter 2 not started)
-- ❌ Resource Gate: N/A (blocked by story gate)
-Result: Cannot promote yet (prevents sequence breaking)
-
-Player defeats Chapter 2 boss at Level 11
-- ✅ Level Gate: Passed
-- ✅ Story Gate: Passed
-- 🤔 Resource Gate: Has 800 gold (needs 1000)
-Result: Cannot promote yet (creates choice: grind gold or find Promotion Seal as boss drop)
-
-Player obtains Promotion Seal from boss
-- ✅ Level Gate: Passed
-- ✅ Story Gate: Passed
-- ✅ Resource Gate: Obtained Promotion Seal (Venus)
-Result: Can promote! (feels rewarding)
-```
-
-### **Application to Class Promotions**
-
-**Tier 1 → Tier 2 (Chapter 2):**
-- Level Gate: 10+
-- Story Gate: Defeat Shadow Fortress Boss
-- Resource Gate: 1000 gold OR Promotion Seal (element-specific, boss drop)
-
-**Tier 2 → Tier 3 (Chapter 3):**
-- Level Gate: 15+
-- Story Gate: Defeat Chapter 3 Boss
-- Resource Gate: 5000 gold OR Master's Crest (boss drop)
-
-**Result:** Promotions feel earned, not automatic
+**Development:**
+- Faster iteration (1 map to test)
+- Easier balancing (consistent environment)
+- Less asset production
 
 ---
 
@@ -163,18 +127,19 @@ Result: Can promote! (feels rewarding)
 
 ### **Before Refinements:**
 - 105 unique enemies (unsustainable production)
-- Promotions at Lv 10 (breaks balance)
+- 3-5 maps (fragmented effort)
 
 ### **After Refinements:**
 - ✅ 80 enemies (50 core + 30 elites) = -30% work
-- ✅ Three-gate promotion (level + story + resource) = balanced
+- ✅ 1 focused map = -75% map production
 
 ### **Metrics:**
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
 | **Enemy Design Hours** | 315-420h | 175-210h | -30% work |
-| **Promotion Balance** | Broken (early spike) | Gated properly | ✅ Fixed |
+| **Map Production** | 3-5 maps | 1 map | -75% scope |
+| **Total Savings** | - | - | ~40% faster |
 
 ---
 
@@ -186,11 +151,11 @@ Result: Can promote! (feels rewarding)
 - ✅ Simple balance formula (+25% stats, +1 ability)
 - ✅ Production-efficient (1 hour vs 3-4 hours per elite)
 
-### **Refinement 2: Promotion Gating**
-- ✅ Prevents sequence breaking (story gate)
-- ✅ Prevents early power spikes (level gate)
-- ✅ Creates strategic choice (resource gate)
-- ✅ Feels rewarding (three gates = earned progression)
+### **Refinement 2: Single Map Focus**
+- ✅ Concentrated effort = higher quality
+- ✅ Geographic coherence
+- ✅ Faster iteration
+- ✅ Less asset production
 
 ---
 
@@ -199,6 +164,6 @@ Result: Can promote! (feels rewarding)
 1. ✅ Both refinements applied to designs
 2. ✅ Validation complete (improvements confirmed)
 3. Await approval for implementation
-4. Generate Chapter 2 content using refined systems
+4. Generate Chapter 2 content using refined approach
 
-**Status:** Design phase complete, ready for prototype implementation
+**Status:** Design phase complete, ready for content generation
