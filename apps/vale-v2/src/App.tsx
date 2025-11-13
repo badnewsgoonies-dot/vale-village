@@ -8,6 +8,7 @@ import { DialogueBox } from './ui/components/DialogueBox';
 import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopScreen } from './ui/components/ShopScreen';
 import { SpriteMockup } from './ui/components/SpriteMockup';
+import { StoryboardGallery } from './ui/components/StoryboardGallery';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -108,8 +109,8 @@ function App() {
         />
       ) : (
         <>
-          {/* TEMPORARY: Show sprite mockup - remove this to restore normal game */}
-          <SpriteMockup />
+          {/* TEMPORARY: Show storyboard gallery - remove this to restore normal game */}
+          <StoryboardGallery />
           {/* 
           {mode === 'overworld' && <OverworldMap />}
           {mode === 'battle' && <QueueBattleView />}
