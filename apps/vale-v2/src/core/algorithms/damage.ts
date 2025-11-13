@@ -230,19 +230,25 @@ export function hasShieldCharges(unit: Unit): boolean {
 
 /**
  * Phase 2: Consume one shield charge from unit
- * Returns updated unit with shield charge consumed
+ * Returns updated unit with ONE shield charge consumed (from first available shield)
  * Removes shield status if charges reach 0
  */
 export function consumeShieldCharge(unit: Unit): Unit {
-  const updatedStatusEffects = unit.statusEffects.map(effect => {
-    if (effect.type === 'shield' && effect.remainingCharges > 0) {
-      return { ...effect, remainingCharges: effect.remainingCharges - 1 };
-    }
-    return effect;
-  }).filter(effect => {
-    // Remove shield if charges depleted
-    return !(effect.type === 'shield' && effect.remainingCharges === 0);
-  });
+  let chargeConsumed = false;
+
+  const updatedStatusEffects = unit.statusEffects
+    .map(effect => {
+      // Only consume from the FIRST shield with charges remaining
+      if (effect.type === 'shield' && effect.remainingCharges > 0 && !chargeConsumed) {
+        chargeConsumed = true;
+        return { ...effect, remainingCharges: effect.remainingCharges - 1 };
+      }
+      return effect;
+    })
+    .filter(effect => {
+      // Remove shield if charges depleted OR already at 0 (cleanup)
+      return !(effect.type === 'shield' && effect.remainingCharges === 0);
+    });
 
   return {
     ...unit,
@@ -288,6 +294,11 @@ export function applyDamageWithShields(
   unit: Unit,
   damage: number
 ): { updatedUnit: Unit; actualDamage: number; autoRevived?: boolean } {
+  // 0. Zero damage doesn't consume shields or trigger any mechanics
+  if (damage <= 0) {
+    return { updatedUnit: unit, actualDamage: 0 };
+  }
+
   // 1. Invulnerability blocks all damage (no shield consumption)
   if (isInvulnerable(unit)) {
     return { updatedUnit: unit, actualDamage: 0 };
@@ -301,6 +312,14 @@ export function applyDamageWithShields(
 
   // 3. No blocking - apply damage normally
   let updatedUnit = applyDamage(unit, damage);
+
+  // Clean up any shields with 0 charges
+  updatedUnit = {
+    ...updatedUnit,
+    statusEffects: updatedUnit.statusEffects.filter(
+      effect => !(effect.type === 'shield' && effect.remainingCharges === 0)
+    ),
+  };
 
   // 4. Check for auto-revive if unit is KO'd
   const { updatedUnit: finalUnit, revived } = checkAutoRevive(updatedUnit);
