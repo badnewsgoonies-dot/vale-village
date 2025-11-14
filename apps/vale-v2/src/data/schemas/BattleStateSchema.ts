@@ -5,7 +5,7 @@ import { UnitSchema } from './UnitSchema';
 /**
  * Zod schema for BattleResult
  */
-export const BattleResultSchema = z.enum(['PLAYER_VICTORY', 'PLAYER_DEFEAT', 'PLAYER_FLEE']);
+export const BattleResultSchema = z.enum(['PLAYER_VICTORY', 'PLAYER_DEFEAT']);
 
 /**
  * Zod schema for BattleStatus

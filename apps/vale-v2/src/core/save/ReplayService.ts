@@ -72,19 +72,6 @@ function applyPlayerCommand(
   } else if (command.type === 'end-turn') {
     const nextState = endTurn(state, rng);
     return { state: nextState, events: [] };
-  } else if (command.type === 'flee') {
-    // Handle flee
-    const nextState: BattleState = {
-      ...state,
-      status: 'PLAYER_FLEE',
-    };
-    return {
-      state: nextState,
-      events: [{
-        type: 'battle-end',
-        result: 'PLAYER_FLEE',
-      }],
-    };
   }
 
   throw new Error(`Unknown command type: ${command.type}`);
@@ -188,7 +175,7 @@ export function playReplay(tape: ReplayTape): ReplayResult {
       // Use deterministic per-turn RNG substream
       const turnRng = makePRNG(tape.seed + input.turn * 1_000_000);
 
-      if (input.type === 'ability' || input.type === 'end-turn' || input.type === 'flee') {
+      if (input.type === 'ability' || input.type === 'end-turn') {
         const result = applyPlayerCommand(battleState, input as PlayerCommand, turnRng);
         battleState = result.state;
         allEvents.push(...result.events);
