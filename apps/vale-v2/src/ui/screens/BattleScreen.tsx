@@ -3,13 +3,19 @@
  *
  * Container component that connects battle UI to Zustand state and core services.
  * Builds view models from BattleState and delegates to presentational components.
+ *
+ * Phase 1: Read-only state display (no action handlers yet)
  */
 
 import React from 'react';
 import { useStore } from '../state/store';
+import type { StatusEffect } from '../../core/models/types';
+import type { Unit } from '../../core/models/Unit';
+import { calculateMaxHp } from '../../core/models/Unit';
 import type {
   TurnOrderUnitVM,
   UnitVM,
+  StatusEffectVM,
   AbilityVM,
   DjinnVM,
   ActionSlotVM,
@@ -17,33 +23,153 @@ import type {
   BattleLogEntry,
   BattleStatus,
   BattleRewardsVM,
+  BattlePhase,
   CommandType,
 } from '../components/battle/types';
 
 // Import styles
 import '../styles/battle-screen.css';
 
-// TODO: Import components when created
-// import { LayoutBattle } from '../components/battle/LayoutBattle';
-// import { TurnOrderStrip } from '../components/battle/TurnOrderStrip';
-// import { SidePanelPlayer } from '../components/battle/SidePanelPlayer';
-// import { SidePanelEnemy } from '../components/battle/SidePanelEnemy';
-// import { Battlefield } from '../components/battle/Battlefield';
-// import { CommandPanel } from '../components/battle/CommandPanel';
-// import { QueuePanel } from '../components/battle/QueuePanel';
-// import { DjinnPanel } from '../components/battle/DjinnPanel';
-// import { BattleLog } from '../components/battle/BattleLog';
-// import { BattleOverlay } from '../components/battle/BattleOverlay';
+// Import components
+import { TurnOrderStrip } from '../components/battle/TurnOrderStrip';
+import { SidePanelPlayer } from '../components/battle/SidePanelPlayer';
+import { SidePanelEnemy } from '../components/battle/SidePanelEnemy';
+import { Battlefield } from '../components/battle/Battlefield';
+import { CommandPanel } from '../components/battle/CommandPanel';
+import { QueuePanel } from '../components/battle/QueuePanel';
+import { DjinnPanel } from '../components/battle/DjinnPanel';
+import { BattleLog } from '../components/battle/BattleLog';
+import { BattleOverlay } from '../components/battle/BattleOverlay';
+
+// ============================================================================
+// Helper Functions: Status Effect Mapping
+// ============================================================================
+
+/**
+ * Map core StatusEffect to UI-friendly icon and title
+ */
+function mapStatusEffectToVM(status: StatusEffect): StatusEffectVM {
+  switch (status.type) {
+    case 'buff':
+      return {
+        id: `buff-${status.stat}`,
+        icon: '⬆️',
+        title: `${status.stat.toUpperCase()} +${Math.abs(status.modifier)} (${status.duration} turns)`,
+      };
+    case 'debuff':
+      return {
+        id: `debuff-${status.stat}`,
+        icon: '⬇️',
+        title: `${status.stat.toUpperCase()} ${status.modifier} (${status.duration} turns)`,
+      };
+    case 'poison':
+      return {
+        id: 'poison',
+        icon: '☠',
+        title: `Poisoned: ${status.damagePerTurn} damage/turn (${status.duration} turns)`,
+      };
+    case 'burn':
+      return {
+        id: 'burn',
+        icon: '🔥',
+        title: `Burned: ${status.damagePerTurn} damage/turn (${status.duration} turns)`,
+      };
+    case 'freeze':
+      return {
+        id: 'freeze',
+        icon: '❄️',
+        title: `Frozen (${status.duration} turns)`,
+      };
+    case 'paralyze':
+      return {
+        id: 'paralyze',
+        icon: '⚡',
+        title: `Paralyzed (${status.duration} turns)`,
+      };
+    case 'stun':
+      return {
+        id: 'stun',
+        icon: '💫',
+        title: `Stunned (${status.duration} turns)`,
+      };
+    case 'healOverTime':
+      return {
+        id: 'healOverTime',
+        icon: '💚',
+        title: `Regen: +${status.healPerTurn} HP/turn (${status.duration} turns)`,
+      };
+    case 'elementalResistance':
+      return {
+        id: `resist-${status.element}`,
+        icon: '🛡',
+        title: `${status.element} ${status.modifier > 0 ? 'Resist' : 'Weakness'} (${status.duration} turns)`,
+      };
+    case 'damageReduction':
+      return {
+        id: 'damage-reduction',
+        icon: '🛡',
+        title: `Damage -${Math.round(status.percent * 100)}% (${status.duration} turns)`,
+      };
+    case 'shield':
+      return {
+        id: 'shield',
+        icon: '🛡',
+        title: `Shield: ${status.remainingCharges} charges (${status.duration} turns)`,
+      };
+    case 'invulnerable':
+      return {
+        id: 'invulnerable',
+        icon: '✨',
+        title: `Invulnerable (${status.duration} turns)`,
+      };
+    case 'immunity':
+      return {
+        id: 'immunity',
+        icon: '🔰',
+        title: status.all ? `Status Immunity (${status.duration} turns)` : `Partial Immunity (${status.duration} turns)`,
+      };
+    case 'autoRevive':
+      return {
+        id: 'auto-revive',
+        icon: '❤️',
+        title: `Auto-Revive: ${status.hpPercent * 100}% HP (${status.usesRemaining} uses)`,
+      };
+    default:
+      // Exhaustiveness check
+      const _never: never = status;
+      return { id: 'unknown', icon: '?', title: 'Unknown Status' };
+  }
+}
+
+/**
+ * Build UnitVM from core Unit
+ */
+function buildUnitVM(
+  unit: Unit,
+  isEnemy: boolean,
+  isSelected: boolean
+): UnitVM {
+  const maxHp = calculateMaxHp(unit);
+  const isKo = unit.currentHp <= 0;
+
+  return {
+    id: unit.id,
+    name: unit.name,
+    element: unit.element,
+    hp: isEnemy ? undefined : unit.currentHp,
+    maxHp: isEnemy ? undefined : maxHp,
+    statuses: unit.statusEffects.map(mapStatusEffectToVM),
+    isSelected,
+    isKo,
+    isEnemy,
+  };
+}
 
 /**
  * Battle Screen
  *
  * Top-level container for the queue-based battle UI.
- * Responsibilities:
- * - Read state from queueBattleSlice
- * - Build view models from core BattleState
- * - Handle user interactions by calling slice actions
- * - Delegate rendering to presentational components
+ * Phase 1: Displays read-only battle state (no actions yet)
  */
 export function BattleScreen(): JSX.Element | null {
   // ========================================================================
@@ -51,20 +177,17 @@ export function BattleScreen(): JSX.Element | null {
   // ========================================================================
 
   const battle = useStore((state) => state.battle);
-  const events = useStore((state) => state.events);
+  const team = useStore((state) => state.team);
 
-  // Actions
+  // Actions (for Phase 2+)
   const queueUnitAction = useStore((state) => state.queueUnitAction);
   const clearUnitAction = useStore((state) => state.clearUnitAction);
   const queueDjinnActivation = useStore((state) => state.queueDjinnActivation);
   const unqueueDjinnActivation = useStore((state) => state.unqueueDjinnActivation);
   const executeQueuedRound = useStore((state) => state.executeQueuedRound);
 
-  // TODO: Get team state for Djinn data
-  // const team = useStore((state) => state.team);
-
   // ========================================================================
-  // Local UI state
+  // Local UI state (Phase 1: placeholders)
   // ========================================================================
 
   const [selectedCommand, setSelectedCommand] = React.useState<CommandType | null>(null);
@@ -84,12 +207,20 @@ export function BattleScreen(): JSX.Element | null {
   // Build View Models
   // ========================================================================
 
-  // TODO: Build TurnOrderUnitVM[] from battle.turnOrder
-  const turnOrderVM: TurnOrderUnitVM[] = [];
-  /* Example:
+  // Phase and Status
+  const phase: BattlePhase = battle.phase as BattlePhase;
+  const battleStatusVM: BattleStatus =
+    battle.phase === 'victory' ? 'victory' :
+    battle.phase === 'defeat' ? 'defeat' : 'ongoing';
+
+  // Rewards (Phase 1: undefined, will be wired in Phase 2)
+  const rewardsVM: BattleRewardsVM | undefined = undefined;
+
+  // Turn Order
   const turnOrderVM: TurnOrderUnitVM[] = battle.turnOrder.map((unitId) => {
     const unitIndex = battle.unitById.get(unitId);
     if (!unitIndex) return null;
+
     return {
       id: unitId,
       name: unitIndex.unit.name,
@@ -97,99 +228,61 @@ export function BattleScreen(): JSX.Element | null {
       isCurrent: unitId === battle.turnOrder[battle.currentActorIndex],
     };
   }).filter((u): u is TurnOrderUnitVM => u !== null);
-  */
 
-  // TODO: Build UnitVM[] for player units
-  const playerUnitsVM: UnitVM[] = [];
-  /* Example:
-  const playerUnitsVM: UnitVM[] = battle.playerTeam.units.map((unit) => ({
-    id: unit.id,
-    name: unit.name,
-    element: unit.element,
-    hp: unit.currentHp,
-    maxHp: unit.maxHp,
-    statuses: [], // TODO: map status effects
-    isSelected: selectedUnitId === unit.id,
-    isKo: unit.currentHp <= 0,
-    isEnemy: false,
-  }));
-  */
+  // Player Units
+  const currentQueueUnitId = battle.playerTeam.units[battle.currentQueueIndex]?.id;
+  const playerUnitsVM: UnitVM[] = battle.playerTeam.units.map((unit) =>
+    buildUnitVM(unit, false, unit.id === currentQueueUnitId)
+  );
 
-  // TODO: Build UnitVM[] for enemies (no HP shown)
-  const enemyUnitsVM: UnitVM[] = [];
-  /* Example:
-  const enemyUnitsVM: UnitVM[] = battle.enemies.map((enemy) => ({
-    id: enemy.id,
-    name: enemy.name,
-    element: enemy.element,
-    hp: undefined,       // Hide enemy HP
-    maxHp: undefined,
-    statuses: [], // TODO: map status effects
-    isSelected: selectedUnitId === enemy.id,
-    isKo: enemy.currentHp <= 0,
-    isEnemy: true,
-  }));
-  */
+  // Enemy Units
+  const enemyUnitsVM: UnitVM[] = battle.enemies.map((enemy) =>
+    buildUnitVM(enemy, true, false)
+  );
 
-  // TODO: Build AbilityVM[] for current unit
+  // Current Unit for CommandPanel (Phase 1: show current queue unit)
+  const currentUnit = battle.playerTeam.units[battle.currentQueueIndex];
+  const currentUnitVM: UnitVM | null = currentUnit
+    ? buildUnitVM(currentUnit, false, true)
+    : null;
+
+  // Abilities (Phase 1: empty, will wire in Phase 2)
   const coreAbilitiesVM: AbilityVM[] = [];
   const djinnAbilitiesVM: AbilityVM[] = [];
-  /* Example:
-  const currentUnit = battle.playerTeam.units[battle.currentQueueIndex];
-  if (currentUnit) {
-    // Get abilities from core
-    const abilities = getAvailableAbilities(currentUnit, battle);
 
-    coreAbilitiesVM = abilities
-      .filter((a) => a.source === 'level' || a.source === 'equip')
-      .map((a) => ({
-        id: a.id,
-        name: a.name,
-        manaCost: a.manaCost,
-        targeting: a.targeting,
-        source: a.source,
-        sourceLabel: a.sourceLabel,
-        description: formatTargeting(a.targeting),
-        isLocked: false,
-        lockedReason: undefined,
-      }));
+  // TODO Phase 2: Build abilities using core services
+  // const abilities = getAvailableAbilities(currentUnit, battle);
+  // coreAbilitiesVM = abilities.filter(...);
+  // djinnAbilitiesVM = abilities.filter(...);
 
-    djinnAbilitiesVM = abilities
-      .filter((a) => a.source === 'djinn')
-      .map((a) => ({
-        ...a,
-        isLocked: isDjinnAbilityLocked(a, battle),
-        lockedReason: getDjinnLockReason(a, battle),
-      }));
-  }
-  */
-
-  // TODO: Build DjinnVM[] from team.djinn + battle.djinnRecoveryTimers
+  // Djinn (Phase 1: basic wiring to team Djinn)
   const djinnVM: DjinnVM[] = [];
-  /* Example:
-  const djinnVM: DjinnVM[] = team.djinn.map((djinn) => {
-    const turnsRemaining = battle.djinnRecoveryTimers[djinn.id] ?? 0;
-    const state = turnsRemaining > 0 ? 'recovery' :
-                  battle.queuedDjinn.includes(djinn.id) ? 'standby' : 'set';
+  if (team?.equippedDjinn) {
+    for (const djinnId of team.equippedDjinn) {
+      const tracker = team.djinnTrackers[djinnId];
+      if (!tracker) continue;
 
-    return {
-      id: djinn.id,
-      name: djinn.name,
-      element: djinn.element,
-      state,
-      turnsRemaining,
-      summonDescription: djinn.summonEffect.description,
-      isSelectable: state === 'set' && battle.phase === 'planning',
-    };
-  });
-  */
+      // Map state to lowercase for VM
+      const state = tracker.state.toLowerCase() as 'set' | 'standby' | 'recovery';
+      const turnsRemaining = battle.djinnRecoveryTimers[djinnId] ?? 0;
 
-  // TODO: Build ActionSlotVM[] from battle.queuedActions
-  const queueSlotsVM: ActionSlotVM[] = [];
-  /* Example:
+      djinnVM.push({
+        id: djinnId,
+        name: djinnId, // TODO Phase 2: Look up actual Djinn name from definitions
+        element: 'Venus', // TODO Phase 2: Look up actual element
+        state,
+        turnsRemaining,
+        summonDescription: 'TODO: Djinn effect description', // TODO Phase 2
+        isSelectable: state === 'set' && battle.phase === 'planning',
+      });
+    }
+  }
+
+  // Action Queue Slots
   const queueSlotsVM: ActionSlotVM[] = battle.playerTeam.units.map((unit, idx) => {
     const action = battle.queuedActions[idx];
     const isKo = unit.currentHp <= 0;
+    const isCurrent = idx === battle.currentQueueIndex;
 
     if (!action) {
       return {
@@ -197,281 +290,214 @@ export function BattleScreen(): JSX.Element | null {
         unitName: unit.name,
         summary: isKo ? '[KO\'d]' : '[Empty]',
         manaCost: 0,
-        isCurrent: idx === battle.currentQueueIndex,
+        isCurrent,
         isEmpty: true,
         isKo,
       };
     }
 
+    // TODO Phase 2: Format action summary properly
+    const targetUnit = battle.unitById.get(action.targetIds[0] ?? '');
+    const targetName = targetUnit?.unit.name ?? 'Unknown';
+    const abilityName = action.abilityId ?? 'Attack';
+
     return {
       unitId: unit.id,
       unitName: unit.name,
-      summary: formatActionSummary(action, battle),
+      summary: `${abilityName} → ${targetName}`,
       manaCost: action.manaCost,
-      isCurrent: idx === battle.currentQueueIndex,
+      isCurrent,
       isEmpty: false,
       isKo,
     };
   });
-  */
 
-  // TODO: Build ManaVM
+  // Mana
   const manaVM: ManaVM = {
     current: battle.remainingMana,
     max: battle.maxMana,
     overBudget: battle.remainingMana < 0,
   };
 
-  // TODO: Build BattleLogEntry[] from battle.log
-  const logEntriesVM: BattleLogEntry[] = [];
-  /* Example:
+  // Battle Log
   const logEntriesVM: BattleLogEntry[] = battle.log.map((text, idx) => ({
     id: `log-${idx}`,
     text,
     timestamp: Date.now() - (battle.log.length - idx) * 100,
   }));
-  */
 
-  // TODO: Build BattleStatus and rewards
-  const battleStatusVM: BattleStatus = battle.phase === 'victory' ? 'victory' :
-                                       battle.phase === 'defeat' ? 'defeat' : 'ongoing';
-  const rewardsVM: BattleRewardsVM | undefined = undefined;
-  /* Example:
-  if (battle.phase === 'victory') {
-    rewardsVM = {
-      xp: calculateXpReward(battle.enemies),
-      gold: calculateGoldReward(battle.enemies),
-    };
-  }
-  */
+  // Can Execute (Phase 1: simple check)
+  const canExecute = battle.phase === 'planning' &&
+                     battle.queuedActions.some(a => a !== null);
 
   // ========================================================================
-  // Event Handlers
+  // Event Handlers (Phase 1: Stubs with TODOs)
   // ========================================================================
 
   const handleSelectUnit = React.useCallback((unitId: string) => {
-    // TODO: Implement unit selection logic
+    // TODO Phase 2: Implement unit selection logic
     // - If in targeting mode, apply target
     // - Otherwise, select unit for planning
     setSelectedUnitId(unitId);
+    console.log('[TODO] Selected unit:', unitId);
   }, []);
 
   const handleSelectCommand = React.useCallback((command: CommandType) => {
-    // TODO: Implement command selection logic
+    // TODO Phase 2: Implement command selection logic
     setSelectedCommand(command);
+    console.log('[TODO] Selected command:', command);
   }, []);
 
   const handleSelectAbility = React.useCallback((abilityId: string) => {
-    // TODO: Implement ability selection logic
+    // TODO Phase 2: Implement ability selection logic
     // - Enter targeting mode
     // - Store pending ability ID
     setPendingAbilityId(abilityId);
     setTargetingMode(true);
+    console.log('[TODO] Selected ability:', abilityId);
   }, []);
 
   const handleSelectTarget = React.useCallback((targetId: string) => {
-    // TODO: Implement target selection logic
+    // TODO Phase 2: Implement target selection logic
     // - Call queueUnitAction with pendingAbilityId and targetId
     // - Exit targeting mode
-    if (!pendingAbilityId) return;
-
-    // queueUnitAction(battle.currentQueueIndex, pendingAbilityId, [targetId]);
+    console.log('[TODO] Selected target:', targetId, 'for ability:', pendingAbilityId);
 
     setPendingAbilityId(null);
     setTargetingMode(false);
-  }, [pendingAbilityId, battle.currentQueueIndex, queueUnitAction]);
+  }, [pendingAbilityId]);
 
   const handleSelectDjinn = React.useCallback((djinnId: string) => {
-    // TODO: Implement Djinn selection logic
-    // - Toggle queued state
-    if (battle.queuedDjinn.includes(djinnId)) {
-      unqueueDjinnActivation(djinnId);
-    } else {
-      queueDjinnActivation(djinnId);
-    }
-  }, [battle.queuedDjinn, queueDjinnActivation, unqueueDjinnActivation]);
+    // TODO Phase 2: Implement Djinn selection logic
+    console.log('[TODO] Selected Djinn:', djinnId);
+  }, []);
 
   const handleClearQueueSlot = React.useCallback((unitId: string) => {
-    // TODO: Find unit index from unitId
-    // const unitIndex = battle.playerTeam.units.findIndex((u) => u.id === unitId);
-    // if (unitIndex >= 0) clearUnitAction(unitIndex);
-  }, [clearUnitAction, battle.playerTeam.units]);
-
-  const handleSelectQueueSlot = React.useCallback((unitId: string) => {
-    // TODO: Switch currentQueueIndex to selected unit
-    // const unitIndex = battle.playerTeam.units.findIndex((u) => u.id === unitId);
-    // if (unitIndex >= 0) {
-    //   // Need a slice action to set currentQueueIndex
-    // }
+    // TODO Phase 2: Find unit index and call clearUnitAction
+    const unitIndex = battle.playerTeam.units.findIndex((u) => u.id === unitId);
+    console.log('[TODO] Clear queue slot for unit:', unitId, 'index:', unitIndex);
   }, [battle.playerTeam.units]);
 
+  const handleSelectQueueSlot = React.useCallback((unitId: string) => {
+    // TODO Phase 2: Switch currentQueueIndex to selected unit
+    console.log('[TODO] Select queue slot:', unitId);
+  }, []);
+
   const handlePrevUnit = React.useCallback(() => {
-    // TODO: Navigate to previous unit in queue
-    // const prevIndex = (battle.currentQueueIndex - 1 + 4) % 4;
-    // Need slice action to set currentQueueIndex
-  }, [battle.currentQueueIndex]);
+    // TODO Phase 2: Navigate to previous unit in queue
+    console.log('[TODO] Navigate to previous unit');
+  }, []);
 
   const handleNextUnit = React.useCallback(() => {
-    // TODO: Navigate to next unit in queue
-    // const nextIndex = (battle.currentQueueIndex + 1) % 4;
-    // Need slice action to set currentQueueIndex
-  }, [battle.currentQueueIndex]);
+    // TODO Phase 2: Navigate to next unit in queue
+    console.log('[TODO] Navigate to next unit');
+  }, []);
 
   const handleExecuteRound = React.useCallback(() => {
-    // TODO: Validate all actions queued
-    // TODO: Validate mana budget
-    executeQueuedRound();
-  }, [executeQueuedRound]);
+    // TODO Phase 2: Validate and execute round
+    console.log('[TODO] Execute round - button clicked');
+  }, []);
 
   const handleContinue = React.useCallback(() => {
-    // TODO: Transition to rewards screen or overworld
+    // TODO Phase 2: Transition to rewards screen
+    console.log('[TODO] Continue to rewards');
   }, []);
 
   const handleReturnToVillage = React.useCallback(() => {
-    // TODO: Transition to overworld
+    // TODO Phase 2: Transition to overworld
+    console.log('[TODO] Return to village');
   }, []);
 
   const handleRetry = React.useCallback(() => {
-    // TODO: Restart battle
+    // TODO Phase 2: Restart battle
+    console.log('[TODO] Retry battle');
   }, []);
 
   const handleReturnToTitle = React.useCallback(() => {
-    // TODO: Return to title screen
+    // TODO Phase 2: Return to title screen
+    console.log('[TODO] Return to title');
   }, []);
 
   // ========================================================================
   // Render
   // ========================================================================
 
-  // TODO: Replace with actual components once created
   return (
     <div className="game-root">
       <div className="battle-screen">
-        <div className="turn-order-strip">
-          {/* TODO: <TurnOrderStrip units={turnOrderVM} /> */}
-          <div className="turn-order-unit turn-order-unit--player">P1</div>
-          <div className="turn-order-unit turn-order-unit--enemy turn-order-unit--current">E1</div>
-          <div className="turn-order-unit turn-order-unit--player">P2</div>
-        </div>
+        {/* Turn Order Strip */}
+        <TurnOrderStrip units={turnOrderVM} />
 
+        {/* Top Row: Player + Enemy Sides */}
         <div className="top-row">
-          <div className="player-side">
-            {/* TODO: <SidePanelPlayer units={playerUnitsVM} onSelectUnit={handleSelectUnit} /> */}
-            <div className="side-title">Player Party</div>
-            <div className="unit-list">
-              {battle.playerTeam.units.map((unit) => (
-                <div key={unit.id} className="unit-card">
-                  <div className="unit-sprite">{unit.name.slice(0, 3)}</div>
-                  <div className="unit-header">
-                    <div className="unit-name">{unit.name}</div>
-                    <div className="unit-element">{unit.element}</div>
-                  </div>
-                  <div className="unit-hp-row">
-                    <div className="hp-bar">
-                      <div
-                        className="hp-fill"
-                        style={{ width: `${(unit.currentHp / unit.maxHp) * 100}%` }}
-                      />
-                    </div>
-                    <div className="hp-text">{unit.currentHp} / {unit.maxHp}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="enemy-side">
-            {/* TODO: <SidePanelEnemy units={enemyUnitsVM} onSelectUnit={handleSelectUnit} /> */}
-            <div className="side-title">Enemies</div>
-            <div className="unit-list">
-              {battle.enemies.map((enemy) => (
-                <div key={enemy.id} className="unit-card">
-                  <div className="unit-sprite">{enemy.name.slice(0, 3)}</div>
-                  <div className="unit-header">
-                    <div className="unit-name">{enemy.name}</div>
-                    <div className="unit-element">{enemy.element}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SidePanelPlayer
+            units={playerUnitsVM}
+            onSelectUnit={handleSelectUnit}
+          />
+          <SidePanelEnemy
+            units={enemyUnitsVM}
+            onSelectUnit={handleSelectUnit}
+          />
         </div>
 
+        {/* Middle Row: Phase Indicator + Battlefield */}
         <div className="middle-row">
           <div className="phase-indicator">
-            {battle.phase === 'planning' ? 'Planning Phase – Queue Actions' : 'Executing...'}
+            {phase === 'planning' && 'Planning Phase – Queue Actions'}
+            {phase === 'executing' && 'Executing Round...'}
+            {phase === 'victory' && 'Victory!'}
+            {phase === 'defeat' && 'Defeat'}
           </div>
-          <div className="battlefield">
-            {/* TODO: <Battlefield
-              playerUnits={playerUnitsVM}
-              enemyUnits={enemyUnitsVM}
-              targetingMode={targetingMode}
-              onSelectTarget={handleSelectTarget}
-            /> */}
-            <div className="battlefield-inner">
-              <div className="battlefield-column">
-                {battle.playerTeam.units.map((unit) => (
-                  <div key={unit.id} className="battlefield-unit">{unit.name.slice(0, 1)}</div>
-                ))}
-              </div>
-              <div className="battlefield-column">
-                {battle.enemies.map((enemy) => (
-                  <div key={enemy.id} className="battlefield-unit">{enemy.name.slice(0, 1)}</div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <Battlefield
+            playerUnits={playerUnitsVM}
+            enemyUnits={enemyUnitsVM}
+            targetingMode={targetingMode}
+            onSelectTarget={handleSelectTarget}
+          />
         </div>
 
+        {/* Bottom Row: Commands, Queue, Djinn/Log */}
         <div className="bottom-row">
-          <div className="command-bar">
-            {/* TODO: <CommandPanel
-              currentUnit={currentUnitVM}
-              selectedCommand={selectedCommand}
-              coreAbilities={coreAbilitiesVM}
-              djinnAbilities={djinnAbilitiesVM}
-              onCommandSelect={handleSelectCommand}
-              onSelectAbility={handleSelectAbility}
-            /> */}
-            <div className="command-header">Battle Commands (TODO)</div>
-          </div>
+          <CommandPanel
+            currentUnit={currentUnitVM}
+            selectedCommand={selectedCommand}
+            coreAbilities={coreAbilitiesVM}
+            djinnAbilities={djinnAbilitiesVM}
+            onCommandSelect={handleSelectCommand}
+            onSelectAbility={handleSelectAbility}
+          />
 
-          <div className="queue-mana-panel">
-            {/* TODO: <QueuePanel
-              roundNumber={battle.roundNumber}
-              queueSlots={queueSlotsVM}
-              mana={manaVM}
-              canExecute={canExecute}
-              targetingMode={targetingMode}
-              onSelectSlot={handleSelectQueueSlot}
-              onClearSlot={handleClearQueueSlot}
-              onPrevUnit={handlePrevUnit}
-              onNextUnit={handleNextUnit}
-              onExecuteRound={handleExecuteRound}
-            /> */}
-            <div className="queue-header">
-              <span>Action Queue – Round {battle.roundNumber}</span>
-            </div>
-            <div className="mana-row">
-              <div className="mana-display">Mana: {battle.remainingMana} / {battle.maxMana}</div>
-            </div>
-          </div>
+          <QueuePanel
+            roundNumber={battle.roundNumber}
+            queueSlots={queueSlotsVM}
+            mana={manaVM}
+            canExecute={canExecute}
+            targetingMode={targetingMode}
+            onSelectSlot={handleSelectQueueSlot}
+            onClearSlot={handleClearQueueSlot}
+            onPrevUnit={handlePrevUnit}
+            onNextUnit={handleNextUnit}
+            onExecuteRound={handleExecuteRound}
+          />
 
           <div className="right-bottom-panel">
-            {/* TODO: <DjinnPanel djinns={djinnVM} onSelectDjinn={handleSelectDjinn} /> */}
-            {/* TODO: <BattleLog entries={logEntriesVM} /> */}
-            <div>Djinn & Log (TODO)</div>
+            <DjinnPanel
+              djinns={djinnVM}
+              onSelectDjinn={handleSelectDjinn}
+            />
+            <BattleLog entries={logEntriesVM} />
           </div>
         </div>
 
-        {/* TODO: <BattleOverlay
+        {/* Battle Overlay (Victory/Defeat) */}
+        <BattleOverlay
           status={battleStatusVM}
           rewards={rewardsVM}
           onContinue={handleContinue}
           onReturnToVillage={handleReturnToVillage}
           onRetry={handleRetry}
           onReturnToTitle={handleReturnToTitle}
-        /> */}
+        />
       </div>
     </div>
   );
