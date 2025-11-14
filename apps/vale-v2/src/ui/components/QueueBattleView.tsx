@@ -1,6 +1,7 @@
 /**
  * Queue-Based Battle View Component
  * PR-QUEUE-BATTLE: Main battle UI with planning and execution phases
+ * Phase 4: Execution polish, rewards wiring, UX refinements
  */
 
 import { useEffect, useState } from 'react';
@@ -18,7 +19,6 @@ import { canAffordAction } from '../../core/algorithms/mana';
 import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
 import { DJINN } from '../../data/definitions/djinn';
 import { getLockedDjinnAbilityMetadataForUnit } from '../../core/algorithms/djinnAbilities';
-import { MAX_QUEUE_SIZE } from '../../core/constants';
 
 export function QueueBattleView() {
   const battle = useStore((s) => s.battle);
@@ -34,6 +34,9 @@ export function QueueBattleView() {
   const [selectedUnitIndex, setSelectedUnitIndex] = useState<number | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<string | null>(null);
   const [selectedTargets, setSelectedTargets] = useState<string[]>([]);
+
+  // Phase 4: Error message state for UX feedback
+  const [queueError, setQueueError] = useState<string | null>(null);
 
   // Post-battle flow state
   const [showCutscene, setShowCutscene] = useState(false);
@@ -55,6 +58,13 @@ export function QueueBattleView() {
     const t = setTimeout(() => dequeue(), 450);
     return () => clearTimeout(t);
   }, [battle?.phase, events.length, dequeue]);
+
+  // Clear error message when battle phase changes
+  useEffect(() => {
+    if (battle?.phase !== 'planning') {
+      setQueueError(null);
+    }
+  }, [battle?.phase]);
 
   if (!battle) return <div>No battle loaded.</div>;
 
@@ -94,11 +104,52 @@ export function QueueBattleView() {
     const countdownText = timer !== undefined ? ` (${timer} rounds left)` : '';
     return `${djinnName} is ${state}${countdownText}`;
   };
-  const isQueueComplete = battle.queuedActions.every(a => a !== null);
+
+  // Phase 2 Fix #3: Robust canExecute check
+  // Check: in planning phase, mana budget OK, all non-KO units have actions
+  const totalQueuedManaCost = battle.queuedActions
+    .filter((action): action is NonNullable<typeof action> => action != null)
+    .reduce((sum, action) => sum + action.manaCost, 0);
+  const isOverBudget = totalQueuedManaCost > battle.maxMana;
+
+  const isQueueComplete =
+    battle.phase === 'planning' &&
+    !isOverBudget &&
+    battle.playerTeam.units.every((unit, idx) => {
+      const isKo = unit.currentHp <= 0;
+      const action = battle.queuedActions[idx];
+      const hasAction = action != null;
+      return isKo || hasAction;
+    });
+
+  // Phase 4: Get execute validation message
+  const getExecuteValidationMessage = (): string | null => {
+    if (battle.phase !== 'planning') return null;
+    if (isOverBudget) {
+      const over = totalQueuedManaCost - battle.maxMana;
+      return `Cannot execute: ${over} mana over budget`;
+    }
+    const missingActions = battle.playerTeam.units.filter((unit, idx) => {
+      const isKo = unit.currentHp <= 0;
+      const action = battle.queuedActions[idx];
+      return !isKo && action == null;
+    });
+    if (missingActions.length > 0) {
+      return `Cannot execute: ${missingActions.length} unit(s) need actions`;
+    }
+    return null;
+  };
+
+  const executeValidationMessage = getExecuteValidationMessage();
+
+  // Phase 4: Check if in execution phase for visual lockdown
+  const isExecuting = battle.phase === 'executing';
+  const isPlanningLocked = isExecuting;
 
   const handleAbilitySelect = (abilityId: string | null) => {
     setSelectedAbility(abilityId);
     setSelectedTargets([]);
+    setQueueError(null); // Clear error on new selection
   };
 
   const handleTargetSelect = (targetId: string) => {
@@ -135,25 +186,28 @@ export function QueueBattleView() {
 
     const ability = selectedAbility ? currentUnit.abilities.find(a => a.id === selectedAbility) : undefined;
 
-    // Let the service validate (it checks mana affordability, etc.)
+    // Phase 4: Better error handling with inline messages
     try {
       queueUnitAction(selectedUnitIndex, selectedAbility, selectedTargets, ability);
       setSelectedAbility(null);
       setSelectedTargets([]);
-      // Move to next unit if not last
-      if (selectedUnitIndex < MAX_QUEUE_SIZE - 1) {
+      setQueueError(null); // Clear error on success
+      // Phase 2 Fix #1: Use actual party size instead of hard-coded MAX_QUEUE_SIZE
+      const unitCount = battle.playerTeam.units.length;
+      if (selectedUnitIndex < unitCount - 1) {
         setSelectedUnitIndex(selectedUnitIndex + 1);
       }
     } catch (error) {
-      // Service will throw descriptive errors for validation failures
+      // Phase 4: Show inline error instead of alert
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      setQueueError(errorMsg);
       console.error('Failed to queue action:', error);
-      alert(`Failed to queue action: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleExecuteRound = () => {
     if (!isQueueComplete) {
-      alert('Please queue actions for all 4 units first');
+      // Phase 4: Better validation message already shown inline
       return;
     }
     executeQueuedRound();
@@ -172,9 +226,16 @@ export function QueueBattleView() {
           border: '2px solid #4a6a8a',
           borderRadius: '4px',
           marginBottom: '1rem',
+          // Phase 4: Dim during execution
+          opacity: isPlanningLocked ? 0.6 : 1,
+          pointerEvents: isPlanningLocked ? 'none' : 'auto',
         }}
       >
-        <ManaCirclesBar remainingMana={battle.remainingMana} maxMana={battle.maxMana} />
+        {/* Phase 2 Fix #2: Clamp remaining mana to not go negative */}
+        <ManaCirclesBar
+          remainingMana={Math.max(0, battle.remainingMana)}
+          maxMana={battle.maxMana}
+        />
         <DjinnBar
           team={battle.playerTeam}
           queuedDjinn={battle.queuedDjinn}
@@ -187,6 +248,25 @@ export function QueueBattleView() {
           }}
         />
       </div>
+
+      {/* Phase 4: Execution indicator */}
+      {isExecuting && (
+        <div
+          style={{
+            padding: '0.75rem',
+            backgroundColor: '#4a2a1a',
+            border: '2px solid #8a4a2a',
+            borderRadius: '4px',
+            marginBottom: '1rem',
+            textAlign: 'center',
+            color: '#FFD87F',
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+          }}
+        >
+          ⚔️ EXECUTING ROUND... ⚔️
+        </div>
+      )}
 
       {/* Battlefield */}
       <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
@@ -214,17 +294,20 @@ export function QueueBattleView() {
               <div
                 key={unit.id}
                 onClick={() => {
-                  if (battle.phase === 'planning') {
+                  if (battle.phase === 'planning' && !isPlanningLocked) {
                     setSelectedUnitIndex(index);
                     setSelectedAbility(null);
                     setSelectedTargets([]);
+                    setQueueError(null);
                   }
                 }}
                 style={{
-                  cursor: battle.phase === 'planning' ? 'pointer' : 'default',
+                  cursor: battle.phase === 'planning' && !isPlanningLocked ? 'pointer' : 'default',
                   border: selectedUnitIndex === index ? '3px solid #4CAF50' : '1px solid transparent',
                   borderRadius: '4px',
                   padding: '0.25rem',
+                  // Phase 4: Dim during execution
+                  opacity: isPlanningLocked ? 0.7 : 1,
                 }}
               >
                 <UnitCard unit={unit} isPlayer={true} team={battle.playerTeam} />
@@ -238,17 +321,53 @@ export function QueueBattleView() {
       {battle.phase === 'planning' ? (
         <div style={{ display: 'flex', gap: '1rem' }}>
           {/* Action Queue Panel */}
-          <div style={{ flex: '0 0 40%' }}>
+          <div
+            style={{
+              flex: '0 0 40%',
+              // Phase 4: Dim during execution
+              opacity: isPlanningLocked ? 0.6 : 1,
+              pointerEvents: isPlanningLocked ? 'none' : 'auto',
+            }}
+          >
             <ActionQueuePanel battle={battle} onClearAction={clearUnitAction} />
           </div>
 
           {/* Command Panel */}
-          <div style={{ flex: '1', backgroundColor: '#1a2a4a', border: '2px solid #4a6a8a', borderRadius: '4px', padding: '1rem' }}>
+          <div
+            style={{
+              flex: '1',
+              backgroundColor: '#1a2a4a',
+              border: '2px solid #4a6a8a',
+              borderRadius: '4px',
+              padding: '1rem',
+              // Phase 4: Dim during execution
+              opacity: isPlanningLocked ? 0.6 : 1,
+              pointerEvents: isPlanningLocked ? 'none' : 'auto',
+            }}
+          >
             {selectedUnitIndex !== null && currentUnit ? (
               <>
                 <h3 style={{ marginTop: 0, color: '#FFD87F' }}>
                   Current: {currentUnit.name}
                 </h3>
+
+                {/* Phase 4: Queue error message */}
+                {queueError && (
+                  <div
+                    style={{
+                      padding: '0.5rem',
+                      marginBottom: '1rem',
+                      backgroundColor: '#5a1a1a',
+                      border: '1px solid #8a2a2a',
+                      borderRadius: '4px',
+                      color: '#ffaaaa',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    ⚠️ {queueError}
+                  </div>
+                )}
+
                 {/* Abilities */}
                 <div style={{ marginBottom: '1rem' }}>
                   <h4>Abilities:</h4>
@@ -271,30 +390,34 @@ export function QueueBattleView() {
                       .map((ability) => {
                         const manaCost = ability.manaCost ?? 0;
                         const canAfford = canAffordAction(battle.remainingMana, manaCost);
+                        // Phase 4: Check if this is a Djinn ability
+                        const isDjinnAbility = DJINN_ABILITIES[ability.id] != null;
                         return (
                           <button
                             key={ability.id}
                             onClick={() => handleAbilitySelect(ability.id)}
                             disabled={!canAfford}
+                            title={!canAfford ? 'Not enough mana' : isDjinnAbility ? 'Djinn ability' : ''}
                             style={{
                               padding: '0.5rem',
                               backgroundColor: selectedAbility === ability.id ? '#4CAF50' : canAfford ? '#444' : '#222',
                               color: canAfford ? '#fff' : '#666',
-                              border: 'none',
+                              border: isDjinnAbility ? '1px solid #9C27B0' : 'none',
                               borderRadius: '4px',
                               cursor: canAfford ? 'pointer' : 'not-allowed',
                             }}
                           >
-                            {ability.name} [{manaCost}○]
+                            {isDjinnAbility && '✦ '}{ability.name} [{manaCost}○]
                           </button>
                         );
                       })}
                   </div>
                 </div>
 
+                {/* Phase 4: Locked Djinn abilities with improved clarity */}
                 {lockedDjinnAbilitiesForCurrentUnit.length > 0 && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#ccc' }}>Locked Djinn Abilities</h5>
+                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#ccc' }}>🔒 Locked Djinn Abilities</h5>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {lockedDjinnAbilitiesForCurrentUnit.map((meta) => {
                         const ability = DJINN_ABILITIES[meta.abilityId];
@@ -314,7 +437,7 @@ export function QueueBattleView() {
                               textAlign: 'left',
                             }}
                           >
-                            {ability.name} [{ability.manaCost ?? 0}○] — {formatLockedReason(meta)}
+                            🔒 {ability.name} [{ability.manaCost ?? 0}○] — {formatLockedReason(meta)}
                           </button>
                         );
                       })}
@@ -372,25 +495,42 @@ export function QueueBattleView() {
                 )}
 
                 {/* Execute Round Button */}
-                {isQueueComplete && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <button
-                      onClick={handleExecuteRound}
+                <div style={{ marginTop: '1rem' }}>
+                  {/* Phase 4: Show validation message */}
+                  {executeValidationMessage && (
+                    <div
                       style={{
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: '#FFD87F',
-                        color: '#000',
-                        border: 'none',
+                        padding: '0.5rem',
+                        marginBottom: '0.5rem',
+                        backgroundColor: '#3a3a1a',
+                        border: '1px solid #6a6a2a',
                         borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '1rem',
-                        fontWeight: 'bold',
+                        color: '#ffee88',
+                        fontSize: '0.9rem',
+                        textAlign: 'center',
                       }}
                     >
-                      EXECUTE ROUND
-                    </button>
-                  </div>
-                )}
+                      ℹ️ {executeValidationMessage}
+                    </div>
+                  )}
+                  <button
+                    onClick={handleExecuteRound}
+                    disabled={!isQueueComplete}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1.5rem',
+                      backgroundColor: isQueueComplete ? '#FFD87F' : '#666',
+                      color: isQueueComplete ? '#000' : '#999',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: isQueueComplete ? 'pointer' : 'not-allowed',
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {isQueueComplete ? 'EXECUTE ROUND' : 'QUEUE ALL ACTIONS FIRST'}
+                  </button>
+                </div>
               </>
             ) : (
               <div style={{ color: '#888', textAlign: 'center', padding: '2rem' }}>
