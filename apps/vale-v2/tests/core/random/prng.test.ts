@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { makePRNG, XorShiftPRNG } from '@/core/random/prng';
+import { makePRNG, prngFromSnapshot, deriveSeed } from '../../../src/core/random/prng';
 
 describe('PRNG', () => {
   test('should generate deterministic sequences with same seed', () => {
@@ -71,6 +71,42 @@ describe('PRNG', () => {
       makePRNG(12345);
       makePRNG(999999);
     }).not.toThrow();
+  });
+
+  test('should snapshot and restore deterministically', () => {
+    const rng1 = makePRNG(4242);
+
+    const prefix = Array.from({ length: 5 }, () => rng1.next());
+    const snapshot = rng1.snapshot();
+
+    const rng2 = prngFromSnapshot(snapshot);
+
+    const rest1 = Array.from({ length: 10 }, () => rng1.next());
+    const rest2 = Array.from({ length: 10 }, () => rng2.next());
+
+    expect(rest2).toEqual(rest1);
+    expect(prefix.length).toBe(5);
+  });
+
+  test('should track draw count excluding warmup', () => {
+    const rng = makePRNG(2025);
+    expect(rng.getDrawCount()).toBe(0);
+
+    rng.next();
+    rng.next();
+    rng.next();
+
+    expect(rng.getDrawCount()).toBe(3);
+  });
+
+  test('deriveSeed should be deterministic per label', () => {
+    const base = 1337;
+    const a1 = deriveSeed(base, 'actions');
+    const a2 = deriveSeed(base, 'actions');
+    const b = deriveSeed(base, 'effects');
+
+    expect(a1).toBe(a2);
+    expect(a1).not.toBe(b);
   });
 });
 

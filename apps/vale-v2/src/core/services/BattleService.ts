@@ -15,7 +15,6 @@ import {
   calculatePhysicalDamage,
   calculatePsynergyDamage,
   calculateHealAmount,
-  applyDamage,
   applyDamageWithShields,
   applyHealing,
 } from '../algorithms/damage';
@@ -69,7 +68,7 @@ export function performAction(
   abilityId: string,
   targetIds: readonly string[],
   rng: PRNG
-): { state: BattleState; result: ActionResult; events: readonly BattleEvent[]; hit: boolean } {
+): { state: BattleState; result: ActionResult; events: readonly BattleEvent[] } {
   // Find actor using index (O(1) instead of O(n))
   const actorEntry = state.unitById.get(actorId);
   if (!actorEntry || isUnitKO(actorEntry.unit)) {
@@ -235,7 +234,7 @@ export function performAction(
     });
   }
 
-  return { state: updatedState, result, events, hit: result.hit ?? false };
+  return { state: updatedState, result, events };
 }
 
 /**
@@ -382,7 +381,7 @@ function executeAbility(
           targetDamage += actualDamage;
 
           // Update in the working set
-          const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+          const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget!.id);
           if (existingIndex >= 0) {
             updatedUnits[existingIndex] = currentTarget;
           } else {
@@ -444,7 +443,7 @@ function executeAbility(
             // Phase 2: Apply status with immunity check
             currentTarget = applyStatusToUnit(currentTarget, newStatus);
 
-            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget!.id);
             if (existingIndex >= 0) {
               updatedUnits[existingIndex] = currentTarget;
             } else {
@@ -475,7 +474,7 @@ function executeAbility(
               currentTarget = applyStatusToUnit(currentTarget, debuff);
             }
 
-            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget.id);
+            const existingIndex = updatedUnits.findIndex(u => u.id === currentTarget!.id);
             if (existingIndex >= 0) {
               updatedUnits[existingIndex] = currentTarget;
             } else {
@@ -827,11 +826,13 @@ export function startTurnTick(
   }
 
   // Check for expired statuses by comparing old and new status effects
-  const oldStatusIds = new Set(currentActor.statusEffects.map(s => `${s.type}-${s.duration}`));
-  const newStatusIds = new Set(statusResult.updatedUnit.statusEffects.map(s => `${s.type}-${s.duration}`));
+  const makeStatusKey = (s: typeof currentActor.statusEffects[number]) =>
+    `${s.type}-${'duration' in s ? s.duration : 'usesRemaining' in s ? s.usesRemaining : 'permanent'}`;
+  const oldStatusIds = new Set(currentActor.statusEffects.map(makeStatusKey));
+  const newStatusIds = new Set(statusResult.updatedUnit.statusEffects.map(makeStatusKey));
 
   currentActor.statusEffects.forEach(status => {
-    const statusKey = `${status.type}-${status.duration}`;
+    const statusKey = makeStatusKey(status);
     if (oldStatusIds.has(statusKey) && !newStatusIds.has(statusKey)) {
       newEvents.push({
         type: 'status-expired',

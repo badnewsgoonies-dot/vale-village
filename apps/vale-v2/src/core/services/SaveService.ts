@@ -23,7 +23,6 @@ import {
   type SaveFileValidationError,
 } from '../validation/saveFileValidation';
 
-const SAVE_KEY = 'vale_chronicles_v2_save';
 const SAVE_SLOT_PREFIX = 'vale_chronicles_v2_save_slot_';
 const BACKUP_SUFFIX = '_backup';
 const BATTLE_SAVE_KEY = 'vale_chronicles_v2_battle';
@@ -130,7 +129,7 @@ function unwrapAndValidate<T>(
     });
   }
 
-  const file = wrapper as Partial<SaveFileWrapper>;
+  let file = wrapper as Partial<SaveFileWrapper>;
 
   // Check required fields
   if (!file.version || !file.timestamp || !file.checksum || !file.data) {
@@ -183,10 +182,10 @@ function unwrapAndValidate<T>(
   }
 
   // Checksum verification
-  if (!verifyChecksum(file.data, file.checksum)) {
+  if (!verifyChecksum(file.data, file.checksum!)) {
     return Err({
       type: 'CHECKSUM_FAILED',
-      expected: file.checksum,
+      expected: file.checksum!,
       actual: calculateChecksum(file.data),
     });
   }

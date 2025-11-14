@@ -36,7 +36,7 @@ function shouldGenerateMana(
   action: QueuedAction,
   actionResult: PerformActionResult
 ): boolean {
-  return isBasicAttack(action) && actionResult.hit;
+  return isBasicAttack(action);
 }
 
 /**

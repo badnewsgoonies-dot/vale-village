@@ -1,4 +1,4 @@
-import type { GameMap as SchemaGameMap, MapTrigger as SchemaMapTrigger, NPC as SchemaNPC, Tile as SchemaTile, Position as SchemaPosition } from '@/data/schemas/MapSchema';
+import type { GameMap as SchemaGameMap, MapTrigger as SchemaMapTrigger, NPC as SchemaNPC, Tile as SchemaTile, Position as SchemaPosition } from '@/data/schemas/mapSchema';
 
 export type Position = SchemaPosition;
 export type Tile = SchemaTile;

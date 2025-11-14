@@ -19,6 +19,7 @@
     "precommit": "pnpm typecheck && pnpm lint && pnpm test && pnpm validate:data"
   },
   "devDependencies": {
+    "@dqbd/tiktoken": "^1.0.22",
     "pnpm": "^8.15.0",
     "ts-morph": "^27.0.2",
     "yargs": "^18.0.0"
