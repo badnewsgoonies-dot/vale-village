@@ -1370,9 +1370,10 @@ export const FIZZ_AQUA_BARRIER = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 1,
-  description: 'Create a protective barrier of flowing water.',
+  description: 'Create a protective barrier of flowing water that resists Mars psynergy.',
   buffEffect: { def: 6 },
   duration: 3,
+  elementalResistance: { element: 'Mars', modifier: 0.25 },
 });
 
 export const FIZZ_FROST_STORM = makeAbility({
@@ -1408,7 +1409,9 @@ export const FIZZ_HEALING_WAVE = makeAbility({
   basePower: 42,
   targets: 'all-allies',
   unlockLevel: 1,
-  description: 'Restore health to all allies with gentle waves.',
+  description: 'Restore health to all allies, cleanse negatives, and grant short burn/poison immunity.',
+  removeStatusEffects: { type: 'negative' },
+  grantImmunity: { all: false, types: ['burn', 'poison'], duration: 1 },
 });
 
 export const FIZZ_AQUA_HEAL = makeAbility({
@@ -1501,9 +1504,11 @@ export const TONIC_AQUA_FORTRESS = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Erect an impenetrable aqua fortress.',
+  description: 'Erect an aqua fortress that reduces damage and grants a single-use shield.',
   buffEffect: { def: 8 },
   duration: 3,
+  damageReductionPercent: 0.25,
+  shieldCharges: 1,
 });
 
 export const TONIC_FROST_BLAST = makeAbility({
@@ -1551,7 +1556,8 @@ export const TONIC_AQUA_RESTORE = makeAbility({
   basePower: 55,
   targets: 'all-allies',
   unlockLevel: 2,
-  description: 'Restore health to all allies with aqua energy.',
+  description: 'Restore health to all allies while granting burn immunity for 2 turns.',
+  grantImmunity: { all: false, types: ['burn'], duration: 2 },
 });
 
 export const TONIC_ICE_SHIELD = makeAbility({
@@ -1631,9 +1637,11 @@ export const CRYSTAL_AQUA_TITAN = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 3,
-  description: 'Become an aqua titan, massively boosting defense.',
+  description: 'Become an aqua titan, massively boosting defense while adding shields and damage reduction.',
   buffEffect: { def: 12 },
   duration: 3,
+  damageReductionPercent: 0.25,
+  shieldCharges: 2,
 });
 
 export const CRYSTAL_ICE_APOCALYPSE = makeAbility({
@@ -1694,7 +1702,9 @@ export const CRYSTAL_MIST_BLESSING = makeAbility({
   basePower: 70,
   targets: 'all-allies',
   unlockLevel: 3,
-  description: 'Bless all allies with restorative mist.',
+  description: 'Bless all allies with restorative mist, cleansing negatives and granting short immunity to burn/poison/freeze.',
+  removeStatusEffects: { type: 'negative' },
+  grantImmunity: { all: false, types: ['burn', 'poison', 'freeze'], duration: 1 },
 });
 
 export const CRYSTAL_ICE_TITAN = makeAbility({
@@ -1746,9 +1756,10 @@ export const BREEZE_WIND_VEIL = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 1,
-  description: 'Wrap yourself in wind.',
+  description: 'Wrap yourself in wind that also reduces incoming damage.',
   buffEffect: { def: 5 },
   duration: 3,
+  damageReductionPercent: 0.15,
 });
 
 export const BREEZE_ICE_BURST = makeAbility({
@@ -1772,9 +1783,10 @@ export const BREEZE_AERO_SHIELD = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 1,
-  description: 'Summon a protective breeze shield.',
+  description: 'Summon a protective breeze shield that can absorb a hit.',
   buffEffect: { def: 6 },
   duration: 3,
+  shieldCharges: 1,
 });
 
 export const BREEZE_EDDY_PULSE = makeAbility({
@@ -1810,9 +1822,10 @@ export const SQUALL_HURRICANE_GUARD = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Create a hurricane around yourself.',
+  description: 'Create a hurricane that bolsters defense and reduces incoming damage.',
   buffEffect: { def: 8 },
   duration: 3,
+  damageReductionPercent: 0.2,
 });
 
 export const SQUALL_WAVE_BLAST = makeAbility({
@@ -1872,9 +1885,10 @@ export const STORM_TEMPEST_SHIELD = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 3,
-  description: 'Shield with raging tempest.',
+  description: 'Shield with raging tempest while building resistance to Mercury psynergy.',
   buffEffect: { def: 10 },
   duration: 3,
+  elementalResistance: { element: 'Mercury', modifier: 0.3 },
 });
 
 export const STORM_COLD_HAIL = makeAbility({
@@ -1898,9 +1912,11 @@ export const STORM_ICY_BARRIER = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 3,
-  description: 'Encase self in icy winds.',
+  description: 'Encase self in icy winds, reducing damage and gaining freeze immunity.',
   buffEffect: { def: 9 },
   duration: 3,
+  damageReductionPercent: 0.15,
+  grantImmunity: { all: false, types: ['freeze'], duration: 2 },
 });
 
 export const STORM_BREEZE_PULSE = makeAbility({
@@ -1912,7 +1928,8 @@ export const STORM_BREEZE_PULSE = makeAbility({
   basePower: 55,
   targets: 'single-enemy',
   unlockLevel: 3,
-  description: 'Pulse of concentrated breeze.',
+  description: 'Pulse of concentrated breeze that splashes to nearby foes.',
+  splashDamagePercent: 0.3,
 });
 
 export const DJINN_ABILITIES: Record<string, Ability> = {
