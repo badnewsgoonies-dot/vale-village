@@ -94,7 +94,23 @@ export function QueueBattleView() {
     const countdownText = timer !== undefined ? ` (${timer} rounds left)` : '';
     return `${djinnName} is ${state}${countdownText}`;
   };
-  const isQueueComplete = battle.queuedActions.every(a => a !== null);
+
+  // Phase 2 Fix #3: Robust canExecute check
+  // Check: in planning phase, mana budget OK, all non-KO units have actions
+  const totalQueuedManaCost = battle.queuedActions
+    .filter((action): action is NonNullable<typeof action> => action != null)
+    .reduce((sum, action) => sum + action.manaCost, 0);
+  const isOverBudget = totalQueuedManaCost > battle.maxMana;
+
+  const isQueueComplete =
+    battle.phase === 'planning' &&
+    !isOverBudget &&
+    battle.playerTeam.units.every((unit, idx) => {
+      const isKo = unit.currentHp <= 0;
+      const action = battle.queuedActions[idx];
+      const hasAction = action != null;
+      return isKo || hasAction;
+    });
 
   const handleAbilitySelect = (abilityId: string | null) => {
     setSelectedAbility(abilityId);
@@ -140,8 +156,9 @@ export function QueueBattleView() {
       queueUnitAction(selectedUnitIndex, selectedAbility, selectedTargets, ability);
       setSelectedAbility(null);
       setSelectedTargets([]);
-      // Move to next unit if not last
-      if (selectedUnitIndex < MAX_QUEUE_SIZE - 1) {
+      // Phase 2 Fix #1: Use actual party size instead of hard-coded MAX_QUEUE_SIZE
+      const unitCount = battle.playerTeam.units.length;
+      if (selectedUnitIndex < unitCount - 1) {
         setSelectedUnitIndex(selectedUnitIndex + 1);
       }
     } catch (error) {
@@ -153,7 +170,8 @@ export function QueueBattleView() {
 
   const handleExecuteRound = () => {
     if (!isQueueComplete) {
-      alert('Please queue actions for all 4 units first');
+      const unitCount = battle.playerTeam.units.length;
+      alert(`Please queue actions for all ${unitCount} units first`);
       return;
     }
     executeQueuedRound();
@@ -174,7 +192,11 @@ export function QueueBattleView() {
           marginBottom: '1rem',
         }}
       >
-        <ManaCirclesBar remainingMana={battle.remainingMana} maxMana={battle.maxMana} />
+        {/* Phase 2 Fix #2: Clamp remaining mana to not go negative */}
+        <ManaCirclesBar
+          remainingMana={Math.max(0, battle.remainingMana)}
+          maxMana={battle.maxMana}
+        />
         <DjinnBar
           team={battle.playerTeam}
           queuedDjinn={battle.queuedDjinn}

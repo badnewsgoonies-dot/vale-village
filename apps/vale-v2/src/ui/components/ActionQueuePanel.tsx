@@ -6,6 +6,7 @@
 import * as React from 'react';
 import type { BattleState } from '../../core/models/BattleState';
 import { ABILITIES } from '../../data/definitions/abilities';
+import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
 
 interface ActionQueuePanelProps {
   battle: BattleState;
@@ -52,8 +53,9 @@ export function ActionQueuePanel({ battle, onClearAction, className, style }: Ac
           const unit = playerTeam.units[index];
           if (!unit) return null;
 
+          // Phase 3: Lookup ability from both ABILITIES and DJINN_ABILITIES
           const ability = action?.abilityId
-            ? ABILITIES[action.abilityId] ?? null
+            ? ABILITIES[action.abilityId] ?? DJINN_ABILITIES[action.abilityId] ?? null
             : null;
 
           return (
