@@ -1,19 +1,26 @@
 import { describe, expect, test } from 'vitest';
-import { applyHealing, calculateHealAmount } from '../../../src/core/algorithms/damage';
-import { applyStatusToUnit, isNegativeStatus, processStatusEffectTick } from '../../../src/core/algorithms/status';
+import { applyStatusToUnit, processStatusEffectTick } from '../../../src/core/algorithms/status';
 import { createTeam } from '../../../src/core/models/Team';
 import type { Unit } from '../../../src/core/models/Unit';
-import { createUnit, calculateMaxHp } from '../../../src/core/models/Unit';
+import { createUnit } from '../../../src/core/models/Unit';
 import { UNIT_DEFINITIONS } from '../../../src/data/definitions/units';
 import { FIZZ_HEALING_WAVE } from '../../../src/data/definitions/djinnAbilities';
 import { makePRNG } from '../../../src/core/random/prng';
+import { performAction } from '../../../src/core/services/BattleService';
+import { createBattleState } from '../../../src/core/models/BattleState';
 
 describe('Mercury Djinn Phase 2 Integration', () => {
-  test('Healing Wave heals, cleanses negatives, and grants temporary immunity', () => {
+  test('Healing Wave heals, cleanses negatives, and grants temporary immunity via executeAbility', () => {
     const caster = createUnit(UNIT_DEFINITIONS.mystic, 1);
     const rawAllyA = createUnit(UNIT_DEFINITIONS.adept, 1);
     const rawAllyB = createUnit(UNIT_DEFINITIONS.ranger, 1);
     const filler = createUnit(UNIT_DEFINITIONS['war-mage'], 1);
+
+    // Add ability to caster
+    const casterWithAbility: Unit = {
+      ...caster,
+      abilities: [...caster.abilities, FIZZ_HEALING_WAVE],
+    };
 
     const allyA: Unit = {
       ...rawAllyA,
@@ -35,62 +42,63 @@ describe('Mercury Djinn Phase 2 Integration', () => {
       ],
     };
 
-    const team = createTeam([caster, allyA, allyB, filler]);
-    const healAmount = calculateHealAmount(caster, team, FIZZ_HEALING_WAVE);
+    const team = createTeam([casterWithAbility, allyA, allyB, filler]);
+    const enemies = [createUnit(UNIT_DEFINITIONS.sentinel, 1)];
+    const battleState = createBattleState(team, enemies);
+    const rng = makePRNG(42);
 
-    const healedA = applyHealing(allyA, healAmount);
-    const healedB = applyHealing(allyB, healAmount);
+    // Execute ability through performAction (which calls executeAbility internally)
+    const { result } = performAction(
+      battleState,
+      casterWithAbility.id,
+      FIZZ_HEALING_WAVE.id,
+      [allyA.id, allyB.id],
+      rng
+    );
 
-    const maxHpA = calculateMaxHp(healedA);
-    const maxHpB = calculateMaxHp(healedB);
+    // Find updated units
+    const updatedAllyA = result.updatedUnits.find(u => u.id === allyA.id);
+    const updatedAllyB = result.updatedUnits.find(u => u.id === allyB.id);
 
-    expect(healAmount).toBeGreaterThan(0);
-    expect(healedA.currentHp - allyA.currentHp).toBe(healAmount);
-    expect(healedB.currentHp).toBe(maxHpB);
+    expect(updatedAllyA).toBeDefined();
+    expect(updatedAllyB).toBeDefined();
 
-    const cleanseNegativeStatuses = (unit: Unit) => ({
-      ...unit,
-      statusEffects: unit.statusEffects.filter(status => !isNegativeStatus(status)),
-    });
+    if (!updatedAllyA || !updatedAllyB) return;
 
-    const cleansedA = cleanseNegativeStatuses(healedA);
-    const cleansedB = cleanseNegativeStatuses(healedB);
+    // Verify healing occurred
+    expect(updatedAllyA.currentHp).toBeGreaterThan(allyA.currentHp);
+    expect(updatedAllyB.currentHp).toBeGreaterThan(allyB.currentHp);
 
-    const immunityStatus = {
-      type: 'immunity',
-      all: false,
-      types: ['burn', 'poison'] as const,
-      duration: 1,
-    };
+    // Verify negative statuses were cleansed (Phase 2: removeStatusEffects)
+    expect(updatedAllyA.statusEffects.some(status => status.type === 'burn')).toBe(false);
+    expect(updatedAllyA.statusEffects.some(status => status.type === 'poison')).toBe(false);
+    expect(updatedAllyB.statusEffects.some(status => status.type === 'freeze')).toBe(false);
+    expect(updatedAllyB.statusEffects.some(status => status.type === 'debuff')).toBe(false);
 
-    const withImmunityA = applyStatusToUnit(cleansedA, immunityStatus);
-    const withImmunityB = applyStatusToUnit(cleansedB, immunityStatus);
+    // Verify positive statuses were preserved
+    expect(updatedAllyA.statusEffects.some(status => status.type === 'buff')).toBe(true);
+    expect(updatedAllyB.statusEffects.some(status => status.type === 'healOverTime')).toBe(true);
 
-    expect(withImmunityA.statusEffects.some(status => status.type === 'buff')).toBe(true);
-    expect(withImmunityB.statusEffects.some(status => status.type === 'healOverTime')).toBe(true);
-    expect(withImmunityA.statusEffects.some(status =>
-      ['burn', 'poison', 'freeze', 'debuff'].includes(status.type)
-    )).toBe(false);
+    // Verify immunity was granted (Phase 2: grantImmunity)
+    const immunityA = updatedAllyA.statusEffects.find(status => status.type === 'immunity');
+    expect(immunityA).toBeDefined();
+    if (immunityA && immunityA.type === 'immunity') {
+      expect(immunityA.all).toBe(false);
+      expect(immunityA.types).toEqual(['burn', 'poison']);
+      expect(immunityA.duration).toBe(1);
+    }
 
-    const immunity = withImmunityA.statusEffects.find(status => status.type === 'immunity');
-    expect(immunity).toMatchObject({ all: false, types: ['burn', 'poison'], duration: 1 });
+    // Verify immunity blocks burn/poison
+    const blockedBurn = applyStatusToUnit(updatedAllyA, { type: 'burn', duration: 2 });
+    expect(blockedBurn.statusEffects.filter(status => status.type === 'burn')).toHaveLength(0);
 
-    const blocked = applyStatusToUnit(withImmunityA, { type: 'burn', duration: 2 });
-    expect(blocked.statusEffects.filter(status => status.type === 'burn')).toHaveLength(0);
+    // Verify immunity expires after duration
+    let ticking = updatedAllyA;
+    ticking = processStatusEffectTick(ticking, makePRNG(7)).updatedUnit;
+    expect(ticking.statusEffects.some(status => status.type === 'immunity')).toBe(false);
 
-    const { updatedUnit: afterTick } = processStatusEffectTick(withImmunityA, makePRNG(42));
-    expect(afterTick.statusEffects.some(status => status.type === 'immunity')).toBe(false);
-
-    const appliedAfterExpiration = applyStatusToUnit(afterTick, { type: 'burn', duration: 2 });
+    // Verify status can be applied after immunity expires
+    const appliedAfterExpiration = applyStatusToUnit(ticking, { type: 'burn', duration: 2 });
     expect(appliedAfterExpiration.statusEffects.filter(status => status.type === 'burn')).toHaveLength(1);
-
-    const reCleaned = {
-      ...appliedAfterExpiration,
-      statusEffects: appliedAfterExpiration.statusEffects.filter(status => !isNegativeStatus(status)),
-    };
-    const reImmunized = applyStatusToUnit(reCleaned, immunityStatus);
-    expect(reImmunized.statusEffects.some(status => status.type === 'buff')).toBe(true);
-    expect(reImmunized.statusEffects.filter(status => status.type === 'burn')).toHaveLength(0);
-    expect(reImmunized.statusEffects.some(status => status.type === 'immunity')).toBe(true);
   });
 });
