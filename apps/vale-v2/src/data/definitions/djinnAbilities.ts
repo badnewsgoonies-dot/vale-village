@@ -75,9 +75,10 @@ export const GRANITE_EARTH_WALL = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Raise an earthen wall around yourself.',
+  description: 'Raise an earthen wall, granting strong Venus resistance.',
   buffEffect: { def: 8 },
   duration: 3,
+  elementalResistance: { element: 'Venus', modifier: 0.4 },
 });
 
 export const GRANITE_TERRA_BREAK = makeAbility({
@@ -772,9 +773,10 @@ export const FLINT_TERRA_ARMOR = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 1,
-  description: 'Encase yourself in hardened earth armor.',
+  description: 'Encase yourself in hardened earth armor, reducing incoming damage.',
   buffEffect: { def: 6 },
   duration: 3,
+  damageReductionPercent: 0.15,
 });
 
 export const FLINT_EARTHQUAKE_PUNCH = makeAbility({
@@ -824,9 +826,10 @@ export const FLINT_GROUND_SHIELD = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 1,
-  description: 'Raise a protective earth barrier.',
+  description: 'Raise a protective earth barrier that blocks 1 hit.',
   buffEffect: { def: 4 },
   duration: 3,
+  shieldCharges: 1,
 });
 
 export const FLINT_ROCK_BARRAGE = makeAbility({
@@ -915,9 +918,10 @@ export const GRANITE_STONE_FORTRESS = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Erect an impenetrable stone fortress around yourself.',
+  description: 'Erect an impenetrable stone fortress, greatly reducing damage.',
   buffEffect: { def: 9 },
   duration: 3,
+  damageReductionPercent: 0.4,
 });
 
 export const GRANITE_MAGMA_BLAST = makeAbility({
@@ -941,9 +945,10 @@ export const GRANITE_VOLCANIC_ARMOR = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Envelop yourself in hardened volcanic rock.',
+  description: 'Envelop yourself in hardened volcanic rock, reducing damage.',
   buffEffect: { def: 7 },
   duration: 3,
+  damageReductionPercent: 0.25,
 });
 
 export const GRANITE_GROUND_WAVE = makeAbility({
@@ -967,9 +972,10 @@ export const GRANITE_ROCK_SHIELD = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Form a protective barrier of solid rock.',
+  description: 'Form a protective barrier of solid rock with Venus resistance.',
   buffEffect: { def: 5 },
   duration: 3,
+  elementalResistance: { element: 'Venus', modifier: 0.25 },
 });
 
 export const GRANITE_TERRA_HEAL = makeAbility({
@@ -1047,9 +1053,11 @@ export const BANE_STONE_TITAN = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 3,
-  description: 'Transform into a titan of stone and earth.',
+  description: 'Transform into a titan of stone with layered defenses.',
   buffEffect: { def: 12 },
   duration: 3,
+  shieldCharges: 2,
+  damageReductionPercent: 0.3,
 });
 
 export const BANE_MOLTEN_TORRENT = makeAbility({
@@ -1097,7 +1105,8 @@ export const BANE_TERRA_PULSE = makeAbility({
   basePower: 70,
   targets: 'single-enemy',
   unlockLevel: 3,
-  description: 'Release a concentrated pulse of terra energy.',
+  description: 'Release a concentrated pulse that bypasses armor.',
+  ignoreDefensePercent: 0.5,
 });
 
 export const BANE_EARTH_REVIVAL = makeAbility({
@@ -1135,8 +1144,9 @@ export const BANE_TERRA_BLESSING = makeAbility({
   basePower: 70,
   targets: 'all-allies',
   unlockLevel: 3,
-  description: 'Bless all allies with earth\'s protective embrace.',
-  duration: 3,
+  description: 'Bless all allies with healing, cleansing, and brief immunity.',
+  removeStatusEffects: { type: 'negative' },
+  grantImmunity: { all: true, duration: 1 },
 });
 
 export const FIZZ_ICE_SHARD = makeAbility({

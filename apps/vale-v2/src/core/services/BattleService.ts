@@ -263,7 +263,51 @@ function applyPhase2Effects(
       };
     }
 
-    // 2. Status cleanse
+    // 2. Damage reduction granting
+    if (ability.damageReductionPercent !== undefined) {
+      const damageReductionStatus: Extract<typeof target.statusEffects[number], { type: 'damageReduction' }> = {
+        type: 'damageReduction',
+        percent: ability.damageReductionPercent,
+        duration: ability.duration || 3,
+      };
+
+      modifiedTarget = {
+        ...modifiedTarget,
+        statusEffects: [...modifiedTarget.statusEffects, damageReductionStatus],
+      };
+    }
+
+    // 3. Elemental resistance granting
+    if (ability.elementalResistance) {
+      const elementalResistanceStatus: Extract<typeof target.statusEffects[number], { type: 'elementalResistance' }> = {
+        type: 'elementalResistance',
+        element: ability.elementalResistance.element,
+        modifier: ability.elementalResistance.modifier,
+        duration: ability.duration || 3,
+      };
+
+      modifiedTarget = {
+        ...modifiedTarget,
+        statusEffects: [...modifiedTarget.statusEffects, elementalResistanceStatus],
+      };
+    }
+
+    // 4. Immunity granting
+    if (ability.grantImmunity) {
+      const immunityStatus: Extract<typeof target.statusEffects[number], { type: 'immunity' }> = {
+        type: 'immunity',
+        all: ability.grantImmunity.all,
+        types: ability.grantImmunity.types,
+        duration: ability.grantImmunity.duration,
+      };
+
+      modifiedTarget = {
+        ...modifiedTarget,
+        statusEffects: [...modifiedTarget.statusEffects, immunityStatus],
+      };
+    }
+
+    // 5. Status cleanse
     if (ability.removeStatusEffects) {
       const removeSpec = ability.removeStatusEffects;
       let filteredStatuses = modifiedTarget.statusEffects;
