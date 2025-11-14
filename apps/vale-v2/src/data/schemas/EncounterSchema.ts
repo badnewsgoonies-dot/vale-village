@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Zod schema for Encounter rules
- * Encounters can have special rules like phase changes, flee restrictions, etc.
+ * Encounters can have special rules like phase changes, etc.
  */
 export const EncounterRulesSchema = z.object({
   phaseChange: z
@@ -11,7 +11,6 @@ export const EncounterRulesSchema = z.object({
       addAbility: z.string().min(1), // Ability ID to add at phase change
     })
     .optional(),
-  fleeDisabled: z.boolean().optional(),
 });
 
 const equipmentOptionsUnique = (options: readonly string[]) => new Set(options).size === options.length;

@@ -226,9 +226,6 @@ export const HOUSE_15_STORMCALLER: Encounter = {
   name: 'House 15: The Lightning Commander',
   enemies: ['lightning-commander', 'storm-elemental', 'jupiter-bear'],
   difficulty: 'boss',
-  rules: {
-    fleeDisabled: true,
-  },
   reward: {
     xp: 300,
     gold: 90,
@@ -245,9 +242,6 @@ export const HOUSE_16_TONIC: Encounter = {
   name: 'House 16: The Mountain\'s Shadow',
   enemies: ['mountain-commander', 'basilisk', 'rock-elemental'],
   difficulty: 'boss',
-  rules: {
-    fleeDisabled: true,
-  },
   reward: {
     xp: 320,
     gold: 90,
@@ -261,9 +255,6 @@ export const HOUSE_17_WARLORDS: Encounter = {
   name: 'House 17: Warlord Duo',
   enemies: ['fire-commander', 'volcano-warlord'],
   difficulty: 'boss',
-  rules: {
-    fleeDisabled: true,
-  },
   reward: {
     xp: 380,
     gold: 100,
@@ -279,9 +270,6 @@ export const HOUSE_18_BANE: Encounter = {
   name: 'House 18: Hydra\'s Lair',
   enemies: ['storm-commander', 'hydra'],
   difficulty: 'boss',
-  rules: {
-    fleeDisabled: true,
-  },
   reward: {
     xp: 400,
     gold: 110,
@@ -295,9 +283,6 @@ export const HOUSE_19_FURY: Encounter = {
   name: 'House 19: Warlords\' Last Stand',
   enemies: ['granite-warlord', 'blizzard-warlord'],
   difficulty: 'boss',
-  rules: {
-    fleeDisabled: true,
-  },
   reward: {
     xp: 480,
     gold: 120,
@@ -312,7 +297,6 @@ export const HOUSE_20_OVERSEER: Encounter = {
   enemies: ['overseer', 'chimera', 'tempest-warlord'],
   difficulty: 'boss',
   rules: {
-    fleeDisabled: true,
     phaseChange: {
       hpPct: 0.5, // At 50% HP, Overseer gets enraged
       addAbility: 'party-heal', // Overseer can heal at 50%

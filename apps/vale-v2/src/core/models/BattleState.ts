@@ -12,7 +12,7 @@ import { mergeDjinnAbilitiesIntoUnit } from '../algorithms/djinnAbilities';
 /**
  * Battle result types
  */
-export type BattleResult = 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | 'PLAYER_FLEE';
+export type BattleResult = 'PLAYER_VICTORY' | 'PLAYER_DEFEAT';
 
 /**
  * Battle status (ongoing or ended)
@@ -93,7 +93,7 @@ export interface BattleProgress {
  * Context information about the battle encounter
  */
 export interface BattleMetadata {
-  /** Is this a boss battle? (cannot flee) */
+  /** Is this a boss battle? (used for difficulty/rewards/UX) */
   readonly isBossBattle?: boolean;
   /** NPC ID that triggered this battle (for post-battle cutscene) */
   readonly npcId?: string;

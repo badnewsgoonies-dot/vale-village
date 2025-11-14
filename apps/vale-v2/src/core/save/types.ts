@@ -51,7 +51,7 @@ export interface SaveEnvelope {
  * Player command - input from player
  */
 export interface PlayerCommand {
-  type: 'ability' | 'end-turn' | 'flee';
+  type: 'ability' | 'end-turn';
   turn: number;
   actorId: string;
   abilityId?: string;

@@ -62,11 +62,9 @@ export function createBattleFromEncounter(
     encounterId: encounter.id, // Legacy field
     meta: {
       encounterId: encounter.id,
-      difficulty: encounter.rules?.fleeDisabled 
-        ? (encounter.id.includes('boss') ? 'boss' : 'elite')
-        : 'normal',
+      difficulty: encounter.difficulty === 'boss' ? 'boss' : 'normal',
     },
-    isBossBattle: encounter.rules?.fleeDisabled ?? false,
+    isBossBattle: encounter.difficulty === 'boss',
   };
 
   return { battle: battleWithMeta, encounter };
