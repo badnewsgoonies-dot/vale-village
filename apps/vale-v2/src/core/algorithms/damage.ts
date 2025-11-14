@@ -324,7 +324,9 @@ export function applyDamageWithShields(
   // 4. Check for auto-revive if unit is KO'd
   const { updatedUnit: finalUnit, revived } = checkAutoRevive(updatedUnit);
 
-  return { updatedUnit: finalUnit, actualDamage: damage, autoRevived: revived };
+  return revived
+    ? { updatedUnit: finalUnit, actualDamage: damage, autoRevived: true }
+    : { updatedUnit: finalUnit, actualDamage: damage };
 }
 
 /**
