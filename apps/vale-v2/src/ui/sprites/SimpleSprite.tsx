@@ -301,7 +301,7 @@ export function SimpleSprite({
           width: '100%',
           height: '100%',
           objectFit,
-          imageRendering,
+          imageRendering: imageRendering as React.CSSProperties['imageRendering'],
           display: 'block',
         }}
         onLoad={handleLoad}
@@ -309,7 +309,7 @@ export function SimpleSprite({
       />
       
       {/* Debug info overlay */}
-      {debug && showDebugInfo && spriteEntry && (
+      {debug && showDebugInfo && spriteEntry && spriteEntry.entry && (
         <div
           style={{
             position: 'absolute',

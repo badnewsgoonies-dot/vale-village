@@ -169,8 +169,6 @@ export const createSaveSlice: StateCreator<
       story: {
         chapter: 1, // Will be updated when chapter tracking is added
         flags: saveData.playerData.storyFlags,
-        currentEncounter: null,
-        encountersCompleted: [],
       },
     });
 
@@ -312,8 +310,6 @@ export const createSaveSlice: StateCreator<
       story: {
         chapter: 1, // Will be updated when chapter tracking is added
         flags: saveData.playerData.storyFlags,
-        currentEncounter: null,
-        encountersCompleted: [],
       },
     });
 

@@ -34,7 +34,7 @@ function isBasicAttack(action: QueuedAction): boolean {
 
 function shouldGenerateMana(
   action: QueuedAction,
-  actionResult: PerformActionResult
+  __actionResult: PerformActionResult
 ): boolean {
   return isBasicAttack(action);
 }

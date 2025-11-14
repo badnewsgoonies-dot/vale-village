@@ -39,6 +39,7 @@ export const HOUSE_02_FLINT: Encounter = {
   reward: {
     xp: 60,
     gold: 19,
+    equipment: { type: 'none' },
     djinn: 'flint', // Venus T1 Djinn
   },
 };
@@ -66,6 +67,7 @@ export const HOUSE_04_BREEZE: Encounter = {
   reward: {
     xp: 65,
     gold: 19,
+    equipment: { type: 'none' },
     djinn: 'breeze', // Jupiter T1 Djinn
   },
 };
@@ -93,6 +95,7 @@ export const HOUSE_06_FORGE: Encounter = {
   reward: {
     xp: 105,
     gold: 34,
+    equipment: { type: 'none' },
     djinn: 'forge', // Mars T1 Djinn
   },
 };
@@ -124,6 +127,7 @@ export const HOUSE_08_SENTINEL_FIZZ: Encounter = {
   reward: {
     xp: 180,
     gold: 50,
+    equipment: { type: 'none' },
     djinn: 'fizz', // Mercury T1 Djinn
     unlockUnit: 'sentinel', // Recruit Sentinel
   },
@@ -152,6 +156,7 @@ export const HOUSE_10_GRANITE: Encounter = {
   reward: {
     xp: 200,
     gold: 52,
+    equipment: { type: 'none' },
     djinn: 'granite', // Venus T2 Djinn - POWER SPIKE
   },
 };
@@ -179,6 +184,7 @@ export const HOUSE_12_SQUALL: Encounter = {
   reward: {
     xp: 225,
     gold: 78,
+    equipment: { type: 'none' },
     djinn: 'squall', // Jupiter T2 Djinn
   },
 };
@@ -206,6 +212,7 @@ export const HOUSE_14_CORONA: Encounter = {
   reward: {
     xp: 230,
     gold: 48,
+    equipment: { type: 'none' },
     djinn: 'corona', // Mars T2 Djinn
   },
 };
@@ -244,6 +251,7 @@ export const HOUSE_16_TONIC: Encounter = {
   reward: {
     xp: 320,
     gold: 90,
+    equipment: { type: 'none' },
     djinn: 'tonic', // Mercury T2 Djinn
   },
 };
@@ -277,6 +285,7 @@ export const HOUSE_18_BANE: Encounter = {
   reward: {
     xp: 400,
     gold: 110,
+    equipment: { type: 'none' },
     djinn: 'bane', // Venus T3 Djinn
   },
 };
@@ -292,6 +301,7 @@ export const HOUSE_19_FURY: Encounter = {
   reward: {
     xp: 480,
     gold: 120,
+    equipment: { type: 'none' },
     djinn: 'fury', // Mars T3 Djinn
   },
 };

@@ -14,9 +14,8 @@ interface PartyManagementScreenProps {
 }
 
 export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
-  const { team, setTeam, swapPartyMember } = useStore((s) => ({
+  const { team, swapPartyMember } = useStore((s) => ({
     team: s.team,
-    setTeam: s.setTeam,
     swapPartyMember: s.swapPartyMember,
   }));
 
@@ -94,7 +93,6 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
             <div className="party-grid">
               {activeParty.map((unit, index) => {
                 const isSelected = selectedUnitIndex === index;
-                const unitDef = UNIT_DEFINITIONS[unit.id];
 
                 return (
                   <div

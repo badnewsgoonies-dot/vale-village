@@ -15,7 +15,7 @@ import type { Enemy } from '../../data/schemas/EnemySchema';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
 import type { Encounter } from '../../data/schemas/EncounterSchema';
-import type { Unit } from '../models/Unit';
+// Unused import: import type { Unit } from .../models/Unit
 
 /**
  * Balance warning
@@ -70,9 +70,6 @@ export function validateContentBalance(content: {
  */
 function validateEnemyBalance(id: string, enemy: Enemy): BalanceWarning[] {
   const warnings: BalanceWarning[] = [];
-
-  // Calculate enemy "power" (rough metric)
-  const power = enemy.stats.hp + enemy.stats.atk + enemy.stats.def;
 
   // ATK too high relative to HP (glass cannon)
   if (enemy.stats.atk > enemy.stats.hp * 0.5) {
@@ -427,8 +424,8 @@ function validateEncounterBalance(
 
   // Calculate total encounter power
   let totalPower = 0;
-  for (const enemyRef of encounter.enemies) {
-    const enemyDef = enemyDefinitions[enemyRef.id];
+  for (const enemyId of encounter.enemies) {
+    const enemyDef = enemyDefinitions[enemyId];
     if (enemyDef) {
       const power = enemyDef.stats.hp + enemyDef.stats.atk + enemyDef.stats.def;
       totalPower += power;

@@ -253,7 +253,7 @@ export function BackgroundSprite({
       />
       
       {/* Debug info overlay */}
-      {debug && showDebugInfo && spriteEntry && (
+      {debug && showDebugInfo && spriteEntry && spriteEntry.entry && (
         <div
           style={{
             position: 'absolute',

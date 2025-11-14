@@ -45,13 +45,19 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
   collectedDjinn.forEach((djinnId) => {
     const djinn = DJINN[djinnId];
     if (djinn) {
-      djinnByElement[djinn.element].push(djinn);
+      const elementList = djinnByElement[djinn.element];
+      if (elementList) {
+        elementList.push(djinn);
+      }
     }
   });
 
-  // Sort by tier within each element
+  // Sort by tier within each element (convert string tier to number for comparison)
   Object.keys(djinnByElement).forEach((element) => {
-    djinnByElement[element].sort((a, b) => a.tier - b.tier);
+    const elementList = djinnByElement[element];
+    if (elementList) {
+      elementList.sort((a, b) => parseInt(a.tier, 10) - parseInt(b.tier, 10));
+    }
   });
 
   const getElementColor = (element: string): string => {

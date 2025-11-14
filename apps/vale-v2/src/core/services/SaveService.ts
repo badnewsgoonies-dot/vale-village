@@ -329,11 +329,8 @@ function loadProgressFromBackup(slot: number, mainError?: string): Result<SaveV1
  */
 export function saveBattle(state: BattleState): Result<void, string> {
   try {
-    // Remove unitById (Map can't be JSON serialized, will be rebuilt on load)
-    const { unitById, ...serializable } = state;
-
-    // Validate battle state (without unitById)
-    const validationResult = BattleStateSchema.safeParse(serializable);
+    // Validate battle state
+    const validationResult = BattleStateSchema.safeParse(state);
     if (!validationResult.success) {
       return Err(`Invalid battle state: ${validationResult.error.message}`);
     }

@@ -29,7 +29,6 @@ export const HOUSE_01_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Let\'s see how confident you are after I free that wolf from your control.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-01' },
     },
     {
       id: 'post-battle',
@@ -43,7 +42,6 @@ export const HOUSE_01_DIALOGUE: DialogueTree = {
       speaker: 'Freed Villager',
       text: 'Thank you! They\'ve been enslaving both people and beasts. There are 19 more houses like this in the village. Please, help us!',
       portrait: 'villager',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -65,7 +63,6 @@ export const HOUSE_02_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*smirks* Fire, huh? Good thing I brought earth magic. Rock beats flame scout, right?',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-02' },
     },
     {
       id: 'post-battle',
@@ -78,8 +75,7 @@ export const HOUSE_02_DIALOGUE: DialogueTree = {
       id: 'djinn-found',
       speaker: 'Narrator',
       text: 'You discovered Flint, the Venus Djinni! Flint joins your team, granting powerful earth abilities.',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'flint' },
+      
       nextNodeId: 'djinn-explains',
     },
     {
@@ -87,7 +83,6 @@ export const HOUSE_02_DIALOGUE: DialogueTree = {
       speaker: 'Flint',
       text: '*rumbles* I was trapped here by those slavers. Thanks for the rescue, Isaac! Let\'s crush some more of them!',
       portrait: 'djinn-venus',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -109,14 +104,12 @@ export const HOUSE_03_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*groans* Did you really just make an ice pun? That\'s it, you\'re going down.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-03' },
     },
     {
       id: 'post-battle',
       speaker: 'Isaac',
       text: 'Another house freed. The villagers say there\'s a pattern - scouts guard the outer houses, but stronger enemies wait deeper in.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -138,7 +131,6 @@ export const HOUSE_04_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Fast doesn\'t matter if I can predict where you\'ll be. Let\'s go!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-04' },
     },
     {
       id: 'post-battle',
@@ -151,8 +143,7 @@ export const HOUSE_04_DIALOGUE: DialogueTree = {
       id: 'djinn-found',
       speaker: 'Narrator',
       text: 'You discovered Breeze, the Jupiter Djinni! Breeze joins your team with swift wind magic.',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'breeze' },
+      
       nextNodeId: 'breeze-intro',
     },
     {
@@ -160,7 +151,6 @@ export const HOUSE_04_DIALOGUE: DialogueTree = {
       speaker: 'Breeze',
       text: '*whoosh* Finally free! That scout was using my power to amplify his speed. Now I\'m YOUR wind, Isaac!',
       portrait: 'djinn-jupiter',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -189,14 +179,12 @@ export const HOUSE_05_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*sigh* Great, the slavers have a training program now. Let\'s see how well that works.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-05' },
     },
     {
       id: 'post-battle',
       speaker: 'Isaac',
       text: 'Their "teamwork" lasted about 30 seconds. Five houses down, fifteen to go.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -218,7 +206,6 @@ export const HOUSE_06_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'A Mountain Bear under your control? That\'s a powerful creature. I\'ll have to be careful here.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-06' },
     },
     {
       id: 'post-battle',
@@ -231,8 +218,7 @@ export const HOUSE_06_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Forge, the Mars Djinni! Forge ignites with fiery power!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'forge' },
+      
       nextNodeId: 'forge-excited',
     },
     {
@@ -240,7 +226,6 @@ export const HOUSE_06_DIALOGUE: DialogueTree = {
       speaker: 'Forge',
       text: '*crackles* FINALLY! I\'ve been itching to burn down some slavers! Let me at \'em, Isaac!',
       portrait: 'djinn-mars',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -262,14 +247,12 @@ export const HOUSE_07_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Your commander SHOULD be nervous. This ends today.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-07' },
     },
     {
       id: 'post-battle',
       speaker: 'Isaac',
       text: 'Seven down. The next house... I sense something different. A powerful presence. Another ally, perhaps?',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -295,7 +278,6 @@ export const HOUSE_08_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'You enslaved an ADEPT? That\'s it. I\'m ending this NOW.',
       portrait: 'isaac-angry',
-      action: { type: 'START_BATTLE', encounterId: 'house-08' },
     },
     {
       id: 'post-battle',
@@ -316,15 +298,13 @@ export const HOUSE_08_DIALOGUE: DialogueTree = {
       speaker: 'Sentinel',
       text: 'I saw what you did. Seven houses freed. Let me join you, Isaac. Together, we\'ll liberate this entire village!',
       portrait: 'sentinel',
-      action: { type: 'RECRUIT_UNIT', unitId: 'sentinel' },
       nextNodeId: 'djinn-appears',
     },
     {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Fizz, the Mercury Djinni! Fizz bubbles with icy energy!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'fizz' },
+      
       nextNodeId: 'fizz-playful',
     },
     {
@@ -332,7 +312,6 @@ export const HOUSE_08_DIALOGUE: DialogueTree = {
       speaker: 'Fizz',
       text: '*bubbles* Heehee! I was hiding from the slavers in the ice elemental! Thanks for the rescue, Isaac and Sentinel!',
       portrait: 'djinn-mercury',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -361,7 +340,6 @@ export const HOUSE_09_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Good plan. Let\'s show them what REAL teamwork looks like.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-09' },
     },
     {
       id: 'post-battle',
@@ -375,7 +353,6 @@ export const HOUSE_09_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'I\'m just doing what\'s right. Let\'s keep moving. We\'re halfway through.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -397,7 +374,6 @@ export const HOUSE_10_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*grips sword* Elite or not, you\'re standing between me and freedom. Let\'s go!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-10' },
     },
     {
       id: 'post-battle',
@@ -410,8 +386,7 @@ export const HOUSE_10_DIALOGUE: DialogueTree = {
       id: 'djinn-emerges',
       speaker: 'Narrator',
       text: 'You discovered Granite, the Venus Djinni! Granite\'s immense power surges through you!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'granite' },
+      
       nextNodeId: 'granite-serious',
     },
     {
@@ -419,7 +394,6 @@ export const HOUSE_10_DIALOGUE: DialogueTree = {
       speaker: 'Granite',
       text: '*rumbles deeply* I am Granite. The captain tried to use my power to enslave earth itself. Thank you for freeing me, Isaac. I will serve you well.',
       portrait: 'djinn-venus',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -448,7 +422,6 @@ export const HOUSE_11_DIALOGUE: DialogueTree = {
       speaker: 'Inferno Captain',
       text: '*laughs* Extinct? Not if you know where to look! Now, face the flames of rebirth!',
       portrait: 'enemy-captain',
-      action: { type: 'START_BATTLE', encounterId: 'house-11' },
     },
     {
       id: 'post-battle',
@@ -462,7 +435,6 @@ export const HOUSE_11_DIALOGUE: DialogueTree = {
       speaker: 'Sentinel',
       text: 'That\'s the power of liberation, Isaac. Even legendary creatures choose freedom when given the chance.',
       portrait: 'sentinel',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -484,7 +456,6 @@ export const HOUSE_12_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Legend or not, it deserves freedom. Let\'s break those chains!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-12' },
     },
     {
       id: 'post-battle',
@@ -497,8 +468,7 @@ export const HOUSE_12_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Squall, the Jupiter Djinni! Squall crackles with storm energy!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'squall' },
+      
       nextNodeId: 'squall-energetic',
     },
     {
@@ -506,7 +476,6 @@ export const HOUSE_12_DIALOGUE: DialogueTree = {
       speaker: 'Squall',
       text: '*zaps* WOO! Freedom feels ELECTRIC! Let\'s keep this storm rolling, Isaac!',
       portrait: 'djinn-jupiter',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -535,14 +504,12 @@ export const HOUSE_13_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'We\'ll find out soon enough. For now, let\'s free this Thunderbird.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-13' },
     },
     {
       id: 'post-battle',
       speaker: 'Isaac',
       text: 'The Thunderbird flew north... toward the final houses. I think it\'s trying to lead us somewhere.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -585,7 +552,6 @@ export const HOUSE_14_DIALOGUE: DialogueTree = {
       speaker: 'Sentinel',
       text: 'We\'ve been doing multi-front combat since House 8. Let\'s show them how it\'s REALLY done.',
       portrait: 'sentinel',
-      action: { type: 'START_BATTLE', encounterId: 'house-14' },
     },
     {
       id: 'post-battle',
@@ -598,8 +564,7 @@ export const HOUSE_14_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Corona, the Mars Djinni! Corona blazes with solar fury!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'corona' },
+      
       nextNodeId: 'corona-confident',
     },
     {
@@ -607,7 +572,6 @@ export const HOUSE_14_DIALOGUE: DialogueTree = {
       speaker: 'Corona',
       text: '*flares brightly* I am Corona, the sun\'s fury! Isaac, Sentinel - together we\'ll burn down the Overseer\'s empire!',
       portrait: 'djinn-mars',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -632,7 +596,7 @@ export const HOUSE_15_DIALOGUE: DialogueTree = {
       id: 'voice-calls-out',
       speaker: '???',
       text: '*from inside the house* Isaac! Is that you?! Help!',
-      portrait: null,
+      
       nextNodeId: 'isaac-recognizes',
     },
     {
@@ -647,7 +611,6 @@ export const HOUSE_15_DIALOGUE: DialogueTree = {
       speaker: 'Lightning Commander',
       text: '*laughs* Oh yes. The Stormcaller. Powerful. Defiant. But ultimately... MINE. If you want them, come and take them!',
       portrait: 'enemy-commander',
-      action: { type: 'START_BATTLE', encounterId: 'house-15' },
     },
     {
       id: 'post-battle',
@@ -668,7 +631,6 @@ export const HOUSE_15_DIALOGUE: DialogueTree = {
       speaker: 'Stormcaller',
       text: 'I came to Vale to help, just like Sentinel. But I underestimated the Overseer. Let me join you. Together, we\'ll END this!',
       portrait: 'stormcaller',
-      action: { type: 'RECRUIT_UNIT', unitId: 'stormcaller' },
       nextNodeId: 'sentinel-welcomes',
     },
     {
@@ -683,7 +645,6 @@ export const HOUSE_15_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Five more houses. Then we face the Overseer. Let\'s finish this.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -712,7 +673,6 @@ export const HOUSE_16_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Good thing we have THREE Adepts now. Sentinel, take the Basilisk. Stormcaller, focus the elemental. I\'ll handle the commander.',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-16' },
     },
     {
       id: 'post-battle',
@@ -725,8 +685,7 @@ export const HOUSE_16_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Tonic, the Mercury Djinni! Tonic flows with healing waters!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'tonic' },
+      
       nextNodeId: 'tonic-gentle',
     },
     {
@@ -734,7 +693,6 @@ export const HOUSE_16_DIALOGUE: DialogueTree = {
       speaker: 'Tonic',
       text: '*flows gently* I am Tonic. I sense your wounds, Isaac. Let me heal you and your allies. We have four more battles ahead.',
       portrait: 'djinn-mercury',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -770,7 +728,6 @@ export const HOUSE_17_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Then we give them full focus. Team, stick to the plan! We\'ve come too far to fall now!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-17' },
     },
     {
       id: 'post-battle',
@@ -784,7 +741,6 @@ export const HOUSE_17_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Three more houses. Then the Overseer. Everyone, rest up. The final battles are ahead.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -813,7 +769,6 @@ export const HOUSE_18_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'We don\'t cut the heads. We free the HEART. The Hydra is enslaved, just like everything else. Let\'s break its chains!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-18' },
     },
     {
       id: 'post-battle',
@@ -826,8 +781,7 @@ export const HOUSE_18_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Bane, the Venus Djinni! Bane rumbles with earthshaking might!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'bane' },
+      
       nextNodeId: 'bane-serious',
     },
     {
@@ -835,7 +789,6 @@ export const HOUSE_18_DIALOGUE: DialogueTree = {
       speaker: 'Bane',
       text: '*rumbles powerfully* I am Bane, destroyer of chains. Isaac, your resolve is admirable. Let us END the Overseer\'s reign. Two battles remain.',
       portrait: 'djinn-venus',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -878,7 +831,6 @@ export const HOUSE_19_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Together! NOW!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-19' },
     },
     {
       id: 'post-battle',
@@ -891,8 +843,7 @@ export const HOUSE_19_DIALOGUE: DialogueTree = {
       id: 'djinn-appears',
       speaker: 'Narrator',
       text: 'You discovered Fury, the Mars Djinni! Fury burns with volcanic rage!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'fury' },
+      
       nextNodeId: 'fury-fierce',
     },
     {
@@ -900,7 +851,6 @@ export const HOUSE_19_DIALOGUE: DialogueTree = {
       speaker: 'Fury',
       text: '*roars with flame* FINALLY! I am Fury! The Overseer imprisoned me to fuel his dark magic! Isaac - BURN HIM DOWN! One battle left!',
       portrait: 'djinn-mars',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };
@@ -950,7 +900,6 @@ export const HOUSE_20_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*draws sword* For Vale. For freedom. FOR EVERYONE YOU\'VE ENSLAVED!',
       portrait: 'isaac',
-      action: { type: 'START_BATTLE', encounterId: 'house-20' },
     },
     {
       id: 'post-battle',
@@ -970,7 +919,7 @@ export const HOUSE_20_DIALOGUE: DialogueTree = {
       id: 'overseer-falls',
       speaker: 'The Overseer',
       text: '*collapses* Vale... is yours... *vanishes*',
-      portrait: null,
+      
       nextNodeId: 'sentinel-celebrates',
     },
     {
@@ -991,8 +940,7 @@ export const HOUSE_20_DIALOGUE: DialogueTree = {
       id: 'djinn-storm-appears',
       speaker: 'Narrator',
       text: 'You discovered Storm, the Jupiter Djinni! Storm swirls with tempest fury!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'storm' },
+      
       nextNodeId: 'storm-triumphant',
     },
     {
@@ -1013,8 +961,7 @@ export const HOUSE_20_DIALOGUE: DialogueTree = {
       id: 'crystal-found',
       speaker: 'Narrator',
       text: 'You discovered Crystal, the Mercury Djinni, hidden in the Overseer\'s throne! Crystal shimmers with icy beauty!',
-      portrait: null,
-      action: { type: 'AWARD_DJINN', djinnId: 'crystal' },
+      
       nextNodeId: 'crystal-speaks',
     },
     {
@@ -1029,7 +976,6 @@ export const HOUSE_20_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Vale is free. All the enslaved creatures have been liberated. And twelve Djinn stand with us. This... this is just the beginning.',
       portrait: 'isaac',
-      action: { type: 'END_DIALOGUE' },
     },
   ],
 };

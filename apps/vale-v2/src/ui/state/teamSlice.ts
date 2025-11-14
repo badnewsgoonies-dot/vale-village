@@ -67,6 +67,7 @@ export const createTeamSlice: StateCreator<
 
       while (newUnits.length < 4) {
         const placeholderKey = Object.keys(UNIT_DEFINITIONS)[0];
+        if (!placeholderKey) break;
         const placeholderDef = UNIT_DEFINITIONS[placeholderKey];
         if (!placeholderDef) break;
         newUnits.push(createUnit(placeholderDef, 1, 0));

@@ -104,10 +104,8 @@ export function mergeDjinnAbilitiesIntoUnit(unit: Unit, team: Team): Unit {
 
   const djinnAbilities = abilityIds
     .map((id) => DJINN_ABILITIES[id])
-    .filter(
-      (ability): ability is typeof DJINN_ABILITIES[string] =>
-        Boolean(ability) && !existingIds.has(ability.id)
-    );
+    .filter((ability): ability is typeof DJINN_ABILITIES[string] => ability !== undefined)
+    .filter((ability) => !existingIds.has(ability.id));
 
   const mergedAbilities = [...baseAbilities, ...djinnAbilities];
   const mergedUnlocked = Array.from(new Set([...baseUnlocked, ...abilityIds]));

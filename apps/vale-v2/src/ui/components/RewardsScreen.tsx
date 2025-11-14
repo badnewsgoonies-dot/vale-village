@@ -18,7 +18,7 @@ interface RewardsScreenProps {
   onSelectEquipment: (equipment: Equipment) => void;
 }
 
-export function RewardsScreen({ rewards, team, onContinue }: RewardsScreenProps) {
+export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: RewardsScreenProps) {
   // Look up units for level-ups
   const levelUpUnits = rewards.levelUps
     .map(levelUp => {

@@ -154,8 +154,8 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
                 pp: 'PP',
               };
 
-              // Handle both old status.id format and new status.type format
-              const statusType = 'type' in status ? status.type : status.id;
+              // All status effects have a type property
+              const statusType = status.type;
               const config = statusConfig[statusType] || {
                 icon: '⚠️',
                 bgColor: '#FFEB3B',
@@ -164,25 +164,34 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
 
               const statusName = statusType.charAt(0).toUpperCase() + statusType.slice(1);
 
+              // Get duration or uses remaining for display
+              const getDurationDisplay = () => {
+                if ('duration' in status) return status.duration;
+                if ('usesRemaining' in status) return status.usesRemaining;
+                return 0;
+              };
+              const durationValue = getDurationDisplay();
+
               const badgeLabel = (() => {
                 if (statusType === 'buff' || statusType === 'debuff') {
                   const stat = 'stat' in status ? status.stat : '';
                   const modifier = 'modifier' in status ? (status.modifier ?? 0) : 0;
                   const statLabel = stat ? (statLabels[stat] || stat.toUpperCase()) : '';
                   const formatted = `${modifier >= 0 ? '+' : ''}${modifier}`;
-                  return `${statLabel}${formatted} ${status.duration}`;
+                  return `${statLabel}${formatted} ${durationValue}`;
                 }
-                return `${statusName} ${status.duration}`;
+                return `${statusName} ${durationValue}`;
               })();
 
               const tooltip = (() => {
+                const durationLabel = 'usesRemaining' in status ? 'use' : 'turn';
                 if (statusType === 'buff' || statusType === 'debuff') {
                   const stat = 'stat' in status ? status.stat : '';
                   const modifier = 'modifier' in status ? (status.modifier ?? 0) : 0;
                   const statLabel = stat ? (statLabels[stat] || stat.toUpperCase()) : '';
-                  return `${statusType === 'buff' ? 'Buff' : 'Debuff'}: ${statLabel}${modifier >= 0 ? '+' : ''}${modifier} (${status.duration} turn${status.duration !== 1 ? 's' : ''} remaining)`;
+                  return `${statusType === 'buff' ? 'Buff' : 'Debuff'}: ${statLabel}${modifier >= 0 ? '+' : ''}${modifier} (${durationValue} ${durationLabel}${durationValue !== 1 ? 's' : ''} remaining)`;
                 }
-                return `${statusName} (${status.duration} turn${status.duration !== 1 ? 's' : ''} remaining)`;
+                return `${statusName} (${durationValue} ${durationLabel}${durationValue !== 1 ? 's' : ''} remaining)`;
               })();
 
               return (

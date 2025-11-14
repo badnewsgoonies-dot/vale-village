@@ -13,7 +13,7 @@
  * - Recovery suggestions for corrupted saves
  */
 
-import { Result, Ok, Err } from '../utils/result';
+import { Result, Err } from '../utils/result';
 
 /**
  * Save file metadata
@@ -49,7 +49,7 @@ export type SaveFileValidationError =
  * 6. Validate game state using Zod schemas
  * 7. Return validated data or detailed error
  */
-export function validateSaveFile(data: unknown): Result<unknown, SaveFileValidationError> {
+export function validateSaveFile(_data: unknown): Result<unknown, SaveFileValidationError> {
   // TODO: Implement validation when building save system
   return Err({
     type: 'INVALID_FORMAT',
@@ -68,7 +68,7 @@ export function validateSaveFile(data: unknown): Result<unknown, SaveFileValidat
  */
 export function calculateChecksum(data: unknown): string {
   // Serialize with sorted keys at all levels for deterministic output
-  const serialized = JSON.stringify(data, (key, value) => {
+  const serialized = JSON.stringify(data, (_key, value) => {
     // Sort object keys recursively
     if (value && typeof value === 'object' && !Array.isArray(value)) {
       return Object.keys(value)
@@ -116,7 +116,7 @@ export function verifyChecksum(data: unknown, expectedChecksum: string): boolean
  * 3. If backup corrupted, offer to start new game
  * 4. Never crash - always provide graceful fallback
  */
-export function loadSaveFileSafe(slot: number): Result<unknown, SaveFileValidationError> {
+export function loadSaveFileSafe(_slot: number): Result<unknown, SaveFileValidationError> {
   // TODO: Implement safe loading with recovery
   return Err({
     type: 'INVALID_FORMAT',

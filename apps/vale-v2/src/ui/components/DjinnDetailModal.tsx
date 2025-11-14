@@ -100,7 +100,7 @@ export function DjinnDetailModal({ djinnId, onClose }: DjinnDetailModalProps) {
   const previewDjinn = previewEquipped
     .filter(Boolean)
     .map((id) => DJINN[id])
-    .filter(Boolean);
+    .filter((d): d is NonNullable<typeof d> => d !== null && d !== undefined);
   const synergy = calculateDjinnSynergy(previewDjinn.map((d) => d.element));
 
   const getElementColor = (element: string): string => {
@@ -151,13 +151,9 @@ export function DjinnDetailModal({ djinnId, onClose }: DjinnDetailModalProps) {
             </div>
           </div>
 
-          <div className="djinn-description">
-            <p>{djinn.description}</p>
-          </div>
-
-          <div className="djinn-unleash">
-            <h3>Unleash: {djinn.unleashName}</h3>
-            <p>{djinn.unleashDescription}</p>
+          <div className="djinn-summon-effect">
+            <h3>Summon Effect</h3>
+            <p>{djinn.summonEffect.description}</p>
           </div>
 
           {isCollected && (

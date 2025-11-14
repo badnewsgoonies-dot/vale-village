@@ -273,17 +273,8 @@ function validateDjinnInvariants(state: BattleState): void {
       );
     }
 
-    // If assigned to a unit, unit must exist in team
-    if (tracker.assignedUnitId) {
-      const unit = state.playerTeam.units.find(u => u.id === tracker.assignedUnitId);
-      if (!unit) {
-        throw new BattleStateInvariantError(
-          `Djinn ${djinnId} assigned to non-existent unit ${tracker.assignedUnitId}`,
-          'DJINN_INVALID_ASSIGNMENT',
-          { djinnId, assignedUnitId: tracker.assignedUnitId }
-        );
-      }
-    }
+    // Note: Djinn are now team-wide, not assigned to specific units
+    // Old per-unit assignment validation removed
   }
 
   // Recovery timers are non-negative

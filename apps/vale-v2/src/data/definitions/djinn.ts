@@ -261,8 +261,6 @@ export const BANE: Djinn = {
   },
 };
 
-const sharedMarsNeutral = ['forge-ember-wave'];
-
 export const FORGE: Djinn = {
   id: 'forge',
   name: 'Forge',
