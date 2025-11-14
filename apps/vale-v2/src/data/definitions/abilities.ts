@@ -385,6 +385,98 @@ export const PARALYZE_SHOCK: Ability = {
 };
 
 // ============================================================================
+// VS1 Demo Abilities
+// ============================================================================
+
+export const FLARE: Ability = {
+  id: 'flare',
+  name: 'Flare',
+  type: 'psynergy',
+  element: 'Mars',
+  manaCost: 5,
+  basePower: 30,
+  targets: 'all-enemies',
+  unlockLevel: 3,
+  description: 'Fire elemental attack hitting all enemies',
+  aiHints: {
+    priority: 2.5,
+    target: 'random',
+    avoidOverkill: false,
+  },
+};
+
+export const CURE: Ability = {
+  id: 'cure',
+  name: 'Cure',
+  type: 'healing',
+  element: 'Mercury',
+  manaCost: 4,
+  basePower: 40,
+  targets: 'single-ally',
+  unlockLevel: 2,
+  description: 'Restores HP to a single ally',
+  aiHints: {
+    priority: 2.5,
+    target: 'healerFirst',
+    avoidOverkill: false,
+  },
+};
+
+export const GUARD: Ability = {
+  id: 'guard',
+  name: 'Guard',
+  type: 'buff',
+  manaCost: 3,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 2,
+  description: 'Increases ally DEF temporarily',
+  buffEffect: {
+    def: 8,
+  },
+  duration: 3,
+  aiHints: {
+    priority: 1.5,
+    target: 'random',
+    opener: true,
+  },
+};
+
+export const EARTH_SPIKE: Ability = {
+  id: 'earth-spike',
+  name: 'Earth Spike',
+  type: 'psynergy',
+  element: 'Venus',
+  manaCost: 0,
+  basePower: 46,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Powerful earth spike - Djinn Unleash ability',
+  aiHints: {
+    priority: 3.0,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
+};
+
+export const FIRE_BURST: Ability = {
+  id: 'fire-burst',
+  name: 'Fire Burst',
+  type: 'psynergy',
+  element: 'Mars',
+  manaCost: 0,
+  basePower: 46,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Explosive fire burst - Djinn Unleash ability',
+  aiHints: {
+    priority: 3.0,
+    target: 'weakest',
+    avoidOverkill: false,
+  },
+};
+
+// ============================================================================
 // Export all abilities
 // ============================================================================
 
@@ -414,4 +506,10 @@ export const ABILITIES: Record<string, Ability> = {
   // Debuffs
   'weaken-def': WEAKEN_DEF,
   blind: BLIND,
+  // VS1 Demo
+  flare: FLARE,
+  cure: CURE,
+  guard: GUARD,
+  'earth-spike': EARTH_SPIKE,
+  'fire-burst': FIRE_BURST,
 };
