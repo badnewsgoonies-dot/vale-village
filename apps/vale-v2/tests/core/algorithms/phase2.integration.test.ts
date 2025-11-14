@@ -743,4 +743,107 @@ describe('Phase 2 - Integration Tests', () => {
       expect(result1.statusEffects.filter(s => s.type === 'poison')).toHaveLength(1); // Added
     });
   });
+
+  describe('Mars Djinn Abilities - Phase 2 Armor-Pierce Integration', () => {
+    test('fury-terra-burn: armor-piercing physical vs baseline', () => {
+      // High-DEF tank to show armor-pierce impact
+      const defender = createTestUnit('tank', {
+        atk: 10,
+        def: 40, // High defense to test armor bypass
+        mag: 10,
+        spd: 10,
+      });
+
+      const attacker = createTestUnit('warrior', {
+        atk: 50,
+        def: 10,
+        mag: 10,
+        spd: 10,
+      });
+
+      // Create dummy units to fill teams (Team requires exactly 4 units)
+      const dummy1 = createTestUnit('dummy1', { atk: 5, def: 5, mag: 5, spd: 5 });
+      const dummy2 = createTestUnit('dummy2', { atk: 5, def: 5, mag: 5, spd: 5 });
+      const dummy3 = createTestUnit('dummy3', { atk: 5, def: 5, mag: 5, spd: 5 });
+      const dummy4 = createTestUnit('dummy4', { atk: 5, def: 5, mag: 5, spd: 5 });
+
+      // Create teams (no Djinn effects)
+      const attackerTeam = createTeam([attacker, dummy1, dummy2, dummy3]);
+      const defenderTeam = createTeam([defender, dummy4, dummy1, dummy2]);
+
+      const initialDefenderHp = defender.currentHp;
+
+      // === Baseline: Regular physical attack (no armor-pierce) ===
+      const baselineAbility: Ability = {
+        id: 'baseline-physical',
+        name: 'Baseline Physical',
+        type: 'physical',
+        element: 'Mars',
+        manaCost: 3,
+        basePower: 50,
+        targets: 'single-enemy',
+        unlockLevel: 1,
+        description: 'Regular physical attack with no armor-pierce.',
+      };
+
+      const baselineDamage = calculatePhysicalDamage(
+        attacker,
+        defender,
+        attackerTeam,
+        baselineAbility
+      );
+
+      // === Armor-Pierce: fury-terra-burn (ignoreDefensePercent: 0.6) ===
+      // This ability bypasses 60% of defender's DEF, resulting in higher damage
+      const armorPierceAbility: Ability = {
+        id: 'fury-terra-burn',
+        name: 'Terra Burn',
+        type: 'physical',
+        element: 'Mars',
+        manaCost: 5,
+        basePower: 50,
+        targets: 'single-enemy',
+        unlockLevel: 3,
+        description: 'Strike with fire so intense it burns through earth and armor.',
+        ignoreDefensePercent: 0.6,
+      };
+
+      const armorPierceDamage = calculatePhysicalDamage(
+        attacker,
+        defender,
+        attackerTeam,
+        armorPierceAbility
+      );
+
+      // Core assertion: armor-pierce deals more damage than baseline
+      expect(armorPierceDamage).toBeGreaterThan(baselineDamage);
+
+      // Verify the damage increase is significant (at least 10 damage)
+      const damageIncrease = armorPierceDamage - baselineDamage;
+      expect(damageIncrease).toBeGreaterThanOrEqual(10);
+
+      // === Simulate full battle flow ===
+      let defenderState = defender;
+
+      // Apply baseline attack
+      let result = applyDamageWithShields(defenderState, baselineDamage);
+      defenderState = result.updatedUnit;
+      expect(result.actualDamage).toBe(baselineDamage);
+      const hpAfterBaseline = defenderState.currentHp;
+      expect(hpAfterBaseline).toBe(initialDefenderHp - baselineDamage);
+
+      // Reset defender
+      defenderState = defender;
+
+      // Apply armor-pierce attack
+      result = applyDamageWithShields(defenderState, armorPierceDamage);
+      defenderState = result.updatedUnit;
+      expect(result.actualDamage).toBe(armorPierceDamage);
+      const hpAfterArmorPierce = defenderState.currentHp;
+      expect(hpAfterArmorPierce).toBe(initialDefenderHp - armorPierceDamage);
+
+      // Verify armor-pierce left defender with less HP than baseline would
+      expect(hpAfterArmorPierce).toBeLessThan(hpAfterBaseline);
+    });
+  });
 });

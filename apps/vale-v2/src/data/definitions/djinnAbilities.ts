@@ -304,7 +304,8 @@ export const FORGE_STONE_MELT = makeAbility({
   basePower: 65,
   targets: 'single-enemy',
   unlockLevel: 1,
-  description: 'Melt stone with intense heat.',
+  description: 'Melt stone with intense heat, bypassing half of enemy armor.',
+  ignoreDefensePercent: 0.5,
 });
 
 export const FORGE_GRANITE_BURN = makeAbility({
@@ -429,9 +430,10 @@ export const CORONA_MOUNTAIN_WALL = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 2,
-  description: 'Form a mountain barrier.',
+  description: 'Form a mountain barrier that reduces incoming damage.',
   buffEffect: { def: 8 },
   duration: 3,
+  damageReductionPercent: 0.25,
 });
 
 export const CORONA_SOLAR_SPIN = makeAbility({
@@ -493,7 +495,8 @@ export const CORONA_EARTH_MELT = makeAbility({
   basePower: 70,
   targets: 'single-enemy',
   unlockLevel: 2,
-  description: 'Melt earth with solar intensity.',
+  description: 'Melt earth with solar intensity, penetrating armor.',
+  ignoreDefensePercent: 0.4,
 });
 
 export const CORONA_STONE_SCORCH = makeAbility({
@@ -657,9 +660,10 @@ export const FURY_FLAME_TITAN = makeAbility({
   basePower: 0,
   targets: 'self',
   unlockLevel: 3,
-  description: 'Transform into a titan of pure flame with extended protection.',
+  description: 'Transform into a titan of pure flame with extended protection and damage reduction.',
   buffEffect: { def: 12 },
   duration: 4,
+  damageReductionPercent: 0.3,
 });
 
 export const FURY_FIRE_APOCALYPSE = makeAbility({
@@ -683,7 +687,8 @@ export const FURY_TERRA_BURN = makeAbility({
   basePower: 78,
   targets: 'single-enemy',
   unlockLevel: 3,
-  description: 'Strike with fire so intense it burns through earth.',
+  description: 'Strike with fire so intense it burns through earth and armor.',
+  ignoreDefensePercent: 0.6,
 });
 
 export const FURY_HEAT_STORM = makeAbility({
