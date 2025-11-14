@@ -2,6 +2,28 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**📍 You are in `apps/vale-v2/`** - For repository-wide guidance, see [../../CLAUDE.md](../../CLAUDE.md)
+
+---
+
+## Quick Reference Card
+
+**Most Common Commands (from apps/vale-v2/):**
+```bash
+pnpm test              # Run all tests with coverage
+pnpm dev               # Start dev server
+pnpm validate:data     # Validate game data
+pnpm typecheck         # TypeScript type checking
+vitest run tests/core/algorithms/damage.test.ts    # Specific test
+```
+
+**Important Files:**
+- [../../CLAUDE.md](../../CLAUDE.md) - Root CLAUDE.md with repository-wide guidance
+- [CHANGELOG.md](../../CHANGELOG.md) - Recent changes & breaking changes
+- [docs/NAMING_CONVENTIONS.md](docs/NAMING_CONVENTIONS.md) - ID formatting rules
+
+---
+
 ## Project Overview
 
 Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. This is a Golden Sun-inspired turn-based RPG built with React, TypeScript, Zustand, and Zod.
@@ -15,7 +37,7 @@ Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. This is a
 
 **Current Status:** Core systems (battle, progression, equipment, djinn) run inside a deterministic queue-battle sandbox (`QueueBattleView`) that wires directly into the Zustand store.
 
-**Last Updated:** 2025-11-10
+**Last Updated:** 2025-11-14
 
 **State Snapshot:** GameProvider has been fully sunset; all shared state lives in slices under `src/ui/state/`. Overworld/story screens are staged separately while the queue battle flow is hardened.
 

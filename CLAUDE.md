@@ -10,7 +10,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **For detailed development guidance**, see `apps/vale-v2/CLAUDE.md` - it contains comprehensive architecture details, testing philosophy, and development workflows.
 
-## What's New (Last Updated: 2025-11-12)
+---
+
+## Quick Reference Card
+
+**Most Common Commands:**
+```bash
+pnpm test              # Run all tests with coverage
+pnpm dev               # Start dev server
+pnpm validate:data     # Validate game data against Zod schemas
+pnpm typecheck         # TypeScript type checking
+pnpm precommit         # Run all checks before committing
+```
+
+**Running Specific Tests:**
+```bash
+cd apps/vale-v2
+vitest run tests/core/algorithms/damage.test.ts    # Single file
+vitest run tests/gameplay/                          # Directory
+vitest run tests/core/algorithms                    # All algorithm tests
+```
+
+**Key Files:**
+- [apps/vale-v2/CLAUDE.md](apps/vale-v2/CLAUDE.md) - Detailed development patterns & conventions
+- [CHANGELOG.md](CHANGELOG.md) - Recent changes & breaking changes (check after git pull!)
+- [COMPREHENSIVE_AUDIT_2025.md](COMPREHENSIVE_AUDIT_2025.md) - Current state & roadmap
+
+---
+
+## What's New (Last Updated: 2025-11-14)
 
 ### Recent Critical Changes
 
@@ -50,6 +78,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Full battle integration with ability unlocking/unlocking on Djinn state changes
   - Complete test coverage and data validation
   - See [docs/PHASE_07_COMPLETION_SUMMARY.md](docs/PHASE_07_COMPLETION_SUMMARY.md) for details
+
+- **Repository Cleanup** (Nov 14, 2025) ✅ COMPLETE
+  - Cleaned up stale AI-generated branches (53 → 18 branches, 66% reduction)
+  - Removed 35 branches: 14 merged, 7 duplicate storyboards, 3 failed attempts, 6 local Cursor branches, 5 worktrees
+  - All work safely preserved in `main`, no data loss
+  - Cleaner git workflow with only active branches remaining
 
 **For complete change history**, see [CHANGELOG.md](CHANGELOG.md)
 
@@ -186,6 +220,48 @@ Uses **Zustand** with feature-based slices (11 total):
 
 **Pattern:** State slices contain only state and setters. Business logic lives in `core/services/`.
 
+#### When to Use Which Service
+
+**Decision Tree for Common Tasks:**
+
+```
+Need to execute a battle action?
+├─ Classic turn-by-turn battle → BattleService.performAction()
+└─ Queue-based battle (planning phase) → QueueBattleService.queueAction() + executeRound()
+
+Need AI to decide an action?
+└─ AIService.selectAction() → Returns best action for AI unit
+
+Need to handle encounter logic?
+└─ EncounterService → Manages encounter triggers and spawn logic
+
+Need to save/load game state?
+└─ SaveService → Handles serialization, versioning, migrations
+
+Need to manage dialogue progression?
+└─ DialogueService (via dialogueSlice) → Handles dialogue trees and choices
+
+Need to manage story progression?
+└─ StoryService → Handles story flags, quest tracking
+
+Need to handle rewards after battle?
+└─ RewardsService → Calculates XP, gold, items, equipment from encounters
+
+Need to manage overworld movement?
+└─ OverworldService → Handles map navigation, triggers, encounters
+
+Need deterministic random numbers?
+└─ RngService (or use PRNG directly) → Manages seeded random generation
+
+Need to handle shop transactions?
+└─ ShopService → Manages buying/selling equipment
+```
+
+**Key Service Relationships:**
+- **Battle flow:** `queueBattleSlice` → `QueueBattleService` → `BattleService` (for action execution) → algorithms (damage, status, etc.)
+- **Rewards flow:** `rewardsSlice` → `RewardsService` → `calculateRewards()` algorithm
+- **AI flow:** `AIService` → evaluates all possible actions → calls algorithms (damage, healing) for each option
+
 ### 4. Deterministic Game Logic
 
 All randomness uses **seeded PRNG** for:
@@ -274,6 +350,184 @@ Run gameplay tests: `vitest run tests/gameplay/`
 - `noUncheckedIndexedAccess: true` - Array/object access returns `T | undefined`
 - `noImplicitReturns: true` - All code paths must return
 - Path alias: `@/*` maps to `./src/*` (in vale-v2)
+
+## Common Pitfalls & How to Avoid Them
+
+### 1. Forgetting PRNG in Function Signatures
+**Problem:** Using `Math.random()` or forgetting to pass `PRNG` as the last parameter.
+
+```typescript
+// ❌ BAD - Uses Math.random()
+function calculateDamage(attacker: Unit, defender: Unit): number {
+  const roll = Math.random(); // BREAKS determinism!
+  return baseDamage * roll;
+}
+
+// ❌ BAD - Missing PRNG parameter
+function calculateCritical(attacker: Unit): boolean {
+  return Math.random() < 0.1; // NOT deterministic!
+}
+
+// ✅ GOOD - PRNG as last parameter
+function calculateDamage(attacker: Unit, defender: Unit, rng: PRNG): number {
+  const roll = rng.next(); // Deterministic!
+  return baseDamage * roll;
+}
+```
+
+**Fix:** Always pass `PRNG` as the last parameter in any function that needs randomness.
+
+---
+
+### 2. Violating Clean Architecture Boundaries
+**Problem:** Importing from the wrong layer, breaking dependency flow.
+
+```typescript
+// ❌ BAD - UI importing core/algorithms directly
+import { calculateDamage } from '@/core/algorithms/damage';
+
+// ❌ BAD - Algorithms importing services
+import { BattleService } from '@/core/services/BattleService';
+
+// ✅ GOOD - UI uses services or hooks
+import { useBattle } from '@/ui/hooks/useBattle';
+// or
+import { performAction } from '@/core/services/BattleService';
+
+// ✅ GOOD - Services use algorithms
+import { calculateDamage } from '@/core/algorithms/damage';
+```
+
+**Fix:** Follow the dependency flow: `UI → State → Services → Algorithms → Models`. ESLint will catch most of these.
+
+---
+
+### 3. Not Validating Data After Changes
+**Problem:** Adding/modifying game data without running validation, causing runtime errors.
+
+```bash
+# ❌ BAD - Modify data and commit
+git add src/data/definitions/units.ts
+git commit -m "Added new unit"
+
+# ✅ GOOD - Validate before committing
+pnpm validate:data    # Catches schema violations!
+pnpm test              # Ensures data works in tests
+pnpm precommit         # Runs all checks
+git add src/data/definitions/units.ts
+git commit -m "Added new unit"
+```
+
+**Fix:** Always run `pnpm validate:data` after modifying any file in `src/data/definitions/`.
+
+---
+
+### 4. Using `any` Types in Core
+**Problem:** Using `any` defeats TypeScript's safety and is forbidden in `core/`.
+
+```typescript
+// ❌ BAD - ESLint will error!
+function processUnit(unit: any): void {
+  // Type safety lost!
+}
+
+// ✅ GOOD - Explicit types
+function processUnit(unit: Unit): void {
+  // Type-safe!
+}
+
+// ✅ GOOD - Generic constraints
+function processEntity<T extends { id: string }>(entity: T): void {
+  // Type-safe with flexibility!
+}
+```
+
+**Fix:** Use proper types. If you need flexibility, use generics with constraints or union types.
+
+---
+
+### 5. Mutating Models Instead of Creating New Ones
+**Problem:** Directly modifying model properties instead of using immutable updates.
+
+```typescript
+// ❌ BAD - Mutating existing object
+function damageUnit(unit: Unit, damage: number): Unit {
+  unit.currentHp -= damage; // MUTATION!
+  return unit;
+}
+
+// ✅ GOOD - Immutable update
+function damageUnit(unit: Unit, damage: number): Unit {
+  return {
+    ...unit,
+    currentHp: unit.currentHp - damage,
+  };
+}
+```
+
+**Fix:** Always return new objects using spread operators. Use `updateUnit()`, `updateBattleState()` helper functions.
+
+---
+
+### 6. Not Checking Array/Object Access
+**Problem:** TypeScript's `noUncheckedIndexedAccess` means array access returns `T | undefined`.
+
+```typescript
+// ❌ BAD - TypeScript error!
+const firstUnit = team.units[0];
+console.log(firstUnit.name); // Error: 'firstUnit' is possibly 'undefined'
+
+// ✅ GOOD - Check before use
+const firstUnit = team.units[0];
+if (firstUnit) {
+  console.log(firstUnit.name);
+}
+
+// ✅ GOOD - Optional chaining
+console.log(team.units[0]?.name);
+```
+
+**Fix:** Always check for `undefined` when accessing arrays/objects by index or key.
+
+---
+
+### 7. Forgetting to Update Tests
+**Problem:** Modifying core algorithms without updating corresponding tests.
+
+```bash
+# ❌ BAD - Modify algorithm, skip tests
+# (Tests will fail, you'll waste time debugging later)
+
+# ✅ GOOD - Update tests immediately
+# 1. Modify algorithm
+# 2. Run existing tests: pnpm test
+# 3. Update/add tests for new behavior
+# 4. Verify: pnpm test
+```
+
+**Fix:** Never modify an algorithm without immediately updating its tests. Tests document expected behavior.
+
+---
+
+### 8. Using AI-Generated Branches Without Cleanup
+**Problem:** AI tools (Claude, Cursor, Copilot) create branches automatically and don't clean up.
+
+```bash
+# ❌ BAD - Let branches accumulate
+# After a month: 50+ branches, half are duplicates/merged/failed
+
+# ✅ GOOD - Clean up after merging
+git push origin --delete feature-branch-name    # Delete remote branch
+git branch -d feature-branch-name               # Delete local branch
+
+# ✅ GOOD - Regular cleanup
+git branch --merged main    # See what's safe to delete
+git push origin --delete $(git branch -r --merged main | grep -v main | sed 's/origin\///')
+```
+
+**Fix:** After merging a branch to `main`, immediately delete it. Run regular cleanup (we did this Nov 14: 53 → 18 branches).
+
+---
 
 ## Common Workflows
 
