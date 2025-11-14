@@ -2,6 +2,8 @@
 
 All notable changes to Vale Chronicles V2 will be documented in this file.
 
+<!-- markdownlint-disable MD022 MD032 MD031 MD007 -->
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -10,13 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added - Phase 7: Djinn Ability Unlocking System (2025-11-12)
 
 #### Complete Djinn Ability System Implementation
+
 - **Element Compatibility Logic** (`djinnAbilities.ts`)
   - `getElementCompatibility()` - Calculates same/counter/neutral compatibility
   - `calculateDjinnBonusesForUnit()` - Per-unit stat bonuses based on compatibility
   - Stat bonuses: Same (+4 ATK, +3 DEF), Counter (-3 ATK, -2 DEF), Neutral (+2 ATK, +2 DEF)
   - Location: `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
 
-- **Djinn Schema & Definitions**
+-- **Djinn Schema & Definitions**
   - Zod schema validation for Djinn data (`DjinnSchema.ts`)
   - 12 Djinn definitions (3 per element, 3 tiers each)
   - 180 Djinn-granted abilities (15 per Djinn)
@@ -26,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `apps/vale-v2/src/data/definitions/djinn.ts`
     - `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
 
-- **Battle Integration**
+-- **Battle Integration**
   - `getDjinnGrantedAbilitiesForUnit()` - Extracts ability IDs from Set Djinn
   - `mergeDjinnAbilitiesIntoUnit()` - Merges Djinn abilities into unit's ability list
   - Abilities automatically unlock when Djinn are equipped
@@ -37,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `executeDjinnSummons()` - Updates abilities when Djinn activate
     - `transitionToPlanningPhase()` - Updates abilities when Djinn recover
 
-- **Ability Catalog**
+-- **Ability Catalog**
   - **180 total abilities** distributed across 12 Djinn
   - **Venus:** Flint (15), Granite (15), Bane (15) = 45 abilities
   - **Mars:** Forge (15), Corona (15), Fury (15) = 45 abilities
@@ -50,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Impact:** Units now gain powerful abilities based on equipped Djinn and element compatibility. The system creates strategic depth through trade-offs between stat bonuses and ability diversity.
 
 **Documentation:**
+
 - See [docs/PHASE_07_COMPLETION_SUMMARY.md](docs/PHASE_07_COMPLETION_SUMMARY.md) for complete details
 - Updated `VALE_CHRONICLES_INSTRUCTION_BOOKLET.md` with ability counts and completion status
 
@@ -58,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed - System 1: Critical Validation & Bug Fixes (2025-11-11)
 
 #### Healing System Validation (`damage.ts:241`)
+
 - **Added `abilityRevivesFallen` parameter to `applyHealing()`**
   - Prevents healing KO'd units unless ability explicitly supports revival
   - Throws `Error` when attempting to heal KO'd unit without revive capability
@@ -65,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Location: `apps/vale-v2/src/core/algorithms/damage.ts:241`
 
   **Breaking Change:** `applyHealing()` signature changed from:
+
   ```typescript
   applyHealing(unit: Unit, healing: number): Unit
   ```
@@ -74,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
   **Migration:** Add third parameter when calling `applyHealing()` for revival abilities:
+
   ```typescript
   // Old: Would incorrectly heal KO'd units
   const healed = applyHealing(koUnit, 50);
@@ -84,11 +91,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
 #### PRNG Seed Validation (`prng.ts:30-36, 72-74`)
+
 - **Reject negative seeds** - `XorShiftPRNG` constructor and `makePRNG()` now throw `Error` on negative seeds
 - **Zero seed handling** - Zero seeds are automatically converted to 1 (XorShift requires non-zero state)
 - Location: `apps/vale-v2/src/core/random/prng.ts`
 
   **Impact:** Prevents invalid PRNG states that could cause determinism failures
+
   ```typescript
   // Now throws error
   makePRNG(-100); // Error: PRNG seed must be non-negative
@@ -99,11 +108,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
 #### Team Djinn Validation (`Team.ts:75-88`)
+
 - **Prevent duplicate Djinn** - `updateTeam()` now validates that `equippedDjinn` contains no duplicates
 - **Enforce 3-Djinn limit** - Throws `Error` if more than 3 Djinn are equipped
 - Location: `apps/vale-v2/src/core/models/Team.ts:75`
 
   **Examples:**
+
   ```typescript
   // Throws: Cannot equip duplicate Djinn
   updateTeam(team, { equippedDjinn: ['flint', 'flint', 'granite'] });
@@ -116,10 +127,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
 #### Equipment Schema Default (`EquipmentSchema.ts:44`)
+
 - **`statBonus` defaults to `{}`** - Missing `statBonus` field now defaults to empty object instead of `undefined`
 - Location: `apps/vale-v2/src/data/schemas/EquipmentSchema.ts:44`
 
   **Impact:** Prevents `undefined` access errors when equipment has no stat bonuses
+
   ```typescript
   // Before: statBonus could be undefined
   const atk = equipment.statBonus?.atk || 0; // Required optional chaining
@@ -131,40 +144,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added - Test Coverage
 
 #### Healing Validation Tests (`damage.test.ts:153-178`)
+
 - Test rejection of negative healing values
 - Test prevention of healing KO'd units without revival
 - Test successful revival with `abilityRevivesFallen: true`
 
 #### PRNG Validation Tests (`prng.test.ts:50-74`)
+
 - Test rejection of negative seeds (`-1`, `-100`)
 - Test zero seed conversion to 1
 - Test acceptance of positive seeds
 
 #### Team Djinn Validation Tests (`Team.test.ts:89-131`)
+
 - Test rejection of duplicate Djinn
 - Test rejection of >3 Djinn
 - Test acceptance of valid Djinn configurations
 
+### Added - Liberation Encounter Flow & Djinn Audit (2025-11-14)
+
+#### Djinn Ability Consistency
+
+- `tests/core/data/djinnAbilityConsistency.test.ts` now asserts that every Djinn-granted ability ID exists in `DJINN_ABILITIES`, that the registry contains no duplicates, and that each Djinn supplies granted abilities for all six unit types. The test suite passes (`pnpm test tests/core/data/djinnAbilityConsistency.test.ts`).
+- `djinnAbilities.ts` is the sole ability definition file after removing `djinnAbilitiesNew.ts` and `djinnAbilities.old.ts`, and the registry now exposes the missing `FURY_MOLTEN_TORRENT` definition, the nine Forge abilities, the Fury unlock, and the corrected `corona-flare-revival` ID.
+
+#### Liberation Village Encounters
+
+- `apps/vale-v2/src/data/definitions/maps.ts` now wires the `house-01` and `house-02` encounters into the `vale-village` map via `buildTriggers()` and the `encounterPool`, so the Liberation playtest path can trigger the new battles when visiting those houses.
+- Playtesters can now trigger the Liberation encounters by entering the `house-01` or `house-02` trigger volumes in the overworld; the encounter definitions for those houses are also linked in the `liberationDialogues` scripts for narrative flow.
+
 ### Technical Details
 
 **Error Handling Approach:**
+
 - **Throwing errors vs Result types** - System 1 uses thrown `Error` instances for validation failures (model/algorithm layer)
 - Errors propagate to service layer where they can be caught and handled
 - Future consideration: Introduce `Result<T, E>` type for expected failures (save/load, network)
 
 **Validation Philosophy:**
+
 - **Fail fast** - Invalid states are rejected immediately at model/algorithm boundaries
 - **Type safety** - Zod schemas validate data shape, runtime checks validate business rules
 - **Determinism** - PRNG validation ensures reproducible battle outcomes
 
 **Test Strategy:**
+
 - All validation paths have explicit test coverage
 - Property-based tests ensure invariants hold (e.g., damage ≥ 0, HP clamped to [0, maxHp])
 - Integration tests verify error handling in service layer
 
 ## Migration Guide - System 1 Changes
 
-### If you use `applyHealing()`:
+### If you use `applyHealing()`
 
 **Check all call sites** - Add `abilityRevivesFallen` parameter if ability can revive:
 
@@ -177,7 +208,7 @@ if (ability.revivesFallen) {
 }
 ```
 
-### If you create PRNG instances:
+### If you create PRNG instances
 
 **Ensure seeds are non-negative** - Validate user input or generated seeds:
 
@@ -191,7 +222,7 @@ const seed = Math.abs(Math.random() * 100); // Always non-negative
 const rng = makePRNG(seed); // Safe
 ```
 
-### If you manage team Djinn:
+### If you manage team Djinn
 
 **Validate before calling `updateTeam()`** - UI should prevent invalid selections:
 
