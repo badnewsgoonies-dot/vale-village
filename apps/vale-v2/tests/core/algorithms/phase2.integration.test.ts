@@ -610,4 +610,137 @@ describe('Phase 2 - Integration Tests', () => {
       expect(result.updatedUnit.currentHp).toBe(0);
     });
   });
+
+  describe('Djinn Abilities - Phase 2 Integration', () => {
+    test('bane-stone-titan: shields + damage reduction layered defense', () => {
+      // Create a unit and simulate bane-stone-titan effects
+      let unit = createTestUnit('tank', { def: 10 }, 100);
+
+      // Simulate BattleService applying bane-stone-titan effects:
+      // - shieldCharges: 2
+      // - damageReductionPercent: 0.3
+      // - buffEffect: { def: 12 }
+      unit = {
+        ...unit,
+        statusEffects: [
+          {
+            type: 'shield',
+            remainingCharges: 2,
+            duration: 3,
+          },
+          {
+            type: 'damageReduction',
+            percent: 0.3,
+            duration: 3,
+          },
+          {
+            type: 'buff',
+            stat: 'def',
+            modifier: 12,
+            duration: 3,
+          },
+        ],
+      };
+
+      // Hit 1: 50 damage → blocked by shield
+      let result = applyDamageWithShields(unit, 50);
+      unit = result.updatedUnit;
+
+      expect(result.actualDamage).toBe(0); // Shield blocks
+      expect(unit.currentHp).toBe(100); // HP unchanged
+      const shield1 = unit.statusEffects.find(s => s.type === 'shield') as any;
+      expect(shield1?.remainingCharges).toBe(1); // 2 → 1
+
+      // Hit 2: 50 damage → blocked by shield
+      result = applyDamageWithShields(unit, 50);
+      unit = result.updatedUnit;
+
+      expect(result.actualDamage).toBe(0); // Shield blocks
+      expect(unit.currentHp).toBe(100); // HP unchanged
+      expect(unit.statusEffects.find(s => s.type === 'shield')).toBeUndefined(); // Shield depleted
+
+      // Hit 3: 50 damage → no shield, but DR 30% reduces to 35
+      // Note: In real battle, damage would be calculated with DR applied in damage.ts
+      // For this test, we simulate the pre-reduced damage
+      const reducedDamage = Math.floor(50 * 0.7); // 35
+      result = applyDamageWithShields(unit, reducedDamage);
+      unit = result.updatedUnit;
+
+      expect(result.actualDamage).toBe(35);
+      expect(unit.currentHp).toBe(65); // 100 - 35
+    });
+
+    test('bane-terra-blessing: cleanse all negatives + grant immunity', () => {
+      // Create 2 allies with mixed statuses
+      let ally1 = createTestUnit('ally1', {}, 50, [
+        { type: 'poison', damagePerTurn: 8, duration: 3 },
+        { type: 'burn', damagePerTurn: 10, duration: 2 },
+        { type: 'buff', stat: 'atk', modifier: 5, duration: 3 },
+      ]);
+
+      let ally2 = createTestUnit('ally2', {}, 40, [
+        { type: 'freeze', duration: 1 },
+        { type: 'debuff', stat: 'def', modifier: -3, duration: 3 },
+        { type: 'healOverTime', healPerTurn: 10, duration: 2 },
+      ]);
+
+      // Simulate bane-terra-blessing effect:
+      // - removeStatusEffects: { type: 'negative' }
+      // - grantImmunity: { all: true, duration: 1 }
+
+      // Helper to simulate blessing effects
+      const applyBlessing = (unit: Unit): Unit => {
+        // 1. Cleanse negative statuses
+        let updated = {
+          ...unit,
+          statusEffects: unit.statusEffects.filter(s => !isNegativeStatus(s)),
+        };
+
+        // 2. Grant immunity
+        updated = {
+          ...updated,
+          statusEffects: [
+            ...updated.statusEffects,
+            { type: 'immunity', all: true, duration: 1 },
+          ],
+        };
+
+        return updated;
+      };
+
+      ally1 = applyBlessing(ally1);
+      ally2 = applyBlessing(ally2);
+
+      // Verify cleanse worked
+      expect(ally1.statusEffects.filter(s => s.type === 'poison')).toHaveLength(0);
+      expect(ally1.statusEffects.filter(s => s.type === 'burn')).toHaveLength(0);
+      expect(ally1.statusEffects.filter(s => s.type === 'buff')).toHaveLength(1); // Still there
+
+      expect(ally2.statusEffects.filter(s => s.type === 'freeze')).toHaveLength(0);
+      expect(ally2.statusEffects.filter(s => s.type === 'debuff')).toHaveLength(0);
+      expect(ally2.statusEffects.filter(s => s.type === 'healOverTime')).toHaveLength(1); // Still there
+
+      // Verify immunity granted
+      expect(ally1.statusEffects.find(s => s.type === 'immunity')).toBeDefined();
+      expect(ally2.statusEffects.find(s => s.type === 'immunity')).toBeDefined();
+
+      const immunity1 = ally1.statusEffects.find(s => s.type === 'immunity') as any;
+      expect(immunity1?.all).toBe(true);
+      expect(immunity1?.duration).toBe(1);
+
+      // Try to apply poison while immune (should fail)
+      let result1 = applyStatusToUnit(ally1, { type: 'poison', damagePerTurn: 8, duration: 3 });
+      expect(result1.statusEffects.filter(s => s.type === 'poison')).toHaveLength(0); // Not added
+
+      // Expire immunity
+      ally1 = {
+        ...ally1,
+        statusEffects: ally1.statusEffects.filter(s => s.type !== 'immunity'),
+      };
+
+      // Now poison applies
+      result1 = applyStatusToUnit(ally1, { type: 'poison', damagePerTurn: 8, duration: 3 });
+      expect(result1.statusEffects.filter(s => s.type === 'poison')).toHaveLength(1); // Added
+    });
+  });
 });

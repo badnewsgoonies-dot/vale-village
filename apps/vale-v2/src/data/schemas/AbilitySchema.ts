@@ -82,6 +82,22 @@ export const AbilitySchema = z.object({
     }),
   ]).optional(),
 
+  // Phase 2: Damage reduction granting
+  damageReductionPercent: z.number().min(0).max(1).optional(), // % damage reduction granted to target(s)
+
+  // Phase 2: Elemental resistance granting
+  elementalResistance: z.object({
+    element: z.enum(['Venus', 'Mars', 'Mercury', 'Jupiter']),
+    modifier: z.number(), // Positive = resistance, negative = weakness
+  }).optional(),
+
+  // Phase 2: Immunity granting
+  grantImmunity: z.object({
+    all: z.boolean(), // If true, immune to all negative statuses
+    types: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'])).optional(), // Specific immunities
+    duration: z.number().int().min(1), // Duration in turns
+  }).optional(),
+
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
     priority: z.number().min(0).max(3).optional(),
