@@ -563,8 +563,8 @@ export const CORONA_SCORCH_BURN = makeAbility({
 });
 
 export const CORONA_FLAME_REVIVAL = makeAbility({
-  id: 'corona-flame-revival',
-  name: 'Flame Revival',
+  id: 'corona-flare-revival',
+  name: 'Flare Revival',
   type: 'healing',
   element: 'Mars',
   manaCost: 5,
@@ -753,8 +753,20 @@ export const FURY_INFERNO_BLESSING = makeAbility({
   description: 'Bless all allies with inferno\'s protective embrace.',
 });
 
-// ============================================================================ 
-// FLINT - Additional Abilities 
+export const FURY_MOLTEN_TORRENT = makeAbility({
+  id: 'fury-molten-torrent',
+  name: 'Molten Torrent',
+  type: 'psynergy',
+  element: 'Mars',
+  manaCost: 6,
+  basePower: 95,
+  targets: 'single-enemy',
+  unlockLevel: 3,
+  description: 'Unleash a devastating stream of molten rock.',
+});
+
+// ============================================================================
+// FLINT - Additional Abilities
 // ============================================================================
 
 export const FLINT_STONE_SPIKE = makeAbility({
@@ -1957,6 +1969,15 @@ export const DJINN_ABILITIES: Record<string, Ability> = {
   'forge-stone-slam': FORGE_STONE_SLAM,
   'forge-granite-shield': FORGE_GRANITE_SHIELD,
   'forge-ember-wave': FORGE_EMBER_WAVE,
+  'forge-flame-burst': FORGE_FLAME_BURST,
+  'forge-inferno-shield': FORGE_INFERNO_SHIELD,
+  'forge-fire-storm': FORGE_FIRE_STORM,
+  'forge-stone-melt': FORGE_STONE_MELT,
+  'forge-granite-burn': FORGE_GRANITE_BURN,
+  'forge-ember-shield': FORGE_EMBER_SHIELD,
+  'forge-heat-wave': FORGE_HEAT_WAVE,
+  'forge-warmth': FORGE_WARMTH,
+  'forge-flame-heal': FORGE_FLAME_HEAL,
   // Corona
   'corona-scorch': CORONA_SCORCH,
   'corona-ember-veil': CORONA_EMBER_VEIL,
@@ -1972,7 +1993,7 @@ export const DJINN_ABILITIES: Record<string, Ability> = {
   'corona-heat-pulse': CORONA_HEAT_PULSE,
   'corona-solar-heal': CORONA_SOLAR_HEAL,
   'corona-scorch-burn': CORONA_SCORCH_BURN,
-  'corona-flame-revival': CORONA_FLAME_REVIVAL,
+  'corona-flare-revival': CORONA_FLAME_REVIVAL,
   // Fury
   'fury-heat-rush': FURY_HEAT_RUSH,
   'fury-flare-guard': FURY_FLARE_GUARD,
@@ -1988,6 +2009,7 @@ export const DJINN_ABILITIES: Record<string, Ability> = {
   'fury-flame-revival': FURY_FLAME_REVIVAL,
   'fury-burn-venom': FURY_BURN_VENOM,
   'fury-inferno-blessing': FURY_INFERNO_BLESSING,
+  'fury-molten-torrent': FURY_MOLTEN_TORRENT,
   // Fizz
   'fizz-ice-shard': FIZZ_ICE_SHARD,
   'fizz-wave-shield': FIZZ_WAVE_SHIELD,

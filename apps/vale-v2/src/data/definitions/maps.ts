@@ -53,12 +53,33 @@ const buildNPCs = (): GameMap['npcs'] =>
   );
 
 const buildTriggers = (): GameMap['triggers'] => [
-  { id: 'battle-1', type: 'battle', position: { x: 7, y: 10 }, data: { encounterId: 'c1_normal_3' } },
-  { id: 'battle-2', type: 'battle', position: { x: 10, y: 10 }, data: { encounterId: 'c1_normal_2' } },
+  // Wire overworld triggers directly into liberation encounters
+  {
+    id: 'house-01-trigger',
+    type: 'battle',
+    position: { x: 7, y: 10 },
+    data: { encounterId: 'house-01' },
+  },
+  {
+    id: 'house-02-trigger',
+    type: 'battle',
+    position: { x: 10, y: 10 },
+    data: { encounterId: 'house-02' },
+  },
   { id: 'npc-elder', type: 'npc', position: { x: 15, y: 5 }, data: { npcId: 'elder-vale' } },
   { id: 'shop-vale-armory', type: 'shop', position: { x: 12, y: 5 }, data: { shopId: 'vale-armory' } },
-  { id: 'shop-weapons', type: 'transition', position: { x: 8, y: 6 }, data: { targetMap: 'weapon-shop-interior', targetPos: { x: 5, y: 7 } } },
-  { id: 'shop-weapons-exit', type: 'transition', position: { x: 5, y: 7 }, data: { targetMap: 'vale-village', targetPos: { x: 8, y: 6 } } },
+  {
+    id: 'shop-weapons',
+    type: 'transition',
+    position: { x: 8, y: 6 },
+    data: { targetMap: 'weapon-shop-interior', targetPos: { x: 5, y: 7 } },
+  },
+  {
+    id: 'shop-weapons-exit',
+    type: 'transition',
+    position: { x: 5, y: 7 },
+    data: { targetMap: 'vale-village', targetPos: { x: 8, y: 6 } },
+  },
 ];
 
 export const MAPS: Record<string, GameMap> = {
@@ -71,8 +92,9 @@ export const MAPS: Record<string, GameMap> = {
     npcs: buildNPCs(),
     triggers: buildTriggers(),
     spawnPoint: { x: 15, y: 10 },
-    encounterRate: 0.05, // 5% chance per step
-    encounterPool: ['c1_normal_1', 'c1_normal_2'], // Random encounters from pool
+    encounterRate: 0.05,
+    // Use liberation encounters as the random pool as well, if you want:
+    encounterPool: ['house-01', 'house-02']
   },
   'weapon-shop-interior': {
     id: 'weapon-shop-interior',

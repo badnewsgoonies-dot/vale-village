@@ -161,7 +161,6 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
             </div>
           </div>
         )}
-      </div>
 
       {selectedAbility && (
         <div style={{ marginBottom: '1rem' }}>
