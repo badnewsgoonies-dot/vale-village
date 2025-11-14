@@ -18,7 +18,7 @@ export const AbilitySchema = z.object({
   name: z.string().min(1),
   type: z.enum(['physical', 'psynergy', 'healing', 'buff', 'debuff', 'summon']),
   element: z.enum(['Venus', 'Mars', 'Jupiter', 'Mercury', 'Neutral']).optional(),
-  manaCost: z.number().int().min(0).max(10), // Cannot be negative!
+  manaCost: z.number().int().min(0).max(5), // Cannot be negative! Max 5 for mana pool system
   basePower: z.number().int().min(0), // Cannot be negative!
   targets: z.enum(['single-enemy', 'all-enemies', 'single-ally', 'all-allies', 'self']),
   unlockLevel: z.number().int().min(1).max(20),
@@ -38,10 +38,50 @@ export const AbilitySchema = z.object({
   
   // Status effect applied on hit (for physical/psynergy abilities)
   statusEffect: z.object({
-    type: z.enum(['poison', 'burn', 'freeze', 'paralyze']),
+    type: z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun']),
     duration: z.number().int().min(1),
+    chance: z.number().min(0).max(1).optional(), // Probability of applying (0-1), defaults to 1.0
   }).optional(),
-  
+
+  // Debuff effects (stat reductions applied to targets)
+  debuffEffect: z.object({
+    atk: z.number().optional(),
+    def: z.number().optional(),
+    mag: z.number().optional(),
+    spd: z.number().optional(),
+    hp: z.number().optional(), // Max HP reduction
+  }).optional(),
+
+  // Heal over time effect
+  healOverTime: z.object({
+    amount: z.number().int().min(1), // HP restored per turn
+    duration: z.number().int().min(1), // Number of turns
+  }).optional(),
+
+  // Multi-hit attacks
+  hitCount: z.number().int().min(1).max(10).optional(), // Number of hits (2-4 typical)
+
+  // Revive mechanics
+  revive: z.boolean().optional(), // Can revive KO'd units
+  reviveHPPercent: z.number().min(0).max(1).optional(), // HP% restored when reviving (0-1)
+
+  // Phase 2: Advanced offense mechanics
+  ignoreDefensePercent: z.number().min(0).max(1).optional(), // % of target DEF to ignore (default 0)
+  splashDamagePercent: z.number().min(0).max(1).optional(), // % damage dealt to non-primary targets (default 0)
+
+  // Phase 2: Shield granting
+  shieldCharges: z.number().int().min(1).max(99).optional(), // Number of hit charges granted when cast
+
+  // Phase 2: Status cleanse
+  removeStatusEffects: z.union([
+    z.object({ type: z.literal('all') }),
+    z.object({ type: z.literal('negative') }),
+    z.object({
+      type: z.literal('byType'),
+      statuses: z.array(z.enum(['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'])),
+    }),
+  ]).optional(),
+
   // AI hints (optional metadata for AI decision-making)
   aiHints: z.object({
     priority: z.number().min(0).max(3).optional(),
