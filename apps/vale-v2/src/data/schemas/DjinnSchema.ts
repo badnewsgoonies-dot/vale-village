@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ElementSchema } from './UnitSchema';
 
+<<<<<<< Updated upstream
 export const DjinnSummonEffectSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('damage'),
@@ -34,10 +35,16 @@ export const DjinnGrantedAbilitiesSchema = z.object({
   neutral: z.array(z.string()).min(0).max(4),
 });
 
+=======
+/**
+ * Zod schema for Djinn
+ */
+>>>>>>> Stashed changes
 export const DjinnSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   element: ElementSchema,
+<<<<<<< Updated upstream
   tier: z.enum(['1', '2', '3']),
   summonEffect: DjinnSummonEffectSchema,
   grantedAbilities: z.record(z.string().min(1), DjinnGrantedAbilitiesSchema),
@@ -45,3 +52,13 @@ export const DjinnSchema = z.object({
 
 export type Djinn = z.infer<typeof DjinnSchema>;
 export type DjinnSummonEffect = z.infer<typeof DjinnSummonEffectSchema>;
+=======
+  tier: z.enum([1, 2, 3]).or(z.literal(1).or(z.literal(2)).or(z.literal(3))),
+  description: z.string(),
+  unleashName: z.string(),
+  unleashDescription: z.string(),
+});
+
+export type Djinn = z.infer<typeof DjinnSchema>;
+
+>>>>>>> Stashed changes

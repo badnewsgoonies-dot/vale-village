@@ -7,6 +7,8 @@ import { OverworldMap } from './ui/components/OverworldMap';
 import { DialogueBox } from './ui/components/DialogueBox';
 import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopScreen } from './ui/components/ShopScreen';
+import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
+import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
 
@@ -27,6 +29,8 @@ function App() {
   const setMode = useStore((s) => s.setMode);
   const currentShopId = useStore((s) => s.currentShopId);
   const [showSaveMenu, setShowSaveMenu] = useState(false);
+  const [showDjinnCollection, setShowDjinnCollection] = useState(false);
+  const [showPartyManagement, setShowPartyManagement] = useState(false);
 
   // Initialize team on app startup (needed for battle triggers)
   useEffect(() => {
@@ -61,7 +65,7 @@ function App() {
           <h1 style={{ margin: 0 }}>Vale Chronicles V2</h1>
           <ChapterIndicator chapter={story.chapter} />
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setShowSaveMenu(true)}
             style={{
@@ -75,6 +79,34 @@ function App() {
             }}
           >
             Save Game
+          </button>
+          <button
+            onClick={() => setShowDjinnCollection(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#9C27B0',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            Djinn Collection
+          </button>
+          <button
+            onClick={() => setShowPartyManagement(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#FF9800',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            Party Management
           </button>
           {canAccessCredits && (
             <button
@@ -99,6 +131,12 @@ function App() {
       )}
       {showSaveMenu && (
         <SaveMenu onClose={() => setShowSaveMenu(false)} />
+      )}
+      {showDjinnCollection && (
+        <DjinnCollectionScreen onClose={() => setShowDjinnCollection(false)} />
+      )}
+      {showPartyManagement && (
+        <PartyManagementScreen onClose={() => setShowPartyManagement(false)} />
       )}
       {showRewards && lastBattleRewards && team ? (
         <RewardsScreen

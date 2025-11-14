@@ -1,0 +1,231 @@
+/* Djinn Collection Screen */
+.djinn-collection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.djinn-collection-container {
+  width: 1000px;
+  max-width: 100%;
+  max-height: 90vh;
+  background: linear-gradient(180deg, #0F2550, #1A3560);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.djinn-collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 16px;
+}
+
+.djinn-collection-header h1 {
+  font-size: 32px;
+  color: #FFD87F;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #FFD87F;
+  color: #FFD87F;
+}
+
+.djinn-stats {
+  display: flex;
+  gap: 24px;
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 215, 127, 0.5);
+  padding: 12px 20px;
+  border-radius: 4px;
+}
+
+.stat-item {
+  display: flex;
+  gap: 8px;
+}
+
+.stat-label {
+  color: #FFD87F;
+  font-weight: bold;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: bold;
+}
+
+.djinn-collection-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.djinn-element-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.element-header {
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.no-djinn-message {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  padding: 24px;
+  text-align: center;
+}
+
+.djinn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.djinn-card {
+  background: rgba(20, 30, 50, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.djinn-card:hover {
+  background: rgba(74, 122, 184, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.djinn-card.equipped {
+  border-color: #FFD87F;
+  background: rgba(255, 215, 127, 0.1);
+}
+
+.djinn-card.set {
+  border-left: 4px solid #4CAF50;
+}
+
+.djinn-card.standby {
+  border-left: 4px solid #FF9800;
+}
+
+.djinn-card.recovery {
+  border-left: 4px solid #F44336;
+}
+
+.djinn-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.djinn-initial {
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.djinn-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.djinn-name {
+  font-size: 18px;
+  color: #FFD87F;
+  font-weight: bold;
+  text-align: center;
+}
+
+.djinn-tier {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+.djinn-status {
+  font-size: 11px;
+  color: #4CAF50;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.djinn-error {
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .djinn-collection-container {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .djinn-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
