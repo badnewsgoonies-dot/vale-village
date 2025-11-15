@@ -11,7 +11,7 @@ import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
-import { VS1_ENCOUNTER_ID, VS1_SCENE_POST } from './story/vs1Constants';
+import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 
 function App() {
