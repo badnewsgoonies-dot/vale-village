@@ -22,7 +22,7 @@ export function BattleView() {
   const dequeue = useStore((s) => s.dequeueEvent);
   const startTurnTick = useStore((s) => s.startTurnTick);
   const performAIAction = useStore((s) => s.performAIAction);
-  const setShowRewards = useStore((s) => s.setShowRewards);
+  const setMode = useStore((s) => s.setMode);
   
   // Post-battle flow state
   const [showCutscene, setShowCutscene] = useState(false);
@@ -93,7 +93,7 @@ export function BattleView() {
       <VictoryOverlay
         onComplete={() => {
           setShowVictoryOverlay(false);
-          setShowRewards(true);
+          setMode('rewards');
         }}
       />
     );

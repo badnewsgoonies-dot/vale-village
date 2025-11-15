@@ -25,10 +25,8 @@ function App() {
   const story = useStore((s) => s.story);
   const showCredits = useStore((s) => s.showCredits);
   const setShowCredits = useStore((s) => s.setShowCredits);
-  const showRewards = useStore((s) => s.showRewards);
   const lastBattleRewards = useStore((s) => s.lastBattleRewards);
   const claimRewards = useStore((s) => s.claimRewards);
-  const setShowRewards = useStore((s) => s.setShowRewards);
   const selectEquipmentChoice = useStore((s) => s.selectEquipmentChoice);
   const team = useStore((s) => s.team);
   const setTeam = useStore((s) => s.setTeam);
@@ -85,10 +83,8 @@ function App() {
     }
   }, [team, setTeam, setRoster]);
 
-  // Ensure app starts in overworld mode
-  useEffect(() => {
-    setMode('overworld');
-  }, [setMode]);
+  // Mode is initialized to 'overworld' in gameFlowSlice, so no need to set it here
+  // Removing this effect prevents it from overwriting mode changes (e.g., dialogue)
 
   const canAccessCredits = story.chapter >= 4;
 
@@ -99,7 +95,6 @@ function App() {
     const preScene = DIALOGUES[VS1_SCENE_PRE];
     if (preScene) {
       startDialogueTree(preScene);
-      setMode('dialogue');
     }
   };
 
@@ -108,21 +103,19 @@ function App() {
     // Check if this was the VS1 encounter
     const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
 
-    claimRewards(); // Add gold/equipment to inventory, clear rewards
-    setShowRewards(false); // Ensure rewards screen is hidden
+    claimRewards(); // This now sets mode to 'overworld'
     setBattle(null, 0);
 
     // VS1 specific: show post-scene after rewards
     if (wasVS1Battle) {
       const postScene = DIALOGUES[VS1_SCENE_POST];
       if (postScene) {
-        startDialogueTree(postScene);
-        setMode('dialogue');
+        startDialogueTree(postScene); // This sets mode to 'dialogue'
         return;
       }
     }
 
-    // Fallback: return to overworld
+    // Fallback: return to overworld (shouldn't be needed as claimRewards sets mode)
     returnToOverworld();
   };
 
@@ -221,7 +214,7 @@ function App() {
       {showPartyManagement && (
         <PartyManagementScreen onClose={() => setShowPartyManagement(false)} />
       )}
-      {showRewards && lastBattleRewards && team ? (
+      {mode === 'rewards' && lastBattleRewards && team ? (
         <RewardsScreen
           rewards={lastBattleRewards}
           team={team}

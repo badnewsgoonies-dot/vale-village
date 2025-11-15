@@ -3,6 +3,7 @@
  * Displays post-battle rewards: XP, gold, equipment, level-ups
  */
 
+import { useEffect } from 'react';
 import type { RewardDistribution } from '../../core/models/Rewards';
 import type { Team } from '../../core/models/Team';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
@@ -48,6 +49,38 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
       : [];
   const latestDjinnId = team.collectedDjinn[team.collectedDjinn.length - 1];
   const latestDjinn = latestDjinnId ? DJINN[latestDjinnId] : null;
+
+  // Keyboard handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle equipment choice selection (1-9)
+      if (hasPendingChoice && rewards.equipmentChoice) {
+        const num = parseInt(event.key, 10);
+        if (!Number.isNaN(num) && num >= 1 && num <= rewards.equipmentChoice.length) {
+          event.preventDefault();
+          event.stopPropagation();
+          const selected = rewards.equipmentChoice[num - 1];
+          if (selected) {
+            onSelectEquipment(selected);
+          }
+          return;
+        }
+      }
+
+      // Handle continue (Enter/Space)
+      if (!hasPendingChoice || rewards.choiceSelected) {
+        if (event.key === 'Enter' || event.key === ' ' || event.code === 'Enter' || event.code === 'Space') {
+          event.preventDefault();
+          event.stopPropagation();
+          onContinue();
+          return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [hasPendingChoice, rewards.equipmentChoice, rewards.choiceSelected, onContinue, onSelectEquipment]);
 
   return (
     <div className="rewards-screen">

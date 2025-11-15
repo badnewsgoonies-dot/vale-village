@@ -10,6 +10,7 @@ import { processVictory as rewardsServiceProcessVictory } from '../../core/servi
 import type { InventorySlice } from './inventorySlice';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
+import type { GameFlowSlice } from './gameFlowSlice';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
 
 export interface RewardsSlice {
@@ -23,7 +24,7 @@ export interface RewardsSlice {
 }
 
 export const createRewardsSlice: StateCreator<
-  RewardsSlice & InventorySlice & BattleSlice & TeamSlice,
+  RewardsSlice & InventorySlice & BattleSlice & TeamSlice & GameFlowSlice,
   [['zustand/devtools', never]],
   [],
   RewardsSlice
@@ -34,7 +35,7 @@ export const createRewardsSlice: StateCreator<
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
 
-    const { setTeam, addUnitToRoster } = get();
+    const { setTeam, addUnitToRoster, setMode } = get();
     setTeam(result.updatedTeam);
 
     // Handle unit recruitment
@@ -47,7 +48,8 @@ export const createRewardsSlice: StateCreator<
       lastBattleRewards: {
         ...result.distribution,
         recruitedUnit: result.recruitedUnit,
-      }
+      },
+      mode: 'rewards', // Set mode instead of showRewards
     });
   },
 
@@ -55,7 +57,7 @@ export const createRewardsSlice: StateCreator<
     const { lastBattleRewards } = get();
     if (!lastBattleRewards) return;
 
-    const { addGold, addEquipment } = get();
+    const { addGold, addEquipment, setMode } = get();
     addGold(lastBattleRewards.goldEarned);
 
     const equipmentToAdd: Equipment[] = [];
@@ -70,7 +72,8 @@ export const createRewardsSlice: StateCreator<
       addEquipment(equipmentToAdd);
     }
 
-    set({ lastBattleRewards: null, showRewards: false });
+    set({ lastBattleRewards: null });
+    setMode('overworld'); // Return to overworld after claiming rewards
   },
 
   setShowRewards: (visible) => {

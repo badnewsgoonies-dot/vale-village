@@ -29,7 +29,7 @@ export function QueueBattleView() {
   const queueDjinnActivation = useStore((s) => s.queueDjinnActivation);
   const unqueueDjinnActivation = useStore((s) => s.unqueueDjinnActivation);
   const executeQueuedRound = useStore((s) => s.executeQueuedRound);
-  const setShowRewards = useStore((s) => s.setShowRewards);
+  const setMode = useStore((s) => s.setMode);
 
   const [selectedUnitIndex, setSelectedUnitIndex] = useState<number | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<string | null>(null);
@@ -86,7 +86,7 @@ export function QueueBattleView() {
       <VictoryOverlay
         onComplete={() => {
           setShowVictoryOverlay(false);
-          setShowRewards(true);
+          setMode('rewards');
         }}
       />
     );

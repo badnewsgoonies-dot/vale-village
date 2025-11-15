@@ -3,7 +3,7 @@
  * Main pre-battle team selection screen
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '../state/store';
 import type { Team } from '@/core/models/Team';
 import type { Unit } from '@/core/models/Unit';
@@ -90,7 +90,7 @@ export function PreBattleTeamSelectScreen({
   };
 
   // Handle start battle
-  const handleStartBattle = () => {
+  const handleStartBattle = useCallback(() => {
     if (!team || team.units.length < MIN_PARTY_SIZE) {
       alert(`Team must have at least ${MIN_PARTY_SIZE} unit`);
       return;
@@ -100,7 +100,32 @@ export function PreBattleTeamSelectScreen({
       return;
     }
     onConfirm(team);
-  };
+  }, [team, onConfirm]);
+
+  // Keyboard handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        onCancel();
+        return;
+      }
+
+      if (event.key === 'Enter' || event.code === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (team && team.units.length >= MIN_PARTY_SIZE && team.units.length <= MAX_PARTY_SIZE) {
+          handleStartBattle();
+        }
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [team, onCancel, handleStartBattle]);
 
   return (
     <div className="pre-battle-overlay">

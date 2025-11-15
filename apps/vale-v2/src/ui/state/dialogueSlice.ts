@@ -55,23 +55,39 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     const { currentDialogueTree, currentDialogueState } = get();
     if (!currentDialogueTree || !currentDialogueState) return;
 
-    // Get current node to check for effects before advancing
     const currentNode = currentDialogueTree.nodes.find(n => n.id === currentDialogueState.currentNodeId);
-
-    // Process effects from current node before advancing
-    if (currentNode?.effects && Object.keys(currentNode.effects).length > 0) {
-      processDialogueEffects(currentNode.effects, get);
+    if (!currentNode) {
+      get().endDialogue();
+      return;
     }
 
-    const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
-    if (newState) {
-      set({ currentDialogueState: newState });
+    // Check if this is the last node (no nextNodeId and no choices)
+    const isLastNode = !currentNode.nextNodeId && (!currentNode.choices || currentNode.choices.length === 0);
 
-      // Check if dialogue is complete after advancing
-      if (isDialogueComplete(currentDialogueTree, newState)) {
+    // If last node has effects, process them and end dialogue
+    if (isLastNode && currentNode.effects && Object.keys(currentNode.effects).length > 0) {
+      processDialogueEffects(currentNode.effects, get);
+      // Effects may have changed mode (e.g., to 'team-select'), so end dialogue preserving that mode
+      get().endDialogue();
+      return;
+    }
+
+    // If not last node, advance to next node
+    if (currentNode.nextNodeId) {
+      const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
+      if (newState) {
+        set({ currentDialogueState: newState });
+
+        // Check if dialogue is complete after advancing
+        if (isDialogueComplete(currentDialogueTree, newState)) {
+          get().endDialogue();
+        }
+      } else {
+        // No next node - end dialogue
         get().endDialogue();
       }
     } else {
+      // No next node and not last node with effects - end dialogue
       get().endDialogue();
     }
   },
@@ -81,8 +97,8 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     set({
       currentDialogueTree: null,
       currentDialogueState: null,
-      // Race guard: don't overwrite 'battle' mode
-      mode: prevMode === 'battle' ? 'battle' : 'overworld',
+      // Race guard: don't overwrite 'battle' or 'team-select' mode (set by effects)
+      mode: prevMode === 'battle' || prevMode === 'team-select' ? prevMode : 'overworld',
     });
   },
 } as DialogueSlice & GameFlowSlice & StorySlice & SaveSlice & TeamSlice);

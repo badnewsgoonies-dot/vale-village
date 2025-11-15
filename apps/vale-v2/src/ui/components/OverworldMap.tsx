@@ -5,7 +5,7 @@ import type { Tile, Position } from '@/core/models/overworld';
 import './OverworldMap.css';
 
 export function OverworldMap() {
-  const { currentMapId, playerPosition, movePlayer, currentTrigger, clearTrigger, teleportPlayer, resetLastTrigger, stepCount } = useStore(state => ({
+  const { currentMapId, playerPosition, movePlayer, currentTrigger, clearTrigger, teleportPlayer, resetLastTrigger, stepCount, mode } = useStore(state => ({
     currentMapId: state.currentMapId,
     playerPosition: state.playerPosition,
     movePlayer: state.movePlayer,
@@ -14,10 +14,14 @@ export function OverworldMap() {
     teleportPlayer: state.teleportPlayer,
     resetLastTrigger: state.resetLastTrigger,
     stepCount: state.stepCount,
+    mode: state.mode,
   }));
 
   const map = MAPS[currentMapId];
   useEffect(() => {
+    // Only listen in overworld mode
+    if (mode !== 'overworld') return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp') {
         movePlayer('up');
@@ -32,7 +36,7 @@ export function OverworldMap() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [movePlayer]);
+  }, [movePlayer, mode]);
 
 
   useEffect(() => {

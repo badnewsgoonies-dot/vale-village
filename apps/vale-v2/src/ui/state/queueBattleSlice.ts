@@ -150,8 +150,6 @@ export const createQueueBattleSlice: StateCreator<
       const {
         processVictory,
         onBattleEvents,
-        setMode,
-        setShowRewards,
         updateTeamUnits,
       } = get();
 
@@ -170,9 +168,7 @@ export const createQueueBattleSlice: StateCreator<
       });
 
       updateTeamUnits(healedUnits);
-      processVictory(healedState);
-      setMode('rewards');
-      setShowRewards(true);
+      processVictory(healedState); // This now sets mode: 'rewards'
 
       // Auto-save after battle victory
       try {
