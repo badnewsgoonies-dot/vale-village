@@ -7,7 +7,7 @@ import type { StateCreator } from 'zustand';
 import type { BattleEvent } from '../../core/services/types';
 import type { StoryState } from '../../core/models/story';
 import { createStoryState, setFlag } from '../../core/models/story';
-import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey } from '../../core/services/StoryService';
+import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey, processStoryFlagForDjinn } from '../../core/services/StoryService';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { SaveSlice } from './saveSlice';
@@ -34,8 +34,25 @@ export const createStorySlice: StateCreator<
 
   setStoryFlag: (key, value) => {
     const story = get().story;
-    const updatedStory = setFlag(story, key, value);
-    _set({ story: updatedStory });
+    const team = get().team;
+    
+    // Process story flag (includes Djinn granting)
+    if (team) {
+      const result = processStoryFlagForDjinn(story, team, key, value);
+      
+      // Update story state
+      _set({ story: result.story });
+      
+      // Update team if Djinn was granted
+      if (result.djinnGranted) {
+        get().updateTeam(result.team);
+        console.log(`🎉 Djinn ${result.djinnGranted} granted from story flag: ${key}`);
+      }
+    } else {
+      // No team available, just update story
+      const updatedStory = setFlag(story, key, value);
+      _set({ story: updatedStory });
+    }
   },
 
   getStoryFlag: (key) => {
@@ -44,12 +61,26 @@ export const createStorySlice: StateCreator<
 
   onBattleEvents: (events) => {
     let st = get().story;
+    const team = get().team;
 
     for (const e of events) {
       if (e.type === 'encounter-finished' && e.outcome === 'PLAYER_VICTORY') {
         st = processEncounterCompletion(st, e.encounterId);
         // Convert encounter ID to flag key for chapter advancement
         const flagKey = encounterIdToFlagKey(e.encounterId);
+        
+        // Process story flag for Djinn (if team available)
+        if (team) {
+          const djinnResult = processStoryFlagForDjinn(st, team, flagKey, true);
+          st = djinnResult.story;
+          
+          // Update team if Djinn was granted
+          if (djinnResult.djinnGranted) {
+            get().updateTeam(djinnResult.team);
+            console.log(`🎉 Djinn ${djinnResult.djinnGranted} granted from encounter: ${e.encounterId}`);
+          }
+        }
+        
         const adv = advanceChapter(st, flagKey);
         if (adv.ok) {
           st = adv.value;

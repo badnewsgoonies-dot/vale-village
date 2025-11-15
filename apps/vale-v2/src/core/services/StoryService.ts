@@ -5,7 +5,10 @@
 
 import type { StoryState, FlagId } from '../models/story';
 import type { Result } from '../utils/result';
+import type { Team } from '../models/Team';
 import { setFlag, hasFlag } from '../models/story';
+import { collectDjinn } from './DjinnService';
+import { STORY_FLAG_TO_DJINN } from '../../data/definitions/storyFlags';
 
 /**
  * Check if a requirement is met
@@ -119,5 +122,46 @@ export function processEncounterCompletion(
 ): StoryState {
   const flagKey = encounterIdToFlagKey(encounterId);
   return setFlag(state, flagKey, true);
+}
+
+/**
+ * Process story flag and grant Djinn if applicable
+ * Pure function - no side effects
+ * 
+ * @param story - Current story state
+ * @param team - Current team state
+ * @param flagId - Story flag being set
+ * @param flagValue - Value being set (only grants Djinn if true)
+ * @returns Updated story and team (team unchanged if no Djinn granted)
+ */
+export function processStoryFlagForDjinn(
+  story: StoryState,
+  team: Team,
+  flagId: string,
+  flagValue: boolean | number
+): { story: StoryState; team: Team; djinnGranted: string | null } {
+  // Update story flag first
+  const updatedStory = setFlag(story, flagId, flagValue);
+  
+  // Only grant Djinn if flag is being set to true
+  if (flagValue !== true) {
+    return { story: updatedStory, team, djinnGranted: null };
+  }
+  
+  // Check if this flag grants a Djinn
+  const djinnId = STORY_FLAG_TO_DJINN[flagId];
+  if (!djinnId) {
+    return { story: updatedStory, team, djinnGranted: null };
+  }
+  
+  // Try to collect Djinn (pure function)
+  const collectResult = collectDjinn(team, djinnId);
+  if (collectResult.ok) {
+    return { story: updatedStory, team: collectResult.value, djinnGranted: djinnId };
+  }
+  
+  // Already collected or error - return unchanged team
+  // This is safe - collectDjinn returns error if already collected, which we ignore
+  return { story: updatedStory, team, djinnGranted: null };
 }
 

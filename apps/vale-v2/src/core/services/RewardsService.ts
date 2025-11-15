@@ -11,6 +11,8 @@ import { calculateBattleRewards, distributeRewards } from '../algorithms/rewards
 import { getEncounterId } from '../models/BattleState';
 import { EQUIPMENT } from '../../data/definitions/equipment';
 import type { EquipmentReward } from '../../data/schemas/EncounterSchema';
+import { ENCOUNTERS } from '../../data/definitions/encounters';
+import { collectDjinn } from './DjinnService';
 
 type EquipmentResolution =
   | { type: 'none' }
@@ -31,6 +33,18 @@ export function processVictory(
   const distribution = distributeRewards(battle.playerTeam, rewards);
   const equipmentResolution = resolveEquipmentReward(rewards.equipmentReward);
 
+  // Check for Djinn reward
+  const encounter = ENCOUNTERS[encounterId];
+  let updatedTeam = distribution.updatedTeam;
+  if (encounter?.reward.djinn) {
+    const djinnResult = collectDjinn(updatedTeam, encounter.reward.djinn);
+    if (djinnResult.ok) {
+      updatedTeam = djinnResult.value;
+    }
+    // Note: If collection fails (e.g., already collected), we silently continue
+    // The player already has the Djinn, so no error is needed
+  }
+
   const resolvedDistribution: RewardDistribution = {
     ...distribution,
     fixedEquipment: equipmentResolution.type === 'fixed' ? equipmentResolution.equipment : undefined,
@@ -39,7 +53,7 @@ export function processVictory(
 
   return {
     distribution: resolvedDistribution,
-    updatedTeam: distribution.updatedTeam,
+    updatedTeam,
   };
 }
 

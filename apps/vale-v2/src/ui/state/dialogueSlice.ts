@@ -6,9 +6,11 @@ import {
   advanceDialogue,
   isDialogueComplete,
 } from '@/core/services/DialogueService';
+import { processStoryFlagForDjinn } from '@/core/services/StoryService';
 import type { GameFlowSlice } from './gameFlowSlice';
 import type { StorySlice } from './storySlice';
 import type { SaveSlice } from './saveSlice';
+import type { TeamSlice } from './teamSlice';
 
 export interface DialogueSlice {
   currentDialogueTree: DialogueTree | null;
@@ -19,7 +21,7 @@ export interface DialogueSlice {
   endDialogue: () => void;
 }
 
-export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice & SaveSlice> = (set, get) =>
+export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & StorySlice & SaveSlice & TeamSlice> = (set, get) =>
   ({
   currentDialogueTree: null,
   currentDialogueState: null,
@@ -83,7 +85,7 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
       mode: prevMode === 'battle' ? 'battle' : 'overworld',
     });
   },
-} as DialogueSlice & GameFlowSlice & StorySlice & SaveSlice);
+} as DialogueSlice & GameFlowSlice & StorySlice & SaveSlice & TeamSlice);
 
 /**
  * Process dialogue effects (quest flags, shop openings, battle triggers)
@@ -91,7 +93,7 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
  */
 function processDialogueEffects(
   effects: Record<string, unknown>,
-  get: () => DialogueSlice & GameFlowSlice & StorySlice & SaveSlice
+  get: () => DialogueSlice & GameFlowSlice & StorySlice & SaveSlice & TeamSlice
 ) {
   const store = get();
   const canSetStoryFlag = typeof store.setStoryFlag === 'function';
@@ -121,6 +123,7 @@ function processDialogueEffects(
   }
 
   let storyFlagSet = false;
+  
   Object.entries(effects).forEach(([key, value]) => {
     if (
       typeof value === 'boolean' &&
@@ -128,6 +131,9 @@ function processDialogueEffects(
       key !== 'openShop' &&
       canSetStoryFlag
     ) {
+      // Process story flag (includes Djinn granting)
+      // setStoryFlag() will handle both story update and Djinn granting
+      // So we just call it once
       store.setStoryFlag(key, value);
       console.warn(`Story flag set via dialogue: ${key} = ${value}`);
       storyFlagSet = true;

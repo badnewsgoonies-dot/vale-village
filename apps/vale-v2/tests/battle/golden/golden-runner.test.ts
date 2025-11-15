@@ -58,8 +58,8 @@ describe('Golden Battles', () => {
     const player4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     const team = createTeam([player1, player2, player3, player4]);
     
-    const enemy1 = enemyToUnit(ENEMIES.slime);
-    const enemy2 = enemyToUnit(ENEMIES.slime);
+    const enemy1 = enemyToUnit(ENEMIES['mercury-slime']);
+    const enemy2 = enemyToUnit(ENEMIES['mercury-slime']);
     
     const battle = createBattleState(team, [enemy1, enemy2], [
       player1.id, enemy1.id, player2.id, enemy2.id,
@@ -103,14 +103,14 @@ describe('Golden Battles', () => {
 
   test('Mini-boss (Gladiator) produces stable log', () => {
     const seed = 2002;
-    
+
     const player1 = createUnit(UNIT_DEFINITIONS.adept, 2, 0);
-    const player2 = createUnit(UNIT_DEFINITIONS.war_mage, 2, 0);
+    const player2 = createUnit(UNIT_DEFINITIONS['war-mage'], 2, 0);
     const player3 = createUnit(UNIT_DEFINITIONS.mystic, 2, 0);
     const player4 = createUnit(UNIT_DEFINITIONS.ranger, 2, 0);
     const team = createTeam([player1, player2, player3, player4]);
     
-    const gladiator = enemyToUnit(ENEMIES.gladiator);
+    const gladiator = enemyToUnit(ENEMIES['granite-warlord']);
     
     const battle = createBattleState(team, [gladiator], [
       player1.id, gladiator.id, player2.id,
@@ -157,19 +157,17 @@ describe('Golden Battles', () => {
 
   test('Boss (Elemental Guardian) produces stable log', () => {
     const seed = 3003;
-    
+
     const player1 = createUnit(UNIT_DEFINITIONS.adept, 3, 0);
-    const player2 = createUnit(UNIT_DEFINITIONS.war_mage, 3, 0);
+    const player2 = createUnit(UNIT_DEFINITIONS['war-mage'], 3, 0);
     const player3 = createUnit(UNIT_DEFINITIONS.mystic, 3, 0);
     const player4 = createUnit(UNIT_DEFINITIONS.ranger, 3, 0);
     const team = createTeam([player1, player2, player3, player4]);
-    
-    const boss = enemyToUnit(ENEMIES.elemental_guardian);
-    const shard1 = enemyToUnit(ENEMIES.guardian_shard_fire);
-    const shard2 = enemyToUnit(ENEMIES.guardian_shard_water);
-    
-    const battle = createBattleState(team, [boss, shard1, shard2], [
-      player1.id, boss.id, player2.id, shard1.id,
+
+    const boss = enemyToUnit(ENEMIES['volcano-warlord']);
+
+    const battle = createBattleState(team, [boss], [
+      player1.id, boss.id, player2.id,
     ]);
     
     const tape: ReplayTape = {

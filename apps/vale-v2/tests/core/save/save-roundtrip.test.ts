@@ -88,7 +88,7 @@ describe('Save Round-trip', () => {
     const notes = 'Test notes for debugging';
 
     const unit1 = createUnit(UNIT_DEFINITIONS.adept, 1, 0);
-    const unit2 = createUnit(UNIT_DEFINITIONS.war_mage, 1, 0);
+    const unit2 = createUnit(UNIT_DEFINITIONS['war-mage'], 1, 0);
     const unit3 = createUnit(UNIT_DEFINITIONS.mystic, 1, 0);
     const unit4 = createUnit(UNIT_DEFINITIONS.ranger, 1, 0);
     

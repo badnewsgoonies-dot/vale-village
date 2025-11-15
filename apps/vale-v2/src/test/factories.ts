@@ -77,7 +77,14 @@ export function mkTeam(units: Unit[]): Team {
   // Ensure exactly 4 units
   const teamUnits = [...units];
   while (teamUnits.length < 4) {
-    teamUnits.push(mkUnit({ id: `placeholder_${teamUnits.length}` }));
+    // Create placeholder units with 9999 HP so they survive but don't contribute damage
+    teamUnits.push(mkUnit({
+      id: `placeholder_${teamUnits.length}`,
+      name: `Placeholder ${teamUnits.length}`,
+      baseStats: { hp: 9999, pp: 0, atk: 0, def: 0, mag: 0, spd: 1 }, // 0 ATK = no damage
+      currentHp: 9999,
+      currentPp: 0,
+    }));
   }
   return createTeam(teamUnits.slice(0, 4));
 }

@@ -9,6 +9,7 @@ import { startBattle } from '../../core/services/BattleService';
 import { makePRNG } from '../../core/random/prng';
 import type { UnitDefinition } from '../../data/schemas/UnitSchema';
 import { STRIKE, FIREBALL, HEAL } from '../../data/definitions/abilities';
+import { collectDjinn, equipDjinn } from '../../core/services/DjinnService';
 
 // Simple test unit definition
 const testUnitDef: UnitDefinition = {
@@ -94,10 +95,21 @@ export function createTestBattle() {
   // Create team
   const team = createTeam([unit1, unit2, unit3, unit4]);
 
+  // Add test Djinn (Flint) for testing
+  let teamWithDjinn = team;
+  const collectResult = collectDjinn(teamWithDjinn, 'flint');
+  if (collectResult.ok) {
+    teamWithDjinn = collectResult.value;
+    const equipResult = equipDjinn(teamWithDjinn, 'flint');
+    if (equipResult.ok) {
+      teamWithDjinn = equipResult.value;
+    }
+  }
+
   // Start battle
   const seed = 12345;
   const rng = makePRNG(seed);
-  const battleState = startBattle(team, [enemy1, enemy2], rng);
+  const battleState = startBattle(teamWithDjinn, [enemy1, enemy2], rng);
 
   return { battleState, seed };
 }

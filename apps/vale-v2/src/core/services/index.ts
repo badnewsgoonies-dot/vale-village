@@ -8,5 +8,6 @@ export * from './RngService';
 export * from './SaveService';
 export * from './AIService';
 export * from './QueueBattleService';
+export * from './DjinnService';
 export * from './types';
 
