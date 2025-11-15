@@ -43,6 +43,7 @@ export interface SaveSlice {
  */
 function createSaveData(
   team: TeamSlice['team'],
+  roster: Unit[],
   inventory: Pick<InventorySlice, 'gold' | 'equipment'>,
   story: StorySlice['story'],
   overworld: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> | null
@@ -57,9 +58,9 @@ function createSaveData(
   // No slice, no padding - save actual team size (1-4 units)
   const activeParty = partyIds;
 
-  // Collect all Djinn from units
+  // Collect all Djinn from roster (not just active party)
   const djinnCollected: string[] = [];
-  team.units.forEach(u => {
+  roster.forEach(u => {
     u.djinn.forEach(djinnId => {
       if (!djinnCollected.includes(djinnId)) {
         djinnCollected.push(djinnId);
@@ -81,7 +82,7 @@ function createSaveData(
     version: '1.0.0' as const,
     timestamp: Date.now(),
     playerData: {
-      unitsCollected: team.units.map(u => ({
+      unitsCollected: roster.map(u => ({
         ...u,
         djinn: [...u.djinn],
         abilities: [...u.abilities],
@@ -128,9 +129,11 @@ export const createSaveSlice: StateCreator<
     const saveData = result.value;
     const state = get();
 
-    // Hydrate team from save data
+    // 1. Restore roster from unitsCollected (bench + active party)
+    state.setRoster(saveData.playerData.unitsCollected);
+
+    // 2. Build active party from activeParty IDs (references roster units)
     const activeUnits = saveData.playerData.activeParty
-      .filter(unitId => unitId !== '')  // Filter empty strings from old saves (backward compatibility)
       .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
       .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
 
@@ -188,12 +191,12 @@ export const createSaveSlice: StateCreator<
   },
 
   saveGame: () => {
-    const { team, story, currentMapId, playerPosition, gold, equipment } = get();
+    const { team, roster, story, currentMapId, playerPosition, gold, equipment } = get();
     const overworldSnapshot: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> = {
       currentMapId,
       playerPosition,
     };
-    const saveData = createSaveData(team, { gold, equipment }, story, overworldSnapshot);
+    const saveData = createSaveData(team, roster, { gold, equipment }, story, overworldSnapshot);
     
     if (!saveData) {
       console.error('Cannot save: no team data');
@@ -225,12 +228,12 @@ export const createSaveSlice: StateCreator<
 
   // Slot-based operations
   saveGameSlot: (slot: number) => {
-    const { team, story, currentMapId, playerPosition, gold, equipment } = get();
+    const { team, roster, story, currentMapId, playerPosition, gold, equipment } = get();
     const overworldSnapshot: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> = {
       currentMapId,
       playerPosition,
     };
-    const saveData = createSaveData(team, { gold, equipment }, story, overworldSnapshot);
+    const saveData = createSaveData(team, roster, { gold, equipment }, story, overworldSnapshot);
     
     if (!saveData) {
       console.error('Cannot save: no team data');
@@ -262,9 +265,11 @@ export const createSaveSlice: StateCreator<
     const saveData = result.value;
     const state = get();
 
-    // Hydrate team from save data
+    // 1. Restore roster from unitsCollected (bench + active party)
+    state.setRoster(saveData.playerData.unitsCollected);
+
+    // 2. Build active party from activeParty IDs (references roster units)
     const activeUnits = saveData.playerData.activeParty
-      .filter(unitId => unitId !== '')  // Filter empty strings from old saves
       .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
       .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
 

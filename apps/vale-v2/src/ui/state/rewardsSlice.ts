@@ -34,8 +34,8 @@ export const createRewardsSlice: StateCreator<
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
 
-    const { updateTeam } = get();
-    updateTeam({ units: result.updatedTeam.units });
+    const { updateTeamUnits } = get();
+    updateTeamUnits(result.updatedTeam.units);
 
     set({ lastBattleRewards: result.distribution });
   },
