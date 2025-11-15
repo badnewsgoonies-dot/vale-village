@@ -332,6 +332,24 @@ export const TRAINING_DUMMY: Encounter = {
 };
 
 // ============================================================================
+// VS1 DEMO ENCOUNTER
+// ============================================================================
+
+export const VS1_BANDITS: Encounter = {
+  id: 'vs1-bandits',
+  name: 'VS1: Bandit Ambush',
+  enemies: ['bandit-minion', 'bandit-minion', 'bandit-captain'],
+  difficulty: 'medium',
+  reward: {
+    xp: 45,
+    gold: 40,
+    equipment: {
+      type: 'none',
+    },
+  },
+};
+
+// ============================================================================
 // Export all encounters
 // ============================================================================
 
@@ -364,6 +382,9 @@ export const ENCOUNTERS: Record<string, Encounter> = {
 
   // Bonus
   'training-dummy': TRAINING_DUMMY,
+
+  // VS1 Demo
+  'vs1-bandits': VS1_BANDITS,
 };
 
 // ============================================================================

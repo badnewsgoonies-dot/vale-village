@@ -1125,6 +1125,51 @@ export const OVERSEER: Enemy = {
 };
 
 // ============================================================================
+// VS1 Demo Enemies
+// ============================================================================
+
+export const BANDIT_MINION: Enemy = {
+  id: 'bandit-minion',
+  name: 'Bandit',
+  level: 3,
+  element: 'Mars',
+  stats: {
+    hp: 48,
+    pp: 0,
+    atk: 13,
+    def: 8,
+    mag: 5,
+    spd: 9,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+  ],
+  baseXp: 18,
+  baseGold: 15,
+};
+
+export const BANDIT_CAPTAIN: Enemy = {
+  id: 'bandit-captain',
+  name: 'Bandit Captain',
+  level: 4,
+  element: 'Mars',
+  stats: {
+    hp: 90,
+    pp: 0,
+    atk: 16,
+    def: 10,
+    mag: 6,
+    spd: 10,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...HEAVY_STRIKE, unlockLevel: 1 },
+  ],
+  baseXp: 30,
+  baseGold: 25,
+};
+
+// ============================================================================
 // Export all enemies
 // ============================================================================
 
@@ -1196,4 +1241,8 @@ export const ENEMIES: Record<string, Enemy> = {
   'venus-sprite': VENUS_SPRITE,
   chimera: CHIMERA,
   overseer: OVERSEER,
+
+  // VS1 Demo
+  'bandit-minion': BANDIT_MINION,
+  'bandit-captain': BANDIT_CAPTAIN,
 };

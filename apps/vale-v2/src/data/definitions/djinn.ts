@@ -812,6 +812,95 @@ export const STORM: Djinn = {
   },
 };
 
+// VS1 Demo Djinn (simplified for demo)
+export const ROCKLING: Djinn = {
+  id: 'rockling',
+  name: 'Rockling',
+  element: 'Venus',
+  tier: '1',
+  summonEffect: {
+    type: 'damage',
+    description: 'Earth spike pierces a single foe.',
+    damage: 46,
+  },
+  grantedAbilities: {
+    adept: {
+      same: ['earth-spike'],
+      counter: [],
+      neutral: [],
+    },
+    sentinel: {
+      same: ['earth-spike'],
+      counter: [],
+      neutral: [],
+    },
+    'war-mage': {
+      same: [],
+      counter: [],
+      neutral: ['earth-spike'],
+    },
+    mystic: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+    ranger: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+    stormcaller: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+  },
+};
+
+export const EMBER: Djinn = {
+  id: 'ember',
+  name: 'Ember',
+  element: 'Mars',
+  tier: '1',
+  summonEffect: {
+    type: 'damage',
+    description: 'Fire burst engulfs a single foe.',
+    damage: 46,
+  },
+  grantedAbilities: {
+    adept: {
+      same: ['fire-burst'],
+      counter: [],
+      neutral: [],
+    },
+    sentinel: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+    'war-mage': {
+      same: ['fire-burst'],
+      counter: [],
+      neutral: [],
+    },
+    mystic: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+    ranger: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+    stormcaller: {
+      same: [],
+      counter: [],
+      neutral: [],
+    },
+  },
+};
+
 export const DJINN: Record<string, Djinn> = {
   flint: FLINT,
   granite: GRANITE,
@@ -825,4 +914,7 @@ export const DJINN: Record<string, Djinn> = {
   breeze: BREEZE,
   squall: SQUALL,
   storm: STORM,
+  // VS1 Demo
+  rockling: ROCKLING,
+  ember: EMBER,
 };
