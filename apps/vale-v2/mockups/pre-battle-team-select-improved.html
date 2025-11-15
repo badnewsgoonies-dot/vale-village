@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Battle Preparation - Improved Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .pre-battle-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* NO SCROLLING */
+            padding: 0.5rem;
+        }
+
+        .pre-battle-container {
+            width: 100%;
+            height: 100%;
+            max-width: 1400px;
+            max-height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; /* Compact spacing */
+            overflow: hidden; /* NO SCROLLING */
+        }
+
+        /* Header - Fixed Height */
+        .pre-battle-header {
+            height: 60px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: #1e1e1e;
+            border: 1px solid #333; /* Thin border */
+            border-radius: 4px;
+        }
+
+        .header-title {
+            font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+            font-weight: bold;
+        }
+
+        .header-info {
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            color: #ccc;
+        }
+
+        .close-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #666;
+        }
+
+        /* Section Cards - Compact */
+        .section-card {
+            border: 1px solid #333; /* Thin border */
+            border-radius: 4px;
+            padding: 0.5rem; /* Compact padding */
+            background: #1e1e1e;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #4a9eff;
+        }
+
+        /* Team Slots - Fixed Height */
+        .team-slots-section {
+            height: 120px;
+        }
+
+        .team-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .team-slot {
+            aspect-ratio: 1;
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #252525;
+            padding: 0.25rem;
+        }
+
+        .team-slot.empty {
+            border-style: dashed;
+            color: #666;
+        }
+
+        .team-slot.filled.selected {
+            border-color: #4a9eff;
+            box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+            background: #1e2a3a;
+        }
+
+        .team-slot:hover {
+            border-color: #666;
+        }
+
+        .unit-name {
+            font-size: clamp(0.75rem, 1vw, 0.9rem);
+            font-weight: bold;
+            margin-bottom: 0.15rem;
+        }
+
+        .unit-level {
+            font-size: clamp(0.65rem, 0.9vw, 0.75rem);
+            color: #4a9eff;
+        }
+
+        .unit-element {
+            font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+            color: #ff6b35;
+            margin-top: 0.15rem;
+        }
+
+        .empty-slot-text {
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            color: #666;
+        }
+
+        /* Equipment Section - Fixed Height, Collapsible */
+        .equipment-section {
+            height: 80px;
+            transition: height 0.2s;
+        }
+
+        .equipment-section.collapsed {
+            height: 40px;
+        }
+
+        .equipment-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .equipment-slot-compact {
+            padding: 0.5rem;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .equipment-label {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #999;
+        }
+
+        .equipment-value {
+            font-weight: bold;
+        }
+
+        .equipment-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+            transition: background 0.2s;
+        }
+
+        .equipment-btn:hover {
+            background: #666;
+        }
+
+        .stat-preview {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ccc;
+            text-align: center;
+            padding: 0.25rem;
+            background: #252525;
+            border-radius: 3px;
+        }
+
+        /* Djinn Section - Fixed Height */
+        .djinn-section {
+            height: 80px;
+        }
+
+        .djinn-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .djinn-slot-compact {
+            flex: 1;
+            padding: 0.5rem;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .djinn-name {
+            font-weight: bold;
+            color: #4a9eff;
+        }
+
+        .djinn-element {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ff6b35;
+        }
+
+        .djinn-state {
+            font-size: clamp(0.6rem, 0.8vw, 0.65rem);
+            color: #999;
+        }
+
+        .djinn-available {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ccc;
+            margin-bottom: 0.25rem;
+        }
+
+        .djinn-abilities {
+            font-size: clamp(0.6rem, 0.8vw, 0.65rem);
+            color: #4a9eff;
+        }
+
+        /* Bench Section - Fixed Height */
+        .bench-section {
+            height: 100px;
+        }
+
+        .bench-grid {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto; /* Horizontal scroll only if needed */
+            overflow-y: hidden;
+            padding-bottom: 0.25rem;
+        }
+
+        .bench-unit-compact {
+            min-width: 80px;
+            padding: 0.5rem;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            text-align: center;
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .bench-unit-compact:hover {
+            border-color: #4a9eff;
+            background: #1e2a3a;
+        }
+
+        /* Enemies Section - Fixed Height, Minimal */
+        .enemies-section {
+            height: 80px;
+        }
+
+        .enemies-grid {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto; /* Horizontal scroll only if needed */
+            overflow-y: hidden;
+        }
+
+        .enemy-card-minimal {
+            min-width: 100px;
+            padding: 0.5rem;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .enemy-icon {
+            font-size: 1.5rem; /* Icon only */
+        }
+
+        .enemy-name {
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            font-weight: bold;
+        }
+
+        .enemy-element {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ff6b35;
+        }
+
+        /* Actions - Fixed Height */
+        .actions-section {
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+        }
+
+        .cancel-btn-action,
+        .start-battle-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: clamp(0.9rem, 1.3vw, 1rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancel-btn-action {
+            background: #444;
+            color: #fff;
+        }
+
+        .cancel-btn-action:hover {
+            background: #666;
+        }
+
+        .start-battle-btn {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .start-battle-btn:hover:not(:disabled) {
+            background: #5aaeff;
+            box-shadow: 0 0 10px rgba(74, 158, 255, 0.4);
+        }
+
+        .start-battle-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Collapse Toggle */
+        .collapse-toggle {
+            background: none;
+            border: none;
+            color: #4a9eff;
+            cursor: pointer;
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            padding: 0.25rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Scrollbar styling (for horizontal scrolls only) */
+        ::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Responsive adjustments */
+        @media (max-height: 800px) {
+            .team-slots-section { height: 100px; }
+            .equipment-section { height: 70px; }
+            .djinn-section { height: 70px; }
+            .bench-section { height: 80px; }
+            .enemies-section { height: 70px; }
+        }
+
+        @media (max-height: 720px) {
+            .team-slots-section { height: 90px; }
+            .equipment-section { height: 60px; }
+            .equipment-section.collapsed { height: 35px; }
+            .djinn-section { height: 60px; }
+            .bench-section { height: 70px; }
+            .enemies-section { height: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pre-battle-overlay">
+        <div class="pre-battle-container">
+            <!-- Header -->
+            <div class="pre-battle-header">
+                <div>
+                    <div class="header-title">PRE-BATTLE PREPARATION</div>
+                    <div class="header-info">VS1: Garet's Challenge | Difficulty: Medium | Rewards: 60 XP, 19 Gold</div>
+                </div>
+                <button class="close-btn" onclick="alert('Close')">×</button>
+            </div>
+
+            <!-- Team Slots -->
+            <div class="section-card team-slots-section">
+                <div class="section-title">YOUR TEAM (1/4)</div>
+                <div class="team-slots-grid">
+                    <div class="team-slot filled selected" onclick="selectSlot(0)">
+                        <div class="unit-name">Isaac</div>
+                        <div class="unit-level">Lv. 1</div>
+                        <div class="unit-element">Venus</div>
+                    </div>
+                    <div class="team-slot empty" onclick="selectSlot(1)">
+                        <div class="empty-slot-text">[+]</div>
+                    </div>
+                    <div class="team-slot empty" onclick="selectSlot(2)">
+                        <div class="empty-slot-text">[+]</div>
+                    </div>
+                    <div class="team-slot empty" onclick="selectSlot(3)">
+                        <div class="empty-slot-text">[+]</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="section-card equipment-section" id="equipmentSection">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="section-title">EQUIPMENT (Isaac)</div>
+                    <button class="collapse-toggle" onclick="toggleCollapse('equipmentSection')">▼</button>
+                </div>
+                <div class="equipment-row">
+                    <div class="equipment-slot-compact">
+                        <div class="equipment-label">Weapon</div>
+                        <div class="equipment-value">[None]</div>
+                        <button class="equipment-btn" onclick="alert('Change weapon')">Change▼</button>
+                    </div>
+                    <div class="equipment-slot-compact">
+                        <div class="equipment-label">Armor</div>
+                        <div class="equipment-value">[None]</div>
+                        <button class="equipment-btn" onclick="alert('Change armor')">Change▼</button>
+                    </div>
+                    <div class="equipment-slot-compact">
+                        <div class="equipment-label">Helm</div>
+                        <div class="equipment-value">[None]</div>
+                        <button class="equipment-btn" onclick="alert('Change helm')">Change▼</button>
+                    </div>
+                    <div class="equipment-slot-compact">
+                        <div class="equipment-label">Boots</div>
+                        <div class="equipment-value">[None]</div>
+                        <button class="equipment-btn" onclick="alert('Change boots')">Change▼</button>
+                    </div>
+                    <div class="equipment-slot-compact">
+                        <div class="equipment-label">Accessory</div>
+                        <div class="equipment-value">[None]</div>
+                        <button class="equipment-btn" onclick="alert('Change accessory')">Change▼</button>
+                    </div>
+                </div>
+                <div class="stat-preview">STAT PREVIEW: ATK:8 DEF:6 MAG:7 SPD:5</div>
+            </div>
+
+            <!-- Djinn -->
+            <div class="section-card djinn-section" id="djinnSection">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="section-title">DJINN (3 slots)</div>
+                    <button class="collapse-toggle" onclick="toggleCollapse('djinnSection')">▼</button>
+                </div>
+                <div class="djinn-row">
+                    <div class="djinn-slot-compact">
+                        <div class="djinn-name">Flint</div>
+                        <div class="djinn-element">Venus</div>
+                        <div class="djinn-state">[Set]</div>
+                    </div>
+                    <div class="djinn-slot-compact">
+                        <div class="djinn-name">[Empty]</div>
+                        <button class="equipment-btn" onclick="alert('Add Djinn')">Add▼</button>
+                    </div>
+                    <div class="djinn-slot-compact">
+                        <div class="djinn-name">[Empty]</div>
+                        <button class="equipment-btn" onclick="alert('Add Djinn')">Add▼</button>
+                    </div>
+                </div>
+                <div class="djinn-available">Available: [Forge]Mars [Fizz]Mercury [Breeze]Jupiter</div>
+                <div class="djinn-abilities">ABILITIES: Growth, Quake (from Flint)</div>
+            </div>
+
+            <!-- Bench Units -->
+            <div class="section-card bench-section">
+                <div class="section-title">BENCH UNITS</div>
+                <div class="bench-grid">
+                    <div class="bench-unit-compact" onclick="alert('Add Garet')">
+                        <div class="unit-name">Garet</div>
+                        <div class="unit-level">Lv. 1</div>
+                        <div class="unit-element">Mars</div>
+                    </div>
+                    <div class="bench-unit-compact" onclick="alert('Add Ivan')">
+                        <div class="unit-name">Ivan</div>
+                        <div class="unit-level">Lv. 1</div>
+                        <div class="unit-element">Jupiter</div>
+                    </div>
+                    <div class="bench-unit-compact" onclick="alert('Add Mia')">
+                        <div class="unit-name">Mia</div>
+                        <div class="unit-level">Lv. 1</div>
+                        <div class="unit-element">Mercury</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enemies - Minimal -->
+            <div class="section-card enemies-section">
+                <div class="section-title">ENEMIES</div>
+                <div class="enemies-grid">
+                    <div class="enemy-card-minimal">
+                        <div class="enemy-icon">🎯</div>
+                        <div class="enemy-name">Garet</div>
+                        <div class="enemy-element">Mars</div>
+                    </div>
+                    <div class="enemy-card-minimal">
+                        <div class="enemy-icon">🎯</div>
+                        <div class="enemy-name">Bandit</div>
+                        <div class="enemy-element">Mars</div>
+                    </div>
+                    <div class="enemy-card-minimal">
+                        <div class="enemy-icon">👑</div>
+                        <div class="enemy-name">Captain</div>
+                        <div class="enemy-element">Mars</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-section">
+                <button class="cancel-btn-action" onclick="alert('Cancel')">Cancel</button>
+                <button class="start-battle-btn" onclick="alert('Start Battle')">Start Battle</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectSlot(index) {
+            document.querySelectorAll('.team-slot').forEach((slot, i) => {
+                if (i === index) {
+                    slot.classList.add('selected');
+                    slot.classList.remove('empty');
+                } else {
+                    slot.classList.remove('selected');
+                }
+            });
+        }
+
+        function toggleCollapse(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
+        }
+    </script>
+</body>
+</html>
+

@@ -335,17 +335,19 @@ export const TRAINING_DUMMY: Encounter = {
 // VS1 DEMO ENCOUNTER
 // ============================================================================
 
-export const VS1_BANDITS: Encounter = {
-  id: 'vs1-bandits',
-  name: 'VS1: Bandit Ambush',
-  enemies: ['bandit-minion', 'bandit-minion', 'bandit-captain'],
+export const VS1_GARET: Encounter = {
+  id: 'vs1-garet',
+  name: 'VS1: Garet\'s Challenge',
+  enemies: ['garet-enemy'],
   difficulty: 'medium',
   reward: {
-    xp: 45,
-    gold: 40,
+    xp: 60,
+    gold: 19,
     equipment: {
       type: 'none',
     },
+    djinn: 'forge', // Mars T1 Djinn
+    unlockUnit: 'war-mage', // Recruit Garet
   },
 };
 
@@ -384,7 +386,7 @@ export const ENCOUNTERS: Record<string, Encounter> = {
   'training-dummy': TRAINING_DUMMY,
 
   // VS1 Demo
-  'vs1-bandits': VS1_BANDITS,
+  'vs1-garet': VS1_GARET,
 };
 
 // ============================================================================

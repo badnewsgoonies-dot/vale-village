@@ -13,6 +13,10 @@ import { EQUIPMENT } from '../../data/definitions/equipment';
 import type { EquipmentReward } from '../../data/schemas/EncounterSchema';
 import { ENCOUNTERS } from '../../data/definitions/encounters';
 import { collectDjinn } from './DjinnService';
+import { UNIT_DEFINITIONS } from '../../data/definitions/units';
+import { ENEMIES } from '../../data/definitions/enemies';
+import { createUnit } from '../models/Unit';
+import type { Unit } from '../models/Unit';
 
 type EquipmentResolution =
   | { type: 'none' }
@@ -21,7 +25,7 @@ type EquipmentResolution =
 
 export function processVictory(
   battle: BattleState
-): { distribution: RewardDistribution; updatedTeam: Team } {
+): { distribution: RewardDistribution; updatedTeam: Team; recruitedUnit?: Unit } {
   const encounterId = getEncounterId(battle);
   if (!encounterId) {
     throw new Error('Cannot process victory without encounter ID');
@@ -45,6 +49,24 @@ export function processVictory(
     // The player already has the Djinn, so no error is needed
   }
 
+  // Check for unit recruitment
+  let recruitedUnit: Unit | undefined;
+  if (encounter?.reward.unlockUnit) {
+    const unitDef = UNIT_DEFINITIONS[encounter.reward.unlockUnit];
+    if (!unitDef) {
+      console.error(`Unit definition ${encounter.reward.unlockUnit} not found`);
+    } else {
+      // Get level from first enemy (should be the recruitable unit enemy)
+      const firstEnemyId = encounter.enemies[0];
+      const enemy = firstEnemyId ? ENEMIES[firstEnemyId] : null;
+      const enemyLevel = enemy?.level ?? 1; // Default to level 1 if not found
+      
+      recruitedUnit = createUnit(unitDef, enemyLevel, 0);
+      
+      // Note: Don't add to active party automatically - add to roster, let player choose
+    }
+  }
+
   const resolvedDistribution: RewardDistribution = {
     ...distribution,
     fixedEquipment: equipmentResolution.type === 'fixed' ? equipmentResolution.equipment : undefined,
@@ -54,6 +76,7 @@ export function processVictory(
   return {
     distribution: resolvedDistribution,
     updatedTeam,
+    recruitedUnit, // New: return recruited unit
   };
 }
 

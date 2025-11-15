@@ -9,10 +9,14 @@ import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopScreen } from './ui/components/ShopScreen';
 import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
+import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
 import { useStore } from './ui/state/store';
-import { createTestBattle } from './ui/utils/testBattle';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
+import { UNIT_DEFINITIONS } from './data/definitions/units';
+import { createUnit } from './core/models/Unit';
+import { createTeam } from './core/models/Team';
+import { collectDjinn, equipDjinn } from './core/services/DjinnService';
 
 function App() {
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
@@ -28,10 +32,14 @@ function App() {
   const selectEquipmentChoice = useStore((s) => s.selectEquipmentChoice);
   const team = useStore((s) => s.team);
   const setTeam = useStore((s) => s.setTeam);
+  const setRoster = useStore((s) => s.setRoster);
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
   const currentShopId = useStore((s) => s.currentShopId);
   const startDialogueTree = useStore((s) => s.startDialogueTree);
+  const pendingBattleEncounterId = useStore((s) => s.pendingBattleEncounterId);
+  const confirmBattleTeam = useStore((s) => s.confirmBattleTeam);
+  const setPendingBattle = useStore((s) => s.setPendingBattle);
   const [showSaveMenu, setShowSaveMenu] = useState(false);
   const [showDjinnCollection, setShowDjinnCollection] = useState(false);
   const [showPartyManagement, setShowPartyManagement] = useState(false);
@@ -40,10 +48,42 @@ function App() {
   useEffect(() => {
     // Only initialize if team doesn't exist
     if (!team) {
-      const { battleState } = createTestBattle();
-      setTeam(battleState.playerTeam);
+      // Create Isaac (Adept) at level 1
+      const adeptDef = UNIT_DEFINITIONS['adept'];
+      if (!adeptDef) {
+        console.error('Adept unit definition not found');
+        return;
+      }
+      const isaac = createUnit(adeptDef, 1, 0);
+      
+      // Create initial team with just Isaac
+      const initialTeam = createTeam([isaac]);
+      
+      // Collect Flint Djinn (Venus T1)
+      const flintCollectResult = collectDjinn(initialTeam, 'flint');
+      if (!flintCollectResult.ok) {
+        // Fallback if Djinn collection fails
+        console.error('Failed to collect Flint Djinn:', flintCollectResult.error);
+        setTeam(initialTeam);
+        setRoster([isaac]);
+        return;
+      }
+      
+      // Equip Flint to first slot (slot 0)
+      const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
+      if (!flintEquipResult.ok) {
+        // Fallback if equipping fails (shouldn't happen, but handle gracefully)
+        console.error('Failed to equip Flint Djinn:', flintEquipResult.error);
+        setTeam(flintCollectResult.value); // Still use team with collected Djinn
+        setRoster([isaac]);
+        return;
+      }
+      
+      // Success: Set team with Isaac + equipped Flint Djinn
+      setTeam(flintEquipResult.value);
+      setRoster([isaac]); // Roster starts with just Isaac
     }
-  }, [team, setTeam]);
+  }, [team, setTeam, setRoster]);
 
   // Ensure app starts in overworld mode
   useEffect(() => {
@@ -190,6 +230,18 @@ function App() {
         />
       ) : (
         <>
+          {mode === 'team-select' && pendingBattleEncounterId && (
+            <PreBattleTeamSelectScreen
+              encounterId={pendingBattleEncounterId}
+              onConfirm={(team) => {
+                confirmBattleTeam(team);
+              }}
+              onCancel={() => {
+                setPendingBattle(null);
+                setMode('overworld');
+              }}
+            />
+          )}
           {mode === 'overworld' && <OverworldMap />}
           {mode === 'battle' && <QueueBattleView />}
           {mode === 'dialogue' && (

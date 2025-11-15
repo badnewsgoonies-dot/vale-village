@@ -3,20 +3,20 @@ import { VS1_SCENE_PRE, VS1_SCENE_POST, VS1_ENCOUNTER_ID } from '../../story/vs1
 
 export const VS1_PRE_SCENE: DialogueTree = {
   id: VS1_SCENE_PRE,
-  name: 'VS1: House Under Attack',
+  name: "VS1: Garet's Challenge",
   startNodeId: 'intro',
   nodes: [
     {
       id: 'intro',
       speaker: 'Isaac',
-      text: 'Something feels off...',
+      text: 'Garet... I need to prove myself.',
       portrait: 'isaac',
-      nextNodeId: 'warning',
+      nextNodeId: 'challenge',
     },
     {
-      id: 'warning',
+      id: 'challenge',
       speaker: 'Garet',
-      text: 'Bandits outside! Get ready!',
+      text: "Show me what you've got, Isaac! Let's see if you're ready.",
       portrait: 'garet',
       effects: { startBattle: VS1_ENCOUNTER_ID },
     },
@@ -25,20 +25,27 @@ export const VS1_PRE_SCENE: DialogueTree = {
 
 export const VS1_POST_SCENE: DialogueTree = {
   id: VS1_SCENE_POST,
-  name: 'VS1: Victory',
+  name: 'VS1: Garet Joins',
   startNodeId: 'victory',
   nodes: [
     {
       id: 'victory',
       speaker: 'Isaac',
-      text: 'We did it.',
+      text: 'You fought well, Garet.',
       portrait: 'isaac',
-      nextNodeId: 'relief',
+      nextNodeId: 'garet-response',
     },
     {
-      id: 'relief',
+      id: 'garet-response',
       speaker: 'Garet',
-      text: "That was close... Let's warn the others.",
+      text: "You've got what it takes. I'm joining your team!",
+      portrait: 'garet',
+      nextNodeId: 'forge',
+    },
+    {
+      id: 'forge',
+      speaker: 'Garet',
+      text: "And take this Forge Djinn - it'll help us both in battle.",
       portrait: 'garet',
     },
   ],

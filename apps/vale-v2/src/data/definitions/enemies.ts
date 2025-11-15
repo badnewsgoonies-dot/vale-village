@@ -12,6 +12,8 @@
  * NO NEUTRAL ELEMENT
  */
 import type { Enemy } from '../schemas/EnemySchema';
+import { unitDefinitionToEnemy } from '../../core/utils/unitToEnemy';
+import { UNIT_DEFINITIONS } from './units';
 import {
   STRIKE,
   HEAVY_STRIKE,
@@ -1170,6 +1172,50 @@ export const BANDIT_CAPTAIN: Enemy = {
 };
 
 // ============================================================================
+// Recruitable Unit Enemies (generated from unit definitions)
+// ============================================================================
+
+// VS1: Garet (War Mage) - Level 2
+const warMageDef = UNIT_DEFINITIONS['war-mage'];
+if (!warMageDef) throw new Error('war-mage unit definition not found');
+export const GARET_ENEMY = unitDefinitionToEnemy(
+  warMageDef,
+  2, // Level 2 for VS1
+  60, // Base XP
+  19, // Base Gold
+  { id: 'garet-enemy' }
+);
+
+// Sentinel - Level 3 (example for future encounters)
+const sentinelDef = UNIT_DEFINITIONS['sentinel'];
+if (!sentinelDef) throw new Error('sentinel unit definition not found');
+export const SENTINEL_ENEMY = unitDefinitionToEnemy(
+  sentinelDef,
+  3, // Level 3
+  80, // Base XP
+  25, // Base Gold
+  { id: 'sentinel-enemy' }
+);
+
+// Stormcaller - Level 3 (example for future encounters)
+const stormcallerDef = UNIT_DEFINITIONS['stormcaller'];
+if (!stormcallerDef) throw new Error('stormcaller unit definition not found');
+export const STORMCALLER_ENEMY = unitDefinitionToEnemy(
+  stormcallerDef,
+  3, // Level 3
+  80, // Base XP
+  25, // Base Gold
+  { id: 'stormcaller-enemy' }
+);
+
+// Note: Starter units (adept, mystic, ranger) can also have enemy versions
+// if needed for story battles, but they're not typically recruited.
+// Uncomment if needed:
+// export const ADEPT_ENEMY = unitDefinitionToEnemy(UNIT_DEFINITIONS['adept'], 1, 50, 15);
+// export const MYSTIC_ENEMY = unitDefinitionToEnemy(UNIT_DEFINITIONS['mystic'], 1, 50, 15);
+// export const RANGER_ENEMY = unitDefinitionToEnemy(UNIT_DEFINITIONS['ranger'], 1, 50, 15);
+
+// ============================================================================
 // Export all enemies
 // ============================================================================
 
@@ -1245,4 +1291,9 @@ export const ENEMIES: Record<string, Enemy> = {
   // VS1 Demo
   'bandit-minion': BANDIT_MINION,
   'bandit-captain': BANDIT_CAPTAIN,
+
+  // Recruitable Unit Enemies
+  'garet-enemy': GARET_ENEMY,
+  'sentinel-enemy': SENTINEL_ENEMY,
+  'stormcaller-enemy': STORMCALLER_ENEMY,
 };

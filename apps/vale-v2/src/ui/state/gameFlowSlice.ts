@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import type { MapTrigger } from '@/core/models/overworld';
 import type { Encounter } from '@/data/schemas/EncounterSchema';
+import type { Team } from '@/core/models/Team';
 import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
 import { makePRNG } from '@/core/random/prng';
@@ -11,13 +12,16 @@ import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
 
 export interface GameFlowSlice {
-  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop';
+  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
   currentShopId: string | null;
   preBattlePosition: { mapId: string; position: { x: number; y: number } } | null;
+  pendingBattleEncounterId: string | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
+  setPendingBattle: (encounterId: string | null) => void;
   handleTrigger: (trigger: MapTrigger | null) => void;
+  confirmBattleTeam: (team: Team) => void;
   resetLastTrigger: () => void;
   returnToOverworld: () => void;
 }
@@ -33,7 +37,9 @@ export const createGameFlowSlice: StateCreator<
   currentEncounter: null,
   currentShopId: null,
   preBattlePosition: null,
+  pendingBattleEncounterId: null,
   setMode: (mode) => set({ mode }),
+  setPendingBattle: (encounterId) => set({ pendingBattleEncounterId: encounterId }),
   handleTrigger: (trigger) => {
     if (!trigger) {
       set({ lastTrigger: null });
@@ -56,43 +62,12 @@ export const createGameFlowSlice: StateCreator<
         return;
       }
 
-      const team = get().team;
-      if (!team) {
-        console.error('No team available for battle');
-        return;
-      }
-
-      // Save current overworld position before entering battle
-      const { currentMapId, playerPosition } = get();
-      const preBattlePosition = {
-        mapId: currentMapId,
-        position: { x: playerPosition.x, y: playerPosition.y },
-      };
-
-      const seed = Date.now();
-      const rng = makePRNG(seed);
-
-      try {
-        const result = createBattleFromEncounter(encounterId, team, rng);
-        if (!result || !result.battle) {
-          console.error(`Failed to create battle from encounter ${encounterId}`);
-          return;
-        }
-
-        get().setBattle(result.battle, seed);
-
-        set({
-          currentEncounter: encounter,
-          lastTrigger: trigger,
-          mode: 'battle',
-          preBattlePosition,
-        });
-
-      } catch (error) {
-        console.error('Error creating battle:', error);
-        return;
-      }
-
+      // Show team selection screen instead of starting battle immediately
+      set({
+        mode: 'team-select',
+        pendingBattleEncounterId: encounterId,
+        lastTrigger: trigger,
+      });
       return;
     }
 
@@ -156,6 +131,51 @@ export const createGameFlowSlice: StateCreator<
     set({ lastTrigger: trigger });
   },
   resetLastTrigger: () => set({ lastTrigger: null }),
+
+  confirmBattleTeam: (team: Team) => {
+    const { pendingBattleEncounterId } = get();
+    if (!pendingBattleEncounterId) {
+      console.error('No pending battle encounter');
+      return;
+    }
+
+    const encounter = ENCOUNTERS[pendingBattleEncounterId];
+    if (!encounter) {
+      console.error(`Encounter ${pendingBattleEncounterId} not found`);
+      return;
+    }
+
+    // Save current overworld position before entering battle
+    const { currentMapId, playerPosition } = get();
+    const preBattlePosition = {
+      mapId: currentMapId,
+      position: { x: playerPosition.x, y: playerPosition.y },
+    };
+
+    // Create battle with selected team
+    const seed = Date.now();
+    const rng = makePRNG(seed);
+
+    try {
+      const result = createBattleFromEncounter(pendingBattleEncounterId, team, rng);
+      if (!result || !result.battle) {
+        console.error(`Failed to create battle from encounter ${pendingBattleEncounterId}`);
+        return;
+      }
+
+      get().setBattle(result.battle, seed);
+      get().setTeam(team);
+
+      set({
+        currentEncounter: encounter,
+        mode: 'battle',
+        preBattlePosition,
+        pendingBattleEncounterId: null,
+      });
+    } catch (error) {
+      console.error('Error creating battle:', error);
+    }
+  },
 
   returnToOverworld: () => {
     const { preBattlePosition, teleportPlayer } = get();

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Battle Preparation - Final Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .pre-battle-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0.5rem;
+        }
+
+        .pre-battle-container {
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            max-height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        /* Header - Fixed Height */
+        .pre-battle-header {
+            height: 60px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+
+        .header-title {
+            font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+            font-weight: bold;
+        }
+
+        .header-info {
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            color: #ccc;
+        }
+
+        .close-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #666;
+        }
+
+        /* Main Content Area - Grid Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Column */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        /* Right Column */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        /* Section Cards */
+        .section-card {
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #1e1e1e;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #4a9eff;
+        }
+
+        /* Team & Bench Section - Side by Side */
+        .team-bench-section {
+            height: 180px; /* Reduced to prevent scrolling */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .current-party-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .current-party-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .party-slot {
+            border: 1px solid #444;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #252525;
+            padding: 0.25rem;
+        }
+
+        .party-slot.empty {
+            border-style: dashed;
+            color: #666;
+        }
+
+        .party-slot.filled.selected {
+            border-color: #4a9eff;
+            box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+            background: #1e2a3a;
+        }
+
+        .party-slot:hover {
+            border-color: #666;
+        }
+
+        .unit-name {
+            font-size: clamp(0.75rem, 1vw, 0.9rem);
+            font-weight: bold;
+            margin-bottom: 0.15rem;
+        }
+
+        .unit-level {
+            font-size: clamp(0.65rem, 0.9vw, 0.75rem);
+            color: #4a9eff;
+        }
+
+        .unit-element {
+            font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+            color: #ff6b35;
+            margin-top: 0.15rem;
+        }
+
+        .empty-slot-text {
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            color: #666;
+        }
+
+        .bench-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .bench-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden; /* NO SCROLLING - limit to visible items */
+            flex: 1;
+            max-height: 100%;
+        }
+
+        .bench-unit-compact {
+            padding: 0.5rem;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bench-unit-compact:hover {
+            border-color: #4a9eff;
+            background: #1e2a3a;
+        }
+
+        .bench-unit-info {
+            flex: 1;
+        }
+
+        /* Equipment Section - New Layout */
+        .equipment-section {
+            height: 200px; /* Reduced to prevent scrolling */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .equipment-slots-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .equipment-slot {
+            border: 2px solid #444;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #252525;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .equipment-slot:hover {
+            border-color: #4a9eff;
+            background: #1e2a3a;
+        }
+
+        .equipment-slot.helm {
+            grid-column: 1 / -1;
+        }
+
+        .equipment-slot.weapon {
+            grid-column: 1;
+        }
+
+        .equipment-slot.armor {
+            grid-column: 2;
+        }
+
+        .equipment-slot.boots {
+            grid-column: 1;
+        }
+
+        .equipment-slot.accessory {
+            grid-column: 2;
+        }
+
+        .equipment-label {
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .equipment-value {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ccc;
+        }
+
+        .equipment-bonus {
+            font-size: clamp(0.6rem, 0.8vw, 0.65rem);
+            color: #4a9eff;
+            margin-top: 0.25rem;
+        }
+
+        .equipment-compendium {
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #252525;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .compendium-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 0.25rem;
+        }
+
+        .compendium-tab {
+            padding: 0.25rem 0.75rem;
+            background: #333;
+            border: none;
+            color: #ccc;
+            border-radius: 3px 3px 0 0;
+            cursor: pointer;
+            font-size: clamp(0.65rem, 0.85vw, 0.75rem);
+            transition: all 0.2s;
+        }
+
+        .compendium-tab.active {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .compendium-tab:hover {
+            background: #555;
+        }
+
+        .compendium-tab.active:hover {
+            background: #5aaeff;
+        }
+
+        .compendium-content {
+            flex: 1;
+            overflow: hidden; /* NO SCROLLING - show limited items */
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .compendium-item {
+            padding: 0.5rem;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .compendium-item:hover {
+            border-color: #4a9eff;
+            background: #252525;
+        }
+
+        .item-name {
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-stats {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ccc;
+        }
+
+        /* Djinn Section - Similar Layout */
+        .djinn-section {
+            height: 200px; /* Reduced to prevent scrolling */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .djinn-slots-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .djinn-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .djinn-slot {
+            border: 2px solid #444;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #252525;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .djinn-slot:hover {
+            border-color: #4a9eff;
+            background: #1e2a3a;
+        }
+
+        .djinn-sprite {
+            width: 48px;
+            height: 48px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .djinn-name {
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            font-weight: bold;
+            color: #4a9eff;
+        }
+
+        .djinn-element {
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+            color: #ff6b35;
+        }
+
+        .djinn-state {
+            font-size: clamp(0.6rem, 0.8vw, 0.65rem);
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
+        .djinn-abilities-panel {
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #252525;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .abilities-title {
+            font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #4a9eff;
+        }
+
+        .abilities-content {
+            flex: 1;
+            overflow: hidden; /* NO SCROLLING - show limited abilities */
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .ability-item {
+            padding: 0.5rem;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.65rem, 0.85vw, 0.7rem);
+        }
+
+        .ability-name {
+            font-weight: bold;
+            color: #4a9eff;
+            margin-bottom: 0.25rem;
+        }
+
+        .ability-source {
+            font-size: clamp(0.6rem, 0.8vw, 0.65rem);
+            color: #999;
+        }
+
+        /* Enemies Section - Portal Tile */
+        .enemies-section {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .enemy-portal {
+            width: 200px;
+            height: 100px;
+            border: 2px solid #4a9eff;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1e2a3a 0%, #252525 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enemy-portal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(74, 158, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .enemy-portal:hover {
+            border-color: #5aaeff;
+            box-shadow: 0 0 20px rgba(74, 158, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .portal-title {
+            font-size: clamp(0.9rem, 1.3vw, 1rem);
+            font-weight: bold;
+            color: #4a9eff;
+            margin-bottom: 0.25rem;
+            z-index: 1;
+        }
+
+        .portal-enemies {
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            color: #ccc;
+            z-index: 1;
+        }
+
+        .portal-icon {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+            z-index: 1;
+        }
+
+        /* Actions - Fixed Height */
+        .actions-section {
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            flex-shrink: 0;
+        }
+
+        .cancel-btn-action,
+        .start-battle-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: clamp(0.9rem, 1.3vw, 1rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancel-btn-action {
+            background: #444;
+            color: #fff;
+        }
+
+        .cancel-btn-action:hover {
+            background: #666;
+        }
+
+        .start-battle-btn {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .start-battle-btn:hover:not(:disabled) {
+            background: #5aaeff;
+            box-shadow: 0 0 10px rgba(74, 158, 255, 0.4);
+        }
+
+        .start-battle-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="pre-battle-overlay">
+        <div class="pre-battle-container">
+            <!-- Header -->
+            <div class="pre-battle-header">
+                <div>
+                    <div class="header-title">PRE-BATTLE PREPARATION</div>
+                    <div class="header-info">VS1: Garet's Challenge | Difficulty: Medium | Rewards: 60 XP, 19 Gold</div>
+                </div>
+                <button class="close-btn" onclick="alert('Close')">×</button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Team & Bench Section -->
+                    <div class="section-card team-bench-section">
+                        <div class="current-party-panel">
+                            <div class="section-title">YOUR TEAM (1/4)</div>
+                            <div class="current-party-grid">
+                                <div class="party-slot filled selected" onclick="selectSlot(0)">
+                                    <div class="unit-name">Isaac</div>
+                                    <div class="unit-level">Lv. 1</div>
+                                    <div class="unit-element">Venus</div>
+                                </div>
+                                <div class="party-slot empty" onclick="selectSlot(1)">
+                                    <div class="empty-slot-text">[+]</div>
+                                </div>
+                                <div class="party-slot empty" onclick="selectSlot(2)">
+                                    <div class="empty-slot-text">[+]</div>
+                                </div>
+                                <div class="party-slot empty" onclick="selectSlot(3)">
+                                    <div class="empty-slot-text">[+]</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bench-panel">
+                            <div class="section-title">BENCH UNITS</div>
+                            <div class="bench-grid">
+                                <div class="bench-unit-compact" onclick="addToTeam('garet')">
+                                    <div class="bench-unit-info">
+                                        <div class="unit-name">Garet</div>
+                                        <div class="unit-level">Lv. 1</div>
+                                        <div class="unit-element">Mars</div>
+                                    </div>
+                                </div>
+                                <div class="bench-unit-compact" onclick="addToTeam('ivan')">
+                                    <div class="bench-unit-info">
+                                        <div class="unit-name">Ivan</div>
+                                        <div class="unit-level">Lv. 1</div>
+                                        <div class="unit-element">Jupiter</div>
+                                    </div>
+                                </div>
+                                <div class="bench-unit-compact" onclick="addToTeam('mia')">
+                                    <div class="bench-unit-info">
+                                        <div class="unit-name">Mia</div>
+                                        <div class="unit-level">Lv. 1</div>
+                                        <div class="unit-element">Mercury</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Section -->
+                    <div class="section-card equipment-section">
+                        <div class="equipment-slots-panel">
+                            <div class="section-title">EQUIPMENT (Isaac)</div>
+                            <div class="equipment-grid">
+                                <div class="equipment-slot helm" onclick="selectEquipment('helm')">
+                                    <div class="equipment-label">Helm</div>
+                                    <div class="equipment-value">[None]</div>
+                                </div>
+                                <div class="equipment-slot weapon" onclick="selectEquipment('weapon')">
+                                    <div class="equipment-label">Weapon</div>
+                                    <div class="equipment-value">[None]</div>
+                                </div>
+                                <div class="equipment-slot armor" onclick="selectEquipment('armor')">
+                                    <div class="equipment-label">Armor</div>
+                                    <div class="equipment-value">[None]</div>
+                                </div>
+                                <div class="equipment-slot boots" onclick="selectEquipment('boots')">
+                                    <div class="equipment-label">Boots</div>
+                                    <div class="equipment-value">[None]</div>
+                                </div>
+                                <div class="equipment-slot accessory" onclick="selectEquipment('accessory')">
+                                    <div class="equipment-label">Accessory</div>
+                                    <div class="equipment-value">[None]</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="equipment-compendium">
+                            <div class="compendium-tabs">
+                                <button class="compendium-tab active" onclick="switchTab('weapon')">Weapon</button>
+                                <button class="compendium-tab" onclick="switchTab('armor')">Armor</button>
+                                <button class="compendium-tab" onclick="switchTab('helm')">Helm</button>
+                                <button class="compendium-tab" onclick="switchTab('boots')">Boots</button>
+                                <button class="compendium-tab" onclick="switchTab('accessory')">Accessory</button>
+                            </div>
+                            <div class="compendium-content">
+                                <div class="compendium-item" onclick="equipItem('iron-sword')">
+                                    <div class="item-name">Iron Sword</div>
+                                    <div class="item-stats">+8 ATK</div>
+                                </div>
+                                <div class="compendium-item" onclick="equipItem('wooden-sword')">
+                                    <div class="item-name">Wooden Sword</div>
+                                    <div class="item-stats">+4 ATK</div>
+                                </div>
+                                <div class="compendium-item" onclick="equipItem('steel-sword')">
+                                    <div class="item-name">Steel Sword</div>
+                                    <div class="item-stats">+12 ATK</div>
+                                </div>
+                                <!-- Limited items shown - no scrolling -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Djinn Section -->
+                    <div class="section-card djinn-section">
+                        <div class="djinn-slots-panel">
+                            <div class="section-title">DJINN (3 slots)</div>
+                            <div class="djinn-slots-grid">
+                                <div class="djinn-slot" onclick="selectDjinnSlot(0)">
+                                    <div class="djinn-sprite">🔥</div>
+                                    <div class="djinn-name">Flint</div>
+                                    <div class="djinn-element">Venus</div>
+                                    <div class="djinn-state">[Set]</div>
+                                </div>
+                                <div class="djinn-slot" onclick="selectDjinnSlot(1)">
+                                    <div class="djinn-sprite">⚪</div>
+                                    <div class="djinn-name">[Empty]</div>
+                                </div>
+                                <div class="djinn-slot" onclick="selectDjinnSlot(2)">
+                                    <div class="djinn-sprite">⚪</div>
+                                    <div class="djinn-name">[Empty]</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="djinn-abilities-panel">
+                            <div class="abilities-title">GRANTED ABILITIES</div>
+                            <div class="abilities-content">
+                                <div class="ability-item">
+                                    <div class="ability-name">Growth</div>
+                                    <div class="ability-source">Flint (Venus - Same)</div>
+                                </div>
+                                <div class="ability-item">
+                                    <div class="ability-name">Quake</div>
+                                    <div class="ability-source">Flint (Venus - Same)</div>
+                                </div>
+                                <div class="ability-item">
+                                    <div class="ability-name">Stone Fist</div>
+                                    <div class="ability-source">Flint (Venus - Same)</div>
+                                </div>
+                                <!-- Limited abilities shown - no scrolling -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Enemies Portal Tile -->
+                    <div class="section-card enemies-section">
+                        <div class="enemy-portal" onclick="alert('View enemies')">
+                            <div class="portal-icon">⚔️</div>
+                            <div class="portal-title">ENEMIES</div>
+                            <div class="portal-enemies">Garet • Bandit • Captain</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-section">
+                <button class="cancel-btn-action" onclick="alert('Cancel')">Cancel</button>
+                <button class="start-battle-btn" onclick="alert('Start Battle')">Start Battle</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectSlot(index) {
+            document.querySelectorAll('.party-slot').forEach((slot, i) => {
+                if (i === index) {
+                    slot.classList.add('selected');
+                } else {
+                    slot.classList.remove('selected');
+                }
+            });
+        }
+
+        function addToTeam(unitId) {
+            alert(`Add ${unitId} to team`);
+        }
+
+        function selectEquipment(slot) {
+            // Highlight selected equipment slot
+            document.querySelectorAll('.equipment-slot').forEach(s => s.classList.remove('selected'));
+            event.target.closest('.equipment-slot').classList.add('selected');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.compendium-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function equipItem(itemId) {
+            alert(`Equip ${itemId}`);
+        }
+
+        function selectDjinnSlot(index) {
+            document.querySelectorAll('.djinn-slot').forEach((slot, i) => {
+                if (i === index) {
+                    slot.classList.add('selected');
+                } else {
+                    slot.classList.remove('selected');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

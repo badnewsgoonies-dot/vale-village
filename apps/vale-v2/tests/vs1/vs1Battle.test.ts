@@ -1,28 +1,49 @@
 /**
  * VS1 Battle Feel & Balance Tests
  *
- * These tests validate that the vs1-bandits encounter:
- * - Has proper enemy composition (2 minions + 1 captain)
+ * These tests validate that the vs1-garet encounter:
+ * - Has proper enemy composition (1 Garet enemy)
  * - Is winnable with reasonable effort
- * - Provides meaningful combat choices (AoE vs single-target, Djinn vs basic)
+ * - Provides meaningful combat choices (Djinn abilities vs basic attacks)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createStore } from '@/ui/state/store';
 import { VS1_ENCOUNTER_ID } from '@/story/vs1Constants';
 import type { BattleState } from '@/core/models/BattleState';
-import { createTestBattle } from '@/ui/utils/testBattle';
-import { calculateMaxHp } from '@/core/models/Unit';
+import { calculateMaxHp, createUnit } from '@/core/models/Unit';
+import { UNIT_DEFINITIONS } from '@/data/definitions/units';
+import { createTeam } from '@/core/models/Team';
+import { collectDjinn, equipDjinn } from '@/core/services/DjinnService';
 
-describe('VS1 vs1-bandits encounter (feel & balance)', () => {
+describe('VS1 vs1-garet encounter (feel & balance)', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
     store = createStore();
 
-    // Initialize team (same as App.tsx does on startup)
-    const { battleState } = createTestBattle();
-    store.getState().setTeam(battleState.playerTeam);
+    // Initialize team exactly like App.tsx: Isaac (adept) + Flint Djinn equipped
+    const adeptDef = UNIT_DEFINITIONS['adept'];
+    if (!adeptDef) {
+      throw new Error('Adept unit definition not found');
+    }
+
+    const isaac = createUnit(adeptDef, 1, 0);
+    let team = createTeam([isaac]);
+
+    const flintCollectResult = collectDjinn(team, 'flint');
+    if (!flintCollectResult.ok) {
+      throw new Error(`Failed to collect Flint: ${flintCollectResult.error}`);
+    }
+
+    const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
+    if (!flintEquipResult.ok) {
+      throw new Error(`Failed to equip Flint: ${flintEquipResult.error}`);
+    }
+
+    team = flintEquipResult.value;
+    store.getState().setTeam(team);
+    store.getState().setRoster([isaac]);
   });
 
   function startVs1Battle(): BattleState | null {
@@ -32,6 +53,14 @@ describe('VS1 vs1-bandits encounter (feel & balance)', () => {
       position: { x: 0, y: 0 },
       data: { encounterId: VS1_ENCOUNTER_ID },
     });
+    expect(store.getState().mode).toBe('team-select');
+
+    const currentTeam = store.getState().team;
+    if (!currentTeam) {
+      return null;
+    }
+
+    store.getState().confirmBattleTeam(currentTeam);
     return store.getState().battle;
   }
 
@@ -41,19 +70,19 @@ describe('VS1 vs1-bandits encounter (feel & balance)', () => {
     expect(battle).toBeTruthy();
     if (!battle) return;
 
-    // VS1 should have 3 enemies: 2 minions + 1 captain
-    expect(battle.enemies.length).toBe(3);
+    // VS1 should have 1 enemy: Garet
+    expect(battle.enemies.length).toBe(1);
 
-    // Check enemy IDs include bandit-related enemies
+    // Check enemy ID is garet-enemy
     const enemyIds = battle.enemies.map(e => e.id);
-    const hasBandits = enemyIds.some(id => id.includes('bandit'));
-    expect(hasBandits).toBe(true);
+    const hasGaret = enemyIds.some(id => id.startsWith('garet-enemy')); // Enemy IDs include suffix
+    expect(hasGaret).toBe(true);
 
     // Should start in planning phase
     expect(battle.phase).toBe('planning');
 
-    // Player should have 4 units
-    expect(battle.playerTeam.units.length).toBe(4);
+    // Player should have 1 unit (Isaac)
+    expect(battle.playerTeam.units.length).toBe(1);
   });
 
   it('player team has sufficient HP and mana to sustain battle', () => {
@@ -117,7 +146,7 @@ describe('VS1 vs1-bandits encounter (feel & balance)', () => {
     if (!battle) return;
 
     // Turn order should include all combatants
-    expect(battle.turnOrder.length).toBe(7); // 4 players + 3 enemies
+    expect(battle.turnOrder.length).toBe(2); // 1 player + 1 enemy
 
     // Turn order should contain all unit IDs
     const allUnitIds = [

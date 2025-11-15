@@ -34,10 +34,21 @@ export const createRewardsSlice: StateCreator<
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
 
-    const { updateTeamUnits } = get();
-    updateTeamUnits(result.updatedTeam.units);
+    const { setTeam, addUnitToRoster } = get();
+    setTeam(result.updatedTeam);
 
-    set({ lastBattleRewards: result.distribution });
+    // Handle unit recruitment
+    if (result.recruitedUnit) {
+      addUnitToRoster(result.recruitedUnit);
+      console.log(`🎉 Recruited ${result.recruitedUnit.name}!`);
+    }
+
+    set({ 
+      lastBattleRewards: {
+        ...result.distribution,
+        recruitedUnit: result.recruitedUnit,
+      }
+    });
   },
 
   claimRewards: () => {

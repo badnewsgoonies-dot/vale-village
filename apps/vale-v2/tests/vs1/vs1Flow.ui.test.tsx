@@ -3,7 +3,7 @@ import type { Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '@/App';
 import { useStore } from '@/ui/state/store';
-import { VS1_SCENE_POST, VS1_SCENE_PRE } from '@/story/vs1Constants';
+import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from '@/story/vs1Constants';
 import { executeRound } from '@/core/services/QueueBattleService';
 import type { BattleState } from '@/core/models/BattleState';
 
@@ -42,10 +42,20 @@ describe('VS1 demo flow (UI, happy-dom)', () => {
       id: 'vs1-start',
       type: 'battle',
       position: { x: 0, y: 0 },
-      data: { encounterId: 'vs1-bandits' },
+      data: { encounterId: VS1_ENCOUNTER_ID },
     });
 
-    // Wait for battle to start
+    // Wait for team select, then confirm team to start battle
+    await waitFor(() => {
+      expect(useStore.getState().mode).toBe('team-select');
+    });
+
+    const team = useStore.getState().team;
+    expect(team).toBeTruthy();
+    if (!team) return;
+
+    store.confirmBattleTeam(team);
+
     await waitFor(() => {
       expect(useStore.getState().mode).toBe('battle');
     });

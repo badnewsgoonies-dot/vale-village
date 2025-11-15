@@ -10,6 +10,7 @@ import { BattleUnitSprite } from './BattleUnitSprite';
 import { EquipmentIcon } from './EquipmentIcon';
 import { EquipmentChoicePicker } from './EquipmentChoicePicker';
 import './RewardsScreen.css';
+import { DJINN } from '../../data/definitions/djinn';
 
 interface RewardsScreenProps {
   rewards: RewardDistribution;
@@ -45,6 +46,8 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
     : rewards.fixedEquipment
       ? [rewards.fixedEquipment]
       : [];
+  const latestDjinnId = team.collectedDjinn[team.collectedDjinn.length - 1];
+  const latestDjinn = latestDjinnId ? DJINN[latestDjinnId] : null;
 
   return (
     <div className="rewards-screen">
@@ -96,6 +99,36 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
                   <div className="item-quantity">x1</div>
                 </div>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Unit Recruitment Notification */}
+        {rewards.recruitedUnit && (
+          <section className="recruitment-panel" role="alert" aria-label={`Recruited ${rewards.recruitedUnit.name}`}>
+            <h2>🎉 NEW RECRUIT!</h2>
+            <div className="recruitment-unit">
+              <div className="recruitment-sprite">
+                <BattleUnitSprite unitId={rewards.recruitedUnit.id} state="idle" size="medium" />
+              </div>
+              <div className="recruitment-details">
+                <div className="recruitment-name">{rewards.recruitedUnit.name}</div>
+                <div className="recruitment-level">Level {rewards.recruitedUnit.level}</div>
+                <div className="recruitment-element">{rewards.recruitedUnit.element}</div>
+                <div className="recruitment-message">has joined your roster!</div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Djinn Acquisition Notification */}
+        {rewards.recruitedUnit && latestDjinn && (
+          <section className="djinn-panel" role="alert" aria-label={`Djinn ${latestDjinn.name} acquired`}>
+            <h2>✨ DJINN ACQUIRED</h2>
+            <div className="djinn-acquisition">
+              <div className="djinn-name">{latestDjinn.name}</div>
+              <div className="djinn-element">{latestDjinn.element}</div>
+              <div className="djinn-message">has been added to your collection!</div>
             </div>
           </section>
         )}

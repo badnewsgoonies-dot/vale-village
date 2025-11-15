@@ -50,8 +50,8 @@ export const createStorySlice: StateCreator<
       }
     } else {
       // No team available, just update story
-      const updatedStory = setFlag(story, key, value);
-      _set({ story: updatedStory });
+    const updatedStory = setFlag(story, key, value);
+    _set({ story: updatedStory });
     }
   },
 

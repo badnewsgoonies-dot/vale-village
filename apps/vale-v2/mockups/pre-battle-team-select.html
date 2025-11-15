@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Battle Team Selection - Vale Chronicles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .pre-battle-team-select {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+
+        .pre-battle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #252525;
+            border-bottom: 2px solid #333;
+        }
+
+        .pre-battle-header h1 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: #fff;
+        }
+
+        .close-btn {
+            background: #444;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #666;
+        }
+
+        .pre-battle-content {
+            display: grid;
+            grid-template-columns: 30fr 70fr;
+            gap: 1rem;
+            padding: 1rem;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* Enemy Intelligence Panel */
+        .enemy-intelligence-panel {
+            background: #1e1e1e;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .enemy-intelligence-panel h2 {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            margin-bottom: 0.5rem;
+            color: #4a9eff;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #ff6b35;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .enemy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .enemy-card {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+
+        .enemy-card h3 {
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .enemy-element {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: #ff6b35;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .enemy-stats {
+            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .enemy-abilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .ability-tag {
+            background: #333;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #4a9eff;
+        }
+
+        .threat-assessment {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .threat-assessment h3 {
+            font-size: clamp(0.9rem, 1.3vw, 1rem);
+            margin-bottom: 0.5rem;
+            color: #ff6b35;
+        }
+
+        .threat-assessment ul {
+            list-style: none;
+            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .threat-assessment li::before {
+            content: "• ";
+            color: #4a9eff;
+            font-weight: bold;
+        }
+
+        /* Team Management Panel */
+        .team-management-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .active-party-slots {
+            background: #1e1e1e;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .active-party-slots h2 {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            margin-bottom: 1rem;
+            color: #4a9eff;
+        }
+
+        .party-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .party-slot {
+            aspect-ratio: 1;
+            border: 2px solid #444;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #252525;
+            padding: 0.5rem;
+        }
+
+        .party-slot.empty {
+            border-style: dashed;
+            color: #666;
+        }
+
+        .party-slot.filled {
+            border-color: #555;
+        }
+
+        .party-slot.selected {
+            border-color: #4a9eff;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+            background: #1e2a3a;
+        }
+
+        .party-slot:hover {
+            border-color: #666;
+            transform: scale(1.02);
+        }
+
+        .party-slot.selected:hover {
+            border-color: #5aaeff;
+        }
+
+        .unit-name {
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .unit-level {
+            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+            color: #4a9eff;
+        }
+
+        .unit-element {
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            color: #ff6b35;
+            margin-top: 0.25rem;
+        }
+
+        .empty-slot-text {
+            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+            color: #666;
+            text-align: center;
+        }
+
+        /* Unit Details Panel */
+        .unit-details-panel {
+            background: #1e1e1e;
+            border: 2px solid #4a9eff;
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #444;
+        }
+
+        .unit-header h3 {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: #4a9eff;
+        }
+
+        .unit-header button {
+            background: #ff4444;
+            border: none;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .unit-header button:hover {
+            background: #ff6666;
+        }
+
+        .unit-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+        }
+
+        .equipment-section,
+        .djinn-section,
+        .abilities-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        .equipment-section h4,
+        .djinn-section h4,
+        .abilities-section h4 {
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            margin-bottom: 0.5rem;
+            color: #4a9eff;
+        }
+
+        .equipment-item,
+        .djinn-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: #252525;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.8rem, 1.3vw, 0.9rem);
+        }
+
+        .equipment-item button,
+        .djinn-item button {
+            background: #444;
+            border: none;
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .equipment-item button:hover,
+        .djinn-item button:hover {
+            background: #666;
+        }
+
+        /* Bench Section */
+        .bench-section {
+            background: #1e1e1e;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .bench-section h3 {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            margin-bottom: 1rem;
+            color: #4a9eff;
+        }
+
+        .bench-grid {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 0.5rem;
+        }
+
+        .bench-unit-card {
+            min-width: 120px;
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bench-unit-card button {
+            background: #4a9eff;
+            border: none;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .bench-unit-card button:hover {
+            background: #5aaeff;
+        }
+
+        .bench-unit-card button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Action Buttons */
+        .pre-battle-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: #252525;
+            border-top: 2px solid #333;
+        }
+
+        .cancel-btn,
+        .start-battle-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancel-btn {
+            background: #444;
+            color: #fff;
+        }
+
+        .cancel-btn:hover {
+            background: #666;
+        }
+
+        .start-battle-btn {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .start-battle-btn:hover:not(:disabled) {
+            background: #5aaeff;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+        }
+
+        .start-battle-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 1366px) {
+            .pre-battle-content {
+                grid-template-columns: 25fr 75fr;
+            }
+        }
+
+        @media (max-width: 1280px) {
+            .pre-battle-content {
+                grid-template-columns: 20fr 80fr;
+            }
+
+            .party-slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="pre-battle-team-select">
+        <div class="pre-battle-header">
+            <h1>Pre-Battle Team Selection</h1>
+            <button class="close-btn" onclick="alert('Close clicked')">×</button>
+        </div>
+
+        <div class="pre-battle-content">
+            <!-- Enemy Intelligence Panel -->
+            <div class="enemy-intelligence-panel">
+                <h2>VS1: Garet's Challenge</h2>
+                <div class="difficulty-badge">Medium</div>
+
+                <div class="enemy-list">
+                    <div class="enemy-card">
+                        <h3>Garet</h3>
+                        <div class="enemy-element">Mars</div>
+                        <div class="enemy-stats">
+                            <div>Level 2</div>
+                            <div>HP: 85</div>
+                            <div>ATK: 18 | DEF: 12</div>
+                            <div>MAG: 14 | SPD: 10</div>
+                        </div>
+                        <div class="enemy-abilities">
+                            <span class="ability-tag">Strike</span>
+                            <span class="ability-tag">Fireball</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="threat-assessment">
+                    <h3>Threat Assessment</h3>
+                    <ul>
+                        <li>High physical damage</li>
+                        <li>Fire attacks (Mars element)</li>
+                        <li>Counter: Mercury units</li>
+                        <li>Weak to: Water/Ice abilities</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Team Management Panel -->
+            <div class="team-management-panel">
+                <!-- Active Party Slots -->
+                <div class="active-party-slots">
+                    <h2>Active Party (1/4)</h2>
+                    <div class="party-slots-grid">
+                        <div class="party-slot filled selected" onclick="selectSlot(0)">
+                            <div class="unit-name">Isaac</div>
+                            <div class="unit-level">Lv. 1</div>
+                            <div class="unit-element">Venus</div>
+                        </div>
+                        <div class="party-slot empty" onclick="selectSlot(1)">
+                            <div class="empty-slot-text">Click to add</div>
+                        </div>
+                        <div class="party-slot empty" onclick="selectSlot(2)">
+                            <div class="empty-slot-text">Click to add</div>
+                        </div>
+                        <div class="party-slot empty" onclick="selectSlot(3)">
+                            <div class="empty-slot-text">Click to add</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit Details Panel -->
+                <div class="unit-details-panel" id="unitDetails">
+                    <div class="unit-header">
+                        <h3>Isaac (Venus Adept)</h3>
+                        <button onclick="removeUnit()">Remove</button>
+                    </div>
+
+                    <div class="unit-stats">
+                        <div>HP: 45/45</div>
+                        <div>PP: 12/12</div>
+                        <div>ATK: 8</div>
+                        <div>DEF: 6</div>
+                        <div>MAG: 7</div>
+                        <div>SPD: 5</div>
+                    </div>
+
+                    <div class="equipment-section">
+                        <h4>Equipment</h4>
+                        <div class="equipment-item">
+                            <span>Weapon:</span>
+                            <span>[None] <button onclick="alert('Equipment modal')">Change</button></span>
+                        </div>
+                        <div class="equipment-item">
+                            <span>Armor:</span>
+                            <span>[None] <button onclick="alert('Equipment modal')">Change</button></span>
+                        </div>
+                        <div class="equipment-item">
+                            <span>Helm:</span>
+                            <span>[None] <button onclick="alert('Equipment modal')">Change</button></span>
+                        </div>
+                        <div class="equipment-item">
+                            <span>Boots:</span>
+                            <span>[None] <button onclick="alert('Equipment modal')">Change</button></span>
+                        </div>
+                        <div class="equipment-item">
+                            <span>Accessory:</span>
+                            <span>[None] <button onclick="alert('Equipment modal')">Change</button></span>
+                        </div>
+                    </div>
+
+                    <div class="djinn-section">
+                        <h4>Djinn (3 slots max)</h4>
+                        <div class="djinn-item">
+                            <span>Slot 1: Flint (Venus)</span>
+                            <button onclick="alert('Remove Djinn')">Remove</button>
+                        </div>
+                        <div class="djinn-item">
+                            <span>Slot 2: [Empty]</span>
+                            <button onclick="alert('Add Djinn modal')">Add Djinn</button>
+                        </div>
+                        <div class="djinn-item">
+                            <span>Slot 3: [Empty]</span>
+                            <button onclick="alert('Add Djinn modal')">Add Djinn</button>
+                        </div>
+                    </div>
+
+                    <div class="abilities-section">
+                        <h4>Granted Abilities (from Djinn)</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                            <span class="ability-tag">Growth (Venus - Same)</span>
+                            <span class="ability-tag">Quake (Venus - Same)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bench Units -->
+                <div class="bench-section">
+                    <h3>Bench Units</h3>
+                    <div class="bench-grid">
+                        <div class="bench-unit-card">
+                            <div class="unit-name">Garet</div>
+                            <div class="unit-level">Lv. 1</div>
+                            <div class="unit-element">Mars</div>
+                            <button onclick="alert('Add Garet to party')">Add</button>
+                        </div>
+                        <div class="bench-unit-card">
+                            <div class="unit-name">Ivan</div>
+                            <div class="unit-level">Lv. 1</div>
+                            <div class="unit-element">Jupiter</div>
+                            <button onclick="alert('Add Ivan to party')">Add</button>
+                        </div>
+                        <div class="bench-unit-card">
+                            <div class="unit-name">Mia</div>
+                            <div class="unit-level">Lv. 1</div>
+                            <div class="unit-element">Mercury</div>
+                            <button onclick="alert('Add Mia to party')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pre-battle-actions">
+            <button class="cancel-btn" onclick="alert('Cancel clicked')">Cancel</button>
+            <button class="start-battle-btn" onclick="alert('Start Battle clicked')">Start Battle</button>
+        </div>
+    </div>
+
+    <script>
+        function selectSlot(index) {
+            // Update selected slot visual state
+            document.querySelectorAll('.party-slot').forEach((slot, i) => {
+                if (i === index) {
+                    slot.classList.add('selected');
+                    slot.classList.remove('empty');
+                } else {
+                    slot.classList.remove('selected');
+                }
+            });
+            
+            // Show/hide unit details panel
+            const detailsPanel = document.getElementById('unitDetails');
+            if (index === 0) {
+                detailsPanel.style.display = 'block';
+            } else {
+                detailsPanel.style.display = 'none';
+            }
+        }
+
+        function removeUnit() {
+            if (confirm('Remove Isaac from party?')) {
+                const slot = document.querySelector('.party-slot.selected');
+                slot.classList.remove('filled', 'selected');
+                slot.classList.add('empty');
+                slot.innerHTML = '<div class="empty-slot-text">Click to add</div>';
+                document.getElementById('unitDetails').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
