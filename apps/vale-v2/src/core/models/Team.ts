@@ -4,6 +4,7 @@
  */
 
 import type { Unit } from './Unit';
+import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../constants';
 
 /**
  * Djinn tracker for team-wide Djinn system
@@ -30,7 +31,7 @@ export interface Team {
   /** State and timing of each equipped Djinn (Set/Standby/Recovery) */
   djinnTrackers: Record<string, DjinnTracker>;  // Plain object instead of Map
 
-  /** Party members (4 units) */
+  /** Party members (1-4 units) */
   readonly units: readonly Unit[];
 
   /** Collected Djinn (up to 12 total) */
@@ -50,8 +51,8 @@ export interface Team {
  * Create a new team
  */
 export function createTeam(units: readonly Unit[]): Team {
-  if (units.length !== 4) {
-    throw new Error('Team must have exactly 4 units');
+  if (units.length < MIN_PARTY_SIZE || units.length > MAX_PARTY_SIZE) {
+    throw new Error(`Team must have between ${MIN_PARTY_SIZE} and ${MAX_PARTY_SIZE} units, got ${units.length}`);
   }
 
   return {

@@ -66,6 +66,12 @@ export function queueAction(
   if (unitIndex === -1) {
     return Err(`Unit ${unitId} not found in player team`);
   }
+  
+  // Validate unitIndex is within bounds
+  const teamSize = state.playerTeam.units.length;
+  if (unitIndex < 0 || unitIndex >= teamSize) {
+    return Err(`Unit index ${unitIndex} out of bounds for team size ${teamSize}`);
+  }
 
   // Calculate mana cost
   try {
@@ -103,7 +109,7 @@ export function queueAction(
  * PR-QUEUE-BATTLE: Removes action from queue and refunds mana
  *
  * @param state - Current battle state
- * @param unitIndex - Index of unit (0-3)
+ * @param unitIndex - Index of unit (0 to teamSize-1)
  * @returns Result with updated battle state or error message
  */
 export function clearQueuedAction(state: BattleState, unitIndex: number): Result<BattleState, string> {
@@ -191,7 +197,8 @@ function validateQueueForExecution(state: BattleState): void {
   if (state.phase !== 'planning') {
     throw new Error('Can only execute round from planning phase');
   }
-  if (!isQueueComplete(state.queuedActions)) {
+  const teamSize = state.playerTeam.units.length;
+  if (!isQueueComplete(state.queuedActions, teamSize)) {
     throw new Error('Cannot execute: queue is not complete');
   }
   if (!validateQueuedActions(state.remainingMana, state.queuedActions)) {
@@ -372,7 +379,7 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     phase: 'planning',
     roundNumber: state.roundNumber + 1,
     currentQueueIndex: 0,
-    queuedActions: createEmptyQueue(),
+    queuedActions: createEmptyQueue(updatedTeam.units.length),
     queuedDjinn: [],
     executionIndex: 0,
     playerTeam: updatedTeam,

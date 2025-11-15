@@ -63,9 +63,9 @@ export interface BattleTurnOrder {
  * Tracks queued actions and execution progress
  */
 export interface BattleQueue {
-  /** Which unit we're currently selecting action for (0-3) */
+  /** Which unit we're currently selecting action for (0 to teamSize-1) */
   currentQueueIndex: number;
-  /** All 4 queued actions (null if not queued yet) */
+  /** Queued actions for each unit (null if not queued yet). Array length matches team size (1-4) */
   queuedActions: readonly (QueuedAction | null)[];
   /** Djinn IDs marked for activation this round */
   queuedDjinn: readonly string[];
@@ -205,7 +205,7 @@ export function createBattleState(
     log: [],
     // Queue-based fields
     currentQueueIndex: 0,
-    queuedActions: createEmptyQueue(),
+    queuedActions: createEmptyQueue(playerTeam.units.length),
     queuedDjinn: [],
     remainingMana: maxMana,
     maxMana,

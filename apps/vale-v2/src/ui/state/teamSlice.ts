@@ -63,17 +63,18 @@ export const createTeamSlice: StateCreator<
         : createUnit(unitDef, 1, 0);
 
       const newUnits = [...state.team.units];
-      newUnits[partyIndex] = newUnit;
 
-      while (newUnits.length < 4) {
-        const placeholderKey = Object.keys(UNIT_DEFINITIONS)[0];
-        if (!placeholderKey) break;
-        const placeholderDef = UNIT_DEFINITIONS[placeholderKey];
-        if (!placeholderDef) break;
-        newUnits.push(createUnit(placeholderDef, 1, 0));
+      // Handle append vs replace for variable team sizes
+      if (partyIndex >= newUnits.length) {
+        // Append if index is beyond current team size
+        newUnits.push(newUnit);
+      } else {
+        // Replace existing unit
+        newUnits[partyIndex] = newUnit;
       }
 
-      const finalUnits = newUnits.slice(0, 4) as typeof state.team.units;
+      // No padding, no slice - allow 1-4 units naturally
+      const finalUnits = newUnits as typeof state.team.units;
 
       return {
         team: updateTeam(state.team, {

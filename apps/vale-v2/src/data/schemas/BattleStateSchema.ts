@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { TeamSchema } from './TeamSchema';
 import { UnitSchema } from './UnitSchema';
+import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';
 
 /**
  * Zod schema for BattleResult
@@ -46,8 +47,8 @@ export const BattleStateSchema = z.object({
   log: z.array(z.string()),
   
   // Queue-based battle system fields
-  currentQueueIndex: z.number().int().min(0).max(3),
-  queuedActions: z.array(QueuedActionSchema.nullable()).length(4),
+  currentQueueIndex: z.number().int().min(0), // Max validated in superRefine
+  queuedActions: z.array(QueuedActionSchema.nullable()).min(MIN_PARTY_SIZE).max(MAX_PARTY_SIZE), // 1-4 actions
   queuedDjinn: z.array(z.string().min(1)),
   remainingMana: z.number().int().min(0),
   maxMana: z.number().int().min(0),
@@ -78,6 +79,29 @@ export const BattleStateSchema = z.object({
     }
   }
   
+  const teamSize = b.playerTeam.units.length;
+  
+  // Validate currentQueueIndex doesn't exceed team size
+  if (b.currentQueueIndex >= teamSize) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.too_big,
+      maximum: teamSize - 1,
+      type: 'number',
+      inclusive: true,
+      path: ['currentQueueIndex'],
+      message: `currentQueueIndex (${b.currentQueueIndex}) exceeds team size (${teamSize})`,
+    });
+  }
+  
+  // Validate queuedActions length matches team size
+  if (b.queuedActions.length !== teamSize) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['queuedActions'],
+      message: `queuedActions length (${b.queuedActions.length}) must match team size (${teamSize})`,
+    });
+  }
+  
   // Validate queued actions reference valid unit IDs
   for (const [i, action] of b.queuedActions.entries()) {
     if (action && !teamIds.includes(action.unitId)) {
@@ -85,6 +109,15 @@ export const BattleStateSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['queuedActions', i, 'unitId'],
         message: `Queued action references unknown unit: ${action.unitId}`,
+      });
+    }
+    
+    // Validate queuedActions reference valid unit indices
+    if (action && i >= teamSize) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['queuedActions', i],
+        message: `Queued action at index ${i} exceeds team size (${teamSize})`,
       });
     }
   }

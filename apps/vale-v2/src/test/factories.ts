@@ -71,22 +71,33 @@ export function mkEnemy(enemyId: keyof typeof ENEMIES = 'slime', overrides?: Par
 }
 
 /**
- * Create a team for testing (fills to 4 units if needed)
+ * Create a team for testing
+ * @param units - Units to include (1-4)
+ * @param padTo4 - If true, pads to 4 units with placeholders (for backward compatibility with existing tests)
  */
-export function mkTeam(units: Unit[]): Team {
-  // Ensure exactly 4 units
-  const teamUnits = [...units];
-  while (teamUnits.length < 4) {
-    // Create placeholder units with 9999 HP so they survive but don't contribute damage
-    teamUnits.push(mkUnit({
-      id: `placeholder_${teamUnits.length}`,
-      name: `Placeholder ${teamUnits.length}`,
-      baseStats: { hp: 9999, pp: 0, atk: 0, def: 0, mag: 0, spd: 1 }, // 0 ATK = no damage
-      currentHp: 9999,
-      currentPp: 0,
-    }));
+export function mkTeam(units: Unit[], padTo4: boolean = false): Team {
+  if (units.length === 0) {
+    throw new Error('mkTeam requires at least 1 unit');
   }
-  return createTeam(teamUnits.slice(0, 4));
+  
+  const teamUnits = [...units];
+  
+  if (padTo4) {
+    while (teamUnits.length < 4) {
+      // Create placeholder units with 9999 HP so they survive but don't contribute damage
+      teamUnits.push(mkUnit({
+        id: `placeholder_${teamUnits.length}`,
+        name: `Placeholder ${teamUnits.length}`,
+        baseStats: { hp: 9999, pp: 0, atk: 0, def: 0, mag: 0, spd: 1 }, // 0 ATK = no damage
+        currentHp: 9999,
+        currentPp: 0,
+      }));
+    }
+    return createTeam(teamUnits.slice(0, 4));
+  }
+  
+  // No padding - use actual team size (1-4 units)
+  return createTeam(teamUnits);
 }
 
 /**

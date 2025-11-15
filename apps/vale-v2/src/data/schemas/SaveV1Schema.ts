@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { UnitSchema } from './UnitSchema';
 import { EquipmentSchema } from './EquipmentSchema';
+import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';
 
 /**
  * NPC State schema
@@ -25,7 +26,7 @@ export const SaveV1Schema = z.object({
   // Player progress
   playerData: z.object({
     unitsCollected: z.array(UnitSchema).max(10),  // Up to 10 units
-    activeParty: z.array(z.string().min(1)).length(4),  // Exactly 4 unit IDs
+    activeParty: z.array(z.string().min(1)).min(MIN_PARTY_SIZE).max(MAX_PARTY_SIZE),  // 1-4 unit IDs
     inventory: z.array(EquipmentSchema),  // Equipment inventory
     gold: z.number().int().min(0),
     djinnCollected: z.array(z.string().min(1)).max(12),  // Up to 12 Djinn IDs

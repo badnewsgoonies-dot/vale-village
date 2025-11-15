@@ -4,14 +4,26 @@
  */
 
 /**
- * Party size - maximum number of units in player team
+ * Minimum party size - minimum number of units in player team
  */
-export const PARTY_SIZE = 4;
+export const MIN_PARTY_SIZE = 1;
+
+/**
+ * Maximum party size - maximum number of units in player team
+ */
+export const MAX_PARTY_SIZE = 4;
+
+/**
+ * Party size - maximum number of units in player team
+ * @deprecated Use MAX_PARTY_SIZE instead. Kept for backward compatibility.
+ */
+export const PARTY_SIZE = MAX_PARTY_SIZE;
 
 /**
  * Maximum queue size (matches party size)
+ * @deprecated Use MAX_PARTY_SIZE instead. Kept for backward compatibility.
  */
-export const MAX_QUEUE_SIZE = PARTY_SIZE;
+export const MAX_QUEUE_SIZE = MAX_PARTY_SIZE;
 
 /**
  * RNG stream offsets for deterministic battle RNG
@@ -63,9 +75,13 @@ export const BATTLE_CONSTANTS = {
 /**
  * Create an empty action queue
  * Returns array of nulls with proper type for BattleState
+ * @param size - Queue size (defaults to MAX_PARTY_SIZE for backward compatibility)
  */
-export function createEmptyQueue(): readonly null[] {
-  return Array(MAX_QUEUE_SIZE).fill(null) as null[];
+export function createEmptyQueue(size: number = MAX_PARTY_SIZE): readonly null[] {
+  if (size < MIN_PARTY_SIZE || size > MAX_PARTY_SIZE) {
+    throw new Error(`Queue size must be between ${MIN_PARTY_SIZE} and ${MAX_PARTY_SIZE}, got ${size}`);
+  }
+  return Array(size).fill(null) as null[];
 }
 
 /**

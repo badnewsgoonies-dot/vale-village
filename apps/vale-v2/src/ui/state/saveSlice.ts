@@ -52,12 +52,10 @@ function createSaveData(
     return null;
   }
 
-  // Build activeParty with exactly 4 elements (pad with empty strings if needed)
-  const partyIds = team.units.map(u => u.id).slice(0, 4);
-  while (partyIds.length < 4) {
-    partyIds.push(''); // Pad to meet schema requirement of length(4)
-  }
-  const activeParty = partyIds as [string, string, string, string];
+  // Build activeParty with actual team size (1-4 units, no padding)
+  const partyIds = team.units.map(u => u.id);
+  // No slice, no padding - save actual team size (1-4 units)
+  const activeParty = partyIds;
 
   // Collect all Djinn from units
   const djinnCollected: string[] = [];
@@ -132,22 +130,15 @@ export const createSaveSlice: StateCreator<
 
     // Hydrate team from save data
     const activeUnits = saveData.playerData.activeParty
+      .filter(unitId => unitId !== '')  // Filter empty strings from old saves (backward compatibility)
       .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
       .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
 
     if (activeUnits.length > 0) {
-      // Pad to 4 units if needed (in case save has fewer)
-      while (activeUnits.length < 4 && activeUnits.length < saveData.playerData.unitsCollected.length) {
-        const nextUnit = saveData.playerData.unitsCollected.find(
-          u => !activeUnits.some(active => active.id === u.id)
-        );
-        if (nextUnit) activeUnits.push(nextUnit);
-      }
-
-      // Create team (will use first 4 units)
+      // No padding - use actual team size (1-4 units)
       const team = {
-        units: activeUnits.slice(0, 4),
-        equippedDjinn: [], // Initialize empty, Djinn are on units
+        units: activeUnits,  // No slice, no padding
+        equippedDjinn: [],
         djinnTrackers: {},
         collectedDjinn: saveData.playerData.djinnCollected,
         currentTurn: 0,
@@ -273,22 +264,15 @@ export const createSaveSlice: StateCreator<
 
     // Hydrate team from save data
     const activeUnits = saveData.playerData.activeParty
+      .filter(unitId => unitId !== '')  // Filter empty strings from old saves
       .map(unitId => saveData.playerData.unitsCollected.find(u => u.id === unitId))
       .filter((u): u is typeof saveData.playerData.unitsCollected[number] => u !== undefined);
 
     if (activeUnits.length > 0) {
-      // Pad to 4 units if needed (in case save has fewer)
-      while (activeUnits.length < 4 && activeUnits.length < saveData.playerData.unitsCollected.length) {
-        const nextUnit = saveData.playerData.unitsCollected.find(
-          u => !activeUnits.some(active => active.id === u.id)
-        );
-        if (nextUnit) activeUnits.push(nextUnit);
-      }
-
-      // Create team (will use first 4 units)
+      // No padding - use actual team size (1-4 units)
       const team = {
-        units: activeUnits.slice(0, 4),
-        equippedDjinn: [], // Initialize empty, Djinn are on units
+        units: activeUnits,  // No slice, no padding
+        equippedDjinn: [],
         djinnTrackers: {},
         collectedDjinn: saveData.playerData.djinnCollected,
         currentTurn: 0,

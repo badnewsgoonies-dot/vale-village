@@ -108,12 +108,13 @@ function validateHPInvariants(state: BattleState): void {
  * Validate queue invariants
  */
 function validateQueueInvariants(state: BattleState): void {
-  // Queue length is always 4 (one per player unit)
-  if (state.queuedActions.length !== 4) {
+  // Queue length must match team size (1-4 units)
+  const teamSize = state.playerTeam.units.length;
+  if (state.queuedActions.length !== teamSize) {
     throw new BattleStateInvariantError(
-      `Queue length (${state.queuedActions.length}) is not 4`,
+      `Queue length (${state.queuedActions.length}) doesn't match team size (${teamSize})`,
       'QUEUE_LENGTH_INVALID',
-      { queueLength: state.queuedActions.length }
+      { queueLength: state.queuedActions.length, teamSize }
     );
   }
 

@@ -83,14 +83,20 @@ export function validateQueuedActions(
 }
 
 /**
- * Check if all 4 unit actions are queued
+ * Check if all unit actions are queued
  * 
  * @param queuedActions - Array of queued actions
- * @returns True if all 4 actions are queued
+ * @param teamSize - Expected team size (1-4). If not provided, uses queuedActions.length
+ * @returns True if all actions are queued
  */
 export function isQueueComplete(
-  queuedActions: readonly (import('../models/BattleState').QueuedAction | null)[]
+  queuedActions: readonly (import('../models/BattleState').QueuedAction | null)[],
+  teamSize?: number
 ): boolean {
-  return queuedActions.length === 4 && queuedActions.every(action => action !== null);
+  const expectedSize = teamSize ?? queuedActions.length;
+  if (expectedSize < 1 || expectedSize > 4) {
+    throw new Error(`Team size must be between 1 and 4, got ${expectedSize}`);
+  }
+  return queuedActions.length === expectedSize && queuedActions.every(action => action !== null);
 }
 
