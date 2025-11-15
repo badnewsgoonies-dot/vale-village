@@ -1,4 +1,48 @@
 import type { DialogueTree } from '@/core/models/dialogue';
+import { VS1_SCENE_PRE, VS1_SCENE_POST, VS1_ENCOUNTER_ID } from '../../story/vs1Constants';
+
+export const VS1_PRE_SCENE: DialogueTree = {
+  id: VS1_SCENE_PRE,
+  name: 'VS1: House Under Attack',
+  startNodeId: 'intro',
+  nodes: [
+    {
+      id: 'intro',
+      speaker: 'Isaac',
+      text: 'Something feels off...',
+      portrait: 'isaac',
+      nextNodeId: 'warning',
+    },
+    {
+      id: 'warning',
+      speaker: 'Garet',
+      text: 'Bandits outside! Get ready!',
+      portrait: 'garet',
+      effects: { startBattle: VS1_ENCOUNTER_ID },
+    },
+  ],
+};
+
+export const VS1_POST_SCENE: DialogueTree = {
+  id: VS1_SCENE_POST,
+  name: 'VS1: Victory',
+  startNodeId: 'victory',
+  nodes: [
+    {
+      id: 'victory',
+      speaker: 'Isaac',
+      text: 'We did it.',
+      portrait: 'isaac',
+      nextNodeId: 'relief',
+    },
+    {
+      id: 'relief',
+      speaker: 'Garet',
+      text: "That was close... Let's warn the others.",
+      portrait: 'garet',
+    },
+  ],
+};
 
 export const ELDER_DIALOGUE: DialogueTree = {
   id: 'elder-vale',
@@ -69,6 +113,10 @@ export const SHOPKEEPER_DIALOGUE: DialogueTree = {
 };
 
 export const DIALOGUES: Record<string, DialogueTree> = {
+  // VS1 Demo
+  [VS1_SCENE_PRE]: VS1_PRE_SCENE,
+  [VS1_SCENE_POST]: VS1_POST_SCENE,
+  // Existing dialogues
   'elder-vale': ELDER_DIALOGUE,
   'shopkeeper-weapons': SHOPKEEPER_DIALOGUE,
 };

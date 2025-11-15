@@ -11,10 +11,13 @@ import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { useStore } from './ui/state/store';
 import { createTestBattle } from './ui/utils/testBattle';
+import { VS1_ENCOUNTER_ID, VS1_SCENE_POST } from './story/vs1Constants';
+import { DIALOGUES } from './data/definitions/dialogues';
 
 function App() {
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);
+  const battle = useStore((s) => s.battle);
   const story = useStore((s) => s.story);
   const showCredits = useStore((s) => s.showCredits);
   const setShowCredits = useStore((s) => s.setShowCredits);
@@ -28,6 +31,7 @@ function App() {
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
   const currentShopId = useStore((s) => s.currentShopId);
+  const startDialogueTree = useStore((s) => s.startDialogueTree);
   const [showSaveMenu, setShowSaveMenu] = useState(false);
   const [showDjinnCollection, setShowDjinnCollection] = useState(false);
   const [showPartyManagement, setShowPartyManagement] = useState(false);
@@ -50,11 +54,35 @@ function App() {
 
   const returnToOverworld = useStore((s) => s.returnToOverworld);
 
+  // Start VS1 demo flow
+  const startVS1Game = () => {
+    const preScene = DIALOGUES[VS1_SCENE_PRE];
+    if (preScene) {
+      startDialogueTree(preScene);
+      setMode('dialogue');
+    }
+  };
+
   // Handle continue from rewards screen
   const handleRewardsContinue = () => {
+    // Check if this was the VS1 encounter
+    const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
+
     claimRewards(); // Add gold/equipment to inventory, clear rewards
     setShowRewards(false); // Ensure rewards screen is hidden
     setBattle(null, 0);
+
+    // VS1 specific: show post-scene after rewards
+    if (wasVS1Battle) {
+      const postScene = DIALOGUES[VS1_SCENE_POST];
+      if (postScene) {
+        startDialogueTree(postScene);
+        setMode('dialogue');
+        return;
+      }
+    }
+
+    // Fallback: return to overworld
     returnToOverworld();
   };
 
@@ -124,6 +152,21 @@ function App() {
               View Credits
             </button>
           )}
+          <button
+            onClick={startVS1Game}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#E91E63',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+            }}
+          >
+            🎮 Play VS1 Demo
+          </button>
         </div>
       </div>
       {showCredits && (

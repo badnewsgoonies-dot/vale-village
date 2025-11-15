@@ -12,6 +12,7 @@ import type { RewardsSlice } from './rewardsSlice';
 import type { StorySlice } from './storySlice';
 import type { TeamSlice } from './teamSlice';
 import type { SaveSlice } from './saveSlice';
+import type { DialogueSlice } from './dialogueSlice';
 import {
   queueAction,
   clearQueuedAction,
@@ -27,6 +28,8 @@ import {
   updateBattleState,
 } from '../../core/models/BattleState';
 import { createRNGStream, RNG_STREAMS } from '../../core/constants';
+import { VS1_ENCOUNTER_ID, VS1_SCENE_PRE } from '../../story/vs1Constants';
+import { DIALOGUES } from '../../data/definitions/dialogues';
 
 export interface QueueBattleSlice {
   battle: BattleState | null;
@@ -48,7 +51,7 @@ export interface QueueBattleSlice {
 }
 
 export const createQueueBattleSlice: StateCreator<
-  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice & SaveSlice,
+  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice & SaveSlice & DialogueSlice,
   [['zustand/devtools', never]],
   [],
   QueueBattleSlice
@@ -197,7 +200,7 @@ export const createQueueBattleSlice: StateCreator<
     }
 
     if (result.state.phase === 'defeat') {
-      const { returnToOverworld, onBattleEvents, updateTeamUnits } = get();
+      const { returnToOverworld, onBattleEvents, updateTeamUnits, startDialogueTree, setMode } = get();
 
       const healedUnits = autoHealUnits(result.state.playerTeam.units);
       const healedTeam = updateTeam(result.state.playerTeam, { units: healedUnits });
@@ -230,6 +233,17 @@ export const createQueueBattleSlice: StateCreator<
         ]);
       }
 
+      // VS1 specific defeat handling: retry from pre-scene
+      if (encounterId === VS1_ENCOUNTER_ID) {
+        const preScene = DIALOGUES[VS1_SCENE_PRE];
+        if (preScene) {
+          startDialogueTree(preScene);
+          setMode('dialogue');
+          return;
+        }
+      }
+
+      // Fallback: return to overworld
       returnToOverworld();
 
       return;

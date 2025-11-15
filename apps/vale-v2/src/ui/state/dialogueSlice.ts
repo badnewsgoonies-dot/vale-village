@@ -62,10 +62,12 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
   },
 
   endDialogue: () => {
+    const prevMode = get().mode;
     set({
       currentDialogueTree: null,
       currentDialogueState: null,
-      mode: 'overworld',
+      // Race guard: don't overwrite 'battle' mode
+      mode: prevMode === 'battle' ? 'battle' : 'overworld',
     });
   },
 } as DialogueSlice & GameFlowSlice & StorySlice & SaveSlice);
