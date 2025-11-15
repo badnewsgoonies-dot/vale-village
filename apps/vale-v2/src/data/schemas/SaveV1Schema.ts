@@ -1,7 +1,16 @@
 import { z } from 'zod';
-import { UnitSchema } from './UnitSchema';
+import { UnitSchema, DjinnStateSchema } from './UnitSchema';
 import { EquipmentSchema } from './EquipmentSchema';
 import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';
+
+/**
+ * Djinn Tracker schema for team-wide Djinn state
+ */
+const DjinnTrackerSchema = z.object({
+  djinnId: z.string().min(1),
+  state: DjinnStateSchema,
+  lastActivatedTurn: z.number().int(),
+});
 
 /**
  * NPC State schema
@@ -30,6 +39,8 @@ export const SaveV1Schema = z.object({
     inventory: z.array(EquipmentSchema),  // Equipment inventory
     gold: z.number().int().min(0),
     djinnCollected: z.array(z.string().min(1)).max(12),  // Up to 12 Djinn IDs
+    equippedDjinn: z.array(z.string().min(1)).max(3).optional(),  // Up to 3 equipped Djinn IDs
+    djinnTrackers: z.record(z.string(), DjinnTrackerSchema).optional(),  // Djinn state tracking
     recruitmentFlags: z.record(z.string(), z.boolean()),
     storyFlags: z.record(z.string(), z.boolean()),
   }),

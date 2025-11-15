@@ -23,13 +23,20 @@ export function OverworldMap() {
     if (mode !== 'overworld') return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle movement when in overworld mode (not during dialogue, shops, etc.)
+      if (mode !== 'overworld') return;
+
       if (event.key === 'ArrowUp') {
+        event.preventDefault();
         movePlayer('up');
       } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
         movePlayer('down');
       } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
         movePlayer('left');
       } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
         movePlayer('right');
       }
     };

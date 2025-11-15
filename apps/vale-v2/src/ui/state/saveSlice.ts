@@ -58,15 +58,10 @@ function createSaveData(
   // No slice, no padding - save actual team size (1-4 units)
   const activeParty = partyIds;
 
-  // Collect all Djinn from roster (not just active party)
-  const djinnCollected: string[] = [];
-  roster.forEach(u => {
-    u.djinn.forEach(djinnId => {
-      if (!djinnCollected.includes(djinnId)) {
-        djinnCollected.push(djinnId);
-      }
-    });
-  });
+  // Get collected Djinn from team (they're stored team-wide, not per-unit)
+  const djinnCollected = team?.collectedDjinn ? [...team.collectedDjinn] : [];
+  const equippedDjinn = team?.equippedDjinn ? [...team.equippedDjinn] : [];
+  const djinnTrackers = team?.djinnTrackers ? { ...team.djinnTrackers } : {};
 
   // Convert story flags to boolean-only (SaveV1Schema expects boolean)
   const storyFlags: Record<string, boolean> = {};
@@ -93,6 +88,8 @@ function createSaveData(
       inventory: inventory.equipment,
       gold: inventory.gold,
       djinnCollected,
+      equippedDjinn,
+      djinnTrackers,
       recruitmentFlags: {}, // TODO: Track recruitment flags
       storyFlags,
     },
@@ -139,10 +136,11 @@ export const createSaveSlice: StateCreator<
 
     if (activeUnits.length > 0) {
       // No padding - use actual team size (1-4 units)
+      // Restore equippedDjinn and djinnTrackers from save data
       const team = {
-        units: activeUnits,  // No slice, no padding
-        equippedDjinn: [],
-        djinnTrackers: {},
+        units: activeUnits,
+        equippedDjinn: saveData.playerData.equippedDjinn || [],
+        djinnTrackers: saveData.playerData.djinnTrackers || {},
         collectedDjinn: saveData.playerData.djinnCollected,
         currentTurn: 0,
         activationsThisTurn: {},
@@ -275,10 +273,11 @@ export const createSaveSlice: StateCreator<
 
     if (activeUnits.length > 0) {
       // No padding - use actual team size (1-4 units)
+      // Restore equippedDjinn and djinnTrackers from save data
       const team = {
-        units: activeUnits,  // No slice, no padding
-        equippedDjinn: [],
-        djinnTrackers: {},
+        units: activeUnits,
+        equippedDjinn: saveData.playerData.equippedDjinn || [],
+        djinnTrackers: saveData.playerData.djinnTrackers || {},
         collectedDjinn: saveData.playerData.djinnCollected,
         currentTurn: 0,
         activationsThisTurn: {},

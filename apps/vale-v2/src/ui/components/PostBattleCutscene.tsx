@@ -44,6 +44,7 @@ export function PostBattleCutscene({ victory, onComplete }: PostBattleCutscenePr
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        e.stopPropagation();
         handleAdvance();
       }
     };

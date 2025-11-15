@@ -19,6 +19,11 @@ import { createTeam } from './core/models/Team';
 import { collectDjinn, equipDjinn } from './core/services/DjinnService';
 
 function App() {
+  // Expose store in devtools for debugging in browser console
+  if (import.meta.env.DEV) {
+    (window as any).__VALE_STORE__ = useStore;
+  }
+
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);
   const battle = useStore((s) => s.battle);

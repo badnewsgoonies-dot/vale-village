@@ -191,19 +191,24 @@ export function refreshMana(state: BattleState): BattleState {
 
 /**
  * Validate queue is ready for execution
- * Throws if validation fails
+ * Returns Result instead of throwing so UI can handle failures gracefully
  */
-function validateQueueForExecution(state: BattleState): void {
+function validateQueueForExecution(state: BattleState): Result<BattleState, string> {
   if (state.phase !== 'planning') {
-    throw new Error('Can only execute round from planning phase');
+    return Err('Can only execute round from planning phase');
   }
   const teamSize = state.playerTeam.units.length;
   if (!isQueueComplete(state.queuedActions, teamSize)) {
-    throw new Error('Cannot execute: queue is not complete');
+    return Err('Cannot execute: queue is not complete');
   }
-  if (!validateQueuedActions(state.remainingMana, state.queuedActions)) {
-    throw new Error('Cannot execute: actions exceed mana budget');
+  // BUG FIX: Validate against maxMana, not remainingMana
+  // remainingMana was already decremented during queueing, so we need to check
+  // the total cost against the original pool
+  if (!validateQueuedActions(state.maxMana, state.queuedActions)) {
+    return Err('Cannot execute: actions exceed mana budget');
   }
+
+  return Ok(state);
 }
 
 /**
@@ -400,7 +405,15 @@ export function executeRound(
   state: BattleState,
   rng: PRNG
 ): { state: BattleState; events: readonly BattleEvent[] } {
-  validateQueueForExecution(state);
+  const validation = validateQueueForExecution(state);
+  if (!validation.ok) {
+    // In development, surface a warning but do not throw to avoid crashing the UI
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn(validation.error);
+    }
+    return { state, events: [] };
+  }
 
   let currentState = transitionToExecutingPhase(state);
   const allEvents: BattleEvent[] = [];

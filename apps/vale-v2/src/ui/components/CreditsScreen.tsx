@@ -83,9 +83,12 @@ export function CreditsScreen({ onExit }: CreditsScreenProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
         onExit();
       } else if (e.key === ' ') {
         e.preventDefault();
+        e.stopPropagation();
         setIsPaused((prev) => !prev);
       }
     };
