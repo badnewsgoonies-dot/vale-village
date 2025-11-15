@@ -53,9 +53,22 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     const { currentDialogueTree, currentDialogueState } = get();
     if (!currentDialogueTree || !currentDialogueState) return;
 
+    // Get current node to check for effects before advancing
+    const currentNode = currentDialogueTree.nodes.find(n => n.id === currentDialogueState.currentNodeId);
+
+    // Process effects from current node before advancing
+    if (currentNode?.effects && Object.keys(currentNode.effects).length > 0) {
+      processDialogueEffects(currentNode.effects, get);
+    }
+
     const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
     if (newState) {
       set({ currentDialogueState: newState });
+
+      // Check if dialogue is complete after advancing
+      if (isDialogueComplete(currentDialogueTree, newState)) {
+        get().endDialogue();
+      }
     } else {
       get().endDialogue();
     }

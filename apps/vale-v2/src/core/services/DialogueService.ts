@@ -77,6 +77,8 @@ export function advanceDialogue(tree: DialogueTree, state: DialogueState): Dialo
       ...state,
       currentNodeId: currentNode.nextNodeId,
       history: [...state.history, currentNode.nextNodeId],
+      // Copy effects from current node to state variables so they get processed
+      variables: currentNode.effects ? { ...state.variables, ...currentNode.effects } : state.variables,
     };
   }
   return null;
