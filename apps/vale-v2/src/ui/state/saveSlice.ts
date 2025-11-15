@@ -4,6 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
+import type { Unit } from '../../core/models/Unit';
 import { 
   saveGame, 
   loadGame, 
