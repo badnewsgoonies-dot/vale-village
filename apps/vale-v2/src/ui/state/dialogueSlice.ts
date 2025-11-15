@@ -51,7 +51,6 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     const { currentDialogueTree, currentDialogueState } = get();
     if (!currentDialogueTree || !currentDialogueState) return;
 
-<<<<<<< HEAD
     const currentNode = currentDialogueTree.nodes.find(n => n.id === currentDialogueState.currentNodeId);
     if (!currentNode) {
       get().endDialogue();
@@ -86,32 +85,7 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     } else {
       // No next node and not last node with effects - end dialogue
       get().endDialogue();
-=======
-    // Get current node to check for effects before advancing
-    const currentNode = currentDialogueTree.nodes.find(
-      (n) => n.id === currentDialogueState.currentNodeId
-    );
-
-    // Process effects from current node before advancing
-    if (currentNode?.effects && Object.keys(currentNode.effects).length > 0) {
-      processDialogueEffects(currentNode.effects, get);
-
-      // If this node starts a battle and has no next node,
-      // treat it as a terminal trigger node and stop here.
-      if ('startBattle' in currentNode.effects && !currentNode.nextNodeId) {
-        return;
-      }
     }
-
-    const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
-    if (newState) {
-      set({ currentDialogueState: newState });
-      return;
->>>>>>> 9ad3661 (fix: Keyboard controls and save/load for Djinn & recruited units)
-    }
-
-    // No further nodes to advance to: close dialogue
-    get().endDialogue();
   },
 
   endDialogue: () => {

@@ -57,11 +57,7 @@ export function DialogueBox() {
         endDialogue();
         return;
       }
-<<<<<<< HEAD
       if (!hasChoices && (event.key === ' ' || event.key === 'Enter' || event.code === 'Space' || event.code === 'Enter')) {
-=======
-      if (!hasChoices && (event.key === ' ' || event.key === 'Enter')) {
->>>>>>> 9ad3661 (fix: Keyboard controls and save/load for Djinn & recruited units)
         event.preventDefault();
         event.stopPropagation();
         advanceCurrentDialogue();
