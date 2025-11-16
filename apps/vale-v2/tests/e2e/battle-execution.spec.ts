@@ -205,10 +205,12 @@ test.describe('Battle Execution', () => {
         const battle = store.getState().battle;
         if (!battle) return false;
 
-        const unitCount = battle.playerTeam?.units?.length ?? 0;
-        const queuedCount = battle.queuedActions?.length ?? 0;
+        const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+        const unitCount = aliveUnits.length;
+        const queuedActions = battle.queuedActions ?? [];
+        const queuedCount = queuedActions.filter((a: any) => a !== null).length;
 
-        // Queue is complete when all units have queued actions
+        // Queue is complete when all alive units have queued actions
         return unitCount > 0 && queuedCount >= unitCount;
       },
       { timeout: 3000 }
@@ -218,9 +220,13 @@ test.describe('Battle Execution', () => {
     const queueState = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       const battle = store.getState().battle;
+      const aliveUnits = battle?.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+      const queuedActions = battle?.queuedActions ?? [];
+      const queuedCount = queuedActions.filter((a: any) => a !== null).length;
+      
       return {
-        playerUnitCount: battle?.playerTeam?.units?.length ?? 0,
-        queuedActions: battle?.queuedActions?.length ?? 0,
+        playerUnitCount: aliveUnits.length,
+        queuedActions: queuedCount,
         phase: battle?.phase,
       };
     });

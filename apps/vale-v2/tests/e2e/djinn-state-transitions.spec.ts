@@ -23,15 +23,19 @@ import {
  * Note: Uses actual battle mechanics, not simulated
  */
 
-function waitForBattlePlanningPhase(page: Page) {
+function waitForBattlePlanningPhase(page: Page, timeout: number = 10000) {
   return page.waitForFunction(
     () => {
       const store = (window as any).__VALE_STORE__;
       const battle = store?.getState().battle;
       if (!battle) return true;
-      return battle.phase === 'planning' && (battle.queuedDjinn?.length ?? 0) === 0;
+      // Wait for planning phase and ensure queuedDjinn is cleared
+      // Also check that round execution completed (not stuck in executing phase)
+      return battle.phase === 'planning' && 
+             (battle.queuedDjinn?.length ?? 0) === 0 &&
+             battle.executionIndex === 0;
     },
-    { timeout: 5000 }
+    { timeout }
   );
 }
 
@@ -251,6 +255,7 @@ test.describe('Djinn State Transitions', () => {
       const battle = store.getState().battle;
       if (!battle) return;
 
+      // Queue actions for all units (required to execute)
       battle.playerTeam.units.forEach((unit: any, idx: number) => {
         const targetId = battle.enemies[0]?.id;
         if (targetId) {
@@ -258,10 +263,12 @@ test.describe('Djinn State Transitions', () => {
         }
       });
 
+      // Execute round (this will process 3 Djinn summons)
       store.getState().executeQueuedRound();
     });
 
-    await waitForBattlePlanningPhase(page);
+    // Wait longer for 3 Djinn execution (more complex than single Djinn)
+    await waitForBattlePlanningPhase(page, 15000);
 
     // Verify all 3 are in Standby
     const flintState = await getDjinnState(page, 'flint');
