@@ -49,6 +49,23 @@ export function processVictory(
     // The player already has the Djinn, so no error is needed
   }
 
+  // Reset all Djinn to Set state after battle (like units heal to full)
+  const resetDjinnTrackers = { ...updatedTeam.djinnTrackers };
+  for (const djinnId in resetDjinnTrackers) {
+    const tracker = resetDjinnTrackers[djinnId];
+    if (tracker) {
+      resetDjinnTrackers[djinnId] = {
+        djinnId: tracker.djinnId,
+        state: 'Set',
+        lastActivatedTurn: tracker.lastActivatedTurn,
+      };
+    }
+  }
+  updatedTeam = {
+    ...updatedTeam,
+    djinnTrackers: resetDjinnTrackers,
+  };
+
   // Check for unit recruitment
   let recruitedUnit: Unit | undefined;
   if (encounter?.reward.unlockUnit) {

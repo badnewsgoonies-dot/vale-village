@@ -81,7 +81,6 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
           <div style={{ textAlign: 'right' }}>
             {!hideHp && <div>HP: {unit.currentHp} / {maxHp}</div>}
             {hideHp && <div>HP: ???</div>}
-            <div>PP: {currentPp} / {maxPp}</div>
           </div>
         </div>
 
@@ -109,28 +108,11 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
               </div>
             </div>
           )}
-
-          <div>
-            <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem' }}>PP</div>
-            <div
-              style={{
-                width: '100%',
-                height: '12px',
-                backgroundColor: '#e0e0e0',
-                borderRadius: '4px',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${ppPercent}%`,
-                  height: '100%',
-                  backgroundColor: '#2196F3',
-                  transition: 'width 0.3s ease',
-                }}
-              />
+          {hideHp && (
+            <div style={{ marginBottom: '0.25rem', height: '28px' }}>
+              {/* Spacer to maintain layout when HP is hidden */}
             </div>
-          </div>
+          )}
         </div>
 
         {unit.statusEffects.length > 0 && (

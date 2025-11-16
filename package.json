@@ -12,6 +12,7 @@
     "build": "pnpm --filter vale-v2 build",
     "preview": "pnpm --filter vale-v2 preview",
     "test": "pnpm --filter vale-v2 test",
+    "test:e2e": "pnpm --filter vale-v2 test:e2e",
     "test:watch": "pnpm --filter vale-v2 test:watch",
     "typecheck": "pnpm --filter vale-v2 typecheck",
     "lint": "pnpm --filter vale-v2 lint",

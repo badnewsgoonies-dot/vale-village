@@ -53,7 +53,7 @@ export function mkUnit(overrides?: Partial<Unit>): Unit {
 /**
  * Create an enemy unit for testing
  */
-export function mkEnemy(enemyId: keyof typeof ENEMIES = 'slime', overrides?: Partial<Unit>): Unit {
+export function mkEnemy(enemyId: keyof typeof ENEMIES = 'mercury-slime', overrides?: Partial<Unit>): Unit {
   const enemyDef = ENEMIES[enemyId];
   if (!enemyDef) {
     throw new Error(`Enemy ${enemyId} not found`);
@@ -90,7 +90,7 @@ export function mkTeam(units: Unit[], padTo4: boolean = false): Team {
         name: `Placeholder ${teamUnits.length}`,
         baseStats: { hp: 9999, pp: 0, atk: 0, def: 0, mag: 0, spd: 1 }, // 0 ATK = no damage
         currentHp: 9999,
-        currentPp: 0,
+        // Note: PP system removed, currentPp not needed
       }));
     }
     return createTeam(teamUnits.slice(0, 4));

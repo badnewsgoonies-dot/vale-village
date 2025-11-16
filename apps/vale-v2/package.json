@@ -11,6 +11,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "validate:data": "tsx src/core/validation/validateAll.ts",
     "generate:sprites": "node scripts/generate-sprite-manifest.cjs",
     "validate:sprites": "node scripts/validate-sprites.cjs",
@@ -26,6 +27,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.6.1",

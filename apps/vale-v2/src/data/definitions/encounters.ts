@@ -50,8 +50,8 @@ export const HOUSE_03_ICE: Encounter = {
   enemies: ['frost-scout', 'mercury-wolf'],
   difficulty: 'easy',
   reward: {
-    xp: 60,
-    gold: 19,
+    xp: 70,
+    gold: 22,
     equipment: {
       type: 'fixed',
       itemId: 'leather-vest',
@@ -65,8 +65,8 @@ export const HOUSE_04_BREEZE: Encounter = {
   enemies: ['gale-scout', 'jupiter-wolf'],
   difficulty: 'easy',
   reward: {
-    xp: 65,
-    gold: 19,
+    xp: 80,
+    gold: 24,
     equipment: { type: 'none' },
     djinn: 'breeze', // Jupiter T1 Djinn
   },
@@ -78,11 +78,11 @@ export const HOUSE_05_ESCALATION: Encounter = {
   enemies: ['earth-scout', 'flame-scout', 'venus-wolf'],
   difficulty: 'medium',
   reward: {
-    xp: 85,
-    gold: 28,
+    xp: 90,
+    gold: 26,
     equipment: {
       type: 'fixed',
-      itemId: 'iron-sword',
+      itemId: 'bronze-sword',
     },
   },
 };
@@ -93,8 +93,8 @@ export const HOUSE_06_FORGE: Encounter = {
   enemies: ['terra-soldier', 'venus-bear'],
   difficulty: 'medium',
   reward: {
-    xp: 105,
-    gold: 34,
+    xp: 100,
+    gold: 28,
     equipment: { type: 'none' },
     djinn: 'forge', // Mars T1 Djinn
   },
@@ -107,7 +107,7 @@ export const HOUSE_07_WIND_CHALLENGE: Encounter = {
   difficulty: 'medium',
   reward: {
     xp: 110,
-    gold: 34,
+    gold: 30,
     equipment: {
       type: 'choice',
       options: ['steel-sword', 'steel-armor', 'steel-helm'],

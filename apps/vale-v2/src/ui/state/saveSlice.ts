@@ -78,13 +78,20 @@ function createSaveData(
     version: '1.0.0' as const,
     timestamp: Date.now(),
     playerData: {
-      unitsCollected: roster.map(u => ({
-        ...u,
-        djinn: [...u.djinn],
-        abilities: [...u.abilities],
-        unlockedAbilityIds: [...u.unlockedAbilityIds],
-        statusEffects: [...u.statusEffects],
-      })),
+      unitsCollected: roster.map(u => {
+        // Clamp HP/PP to base max (no Djinn bonuses in save data)
+        const baseMaxHp = u.baseStats.hp + (u.level - 1) * u.growthRates.hp;
+        const baseMaxPp = u.baseStats.pp + (u.level - 1) * u.growthRates.pp;
+        return {
+          ...u,
+          currentHp: Math.min(u.currentHp, baseMaxHp),
+          currentPp: Math.min(u.currentPp, baseMaxPp),
+          djinn: [...u.djinn],
+          abilities: [...u.abilities],
+          unlockedAbilityIds: [...u.unlockedAbilityIds],
+          statusEffects: [...u.statusEffects],
+        };
+      }),
       activeParty,
       inventory: inventory.equipment,
       gold: inventory.gold,

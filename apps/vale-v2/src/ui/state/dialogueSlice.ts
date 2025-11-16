@@ -51,39 +51,19 @@ export const createDialogueSlice: StateCreator<DialogueSlice & GameFlowSlice & S
     const { currentDialogueTree, currentDialogueState } = get();
     if (!currentDialogueTree || !currentDialogueState) return;
 
+    // Get current node to check for effects before advancing
     const currentNode = currentDialogueTree.nodes.find(n => n.id === currentDialogueState.currentNodeId);
-    if (!currentNode) {
-      get().endDialogue();
-      return;
-    }
 
-    // Check if this is the last node (no nextNodeId and no choices)
-    const isLastNode = !currentNode.nextNodeId && (!currentNode.choices || currentNode.choices.length === 0);
-
-    // If last node has effects, process them and end dialogue
-    if (isLastNode && currentNode.effects && Object.keys(currentNode.effects).length > 0) {
-      processDialogueEffects(currentNode.effects, get);
-      // Effects may have changed mode (e.g., to 'team-select'), so end dialogue preserving that mode
-      get().endDialogue();
-      return;
-    }
-
-    // If not last node, advance to next node
-    if (currentNode.nextNodeId) {
-      const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
-      if (newState) {
-        set({ currentDialogueState: newState });
-
-        // Check if dialogue is complete after advancing
-        if (isDialogueComplete(currentDialogueTree, newState)) {
-          get().endDialogue();
-        }
-      } else {
-        // No next node - end dialogue
-        get().endDialogue();
-      }
+    const newState = advanceDialogue(currentDialogueTree, currentDialogueState);
+    
+    if (newState) {
+      // Advance to the next node
+      set({ currentDialogueState: newState });
     } else {
-      // No next node and not last node with effects - end dialogue
+      // No next node - this is the last node, process effects then end
+      if (currentNode?.effects && Object.keys(currentNode.effects).length > 0) {
+        processDialogueEffects(currentNode.effects, get);
+      }
       get().endDialogue();
     }
   },

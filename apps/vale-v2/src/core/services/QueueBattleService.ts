@@ -18,7 +18,7 @@ import { createEmptyQueue } from '../constants';
 import { getAbilityManaCost, canAffordAction, isQueueComplete, validateQueuedActions } from '../algorithms/mana';
 import { Result, Ok, Err } from '../utils/result';
 import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
-import { getEffectiveSPD } from '../algorithms/stats';
+import { getEffectiveSPD, calculateEffectiveStats } from '../algorithms/stats';
 import { performAction } from './BattleService';
 import { makeAIDecision } from './AIService';
 import {
@@ -350,9 +350,15 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
   const updatedTimers = { ...state.djinnRecoveryTimers };
   const updatedTrackers = { ...state.playerTeam.djinnTrackers };
 
+  console.warn('[QueueBattle] Djinn recovery at start of round', state.roundNumber + 1, ':', {
+    timers: updatedTimers,
+    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
+  });
+
   for (const [djinnId, timer] of Object.entries(updatedTimers)) {
     if (timer > 0) {
       updatedTimers[djinnId] = timer - 1;
+      console.warn(`[QueueBattle] Djinn ${djinnId} timer: ${timer} → ${updatedTimers[djinnId]}`);
       if (updatedTimers[djinnId] === 0) {
         delete updatedTimers[djinnId];
         const tracker = updatedTrackers[djinnId];
@@ -361,6 +367,7 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
             ...tracker,
             state: 'Set',
           };
+          console.warn(`[QueueBattle] Djinn ${djinnId} recovered to Set!`);
         }
       }
     } else {
@@ -368,16 +375,44 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     }
   }
 
+  console.warn('[QueueBattle] After recovery processing:', {
+    timers: updatedTimers,
+    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
+  });
+
   let updatedTeam = updateTeam(state.playerTeam, {
     djinnTrackers: updatedTrackers,
+  });
+
+  console.warn('[QueueBattle] Before merging Djinn abilities:', {
+    round: state.roundNumber + 1,
+    units: updatedTeam.units.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
   });
 
   const unitsWithUpdatedAbilities = updatedTeam.units.map(unit =>
     mergeDjinnAbilitiesIntoUnit(unit, updatedTeam)
   );
 
+  // Clamp HP/PP after Djinn recovery (stat bonuses may have changed)
+  const unitsWithClampedStats = unitsWithUpdatedAbilities.map(unit => {
+    const effectiveStats = calculateEffectiveStats(unit, updatedTeam);
+    const newMaxHp = effectiveStats.hp;
+    const newMaxPp = effectiveStats.pp;
+    let updated = unit;
+    if (unit.currentHp > newMaxHp) {
+      updated = { ...updated, currentHp: newMaxHp };
+    }
+    // Note: PP system removed, no need to clamp currentPp
+    return updated;
+  });
+
+  console.warn('[QueueBattle] After merging Djinn abilities:', {
+    round: state.roundNumber + 1,
+    units: unitsWithClampedStats.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
+  });
+
   updatedTeam = updateTeam(updatedTeam, {
-    units: unitsWithUpdatedAbilities,
+    units: unitsWithClampedStats,
   });
 
   const nextState = updateBattleState(state, {
@@ -510,8 +545,18 @@ function executeDjinnSummons(
     mergeDjinnAbilitiesIntoUnit(unit, updatedTeam)
   );
 
+  // Clamp HP after Djinn state change (stat bonuses may have changed)
+  const unitsWithClampedHP = unitsWithUpdatedAbilities.map(unit => {
+    const effectiveStats = calculateEffectiveStats(unit, updatedTeam);
+    const newMaxHp = effectiveStats.hp;
+    if (unit.currentHp > newMaxHp) {
+      return { ...unit, currentHp: newMaxHp };
+    }
+    return unit;
+  });
+
   updatedTeam = updateTeam(updatedTeam, {
-    units: unitsWithUpdatedAbilities,
+    units: unitsWithClampedHP,
   });
 
   const postBonuses = snapshotDjinnBonuses(updatedTeam);

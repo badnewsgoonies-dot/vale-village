@@ -24,8 +24,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow-y: auto;
   animation: slideIn 0.3s ease-out;
+  overflow: hidden;
 }
 
 @keyframes slideIn {
@@ -92,6 +92,9 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .party-section {
@@ -273,6 +276,95 @@
 .cancel-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Unit Details Section */
+.unit-details {
+  background: rgba(20, 30, 50, 0.5);
+  border: 2px solid rgba(255, 215, 127, 0.3);
+  padding: 20px;
+  border-radius: 4px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.detail-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: bold;
+}
+
+.detail-value {
+  color: #fff;
+  font-weight: bold;
+}
+
+.detail-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 8px 0;
+}
+
+.detail-section {
+  margin-top: 12px;
+}
+
+.detail-section h3 {
+  color: #FFD87F;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.ability-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.ability-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(20, 30, 50, 0.8);
+  border-left: 2px solid #4A7AB8;
+}
+
+.ability-name {
+  color: #fff;
+}
+
+.ability-cost {
+  color: #FFD87F;
+  font-weight: bold;
+}
+
+.member-stats {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.active-badge {
+  background: #4CAF50;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 4px;
 }
 
 /* Responsive */

@@ -80,17 +80,22 @@ export function getDjinnGrantedAbilitiesForUnit(unit: Unit, team: Team): string[
     const abilityGroup = djinn.grantedAbilities[unit.id];
     if (!abilityGroup) continue;
 
+    // Grant only first 2 abilities per Djinn (1 from primary compatibility, 1 from secondary if available)
+    let abilitiesToGrant: string[] = [];
+    
     switch (compatibility) {
       case 'same':
-        granted.push(...abilityGroup.same);
+        abilitiesToGrant = abilityGroup.same.slice(0, 2);
         break;
       case 'counter':
-        granted.push(...abilityGroup.counter);
+        abilitiesToGrant = abilityGroup.counter.slice(0, 2);
         break;
       case 'neutral':
-        granted.push(...abilityGroup.neutral);
+        abilitiesToGrant = abilityGroup.neutral.slice(0, 2);
         break;
     }
+    
+    granted.push(...abilitiesToGrant);
   }
 
   return [...new Set(granted)];
