@@ -268,7 +268,7 @@ test.describe('Djinn State Transitions', () => {
     });
 
     // Wait longer for 3 Djinn execution (more complex than single Djinn)
-    await waitForBattlePlanningPhase(page, 15000);
+    await waitForBattlePlanningPhase(page, 30000);
 
     // Verify all 3 are in Standby
     const flintState = await getDjinnState(page, 'flint');

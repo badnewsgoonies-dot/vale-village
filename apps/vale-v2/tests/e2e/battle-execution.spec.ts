@@ -234,6 +234,25 @@ test.describe('Battle Execution', () => {
     expect(queueState.queuedActions).toBeGreaterThanOrEqual(queueState.playerUnitCount);
     expect(queueState.phase).toBe('planning');
 
+    // Verify canExecute logic is correct before checking button
+    const canExecuteState = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const battle = store.getState().battle;
+      if (!battle) return false;
+      const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+      const queuedActions = battle.queuedActions ?? [];
+      const queuedCount = queuedActions.filter((a: any) => a !== null).length;
+      return battle.phase === 'planning' && queuedCount >= aliveUnits.length;
+    });
+
+    expect(canExecuteState).toBe(true);
+
+    // Wait for button to exist and be visible in DOM
+    await page.waitForSelector('button:has-text("Execute Round")', { 
+      timeout: 5000,
+      state: 'visible' 
+    });
+
     // Now verify execute button is visible and enabled
     const executeButton = page.getByRole('button', { name: /execute.*round/i });
     const buttonVisible = await executeButton.isVisible().catch(() => false);
