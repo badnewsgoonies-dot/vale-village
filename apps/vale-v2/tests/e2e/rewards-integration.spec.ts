@@ -52,7 +52,7 @@ test.describe('Rewards System Integration', () => {
     // ============================================================================
     // BATTLE: house-01 or house-02 (first trigger encountered)
     // house-01: 50 XP, 18 gold, wooden-sword
-    // house-02: 60 XP, 19 gold, (Flint starts equipped)
+    // house-02: 60 XP, 20 gold, (Flint starts equipped)
     // ============================================================================
     
     console.log('\n→ Starting battle...');
@@ -99,9 +99,9 @@ test.describe('Rewards System Integration', () => {
     
     // Verify XP matches expected values (50 or 60 depending on which encounter)
     expect([50, 60]).toContain(afterBattle.roster[0]?.xp);
-    
-    // Verify gold matches expected values (18 or 19)
-    expect([18, 19]).toContain(afterBattle.gold);
+
+    // Verify gold matches expected values (18 or 20)
+    expect([18, 20]).toContain(afterBattle.gold);
     
     // Verify Flint Djinn is collected (starts with it)
     expect(afterBattle.djinn).toContain('flint');

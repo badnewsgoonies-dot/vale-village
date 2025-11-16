@@ -38,7 +38,7 @@ export const HOUSE_02_FLINT: Encounter = {
   difficulty: 'easy',
   reward: {
     xp: 60,
-    gold: 19,
+    gold: 20,
     equipment: { type: 'none' },
     djinn: 'flint', // Venus T1 Djinn
   },
@@ -139,8 +139,8 @@ export const HOUSE_09_INFERNO: Encounter = {
   enemies: ['blaze-soldier', 'mars-bear', 'flame-elemental'],
   difficulty: 'hard',
   reward: {
-    xp: 175,
-    gold: 50,
+    xp: 185,
+    gold: 52,
     equipment: {
       type: 'choice',
       options: ['flame-sword', 'ember-armor', 'fire-boots'],
@@ -154,8 +154,8 @@ export const HOUSE_10_GRANITE: Encounter = {
   enemies: ['stone-captain', 'rock-elemental'],
   difficulty: 'hard',
   reward: {
-    xp: 200,
-    gold: 52,
+    xp: 195,
+    gold: 54,
     equipment: { type: 'none' },
     djinn: 'granite', // Venus T2 Djinn - POWER SPIKE
   },
@@ -167,8 +167,8 @@ export const HOUSE_11_PHOENIX: Encounter = {
   enemies: ['inferno-captain', 'phoenix'],
   difficulty: 'hard',
   reward: {
-    xp: 220,
-    gold: 78,
+    xp: 210,
+    gold: 56,
     equipment: {
       type: 'choice',
       options: ['phoenix-blade', 'flame-shield', 'crimson-boots'],
@@ -182,8 +182,8 @@ export const HOUSE_12_SQUALL: Encounter = {
   enemies: ['glacier-captain', 'leviathan'],
   difficulty: 'hard',
   reward: {
-    xp: 225,
-    gold: 78,
+    xp: 220,
+    gold: 58,
     equipment: { type: 'none' },
     djinn: 'squall', // Jupiter T2 Djinn
   },
@@ -195,8 +195,8 @@ export const HOUSE_13_THUNDERBIRD: Encounter = {
   enemies: ['thunder-captain', 'thunderbird'],
   difficulty: 'hard',
   reward: {
-    xp: 220,
-    gold: 78,
+    xp: 230,
+    gold: 60,
     equipment: {
       type: 'choice',
       options: ['thunder-blade', 'storm-mail', 'gale-boots'],
@@ -210,8 +210,8 @@ export const HOUSE_14_CORONA: Encounter = {
   enemies: ['terra-soldier', 'blaze-soldier', 'wind-soldier'],
   difficulty: 'hard',
   reward: {
-    xp: 230,
-    gold: 48,
+    xp: 245,
+    gold: 62,
     equipment: { type: 'none' },
     djinn: 'corona', // Mars T2 Djinn
   },
@@ -243,8 +243,8 @@ export const HOUSE_16_TONIC: Encounter = {
   enemies: ['mountain-commander', 'basilisk', 'rock-elemental'],
   difficulty: 'boss',
   reward: {
-    xp: 320,
-    gold: 90,
+    xp: 325,
+    gold: 95,
     equipment: { type: 'none' },
     djinn: 'tonic', // Mercury T2 Djinn
   },
@@ -256,7 +256,7 @@ export const HOUSE_17_WARLORDS: Encounter = {
   enemies: ['fire-commander', 'volcano-warlord'],
   difficulty: 'boss',
   reward: {
-    xp: 380,
+    xp: 350,
     gold: 100,
     equipment: {
       type: 'choice',
@@ -271,8 +271,8 @@ export const HOUSE_18_BANE: Encounter = {
   enemies: ['storm-commander', 'hydra'],
   difficulty: 'boss',
   reward: {
-    xp: 400,
-    gold: 110,
+    xp: 375,
+    gold: 105,
     equipment: { type: 'none' },
     djinn: 'bane', // Venus T3 Djinn
   },
@@ -284,8 +284,8 @@ export const HOUSE_19_FURY: Encounter = {
   enemies: ['granite-warlord', 'blizzard-warlord'],
   difficulty: 'boss',
   reward: {
-    xp: 480,
-    gold: 120,
+    xp: 400,
+    gold: 110,
     equipment: { type: 'none' },
     djinn: 'fury', // Mars T3 Djinn
   },
