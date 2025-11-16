@@ -5,8 +5,9 @@
  * Used in both player and enemy side panels.
  */
 
-import React from 'react';
-import type { UnitCardProps } from './types';
+import { SimpleSprite } from '../../sprites/SimpleSprite';
+import { StatusIcon } from './StatusIcon';
+import type { UnitCardProps} from './types';
 
 export function UnitCard({ unit, onClick }: UnitCardProps): JSX.Element {
   const classes = [
@@ -21,7 +22,12 @@ export function UnitCard({ unit, onClick }: UnitCardProps): JSX.Element {
     <div className={classes} onClick={onClick}>
       {/* Sprite */}
       <div className="unit-sprite">
-        {unit.name.slice(0, 3)}
+        <SimpleSprite
+          id={unit.id}
+          width={32}
+          height={32}
+          style={{ borderRadius: '4px' }}
+        />
       </div>
 
       {/* Header: Name + Element */}
@@ -48,9 +54,12 @@ export function UnitCard({ unit, onClick }: UnitCardProps): JSX.Element {
         {unit.isKo && <div className="unit-status-label">KO</div>}
         <div className="status-icons">
           {unit.statuses.map((status) => (
-            <div key={status.id} className="status-icon" title={status.title}>
-              {status.icon}
-            </div>
+            <StatusIcon
+              key={status.id}
+              statusType={status.id}
+              title={status.title}
+              size={20}
+            />
           ))}
         </div>
       </div>

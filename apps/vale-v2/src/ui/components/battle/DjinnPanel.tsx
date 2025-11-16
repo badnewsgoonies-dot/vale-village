@@ -5,7 +5,6 @@
  * Shows current state (SET/STANDBY/RECOVERY) and recovery timers.
  */
 
-import React from 'react';
 import type { DjinnPanelProps } from './types';
 
 export function DjinnPanel({ djinns, onSelectDjinn }: DjinnPanelProps): JSX.Element {

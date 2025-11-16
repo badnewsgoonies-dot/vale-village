@@ -35,7 +35,7 @@ export const createRewardsSlice: StateCreator<
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
 
-    const { setTeam, addUnitToRoster, setMode } = get();
+    const { setTeam, addUnitToRoster } = get();
     setTeam(result.updatedTeam);
 
     // Handle unit recruitment

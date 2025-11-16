@@ -4,7 +4,6 @@
  * Displays all enemy units (HP hidden via CSS).
  */
 
-import React from 'react';
 import { UnitCard } from './UnitCard';
 import type { SidePanelEnemyProps } from './types';
 

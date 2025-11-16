@@ -11,7 +11,6 @@ interface TeamBenchSectionProps {
   selectedSlotIndex: number | null;
   onSelectSlot: (index: number | null) => void;
   onAddToSlot: (slotIndex: number, unitId: string) => void;
-  onRemoveFromParty: (slotIndex: number) => void;
 }
 
 export function TeamBenchSection({
@@ -20,7 +19,6 @@ export function TeamBenchSection({
   selectedSlotIndex,
   onSelectSlot,
   onAddToSlot,
-  onRemoveFromParty,
 }: TeamBenchSectionProps) {
   const handleSlotClick = (index: number) => {
     if (activeParty[index]) {

@@ -9,6 +9,8 @@ import type { Equipment } from '../../core/models/Equipment';
 export interface InventorySlice {
   gold: number;
   equipment: Equipment[];
+  setGold: (amount: number) => void;
+  setEquipment: (items: Equipment[]) => void;
   
   addGold: (amount: number) => void;
   addEquipment: (items: Equipment[]) => void;
@@ -32,5 +34,13 @@ export const createInventorySlice: StateCreator<
     set((state) => ({ 
       equipment: [...state.equipment, ...items.map(item => ({ ...item }))] 
     }));
+  },
+ 
+  setGold: (amount) => {
+    set({ gold: amount });
+  },
+
+  setEquipment: (items) => {
+    set({ equipment: items.map(item => ({ ...item })) });
   },
 });

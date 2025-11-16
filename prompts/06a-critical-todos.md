@@ -49,18 +49,6 @@ const currentPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
   - Save current chapter from `storySlice`
   - Restore chapter on load
 
-### TODO 4: Add Accuracy Property to Ability Schema
-- **File:** `apps/vale-v2/src/core/services/BattleService.ts:288`
-- **Priority:** HIGH
-- **Current:**
-```ts
-const abilityAccuracy = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY; // TODO: Add accuracy property to Ability schema
-```
-- **Implementation:**
-  - Add `accuracy?: number` to `AbilitySchema` (defaults to 0.95)
-  - Update ability definitions with accuracy values
-  - Use `ability.accuracy` instead of constant
-
 ## Medium Priority TODOs (Document)
 ### TODO 5-8: Document Deferred TODOs
 - **Files:**
@@ -91,19 +79,14 @@ const abilityAccuracy = BATTLE_CONSTANTS.DEFAULT_ABILITY_ACCURACY; // TODO: Add 
 **High Priority:**
 - `apps/vale-v2/src/data/schemas/SaveV1Schema.ts` - Add chapter
 - `apps/vale-v2/src/core/services/SaveService.ts` - Save chapter
-- `apps/vale-v2/src/data/schemas/AbilitySchema.ts` - Add accuracy
-- `apps/vale-v2/src/data/definitions/abilities.ts` - Add accuracy values
 
 ## Testing
 # Test save/load with all state
 # Test PP removal doesn't break UI
-# Test ability accuracy works
 pnpm test tests/core/save/
-pnpm test tests/core/services/BattleService.test.ts
 pnpm dev  # Manual test save/load
 
 ## Reference
 - Save slice: `apps/vale-v2/src/ui/state/saveSlice.ts`
 - Save schema: `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
-- Ability schema: `apps/vale-v2/src/data/schemas/AbilitySchema.ts`
 - Current TODOs: Found 13 total across codebase

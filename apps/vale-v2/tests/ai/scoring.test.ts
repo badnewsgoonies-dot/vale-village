@@ -7,6 +7,7 @@ import { describe, test, expect } from 'vitest';
 import { makeAIDecision } from '../../src/core/services/AIService';
 import { makeTestCtx } from '../../src/test/testCtx';
 import { mkBattle, mkUnit, mkEnemy } from '../../src/test/factories';
+import { ABILITIES } from '../../src/data/definitions/abilities';
 
 describe('AI Scoring', () => {
   test('should prefer abilities with higher damage potential', () => {
@@ -29,20 +30,14 @@ describe('AI Scoring', () => {
     // Create enemy with low PP
     const enemy = mkEnemy('slime', {
       id: 'e1',
-      baseStats: {
-        hp: 50,
-        pp: 0, // No PP
-        atk: 10,
-        def: 5,
-        mag: 5,
-        spd: 10,
-      },
+      abilities: [ABILITIES['strike']],
     });
 
     const battle = mkBattle({
       party: [mkUnit({ id: 'u1' })],
       enemies: [enemy],
     });
+    battle.remainingMana = 0;
 
     const decision = makeAIDecision(battle, 'e1', rng);
     
@@ -54,9 +49,8 @@ describe('AI Scoring', () => {
     const ability = enemyUnit?.abilities.find(a => a.id === decision.abilityId);
     expect(ability).toBeDefined();
     if (ability && enemyUnit) {
-      // Ability should be affordable (0 cost or enemy has PP)
-      const currentPp = enemyUnit.baseStats.pp + (enemyUnit.level - 1) * enemyUnit.growthRates.pp;
-      expect(ability.manaCost).toBeLessThanOrEqual(currentPp);
+      const availableMana = battle.remainingMana;
+      expect(ability.manaCost).toBeLessThanOrEqual(availableMana);
     }
   });
 

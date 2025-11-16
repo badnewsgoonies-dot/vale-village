@@ -5,7 +5,6 @@
  * Shows current acting unit with highlight.
  */
 
-import React from 'react';
 import type { TurnOrderStripProps } from './types';
 
 export function TurnOrderStrip({ units }: TurnOrderStripProps): JSX.Element {

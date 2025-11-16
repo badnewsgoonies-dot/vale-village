@@ -4,14 +4,14 @@
  * Displays scrollable battle event log.
  */
 
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import type { BattleLogProps } from './types';
 
 export function BattleLog({ entries }: BattleLogProps): JSX.Element {
-  const logRef = React.useRef<HTMLDivElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new entries added
-  React.useEffect(() => {
+  useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }

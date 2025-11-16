@@ -4,7 +4,6 @@
  * Displays all player units with full HP and status information.
  */
 
-import React from 'react';
 import { UnitCard } from './UnitCard';
 import type { SidePanelPlayerProps } from './types';
 

@@ -135,8 +135,6 @@ function mapStatusEffectToVM(status: StatusEffect): StatusEffectVM {
         title: `Auto-Revive: ${status.hpPercent * 100}% HP (${status.usesRemaining} uses)`,
       };
     default:
-      // Exhaustiveness check
-      const _never: never = status;
       return { id: 'unknown', icon: '?', title: 'Unknown Status' };
   }
 }
@@ -180,18 +178,12 @@ export function BattleScreen(): JSX.Element | null {
   const team = useStore((state) => state.team);
 
   // Actions (for Phase 2+)
-  const queueUnitAction = useStore((state) => state.queueUnitAction);
-  const clearUnitAction = useStore((state) => state.clearUnitAction);
-  const queueDjinnActivation = useStore((state) => state.queueDjinnActivation);
-  const unqueueDjinnActivation = useStore((state) => state.unqueueDjinnActivation);
-  const executeQueuedRound = useStore((state) => state.executeQueuedRound);
 
   // ========================================================================
   // Local UI state (Phase 1: placeholders)
   // ========================================================================
 
   const [selectedCommand, setSelectedCommand] = React.useState<CommandType | null>(null);
-  const [selectedUnitId, setSelectedUnitId] = React.useState<string | null>(null);
   const [targetingMode, setTargetingMode] = React.useState(false);
   const [pendingAbilityId, setPendingAbilityId] = React.useState<string | null>(null);
 
@@ -328,7 +320,8 @@ export function BattleScreen(): JSX.Element | null {
 
   // Can Execute (Phase 1: simple check)
   const canExecute = battle.phase === 'planning' &&
-                     battle.queuedActions.some(a => a !== null);
+                     battle.queuedActions.filter(a => a !== null).length >=
+                     battle.playerTeam.units.filter(u => u.currentHp > 0).length;
 
   // ========================================================================
   // Event Handlers (Phase 1: Stubs with TODOs)
@@ -338,7 +331,6 @@ export function BattleScreen(): JSX.Element | null {
     // TODO Phase 2: Implement unit selection logic
     // - If in targeting mode, apply target
     // - Otherwise, select unit for planning
-    setSelectedUnitId(unitId);
     console.log('[TODO] Selected unit:', unitId);
   }, []);
 

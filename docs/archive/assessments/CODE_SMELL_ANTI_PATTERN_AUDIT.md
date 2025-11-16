@@ -859,12 +859,11 @@ if (abilityId === 'strike') {  // Type-safe
 
 ## 🟡 COMMENT SMELLS
 
-### 20. TODO Comments: 13 Found
+### 20. TODO Comments: 8 Found
 **Files:** Multiple locations
 
 **Issues:**
 - `saveSlice.ts:37` - "TODO: Hydrate team and battle from save data"
-- `BattleService.ts:255` - "TODO: Add accuracy property to Ability schema"
 - `UnitCard.tsx:24` - "TODO: Migrate PP to team mana"
 - `ActionBar.tsx:47` - "TODO: Migrate PP to team mana"
 - `AIService.ts:66` - "TODO: Pass team to scoreAbility for accurate effective stats"

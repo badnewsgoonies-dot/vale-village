@@ -5,6 +5,7 @@
 
 import type { StateCreator } from 'zustand';
 import type { Unit } from '../../core/models/Unit';
+import type { StoryState } from '../../core/models/story';
 import { 
   saveGame, 
   loadGame, 
@@ -79,13 +80,11 @@ function createSaveData(
     timestamp: Date.now(),
     playerData: {
       unitsCollected: roster.map(u => {
-        // Clamp HP/PP to base max (no Djinn bonuses in save data)
+        // Clamp HP to base max (Djinn bonuses not persisted)
         const baseMaxHp = u.baseStats.hp + (u.level - 1) * u.growthRates.hp;
-        const baseMaxPp = u.baseStats.pp + (u.level - 1) * u.growthRates.pp;
         return {
           ...u,
           currentHp: Math.min(u.currentHp, baseMaxHp),
-          currentPp: Math.min(u.currentPp, baseMaxPp),
           djinn: [...u.djinn],
           abilities: [...u.abilities],
           unlockedAbilityIds: [...u.unlockedAbilityIds],
@@ -113,6 +112,22 @@ function createSaveData(
       totalHealingDone: 0,
       playtime: 0, // TODO: Track playtime
     },
+  };
+}
+
+type SaveWithOptionalStory = SaveV1 & {
+  story?: {
+    flags?: Record<string, boolean | number>;
+    chapter?: number;
+  };
+};
+
+function getStoryStateFromSave(saveData: SaveV1): StoryState {
+  const storySection = (saveData as SaveWithOptionalStory).story;
+  const flags = storySection?.flags ?? saveData.playerData.storyFlags ?? {};
+  return {
+    chapter: storySection?.chapter ?? 1,
+    flags: { ...flags },
   };
 }
 
@@ -159,18 +174,11 @@ export const createSaveSlice: StateCreator<
     }
 
     // Hydrate inventory
-    _set({
-      gold: saveData.playerData.gold,
-      equipment: saveData.playerData.inventory,
-    });
+    state.setEquipment(saveData.playerData.inventory ?? []);
+    state.setGold(saveData.playerData.gold ?? 0);
 
     // Hydrate story state
-    _set({
-      story: {
-        chapter: 1, // Will be updated when chapter tracking is added
-        flags: saveData.playerData.storyFlags,
-      },
-    });
+    state.setStoryState(getStoryStateFromSave(saveData));
 
     // Hydrate overworld state
     state.teleportPlayer(
@@ -183,15 +191,14 @@ export const createSaveSlice: StateCreator<
     if (battleStateJson) {
       try {
         const battleState = JSON.parse(battleStateJson);
-        if (battleState.battle && battleState.rngSeed !== undefined) {
-          _set({
-            battle: battleState.battle,
-            rngSeed: battleState.rngSeed,
-            turnNumber: battleState.turnNumber ?? 0,
-          });
+        if (battleState?.battle) {
+          const rngSeed =
+            typeof battleState.rngSeed === 'number' ? battleState.rngSeed : 0;
+          state.setBattle(battleState.battle, rngSeed);
+          _set({ turnNumber: battleState.turnNumber ?? 0 });
         }
       } catch (error) {
-        console.error('Failed to parse battle state:', error);
+        console.warn('Failed to parse battle state:', error);
       }
     }
   },
@@ -296,18 +303,11 @@ export const createSaveSlice: StateCreator<
     }
 
     // Hydrate inventory
-    _set({
-      gold: saveData.playerData.gold,
-      equipment: saveData.playerData.inventory,
-    });
+    state.setEquipment(saveData.playerData.inventory ?? []);
+    state.setGold(saveData.playerData.gold ?? 0);
 
     // Hydrate story state
-    _set({
-      story: {
-        chapter: 1, // Will be updated when chapter tracking is added
-        flags: saveData.playerData.storyFlags,
-      },
-    });
+    state.setStoryState(getStoryStateFromSave(saveData));
 
     // Hydrate overworld state
     state.teleportPlayer(
@@ -320,15 +320,14 @@ export const createSaveSlice: StateCreator<
     if (battleStateJson) {
       try {
         const battleState = JSON.parse(battleStateJson);
-        if (battleState.battle && battleState.rngSeed !== undefined) {
-          _set({
-            battle: battleState.battle,
-            rngSeed: battleState.rngSeed,
-            turnNumber: battleState.turnNumber ?? 0,
-          });
+        if (battleState?.battle) {
+          const rngSeed =
+            typeof battleState.rngSeed === 'number' ? battleState.rngSeed : 0;
+          state.setBattle(battleState.battle, rngSeed);
+          _set({ turnNumber: battleState.turnNumber ?? 0 });
         }
       } catch (error) {
-        console.error('Failed to parse battle state:', error);
+        console.warn('Failed to parse battle state:', error);
       }
     }
   },

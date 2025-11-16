@@ -13,10 +13,6 @@ export function canMoveTo(map: GameMap, position: Position): boolean {
   const tile = getTile(map, position);
   if (!tile) return false;
   if (!tile.walkable) return false;
-  const collisionTrigger = map.triggers.find(trigger =>
-    trigger.position.x === position.x && trigger.position.y === position.y && trigger.type === 'npc'
-  );
-  if (collisionTrigger) return false;
   const npcCollision = map.npcs.find(npc => npc.position.x === position.x && npc.position.y === position.y);
   if (npcCollision) return false;
   return true;

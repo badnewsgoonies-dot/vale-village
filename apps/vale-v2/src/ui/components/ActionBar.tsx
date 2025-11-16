@@ -47,12 +47,11 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
     );
   }
 
-  // TODO: Migrate PP to team mana in PR-MANA-QUEUE
-  // For now, calculate PP from base stats + level
-  const currentPp = currentActor.baseStats.pp + (currentActor.level - 1) * currentActor.growthRates.pp; // TODO: Track PP separately
-  const availableAbilities = currentActor.abilities.filter(a =>
-    currentActor.unlockedAbilityIds.includes(a.id) &&
-    currentPp >= a.manaCost
+  const remainingMana = battle.remainingMana;
+  const availableAbilities = currentActor.abilities.filter(
+    (ability) =>
+      currentActor.unlockedAbilityIds.includes(ability.id) &&
+      remainingMana >= ability.manaCost
   );
   const lockedDjinnAbilities = getLockedDjinnAbilityMetadataForUnit(currentActor, battle.playerTeam);
 
@@ -127,7 +126,7 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
                   cursor: 'pointer',
                 }}
               >
-                {ability.name} (PP: {ability.manaCost})
+                {ability.name} (Cost: {ability.manaCost})
               </button>
             ))}
           </div>
@@ -154,7 +153,7 @@ export function ActionBar({ disabled = false }: ActionBarProps) {
                       cursor: 'not-allowed',
                     }}
                   >
-                    {ability.name} (PP: {ability.manaCost ?? 0}) — {formatLockedReason(meta)}
+                    {ability.name} (Cost: {ability.manaCost}) — {formatLockedReason(meta)}
                   </button>
                 );
               })}

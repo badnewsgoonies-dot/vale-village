@@ -5,7 +5,8 @@
  * Handles target selection during planning phase.
  */
 
-import React from 'react';
+import { BackgroundSprite } from '../../sprites/BackgroundSprite';
+import { BattleUnitSprite } from '../BattleUnitSprite';
 import type { BattlefieldProps } from './types';
 
 export function Battlefield({
@@ -15,8 +16,20 @@ export function Battlefield({
   onSelectTarget,
 }: BattlefieldProps): JSX.Element {
   return (
-    <div className="battlefield">
-      <div className="battlefield-inner">
+    <div className="battlefield" style={{ position: 'relative' }}>
+      <BackgroundSprite
+        id="random"
+        category="backgrounds-gs1"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0,
+        }}
+      />
+      <div className="battlefield-inner" style={{ position: 'relative', zIndex: 1 }}>
         {/* Player column (left side) */}
         <div className="battlefield-column">
           {playerUnits.map((unit) => {
@@ -33,7 +46,11 @@ export function Battlefield({
                 onClick={() => targetingMode && onSelectTarget?.(unit.id)}
                 style={{ opacity: unit.isKo ? 0.4 : 1 }}
               >
-                {unit.name.slice(0, 1)}
+                <BattleUnitSprite
+                  unitId={unit.id}
+                  state="idle"
+                  size="medium"
+                />
               </div>
             );
           })}
@@ -54,7 +71,11 @@ export function Battlefield({
                 onClick={() => targetingMode && onSelectTarget?.(enemy.id)}
                 style={{ opacity: enemy.isKo ? 0.4 : 1 }}
               >
-                {enemy.name.slice(0, 1)}
+                <BattleUnitSprite
+                  unitId={enemy.id}
+                  state="idle"
+                  size="medium"
+                />
               </div>
             );
           })}

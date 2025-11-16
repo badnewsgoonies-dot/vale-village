@@ -104,7 +104,7 @@ describe('Type Guards - Team', () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.units.length).toBe(4);
+      expect(result.value.units.length).toBe(team.units.length);
     }
   });
 
@@ -321,7 +321,7 @@ describe('Type Guards - Integration', () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.playerTeam.units.length).toBe(4);
+      expect(result.value.playerTeam.units.length).toBe(state.playerTeam.units.length);
       expect(result.value.enemies.length).toBeGreaterThan(0);
       expect(result.value.phase).toBe('planning');
       // Verify unitById was reconstructed

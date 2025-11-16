@@ -5,7 +5,8 @@
  * Shows core abilities (level/equipment) and Djinn-granted abilities.
  */
 
-import React from 'react';
+import { SimpleSprite } from '../../sprites/SimpleSprite';
+import { getAbilityIconSprite } from '../../sprites/mappings';
 import type { AbilityPanelProps } from './types';
 
 export function AbilityPanel({
@@ -27,10 +28,20 @@ export function AbilityPanel({
                 onClick={() => onSelectAbility(ability.id)}
               >
                 <div className="ability-item__top">
-                  <span className="ability-name">{ability.name}</span>
-                  <span className="ability-meta">
-                    {ability.manaCost} mana · [{ability.sourceLabel}]
-                  </span>
+                  <div className="ability-icon">
+                    <SimpleSprite
+                      id={getAbilityIconSprite(ability.id)}
+                      width={32}
+                      height={32}
+                      style={{ borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div className="ability-info">
+                    <span className="ability-name">{ability.name}</span>
+                    <span className="ability-meta">
+                      {ability.manaCost} mana · [{ability.sourceLabel}]
+                    </span>
+                  </div>
                 </div>
                 <div className="ability-detail">{ability.description}</div>
               </div>
@@ -57,10 +68,23 @@ export function AbilityPanel({
                   onClick={() => !ability.isLocked && onSelectAbility(ability.id)}
                 >
                   <div className="ability-item__top">
-                    <span className="ability-name">{ability.name}</span>
-                    <span className="ability-meta">
-                      {ability.manaCost} mana · [{ability.sourceLabel}]
-                    </span>
+                    <div className="ability-icon">
+                      <SimpleSprite
+                        id={getAbilityIconSprite(ability.id)}
+                        width={32}
+                        height={32}
+                        style={{
+                          borderRadius: '4px',
+                          opacity: ability.isLocked ? 0.5 : 1
+                        }}
+                      />
+                    </div>
+                    <div className="ability-info">
+                      <span className="ability-name">{ability.name}</span>
+                      <span className="ability-meta">
+                        {ability.manaCost} mana · [{ability.sourceLabel}]
+                      </span>
+                    </div>
                   </div>
                   <div className="ability-detail">{ability.description}</div>
                   {ability.isLocked && ability.lockedReason && (

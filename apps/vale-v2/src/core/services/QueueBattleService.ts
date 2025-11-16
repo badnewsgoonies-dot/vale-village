@@ -357,11 +357,19 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
 
   for (const [djinnId, timer] of Object.entries(updatedTimers)) {
     if (timer > 0) {
+      const tracker = updatedTrackers[djinnId];
+
+      // Skip decrementing if Djinn was just activated this round
+      // (lastActivatedTurn matches the round that just completed)
+      if (tracker?.lastActivatedTurn === state.roundNumber) {
+        console.warn(`[QueueBattle] Djinn ${djinnId} just activated - skipping timer decrement`);
+        continue;
+      }
+
       updatedTimers[djinnId] = timer - 1;
       console.warn(`[QueueBattle] Djinn ${djinnId} timer: ${timer} → ${updatedTimers[djinnId]}`);
       if (updatedTimers[djinnId] === 0) {
         delete updatedTimers[djinnId];
-        const tracker = updatedTrackers[djinnId];
         if (tracker) {
           updatedTrackers[djinnId] = {
             ...tracker,
@@ -397,7 +405,6 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
   const unitsWithClampedStats = unitsWithUpdatedAbilities.map(unit => {
     const effectiveStats = calculateEffectiveStats(unit, updatedTeam);
     const newMaxHp = effectiveStats.hp;
-    const newMaxPp = effectiveStats.pp;
     let updated = unit;
     if (unit.currentHp > newMaxHp) {
       updated = { ...updated, currentHp: newMaxHp };

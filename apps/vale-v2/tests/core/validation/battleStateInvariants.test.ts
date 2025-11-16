@@ -113,12 +113,13 @@ describe('Battle State Invariants - HP', () => {
 });
 
 describe('Battle State Invariants - Queue', () => {
-  test('validates queue length is 4', () => {
-    const state = mkBattle({});
+  test('validates queued actions match active party size', () => {
+    const units = [mkUnit({ id: 'u1' }), mkUnit({ id: 'u2' })];
+    const state = mkBattle({ party: units });
 
     const invalidState = {
       ...state,
-      queuedActions: [null, null], // Only 2 slots
+      queuedActions: state.queuedActions.slice(0, state.playerTeam.units.length - 1),
     };
 
     expect(() => validateBattleState(invalidState)).toThrow(BattleStateInvariantError);
@@ -128,19 +129,18 @@ describe('Battle State Invariants - Queue', () => {
   test('validates queued action references existing unit', () => {
     const state = mkBattle({});
 
+    const queueLength = state.playerTeam.units.length;
+    const queued = Array.from({ length: queueLength }, () => null);
+    queued[0] = {
+      unitId: 'non-existent-unit',
+      abilityId: 'strike',
+      targetIds: ['e1'],
+      manaCost: 0,
+    };
+
     const invalidState = {
       ...state,
-      queuedActions: [
-        {
-          unitId: 'non-existent-unit',
-          abilityId: 'strike',
-          targetIds: ['e1'],
-          manaCost: 0,
-        },
-        null,
-        null,
-        null,
-      ],
+      queuedActions: queued,
     };
 
     expect(() => validateBattleState(invalidState)).toThrow(BattleStateInvariantError);
@@ -151,19 +151,18 @@ describe('Battle State Invariants - Queue', () => {
     const state = mkBattle({});
     const unitId = state.playerTeam.units[0]?.id ?? 'u1';
 
+    const queueLength = state.playerTeam.units.length;
+    const queued = Array.from({ length: queueLength }, () => null);
+    queued[0] = {
+      unitId,
+      abilityId: 'strike',
+      targetIds: ['e1'],
+      manaCost: -5, // Invalid
+    };
+
     const invalidState = {
       ...state,
-      queuedActions: [
-        {
-          unitId,
-          abilityId: 'strike',
-          targetIds: ['e1'],
-          manaCost: -5, // Invalid
-        },
-        null,
-        null,
-        null,
-      ],
+      queuedActions: queued,
     };
 
     expect(() => validateBattleState(invalidState)).toThrow(BattleStateInvariantError);
@@ -174,19 +173,18 @@ describe('Battle State Invariants - Queue', () => {
     const state = mkBattle({});
     const unitId = state.playerTeam.units[0]?.id ?? 'u1';
 
+    const queueLength = state.playerTeam.units.length;
+    const queued = Array.from({ length: queueLength }, () => null);
+    queued[0] = {
+      unitId,
+      abilityId: 'strike',
+      targetIds: ['non-existent-enemy'],
+      manaCost: 0,
+    };
+
     const invalidState = {
       ...state,
-      queuedActions: [
-        {
-          unitId,
-          abilityId: 'strike',
-          targetIds: ['non-existent-enemy'],
-          manaCost: 0,
-        },
-        null,
-        null,
-        null,
-      ],
+      queuedActions: queued,
     };
 
     expect(() => validateBattleState(invalidState)).toThrow(BattleStateInvariantError);
@@ -256,10 +254,13 @@ describe('Battle State Invariants - Phase', () => {
   test('validates executing phase has complete queue', () => {
     const state = mkBattle({});
 
+    const queueLength = state.playerTeam.units.length;
+    const incompleteQueue = Array.from({ length: queueLength }, () => null);
+
     const invalidState = {
       ...state,
       phase: 'executing' as const,
-      queuedActions: [null, null, null, null], // Incomplete
+      queuedActions: incompleteQueue,
     };
 
     expect(() => validateBattleState(invalidState)).toThrow(BattleStateInvariantError);
@@ -325,19 +326,8 @@ describe('Battle State Invariants - Djinn', () => {
     expect(() => validateBattleState(state)).toThrow(/DJINN_INVALID_STATE/);
   });
 
-  test('validates djinn assignment references existing unit', () => {
-    const state = mkBattle({});
-
-    state.playerTeam.djinnTrackers['flint'] = {
-      djinnId: 'flint',
-      element: 'Venus',
-      state: 'Set',
-      lastActivatedTurn: 0,
-      assignedUnitId: 'non-existent-unit',
-    };
-
-    expect(() => validateBattleState(state)).toThrow(BattleStateInvariantError);
-    expect(() => validateBattleState(state)).toThrow(/DJINN_INVALID_ASSIGNMENT/);
+  test.skip('validates djinn assignment references existing unit', () => {
+    // Legacy invariant removed: Djinn are no longer bound to specific units.
   });
 
   test('validates recovery timers are non-negative', () => {

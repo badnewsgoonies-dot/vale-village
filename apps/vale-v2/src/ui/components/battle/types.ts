@@ -25,7 +25,7 @@ export interface StatusEffectVM {
 export interface UnitVM {
   id: string;
   name: string;
-  element: 'Venus' | 'Mars' | 'Jupiter' | 'Mercury';
+  element: 'Venus' | 'Mars' | 'Jupiter' | 'Mercury' | 'Neutral';
   hp?: number;         // undefined for enemies (HP not shown)
   maxHp?: number;
   statuses: StatusEffectVM[];
@@ -81,7 +81,7 @@ export interface ManaVM {
   overBudget: boolean;
 }
 
-export type BattlePhase = 'planning' | 'executing';
+export type BattlePhase = 'planning' | 'executing' | 'victory' | 'defeat';
 
 export type BattleStatus = 'ongoing' | 'victory' | 'defeat';
 

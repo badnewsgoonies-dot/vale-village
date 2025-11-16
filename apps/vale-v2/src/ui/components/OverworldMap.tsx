@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { MAPS } from '@/data/definitions/maps';
 import { useStore } from '../state/store';
+import { isHouseUnlocked } from '@/core/services/StoryService';
 import type { Tile, Position } from '@/core/models/overworld';
 import './OverworldMap.css';
 
 export function OverworldMap() {
-  const { currentMapId, playerPosition, movePlayer, currentTrigger, clearTrigger, teleportPlayer, resetLastTrigger, stepCount, mode } = useStore(state => ({
+  const { currentMapId, playerPosition, movePlayer, currentTrigger, clearTrigger, teleportPlayer, resetLastTrigger, stepCount, mode, story } = useStore(state => ({
     currentMapId: state.currentMapId,
     playerPosition: state.playerPosition,
     movePlayer: state.movePlayer,
@@ -15,6 +16,7 @@ export function OverworldMap() {
     resetLastTrigger: state.resetLastTrigger,
     stepCount: state.stepCount,
     mode: state.mode,
+    story: state.story,
   }));
 
   const map = MAPS[currentMapId];
@@ -124,22 +126,49 @@ export function OverworldMap() {
                   }}
                 >
                   {/* Trigger indicators */}
-                  {hasTrigger && !isPlayer && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '2px',
-                      right: '2px',
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor:
-                        triggerType === 'battle' ? '#e74c3c' :
-                        triggerType === 'shop' ? '#f39c12' :
-                        triggerType === 'npc' ? '#3498db' :
-                        triggerType === 'transition' ? '#9b59b6' :
-                        '#95a5a6',
-                    }} />
-                  )}
+                  {hasTrigger && !isPlayer && (() => {
+                    // Determine trigger color based on type and state
+                    let triggerColor = '#95a5a6'; // Default gray
+                    let shouldRender = true;
+
+                    if (triggerType === 'battle') {
+                      const encounterId = (trigger.data as { encounterId?: string }).encounterId;
+                      if (encounterId) {
+                        // Check if defeated
+                        if (story.flags[encounterId] === true) {
+                          shouldRender = false; // Don't show defeated encounters
+                        }
+                        // Check if locked
+                        else if (!isHouseUnlocked(story, encounterId)) {
+                          triggerColor = '#95a5a6'; // Gray for locked
+                        }
+                        // Unlocked and available
+                        else {
+                          triggerColor = '#e74c3c'; // Red for available battles
+                        }
+                      }
+                    } else if (triggerType === 'shop') {
+                      triggerColor = '#f39c12';
+                    } else if (triggerType === 'npc') {
+                      triggerColor = '#3498db';
+                    } else if (triggerType === 'transition') {
+                      triggerColor = '#9b59b6';
+                    }
+
+                    if (!shouldRender) return null;
+
+                    return (
+                      <div style={{
+                        position: 'absolute',
+                        top: '2px',
+                        right: '2px',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: triggerColor,
+                      }} />
+                    );
+                  })()}
                   {isPlayer && <div className="player-sprite" />}
                 </div>
               );
@@ -159,7 +188,11 @@ export function OverworldMap() {
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#e74c3c' }} />
-            <span>Battle Trigger</span>
+            <span>Battle (Unlocked)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#95a5a6' }} />
+            <span>Battle (Locked)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#f39c12' }} />

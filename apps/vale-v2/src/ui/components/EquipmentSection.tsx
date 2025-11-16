@@ -62,7 +62,6 @@ export function EquipmentSection({
     updateTeamUnits(updatedUnits);
   };
 
-  const currentEquipment = unit.equipment[activeTab];
   const equipmentBonuses = calculateEquipmentBonuses(unit.equipment);
   const levelBonuses = calculateLevelBonuses(unit);
   

@@ -125,6 +125,32 @@ export function processEncounterCompletion(
 }
 
 /**
+ * Check if a house encounter is unlocked
+ * House 1 is always unlocked
+ * House N is unlocked if House N-1 is defeated
+ * 
+ * @param story - Current story state
+ * @param houseId - House encounter ID (e.g., 'house-03')
+ * @returns true if house is unlocked, false otherwise
+ */
+export function isHouseUnlocked(story: StoryState, houseId: string): boolean {
+  // House 1 always unlocked
+  if (houseId === 'house-01') return true;
+
+  // Extract house number from ID (e.g., 'house-03' → 3)
+  const match = houseId.match(/^house-(\d+)$/);
+  if (!match) return false;
+
+  const [, houseNumRaw] = match;
+  if (!houseNumRaw) return false;
+  const houseNum = parseInt(houseNumRaw, 10);
+
+  // House N unlocked if House N-1 defeated
+  const prevHouseId = `house-${String(houseNum - 1).padStart(2, '0')}`;
+  return story.flags[prevHouseId] === true;
+}
+
+/**
  * Process story flag and grant Djinn if applicable
  * Pure function - no side effects
  * 

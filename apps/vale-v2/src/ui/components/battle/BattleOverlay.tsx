@@ -4,7 +4,6 @@
  * Displays victory or defeat overlays with rewards and action buttons.
  */
 
-import React from 'react';
 import type { BattleOverlayProps } from './types';
 
 export function BattleOverlay({

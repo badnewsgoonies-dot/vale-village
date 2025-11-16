@@ -6,7 +6,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '../state/store';
 import type { Team } from '@/core/models/Team';
-import type { Unit } from '@/core/models/Unit';
 import type { EquipmentSlot } from '@/core/models/Equipment';
 import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '@/core/constants';
@@ -27,11 +26,10 @@ export function PreBattleTeamSelectScreen({
   onConfirm,
   onCancel,
 }: PreBattleTeamSelectScreenProps) {
-  const { roster, team, swapPartyMember, updateTeamUnits } = useStore((s) => ({
+  const { roster, team, swapPartyMember } = useStore((s) => ({
     roster: s.roster,
     team: s.team,
     swapPartyMember: s.swapPartyMember,
-    updateTeamUnits: s.updateTeamUnits,
   }));
 
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(0);
@@ -79,16 +77,6 @@ export function PreBattleTeamSelectScreen({
   };
 
   // Handle removing unit from party
-  const handleRemoveFromParty = (slotIndex: number) => {
-    const newUnits = activeParty.filter((_, i) => i !== slotIndex);
-    if (newUnits.length === 0) {
-      // Can't have empty team
-      return;
-    }
-    updateTeamUnits(newUnits);
-    setSelectedSlotIndex(null);
-  };
-
   // Handle start battle
   const handleStartBattle = useCallback(() => {
     if (!team || team.units.length < MIN_PARTY_SIZE) {
@@ -155,7 +143,6 @@ export function PreBattleTeamSelectScreen({
               selectedSlotIndex={selectedSlotIndex}
               onSelectSlot={setSelectedSlotIndex}
               onAddToSlot={handleAddToSlot}
-              onRemoveFromParty={handleRemoveFromParty}
             />
 
             {/* Equipment Section */}

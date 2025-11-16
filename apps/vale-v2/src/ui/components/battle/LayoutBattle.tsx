@@ -5,7 +5,6 @@
  * Could be extended with phase transitions, animations, etc.
  */
 
-import React from 'react';
 import type { LayoutBattleProps } from './types';
 
 export function LayoutBattle({ children, phase }: LayoutBattleProps): JSX.Element {

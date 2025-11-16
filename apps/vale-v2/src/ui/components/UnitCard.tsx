@@ -1,6 +1,6 @@
 /**
  * Unit card component
- * Displays unit stats, HP/PP bars, and status effects
+ * Displays unit stats, HP bar, and status effects
  * PR-STATS-EFFECTIVE: Shows effective stats (base + level + equipment + Djinn + status)
  */
 
@@ -21,13 +21,6 @@ interface UnitCardProps {
 export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps) {
   const maxHp = calculateMaxHp(unit);
   const hpPercent = (unit.currentHp / maxHp) * 100;
-  
-  // Calculate max PP (similar to max HP)
-  const maxPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
-  // For now, use maxPp as currentPp (PP isn't tracked separately per unit - team uses mana pool)
-  // TODO: Track currentPp per unit if needed
-  const currentPp = maxPp;
-  const ppPercent = (currentPp / maxPp) * 100;
 
   // Calculate effective stats (memoized for performance)
   // PR-STATS-EFFECTIVE: Effective stats include base + level + equipment + Djinn + status
@@ -133,7 +126,6 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
                 mag: 'MAG',
                 spd: 'SPD',
                 hp: 'HP',
-                pp: 'PP',
               };
 
               // All status effects have a type property

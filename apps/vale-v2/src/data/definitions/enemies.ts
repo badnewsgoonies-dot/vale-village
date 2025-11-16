@@ -1223,6 +1223,10 @@ export const ENEMIES: Record<string, Enemy> = {
   // Enslaved Beasts - Redesigned Originals
   'mercury-slime': MERCURY_SLIME,
   'venus-wolf': VENUS_WOLF,
+  // Legacy/test-friendly aliases
+  slime: MERCURY_SLIME,
+  wolf: VENUS_WOLF,
+  beetle: VENUS_BEETLE,
   'mars-bandit': MARS_BANDIT,
   'jupiter-sprite': JUPITER_SPRITE,
   'venus-beetle': VENUS_BEETLE,

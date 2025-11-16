@@ -18,6 +18,7 @@ export interface StorySlice {
   setShowCredits: (show: boolean) => void;
   setStoryFlag: (key: string, value: boolean | number) => void;
   getStoryFlag: (key: string) => boolean | number | undefined;
+  setStoryState: (story: StoryState) => void;
   onBattleEvents: (events: readonly BattleEvent[]) => void;
 }
 
@@ -31,6 +32,10 @@ export const createStorySlice: StateCreator<
   showCredits: false,
   
   setShowCredits: (show) => _set({ showCredits: show }),
+
+  setStoryState: (storyState) => {
+    _set({ story: storyState });
+  },
 
   setStoryFlag: (key, value) => {
     const story = get().story;

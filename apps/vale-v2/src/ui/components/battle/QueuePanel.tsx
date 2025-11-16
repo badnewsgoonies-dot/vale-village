@@ -5,7 +5,6 @@
  * Central command hub for queue-based battle planning.
  */
 
-import React from 'react';
 import type { QueuePanelProps } from './types';
 
 export function QueuePanel({

@@ -63,7 +63,8 @@ export function DjinnSection({
         <div className="djinn-slots-grid">
           {[0, 1, 2].map((slotIndex) => {
             const djinnId = team.equippedDjinn[slotIndex];
-            const djinn = djinnId ? DJINN[djinnId] : null;
+        const hasDjinn = Boolean(djinnId);
+        const djinn = hasDjinn ? DJINN[djinnId as keyof typeof DJINN] : null;
             const isSelected = selectedSlot === slotIndex;
 
             return (
@@ -78,7 +79,7 @@ export function DjinnSection({
                     <div className="djinn-name">{djinn.name}</div>
                     <div className="djinn-element">{djinn.element}</div>
                     <div className="djinn-state">
-                      {team.djinnTrackers[djinnId]?.state || 'Set'}
+              {hasDjinn && djinnId ? team.djinnTrackers[djinnId]?.state : 'Set'}
                     </div>
                     {isSelected && (
                       <button

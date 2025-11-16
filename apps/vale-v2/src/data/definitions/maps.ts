@@ -54,6 +54,7 @@ const buildNPCs = (): GameMap['npcs'] =>
 
 const buildTriggers = (): GameMap['triggers'] => [
   // Wire overworld triggers directly into liberation encounters
+  // Act 1: Discovery (Houses 1-7)
   {
     id: 'house-01-trigger',
     type: 'battle',
@@ -65,6 +66,36 @@ const buildTriggers = (): GameMap['triggers'] => [
     type: 'battle',
     position: { x: 10, y: 10 },
     data: { encounterId: 'house-02' },
+  },
+  {
+    id: 'house-03-trigger',
+    type: 'battle',
+    position: { x: 13, y: 10 },
+    data: { encounterId: 'house-03' },
+  },
+  {
+    id: 'house-04-trigger',
+    type: 'battle',
+    position: { x: 16, y: 10 },
+    data: { encounterId: 'house-04' },
+  },
+  {
+    id: 'house-05-trigger',
+    type: 'battle',
+    position: { x: 19, y: 10 },
+    data: { encounterId: 'house-05' },
+  },
+  {
+    id: 'house-06-trigger',
+    type: 'battle',
+    position: { x: 22, y: 10 },
+    data: { encounterId: 'house-06' },
+  },
+  {
+    id: 'house-07-trigger',
+    type: 'battle',
+    position: { x: 24, y: 10 },
+    data: { encounterId: 'house-07' },
   },
   { id: 'npc-elder', type: 'npc', position: { x: 15, y: 5 }, data: { npcId: 'elder-vale' } },
   { id: 'shop-vale-armory', type: 'shop', position: { x: 12, y: 5 }, data: { shopId: 'vale-armory' } },
@@ -92,9 +123,6 @@ export const MAPS: Record<string, GameMap> = {
     npcs: buildNPCs(),
     triggers: buildTriggers(),
     spawnPoint: { x: 15, y: 10 },
-    encounterRate: 0.05,
-    // Use liberation encounters as the random pool as well, if you want:
-    encounterPool: ['house-01', 'house-02']
   },
   'weapon-shop-interior': {
     id: 'weapon-shop-interior',

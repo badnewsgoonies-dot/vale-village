@@ -6,6 +6,8 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../state/store';
 import type { SaveSlotMetadata } from '../../core/services/SaveService';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { BackgroundSprite } from '../sprites/BackgroundSprite';
 import './SaveMenu.css';
 
 interface SaveMenuProps {
@@ -128,6 +130,20 @@ export function SaveMenu({ onClose }: SaveMenuProps) {
   return (
     <div className="save-menu-overlay" onClick={onClose}>
       <div className="save-menu-container" onClick={(e) => e.stopPropagation()}>
+        <BackgroundSprite
+          id="random"
+          category="backgrounds-gs1"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            opacity: 0.3,
+            borderRadius: '12px',
+            zIndex: -1,
+          }}
+        />
         <div className="save-menu-header">
           <h1>Save / Load Game</h1>
           <button className="close-btn" onClick={onClose} aria-label="Close save menu">
@@ -157,6 +173,12 @@ export function SaveMenu({ onClose }: SaveMenuProps) {
             }}
             disabled={isLoading}
           >
+            <SimpleSprite
+              id="save-game"
+              width={24}
+              height={24}
+              style={{ marginRight: '8px' }}
+            />
             New Save
           </button>
           <button
@@ -167,6 +189,12 @@ export function SaveMenu({ onClose }: SaveMenuProps) {
             }}
             disabled={isLoading}
           >
+            <SimpleSprite
+              id="continue"
+              width={24}
+              height={24}
+              style={{ marginRight: '8px' }}
+            />
             Load Save
           </button>
         </div>
@@ -194,29 +222,38 @@ export function SaveMenu({ onClose }: SaveMenuProps) {
 
               {slot.exists ? (
                 <div className="save-slot-content">
-                  <div className="save-slot-meta">
-                    <div className="meta-row">
-                      <span className="meta-label">Date:</span>
-                      <span className="meta-value">{formatTimestamp(slot.timestamp)}</span>
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                    <div className="save-slot-portrait">
+                      <SimpleSprite
+                        id="isaac1"
+                        width={64}
+                        height={64}
+                      />
                     </div>
-                    <div className="meta-row">
-                      <span className="meta-label">Playtime:</span>
-                      <span className="meta-value">{formatPlaytime(slot.playtime)}</span>
-                    </div>
-                    <div className="meta-row">
-                      <span className="meta-label">Team Level:</span>
-                      <span className="meta-value">Lv. {slot.teamLevel ?? 1}</span>
-                    </div>
-                    <div className="meta-row">
-                      <span className="meta-label">Gold:</span>
-                      <span className="meta-value">{slot.gold ?? 0}g</span>
-                    </div>
-                    {slot.chapter && (
+                    <div className="save-slot-meta">
                       <div className="meta-row">
-                        <span className="meta-label">Chapter:</span>
-                        <span className="meta-value">{slot.chapter}</span>
+                        <span className="meta-label">Date:</span>
+                        <span className="meta-value">{formatTimestamp(slot.timestamp)}</span>
                       </div>
-                    )}
+                      <div className="meta-row">
+                        <span className="meta-label">Playtime:</span>
+                        <span className="meta-value">{formatPlaytime(slot.playtime)}</span>
+                      </div>
+                      <div className="meta-row">
+                        <span className="meta-label">Team Level:</span>
+                        <span className="meta-value">Lv. {slot.teamLevel ?? 1}</span>
+                      </div>
+                      <div className="meta-row">
+                        <span className="meta-label">Gold:</span>
+                        <span className="meta-value">{slot.gold ?? 0}g</span>
+                      </div>
+                      {slot.chapter && (
+                        <div className="meta-row">
+                          <span className="meta-label">Chapter:</span>
+                          <span className="meta-value">{slot.chapter}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -263,6 +300,12 @@ export function SaveMenu({ onClose }: SaveMenuProps) {
               }}
               disabled={isLoading}
             >
+              <SimpleSprite
+                id="erase-file"
+                width={24}
+                height={24}
+                style={{ marginRight: '8px' }}
+              />
               Delete Save
             </button>
           </div>

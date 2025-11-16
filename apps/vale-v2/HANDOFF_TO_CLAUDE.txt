@@ -1,0 +1,208 @@
+═══════════════════════════════════════════════════════════════════
+VALE CHRONICLES V2 - DEV MODE BUTTON DEBUG HANDOFF
+Date: Nov 15, 2025
+Session Duration: ~6 hours
+═══════════════════════════════════════════════════════════════════
+
+PROBLEM STATEMENT:
+------------------
+Implemented a "🎮 Dev Mode" button on the overworld screen that should unlock all content (10 units, 12 Djinn, 57 equipment items, 99,999 gold) when clicked. Button exists and is clickable, but after reload, nothing is unlocked.
+
+SUSPECTED ROOT CAUSE:
+--------------------
+Zustand state updates are queued in-memory → window.location.reload() executes immediately → state never persists to localStorage → reload clears memory → game starts fresh.
+
+ARCHITECTURE OVERVIEW:
+---------------------
+- React 18 + TypeScript + Vite
+- State: Zustand v4 with devtools middleware
+- Persistence: localStorage via SaveService
+- Structure: Monorepo (pnpm workspace), main app in apps/vale-v2/
+
+RELEVANT FILES:
+--------------
+1. apps/vale-v2/src/ui/components/OverworldMap.tsx
+   - Lines 23-50: handleActivateDevMode() function
+   - Lines 204-236: Button UI (fixed position, bottom-right)
+
+2. apps/vale-v2/src/core/services/DevModeService.ts
+   - initFullDevMode() returns: { team, roster, equipment, gold }
+   - Creates 10 units at level 5
+   - Sets up 12 Djinn with trackers
+   - Returns 57 equipment items array
+
+3. apps/vale-v2/src/ui/state/store.ts
+   - Combined Zustand store with 11 slices
+   - Uses devtools middleware in dev mode
+   - Pattern: create<Store>()(devtools(storeFactory))
+
+4. apps/vale-v2/src/ui/state/teamSlice.ts
+   - setTeam(team: Team): void
+   - setRoster(units: Unit[]): void
+
+5. apps/vale-v2/src/ui/state/inventorySlice.ts
+   - addEquipment(items: Equipment[]): void
+   - addGold(amount: number): void
+
+6. apps/vale-v2/src/ui/state/saveSlice.ts
+   - saveToSlot(slot: number): void (writes to localStorage)
+
+CURRENT BUTTON CODE (OverworldMap.tsx):
+---------------------------------------
+const handleActivateDevMode = () => {
+  const confirmed = window.confirm(
+    '🎮 Activate Dev Mode?\n\n' +
+    'This will unlock:\n' +
+    '• All 10 units (Level 5)\n' +
+    '• All 12 Djinn (Set state)\n' +
+    '• All 57 equipment items\n' +
+    '• 99,999 gold\n\n' +
+    'Game will reload to apply changes.'
+  );
+
+  if (confirmed) {
+    const devState = initFullDevMode();
+    setTeam(devState.team);                            // Queues update
+    setRoster(devState.roster);                        // Queues update
+    useStore.getState().addEquipment(devState.equipment); // Queues update
+    useStore.getState().addGold(devState.gold);          // Queues update
+    
+    alert('✅ Dev Mode Activated!\n\nReloading game...');
+    window.location.reload(); // ← HAPPENS TOO FAST!
+  }
+};
+
+WHAT DOESN'T WORK:
+-----------------
+❌ State updates don't persist before reload
+❌ No save triggered to localStorage
+❌ Zustand state only exists in memory until reload
+
+WHAT DOES WORK:
+---------------
+✅ Button renders correctly (visible on overworld)
+✅ Confirmation dialog appears
+✅ DevModeService.initFullDevMode() returns correct data
+✅ No console errors
+✅ 396/500 tests passing (core systems work)
+
+TEST STATUS:
+-----------
+- Dialogue progression: ✅ Fixed
+- Djinn auto-recovery: ✅ Fixed  
+- UI scrolling: ✅ Fixed
+- HP clamping: ✅ Fixed
+- Party management: ✅ Fixed
+- Dev mode button: ❌ NOT WORKING
+
+ATTEMPTED SOLUTIONS (in previous session):
+-----------------------------------------
+1. Changed from useStore() hook to useStore.getState()
+2. Added proper DjinnTracker type structure
+3. Fixed equipment inventory structure
+4. All state updates look correct syntactically
+
+WHAT I NEED:
+-----------
+1. Fix state persistence before reload
+2. Options:
+   a) Call saveSlice.saveToSlot() before reload
+   b) Use async/await to wait for state updates
+   c) Add localStorage.setItem() directly
+   d) Change approach entirely
+
+3. Ensure dev mode survives page reload
+
+HOW TO TEST:
+-----------
+cd apps/vale-v2
+pnpm dev
+# Navigate to http://localhost:8000
+# Click purple "🎮 Dev Mode" button (bottom-right)
+# Check console after reload
+# Open Djinn screen (D) or Party Management (P) to verify content
+
+ADDITIONAL CONTEXT:
+------------------
+- User has zero coding ability (needs UI solution)
+- F1 hotkey dev mode also exists but has same issue
+- Game uses deterministic PRNG (seeded random)
+- Save system uses versioned schemas (SaveV1Schema)
+- Store exposed as window.__VALE_STORE__ in dev mode
+
+FILES MODIFIED THIS SESSION (13 files):
+---------------------------------------
+src/App.tsx (+24)
+src/core/algorithms/djinnAbilities.ts (+11)
+src/core/services/QueueBattleService.ts (+51)
+src/core/services/RewardsService.ts (+17)
+src/test/factories.ts (+4)
+src/ui/components/DjinnCollectionScreen.css (+5)
+src/ui/components/OverworldMap.tsx (+59)
+src/ui/components/PartyManagementScreen.css (+94)
+src/ui/components/PartyManagementScreen.tsx (184 changed)
+src/ui/components/PreBattleTeamSelectScreen.css (+2)
+src/ui/components/UnitCard.tsx (-26)
+src/ui/state/dialogueSlice.ts (40 changed)
+src/ui/state/saveSlice.ts (+21)
+
+NEW FILES CREATED (4 files):
+----------------------------
+src/core/services/DevModeService.ts (105 lines)
+src/ui/hooks/useDevMode.ts (82 lines)
+DEV_MODE_GUIDE.md (170 lines)
+SESSION_SUMMARY_2025_11_15.md (177 lines)
+
+DEBUGGING COMMANDS:
+------------------
+# Check if button exists
+grep -n "Dev Mode" apps/vale-v2/src/ui/components/OverworldMap.tsx
+
+# Check store structure
+grep -n "createStore\|devtools" apps/vale-v2/src/ui/state/store.ts
+
+# Run tests
+cd apps/vale-v2 && pnpm test
+
+# Check localStorage in browser console
+localStorage.getItem('vale-save-slot-1')
+
+EXPECTED OUTCOME:
+----------------
+1. User clicks "🎮 Dev Mode" button
+2. Confirmation dialog appears
+3. State updates to Zustand store
+4. State persists to localStorage
+5. Page reloads
+6. Game loads with all content unlocked
+7. Djinn screen shows 12 Djinn
+8. Equipment screen shows 57 items
+9. Party management shows 10 units
+
+CURRENT OUTCOME:
+---------------
+1. ✅ User clicks button
+2. ✅ Confirmation appears
+3. ✅ State updates (presumably)
+4. ❌ State NOT persisted
+5. ✅ Page reloads
+6. ❌ Game loads fresh (nothing unlocked)
+7. ❌ Djinn screen shows 1 Djinn (Flint only)
+8. ❌ Equipment screen shows 0 items
+9. ❌ Party shows 1 unit (Isaac only)
+
+QUESTION FOR NEW CLAUDE:
+------------------------
+How do I ensure Zustand state persists to localStorage BEFORE window.location.reload() executes?
+
+Should I:
+A) Manually trigger save: useStore.getState().saveToSlot(1)
+B) Add setTimeout() delay before reload
+C) Use localStorage.setItem() directly
+D) Different architecture approach
+
+Please provide working code fix for handleActivateDevMode() function.
+
+═══════════════════════════════════════════════════════════════════
+END OF HANDOFF
+═══════════════════════════════════════════════════════════════════

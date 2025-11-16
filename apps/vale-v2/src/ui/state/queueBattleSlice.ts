@@ -146,6 +146,14 @@ export const createQueueBattleSlice: StateCreator<
     // Update battle state with fresh events (pre-heal)
     set({ battle: result.state, events: battleEvents });
 
+    // Sync Djinn trackers to team state (after round execution)
+    if (result.state.playerTeam.djinnTrackers) {
+      const { updateTeam: updateTeamState } = get();
+      updateTeamState({
+        djinnTrackers: result.state.playerTeam.djinnTrackers,
+      });
+    }
+
     if (result.state.phase === 'victory') {
       const {
         processVictory,

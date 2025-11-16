@@ -15,7 +15,6 @@ export function DialogueBox() {
     gold,
     equipment,
     team,
-    mode,
   } = useStore((state) => ({
     currentDialogueTree: state.currentDialogueTree,
     currentDialogueState: state.currentDialogueState,
@@ -26,7 +25,6 @@ export function DialogueBox() {
     gold: state.gold,
     equipment: state.equipment,
     team: state.team,
-    mode: state.mode,
   }));
 
   const currentNode =

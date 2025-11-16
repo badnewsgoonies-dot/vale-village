@@ -11,8 +11,9 @@ import { RewardsStoryboard } from './storyboards/RewardsStoryboard';
 import { ShopStoryboard } from './storyboards/ShopStoryboard';
 import { DialogueStoryboard } from './storyboards/DialogueStoryboard';
 import { MenuStoryboard } from './storyboards/MenuStoryboard';
+import { SpriteMockup } from './SpriteMockup';
 
-type ScreenType = 'battle' | 'overworld' | 'rewards' | 'shop' | 'dialogue' | 'menu';
+type ScreenType = 'battle' | 'overworld' | 'rewards' | 'shop' | 'dialogue' | 'menu' | 'sprites';
 
 export function StoryboardGallery() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('battle');
@@ -24,6 +25,7 @@ export function StoryboardGallery() {
     { id: 'shop', label: 'Shop', icon: '🛒' },
     { id: 'dialogue', label: 'Dialogue', icon: '💬' },
     { id: 'menu', label: 'Menus', icon: '📋' },
+    { id: 'sprites', label: 'Sprite Gallery', icon: '🎨' },
   ];
 
   return (
@@ -84,10 +86,15 @@ export function StoryboardGallery() {
         {currentScreen === 'shop' && <ShopStoryboard />}
         {currentScreen === 'dialogue' && <DialogueStoryboard />}
         {currentScreen === 'menu' && <MenuStoryboard />}
+        {currentScreen === 'sprites' && <SpriteMockup />}
       </div>
     </div>
   );
 }
+
+
+
+
 
 
 

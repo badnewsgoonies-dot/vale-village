@@ -2,18 +2,17 @@ import type { StateCreator } from 'zustand';
 import type { MapTrigger, Position } from '../../core/models/overworld';
 import { MAPS } from '../../data/definitions/maps';
 import { processMovement } from '../../core/services/OverworldService';
-import { processRandomEncounter } from '../../core/services/EncounterService';
-import { makePRNG } from '../../core/random/prng';
+import { isHouseUnlocked } from '../../core/services/StoryService';
 import { DIALOGUES } from '@/data/definitions/dialogues';
 import type { GameFlowSlice } from './gameFlowSlice';
 import type { DialogueSlice } from './dialogueSlice';
+import type { StorySlice } from './storySlice';
 
 export interface OverworldSlice {
   currentMapId: string;
   playerPosition: Position;
   facing: 'up' | 'down' | 'left' | 'right';
   currentTrigger: MapTrigger | null;
-  stepCount: number; // Track steps for random encounters
   setFacing: (direction: OverworldSlice['facing']) => void;
   movePlayer: (direction: 'up' | 'down' | 'left' | 'right') => void;
   teleportPlayer: (mapId: string, position: Position) => void;
@@ -29,14 +28,13 @@ if (!startMap) {
 const STARTING_MAP = startMap;
 
 export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => {
-  const getStore = () => get() as OverworldSlice & GameFlowSlice & DialogueSlice;
+  const getStore = () => get() as OverworldSlice & GameFlowSlice & DialogueSlice & StorySlice;
 
   return {
     currentMapId: 'vale-village',
     playerPosition: STARTING_MAP.spawnPoint,
     facing: 'down',
     currentTrigger: null,
-    stepCount: 0,
 
     setFacing: (direction) => set({ facing: direction }),
 
@@ -47,36 +45,30 @@ export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => 
 
       const result = processMovement(map, store.playerPosition, direction);
       if (!result.blocked) {
-        // Increment step count
-        const newStepCount = store.stepCount + 1;
+        const trigger = result.trigger ?? null;
 
-        // Check for random encounter (only if no fixed trigger)
-        let trigger = result.trigger ?? null;
-        if (!trigger && map.encounterRate && map.encounterPool) {
-          // Use step count as seed for deterministic-ish encounters
-          const rng = makePRNG(Date.now() + newStepCount);
-          const randomEncounterId = processRandomEncounter(
-            map.encounterRate,
-            map.encounterPool,
-            rng
-          );
+        // Filter out locked/defeated battle triggers
+        let filteredTrigger = trigger;
+        if (trigger?.type === 'battle') {
+          const encounterId = (trigger.data as { encounterId?: string }).encounterId;
+          if (encounterId) {
+            const story = store.story;
 
-          if (randomEncounterId) {
-            // Create a synthetic battle trigger for random encounter
-            trigger = {
-              id: `random-encounter-${newStepCount}`,
-              type: 'battle' as const,
-              position: result.newPos,
-              data: { encounterId: randomEncounterId },
-            };
+            // Skip defeated encounters (liberation encounters are one-time only)
+            if (story.flags[encounterId] === true) {
+              filteredTrigger = null;
+            }
+            // Skip locked encounters (progressive unlock system)
+            else if (!isHouseUnlocked(story, encounterId)) {
+              filteredTrigger = null;
+            }
           }
         }
 
         set({
           playerPosition: result.newPos,
           facing: direction,
-          currentTrigger: trigger,
-          stepCount: newStepCount,
+          currentTrigger: filteredTrigger,
         });
 
         // Handle NPC dialogue

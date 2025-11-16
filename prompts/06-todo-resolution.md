@@ -4,7 +4,7 @@
 Review and resolve TODO comments throughout the codebase. Some are critical, some can be deferred with documentation.
 
 ## Current State
-18 TODO comments found:
+17 TODO comments found:
 1. `saveSlice.ts:130` - "Hydrate team and battle from save data" (CRITICAL)
 2. `saveSlice.ts:210` - "Hydrate all state from save data" (CRITICAL)
 3. `UnitCard.tsx:24` - "Migrate PP to team mana" (HIGH)
@@ -12,11 +12,10 @@ Review and resolve TODO comments throughout the codebase. Some are critical, som
 5. `SaveService.ts:246` - "Add chapter to SaveV1Schema" (MEDIUM)
 6. `EncounterService.ts:78` - "Make this data-driven via chapter definitions" (MEDIUM)
 7. `SaveService.ts:103` - "Create separate ReplayPort interface" (LOW)
-8. `BattleService.ts:288` - "Add accuracy property to Ability schema" (MEDIUM)
-9. `AIService.ts:65` - "Pass team to scoreAbility for accurate effective stats" (MEDIUM)
-10. `encounters.ts:62` - "Add this ability later" (DEFERRED)
-11. `stats.ts:49` - "Replace with proper Djinn registry" (MEDIUM)
-12. Plus 6 more in saveSlice.ts (tracking flags, stats, playtime)
+8. `AIService.ts:65` - "Pass team to scoreAbility for accurate effective stats" (MEDIUM)
+9. `encounters.ts:62` - "Add this ability later" (DEFERRED)
+10. `stats.ts:49` - "Replace with proper Djinn registry" (MEDIUM)
+11. Plus 6 more in saveSlice.ts (tracking flags, stats, playtime)
 
 ## Tasks
 
@@ -40,11 +39,6 @@ Review and resolve TODO comments throughout the codebase. Some are critical, som
    - Add chapter field to SaveV1Schema
    - Update save/load logic
    - Test migration
-
-4. **Ability Accuracy** (`BattleService.ts:288`)
-   - Add accuracy to Ability schema
-   - Use in damage calculations
-   - Update ability definitions
 
 ### Task 3: Document Deferred TODOs
 **Priority:** MEDIUM-LOW
@@ -78,7 +72,7 @@ Review and resolve TODO comments throughout the codebase. Some are critical, som
 - Code quality improved
 
 ## Files to Review
-- All files with TODO comments (18 found)
+- All files with TODO comments (17 found)
 - `apps/vale-v2/src/ui/state/saveSlice.ts`
 - `apps/vale-v2/src/ui/components/UnitCard.tsx`
 - `apps/vale-v2/src/ui/components/ActionBar.tsx`
