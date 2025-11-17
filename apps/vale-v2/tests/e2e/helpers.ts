@@ -529,17 +529,135 @@ export async function selectDialogueChoice(page: Page, choiceId: string): Promis
 export async function endDialogue(page: Page): Promise<void> {
   const closeButton = page.getByRole('button', { name: /close|exit|done/i });
   const buttonVisible = await closeButton.isVisible().catch(() => false);
-  
+
   if (buttonVisible) {
     await closeButton.click();
   } else {
-    // Use store method to return to overworld
+    // Use store method to properly end dialogue (clears dialogue state)
     await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       if (store) {
-        store.getState().setMode('overworld');
+        store.getState().endDialogue(); // This clears dialogue state and returns to overworld
       }
     });
   }
   await waitForMode(page, 'overworld', 3000);
+}
+
+/**
+ * Battle Action Testing Helpers
+ */
+
+/**
+ * Execute a real battle action and capture actual damage
+ * Returns actual damage dealt (not simulated)
+ *
+ * This helper is used for testing combat mechanics by:
+ * 1. Capturing initial HP values
+ * 2. Queuing and executing a real battle action
+ * 3. Capturing final HP values
+ * 4. Calculating actual damage dealt
+ *
+ * @param page - Playwright page instance
+ * @param unitIndex - Index of unit in player team (0-based)
+ * @param abilityId - Ability ID or null for basic attack (STRIKE)
+ * @param targetIndex - Index of target enemy (0-based)
+ * @returns Damage dealt and HP values
+ */
+export async function executeBattleActionAndCaptureDamage(
+  page: Page,
+  unitIndex: number,
+  abilityId: string | null,
+  targetIndex: number
+): Promise<{
+  damageDealt: number;
+  initialTargetHp: number;
+  finalTargetHp: number;
+  initialCasterHp: number;
+  finalCasterHp: number;
+}> {
+  // 1. Get initial HP values
+  const initialState = await page.evaluate(({ unitIdx, targetIdx }) => {
+    const store = (window as any).__VALE_STORE__;
+    const battle = store.getState().battle;
+
+    if (!battle) {
+      throw new Error('Battle state not found');
+    }
+
+    const caster = battle.playerTeam?.units?.[unitIdx];
+    const target = battle.enemies?.[targetIdx];
+
+    if (!caster || !target) {
+      throw new Error(`Unit or target not found: unitIdx=${unitIdx}, targetIdx=${targetIdx}`);
+    }
+
+    return {
+      casterHp: caster.currentHp ?? 0,
+      targetHp: target.currentHp ?? 0,
+      targetId: target.id,
+      casterId: caster.id,
+    };
+  }, { unitIdx: unitIndex, targetIdx: targetIndex });
+
+  // 2. Queue action for specified unit
+  await page.evaluate(({ unitIdx, ability, targetIdx }) => {
+    const store = (window as any).__VALE_STORE__;
+    const battle = store.getState().battle;
+
+    if (!battle) {
+      throw new Error('Battle state not found');
+    }
+
+    const targetId = battle.enemies?.[targetIdx]?.id;
+    if (!targetId) {
+      throw new Error(`Target not found at index ${targetIdx}`);
+    }
+
+    // Queue the specified action
+    // If abilityId is null, it will use the basic attack (STRIKE)
+    store.getState().queueUnitAction(unitIdx, ability, [targetId], undefined);
+
+    // Queue basic attacks for other player units (required to execute round)
+    battle.playerTeam.units.forEach((unit: any, idx: number) => {
+      if (idx !== unitIdx) {
+        const enemyId = battle.enemies?.[0]?.id;
+        if (enemyId) {
+          store.getState().queueUnitAction(idx, null, [enemyId], undefined);
+        }
+      }
+    });
+
+    // Execute round
+    store.getState().executeQueuedRound();
+  }, { unitIdx: unitIndex, ability: abilityId, targetIdx: targetIndex });
+
+  // 3. Wait for execution to complete
+  await page.waitForTimeout(2000);
+
+  // 4. Get final HP values
+  const finalState = await page.evaluate(({ targetId, casterId }) => {
+    const store = (window as any).__VALE_STORE__;
+    const battle = store.getState().battle;
+
+    if (!battle) {
+      throw new Error('Battle state not found after execution');
+    }
+
+    const target = battle.enemies?.find((e: any) => e.id === targetId);
+    const caster = battle.playerTeam?.units?.find((u: any) => u.id === casterId);
+
+    return {
+      targetHp: target?.currentHp ?? 0,
+      casterHp: caster?.currentHp ?? 0,
+    };
+  }, { targetId: initialState.targetId, casterId: initialState.casterId });
+
+  return {
+    damageDealt: initialState.targetHp - finalState.targetHp,
+    initialTargetHp: initialState.targetHp,
+    finalTargetHp: finalState.targetHp,
+    initialCasterHp: initialState.casterHp,
+    finalCasterHp: finalState.casterHp,
+  };
 }
