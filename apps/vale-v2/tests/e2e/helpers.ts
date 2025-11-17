@@ -647,9 +647,13 @@ export async function executeBattleActionAndCaptureDamage(
     const target = battle.enemies?.find((e: any) => e.id === targetId);
     const caster = battle.playerTeam?.units?.find((u: any) => u.id === casterId);
 
+    if (!target || !caster) {
+      throw new Error(`Unit or target not found after execution: targetId=${targetId}, casterId=${casterId}`);
+    }
+
     return {
-      targetHp: target?.currentHp ?? 0,
-      casterHp: caster?.currentHp ?? 0,
+      targetHp: target.currentHp ?? 0,
+      casterHp: caster.currentHp ?? 0,
     };
   }, { targetId: initialState.targetId, casterId: initialState.casterId });
 
