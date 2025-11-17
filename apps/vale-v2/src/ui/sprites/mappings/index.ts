@@ -6,3 +6,4 @@
 export * from './statusIcons';
 export * from './abilityIcons';
 export * from './portraits';
+export * from './overworldSprites';

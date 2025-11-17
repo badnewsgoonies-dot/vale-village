@@ -1,9 +1,10 @@
 /**
  * Equipment model (POJO)
  * Following ADR 003: Plain objects with readonly properties
+ * REFACTORED: Element-based equipment restrictions (allowedElements, not allowedUnits)
  */
 
-import type { Stats } from './types';
+import type { Stats, Element } from './types';
 
 /**
  * Equipment slots
@@ -17,6 +18,7 @@ export type EquipmentTier = 'basic' | 'bronze' | 'iron' | 'steel' | 'silver' | '
 
 /**
  * Equipment item definition
+ * REFACTORED: allowedUnits → allowedElements (element-based restrictions)
  */
 export interface Equipment {
   readonly id: string;
@@ -24,7 +26,7 @@ export interface Equipment {
   readonly slot: EquipmentSlot;
   readonly tier: EquipmentTier;
   readonly cost: number;
-  readonly allowedUnits: string[];
+  readonly allowedElements: readonly Element[]; // CHANGED: Element-based restrictions
 
   // Stat bonuses
   readonly statBonus: Partial<Stats>;

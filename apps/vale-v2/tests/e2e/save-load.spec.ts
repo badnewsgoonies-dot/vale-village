@@ -9,7 +9,7 @@ type SaveConfig = {
     tier: string;
     cost: number;
     statBonus: Record<string, number>;
-    allowedUnits: string[];
+    allowedElements: string[]; // Changed from allowedUnits to allowedElements (element-based system)
   }>;
   story: {
     chapter: number;
@@ -155,7 +155,7 @@ const defaultSaveConfig: SaveConfig = {
       tier: 'basic',
       cost: 10,
       statBonus: { atk: 3 },
-      allowedUnits: ['adept'],
+      allowedElements: ['Venus'], // Adept is Venus element
     },
   ],
   story: {
@@ -182,7 +182,7 @@ const slotSaveConfig: SaveConfig = {
       tier: 'bronze',
       cost: 25,
       statBonus: { atk: 5 },
-      allowedUnits: ['adept'],
+      allowedElements: ['Venus'], // Adept is Venus element
     },
     {
       id: 'slot-test-shield',
@@ -191,7 +191,7 @@ const slotSaveConfig: SaveConfig = {
       tier: 'bronze',
       cost: 15,
       statBonus: { def: 4 },
-      allowedUnits: ['adept'],
+      allowedElements: ['Venus'], // Adept is Venus element
     },
   ],
   story: {

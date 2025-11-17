@@ -3,8 +3,7 @@
  * Displays equipment sprites with fallback icons
  */
 
-import { Sprite } from '../sprites/Sprite';
-import { hasSprite } from '../sprites/manifest';
+import { SimpleSprite } from '../sprites/SimpleSprite';
 import type { Equipment } from '../../core/models/Equipment';
 
 interface EquipmentIconProps {
@@ -75,7 +74,7 @@ function getTierColor(tier: Equipment['tier']): string {
 
 /**
  * EquipmentIcon component
- * Displays equipment sprite or fallback icon
+ * Displays equipment sprite with automatic fallback to colored emoji icons
  */
 export function EquipmentIcon({
   equipment,
@@ -83,48 +82,37 @@ export function EquipmentIcon({
   className,
   style,
 }: EquipmentIconProps) {
-  // Try to find equipment sprite (equipment:equipmentId)
-  const spriteId = `equipment:${equipment.id}`;
-  const spriteExists = hasSprite(spriteId);
+  const sizeStyles = SIZE_MAP[size];
+  const icon = getSlotIcon(equipment.slot);
+  const tierColor = getTierColor(equipment.tier);
 
-  // Fallback rendering if sprite doesn't exist
-  if (!spriteExists) {
-    const sizeStyles = SIZE_MAP[size];
-    const icon = getSlotIcon(equipment.slot);
-    const tierColor = getTierColor(equipment.tier);
-    
-    return (
-      <div
-        className={className}
-        style={{
-          ...sizeStyles,
-          backgroundColor: tierColor,
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '4px',
-          fontSize: size === 'small' ? '12px' : size === 'medium' ? '16px' : '24px',
-          border: '2px solid rgba(0,0,0,0.2)',
-          ...style,
-        }}
-        title={`${equipment.name} (${equipment.tier})`}
-      >
-        {icon}
-      </div>
-    );
-  }
-
-  // Render sprite
+  // SimpleSprite will automatically show fallback if sprite not found
+  // Try flexible lookup: equipment ID might match item icon sprites
   return (
-    <Sprite
-      id={spriteId}
-      state="idle"
+    <SimpleSprite
+      id={equipment.id.toLowerCase()}
+      width={sizeStyles.width}
+      height={sizeStyles.height}
       className={className}
-      style={{
-        ...SIZE_MAP[size],
-        ...style,
-      }}
+      style={style}
+      fallback={
+        <div
+          style={{
+            ...sizeStyles,
+            backgroundColor: tierColor,
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '4px',
+            fontSize: size === 'small' ? '12px' : size === 'medium' ? '16px' : '24px',
+            border: '2px solid rgba(0,0,0,0.2)',
+          }}
+          title={`${equipment.name} (${equipment.tier})`}
+        >
+          {icon}
+        </div>
+      }
     />
   );
 }

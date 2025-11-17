@@ -1,57 +1,44 @@
-import { describe, expect, test } from 'vitest';
-import { canEquipItem, getEquippableItems } from '../../../src/core/algorithms/equipment';
-
-const mockEquipment = {
-  id: 'mock-sword',
-  name: 'Mock Sword',
-  slot: 'weapon',
-  tier: 'basic',
-  cost: 100,
-  statBonus: {},
-  allowedUnits: ['adept', 'sentinel'],
-};
-
-const otherEquipment = {
-  ...mockEquipment,
-  id: 'mock-axe',
-  allowedUnits: ['war-mage'],
-};
-
-const mockUnit = {
-  id: 'adept',
-  name: 'Adept',
-  element: 'Venus',
-  role: 'Warrior',
-  level: 1,
-  xp: 0,
-  manaContribution: 1,
-  currentHp: 100,
-  baseStats: { hp: 100, pp: 20, atk: 10, def: 10, mag: 5, spd: 8 },
-  growthRates: { hp: 15, pp: 5, atk: 3, def: 2, mag: 2, spd: 1 },
-  abilities: [],
-  statusEffects: [],
-  equipment: {
-    weapon: null,
-    armor: null,
-    helm: null,
-    boots: null,
-    accessory: null,
-  },
-  storeUnlocked: false,
-};
+import { describe, test, expect } from 'vitest';
+import { canEquipItem, getEquippableItems } from '@/core/algorithms/equipment';
+import { mkUnit } from '@/test/factories';
+import type { Equipment } from '@/data/schemas/EquipmentSchema';
 
 describe('Equipment helpers', () => {
-  test('canEquipItem returns true when unit allowed', () => {
-    expect(canEquipItem(mockUnit, mockEquipment)).toBe(true);
+  const testEquipment: Equipment = {
+    id: 'test-sword',
+    name: 'Test Sword',
+    slot: 'weapon',
+    tier: 'iron',
+    cost: 100,
+    statBonus: { atk: 10 },
+    allowedElements: ['Venus'], // Venus units only (Adept, Sentinel)
+  };
+
+  const testEquipment2: Equipment = {
+    id: 'test-staff',
+    name: 'Test Staff',
+    slot: 'weapon',
+    tier: 'bronze',
+    cost: 200,
+    statBonus: { mag: 12 },
+    allowedElements: ['Mercury'], // Mercury units only (Mystic)
+  };
+
+  test('canEquipItem returns true when unit element allowed', () => {
+    const unit = mkUnit(); // Default is Adept (Venus element)
+    expect(canEquipItem(unit, testEquipment)).toBe(true);
   });
 
-  test('canEquipItem returns false when not in allowed list', () => {
-    expect(canEquipItem(mockUnit, otherEquipment)).toBe(false);
+  test('canEquipItem returns false when element not allowed', () => {
+    const unit = mkUnit({ element: 'Mars' }); // Override element to Mars
+    expect(canEquipItem(unit, testEquipment)).toBe(false); // testEquipment is Venus-only
   });
 
   test('getEquippableItems filters correctly', () => {
-    const list = [mockEquipment, otherEquipment];
-    const equippable = getEquippableItems(list, 'adept');
-    expect(equippable).toEqual([mockEquipment]);
+    const venusUnit = mkUnit(); // Default is Adept (Venus element)
+    const equipmentList = [testEquipment, testEquipment2];
+    const result = getEquippableItems(equipmentList, venusUnit);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('test-sword'); // Only Venus equipment
   });
 });

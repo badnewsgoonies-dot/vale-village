@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useStore } from '../state/store';
 import { DJINN } from '@/data/definitions/djinn';
+import { SimpleSprite } from '../sprites/SimpleSprite';
 import { DjinnDetailModal } from './DjinnDetailModal';
 import './DjinnCollectionScreen.css';
 
@@ -70,6 +71,12 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
     }
   };
 
+  const getDjinnSprite = (element: string): string => {
+    // Map element to Djinn sprite (using Front variant)
+    const elementLower = element.toLowerCase();
+    return `${elementLower}-djinn-front`;
+  };
+
   return (
     <div className="djinn-collection-overlay" onClick={onClose}>
       <div className="djinn-collection-container" onClick={(e) => e.stopPropagation()}>
@@ -113,7 +120,12 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
                         onClick={() => setSelectedDjinnId(djinn.id)}
                       >
                         <div className="djinn-icon" style={{ backgroundColor: getElementColor(element) + '40' }}>
-                          <span className="djinn-initial">{djinn.name[0]}</span>
+                          <SimpleSprite
+                            id={getDjinnSprite(element)}
+                            width={48}
+                            height={48}
+                            style={{ filter: state === 'Standby' ? 'brightness(0.6)' : 'none' }}
+                          />
                         </div>
                         <div className="djinn-info">
                           <div className="djinn-name">{djinn.name}</div>

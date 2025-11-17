@@ -41,7 +41,7 @@ export function EquipmentSection({
 
   // Get available equipment for current slot
   const availableEquipment = inventory.filter(
-    (item) => item.slot === activeTab && (item.allowedUnits.length === 0 || item.allowedUnits.includes(unit.id))
+    (item) => item.slot === activeTab && (item.allowedElements.length === 0 || item.allowedElements.includes(unit.element))
   );
 
   const handleEquip = (equipment: Equipment) => {

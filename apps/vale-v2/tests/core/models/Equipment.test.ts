@@ -22,6 +22,7 @@ describe('Equipment Model', () => {
       tier: 'basic',
       cost: 100,
       statBonus: { atk: 10 },
+      allowedElements: ['Venus'], // Required after refactor to element-based system
     };
 
     const armor: Equipment = {
@@ -31,6 +32,7 @@ describe('Equipment Model', () => {
       tier: 'basic',
       cost: 150,
       statBonus: { def: 8, hp: 20 },
+      allowedElements: ['Venus'], // Required after refactor to element-based system
     };
 
     const loadout = {
@@ -56,6 +58,7 @@ describe('Equipment Model', () => {
       tier: 'basic',
       cost: 100,
       statBonus: { atk: 10 },
+      allowedElements: ['Venus'], // Required after refactor to element-based system
     };
 
     const result = EquipmentSchema.safeParse(equipment);

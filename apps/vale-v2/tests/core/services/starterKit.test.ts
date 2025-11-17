@@ -5,26 +5,34 @@ import { STARTER_KITS } from '../../../src/data/definitions/starterKits';
 
 describe('Starter Kit Service', () => {
   test('purchases starter kit when affordable', () => {
-    const result = purchaseStarterKit('adept', 500);
+    const unit = mkUnit({ id: 'adept' }); // Adept is Venus element
+    const result = purchaseStarterKit(unit, 500);
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.newGold).toBe(500 - STARTER_KITS.adept.cost);
+      expect(result.value.newGold).toBe(500 - STARTER_KITS.Venus.cost);
       expect(result.value.equipment).toHaveLength(5);
-      expect(result.value.equipment[0].id).toBe(STARTER_KITS.adept.equipment.weapon);
+      expect(result.value.equipment[0].id).toBe(STARTER_KITS.Venus.equipment.weapon);
     }
   });
 
   test('fails when insufficient gold', () => {
-    const result = purchaseStarterKit('adept', 100);
+    const unit = mkUnit({ id: 'adept' }); // Adept is Venus element
+    const result = purchaseStarterKit(unit, 100);
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toContain('Insufficient gold');
     }
   });
 
-  test('fails when unit has no kit', () => {
-    const result = purchaseStarterKit('unknown-unit', 500);
-    expect(result.ok).toBe(false);
+  test('purchases kit for different element units', () => {
+    // Test that Mars unit gets Mars kit
+    const marsUnit = mkUnit({ id: 'war-mage', element: 'Mars' });
+    const result = purchaseStarterKit(marsUnit, 500);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.newGold).toBe(500 - STARTER_KITS.Mars.cost);
+      expect(result.value.equipment[0].id).toBe(STARTER_KITS.Mars.equipment.weapon);
+    }
   });
 });
 

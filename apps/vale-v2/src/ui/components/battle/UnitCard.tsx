@@ -6,6 +6,7 @@
  */
 
 import { SimpleSprite } from '../../sprites/SimpleSprite';
+import { getPortraitSprite } from '../../sprites/mappings';
 import { StatusIcon } from './StatusIcon';
 import type { UnitCardProps} from './types';
 
@@ -23,10 +24,11 @@ export function UnitCard({ unit, onClick }: UnitCardProps): JSX.Element {
       {/* Sprite */}
       <div className="unit-sprite">
         <SimpleSprite
-          id={unit.id}
+          id={getPortraitSprite(unit.id)}
           width={32}
           height={32}
           style={{ borderRadius: '4px' }}
+          debug={false}
         />
       </div>
 

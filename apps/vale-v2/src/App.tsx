@@ -14,15 +14,22 @@ import { useStore } from './ui/state/store';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 import { UNIT_DEFINITIONS } from './data/definitions/units';
+import { DJINN } from './data/definitions/djinn';
 import { createUnit } from './core/models/Unit';
 import { createTeam } from './core/models/Team';
 import { collectDjinn, equipDjinn } from './core/services/DjinnService';
+import { calculateEffectiveStats } from './core/algorithms/stats';
+import { getXpProgress } from './core/algorithms/xp';
 
 function App() {
-  // Expose store in devtools for debugging in browser console
-  if (import.meta.env.DEV) {
-    (window as any).__VALE_STORE__ = useStore;
-  }
+  // Expose store and test helpers for debugging and E2E tests
+  // Always expose (TODO: restrict in production builds if needed)
+  (window as any).__VALE_STORE__ = useStore;
+  (window as any).__VALE_TEST_HELPERS__ = {
+    calculateEffectiveStats,
+    getXpProgress,
+    DJINN,
+  };
 
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);

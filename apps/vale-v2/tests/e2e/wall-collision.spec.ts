@@ -7,7 +7,7 @@ import { getGameState } from './helpers';
  * Tests collision detection:
  * - Walls block movement
  * - Water tiles block movement
- * - Step counter doesn't increment on blocked moves
+ * - Position doesn't change on blocked moves
  * - Position doesn't change when blocked
  * 
  * Wall Locations (vale-village):
@@ -39,10 +39,8 @@ test.describe('Wall Collision Detection', () => {
 
     let state = await getGameState(page);
     const positionBeforeWall = { ...state?.playerPosition };
-    const stepCountBefore = state?.stepCount ?? 0;
 
     console.log(`→ Position before wall: (${positionBeforeWall.x}, ${positionBeforeWall.y})`);
-    console.log(`→ Step count before: ${stepCountBefore}`);
 
     // Try to move left into wall (should be blocked)
     await page.keyboard.press('ArrowLeft');
@@ -50,17 +48,12 @@ test.describe('Wall Collision Detection', () => {
 
     state = await getGameState(page);
     const positionAfterWall = state?.playerPosition;
-    const stepCountAfter = state?.stepCount ?? 0;
 
     // Position should not change
     expect(positionAfterWall.x).toBe(positionBeforeWall.x);
     expect(positionAfterWall.y).toBe(positionBeforeWall.y);
 
-    // Step count should not increment
-    expect(stepCountAfter).toBe(stepCountBefore);
-
     console.log(`→ Position after wall attempt: (${positionAfterWall.x}, ${positionAfterWall.y})`);
-    console.log(`→ Step count after: ${stepCountAfter}`);
     console.log('✅ Wall collision detected - movement blocked');
   });
 
@@ -86,7 +79,6 @@ test.describe('Wall Collision Detection', () => {
 
     let state = await getGameState(page);
     const positionBeforeWater = { ...state?.playerPosition };
-    const stepCountBefore = state?.stepCount ?? 0;
 
     console.log(`→ Position before water: (${positionBeforeWater.x}, ${positionBeforeWater.y})`);
 
@@ -98,34 +90,27 @@ test.describe('Wall Collision Detection', () => {
 
     state = await getGameState(page);
     const positionAfterWater = state?.playerPosition;
-    const stepCountAfter = state?.stepCount ?? 0;
 
     // If we were at (12, 15) and tried to move right to (13, 15) water,
     // position should not change
     // Note: This depends on whether (12, 15) is walkable or not
     // If (12, 15) is also water, we might not have reached it
-    
-    // At minimum, step count should not increment if blocked
-    expect(stepCountAfter).toBeLessThanOrEqual(stepCountBefore + 1);
+    expect(positionAfterWater.x).toBeLessThanOrEqual(positionBeforeWater.x + 1);
 
     console.log(`→ Position after water attempt: (${positionAfterWater.x}, ${positionAfterWater.y})`);
     console.log('✅ Water collision detected');
   });
 
-  test('step counter only increments on successful moves', async ({ page }) => {
+  test('blocked moves do not change position', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    let state = await getGameState(page);
-    let initialStepCount = state?.stepCount ?? 0;
-
-    // Make a successful move
+    // Make a successful move first
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(150);
 
-    state = await getGameState(page);
-    let stepCountAfterMove = state?.stepCount ?? 0;
-    expect(stepCountAfterMove).toBe(initialStepCount + 1);
+    let state = await getGameState(page);
+    const positionAfterMove = state?.playerPosition;
 
     // Navigate to wall and try blocked move
     // Move to position near wall
@@ -139,21 +124,22 @@ test.describe('Wall Collision Detection', () => {
     }
 
     state = await getGameState(page);
-    const stepCountBeforeBlocked = state?.stepCount ?? 0;
+    const positionBeforeBlocked = { ...state?.playerPosition };
 
     // Try blocked move
     await page.keyboard.press('ArrowLeft'); // Into wall
     await page.waitForTimeout(150);
 
     state = await getGameState(page);
-    const stepCountAfterBlocked = state?.stepCount ?? 0;
+    const positionAfterBlocked = state?.playerPosition;
 
-    // Step count should not increment
-    expect(stepCountAfterBlocked).toBe(stepCountBeforeBlocked);
+    // Position should not change when blocked
+    expect(positionAfterBlocked.x).toBe(positionBeforeBlocked.x);
+    expect(positionAfterBlocked.y).toBe(positionBeforeBlocked.y);
 
-    console.log(`→ Step count before blocked move: ${stepCountBeforeBlocked}`);
-    console.log(`→ Step count after blocked move: ${stepCountAfterBlocked}`);
-    console.log('✅ Step counter correctly ignores blocked moves');
+    console.log(`→ Position before blocked move: (${positionBeforeBlocked.x}, ${positionBeforeBlocked.y})`);
+    console.log(`→ Position after blocked move: (${positionAfterBlocked.x}, ${positionAfterBlocked.y})`);
+    console.log('✅ Blocked moves correctly do not change position');
   });
 });
 

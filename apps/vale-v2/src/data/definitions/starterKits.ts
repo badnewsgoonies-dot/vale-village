@@ -1,6 +1,16 @@
+import type { Element } from '../../core/models/types';
+
+/**
+ * Element-Based Starter Kit
+ * REFACTORED: Kits are now element-specific (not unit-specific)
+ * - All Venus units share the same kit
+ * - All Mars units share the same kit
+ * - All Mercury units share the same kit
+ * - All Jupiter units share the same kit
+ */
 export interface StarterKit {
-  /** Unit ID this kit belongs to */
-  readonly unitId: string;
+  /** Element type this kit belongs to */
+  readonly element: Element;
   /** Display name shown in the shop */
   readonly name: string;
   /** Gold cost to unlock the kit */
@@ -15,87 +25,85 @@ export interface StarterKit {
   };
 }
 
-export const STARTER_KITS: Record<string, StarterKit> = {
-  adept: {
-    unitId: 'adept',
-    name: "Adept's Starter Kit",
+export const STARTER_KITS: Record<Element, StarterKit> = {
+  Venus: {
+    element: 'Venus',
+    name: "Earth Warrior Kit",
     cost: 350,
     equipment: {
-      weapon: 'wooden-sword',
-      armor: 'leather-vest',
-      helm: 'cloth-cap',
-      boots: 'leather-boots',
-      accessory: 'power-ring',
+      weapon: 'wooden-sword',    // Basic sword
+      armor: 'leather-vest',     // Medium armor
+      helm: 'leather-cap',       // Medium helm
+      boots: 'leather-boots',    // Medium boots
+      accessory: 'guardian-ring', // Defensive ring
     },
   },
-  'war-mage': {
-    unitId: 'war-mage',
-    name: "War Mage's Starter Kit",
+  Mars: {
+    element: 'Mars',
+    name: "Fire Mage Kit",
     cost: 350,
     equipment: {
-      weapon: 'wooden-axe',
-      armor: 'leather-vest',
-      helm: 'leather-cap',
-      boots: 'leather-boots',
-      accessory: 'war-gloves',
+      weapon: 'wooden-axe',      // Mars axe
+      armor: 'leather-vest',     // Medium armor
+      helm: 'bronze-helm',       // Heavy helm
+      boots: 'leather-boots',    // Medium boots
+      accessory: 'war-gloves',   // Mars-specific gloves
     },
   },
-  mystic: {
-    unitId: 'mystic',
-    name: "Mystic's Starter Kit",
+  Mercury: {
+    element: 'Mercury',
+    name: "Water Mystic Kit",
     cost: 350,
     equipment: {
-      weapon: 'wooden-staff',
-      armor: 'cotton-shirt',
-      helm: 'cloth-cap',
-      boots: 'leather-boots',
-      accessory: 'spirit-gloves',
+      weapon: 'wooden-staff',    // Mage staff
+      armor: 'cotton-shirt',     // Light mage armor
+      helm: 'cloth-cap',         // Light mage helm
+      boots: 'leather-boots',    // Medium boots
+      accessory: 'spirit-gloves', // Mage gloves
     },
   },
-  ranger: {
-    unitId: 'ranger',
-    name: "Ranger's Starter Kit",
+  Jupiter: {
+    element: 'Jupiter',
+    name: "Wind Warrior Kit",
     cost: 350,
     equipment: {
-      weapon: 'wooden-sword',
-      armor: 'leather-vest',
-      helm: 'leather-cap',
-      boots: 'leather-boots',
-      accessory: 'lucky-medal',
+      weapon: 'wooden-staff',    // Staff for Stormcaller, also works for Ranger
+      armor: 'leather-vest',     // Medium armor
+      helm: 'cloth-cap',         // Light helm
+      boots: 'leather-boots',    // Medium boots
+      accessory: 'lucky-medal',  // Jupiter-specific medal
     },
   },
-  sentinel: {
-    unitId: 'sentinel',
-    name: "Sentinel's Starter Kit",
+  Neutral: {
+    element: 'Neutral',
+    name: "Neutral Kit",
     cost: 350,
     equipment: {
-      weapon: 'wooden-sword',
-      armor: 'bronze-armor',
-      helm: 'leather-cap',
-      boots: 'iron-boots',
-      accessory: 'guardian-ring',
-    },
-  },
-  stormcaller: {
-    unitId: 'stormcaller',
-    name: "Stormcaller's Starter Kit",
-    cost: 350,
-    equipment: {
-      weapon: 'magic-rod',
-      armor: 'cotton-shirt',
-      helm: 'cloth-cap',
-      boots: 'hyper-boots',
-      accessory: 'elemental-star',
+      weapon: 'wooden-sword',    // Generic weapon
+      armor: 'leather-vest',     // Generic armor
+      helm: 'leather-cap',       // Generic helm
+      boots: 'leather-boots',    // Generic boots
+      accessory: 'power-ring',   // Generic accessory
     },
   },
 };
 
-export function getStarterKit(unitId: string): StarterKit | undefined {
-  return STARTER_KITS[unitId];
+/**
+ * Get starter kit for a unit based on their element
+ * REFACTORED: Returns kit by element, not unit ID
+ */
+export function getStarterKit(unit: { element: Element }): StarterKit {
+  return STARTER_KITS[unit.element];
 }
 
-export function getAvailableStarterKits(recruitedUnitIds: readonly string[]): StarterKit[] {
-  return recruitedUnitIds
-    .map((id) => STARTER_KITS[id])
+/**
+ * Get available starter kits for a list of units
+ * REFACTORED: Returns kits by element (deduplicates same-element units)
+ */
+export function getAvailableStarterKits(units: readonly { id: string; element: Element }[]): StarterKit[] {
+  // Deduplicate by element
+  const uniqueElements = Array.from(new Set(units.map(u => u.element)));
+  return uniqueElements
+    .map((element) => STARTER_KITS[element])
     .filter((kit): kit is StarterKit => Boolean(kit));
 }

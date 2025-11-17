@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../state/store';
 import { getCurrentNode, getAvailableChoices } from '@/core/services/DialogueService';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPortraitSprite } from '../sprites/mappings';
 import './DialogueBox.css';
 
 export function DialogueBox() {
@@ -105,7 +107,12 @@ export function DialogueBox() {
         {currentNode.speaker && (
           <div className="dialogue-header">
             <div className="dialogue-portrait">
-              <div className="portrait-placeholder">{currentNode.speaker[0]}</div>
+              <SimpleSprite
+                id={getPortraitSprite(currentNode.speaker)}
+                width={80}
+                height={80}
+                style={{ borderRadius: '8px' }}
+              />
             </div>
             <div className="dialogue-speaker">{currentNode.speaker}</div>
           </div>

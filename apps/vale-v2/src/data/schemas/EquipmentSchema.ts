@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
 /**
+ * Element type for equipment restrictions
+ * Defined here to avoid circular dependency with UnitSchema
+ */
+const ElementSchema = z.enum(['Venus', 'Mars', 'Mercury', 'Jupiter', 'Neutral']);
+
+/**
  * Stat bonus schema for equipment (allows negative values for penalties)
  * Unlike StatsSchema, this allows negative values since equipment can have penalties
  */
@@ -34,6 +40,7 @@ export const EquipmentTierSchema = z.enum([
 
 /**
  * Zod schema for Equipment validation
+ * CHANGED: allowedUnits → allowedElements for element-based equipment restrictions
  */
 export const EquipmentSchema = z.object({
   id: z.string().min(1),
@@ -42,7 +49,7 @@ export const EquipmentSchema = z.object({
   tier: EquipmentTierSchema,
   cost: z.number().int().min(0),
   statBonus: EquipmentStatBonusSchema.default({}), // Default to empty object if missing
-  allowedUnits: z.array(z.string().min(1)).min(1), // Unit IDs permitted to equip
+  allowedElements: z.array(ElementSchema).min(1).readonly(), // CHANGED: Make readonly for compatibility with Equipment type
   unlocksAbility: z.string().optional(),
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)

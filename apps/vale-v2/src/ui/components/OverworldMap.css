@@ -13,6 +13,12 @@
   display: flex;
 }
 
+/* Base tile - supports sprite overlays via position: relative */
+/* Sprites are positioned absolutely within tiles with z-index layering:
+   - z-index 1: Tile background (this)
+   - z-index 2: NPCs (SimpleSprite components)
+   - z-index 3: Player (SimpleSprite component)
+*/
 .tile {
   width: 32px;
   height: 32px;
@@ -21,6 +27,7 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  position: relative; /* Enables absolute positioning for sprite children */
 }
 
 .tile-grass {
@@ -47,14 +54,7 @@
   background-color: #9e6ac8;
 }
 
+/* Trigger tiles no longer have visual indicators - discovery through exploration */
 .tile-trigger {
-  box-shadow: inset 0 0 0 2px #f0df6d;
-}
-
-.player-sprite {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffd966, #c44617);
-  border: 2px solid #fff;
+  /* No special styling - triggers are invisible */
 }

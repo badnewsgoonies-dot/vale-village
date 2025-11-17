@@ -6,6 +6,8 @@
 import { useState } from 'react';
 import { useStore } from '../state/store';
 import { calculateEffectiveStats } from '@/core/algorithms/stats';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPortraitSprite, getAbilityIconSprite } from '../sprites/mappings';
 import './PartyManagementScreen.css';
 
 interface PartyManagementScreenProps {
@@ -65,7 +67,12 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
                     onClick={() => setSelectedUnitId(unit.id)}
                   >
                     <div className="member-icon">
-                      <span className="member-initial">{unit.name[0]}</span>
+                      <SimpleSprite
+                        id={getPortraitSprite(unit.id)}
+                        width={64}
+                        height={64}
+                        style={{ borderRadius: '8px' }}
+                      />
                     </div>
                     <div className="member-info">
                       <div className="member-name">{unit.name}</div>
@@ -127,6 +134,12 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
                   <div className="ability-list">
                     {selectedUnit.abilities.map((ability) => (
                       <div key={ability.id} className="ability-item">
+                        <SimpleSprite
+                          id={getAbilityIconSprite(ability.id)}
+                          width={24}
+                          height={24}
+                          style={{ marginRight: '8px', borderRadius: '4px' }}
+                        />
                         <span className="ability-name">{ability.name}</span>
                         {ability.manaCost > 0 && (
                           <span className="ability-cost">[{ability.manaCost}]</span>

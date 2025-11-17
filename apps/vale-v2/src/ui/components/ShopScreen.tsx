@@ -73,7 +73,7 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
     ? team.units
         .map((unit) => ({
           unit,
-          kit: getStarterKit(unit.id),
+          kit: getStarterKit(unit), // CHANGED: Takes unit object (needs element)
         }))
         .filter(({ kit, unit }) => Boolean(kit) && !unit.storeUnlocked)
         .map(({ unit, kit }) => ({ unit, kit: kit! }))
@@ -83,8 +83,11 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
 
   const handleStarterKitPurchase = (unitId: string) => {
     if (!team) return;
+    const unit = team.units.find(u => u.id === unitId);
+    if (!unit) return;
+    
     setError(null);
-    const result = purchaseStarterKit(unitId, gold);
+    const result = purchaseStarterKit(unit, gold); // CHANGED: Takes unit object
     if (!result.ok) {
       setError(result.error);
       return;
@@ -169,7 +172,7 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
 
           {unlockedUnits.map((unit) => {
             const availableEquipment = Object.values(EQUIPMENT).filter((item) =>
-              item.allowedUnits.includes(unit.id)
+              item.allowedElements.includes(unit.element) // CHANGED: Element-based filtering
             );
             return (
               <section key={unit.id} className="unit-store-section">

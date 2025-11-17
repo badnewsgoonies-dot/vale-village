@@ -1,12 +1,14 @@
 /**
  * Shop Service
  * Handles buying equipment
+ * REFACTORED: Element-based equipment system
  */
 
 import type { Result } from '../utils/result';
 import { Ok, Err } from '../utils/result';
 import type { Equipment } from '../models/Equipment';
 import type { Unit } from '../models/Unit';
+import type { Element } from '../models/types';
 import { EQUIPMENT } from '../../data/definitions/equipment';
 import { getStarterKit } from '../../data/definitions/starterKits';
 import { canEquipItem } from '../algorithms/equipment';
@@ -43,15 +45,15 @@ export function buyItem(gold: number, itemId: string): Result<{ success: boolean
   });
 }
 
+/**
+ * Purchase starter kit for a unit based on element
+ * REFACTORED: Element-based kit system (not unit-specific)
+ */
 export function purchaseStarterKit(
-  unitId: string,
+  unit: { id: string; element: Element },
   currentGold: number
 ): Result<{ newGold: number; equipment: Equipment[] }, string> {
-  const kit = getStarterKit(unitId);
-
-  if (!kit) {
-    return Err(`Starter Kit not found for unit: ${unitId}`);
-  }
+  const kit = getStarterKit(unit);
 
   if (currentGold < kit.cost) {
     return Err(`Insufficient gold. Need ${kit.cost}g, have ${currentGold}g`);
@@ -62,7 +64,7 @@ export function purchaseStarterKit(
   for (const id of equipmentIds) {
     const item = EQUIPMENT[id];
     if (!item) {
-      return Err(`Equipment ${id} not found for Starter Kit ${unitId}`);
+      return Err(`Equipment ${id} not found for ${kit.name}`);
     }
     equipmentList.push(item);
   }

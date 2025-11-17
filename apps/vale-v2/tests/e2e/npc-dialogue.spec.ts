@@ -182,26 +182,27 @@ test.describe('NPC Dialogue', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Get position before dialogue
-    const beforePos = await page.evaluate(() => {
+    // Trigger dialogue (this navigates player to NPC position)
+    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await waitForMode(page, 'dialogue', 5000);
+
+    // Get position during dialogue (should be at NPC position)
+    const dialoguePos = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       return store.getState().playerPosition;
     });
 
-    // Trigger dialogue
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
-    await waitForMode(page, 'dialogue', 5000);
-
     // End dialogue
     await endDialogue(page);
 
-    // Verify position preserved
+    // Verify position preserved (should be at NPC position where dialogue was triggered)
     const afterPos = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       return store.getState().playerPosition;
     });
 
-    expect(afterPos).toEqual(beforePos);
+    expect(afterPos).toEqual(dialoguePos);
+    expect(afterPos).toEqual({ x: 15, y: 5 }); // NPC position
 
     console.log('✅ Player position preserved after dialogue');
   });
