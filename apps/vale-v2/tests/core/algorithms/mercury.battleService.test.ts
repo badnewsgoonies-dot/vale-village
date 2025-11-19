@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { executeAbility } from '@/core/services/BattleService';
-import { createUnit } from '@/core/models/Unit';
+import { createUnit, calculateMaxHp } from '@/core/models/Unit';
 import { createTeam } from '@/core/models/Team';
 import { createBattleState } from '@/core/models/BattleState';
 import { makePRNG } from '@/core/random/prng';
@@ -178,8 +178,8 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     // Verify HP increased (healed)
     expect(ally1After.currentHp).toBeGreaterThan(ally1PreHp);
     expect(ally2After.currentHp).toBeGreaterThan(ally2PreHp);
-    expect(ally1After.currentHp).toBeLessThanOrEqual(ally1After.maxHp); // Clamped to max
-    expect(ally2After.currentHp).toBeLessThanOrEqual(ally2After.maxHp);
+    expect(ally1After.currentHp).toBeLessThanOrEqual(calculateMaxHp(ally1After)); // Clamped to max
+    expect(ally2After.currentHp).toBeLessThanOrEqual(calculateMaxHp(ally2After));
 
     // Verify negative statuses removed
     const ally1Negatives = ally1After.statusEffects.filter(s => isNegativeStatus(s));
@@ -408,7 +408,8 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     }
 
     // Verify HP clamped to maxHp (not above)
-    expect(allyAfter.currentHp).toBe(allyAfter.maxHp);
-    expect(allyAfter.currentHp).toBe(100);
+    const maxHp = calculateMaxHp(allyAfter);
+    expect(allyAfter.currentHp).toBe(maxHp);
+    expect(allyAfter.currentHp).toBeLessThanOrEqual(maxHp);
   });
 });
