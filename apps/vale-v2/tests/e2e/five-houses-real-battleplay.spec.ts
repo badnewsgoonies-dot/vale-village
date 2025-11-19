@@ -33,13 +33,69 @@ import {
 /**
  * Actually play a battle by queuing actions and executing rounds until victory
  * This replaces the simulated completeBattle() with real battle play
+ * Returns battle statistics
  */
-async function playBattleUntilVictory(page: any, logDetails: boolean = true): Promise<void> {
+async function playBattleUntilVictory(page: any, logDetails: boolean = true): Promise<BattleStats> {
   // Wait for battle to start
   await waitForMode(page, 'battle', 10000);
   
+  // Initialize battle statistics
+  const stats: BattleStats = {
+    houseNumber: 0, // Will be set by caller
+    encounterId: '',
+    totalRounds: 0,
+    actionsUsed: [],
+    enemyStats: [],
+    playerUnitStats: [],
+  };
+  
+  // Get initial battle state for stats
+  const initialBattleState = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const battle = store.getState().battle;
+    if (!battle) return null;
+    
+    return {
+      encounterId: battle.encounterId || '',
+      enemies: battle.enemies.map((e: any) => ({
+        id: e.id,
+        initialHp: e.currentHp,
+        maxHp: e.maxHp,
+      })),
+      playerUnits: battle.playerTeam.units.map((u: any) => ({
+        id: u.id,
+        initialHp: u.currentHp,
+        maxHp: u.maxHp,
+      })),
+    };
+  });
+  
+  if (initialBattleState) {
+    stats.encounterId = initialBattleState.encounterId;
+    stats.enemyStats = initialBattleState.enemies.map((e: any) => ({
+      id: e.id,
+      initialHp: e.initialHp,
+      finalHp: e.initialHp,
+      roundsToDefeat: 0,
+    }));
+    stats.playerUnitStats = initialBattleState.playerUnits.map((u: any) => ({
+      id: u.id,
+      initialHp: u.initialHp,
+      finalHp: u.initialHp,
+      damageTaken: 0,
+    }));
+  }
+  
   let roundCount = 0;
   const maxRounds = 20; // Safety limit
+  
+  // Track enemy HP per round for damage calculation
+  const enemyHpSnapshot: Record<string, number> = {};
+  if (initialBattleState) {
+    initialBattleState.enemies.forEach((e: any) => {
+      enemyHpSnapshot[e.id] = e.initialHp;
+    });
+  }
   
   while (roundCount < maxRounds) {
     // Check battle state
@@ -80,16 +136,31 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         console.log(`   → Round ${battleState.roundNumber + 1}: Planning actions...`);
       }
       
-      // Queue basic attack for each alive unit targeting first enemy
-      await page.evaluate(() => {
+      // Get enemy HP before actions for damage tracking
+      const enemyHpBefore = await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
-        if (!battle || battle.phase !== 'planning') return;
+        if (!battle) return {};
+        
+        const hpMap: Record<string, number> = {};
+        battle.enemies.forEach((e: any) => {
+          hpMap[e.id] = e.currentHp;
+        });
+        return hpMap;
+      });
+      
+      // Queue basic attack for each alive unit targeting first enemy
+      const queuedActions = await page.evaluate(() => {
+        const store = (window as any).__VALE_STORE__;
+        const battle = store.getState().battle;
+        if (!battle || battle.phase !== 'planning') return [];
         
         const aliveUnits = battle.playerTeam.units.filter((u: any) => u.currentHp > 0);
         const firstEnemyId = battle.enemies.find((e: any) => e.currentHp > 0)?.id;
         
-        if (!firstEnemyId) return;
+        if (!firstEnemyId) return [];
+        
+        const actions: Array<{ unitId: string; targetId: string; abilityId: string | null }> = [];
         
         // Queue attack for each unit
         aliveUnits.forEach((unit: any, idx: number) => {
@@ -98,11 +169,18 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
             try {
               // Use null abilityId for basic attack (STRIKE)
               store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
+              actions.push({
+                unitId: unit.id,
+                targetId: firstEnemyId,
+                abilityId: null, // Basic attack
+              });
             } catch (e) {
               // Ignore if already queued
             }
           }
         });
+        
+        return actions;
       });
       
       // Wait for queue to be complete
@@ -170,7 +248,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         }
       }
       
-      // Check battle state after execution
+      // Check battle state after execution and collect damage stats
       const afterExecution = await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
@@ -182,12 +260,64 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
           roundNumber: battle.roundNumber,
           enemiesAlive: battle.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0,
           playerUnitsAlive: battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0,
+          enemies: battle.enemies.map((e: any) => ({
+            id: e.id,
+            currentHp: e.currentHp,
+          })),
+          playerUnits: battle.playerTeam.units.map((u: any) => ({
+            id: u.id,
+            currentHp: u.currentHp,
+          })),
         };
       });
       
       if (!afterExecution) {
         throw new Error('Battle state lost after execution');
       }
+      
+      // Calculate damage dealt this round
+      if (queuedActions && enemyHpBefore) {
+        queuedActions.forEach((action) => {
+          const hpBefore = enemyHpBefore[action.targetId] ?? 0;
+          const enemyAfter = afterExecution.enemies.find((e: any) => e.id === action.targetId);
+          const hpAfter = enemyAfter?.currentHp ?? 0;
+          const damageDealt = Math.max(0, hpBefore - hpAfter);
+          const wasOneShot = damageDealt >= hpBefore && hpBefore > 0;
+          
+          stats.actionsUsed.push({
+            round: afterExecution.roundNumber,
+            unitId: action.unitId,
+            abilityId: action.abilityId,
+            targetId: action.targetId,
+            damageDealt,
+            enemyHpBefore: hpBefore,
+            enemyHpAfter: hpAfter,
+            wasOneShot,
+          });
+          
+          // Update enemy HP snapshot
+          enemyHpSnapshot[action.targetId] = hpAfter;
+          
+          // Update enemy stats
+          const enemyStat = stats.enemyStats.find((e) => e.id === action.targetId);
+          if (enemyStat) {
+            enemyStat.finalHp = hpAfter;
+            if (hpAfter <= 0 && enemyStat.roundsToDefeat === 0) {
+              enemyStat.roundsToDefeat = afterExecution.roundNumber;
+            }
+          }
+        });
+      }
+      
+      // Update player unit stats
+      afterExecution.playerUnits.forEach((unit: any) => {
+        const unitStat = stats.playerUnitStats.find((u) => u.id === unit.id);
+        if (unitStat) {
+          const damageTaken = unitStat.initialHp - unit.currentHp;
+          unitStat.damageTaken = Math.max(unitStat.damageTaken, damageTaken);
+          unitStat.finalHp = unit.currentHp;
+        }
+      });
       
       if (logDetails) {
         console.log(`   → Round ${afterExecution.roundNumber}: phase=${afterExecution.phase}, enemies=${afterExecution.enemiesAlive}, units=${afterExecution.playerUnitsAlive}`);
@@ -395,6 +525,9 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
   if (logDetails) {
     console.log('   ✅ Victory! Rewards screen shown');
   }
+  
+  stats.totalRounds = roundCount;
+  return stats;
 }
 
 /**
@@ -484,6 +617,8 @@ async function addUnitToActiveTeam(page: any, unitId: string): Promise<void> {
 
 test.describe('Five Houses Real Battle Play', () => {
   test('plays through 5 houses with real battles and natural equipment/unit equipping', async ({ page }) => {
+    // Collect battle statistics for all houses
+    const allBattleStats: BattleStats[] = [];
     console.log('\n🎮 === FIVE HOUSES REAL BATTLE PLAY TEST ===\n');
 
     // ============================================================================
@@ -535,37 +670,9 @@ test.describe('Five Houses Real Battle Play', () => {
     // ACTUALLY PLAY THE BATTLE
     console.log('   → Playing battle (queuing actions, executing rounds)...');
     
-    // Log initial battle stats
-    const initialBattleStats = await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      const battle = store.getState().battle;
-      if (!battle) return null;
-      
-      return {
-        playerUnits: battle.playerTeam?.units?.map((u: any) => ({
-          id: u.id,
-          currentHp: u.currentHp,
-          maxHp: u.maxHp,
-          attack: u.attack,
-          defense: u.defense,
-        })) ?? [],
-        enemies: battle.enemies?.map((e: any) => ({
-          id: e.id,
-          currentHp: e.currentHp,
-          maxHp: e.maxHp,
-          attack: e.attack,
-          defense: e.defense,
-        })) ?? [],
-      };
-    });
-    
-    if (initialBattleStats) {
-      console.log(`   📊 Battle stats:`);
-      console.log(`   Player:`, JSON.stringify(initialBattleStats.playerUnits, null, 2));
-      console.log(`   Enemies:`, JSON.stringify(initialBattleStats.enemies, null, 2));
-    }
-    
-    await playBattleUntilVictory(page, true);
+    const battleStats1 = await playBattleUntilVictory(page, true);
+    battleStats1.houseNumber = 1;
+    allBattleStats.push(battleStats1);
     
     // Claim rewards and handle dialogue
     await claimRewardsAndReturnToOverworld(page);
@@ -643,7 +750,9 @@ test.describe('Five Houses Real Battle Play', () => {
     
     // ACTUALLY PLAY THE BATTLE
     console.log('   → Playing battle...');
-    await playBattleUntilVictory(page, true);
+    const battleStats2 = await playBattleUntilVictory(page, true);
+    battleStats2.houseNumber = 2;
+    allBattleStats.push(battleStats2);
     
     await claimRewardsAndReturnToOverworld(page);
     
@@ -693,7 +802,9 @@ test.describe('Five Houses Real Battle Play', () => {
     
     // ACTUALLY PLAY THE BATTLE
     console.log('   → Playing battle...');
-    await playBattleUntilVictory(page, true);
+    const battleStats3 = await playBattleUntilVictory(page, true);
+    battleStats3.houseNumber = 3;
+    allBattleStats.push(battleStats3);
     
     await claimRewardsAndReturnToOverworld(page);
     
@@ -743,7 +854,9 @@ test.describe('Five Houses Real Battle Play', () => {
     
     // ACTUALLY PLAY THE BATTLE
     console.log('   → Playing battle...');
-    await playBattleUntilVictory(page, true);
+    const battleStats4 = await playBattleUntilVictory(page, true);
+    battleStats4.houseNumber = 4;
+    allBattleStats.push(battleStats4);
     
     await claimRewardsAndReturnToOverworld(page);
     await waitForMode(page, 'overworld', 5000);
@@ -777,7 +890,9 @@ test.describe('Five Houses Real Battle Play', () => {
     
     // ACTUALLY PLAY THE BATTLE
     console.log('   → Playing battle...');
-    await playBattleUntilVictory(page, true);
+    const battleStats5 = await playBattleUntilVictory(page, true);
+    battleStats5.houseNumber = 5;
+    allBattleStats.push(battleStats5);
     
     await claimRewardsAndReturnToOverworld(page);
     
@@ -854,5 +969,91 @@ test.describe('Five Houses Real Battle Play', () => {
     console.log('   ✅ Equipment naturally equipped');
     console.log('   ✅ Units naturally added to team');
     console.log('   ✅ Full gameplay loop validated');
+    
+    // ============================================================================
+    // BATTLE STATISTICS SUMMARY
+    // ============================================================================
+    console.log('\n📊 === BATTLE STATISTICS SUMMARY ===\n');
+    
+    allBattleStats.forEach((stats) => {
+      console.log(`🏠 HOUSE ${stats.houseNumber} (${stats.encounterId}):`);
+      console.log(`   Total Rounds: ${stats.totalRounds}`);
+      
+      // Calculate damage statistics
+      const totalDamage = stats.actionsUsed.reduce((sum, a) => sum + a.damageDealt, 0);
+      const avgDamage = stats.actionsUsed.length > 0 ? totalDamage / stats.actionsUsed.length : 0;
+      const oneShots = stats.actionsUsed.filter(a => a.wasOneShot).length;
+      const basicAttacks = stats.actionsUsed.filter(a => a.abilityId === null).length;
+      const abilityUses = stats.actionsUsed.filter(a => a.abilityId !== null).length;
+      
+      console.log(`   Total Actions: ${stats.actionsUsed.length}`);
+      console.log(`   - Basic Attacks: ${basicAttacks}`);
+      console.log(`   - Abilities Used: ${abilityUses}`);
+      console.log(`   Total Damage Dealt: ${totalDamage}`);
+      console.log(`   Average Damage per Action: ${avgDamage.toFixed(1)}`);
+      console.log(`   One-Shots: ${oneShots} (${stats.actionsUsed.length > 0 ? ((oneShots / stats.actionsUsed.length) * 100).toFixed(1) : 0}%)`);
+      
+      // Enemy statistics
+      console.log(`   Enemies:`);
+      stats.enemyStats.forEach((enemy) => {
+        const damageTaken = enemy.initialHp - enemy.finalHp;
+        const actionsOnEnemy = stats.actionsUsed.filter(a => a.targetId === enemy.id).length;
+        const avgDamageToEnemy = actionsOnEnemy > 0 ? damageTaken / actionsOnEnemy : 0;
+        console.log(`     - ${enemy.id}: ${enemy.initialHp} HP → ${enemy.finalHp} HP (${damageTaken} damage, ${actionsOnEnemy} actions, ${avgDamageToEnemy.toFixed(1)} avg)`);
+        if (enemy.roundsToDefeat > 0) {
+          console.log(`       Defeated in round ${enemy.roundsToDefeat}`);
+        }
+      });
+      
+      // Player unit statistics
+      console.log(`   Player Units:`);
+      stats.playerUnitStats.forEach((unit) => {
+        console.log(`     - ${unit.id}: ${unit.initialHp} HP → ${unit.finalHp} HP (${unit.damageTaken} damage taken)`);
+      });
+      
+      // Difficulty assessment
+      const totalEnemyHp = stats.enemyStats.reduce((sum, e) => sum + e.initialHp, 0);
+      const damageEfficiency = stats.totalRounds > 0 ? totalEnemyHp / stats.totalRounds : 0;
+      const actionsPerRound = stats.totalRounds > 0 ? stats.actionsUsed.length / stats.totalRounds : 0;
+      
+      console.log(`   Difficulty Metrics:`);
+      console.log(`     - Enemy HP per Round: ${damageEfficiency.toFixed(1)}`);
+      console.log(`     - Actions per Round: ${actionsPerRound.toFixed(1)}`);
+      
+      if (stats.actionsUsed.length > 0 && oneShots / stats.actionsUsed.length > 0.5) {
+        console.log(`     ⚠️  WARNING: >50% one-shots - battles may be too easy`);
+      } else if (stats.totalRounds > 10) {
+        console.log(`     ⚠️  WARNING: >10 rounds - battles may be too long`);
+      } else {
+        console.log(`     ✅ Battle length seems balanced`);
+      }
+      
+      console.log('');
+    });
+    
+    // Overall statistics
+    const totalRounds = allBattleStats.reduce((sum, s) => sum + s.totalRounds, 0);
+    const totalActions = allBattleStats.reduce((sum, s) => sum + s.actionsUsed.length, 0);
+    const totalOneShots = allBattleStats.reduce((sum, s) => sum + s.actionsUsed.filter(a => a.wasOneShot).length, 0);
+    const totalBasicAttacks = allBattleStats.reduce((sum, s) => sum + s.actionsUsed.filter(a => a.abilityId === null).length, 0);
+    const totalAbilityUses = allBattleStats.reduce((sum, s) => sum + s.actionsUsed.filter(a => a.abilityId !== null).length, 0);
+    
+    console.log('📈 OVERALL STATISTICS:');
+    console.log(`   Total Rounds Across All Houses: ${totalRounds}`);
+    console.log(`   Average Rounds per House: ${allBattleStats.length > 0 ? (totalRounds / allBattleStats.length).toFixed(1) : 0}`);
+    console.log(`   Total Actions: ${totalActions}`);
+    console.log(`   - Basic Attacks: ${totalBasicAttacks} (${totalActions > 0 ? ((totalBasicAttacks / totalActions) * 100).toFixed(1) : 0}%)`);
+    console.log(`   - Abilities Used: ${totalAbilityUses} (${totalActions > 0 ? ((totalAbilityUses / totalActions) * 100).toFixed(1) : 0}%)`);
+    console.log(`   Total One-Shots: ${totalOneShots} (${totalActions > 0 ? ((totalOneShots / totalActions) * 100).toFixed(1) : 0}%)`);
+    
+    if (totalActions > 0 && totalOneShots / totalActions > 0.5) {
+      console.log(`   ⚠️  OVERALL: >50% one-shots - game may be too easy`);
+    } else if (totalActions > 0 && totalOneShots / totalActions < 0.1) {
+      console.log(`   ⚠️  OVERALL: <10% one-shots - game may be too hard`);
+    } else {
+      console.log(`   ✅ Overall difficulty seems balanced`);
+    }
+    
+    console.log('');
   });
 });
