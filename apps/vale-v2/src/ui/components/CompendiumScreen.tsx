@@ -16,12 +16,11 @@ interface CompendiumScreenProps {
 
 type CompendiumTab = 'units' | 'equipment' | 'djinn' | 'enemies' | 'bosses' | 'npcs';
 
-// Boss enemy IDs (can be expanded)
+// Boss enemy IDs - from the "BOSS ENEMIES" section in enemies.ts
 const BOSS_ENEMY_IDS = new Set([
   'mars-sprite',
   'mercury-sprite',
   'venus-sprite',
-  'jupiter-sprite',
   'chimera',
   'overseer',
 ]);
