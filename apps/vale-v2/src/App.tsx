@@ -10,7 +10,9 @@ import { ShopScreen } from './ui/components/ShopScreen';
 import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
+import { DevModeOverlay } from './ui/components/DevModeOverlay';
 import { useStore } from './ui/state/store';
+import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 import { UNIT_DEFINITIONS } from './data/definitions/units';
@@ -22,6 +24,8 @@ import { calculateEffectiveStats } from './core/algorithms/stats';
 import { getXpProgress } from './core/algorithms/xp';
 
 function App() {
+  // Enable dev mode keyboard shortcut (Ctrl+D)
+  useDevMode();
   // Expose store and test helpers for debugging and E2E tests
   // Always expose (TODO: restrict in production builds if needed)
   (window as any).__VALE_STORE__ = useStore;
@@ -260,6 +264,9 @@ function App() {
           )}
         </>
       )}
+
+      {/* Dev Mode Overlay - Only renders when enabled (Ctrl+D) */}
+      <DevModeOverlay />
     </div>
   );
 }

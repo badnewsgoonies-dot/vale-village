@@ -16,8 +16,9 @@ import { createRewardsSlice, type RewardsSlice } from './rewardsSlice';
 import { createGameFlowSlice, type GameFlowSlice } from './gameFlowSlice';
 import { createOverworldSlice, type OverworldStore } from './overworldSlice';
 import { createDialogueSlice, type DialogueSlice } from './dialogueSlice';
+import { createDevModeSlice, type DevModeSlice } from './devModeSlice';
 
-export type Store = BattleSlice & QueueBattleSlice & TeamSlice & SaveSlice & StorySlice & InventorySlice & RewardsSlice & GameFlowSlice & OverworldStore & DialogueSlice;
+export type Store = BattleSlice & QueueBattleSlice & TeamSlice & SaveSlice & StorySlice & InventorySlice & RewardsSlice & GameFlowSlice & OverworldStore & DialogueSlice & DevModeSlice;
 
 // Store factory function to combine all slices
 const storeFactory = (set: SetState<Store>, get: GetState<Store>, api: StoreApi<Store>) => ({
@@ -31,6 +32,7 @@ const storeFactory = (set: SetState<Store>, get: GetState<Store>, api: StoreApi<
   ...createGameFlowSlice(set, get, api),
   ...createOverworldSlice(set, get, api),
   ...createDialogueSlice(set, get, api),
+  ...createDevModeSlice(set, get, api),
 });
 
 export function createStore() {
