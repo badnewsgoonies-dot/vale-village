@@ -14,6 +14,7 @@ import { DevModeOverlay } from './ui/components/DevModeOverlay';
 import { TitleScreen } from './ui/components/TitleScreen';
 import { MainMenu } from './ui/components/MainMenu';
 import { IntroScreen } from './ui/components/IntroScreen';
+import { CompendiumScreen } from './ui/components/CompendiumScreen';
 import { useStore, store } from './ui/state/store';
 import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
@@ -321,6 +322,9 @@ function App() {
       {mode === 'title-screen' && <TitleScreen />}
       {mode === 'main-menu' && <MainMenu />}
       {mode === 'intro' && <IntroScreen />}
+      {mode === 'compendium' && (
+        <CompendiumScreen onClose={() => setMode('main-menu')} />
+      )}
       
       {/* Game screens */}
       {mode === 'rewards' && lastBattleRewards && team ? (

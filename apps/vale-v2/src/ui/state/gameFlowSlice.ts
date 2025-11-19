@@ -13,7 +13,7 @@ import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
 
 export interface GameFlowSlice {
-  mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select';
+  mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select' | 'compendium';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
   currentShopId: string | null;

@@ -18,7 +18,7 @@ export function MainMenu() {
   const menuOptions = [
     { id: 'new-game', label: 'New Game', enabled: true },
     { id: 'continue', label: 'Continue', enabled: hasSaveFile },
-    { id: 'compendium', label: 'Compendium', enabled: false },
+    { id: 'compendium', label: 'Compendium', enabled: true },
   ];
 
   const enabledOptions = menuOptions.filter(opt => opt.enabled);
@@ -84,8 +84,7 @@ export function MainMenu() {
         setMode('overworld');
       }
     } else if (optionId === 'compendium') {
-      // Placeholder - do nothing for now
-      console.warn('Compendium not implemented yet');
+      setMode('compendium');
     }
   };
 
@@ -107,9 +106,6 @@ export function MainMenu() {
                 disabled={!isEnabled}
               >
                 {option.label}
-                {!isEnabled && option.id === 'compendium' && (
-                  <span className="coming-soon"> (Coming Soon)</span>
-                )}
               </button>
             );
           })}
