@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { BattleService } from '@/core/services/BattleService';
-import { createUnit } from '@/core/models/Unit';
+import { executeAbility } from '@/core/services/BattleService';
+import { createUnit, calculateMaxHp } from '@/core/models/Unit';
 import { createTeam } from '@/core/models/Team';
 import { createBattleState } from '@/core/models/BattleState';
 import { makePRNG } from '@/core/random/prng';
@@ -122,12 +122,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally1, ally2, dummy]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy('enemy1'),
       createEnemy('enemy2'),
       createEnemy('enemy3'),
       createEnemy('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -152,9 +152,17 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     const ally1PreStatuses = ally1.statusEffects.length;
     const ally2PreStatuses = ally2.statusEffects.length;
 
-    // Execute ability through BattleService
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally1, ally2]);
+    // Execute ability through executeAbility
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally1, ally2], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     // Find updated allies
     const ally1After = updatedBattle.playerTeam.units.find(u => u.id === 'ally1');
@@ -170,8 +178,8 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     // Verify HP increased (healed)
     expect(ally1After.currentHp).toBeGreaterThan(ally1PreHp);
     expect(ally2After.currentHp).toBeGreaterThan(ally2PreHp);
-    expect(ally1After.currentHp).toBeLessThanOrEqual(ally1After.maxHp); // Clamped to max
-    expect(ally2After.currentHp).toBeLessThanOrEqual(ally2After.maxHp);
+    expect(ally1After.currentHp).toBeLessThanOrEqual(calculateMaxHp(ally1After)); // Clamped to max
+    expect(ally2After.currentHp).toBeLessThanOrEqual(calculateMaxHp(ally2After));
 
     // Verify negative statuses removed
     const ally1Negatives = ally1After.statusEffects.filter(s => isNegativeStatus(s));
@@ -226,12 +234,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally1, ally2, ally3]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy2('enemy1'),
       createEnemy2('enemy2'),
       createEnemy2('enemy3'),
       createEnemy2('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -250,9 +258,17 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
       grantImmunity: { all: false, types: ['burn', 'poison', 'freeze'], duration: 1 },
     };
 
-    // Execute ability through BattleService
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally1, ally2, ally3]);
+    // Execute ability through executeAbility
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally1, ally2, ally3], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     // Find updated allies
     const ally1After = updatedBattle.playerTeam.units.find(u => u.id === 'ally1');
@@ -333,7 +349,6 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     const dummies = [
       createDummy('dummy1'),
       createDummy('dummy2'),
-      createDummy('dummy3'),
     ];
 
     const createEnemy3 = (id: string) => {
@@ -351,12 +366,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally, ...dummies]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy3('enemy1'),
       createEnemy3('enemy2'),
       createEnemy3('enemy3'),
       createEnemy3('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -374,8 +389,16 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
       grantImmunity: { all: false, types: ['burn', 'poison'], duration: 1 },
     };
 
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally]);
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     const allyAfter = updatedBattle.playerTeam.units.find(u => u.id === ally.id);
     expect(allyAfter).toBeDefined();
@@ -385,7 +408,8 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     }
 
     // Verify HP clamped to maxHp (not above)
-    expect(allyAfter.currentHp).toBe(allyAfter.maxHp);
-    expect(allyAfter.currentHp).toBe(100);
+    const maxHp = calculateMaxHp(allyAfter);
+    expect(allyAfter.currentHp).toBe(maxHp);
+    expect(allyAfter.currentHp).toBeLessThanOrEqual(maxHp);
   });
 });

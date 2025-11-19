@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { calculatePsynergyDamage, applyDamageWithShields } from '@/core/algorithms/damage';
-import { createUnit } from '@/core/models/Unit';
+import { createUnit, calculateMaxHp } from '@/core/models/Unit';
 import { createTeam } from '@/core/models/Team';
 import { makePRNG } from '@/core/random/prng';
 import type { Ability } from '@/data/schemas/AbilitySchema';
@@ -166,34 +166,32 @@ describe('Splash Damage (Phase 2)', () => {
   test('splash with DR + elementalResistance on secondary → multiplicative reduction', () => {
     const attacker = createAttacker();
     const primary = createDefender('primary');
-    const secondary = createDefender('secondary', { dr: 0.3, resist: 0.25 });
+    // Create secondary without defenses first to calculate baseline
+    const secondaryNoDefenses = createDefender('secondary-no-def');
+    const secondaryWithDefenses = createDefender('secondary', { dr: 0.3, resist: 0.25 });
 
     const attackerTeam = createTeam([attacker, createDefender('dummy1'), createDefender('dummy2'), createDefender('dummy3')]);
 
-    // Calculate base splash damage (before DR/resist)
+    // Calculate primary damage
     const primaryDamage = calculatePsynergyDamage(attacker, primary, attackerTeam, splashAbility);
-    const baseSplashDamage = Math.floor(primaryDamage * 0.3);
-
-    // Apply damage modifiers: resist first, then DR
-    // Resist: modifier 0.25 → factor (1 - 0.25) = 0.75
-    // DR: 0.3 → factor (1 - 0.3) = 0.7
-    // Expected: baseSplashDamage × 0.75 × 0.7 (multiplicative)
-    const expectedDamage = Math.floor(Math.floor(baseSplashDamage * 0.75) * 0.7);
-
-    // Apply splash damage (this happens in BattleService, but we're testing the pipeline)
-    // Note: In real implementation, resist/DR are applied via calculatePsynergyDamage
-    // For this test, we verify the damage reduction mechanics work correctly
-
-    // Calculate splash damage with modifiers (simulating BattleService calculation)
-    const splashWithModifiers = calculatePsynergyDamage(attacker, secondary, attackerTeam, {
+    
+    // Calculate splash damage against secondary WITHOUT defenses (baseline)
+    const splashAbilitySplash = {
       ...splashAbility,
       basePower: Math.floor(splashAbility.basePower * 0.3), // Splash reduced power
-    });
+    };
+    const baseSplashDamage = calculatePsynergyDamage(attacker, secondaryNoDefenses, attackerTeam, splashAbilitySplash);
+
+    // Calculate splash damage against secondary WITH defenses
+    const splashWithModifiers = calculatePsynergyDamage(attacker, secondaryWithDefenses, attackerTeam, splashAbilitySplash);
 
     // Apply to unit
-    const result = applyDamageWithShields(secondary, splashWithModifiers);
+    const result = applyDamageWithShields(secondaryWithDefenses, splashWithModifiers);
     expect(result.actualDamage).toBe(splashWithModifiers);
-    expect(result.actualDamage).toBeLessThan(baseSplashDamage); // Reduced by DR/resist
+    
+    // Verify that DR/resist reduced the damage
+    // Damage with defenses should be less than damage without defenses
+    expect(result.actualDamage).toBeLessThan(baseSplashDamage);
   });
 
   test('lethal primary hit still applies splash to others', () => {
@@ -272,7 +270,7 @@ describe('Splash Damage (Phase 2)', () => {
 
     // Auto-revive should trigger
     expect(secondaryResult.autoRevived).toBe(true);
-    expect(secondaryResult.updatedUnit.currentHp).toBe(Math.floor(secondary.maxHp * 0.5)); // Revived to 50%
+    expect(secondaryResult.updatedUnit.currentHp).toBe(Math.floor(calculateMaxHp(secondary) * 0.5)); // Revived to 50%
 
     // Auto-revive status should be removed (usesRemaining decremented to 0)
     const autoReviveAfter = secondaryResult.updatedUnit.statusEffects.find(s => s.type === 'autoRevive');

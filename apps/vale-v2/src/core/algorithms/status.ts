@@ -177,10 +177,17 @@ export function applyStatusToUnit(
     return unit; // No change
   }
 
+  // Phase 2: Immunity replacement - if applying a new immunity, remove old immunities
+  let updatedStatusEffects = unit.statusEffects;
+  if (newStatus.type === 'immunity') {
+    // Remove all existing immunity statuses (replacement behavior)
+    updatedStatusEffects = unit.statusEffects.filter(s => s.type !== 'immunity');
+  }
+
   // Add status to unit
   return {
     ...unit,
-    statusEffects: [...unit.statusEffects, newStatus],
+    statusEffects: [...updatedStatusEffects, newStatus],
   };
 }
 

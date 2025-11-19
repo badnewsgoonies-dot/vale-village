@@ -152,9 +152,42 @@ describe('Jupiter Djinn Phase 2 Integration', () => {
     const initialShieldedHp = shieldedSecondary.currentHp;
     const initialDrHp = drSecondary.currentHp;
 
+    // Get the actual caster from battle state (after Djinn ability merging)
+    const battleCaster = battleState.playerTeam.units.find(u => u.id === casterWithAbility.id);
+    if (!battleCaster) {
+      throw new Error('Caster not found in battle state');
+    }
+    
+    // Ensure the ability is present (mergeDjinnAbilitiesIntoUnit might have overwritten)
+    // Check if ability already exists before adding
+    const hasAbility = battleCaster.abilities.some(a => a.id === STORM_BREEZE_PULSE.id);
+    const casterWithAbilityInBattle: Unit = hasAbility 
+      ? battleCaster
+      : {
+          ...battleCaster,
+          abilities: [...battleCaster.abilities, STORM_BREEZE_PULSE],
+        };
+    
+    // Update battle state with the caster that has the ability
+    const updatedBattleState = {
+      ...battleState,
+      playerTeam: {
+        ...battleState.playerTeam,
+        units: battleState.playerTeam.units.map(u => 
+          u.id === casterWithAbility.id ? casterWithAbilityInBattle : u
+        ),
+      },
+    };
+    
+    // Update unitById index
+    updatedBattleState.unitById.set(casterWithAbility.id, {
+      unit: casterWithAbilityInBattle,
+      isPlayer: true,
+    });
+
     // Execute ability through performAction (which calls executeAbility internally)
     const { result } = performAction(
-      battleState,
+      updatedBattleState,
       casterWithAbility.id,
       STORM_BREEZE_PULSE.id,
       [primaryTarget.id],
@@ -176,7 +209,9 @@ describe('Jupiter Djinn Phase 2 Integration', () => {
     expect(updatedPrimary.currentHp).toBeLessThan(initialPrimaryHp);
 
     // Verify splash damage occurred (Phase 2: splashDamagePercent)
-    expect(updatedShielded.currentHp).toBeLessThan(initialShieldedHp);
+    // Shield should block splash damage, so HP should be unchanged (shield consumed)
+    expect(updatedShielded.currentHp).toBe(initialShieldedHp);
+    // DR secondary should take reduced splash damage
     expect(updatedDr.currentHp).toBeLessThan(initialDrHp);
 
     // Verify shield blocked splash damage (shield should be consumed)

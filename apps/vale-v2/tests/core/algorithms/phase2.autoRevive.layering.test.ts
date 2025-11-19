@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { applyDamageWithShields } from '@/core/algorithms/damage';
-import { createUnit } from '@/core/models/Unit';
+import { createUnit, calculateMaxHp } from '@/core/models/Unit';
 import { makePRNG } from '@/core/random/prng';
 import type { Unit } from '@/core/models/Unit';
 
@@ -80,7 +80,7 @@ describe('Auto-Revive with Complex Layering (Phase 2)', () => {
     ];
 
     const initialHp = unit.currentHp;
-    const maxHp = unit.maxHp;
+    const maxHp = calculateMaxHp(unit);
 
     // Calculate lethal damage (more than current HP)
     // Note: This damage would be reduced by DR (0.3) in real combat
@@ -245,9 +245,10 @@ describe('Auto-Revive with Complex Layering (Phase 2)', () => {
       ];
 
       const result = applyDamageWithShields(testUnit, 50);
+      const expectedHp = Math.floor(calculateMaxHp(testUnit) * testCase.hpPercent);
 
       expect(result.autoRevived).toBe(true);
-      expect(result.updatedUnit.currentHp).toBe(testCase.expected);
+      expect(result.updatedUnit.currentHp).toBe(expectedHp);
     }
   });
 
@@ -286,7 +287,8 @@ describe('Auto-Revive with Complex Layering (Phase 2)', () => {
 
     // Only first auto-revive should trigger
     expect(result.autoRevived).toBe(true);
-    expect(result.updatedUnit.currentHp).toBe(50); // First one (0.5)
+    const expectedHp = Math.floor(calculateMaxHp(unit) * 0.5); // First one (0.5)
+    expect(result.updatedUnit.currentHp).toBe(expectedHp);
 
     // First auto-revive should be removed, second should remain
     const autoReviveStatuses = result.updatedUnit.statusEffects.filter(s => s.type === 'autoRevive');

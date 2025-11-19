@@ -337,7 +337,7 @@ function applyPhase2Effects(
  * Execute an ability in battle (internal helper)
  * Phase 2: Added enemies parameter for splash damage targeting, added rng for status chance rolls
  */
-function executeAbility(
+export function executeAbility(
   caster: Unit,
   ability: Ability,
   targets: readonly Unit[],

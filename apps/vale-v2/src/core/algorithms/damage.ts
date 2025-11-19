@@ -339,6 +339,16 @@ export function applyDamageWithShields(
 export function checkAutoRevive(unit: Unit): { updatedUnit: Unit; revived: boolean } {
   // Only trigger if unit is KO'd
   if (unit.currentHp > 0) {
+    // Clean up exhausted auto-revive statuses even if unit isn't KO'd
+    const hasExhaustedAutoRevive = unit.statusEffects.some(
+      effect => effect.type === 'autoRevive' && effect.usesRemaining === 0
+    );
+    if (hasExhaustedAutoRevive) {
+      const cleanedStatusEffects = unit.statusEffects.filter(
+        effect => !(effect.type === 'autoRevive' && effect.usesRemaining === 0)
+      );
+      return { updatedUnit: { ...unit, statusEffects: cleanedStatusEffects }, revived: false };
+    }
     return { updatedUnit: unit, revived: false };
   }
 
@@ -350,6 +360,16 @@ export function checkAutoRevive(unit: Unit): { updatedUnit: Unit; revived: boole
   const autoReviveStatus = autoReviveEffects[0];
 
   if (!autoReviveStatus) {
+    // Clean up exhausted auto-revive statuses even if none can trigger
+    const hasExhaustedAutoRevive = unit.statusEffects.some(
+      effect => effect.type === 'autoRevive' && effect.usesRemaining === 0
+    );
+    if (hasExhaustedAutoRevive) {
+      const cleanedStatusEffects = unit.statusEffects.filter(
+        effect => !(effect.type === 'autoRevive' && effect.usesRemaining === 0)
+      );
+      return { updatedUnit: { ...unit, statusEffects: cleanedStatusEffects }, revived: false };
+    }
     return { updatedUnit: unit, revived: false };
   }
 
@@ -357,16 +377,20 @@ export function checkAutoRevive(unit: Unit): { updatedUnit: Unit; revived: boole
   const maxHp = calculateMaxHp(unit);
   const reviveHp = Math.floor(maxHp * autoReviveStatus.hpPercent);
 
-  // Decrement uses or remove status
+  // Decrement uses only for the first auto-revive status that triggered
+  // Other auto-revive statuses remain unchanged
+  let foundFirst = false;
   const updatedStatusEffects = unit.statusEffects
     .map(effect => {
-      if (effect.type === 'autoRevive' && effect.usesRemaining > 0) {
+      // Only decrement the first auto-revive status with uses remaining
+      if (effect.type === 'autoRevive' && effect.usesRemaining > 0 && !foundFirst) {
+        foundFirst = true;
         return { ...effect, usesRemaining: effect.usesRemaining - 1 };
       }
       return effect;
     })
     .filter(effect => {
-      // Remove auto-revive if uses depleted
+      // Remove auto-revive if uses depleted (only the one we decremented)
       return !(effect.type === 'autoRevive' && effect.usesRemaining === 0);
     });
 
