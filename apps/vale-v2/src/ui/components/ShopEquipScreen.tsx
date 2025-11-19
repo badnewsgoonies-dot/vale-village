@@ -32,69 +32,6 @@ interface ShopEquipScreenProps {
 
 const EQUIPMENT_SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'helm', 'boots', 'accessory'];
 
-/**
- * Get equipment unique to a specific unit
- * Equipment is unit-specific, not just element-based
- */
-function getUnitSpecificEquipment(unitId: string, unitElement: string, unitRole: string): Equipment[] {
-  return Object.values(EQUIPMENT).filter((item) => {
-    // First check if unit's element is allowed
-    if (!item.allowedElements.includes(unitElement as any)) {
-      return false;
-    }
-    
-    // Unit-specific filtering based on unit ID and role:
-    // - Venus units: Adept and Sentinel share Venus equipment (both can use it)
-    // - Mars units: War Mage has exclusive Mars equipment
-    // - Mercury units: Mystic has exclusive Mercury equipment
-    // - Jupiter units: Ranger and Stormcaller share Jupiter equipment
-    
-    // For weapons and armor, filter by unit role/ID:
-    if (item.slot === 'weapon') {
-      // Mars weapons: only war-mage
-      if (item.allowedElements.includes('Mars') && !item.allowedElements.includes('Venus') && !item.allowedElements.includes('Mercury') && !item.allowedElements.includes('Jupiter')) {
-        return unitId === 'war-mage';
-      }
-      // Mercury weapons: only mystic
-      if (item.allowedElements.includes('Mercury') && !item.allowedElements.includes('Venus') && !item.allowedElements.includes('Mars') && !item.allowedElements.includes('Jupiter')) {
-        return unitId === 'mystic';
-      }
-      // Venus weapons: adept and sentinel
-      if (item.allowedElements.includes('Venus') && !item.allowedElements.includes('Mars') && !item.allowedElements.includes('Mercury')) {
-        return unitId === 'adept' || unitId === 'sentinel';
-      }
-      // Jupiter weapons: ranger and stormcaller
-      if (item.allowedElements.includes('Jupiter') && !item.allowedElements.includes('Venus') && !item.allowedElements.includes('Mars') && !item.allowedElements.includes('Mercury')) {
-        return unitId === 'ranger' || unitId === 'stormcaller';
-      }
-      // Shared weapons (Venus + Jupiter): adept, sentinel, ranger, stormcaller
-      if (item.allowedElements.includes('Venus') && item.allowedElements.includes('Jupiter')) {
-        return unitId === 'adept' || unitId === 'sentinel' || unitId === 'ranger' || unitId === 'stormcaller';
-      }
-    }
-    
-    // For armor, similar logic but more permissive for shared types
-    if (item.slot === 'armor') {
-      // Heavy armor (Venus only): adept and sentinel
-      if (item.allowedElements.length === 1 && item.allowedElements[0] === 'Venus') {
-        return unitId === 'adept' || unitId === 'sentinel';
-      }
-      // Light armor (Mercury/Jupiter): mystic, ranger, stormcaller
-      if (item.allowedElements.includes('Mercury') && item.allowedElements.includes('Jupiter') && !item.allowedElements.includes('Venus') && !item.allowedElements.includes('Mars')) {
-        return unitId === 'mystic' || unitId === 'ranger' || unitId === 'stormcaller';
-      }
-      // Medium armor (Venus/Mars/Jupiter): adept, sentinel, war-mage, ranger
-      if (item.allowedElements.includes('Venus') && item.allowedElements.includes('Mars') && item.allowedElements.includes('Jupiter')) {
-        return unitId === 'adept' || unitId === 'sentinel' || unitId === 'war-mage' || unitId === 'ranger';
-      }
-    }
-    
-    // For other slots, use element-based filtering (more permissive)
-    // This allows units of the same element to share accessories, helms, boots
-    return true;
-  });
-}
-
 export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const { gold, addGold, addEquipment, team, updateTeamUnits, equipment: inventory } = useStore((s) => ({
     gold: s.gold,
@@ -297,11 +234,13 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
                   )}
 
                   {unlockedUnits.map((unit) => {
-                    // Get equipment unique to this specific unit
-                    const availableEquipment = getUnitSpecificEquipment(unit.id, unit.element, unit.role);
+                    // Filter equipment by element type (not unit-specific)
+                    const availableEquipment = Object.values(EQUIPMENT).filter((item) =>
+                      item.allowedElements.includes(unit.element)
+                    );
                     return (
                       <section key={unit.id} className="unit-store-section">
-                        <h2>{unit.name}'s Equipment</h2>
+                        <h2>{unit.name}'s Equipment ({unit.element})</h2>
                         {availableEquipment.length === 0 ? (
                           <div className="shop-empty">No equipment available yet.</div>
                         ) : (
