@@ -107,12 +107,14 @@ function processDialogueEffects(
   if (typeof effects.startBattle === 'string') {
     const encounterId = effects.startBattle;
     console.warn(`Starting battle from dialogue: ${encounterId}`);
+    // Pass true to skipPreBattleDialogue to prevent infinite loop
+    // (we're already IN a pre-battle dialogue)
     store.handleTrigger({
       id: 'dialogue-battle',
       type: 'battle',
       position: { x: 0, y: 0 },
       data: { encounterId },
-    });
+    }, true);
   }
 
   // Handle unit recruitment via dialogue

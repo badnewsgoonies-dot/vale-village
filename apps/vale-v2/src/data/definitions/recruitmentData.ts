@@ -18,6 +18,7 @@ export const ENCOUNTER_TO_RECRUITMENT_DIALOGUE: Record<string, string> = {
   'house-01': 'house-01-recruit',
   'house-02': 'house-02-recruit',
   'house-03': 'house-03-recruit',
+  'house-04': 'house-04-post',
   'house-05': 'house-05-recruit',
   'house-07': 'house-07-djinn',
   'house-08': 'house-08-recruit',

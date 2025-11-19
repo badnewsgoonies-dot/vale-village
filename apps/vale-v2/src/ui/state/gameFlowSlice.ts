@@ -6,6 +6,7 @@ import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
 import { makePRNG } from '@/core/random/prng';
 import { DIALOGUES } from '@/data/definitions/dialogues';
+import { getPreBattleDialogue } from '@/data/definitions/preBattleDialogues';
 import type { QueueBattleSlice } from './queueBattleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
@@ -20,7 +21,7 @@ export interface GameFlowSlice {
   pendingBattleEncounterId: string | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   setPendingBattle: (encounterId: string | null) => void;
-  handleTrigger: (trigger: MapTrigger | null) => void;
+  handleTrigger: (trigger: MapTrigger | null, skipPreBattleDialogue?: boolean) => void;
   confirmBattleTeam: (team: Team) => void;
   resetLastTrigger: () => void;
   returnToOverworld: () => void;
@@ -47,7 +48,7 @@ export const createGameFlowSlice: StateCreator<
       mode: encounterId ? 'team-select' : 'overworld'
     });
   },
-  handleTrigger: (trigger) => {
+  handleTrigger: (trigger, skipPreBattleDialogue = false) => {
     if (!trigger) {
       set({ lastTrigger: null });
       return;
@@ -69,7 +70,19 @@ export const createGameFlowSlice: StateCreator<
         return;
       }
 
-      // Show team selection screen instead of starting battle immediately
+      // Check for pre-battle dialogue (unless skipped - e.g., when triggered from dialogue)
+      if (!skipPreBattleDialogue) {
+        const preBattleDialogue = getPreBattleDialogue(encounterId);
+        if (preBattleDialogue) {
+          // Show pre-battle dialogue first
+          // The dialogue will trigger the battle via effects.startBattle
+          get().startDialogueTree(preBattleDialogue);
+          set({ lastTrigger: trigger });
+          return;
+        }
+      }
+
+      // No pre-battle dialogue (or skipped): go straight to team-select
       set({
         mode: 'team-select',
         pendingBattleEncounterId: encounterId,

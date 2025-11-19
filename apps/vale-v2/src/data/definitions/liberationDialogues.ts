@@ -29,6 +29,7 @@ export const HOUSE_01_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Let\'s see how confident you are after I free that wolf from your control.',
       portrait: 'isaac',
+      effects: { startBattle: 'house-01' },
     },
     {
       id: 'post-battle',
@@ -63,6 +64,7 @@ export const HOUSE_02_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*smirks* Fire, huh? Good thing I brought earth magic. Rock beats flame scout, right?',
       portrait: 'isaac',
+      effects: { startBattle: 'house-02' },
     },
     {
       id: 'post-battle',
@@ -104,6 +106,7 @@ export const HOUSE_03_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*groans* Did you really just make an ice pun? That\'s it, you\'re going down.',
       portrait: 'isaac',
+      effects: { startBattle: 'house-03' },
     },
     {
       id: 'post-battle',
@@ -131,6 +134,7 @@ export const HOUSE_04_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: 'Fast doesn\'t matter if I can predict where you\'ll be. Let\'s go!',
       portrait: 'isaac',
+      effects: { startBattle: 'house-04' },
     },
     {
       id: 'post-battle',
@@ -179,6 +183,7 @@ export const HOUSE_05_DIALOGUE: DialogueTree = {
       speaker: 'Isaac',
       text: '*sigh* Great, the slavers have a training program now. Let\'s see how well that works.',
       portrait: 'isaac',
+      effects: { startBattle: 'house-05' },
     },
     {
       id: 'post-battle',
