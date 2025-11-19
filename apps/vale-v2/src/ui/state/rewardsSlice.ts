@@ -35,20 +35,14 @@ export const createRewardsSlice: StateCreator<
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
 
-    const { setTeam, addUnitToRoster } = get();
+    const { setTeam } = get();
     setTeam(result.updatedTeam);
 
-    // Handle unit recruitment
-    if (result.recruitedUnit) {
-      addUnitToRoster(result.recruitedUnit);
-      console.log(`🎉 Recruited ${result.recruitedUnit.name}!`);
-    }
+    // NOTE: Unit recruitment is now handled via post-battle recruitment dialogues
+    // All recruitment is narrative-driven via dialogue effects (recruitUnit)
 
-    set({ 
-      lastBattleRewards: {
-        ...result.distribution,
-        recruitedUnit: result.recruitedUnit,
-      },
+    set({
+      lastBattleRewards: result.distribution,
       mode: 'rewards', // Set mode instead of showRewards
     });
   },

@@ -9,6 +9,8 @@ import type { GameFlowSlice } from './gameFlowSlice';
 import type { StorySlice } from './storySlice';
 import type { SaveSlice } from './saveSlice';
 import type { TeamSlice } from './teamSlice';
+import { UNIT_DEFINITIONS } from '@/data/definitions/units';
+import { createUnit } from '@/core/models/Unit';
 
 export interface DialogueSlice {
   currentDialogueTree: DialogueTree | null;
@@ -110,6 +112,37 @@ function processDialogueEffects(
       position: { x: 0, y: 0 },
       data: { encounterId },
     });
+  }
+
+  // Handle unit recruitment via dialogue
+  if (typeof effects.recruitUnit === 'string') {
+    const unitId = effects.recruitUnit;
+    const unitDef = UNIT_DEFINITIONS[unitId];
+
+    if (unitDef && store.team) {
+      // Calculate average team level for new recruit
+      const avgLevel = Math.max(1, Math.floor(
+        store.team.units.reduce((sum, u) => sum + u.level, 0) / store.team.units.length
+      ));
+
+      const newUnit = createUnit(unitDef, avgLevel, 0);
+      store.addUnitToRoster(newUnit);
+      console.warn(`🎉 Recruited ${newUnit.name} via dialogue effect!`);
+    } else {
+      console.error(`Failed to recruit unit: ${unitId} (definition not found or no team)`);
+    }
+  }
+
+  // Handle Djinn granting via dialogue
+  if (typeof effects.grantDjinn === 'string') {
+    const djinnId = effects.grantDjinn;
+    const canSetStoryFlag = typeof store.setStoryFlag === 'function';
+
+    if (canSetStoryFlag) {
+      // Use story flag system to grant Djinn (reuse existing logic)
+      store.setStoryFlag(`djinn:${djinnId}`, true);
+      console.warn(`🎉 Granted Djinn ${djinnId} via dialogue effect!`);
+    }
   }
 
   let storyFlagSet = false;

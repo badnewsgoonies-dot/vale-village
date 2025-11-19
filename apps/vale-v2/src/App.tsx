@@ -15,6 +15,23 @@ import { useStore } from './ui/state/store';
 import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
+
+// Map encounter IDs to post-battle recruitment dialogue IDs
+const ENCOUNTER_TO_RECRUITMENT_DIALOGUE: Record<string, string> = {
+  'house-01': 'house-01-recruit',
+  'house-02': 'house-02-recruit',
+  'house-03': 'house-03-recruit',
+  'house-05': 'house-05-recruit',
+  'house-07': 'house-07-djinn',
+  'house-08': 'house-08-recruit',
+  'house-11': 'house-11-recruit',
+  'house-12': 'house-12-djinn',
+  'house-14': 'house-14-recruit',
+  'house-15': 'house-15-recruit',
+  'house-17': 'house-17-recruit',
+  'house-18': 'house-18-djinn',
+  'house-20': 'house-20-djinn',
+};
 import { UNIT_DEFINITIONS } from './data/definitions/units';
 import { DJINN } from './data/definitions/djinn';
 import { createUnit } from './core/models/Unit';
@@ -118,6 +135,7 @@ function App() {
   const handleRewardsContinue = () => {
     // Check if this was the VS1 encounter
     const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
+    const encounterId = battle?.encounterId || battle?.meta?.encounterId;
 
     claimRewards(); // This now sets mode to 'overworld'
     setBattle(null, 0);
@@ -128,6 +146,19 @@ function App() {
       if (postScene) {
         startDialogueTree(postScene); // This sets mode to 'dialogue'
         return;
+      }
+    }
+
+    // Check for recruitment dialogue for Houses 1-20
+    if (encounterId && ENCOUNTER_TO_RECRUITMENT_DIALOGUE[encounterId]) {
+      const dialogueId = ENCOUNTER_TO_RECRUITMENT_DIALOGUE[encounterId];
+      const recruitmentDialogue = DIALOGUES[dialogueId];
+
+      if (recruitmentDialogue) {
+        startDialogueTree(recruitmentDialogue); // This sets mode to 'dialogue'
+        return;
+      } else {
+        console.warn(`Recruitment dialogue ${dialogueId} not found for encounter ${encounterId}`);
       }
     }
 
