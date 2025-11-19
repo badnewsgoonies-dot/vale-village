@@ -597,23 +597,46 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
       
       // Calculate damage dealt this round
       if (queuedActions && enemyHpBefore) {
-        queuedActions.forEach((action) => {
+        // Use for loop instead of forEach to allow await
+        for (const action of queuedActions) {
           const hpBefore = enemyHpBefore[action.targetId] ?? 0;
           const enemyAfter = afterExecution.enemies.find((e: any) => e.id === action.targetId);
           const hpAfter = enemyAfter?.currentHp ?? 0;
           const damageDealt = Math.max(0, hpBefore - hpAfter);
           const wasOneShot = damageDealt >= hpBefore && hpBefore > 0;
           
+          // Get ability name for logging
+          const abilityName = await page.evaluate((abilityId: string | null) => {
+            if (!abilityId) return 'Basic Attack';
+            const store = (window as any).__VALE_STORE__;
+            // Try to find ability in battle state or abilities data
+            const battle = store.getState().battle;
+            if (battle) {
+              // Check player units for this ability
+              for (const unit of battle.playerTeam?.units || []) {
+                const ability = unit.abilities?.find((a: any) => a.id === abilityId);
+                if (ability) return ability.name || abilityId;
+              }
+            }
+            return abilityId;
+          }, action.abilityId);
+          
           stats.actionsUsed.push({
             round: afterExecution.roundNumber,
             unitId: action.unitId,
             abilityId: action.abilityId,
+            abilityName: abilityName,
             targetId: action.targetId,
             damageDealt,
             enemyHpBefore: hpBefore,
             enemyHpAfter: hpAfter,
             wasOneShot,
           });
+          
+          // Log ability usage
+          if (logDetails && action.abilityId !== null) {
+            console.log(`      → ${action.unitId} used ${abilityName} on ${action.targetId} (${damageDealt} damage)`);
+          }
           
           // Update enemy HP snapshot
           enemyHpSnapshot[action.targetId] = hpAfter;
@@ -626,7 +649,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
               enemyStat.roundsToDefeat = afterExecution.roundNumber;
             }
           }
-        });
+        }
       }
       
       // Update player unit stats
@@ -962,6 +985,17 @@ test.describe('Five Houses Real Battle Play', () => {
 
     const initialGold = state?.gold ?? 0;
     const initialRosterSize = state?.rosterSize ?? 0;
+    
+    // Capture initial roster and Djinn state for tracking additions
+    const initialRoster = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
+    });
+    const initialDjinn = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
+    
     console.log(`📊 Initial State:`);
     console.log(`   Gold: ${initialGold}g`);
     console.log(`   Roster: ${initialRosterSize} units`);
@@ -1040,15 +1074,35 @@ test.describe('Five Houses Real Battle Play', () => {
       await equipEquipmentFromInventory(page, 'adept', 'wooden-sword', 'weapon');
     }
     
-    // Add Garet to active team if recruited
+    // Check for unit additions after House 1
     const rosterAfter1 = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
-      return store?.getState()?.roster?.map((u: any) => u.id) ?? [];
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
     });
+    const newUnits1 = rosterAfter1.filter((u: any) => !initialRoster.some((ir: any) => ir.id === u.id));
+    if (newUnits1.length > 0) {
+      newUnits1.forEach((unit: any) => {
+        console.log(`   📦 UNIT ADDED: ${unit.name} (${unit.id}) joined the roster`);
+      });
+    }
     
-    if (rosterAfter1.includes('war-mage') && afterHouse1.teamSize < 4) {
-      console.log('   → Adding Garet to active team...');
+    // Check for Djinn additions after House 1
+    const djinnAfter1 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
+    const newDjinn1 = djinnAfter1.filter((d: any) => !initialDjinn.some((id: any) => id.id === d.id));
+    if (newDjinn1.length > 0) {
+      newDjinn1.forEach((djinn: any) => {
+        console.log(`   🔮 DJINN ADDED: ${djinn.name} (${djinn.id}) added to team`);
+      });
+    }
+    
+    // Add Garet to active team if recruited
+    if (rosterAfter1.some((u: any) => u.id === 'war-mage') && afterHouse1.teamSize < 4) {
+      console.log('   📦 UNIT ADDED: Adding Garet (war-mage) to active team...');
       await addUnitToActiveTeam(page, 'war-mage');
+      console.log('   ✅ Garet added to active team');
     }
     
     console.log('   ✅ House 1 complete\n');
@@ -1098,6 +1152,30 @@ test.describe('Five Houses Real Battle Play', () => {
       teamSize: state?.teamSize ?? 0,
     };
 
+    // Check for unit additions
+    const rosterAfter2 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
+    });
+    const newUnits2 = rosterAfter2.filter((u: any) => !rosterAfter1.some((u1: any) => u1.id === u.id));
+    if (newUnits2.length > 0) {
+      newUnits2.forEach((unit: any) => {
+        console.log(`   📦 UNIT ADDED: ${unit.name} (${unit.id}) joined the roster`);
+      });
+    }
+    
+    // Check for Djinn additions (reuse djinnAfter1 from House 1)
+    const djinnAfter2 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
+    const newDjinn2 = djinnAfter2.filter((d: any) => !djinnAfter1.some((d1: any) => d1.id === d.id));
+    if (newDjinn2.length > 0) {
+      newDjinn2.forEach((djinn: any) => {
+        console.log(`   🔮 DJINN ADDED: ${djinn.name} (${djinn.id}) added to team`);
+      });
+    }
+    
     console.log(`   📊 After House 2:`);
     console.log(`      Gold: ${afterHouse2.gold}g (+${afterHouse2.gold - afterHouse1.gold})`);
     console.log(`      Roster: ${afterHouse2.rosterSize} units (+${afterHouse2.rosterSize - afterHouse1.rosterSize})`);
@@ -1150,6 +1228,30 @@ test.describe('Five Houses Real Battle Play', () => {
       teamSize: state?.teamSize ?? 0,
     };
 
+    // Check for unit additions
+    const rosterAfter3 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
+    });
+    const newUnits3 = rosterAfter3.filter((u: any) => !rosterAfter2.some((u2: any) => u2.id === u.id));
+    if (newUnits3.length > 0) {
+      newUnits3.forEach((unit: any) => {
+        console.log(`   📦 UNIT ADDED: ${unit.name} (${unit.id}) joined the roster`);
+      });
+    }
+    
+    // Check for Djinn additions
+    const djinnAfter3 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
+    const newDjinn3 = djinnAfter3.filter((d: any) => !djinnAfter2.some((d2: any) => d2.id === d.id));
+    if (newDjinn3.length > 0) {
+      newDjinn3.forEach((djinn: any) => {
+        console.log(`   🔮 DJINN ADDED: ${djinn.name} (${djinn.id}) added to team`);
+      });
+    }
+    
     console.log(`   📊 After House 3:`);
     console.log(`      Gold: ${afterHouse3.gold}g (+${afterHouse3.gold - afterHouse2.gold})`);
     console.log(`      Roster: ${afterHouse3.rosterSize} units (+${afterHouse3.rosterSize - afterHouse2.rosterSize})`);
@@ -1186,6 +1288,16 @@ test.describe('Five Houses Real Battle Play', () => {
       gold: state?.gold ?? 0,
       equipmentCount: state?.equipment?.length ?? 0,
     };
+    
+    // Capture roster and Djinn state after House 4 for House 5 comparison
+    const rosterAfter4 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
+    });
+    const djinnAfter4 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
 
     console.log(`   📊 After House 4:`);
     console.log(`      Gold: ${afterHouse4.gold}g (+${afterHouse4.gold - afterHouse3.gold})`);
@@ -1231,6 +1343,30 @@ test.describe('Five Houses Real Battle Play', () => {
 
     await waitForMode(page, 'overworld', 5000);
 
+    // Check for unit additions after House 5
+    const rosterAfter5 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.roster?.map((u: any) => ({ id: u.id, name: u.name })) ?? [];
+    });
+    const newUnits5 = rosterAfter5.filter((u: any) => !rosterAfter4.some((u4: any) => u4.id === u.id));
+    if (newUnits5.length > 0) {
+      newUnits5.forEach((unit: any) => {
+        console.log(`   📦 UNIT ADDED: ${unit.name} (${unit.id}) joined the roster`);
+      });
+    }
+    
+    // Check for Djinn additions after House 5
+    const djinnAfter5 = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.team?.collectedDjinn?.map((d: any) => ({ id: d.id, name: d.name })) ?? [];
+    });
+    const newDjinn5 = djinnAfter5.filter((d: any) => !djinnAfter4.some((d4: any) => d4.id === d.id));
+    if (newDjinn5.length > 0) {
+      newDjinn5.forEach((djinn: any) => {
+        console.log(`   🔮 DJINN ADDED: ${djinn.name} (${djinn.id}) added to team`);
+      });
+    }
+
     // ============================================================================
     // FINAL VERIFICATION
     // ============================================================================
@@ -1265,6 +1401,33 @@ test.describe('Five Houses Real Battle Play', () => {
     console.log(`   Equipment: ${finalState.equipmentCount} items`);
     console.log(`   Equipment List: ${finalEquipment.map(e => `${e.name} (${e.slot})`).join(', ') || 'none'}`);
     console.log(`   Collected Djinn: ${finalState.collectedDjinn}`);
+    
+    // Final abilities summary for all units
+    console.log('\n📚 === FINAL UNIT ABILITIES SUMMARY ===');
+    const finalUnitAbilities = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const team = store.getState().team;
+      return team?.units?.map((unit: any) => ({
+        id: unit.id,
+        name: unit.name,
+        abilities: unit.abilities?.map((a: any) => ({
+          id: a.id,
+          name: a.name || a.id,
+          unlockLevel: a.unlockLevel || 1,
+        })) || [],
+      })) || [];
+    });
+    
+    finalUnitAbilities.forEach((unit: any) => {
+      console.log(`\n   ${unit.name} (${unit.id}):`);
+      if (unit.abilities.length === 0) {
+        console.log(`     No abilities`);
+      } else {
+        unit.abilities.forEach((ability: any) => {
+          console.log(`     - ${ability.name} (unlocks at level ${ability.unlockLevel})`);
+        });
+      }
+    });
 
     // Verify progression
     expect(finalState.gold).toBeGreaterThan(initialGold);
@@ -1309,6 +1472,24 @@ test.describe('Five Houses Real Battle Play', () => {
       console.log(`   Total Actions: ${stats.actionsUsed.length}`);
       console.log(`   - Basic Attacks: ${basicAttacks}`);
       console.log(`   - Abilities Used: ${abilityUses}`);
+      
+      // Detailed ability usage breakdown
+      if (abilityUses > 0) {
+        const abilityUsageMap = new Map<string, number>();
+        stats.actionsUsed.forEach((action) => {
+          if (action.abilityId !== null) {
+            const abilityName = (action as any).abilityName || action.abilityId;
+            abilityUsageMap.set(abilityName, (abilityUsageMap.get(abilityName) || 0) + 1);
+          }
+        });
+        console.log(`   Ability Usage Breakdown:`);
+        Array.from(abilityUsageMap.entries())
+          .sort((a, b) => b[1] - a[1])
+          .forEach(([abilityName, count]) => {
+            console.log(`     - ${abilityName}: ${count} time(s)`);
+          });
+      }
+      
       console.log(`   Total Damage Dealt: ${totalDamage}`);
       console.log(`   Average Damage per Action: ${avgDamage.toFixed(1)}`);
       console.log(`   One-Shots: ${oneShots} (${stats.actionsUsed.length > 0 ? ((oneShots / stats.actionsUsed.length) * 100).toFixed(1) : 0}%)`);
