@@ -191,9 +191,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                             <div className="ability-description">{ability.description}</div>
                             <div className="ability-stats">
                               {ability.type && <span>Type: {ability.type}</span>}
-                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                <span>PP: {ability.manaCost}</span>
-                              )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                               {ability.basePower !== undefined && ability.basePower > 0 && (
                                 <span>Power: {ability.basePower}</span>
                               )}
@@ -258,7 +258,6 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                         </div>
                         <div className="stats-grid">
                           <div>HP: {enemy.stats.hp}</div>
-                          <div>PP: {enemy.stats.pp}</div>
                           <div>ATK: {enemy.stats.atk}</div>
                           <div>DEF: {enemy.stats.def}</div>
                           <div>MAG: {enemy.stats.mag}</div>
@@ -276,9 +275,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                                   <div className="ability-description">{ability.description}</div>
                                   <div className="ability-stats">
                                     {ability.type && <span>Type: {ability.type}</span>}
-                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                      <span>PP: {ability.manaCost}</span>
-                                    )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                                     {ability.basePower !== undefined && ability.basePower > 0 && (
                                       <span>Power: {ability.basePower}</span>
                                     )}
@@ -323,7 +322,6 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                         </div>
                         <div className="stats-grid">
                           <div>HP: {enemy.stats.hp}</div>
-                          <div>PP: {enemy.stats.pp}</div>
                           <div>ATK: {enemy.stats.atk}</div>
                           <div>DEF: {enemy.stats.def}</div>
                           <div>MAG: {enemy.stats.mag}</div>
@@ -341,9 +339,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                                   <div className="ability-description">{ability.description}</div>
                                   <div className="ability-stats">
                                     {ability.type && <span>Type: {ability.type}</span>}
-                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                      <span>PP: {ability.manaCost}</span>
-                                    )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                                     {ability.basePower !== undefined && ability.basePower > 0 && (
                                       <span>Power: {ability.basePower}</span>
                                     )}
@@ -397,7 +395,6 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
   const statsLv1 = unit.baseStats;
   const statsLv5 = {
     hp: unit.baseStats.hp + (unit.growthRates.hp * 4),
-    pp: unit.baseStats.pp + (unit.growthRates.pp * 4),
     atk: unit.baseStats.atk + (unit.growthRates.atk * 4),
     def: unit.baseStats.def + (unit.growthRates.def * 4),
     mag: unit.baseStats.mag + (unit.growthRates.mag * 4),
@@ -405,7 +402,6 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
   };
   const statsLv10 = {
     hp: unit.baseStats.hp + (unit.growthRates.hp * 9),
-    pp: unit.baseStats.pp + (unit.growthRates.pp * 9),
     atk: unit.baseStats.atk + (unit.growthRates.atk * 9),
     def: unit.baseStats.def + (unit.growthRates.def * 9),
     mag: unit.baseStats.mag + (unit.growthRates.mag * 9),
@@ -432,7 +428,7 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
             <div>Lv 1</div>
             <div>Lv 5</div>
             <div>Lv 10</div>
-            <div>Growth</div>
+            <div>Growth/Value</div>
           </div>
           <div className="stats-row">
             <div>HP</div>
@@ -442,11 +438,11 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
             <div>+{unit.growthRates.hp}/lv</div>
           </div>
           <div className="stats-row">
-            <div>PP</div>
-            <div>{statsLv1.pp}</div>
-            <div>{statsLv5.pp}</div>
-            <div>{statsLv10.pp}</div>
-            <div>+{unit.growthRates.pp}/lv</div>
+            <div>Mana Contribution</div>
+            <div>{unit.manaContribution}</div>
+            <div>{unit.manaContribution}</div>
+            <div>{unit.manaContribution}</div>
+            <div>Fixed</div>
           </div>
           <div className="stats-row">
             <div>ATK</div>
@@ -498,7 +494,7 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
                     <span>Type: {ability.type}</span>
                     {ability.element && <span>Element: {ability.element}</span>}
                     {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                      <span>PP Cost: {ability.manaCost}</span>
+                      <span>Mana Cost: {ability.manaCost}</span>
                     )}
                     {ability.basePower !== undefined && ability.basePower > 0 && (
                       <span>Power: {ability.basePower}</span>
@@ -576,9 +572,9 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}
-                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                <span>PP: {ability.manaCost}</span>
-                              )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                               {ability.basePower !== undefined && ability.basePower > 0 && (
                                 <span>Power: {ability.basePower}</span>
                               )}
@@ -600,9 +596,9 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}
-                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                <span>PP: {ability.manaCost}</span>
-                              )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                               {ability.basePower !== undefined && ability.basePower > 0 && (
                                 <span>Power: {ability.basePower}</span>
                               )}
@@ -624,9 +620,9 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}
-                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                                <span>PP: {ability.manaCost}</span>
-                              )}
+                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                          <span>Mana: {ability.manaCost}</span>
+                        )}
                               {ability.basePower !== undefined && ability.basePower > 0 && (
                                 <span>Power: {ability.basePower}</span>
                               )}
