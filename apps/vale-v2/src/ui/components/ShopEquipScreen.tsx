@@ -33,10 +33,11 @@ interface ShopEquipScreenProps {
 const EQUIPMENT_SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'helm', 'boots', 'accessory'];
 
 export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
-  const { gold, addGold, addEquipment, team, updateTeamUnits, equipment: inventory } = useStore((s) => ({
+  const { gold, addGold, addEquipment, removeEquipment, team, updateTeamUnits, equipment: inventory } = useStore((s) => ({
     gold: s.gold,
     addGold: s.addGold,
     addEquipment: s.addEquipment,
+    removeEquipment: s.removeEquipment,
     team: s.team,
     updateTeamUnits: s.updateTeamUnits,
     equipment: s.equipment,
@@ -122,6 +123,16 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const handleEquip = (equipment: Equipment) => {
     if (!selectedUnit || !selectedSlot) return;
     
+    // If there's already an item in this slot, return it to inventory first
+    const currentItem = selectedUnit.equipment[selectedSlot];
+    if (currentItem) {
+      addEquipment([currentItem]);
+    }
+    
+    // Remove the new item from inventory
+    removeEquipment(equipment.id);
+    
+    // Equip the new item
     const newEquipment = { ...selectedUnit.equipment, [selectedSlot]: equipment };
     const updatedUnit = updateUnit(selectedUnit, { equipment: newEquipment });
     
@@ -133,8 +144,17 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const handleUnequip = (slot: EquipmentSlot) => {
     if (!selectedUnit) return;
     
+    // Get the item being unequipped
+    const itemToUnequip = selectedUnit.equipment[slot];
+    
+    // Update unit equipment (set slot to null)
     const newEquipment = { ...selectedUnit.equipment, [slot]: null };
     const updatedUnit = updateUnit(selectedUnit, { equipment: newEquipment });
+    
+    // Return item to inventory if it exists
+    if (itemToUnequip) {
+      addEquipment([itemToUnequip]);
+    }
     
     const updatedUnits = team!.units.map((u) => (u.id === selectedUnit.id ? updatedUnit : u));
     updateTeamUnits(updatedUnits);
