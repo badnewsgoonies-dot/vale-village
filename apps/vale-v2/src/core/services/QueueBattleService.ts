@@ -15,7 +15,7 @@ import { updateBattleState } from '../models/BattleState';
 import { updateTeam } from '../models/Team';
 import { isUnitKO } from '../models/Unit';
 import { createEmptyQueue } from '../constants';
-import { getAbilityManaCost, canAffordAction, isQueueComplete, validateQueuedActions } from '../algorithms/mana';
+import { getAbilityManaCost, canAffordAction, validateQueuedActions } from '../algorithms/mana';
 import { Result, Ok, Err } from '../utils/result';
 import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
 import { getEffectiveSPD, calculateEffectiveStats } from '../algorithms/stats';
@@ -197,10 +197,23 @@ function validateQueueForExecution(state: BattleState): Result<BattleState, stri
   if (state.phase !== 'planning') {
     return Err('Can only execute round from planning phase');
   }
-  const teamSize = state.playerTeam.units.length;
-  if (!isQueueComplete(state.queuedActions, teamSize)) {
-    return Err('Cannot execute: queue is not complete');
+  
+  // BUG FIX: Only require actions for ALIVE units, not all units
+  // Dead units don't need actions queued
+  const aliveUnits = state.playerTeam.units.filter(u => !isUnitKO(u));
+  const aliveUnitCount = aliveUnits.length;
+  
+  // Check that we have actions for all alive units
+  // Note: queuedActions array may have null entries for dead units, which is fine
+  const aliveUnitActions = state.queuedActions.filter((action, index) => {
+    const unit = state.playerTeam.units[index];
+    return unit && !isUnitKO(unit) && action !== null;
+  });
+  
+  if (aliveUnitActions.length !== aliveUnitCount) {
+    return Err(`Cannot execute: queue incomplete. Expected ${aliveUnitCount} actions for alive units, got ${aliveUnitActions.length}`);
   }
+  
   // BUG FIX: Validate against maxMana, not remainingMana
   // remainingMana was already decremented during queueing, so we need to check
   // the total cost against the original pool
@@ -793,6 +806,19 @@ function generateEnemyActions(
 function checkBattleEnd(state: BattleState): 'PLAYER_VICTORY' | 'PLAYER_DEFEAT' | null {
   const allEnemiesKO = state.enemies.every(e => isUnitKO(e));
   const allPlayersKO = state.playerTeam.units.every(u => isUnitKO(u));
+
+  // BUG FIX: Defensive check - verify that allPlayersKO is actually correct
+  // If we detect a mismatch (allPlayersKO is true but some units have HP > 0),
+  // this indicates a bug - log and return null to prevent incorrect defeat
+  const aliveUnits = state.playerTeam.units.filter(u => !isUnitKO(u));
+  if (allPlayersKO && aliveUnits.length > 0) {
+    console.warn('[QueueBattle] BUG: checkBattleEnd detected all players KO but some units are alive!', {
+      units: state.playerTeam.units.map(u => ({ id: u.id, currentHp: u.currentHp, isKO: isUnitKO(u) })),
+      aliveUnits: aliveUnits.map(u => ({ id: u.id, currentHp: u.currentHp })),
+      allPlayersKO,
+    });
+    return null; // Continue battle - this is a false positive
+  }
 
   // Check for simultaneous wipe-out (rare but possible)
   if (allEnemiesKO && allPlayersKO) {
