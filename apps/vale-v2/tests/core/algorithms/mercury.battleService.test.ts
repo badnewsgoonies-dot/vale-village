@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { BattleService } from '@/core/services/BattleService';
+import { executeAbility } from '@/core/services/BattleService';
 import { createUnit } from '@/core/models/Unit';
 import { createTeam } from '@/core/models/Team';
 import { createBattleState } from '@/core/models/BattleState';
@@ -122,12 +122,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally1, ally2, dummy]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy('enemy1'),
       createEnemy('enemy2'),
       createEnemy('enemy3'),
       createEnemy('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -152,9 +152,17 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     const ally1PreStatuses = ally1.statusEffects.length;
     const ally2PreStatuses = ally2.statusEffects.length;
 
-    // Execute ability through BattleService
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally1, ally2]);
+    // Execute ability through executeAbility
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally1, ally2], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     // Find updated allies
     const ally1After = updatedBattle.playerTeam.units.find(u => u.id === 'ally1');
@@ -226,12 +234,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally1, ally2, ally3]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy2('enemy1'),
       createEnemy2('enemy2'),
       createEnemy2('enemy3'),
       createEnemy2('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -250,9 +258,17 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
       grantImmunity: { all: false, types: ['burn', 'poison', 'freeze'], duration: 1 },
     };
 
-    // Execute ability through BattleService
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally1, ally2, ally3]);
+    // Execute ability through executeAbility
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally1, ally2, ally3], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     // Find updated allies
     const ally1After = updatedBattle.playerTeam.units.find(u => u.id === 'ally1');
@@ -333,7 +349,6 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     const dummies = [
       createDummy('dummy1'),
       createDummy('dummy2'),
-      createDummy('dummy3'),
     ];
 
     const createEnemy3 = (id: string) => {
@@ -351,12 +366,12 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
     };
 
     const playerTeam = createTeam([caster, ally, ...dummies]);
-    const enemyTeam = createTeam([
+    const enemyTeam = [
       createEnemy3('enemy1'),
       createEnemy3('enemy2'),
       createEnemy3('enemy3'),
       createEnemy3('enemy4'),
-    ]);
+    ];
 
     const battle = createBattleState(playerTeam, enemyTeam, { seed: 123 });
 
@@ -374,8 +389,16 @@ describe('Mercury BattleService Execution (Phase 2)', () => {
       grantImmunity: { all: false, types: ['burn', 'poison'], duration: 1 },
     };
 
-    const battleService = new BattleService();
-    const updatedBattle = battleService.executeAbility(battle, caster, ability, [ally]);
+    const allUnits = [...battle.playerTeam.units, ...battle.enemies];
+    const result = executeAbility(caster, ability, [ally], allUnits, battle.playerTeam, battle.enemies, rng);
+    const updatedBattle = {
+      ...battle,
+      playerTeam: {
+        ...battle.playerTeam,
+        units: result.updatedUnits.filter(u => battle.playerTeam.units.some(pu => pu.id === u.id)),
+      },
+      enemies: result.updatedUnits.filter(u => battle.enemies.some(eu => eu.id === u.id)),
+    };
 
     const allyAfter = updatedBattle.playerTeam.units.find(u => u.id === ally.id);
     expect(allyAfter).toBeDefined();
