@@ -1,6 +1,5 @@
 /**
  * CompendiumScreen Component
- * Displays game data in tabs: Units, Equipment, Djinn, Enemies, Bosses, NPCs
  * Enhanced with detailed stats, abilities, and descriptions
  */
 
@@ -30,8 +29,8 @@ const BOSS_ENEMY_IDS = new Set([
 
 export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
   const [activeTab, setActiveTab] = useState<CompendiumTab>('units');
-  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
-  const [selectedDjinn, setSelectedDjinn] = useState<string | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [selectedDjinnId, setSelectedDjinnId] = useState<string | null>(null);
 
   const tabs: { id: CompendiumTab; label: string }[] = [
     { id: 'units', label: 'Units' },
@@ -47,9 +46,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
-        if (selectedUnit || selectedDjinn) {
-          setSelectedUnit(null);
-          setSelectedDjinn(null);
+        if (selectedUnitId || selectedDjinnId) {
+          setSelectedUnitId(null);
+          setSelectedDjinnId(null);
         } else {
           onClose();
         }
@@ -58,7 +57,8 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
 
       // Arrow key navigation between tabs
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        if (selectedUnit || selectedDjinn) return; // Don't navigate tabs when viewing details
+        if (selectedUnitId || selectedDjinnId) return; // Don't navigate tabs when viewing details
+        
         event.preventDefault();
         event.stopPropagation();
         const currentIndex = tabs.findIndex((t) => t.id === activeTab);
@@ -80,7 +80,7 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [activeTab, tabs, onClose, selectedUnit, selectedDjinn]);
+  }, [activeTab, tabs, onClose, selectedUnitId, selectedDjinnId]);
 
   // Filter enemies into regular and boss
   const regularEnemies = Object.values(ENEMIES).filter(
@@ -89,376 +89,6 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
   const bossEnemies = Object.values(ENEMIES).filter((enemy) =>
     BOSS_ENEMY_IDS.has(enemy.id)
   );
-
-  // Units Tab - Detailed View
-  const renderUnitsTab = () => {
-    if (selectedUnit) {
-      const unit = UNIT_DEFINITIONS[selectedUnit];
-      if (!unit) return null;
-
-      const abilities = unit.abilities.map((abilityRef) => {
-        const ability = ABILITIES[abilityRef.id];
-        return { ...abilityRef, details: ability };
-      });
-
-      return (
-        <div className="compendium-detail-view">
-          <button className="back-btn" onClick={() => setSelectedUnit(null)}>← Back</button>
-          <div className="detail-header">
-            <h2>{unit.name}</h2>
-            <div className="detail-subtitle">{unit.role} • {unit.element}</div>
-          </div>
-          
-          <div className="detail-content">
-            <div className="detail-section">
-              <h3>Base Stats (Level 1)</h3>
-              <div className="stats-grid">
-                <div className="stat-item"><span>HP:</span> <strong>{unit.baseStats.hp}</strong></div>
-                <div className="stat-item"><span>PP:</span> <strong>{unit.baseStats.pp}</strong></div>
-                <div className="stat-item"><span>ATK:</span> <strong>{unit.baseStats.atk}</strong></div>
-                <div className="stat-item"><span>DEF:</span> <strong>{unit.baseStats.def}</strong></div>
-                <div className="stat-item"><span>MAG:</span> <strong>{unit.baseStats.mag}</strong></div>
-                <div className="stat-item"><span>SPD:</span> <strong>{unit.baseStats.spd}</strong></div>
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h3>Growth Rates (per level)</h3>
-              <div className="stats-grid">
-                <div className="stat-item"><span>HP:</span> <strong>+{unit.growthRates.hp}</strong></div>
-                <div className="stat-item"><span>PP:</span> <strong>+{unit.growthRates.pp}</strong></div>
-                <div className="stat-item"><span>ATK:</span> <strong>+{unit.growthRates.atk}</strong></div>
-                <div className="stat-item"><span>DEF:</span> <strong>+{unit.growthRates.def}</strong></div>
-                <div className="stat-item"><span>MAG:</span> <strong>+{unit.growthRates.mag}</strong></div>
-                <div className="stat-item"><span>SPD:</span> <strong>+{unit.growthRates.spd}</strong></div>
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h3>Abilities</h3>
-              <div className="abilities-list">
-                {abilities.map((ability) => (
-                  <div key={ability.id} className="ability-item">
-                    <div className="ability-header">
-                      <span className="ability-name">{ability.details?.name || ability.id}</span>
-                      <span className="ability-level">Lv {ability.unlockLevel}</span>
-                    </div>
-                    <div className="ability-description">
-                      {ability.details?.description || 'No description'}
-                    </div>
-                    {ability.details && (
-                      <div className="ability-details">
-                        <span>Type: {ability.details.type}</span>
-                        {ability.details.element && <span>Element: {ability.details.element}</span>}
-                        {ability.details.manaCost > 0 && <span>Cost: {ability.details.manaCost} PP</span>}
-                        {ability.details.basePower > 0 && <span>Power: {ability.details.basePower}</span>}
-                        <span>Targets: {ability.details.targets}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {unit.description && (
-              <div className="detail-section">
-                <h3>Description</h3>
-                <p>{unit.description}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="compendium-section">
-        <h2>Units ({Object.keys(UNIT_DEFINITIONS).length})</h2>
-        <div className="compendium-grid">
-          {Object.values(UNIT_DEFINITIONS).map((unit) => (
-            <div
-              key={unit.id}
-              className="compendium-item clickable"
-              onClick={() => setSelectedUnit(unit.id)}
-            >
-              <div className="item-name">{unit.name}</div>
-              <div className="item-details">
-                <div>Element: {unit.element}</div>
-                <div>Role: {unit.role}</div>
-                <div>HP: {unit.baseStats.hp} | ATK: {unit.baseStats.atk} | DEF: {unit.baseStats.def}</div>
-                <div className="click-hint">Click for details</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Equipment Tab - Detailed View
-  const renderEquipmentTab = () => {
-    return (
-      <div className="compendium-section">
-        <h2>Equipment ({Object.keys(EQUIPMENT).length})</h2>
-        <div className="compendium-grid">
-          {Object.values(EQUIPMENT).map((equip) => {
-            const ability = equip.unlocksAbility ? ABILITIES[equip.unlocksAbility] : null;
-            return (
-              <div key={equip.id} className="compendium-item equipment-item">
-                <div className="item-name">{equip.name}</div>
-                <div className="item-details">
-                  <div className="equip-slot-tier">
-                    <span className="equip-slot">{equip.slot}</span>
-                    <span className="equip-tier">{equip.tier}</span>
-                  </div>
-                  <div>Cost: {equip.cost} gold</div>
-                  {equip.statBonus && (
-                    <div className="stat-bonuses">
-                      <strong>Stats:</strong> {Object.entries(equip.statBonus)
-                        .map(([stat, val]) => `${stat.toUpperCase()}+${val}`)
-                        .join(', ')}
-                    </div>
-                  )}
-                  {equip.allowedElements && equip.allowedElements.length > 0 && (
-                    <div className="allowed-elements">
-                      <strong>Elements:</strong> {equip.allowedElements.join(', ')}
-                    </div>
-                  )}
-                  {ability && (
-                    <div className="equipment-ability">
-                      <div className="ability-name-small">
-                        <strong>Unlocks:</strong> {ability.name}
-                      </div>
-                      <div className="ability-description-small">{ability.description}</div>
-                      <div className="ability-details-small">
-                        {ability.type} • {ability.targets}
-                        {ability.manaCost > 0 && ` • ${ability.manaCost} PP`}
-                        {ability.basePower > 0 && ` • Power: ${ability.basePower}`}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // Djinn Tab - Network View
-  const renderDjinnTab = () => {
-    if (selectedDjinn) {
-      const djinn = DJINN[selectedDjinn];
-      if (!djinn) return null;
-
-      return (
-        <div className="compendium-detail-view">
-          <button className="back-btn" onClick={() => setSelectedDjinn(null)}>← Back</button>
-          <div className="detail-header">
-            <h2>{djinn.name}</h2>
-            <div className="detail-subtitle">{djinn.element} • Tier {djinn.tier}</div>
-          </div>
-
-          <div className="detail-content">
-            <div className="detail-section">
-              <h3>Summon Effect</h3>
-              <div className="summon-effect">
-                <div className="summon-type">{djinn.summonEffect.type}</div>
-                <div className="summon-description">{djinn.summonEffect.description}</div>
-                {djinn.summonEffect.type === 'damage' && 'damage' in djinn.summonEffect && (
-                  <div>Damage: {djinn.summonEffect.damage}</div>
-                )}
-                {djinn.summonEffect.type === 'heal' && 'healAmount' in djinn.summonEffect && (
-                  <div>Heal Amount: {djinn.summonEffect.healAmount}</div>
-                )}
-                {djinn.summonEffect.type === 'buff' && 'statBonus' in djinn.summonEffect && (
-                  <div>
-                    Stat Bonus: {Object.entries(djinn.summonEffect.statBonus || {})
-                      .map(([stat, val]) => `${stat.toUpperCase()}+${val}`)
-                      .join(', ')}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h3>Granted Abilities by Unit</h3>
-              <div className="djinn-abilities-network">
-                {Object.entries(djinn.grantedAbilities).map(([unitId, abilityGroups]) => {
-                  const unit = UNIT_DEFINITIONS[unitId];
-                  if (!unit) return null;
-
-                  return (
-                    <div key={unitId} className="unit-ability-group">
-                      <div className="unit-header">{unit.name} ({unit.element})</div>
-                      <div className="compatibility-groups">
-                        {Object.entries(abilityGroups).map(([compatibility, abilityIds]) => {
-                          if (abilityIds.length === 0) return null;
-                          return (
-                            <div key={compatibility} className={`compatibility-group ${compatibility}`}>
-                              <div className="compatibility-label">
-                                {compatibility === 'same' ? 'Same Element' : 
-                                 compatibility === 'counter' ? 'Counter Element' : 
-                                 'Neutral'}
-                              </div>
-                              <div className="abilities-list">
-                                {abilityIds.map((abilityId) => {
-                                  const ability = DJINN_ABILITIES[abilityId];
-                                  return (
-                                    <div key={abilityId} className="ability-item-small">
-                                      <div className="ability-name-small">{ability?.name || abilityId}</div>
-                                      <div className="ability-description-small">
-                                        {ability?.description || 'No description'}
-                                      </div>
-                                      {ability && (
-                                        <div className="ability-details-small">
-                                          {ability.type} • {ability.targets}
-                                          {ability.manaCost > 0 && ` • ${ability.manaCost} PP`}
-                                          {ability.basePower > 0 && ` • Power: ${ability.basePower}`}
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="compendium-section">
-        <h2>Djinn ({Object.keys(DJINN).length})</h2>
-        <div className="compendium-grid">
-          {Object.values(DJINN).map((djinn) => (
-            <div
-              key={djinn.id}
-              className="compendium-item clickable"
-              onClick={() => setSelectedDjinn(djinn.id)}
-            >
-              <div className="item-name">{djinn.name}</div>
-              <div className="item-details">
-                <div>Element: {djinn.element}</div>
-                <div>Tier: {djinn.tier}</div>
-                <div>Summon: {djinn.summonEffect.type}</div>
-                <div className="click-hint">Click for ability details</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Enemies Tab - Detailed View
-  const renderEnemiesTab = () => {
-    return (
-      <div className="compendium-section">
-        <h2>Enemies ({regularEnemies.length})</h2>
-        <div className="compendium-grid">
-          {regularEnemies.map((enemy) => {
-            const abilities = enemy.abilities.map((abilityRef) => {
-              const ability = ABILITIES[abilityRef.id];
-              return { ...abilityRef, details: ability };
-            });
-
-            return (
-              <div key={enemy.id} className="compendium-item enemy-item">
-                <div className="item-name">{enemy.name}</div>
-                <div className="item-details">
-                  <div className="enemy-stats">
-                    <div>Level {enemy.level} • {enemy.element}</div>
-                    <div>HP: {enemy.stats.hp} | PP: {enemy.stats.pp}</div>
-                    <div>ATK: {enemy.stats.atk} | DEF: {enemy.stats.def}</div>
-                    <div>MAG: {enemy.stats.mag} | SPD: {enemy.stats.spd}</div>
-                  </div>
-                  <div className="enemy-rewards">
-                    <div>XP: {enemy.baseXp} | Gold: {enemy.baseGold}</div>
-                  </div>
-                  <div className="enemy-abilities">
-                    <strong>Abilities:</strong>
-                    {abilities.map((ability) => (
-                      <div key={ability.id} className="ability-item-small">
-                        <span className="ability-name-small">
-                          {ability.details?.name || ability.id}
-                        </span>
-                        {ability.unlockLevel > 1 && (
-                          <span className="ability-level"> (Lv {ability.unlockLevel})</span>
-                        )}
-                        {ability.details?.description && (
-                          <div className="ability-description-small">{ability.details.description}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // Bosses Tab - Detailed View
-  const renderBossesTab = () => {
-    return (
-      <div className="compendium-section">
-        <h2>Boss Enemies ({bossEnemies.length})</h2>
-        <div className="compendium-grid">
-          {bossEnemies.map((enemy) => {
-            const abilities = enemy.abilities.map((abilityRef) => {
-              const ability = ABILITIES[abilityRef.id];
-              return { ...abilityRef, details: ability };
-            });
-
-            return (
-              <div key={enemy.id} className="compendium-item enemy-item boss-item">
-                <div className="item-name boss-name">{enemy.name} ⭐</div>
-                <div className="item-details">
-                  <div className="enemy-stats">
-                    <div>Level {enemy.level} • {enemy.element}</div>
-                    <div>HP: {enemy.stats.hp} | PP: {enemy.stats.pp}</div>
-                    <div>ATK: {enemy.stats.atk} | DEF: {enemy.stats.def}</div>
-                    <div>MAG: {enemy.stats.mag} | SPD: {enemy.stats.spd}</div>
-                  </div>
-                  <div className="enemy-rewards">
-                    <div>XP: {enemy.baseXp} | Gold: {enemy.baseGold}</div>
-                  </div>
-                  <div className="enemy-abilities">
-                    <strong>Abilities:</strong>
-                    {abilities.map((ability) => (
-                      <div key={ability.id} className="ability-item-small">
-                        <span className="ability-name-small">
-                          {ability.details?.name || ability.id}
-                        </span>
-                        {ability.unlockLevel > 1 && (
-                          <span className="ability-level"> (Lv {ability.unlockLevel})</span>
-                        )}
-                        {ability.details?.description && (
-                          <div className="ability-description-small">{ability.details.description}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="compendium-overlay" onClick={onClose}>
@@ -477,8 +107,8 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
               className={`compendium-tab ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab(tab.id);
-                setSelectedUnit(null);
-                setSelectedDjinn(null);
+                setSelectedUnitId(null);
+                setSelectedDjinnId(null);
               }}
             >
               {tab.label}
@@ -487,11 +117,258 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
         </div>
 
         <div className="compendium-content">
-          {activeTab === 'units' && renderUnitsTab()}
-          {activeTab === 'equipment' && renderEquipmentTab()}
-          {activeTab === 'djinn' && renderDjinnTab()}
-          {activeTab === 'enemies' && renderEnemiesTab()}
-          {activeTab === 'bosses' && renderBossesTab()}
+          {activeTab === 'units' && (
+            <div className="compendium-section">
+              <h2>Recruitable Units ({Object.keys(UNIT_DEFINITIONS).length})</h2>
+              {selectedUnitId ? (
+                <UnitDetailView
+                  unitId={selectedUnitId}
+                  onBack={() => setSelectedUnitId(null)}
+                />
+              ) : (
+                <div className="compendium-grid">
+                  {Object.values(UNIT_DEFINITIONS).map((unit) => (
+                    <div
+                      key={unit.id}
+                      className="compendium-item clickable"
+                      onClick={() => setSelectedUnitId(unit.id)}
+                    >
+                      <div className="item-name">{unit.name}</div>
+                      <div className="item-details">
+                        <div>Element: {unit.element}</div>
+                        <div>Role: {unit.role}</div>
+                        <div>Level 1 HP: {unit.baseStats.hp}</div>
+                        <div className="click-hint">Click for details</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'equipment' && (
+            <div className="compendium-section">
+              <h2>Equipment ({Object.keys(EQUIPMENT).length})</h2>
+              <div className="compendium-grid">
+                {Object.values(EQUIPMENT).map((equip) => {
+                  const ability = equip.unlocksAbility ? ABILITIES[equip.unlocksAbility] : null;
+                  return (
+                    <div key={equip.id} className="compendium-item detailed">
+                      <div className="item-name">{equip.name}</div>
+                      <div className="item-details">
+                        <div className="detail-row">
+                          <span className="detail-label">Slot:</span>
+                          <span className="detail-value">{equip.slot}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Tier:</span>
+                          <span className="detail-value">{equip.tier}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Cost:</span>
+                          <span className="detail-value">{equip.cost} gold</span>
+                        </div>
+                        {equip.statBonus && (
+                          <div className="detail-row">
+                            <span className="detail-label">Stats:</span>
+                            <span className="detail-value">
+                              {Object.entries(equip.statBonus)
+                                .map(([stat, val]) => `${stat.toUpperCase()}+${val}`)
+                                .join(', ')}
+                            </span>
+                          </div>
+                        )}
+                        {equip.allowedElements && equip.allowedElements.length > 0 && (
+                          <div className="detail-row">
+                            <span className="detail-label">Elements:</span>
+                            <span className="detail-value">{equip.allowedElements.join(', ')}</span>
+                          </div>
+                        )}
+                        {ability && (
+                          <div className="ability-section">
+                            <div className="ability-name">{ability.name}</div>
+                            <div className="ability-description">{ability.description}</div>
+                            <div className="ability-stats">
+                              {ability.type && <span>Type: {ability.type}</span>}
+                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                <span>PP: {ability.manaCost}</span>
+                              )}
+                              {ability.basePower !== undefined && ability.basePower > 0 && (
+                                <span>Power: {ability.basePower}</span>
+                              )}
+                              {ability.targets && <span>Target: {ability.targets}</span>}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'djinn' && (
+            <div className="compendium-section">
+              <h2>Djinn ({Object.keys(DJINN).length})</h2>
+              {selectedDjinnId ? (
+                <DjinnDetailView
+                  djinnId={selectedDjinnId}
+                  onBack={() => setSelectedDjinnId(null)}
+                />
+              ) : (
+                <div className="compendium-grid">
+                  {Object.values(DJINN).map((djinn) => (
+                    <div
+                      key={djinn.id}
+                      className="compendium-item clickable"
+                      onClick={() => setSelectedDjinnId(djinn.id)}
+                    >
+                      <div className="item-name">{djinn.name}</div>
+                      <div className="item-details">
+                        <div>Element: {djinn.element}</div>
+                        <div>Tier: {djinn.tier}</div>
+                        <div>Summon: {djinn.summonEffect.type}</div>
+                        <div className="click-hint">Click for ability network</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'enemies' && (
+            <div className="compendium-section">
+              <h2>Enemies ({regularEnemies.length})</h2>
+              <div className="compendium-grid">
+                {regularEnemies.map((enemy) => {
+                  return (
+                    <div key={enemy.id} className="compendium-item detailed">
+                      <div className="item-name">{enemy.name}</div>
+                      <div className="item-details">
+                        <div className="detail-row">
+                          <span className="detail-label">Element:</span>
+                          <span className="detail-value">{enemy.element}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Level:</span>
+                          <span className="detail-value">{enemy.level}</span>
+                        </div>
+                        <div className="stats-grid">
+                          <div>HP: {enemy.stats.hp}</div>
+                          <div>PP: {enemy.stats.pp}</div>
+                          <div>ATK: {enemy.stats.atk}</div>
+                          <div>DEF: {enemy.stats.def}</div>
+                          <div>MAG: {enemy.stats.mag}</div>
+                          <div>SPD: {enemy.stats.spd}</div>
+                        </div>
+                        {enemy.abilities && enemy.abilities.length > 0 && (
+                          <div className="ability-section">
+                            <div className="ability-header">Abilities:</div>
+                            {enemy.abilities.map((abilityRef, idx) => {
+                              const ability = ABILITIES[abilityRef.id];
+                              if (!ability) return null;
+                              return (
+                                <div key={idx} className="ability-item">
+                                  <div className="ability-name">{ability.name}</div>
+                                  <div className="ability-description">{ability.description}</div>
+                                  <div className="ability-stats">
+                                    {ability.type && <span>Type: {ability.type}</span>}
+                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                      <span>PP: {ability.manaCost}</span>
+                                    )}
+                                    {ability.basePower !== undefined && ability.basePower > 0 && (
+                                      <span>Power: {ability.basePower}</span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="detail-row">
+                          <span className="detail-label">XP:</span>
+                          <span className="detail-value">{enemy.baseXp}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Gold:</span>
+                          <span className="detail-value">{enemy.baseGold}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'bosses' && (
+            <div className="compendium-section">
+              <h2>Boss Enemies ({bossEnemies.length})</h2>
+              <div className="compendium-grid">
+                {bossEnemies.map((enemy) => {
+                  return (
+                    <div key={enemy.id} className="compendium-item detailed boss">
+                      <div className="item-name boss-name">{enemy.name}</div>
+                      <div className="item-details">
+                        <div className="detail-row">
+                          <span className="detail-label">Element:</span>
+                          <span className="detail-value">{enemy.element}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Level:</span>
+                          <span className="detail-value">{enemy.level}</span>
+                        </div>
+                        <div className="stats-grid">
+                          <div>HP: {enemy.stats.hp}</div>
+                          <div>PP: {enemy.stats.pp}</div>
+                          <div>ATK: {enemy.stats.atk}</div>
+                          <div>DEF: {enemy.stats.def}</div>
+                          <div>MAG: {enemy.stats.mag}</div>
+                          <div>SPD: {enemy.stats.spd}</div>
+                        </div>
+                        {enemy.abilities && enemy.abilities.length > 0 && (
+                          <div className="ability-section">
+                            <div className="ability-header">Abilities:</div>
+                            {enemy.abilities.map((abilityRef, idx) => {
+                              const ability = ABILITIES[abilityRef.id];
+                              if (!ability) return null;
+                              return (
+                                <div key={idx} className="ability-item">
+                                  <div className="ability-name">{ability.name}</div>
+                                  <div className="ability-description">{ability.description}</div>
+                                  <div className="ability-stats">
+                                    {ability.type && <span>Type: {ability.type}</span>}
+                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                      <span>PP: {ability.manaCost}</span>
+                                    )}
+                                    {ability.basePower !== undefined && ability.basePower > 0 && (
+                                      <span>Power: {ability.basePower}</span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <div className="detail-row">
+                          <span className="detail-label">XP:</span>
+                          <span className="detail-value">{enemy.baseXp}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Gold:</span>
+                          <span className="detail-value">{enemy.baseGold}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'npcs' && (
             <div className="compendium-section">
               <h2>NPCs</h2>
@@ -506,6 +383,263 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
               </div>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Unit Detail View Component
+function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void }) {
+  const unit = UNIT_DEFINITIONS[unitId];
+  if (!unit) return null;
+
+  const statsLv1 = unit.baseStats;
+  const statsLv5 = {
+    hp: unit.baseStats.hp + (unit.growthRates.hp * 4),
+    pp: unit.baseStats.pp + (unit.growthRates.pp * 4),
+    atk: unit.baseStats.atk + (unit.growthRates.atk * 4),
+    def: unit.baseStats.def + (unit.growthRates.def * 4),
+    mag: unit.baseStats.mag + (unit.growthRates.mag * 4),
+    spd: unit.baseStats.spd + (unit.growthRates.spd * 4),
+  };
+  const statsLv10 = {
+    hp: unit.baseStats.hp + (unit.growthRates.hp * 9),
+    pp: unit.baseStats.pp + (unit.growthRates.pp * 9),
+    atk: unit.baseStats.atk + (unit.growthRates.atk * 9),
+    def: unit.baseStats.def + (unit.growthRates.def * 9),
+    mag: unit.baseStats.mag + (unit.growthRates.mag * 9),
+    spd: unit.baseStats.spd + (unit.growthRates.spd * 9),
+  };
+
+  return (
+    <div className="unit-detail-view">
+      <button className="back-btn" onClick={onBack}>← Back</button>
+      <div className="unit-detail-header">
+        <h2>{unit.name}</h2>
+        <div className="unit-meta">
+          <span>Element: {unit.element}</span>
+          <span>Role: {unit.role}</span>
+          {unit.description && <p className="unit-description">{unit.description}</p>}
+        </div>
+      </div>
+
+      <div className="unit-stats-progression">
+        <h3>Stat Progression</h3>
+        <div className="stats-table">
+          <div className="stats-row header">
+            <div>Stat</div>
+            <div>Lv 1</div>
+            <div>Lv 5</div>
+            <div>Lv 10</div>
+            <div>Growth</div>
+          </div>
+          <div className="stats-row">
+            <div>HP</div>
+            <div>{statsLv1.hp}</div>
+            <div>{statsLv5.hp}</div>
+            <div>{statsLv10.hp}</div>
+            <div>+{unit.growthRates.hp}/lv</div>
+          </div>
+          <div className="stats-row">
+            <div>PP</div>
+            <div>{statsLv1.pp}</div>
+            <div>{statsLv5.pp}</div>
+            <div>{statsLv10.pp}</div>
+            <div>+{unit.growthRates.pp}/lv</div>
+          </div>
+          <div className="stats-row">
+            <div>ATK</div>
+            <div>{statsLv1.atk}</div>
+            <div>{statsLv5.atk}</div>
+            <div>{statsLv10.atk}</div>
+            <div>+{unit.growthRates.atk}/lv</div>
+          </div>
+          <div className="stats-row">
+            <div>DEF</div>
+            <div>{statsLv1.def}</div>
+            <div>{statsLv5.def}</div>
+            <div>{statsLv10.def}</div>
+            <div>+{unit.growthRates.def}/lv</div>
+          </div>
+          <div className="stats-row">
+            <div>MAG</div>
+            <div>{statsLv1.mag}</div>
+            <div>{statsLv5.mag}</div>
+            <div>{statsLv10.mag}</div>
+            <div>+{unit.growthRates.mag}/lv</div>
+          </div>
+          <div className="stats-row">
+            <div>SPD</div>
+            <div>{statsLv1.spd}</div>
+            <div>{statsLv5.spd}</div>
+            <div>{statsLv10.spd}</div>
+            <div>+{unit.growthRates.spd}/lv</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="unit-abilities">
+        <h3>Unlockable Abilities</h3>
+        <div className="abilities-list">
+          {unit.abilities
+            .sort((a, b) => (a.unlockLevel || 1) - (b.unlockLevel || 1))
+            .map((abilityRef, idx) => {
+              const ability = ABILITIES[abilityRef.id];
+              if (!ability) return null;
+              return (
+                <div key={idx} className="ability-card">
+                  <div className="ability-card-header">
+                    <span className="ability-level">Lv {abilityRef.unlockLevel || 1}</span>
+                    <span className="ability-name">{ability.name}</span>
+                  </div>
+                  <div className="ability-description">{ability.description}</div>
+                  <div className="ability-meta">
+                    <span>Type: {ability.type}</span>
+                    {ability.element && <span>Element: {ability.element}</span>}
+                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                      <span>PP Cost: {ability.manaCost}</span>
+                    )}
+                    {ability.basePower !== undefined && ability.basePower > 0 && (
+                      <span>Power: {ability.basePower}</span>
+                    )}
+                    {ability.targets && <span>Target: {ability.targets}</span>}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Djinn Detail View Component - Network Visualization
+function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => void }) {
+  const djinn = DJINN[djinnId];
+  if (!djinn) return null;
+
+  // Get all units that can use this Djinn
+  const unitIds = Object.keys(djinn.grantedAbilities);
+
+  return (
+    <div className="djinn-detail-view">
+      <button className="back-btn" onClick={onBack}>← Back</button>
+      <div className="djinn-detail-header">
+        <h2>{djinn.name}</h2>
+        <div className="djinn-meta">
+          <span>Element: {djinn.element}</span>
+          <span>Tier: {djinn.tier}</span>
+          <div className="summon-effect">
+            <strong>Summon Effect:</strong> {djinn.summonEffect.description}
+          </div>
+        </div>
+      </div>
+
+      <div className="djinn-ability-network">
+        <h3>Ability Network - Grants to Units</h3>
+        <div className="network-container">
+          {unitIds.map((unitId) => {
+            const unit = UNIT_DEFINITIONS[unitId];
+            if (!unit) return null;
+
+            const abilityGroup = djinn.grantedAbilities[unitId];
+            if (!abilityGroup) return null;
+            
+            const compatibility = 
+              unit.element === djinn.element ? 'same' :
+              (unit.element === 'Venus' && djinn.element === 'Mars') || 
+              (unit.element === 'Mars' && djinn.element === 'Venus') ||
+              (unit.element === 'Jupiter' && djinn.element === 'Mercury') ||
+              (unit.element === 'Mercury' && djinn.element === 'Jupiter') ? 'counter' : 'neutral';
+
+            return (
+              <div key={unitId} className={`network-node ${compatibility}`}>
+                <div className="node-header">
+                  <div className="node-unit-name">{unit.name}</div>
+                  <div className="node-compatibility">
+                    {compatibility === 'same' && '✓ Same Element'}
+                    {compatibility === 'counter' && '⚠ Counter Element'}
+                    {compatibility === 'neutral' && '○ Neutral'}
+                  </div>
+                </div>
+                <div className="node-abilities">
+                  {abilityGroup.same.length > 0 && (
+                    <div className="ability-group same-element">
+                      <div className="group-label">Same Element Abilities:</div>
+                      {abilityGroup.same.map((abilityId) => {
+                        const ability = DJINN_ABILITIES[abilityId];
+                        if (!ability) return null;
+                        return (
+                          <div key={abilityId} className="network-ability">
+                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-desc">{ability.description}</div>
+                            <div className="network-ability-stats">
+                              {ability.type && <span>{ability.type}</span>}
+                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                <span>PP: {ability.manaCost}</span>
+                              )}
+                              {ability.basePower !== undefined && ability.basePower > 0 && (
+                                <span>Power: {ability.basePower}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {abilityGroup.counter.length > 0 && (
+                    <div className="ability-group counter-element">
+                      <div className="group-label">Counter Element Abilities:</div>
+                      {abilityGroup.counter.map((abilityId) => {
+                        const ability = DJINN_ABILITIES[abilityId];
+                        if (!ability) return null;
+                        return (
+                          <div key={abilityId} className="network-ability">
+                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-desc">{ability.description}</div>
+                            <div className="network-ability-stats">
+                              {ability.type && <span>{ability.type}</span>}
+                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                <span>PP: {ability.manaCost}</span>
+                              )}
+                              {ability.basePower !== undefined && ability.basePower > 0 && (
+                                <span>Power: {ability.basePower}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {abilityGroup.neutral.length > 0 && (
+                    <div className="ability-group neutral-element">
+                      <div className="group-label">Neutral Abilities:</div>
+                      {abilityGroup.neutral.map((abilityId) => {
+                        const ability = DJINN_ABILITIES[abilityId];
+                        if (!ability) return null;
+                        return (
+                          <div key={abilityId} className="network-ability">
+                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-desc">{ability.description}</div>
+                            <div className="network-ability-stats">
+                              {ability.type && <span>{ability.type}</span>}
+                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                <span>PP: {ability.manaCost}</span>
+                              )}
+                              {ability.basePower !== undefined && ability.basePower > 0 && (
+                                <span>Power: {ability.basePower}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
