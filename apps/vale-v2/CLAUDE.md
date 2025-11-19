@@ -156,6 +156,8 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 
 ## Game Systems
 
+**📖 For detailed flow documentation, see [docs/GAME_MECHANICS_FLOW.md](docs/GAME_MECHANICS_FLOW.md)**
+
 ### Battle System
 - **Damage Formula:** `(basePower + ATK - DEF×0.5) × elementAdvantage`
 - **Element Advantages:** 1.5× damage when strong, 0.67× when weak (Venus > Mars > Jupiter > Mercury > Venus)
@@ -163,11 +165,23 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 - **Critical Hits:** Chance based on unit level and luck
 - **Status Effects:** Buffs/debuffs tracked per unit with duration counters
 
+### Mode Transitions
+- **Flow:** `overworld → team-select → battle → rewards → dialogue (if recruitment) → overworld`
+- **Key Points:**
+  - `setPendingBattle()` automatically sets mode to `'team-select'`
+  - `encounterId` preserved in `rewardsSlice.lastBattleEncounterId` for post-battle dialogues
+  - `handleRewardsContinue()` orchestrates rewards → dialogue → overworld transition
+- See [docs/GAME_MECHANICS_FLOW.md](docs/GAME_MECHANICS_FLOW.md) for complete flow
+
 ### Djinn System
 - **Team-Wide:** 3 Djinn slots affect entire party (not per-unit)
 - **Synergy Bonuses:** All same element = +12 ATK/+8 DEF, mixed = balanced bonuses
 - **Activation:** Using a Djinn in battle enters "Standby" mode (loses passive, recovers after turns)
-- **Location:** Core logic in `src/core/algorithms/djinnCalculations.ts` and `src/data/djinn.ts`
+- **Acquisition Methods:**
+  1. Dialogue effects (`grantDjinn` in recruitment dialogues) - calls `collectDjinn()` directly
+  2. Story flags (`STORY_FLAG_TO_DJINN` mapping) - via `processStoryFlagForDjinn()`
+  3. Pre-game (starting Djinn)
+- **Location:** Core logic in `src/core/algorithms/djinnCalculations.ts` and `src/core/services/DjinnService.ts`
 
 ### Leveling System
 - **XP Curve:** Non-linear [0, 100, 350, 850, 1850...92,800] for levels 1-20
@@ -177,10 +191,17 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 
 ### Equipment System
 - **5 Slots:** Weapon (ATK), Armor (DEF/HP), Helm (DEF), Boots (SPD), Accessory (various)
-- **Unit-Locked:** Each character has exclusive equipment (no sharing)
+- **Element-Based:** Equipment restricted by element (not unit-specific)
 - **Stat Bonuses:** Applied during `Unit.calculateStats()` calculation
 - **Some weapons unlock abilities** (checked during ability validation)
 - **Reward System:** Predetermined rewards (no RNG), may offer choice of 1 of 3 items
+
+### Recruitment System
+- **Two Methods:**
+  1. **Recruitment Dialogues** - Post-battle dialogues for Houses 1, 5, 8, 11, 14, 15, 17
+  2. **Story Joins** - Automatic via story flags (Houses 2, 3)
+- **Dialogue Effects:** `recruitUnit` adds to roster, `grantDjinn` adds Djinn
+- See [docs/GAME_MECHANICS_FLOW.md](docs/GAME_MECHANICS_FLOW.md) for complete flow
 
 ---
 
@@ -233,4 +254,4 @@ All game data must validate against Zod schemas:
 - **Recent Work:** Queue planning/execution service, deterministic preview seeds, post-battle rewards/victory overlay, storySlice hooks for encounter-finished events.
 - **Testing:** Context-aware suites covering algorithms, services, and battle flows (`tests/**`).
 
-**Last Updated:** 2025-11-15
+**Last Updated:** 2025-11-16
