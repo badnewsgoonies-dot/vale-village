@@ -149,7 +149,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         return hpMap;
       });
       
-      // Queue basic attack for each alive unit targeting first enemy
+      // Queue strategic actions: heal if low HP, use damage abilities if healthy
       const queuedActions = await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
@@ -162,21 +162,60 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         
         const actions: Array<{ unitId: string; targetId: string; abilityId: string | null }> = [];
         
-        // Queue attack for each unit
-        aliveUnits.forEach((unit: any, idx: number) => {
+        // Queue strategic actions for each unit
+        aliveUnits.forEach((unit: any) => {
           const unitIndex = battle.playerTeam.units.findIndex((u: any) => u.id === unit.id);
-          if (unitIndex >= 0) {
-            try {
-              // Use null abilityId for basic attack (STRIKE)
-              store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
-              actions.push({
-                unitId: unit.id,
-                targetId: firstEnemyId,
-                abilityId: null, // Basic attack
-              });
-            } catch (e) {
-              // Ignore if already queued
+          if (unitIndex < 0) return;
+          
+          const hpPercent = unit.currentHp / unit.maxHp;
+          const lowHpThreshold = 0.5; // 50% HP
+          
+          // Get unit's available abilities
+          const unitAbilities = unit.abilities || [];
+          const healingAbility = unitAbilities.find((a: any) => a.type === 'healing');
+          const damageAbilities = unitAbilities.filter((a: any) => 
+            (a.type === 'psynergy' || a.type === 'physical') && a.id !== 'strike' && a.manaCost <= (unit.currentPp || 0)
+          );
+          
+          let abilityToUse: string | null = null;
+          let targetId = firstEnemyId;
+          
+          // Strategy: Heal if low HP and have healing ability
+          if (hpPercent < lowHpThreshold && healingAbility && (unit.currentPp || 0) >= healingAbility.manaCost) {
+            // Find lowest HP ally (including self)
+            const lowestHpAlly = battle.playerTeam.units
+              .filter((u: any) => u.currentHp > 0)
+              .sort((a: any, b: any) => (a.currentHp / a.maxHp) - (b.currentHp / b.maxHp))[0];
+            
+            if (lowestHpAlly) {
+              abilityToUse = healingAbility.id;
+              targetId = lowestHpAlly.id;
             }
+          }
+          
+          // Otherwise use damage ability if available, or basic attack
+          if (!abilityToUse && damageAbilities.length > 0) {
+            // Use first available damage ability
+            const ability = damageAbilities[0];
+            abilityToUse = ability.id;
+            targetId = firstEnemyId;
+          }
+          
+          // Fallback to basic attack
+          if (!abilityToUse) {
+            abilityToUse = null; // Basic attack
+            targetId = firstEnemyId;
+          }
+          
+          try {
+            store.getState().queueUnitAction(unitIndex, abilityToUse, [targetId], undefined);
+            actions.push({
+              unitId: unit.id,
+              targetId: targetId,
+              abilityId: abilityToUse,
+            });
+          } catch (e) {
+            // Ignore if already queued or invalid
           }
         });
         

@@ -758,6 +758,137 @@ export const ZODIAC_BOLT: Ability = {
 };
 
 // ============================================================================
+// BALANCED ABILITY SETS (for balanced gameplay)
+// ============================================================================
+
+// VENUS (Earth) Abilities
+export const EARTH_SPIKE_DAMAGE: Ability = {
+  id: 'earth-spike-damage',
+  name: 'Earth Spike',
+  type: 'psynergy',
+  element: 'Venus',
+  manaCost: 3,
+  basePower: 35,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Powerful earth spike that deals heavy damage',
+  aiHints: { priority: 2.5, target: 'weakest', avoidOverkill: false },
+};
+
+export const STONE_SKIN_UTILITY: Ability = {
+  id: 'stone-skin',
+  name: 'Stone Skin',
+  type: 'buff',
+  element: 'Venus',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Harden skin like stone, increasing DEF significantly',
+  buffEffect: { def: 10 },
+  duration: 3,
+  aiHints: { priority: 2.0, target: 'random', opener: true },
+};
+
+// MARS (Fire) Abilities
+export const FLAME_BURST_DAMAGE: Ability = {
+  id: 'flame-burst-damage',
+  name: 'Flame Burst',
+  type: 'psynergy',
+  element: 'Mars',
+  manaCost: 3,
+  basePower: 38,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Explosive burst of flame dealing heavy damage',
+  aiHints: { priority: 2.5, target: 'weakest', avoidOverkill: false },
+};
+
+export const FIRE_WARD_UTILITY: Ability = {
+  id: 'fire-ward',
+  name: 'Fire Ward',
+  type: 'buff',
+  element: 'Mars',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Ward yourself with fire, increasing ATK significantly',
+  buffEffect: { atk: 10 },
+  duration: 3,
+  aiHints: { priority: 2.0, target: 'random', opener: true },
+};
+
+// MERCURY (Water) Abilities
+export const ICE_LANCE_DAMAGE: Ability = {
+  id: 'ice-lance-damage',
+  name: 'Ice Lance',
+  type: 'psynergy',
+  element: 'Mercury',
+  manaCost: 3,
+  basePower: 36,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Piercing lance of ice dealing heavy damage',
+  aiHints: { priority: 2.5, target: 'weakest', avoidOverkill: false },
+};
+
+export const AQUA_HEAL_UTILITY: Ability = {
+  id: 'aqua-heal',
+  name: 'Aqua Heal',
+  type: 'healing',
+  element: 'Mercury',
+  manaCost: 3,
+  basePower: 50,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Restore HP with healing waters',
+  aiHints: { priority: 3.0, target: 'healerFirst', avoidOverkill: false },
+};
+
+// JUPITER (Wind) Abilities
+export const GALE_FORCE_DAMAGE: Ability = {
+  id: 'gale-force-damage',
+  name: 'Gale Force',
+  type: 'psynergy',
+  element: 'Jupiter',
+  manaCost: 3,
+  basePower: 34,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Powerful gale dealing heavy damage',
+  aiHints: { priority: 2.5, target: 'weakest', avoidOverkill: false },
+};
+
+export const WIND_BARRIER_UTILITY: Ability = {
+  id: 'wind-barrier',
+  name: 'Wind Barrier',
+  type: 'buff',
+  element: 'Jupiter',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'single-ally',
+  unlockLevel: 1,
+  description: 'Create a barrier of wind, increasing SPD significantly',
+  buffEffect: { spd: 8 },
+  duration: 3,
+  aiHints: { priority: 2.0, target: 'random', opener: true },
+};
+
+// NEUTRAL Abilities
+export const FOCUS_STRIKE_NEUTRAL: Ability = {
+  id: 'focus-strike-neutral',
+  name: 'Focus Strike',
+  type: 'physical',
+  manaCost: 0,
+  basePower: 20,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'Focused physical strike with neutral element',
+  aiHints: { priority: 1.8, target: 'weakest', avoidOverkill: false },
+};
+
+// ============================================================================
 // Export all abilities
 // ============================================================================
 
@@ -815,4 +946,14 @@ export const ABILITIES: Record<string, Ability> = {
   'silver-strike': SILVER_STRIKE,
   'great-cleave': GREAT_CLEAVE,
   'zodiac-bolt': ZODIAC_BOLT,
+  // Balanced Ability Sets
+  'earth-spike-damage': EARTH_SPIKE_DAMAGE,
+  'stone-skin': STONE_SKIN_UTILITY,
+  'flame-burst-damage': FLAME_BURST_DAMAGE,
+  'fire-ward': FIRE_WARD_UTILITY,
+  'ice-lance-damage': ICE_LANCE_DAMAGE,
+  'aqua-heal': AQUA_HEAL_UTILITY,
+  'gale-force-damage': GALE_FORCE_DAMAGE,
+  'wind-barrier': WIND_BARRIER_UTILITY,
+  'focus-strike-neutral': FOCUS_STRIKE_NEUTRAL,
 };

@@ -69,7 +69,7 @@ export const VENUS_WOLF: Enemy = {
   stats: {
     hp: 55,
     pp: 8,
-    atk: 11,
+    atk: 16, // Increased from 11 to encourage defensive play
     def: 7,
     mag: 3,
     spd: 11,
@@ -159,7 +159,7 @@ export const MARS_WOLF: Enemy = {
   stats: {
     hp: 58,
     pp: 10,
-    atk: 12,
+    atk: 18, // Increased from 12 to encourage defensive play
     def: 6,
     mag: 5,
     spd: 13,
@@ -181,7 +181,7 @@ export const MERCURY_WOLF: Enemy = {
   stats: {
     hp: 56,
     pp: 12,
-    atk: 10,
+    atk: 17, // Increased from 10 to encourage defensive play
     def: 7,
     mag: 6,
     spd: 14,
@@ -203,7 +203,7 @@ export const JUPITER_WOLF: Enemy = {
   stats: {
     hp: 52,
     pp: 11,
-    atk: 11,
+    atk: 18, // Increased from 11 to encourage defensive play
     def: 6,
     mag: 7,
     spd: 16,
@@ -321,7 +321,7 @@ export const EARTH_SCOUT: Enemy = {
   stats: {
     hp: 50,
     pp: 10,
-    atk: 9,
+    atk: 14, // Increased from 9 to encourage defensive play
     def: 8,
     mag: 5,
     spd: 8,
@@ -342,7 +342,7 @@ export const FLAME_SCOUT: Enemy = {
   stats: {
     hp: 45,
     pp: 12,
-    atk: 10,
+    atk: 15, // Increased from 10 to encourage defensive play
     def: 6,
     mag: 8,
     spd: 10,
@@ -363,7 +363,7 @@ export const FROST_SCOUT: Enemy = {
   stats: {
     hp: 48,
     pp: 11,
-    atk: 8,
+    atk: 14, // Increased from 8 to encourage defensive play
     def: 7,
     mag: 7,
     spd: 9,
@@ -384,7 +384,7 @@ export const GALE_SCOUT: Enemy = {
   stats: {
     hp: 42,
     pp: 13,
-    atk: 9,
+    atk: 15, // Increased from 9 to encourage defensive play
     def: 6,
     mag: 9,
     spd: 12,
@@ -1183,7 +1183,13 @@ export const GARET_ENEMY = unitDefinitionToEnemy(
   2, // Level 2 for VS1
   60, // Base XP
   19, // Base Gold
-  { id: 'garet-enemy' }
+  { 
+    id: 'garet-enemy',
+    stats: {
+      // Increase attack to encourage defensive play
+      atk: warMageDef.baseStats.atk + 4, // +4 ATK
+    }
+  }
 );
 
 // Sentinel - Level 3 (example for future encounters)
