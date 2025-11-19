@@ -1,12 +1,25 @@
 /**
  * Story Flag Definitions
- * Maps story flags to Djinn acquisition
- * 
+ * Maps story flags to Djinn acquisition and Unit recruitment
+ *
  * Story flags are set when:
  * - Completing encounters (via processEncounterCompletion)
  * - Dialogue choices (via processDialogueEffects)
  * - Manual story progression (via setStoryFlag)
  */
+
+/**
+ * Mapping of story flag IDs to Unit IDs (Story Joins)
+ * When a flag is set to `true`, the corresponding Unit is recruited
+ *
+ * Story joins are automatic recruitments that occur after battle completion
+ * (separate from battle reward recruits which use encounter.reward.unlockUnit)
+ */
+export const STORY_FLAG_TO_UNIT: Record<string, string> = {
+  // Houses 1-20 Progression: Story Joins
+  'house-02': 'mystic',   // Mystic joins after House 2
+  'house-03': 'ranger',   // Ranger joins after House 3
+};
 
 /**
  * Mapping of story flag IDs to Djinn IDs

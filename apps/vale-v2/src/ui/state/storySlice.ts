@@ -7,7 +7,7 @@ import type { StateCreator } from 'zustand';
 import type { BattleEvent } from '../../core/services/types';
 import type { StoryState } from '../../core/models/story';
 import { createStoryState, setFlag } from '../../core/models/story';
-import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey, processStoryFlagForDjinn } from '../../core/services/StoryService';
+import { processEncounterCompletion, advanceChapter, encounterIdToFlagKey, processStoryFlagForDjinn, processStoryFlagForUnit } from '../../core/services/StoryService';
 import type { BattleSlice } from './battleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { SaveSlice } from './saveSlice';
@@ -73,24 +73,35 @@ export const createStorySlice: StateCreator<
         st = processEncounterCompletion(st, e.encounterId);
         // Convert encounter ID to flag key for chapter advancement
         const flagKey = encounterIdToFlagKey(e.encounterId);
-        
+
         // Process story flag for Djinn (if team available)
         if (team) {
           const djinnResult = processStoryFlagForDjinn(st, team, flagKey, true);
           st = djinnResult.story;
-          
+
           // Update team if Djinn was granted
           if (djinnResult.djinnGranted) {
             get().updateTeam(djinnResult.team);
             console.log(`🎉 Djinn ${djinnResult.djinnGranted} granted from encounter: ${e.encounterId}`);
           }
         }
-        
+
+        // Process story flag for Unit recruitment (story joins)
+        const avgLevel = team ? Math.max(1, Math.floor(team.units.reduce((sum, u) => sum + u.level, 0) / team.units.length)) : 1;
+        const unitResult = processStoryFlagForUnit(st, flagKey, true, avgLevel);
+        st = unitResult.story;
+
+        // Add recruited unit to roster if applicable
+        if (unitResult.recruitedUnit) {
+          get().addUnitToRoster(unitResult.recruitedUnit);
+          console.log(`🎉 Unit ${unitResult.recruitedUnit.name} recruited from story join: ${e.encounterId}`);
+        }
+
         const adv = advanceChapter(st, flagKey);
         if (adv.ok) {
           st = adv.value;
         }
-        
+
         // Trigger credits screen when Chapter 3 boss is defeated
         if (flagKey === 'boss:ch3' && st.chapter === 4) {
           _set({ story: st, showCredits: true });

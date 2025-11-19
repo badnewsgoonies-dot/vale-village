@@ -6,9 +6,12 @@
 import type { StoryState, FlagId } from '../models/story';
 import type { Result } from '../utils/result';
 import type { Team } from '../models/Team';
+import type { Unit } from '../models/Unit';
 import { setFlag, hasFlag } from '../models/story';
 import { collectDjinn } from './DjinnService';
-import { STORY_FLAG_TO_DJINN } from '../../data/definitions/storyFlags';
+import { createUnit } from '../models/Unit';
+import { STORY_FLAG_TO_DJINN, STORY_FLAG_TO_UNIT } from '../../data/definitions/storyFlags';
+import { UNIT_DEFINITIONS } from '../../data/definitions/units';
 
 /**
  * Check if a requirement is met
@@ -189,5 +192,48 @@ export function processStoryFlagForDjinn(
   // Already collected or error - return unchanged team
   // This is safe - collectDjinn returns error if already collected, which we ignore
   return { story: updatedStory, team, djinnGranted: null };
+}
+
+/**
+ * Process story flag and recruit unit if applicable
+ * Pure function - no side effects
+ *
+ * @param story - Current story state
+ * @param flagId - Story flag being set
+ * @param flagValue - Value being set (only recruits unit if true)
+ * @param currentLevel - Current party level (for unit creation)
+ * @returns Updated story and recruited unit (null if no unit recruited)
+ */
+export function processStoryFlagForUnit(
+  story: StoryState,
+  flagId: string,
+  flagValue: boolean | number,
+  currentLevel: number = 1
+): { story: StoryState; recruitedUnit: Unit | null } {
+  // Update story flag first
+  const updatedStory = setFlag(story, flagId, flagValue);
+
+  // Only recruit unit if flag is being set to true
+  if (flagValue !== true) {
+    return { story: updatedStory, recruitedUnit: null };
+  }
+
+  // Check if this flag recruits a unit
+  const unitId = STORY_FLAG_TO_UNIT[flagId];
+  if (!unitId) {
+    return { story: updatedStory, recruitedUnit: null };
+  }
+
+  // Get unit definition
+  const unitDef = UNIT_DEFINITIONS[unitId];
+  if (!unitDef) {
+    console.error(`Unit definition ${unitId} not found`);
+    return { story: updatedStory, recruitedUnit: null };
+  }
+
+  // Create unit at current party level (level 1 for Houses 2-3)
+  const recruitedUnit = createUnit(unitDef, currentLevel, 0);
+
+  return { story: updatedStory, recruitedUnit };
 }
 
