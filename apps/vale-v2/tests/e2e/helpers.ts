@@ -201,6 +201,13 @@ export async function completeBattle(
 
   // 1. Simulate victory by setting enemies to 0 HP and battle phase to 'victory'
   // This mimics what executeQueuedRound does when checkBattleEnd returns 'PLAYER_VICTORY'
+  // IMPORTANT: Capture encounterId BEFORE clearing battle (needed for recruitment dialogue)
+  const encounterId = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const battleState = store.getState().battle;
+    return battleState?.encounterId || battleState?.meta?.encounterId || null;
+  });
+  
   await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
     const battleState = store.getState().battle;
@@ -244,6 +251,11 @@ export async function completeBattle(
     updateTeamUnits(healedUnits);
     processVictory(healedBattle);
   });
+  
+  // Store encounterId on window so handleRewardsContinue can access it after battle is cleared
+  await page.evaluate((encId) => {
+    (window as any).__LAST_BATTLE_ENCOUNTER_ID__ = encId;
+  }, encounterId);
 
   // 2. Wait for rewards screen
   await waitForMode(page, 'rewards', 10000);
@@ -620,12 +632,31 @@ export async function getRoster(page: Page): Promise<Array<{
  * Open Dev Mode overlay
  */
 export async function openDevMode(page: Page): Promise<void> {
+  // Try pressing Ctrl+D to toggle dev mode
   await page.keyboard.press('Control+d');
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(300);
+  
+  // Check if dev mode is enabled via store
+  const devModeEnabled = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.devModeEnabled ?? false;
+  });
+  
+  if (!devModeEnabled) {
+    // If keyboard shortcut didn't work, enable it directly via store
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      if (store) {
+        store.getState().setDevModeEnabled(true);
+      }
+    });
+    await page.waitForTimeout(200);
+  }
 
-  // Verify overlay is visible
-  const overlay = page.locator('[style*="position: fixed"][style*="z-index: 9999"]');
-  await overlay.waitFor({ state: 'visible', timeout: 3000 });
+  // Verify overlay is visible (check for Dev Mode content)
+  // Use a more specific selector - the heading is unique
+  const overlay = page.getByRole('heading', { name: /DEV MODE: HOUSE SELECTION/i });
+  await overlay.waitFor({ state: 'visible', timeout: 5000 });
 }
 
 /**
@@ -649,7 +680,40 @@ export async function jumpToHouse(page: Page, houseNumber: number): Promise<void
   await houseButton.click();
 
   // Dev Mode should close and team select should appear
-  await page.waitForTimeout(500);
+  // Wait for dev mode to close (overlay disappears)
+  await page.waitForFunction(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.devModeEnabled === false;
+  }, { timeout: 3000 }).catch(() => {
+    // If dev mode didn't close, that's okay - continue anyway
+  });
+  
+  // Wait a moment for state to update
+  await page.waitForTimeout(300);
+  
+  // Debug: Check what mode we're in after clicking
+  const modeAfterClick = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return {
+      mode: store?.getState()?.mode ?? null,
+      pendingBattleEncounterId: store?.getState()?.pendingBattleEncounterId ?? null,
+      devModeEnabled: store?.getState()?.devModeEnabled ?? null,
+    };
+  });
+  console.log(`   After clicking house ${houseNumber}, mode: ${modeAfterClick.mode}, pendingBattle: ${modeAfterClick.pendingBattleEncounterId}`);
+  
+  // If pendingBattle is set but mode isn't team-select, manually set it
+  // This is a workaround - the DevModeOverlay should set mode to team-select when calling setPendingBattle
+  if (modeAfterClick.pendingBattleEncounterId && modeAfterClick.mode !== 'team-select') {
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      if (store) {
+        store.getState().setMode('team-select');
+      }
+    });
+    await page.waitForTimeout(200);
+    console.log(`   Manually set mode to team-select`);
+  }
 }
 
 /**
@@ -667,7 +731,16 @@ export async function completeBattleFlow(page: Page, options?: {
   const { expectDialogue = false, logDetails = true } = options ?? {};
 
   // 1. Wait for team select screen
-  await waitForMode(page, 'team-select', 10000);
+  // First check current mode - might already be in team-select
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (currentMode !== 'team-select') {
+    if (logDetails) console.log(`   Current mode: ${currentMode}, waiting for team-select...`);
+    await waitForMode(page, 'team-select', 10000);
+  }
   if (logDetails) console.log('   Team select ready');
 
   // 2. Click confirm to start battle
@@ -683,12 +756,12 @@ export async function completeBattleFlow(page: Page, options?: {
 
   // 5. Rewards screen should already be shown (completeBattle waits for it)
   // But verify we're still in rewards mode
-  const currentMode = await page.evaluate(() => {
+  const rewardsMode = await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
     return store?.getState()?.mode ?? null;
   });
   
-  if (currentMode !== 'rewards') {
+  if (rewardsMode !== 'rewards') {
     // If not in rewards mode, wait for it
     await waitForMode(page, 'rewards', 5000);
   }

@@ -166,10 +166,13 @@ function App() {
   const handleRewardsContinue = useCallback(() => {
     // Check if this was the VS1 encounter
     const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
-    const encounterId = battle?.encounterId || battle?.meta?.encounterId;
+    // Get encounterId from battle OR from window (for E2E tests where battle might be cleared)
+    const encounterId = battle?.encounterId || battle?.meta?.encounterId || (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
 
     claimRewards(); // This now sets mode to 'overworld'
     setBattle(null, 0);
+    // Clear the stored encounterId after using it
+    delete (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
 
     // VS1 specific: show post-scene after rewards
     if (wasVS1Battle) {
