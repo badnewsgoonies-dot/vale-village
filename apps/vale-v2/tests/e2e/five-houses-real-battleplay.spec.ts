@@ -249,6 +249,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
           if (logDetails) console.log(`   ⚠️  Bug: Defeat phase but units not KO'd - forcing back to planning`);
           
           // Workaround: Force battle back to planning phase
+          // Use setBattle to directly update the battle state
           await page.evaluate(() => {
             const store = (window as any).__VALE_STORE__;
             const battle = store.getState().battle;
@@ -256,18 +257,22 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
               // Check if all enemies are KO'd - if so, force victory
               const allEnemiesKO = battle.enemies.every((e: any) => e.currentHp <= 0);
               if (allEnemiesKO) {
-                // Force victory
-                store.getState().updateBattleState({
-                  phase: 'victory',
+                // Force victory by updating battle state directly
+                const updatedBattle = {
+                  ...battle,
+                  phase: 'victory' as const,
                   battleOver: true,
-                  status: 'PLAYER_VICTORY',
-                });
+                  status: 'PLAYER_VICTORY' as const,
+                };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
               } else {
                 // Force back to planning phase
-                store.getState().updateBattleState({
-                  phase: 'planning',
+                const updatedBattle = {
+                  ...battle,
+                  phase: 'planning' as const,
                   battleOver: false,
-                });
+                };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
               }
             }
           });
