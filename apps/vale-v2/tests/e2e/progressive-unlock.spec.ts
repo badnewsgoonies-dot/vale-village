@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getGameState, waitForMode, completeBattle } from './helpers';
+import { getGameState, waitForMode, completeBattle, claimRewardsAndReturnToOverworld } from './helpers';
 
 /**
  * Progressive House Unlock System E2E Tests
@@ -79,6 +79,7 @@ test.describe('Progressive House Unlock System', () => {
 
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page, { logDetails: true });
+    await claimRewardsAndReturnToOverworld(page);
 
     console.log('→ House-01 defeated, now trying house-02 again...');
 
@@ -115,6 +116,7 @@ test.describe('Progressive House Unlock System', () => {
 
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page, { logDetails: true });
+    await claimRewardsAndReturnToOverworld(page);
 
     console.log('→ Returning to house-01 position...');
 
@@ -148,22 +150,38 @@ test.describe('Progressive House Unlock System', () => {
     await page.getByRole('button', { name: /confirm|start|begin/i }).click();
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page);
+    await claimRewardsAndReturnToOverworld(page);
     console.log('   ✓ H01 defeated');
 
     // Verify H02 unlocked, H03 still locked
     console.log('→ Verifying H02 unlocked, H03 locked...');
 
-    // Check H03 first (x:13) - should be locked
-    for (let i = 0; i < 6; i++) {
+    // First verify H02 is unlocked by navigating to it (x:10, 3 steps right from x:7)
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('ArrowRight');
+      await page.waitForTimeout(100);
+    }
+    await waitForMode(page, 'team-select', 5000);
+    let state = await getGameState(page);
+    expect(state?.pendingBattleEncounterId).toBe('house-02');
+    console.log('   ✓ H02 correctly unlocked');
+    
+    // Cancel H02 battle and navigate back
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
+    await waitForMode(page, 'overworld', 5000);
+    
+    // Now check H03 (x:13) - should be locked (3 more steps right from x:10)
+    for (let i = 0; i < 3; i++) {
       await page.keyboard.press('ArrowRight');
       await page.waitForTimeout(100);
     }
     await page.waitForTimeout(300);
-    let state = await getGameState(page);
+    state = await getGameState(page);
     expect(state?.mode).toBe('overworld'); // H03 locked
     console.log('   ✓ H03 correctly locked');
 
-    // Navigate back to H02 (x:10)
+    // Navigate back to H02 (x:10) - we're already at H03 position, so go back 3 steps
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(100);
@@ -173,13 +191,14 @@ test.describe('Progressive House Unlock System', () => {
     await waitForMode(page, 'team-select', 5000);
     state = await getGameState(page);
     expect(state?.pendingBattleEncounterId).toBe('house-02');
-    console.log('   ✓ H02 correctly unlocked');
+    console.log('   ✓ H02 confirmed unlocked (already verified above)');
 
     // Defeat H02
     console.log('→ Defeating H02...');
     await page.getByRole('button', { name: /confirm|start|begin/i }).click();
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page);
+    await claimRewardsAndReturnToOverworld(page);
     console.log('   ✓ H02 defeated');
 
     // Verify H03 now unlocked
@@ -236,6 +255,7 @@ test.describe('Progressive House Unlock System', () => {
       await page.getByRole('button', { name: /confirm|start|begin/i }).click();
       await waitForMode(page, 'battle', 10000);
       await completeBattle(page);
+      await claimRewardsAndReturnToOverworld(page);
 
       console.log(`   ✓ ${house.id} defeated`);
     }
@@ -258,6 +278,7 @@ test.describe('Progressive House Unlock System', () => {
     await page.getByRole('button', { name: /confirm|start|begin/i }).click();
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page);
+    await claimRewardsAndReturnToOverworld(page);
 
     // Defeat H02
     for (let i = 0; i < 3; i++) {
@@ -268,6 +289,10 @@ test.describe('Progressive House Unlock System', () => {
     await page.getByRole('button', { name: /confirm|start|begin/i }).click();
     await waitForMode(page, 'battle', 10000);
     await completeBattle(page);
+    await claimRewardsAndReturnToOverworld(page);
+    
+    // Wait a bit to ensure story flags are set before saving
+    await page.waitForTimeout(500);
 
     console.log('→ Saving game...');
 
@@ -276,12 +301,25 @@ test.describe('Progressive House Unlock System', () => {
       const store = (window as any).__VALE_STORE__;
       store.getState().saveGame();
     });
+    
+    // Verify story flags were saved
+    const savedFlags = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store.getState().story.flags;
+    });
+    console.log(`   Saved story flags: ${Object.keys(savedFlags).filter(k => savedFlags[k]).join(', ')}`);
 
     console.log('→ Reloading page...');
 
     // Reload page
     await page.reload();
     await page.waitForLoadState('networkidle');
+    
+    // Wait for store to be initialized
+    await page.waitForFunction(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store && store.getState && typeof store.getState === 'function';
+    }, { timeout: 10000 });
 
     console.log('→ Loading save...');
 
@@ -291,7 +329,15 @@ test.describe('Progressive House Unlock System', () => {
       store.getState().loadGame();
     });
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
+    await waitForMode(page, 'overworld', 5000);
+    
+    // Verify story flags were loaded
+    const loadedFlags = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store.getState().story.flags;
+    });
+    console.log(`   Loaded story flags: ${Object.keys(loadedFlags).filter(k => loadedFlags[k]).join(', ')}`);
 
     console.log('→ Verifying unlock state after load...');
 

@@ -302,6 +302,91 @@ export async function completeBattle(
 }
 
 /**
+ * Helper to claim rewards and return to overworld after completeBattle
+ * Handles dialogue that may appear (e.g., recruitment dialogue)
+ */
+export async function claimRewardsAndReturnToOverworld(page: Page): Promise<void> {
+  // Claim rewards and return to overworld
+  // (completeBattle only waits for rewards mode, doesn't claim rewards)
+  
+  // First check if we're actually in rewards mode
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (currentMode !== 'rewards') {
+    // Not in rewards mode, might already be claimed or in dialogue
+    // Just wait for overworld/dialogue and handle accordingly
+  } else {
+    // We're in rewards mode, try to claim
+    const continueButton = page.getByRole('button', { name: /continue|claim/i });
+    const buttonVisible = await continueButton.isVisible().catch(() => false);
+    const buttonEnabled = buttonVisible ? await continueButton.isEnabled().catch(() => false) : false;
+    
+    if (buttonVisible && buttonEnabled) {
+      await continueButton.click();
+      await page.waitForTimeout(500);
+    } else if (!buttonEnabled && buttonVisible) {
+      // Button visible but disabled - wait a bit and retry
+      await page.waitForTimeout(300);
+      const retryEnabled = await continueButton.isEnabled().catch(() => false);
+      if (retryEnabled) {
+        await continueButton.click();
+        await page.waitForTimeout(500);
+      } else {
+        // Fallback: call handleRewardsContinue directly
+        await page.evaluate(() => {
+          if ((window as any).handleRewardsContinue) {
+            (window as any).handleRewardsContinue();
+          } else {
+            const store = (window as any).__VALE_STORE__;
+            store.getState().claimRewards();
+          }
+        });
+        await page.waitForTimeout(500);
+      }
+    } else {
+      // Fallback: call handleRewardsContinue directly
+      await page.evaluate(() => {
+        if ((window as any).handleRewardsContinue) {
+          (window as any).handleRewardsContinue();
+        } else {
+          const store = (window as any).__VALE_STORE__;
+          store.getState().claimRewards();
+        }
+      });
+      await page.waitForTimeout(500);
+    }
+  }
+  
+  // Wait for overworld mode (might go to dialogue first for recruitment, then overworld)
+  // If dialogue appears, advance through it
+  let modeAfterClaim = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (modeAfterClaim === 'dialogue') {
+    // Advance through dialogue if present (house encounters trigger recruitment)
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(500);
+    // Keep advancing until we're out of dialogue
+    for (let i = 0; i < 10; i++) {
+      const mode = await page.evaluate(() => {
+        const store = (window as any).__VALE_STORE__;
+        return store?.getState()?.mode ?? null;
+      });
+      if (mode !== 'dialogue') break;
+      await page.keyboard.press('Space');
+      await page.waitForTimeout(300);
+    }
+  }
+  
+  await waitForMode(page, 'overworld', 10000);
+}
+
+/**
  * Djinn Testing Helpers
  */
 
