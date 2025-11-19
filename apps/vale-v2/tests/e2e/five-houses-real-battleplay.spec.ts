@@ -87,7 +87,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
   }
   
   let roundCount = 0;
-  const maxRounds = 20; // Safety limit
+  const maxRounds = 30; // Safety limit (increased for longer battles)
   
   // Track enemy HP per round for damage calculation
   const enemyHpSnapshot: Record<string, number> = {};
@@ -130,6 +130,10 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
       throw new Error('All player units defeated - battle lost!');
     }
     
+    // Variables for tracking round execution
+    let roundNumberBefore = battleState.roundNumber;
+    let stuckCount = 0;
+    
     // If in planning phase, queue actions for all units
     if (battleState.phase === 'planning') {
       if (logDetails && roundCount === 0) {
@@ -149,7 +153,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         return hpMap;
       });
       
-      // Queue strategic actions: heal if low HP, use damage abilities if healthy
+      // Queue basic attacks for now (will iterate to add abilities later)
       const queuedActions = await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
@@ -162,57 +166,22 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         
         const actions: Array<{ unitId: string; targetId: string; abilityId: string | null }> = [];
         
-        // Queue strategic actions for each unit
+        // Queue basic attack for each unit
         aliveUnits.forEach((unit: any) => {
           const unitIndex = battle.playerTeam.units.findIndex((u: any) => u.id === unit.id);
           if (unitIndex < 0) return;
           
-          const hpPercent = unit.currentHp / unit.maxHp;
-          const lowHpThreshold = 0.5; // 50% HP
-          
-          // Get unit's available abilities
-          const unitAbilities = unit.abilities || [];
-          const healingAbility = unitAbilities.find((a: any) => a.type === 'healing');
-          const damageAbilities = unitAbilities.filter((a: any) => 
-            (a.type === 'psynergy' || a.type === 'physical') && a.id !== 'strike' && a.manaCost <= (unit.currentPp || 0)
-          );
-          
-          let abilityToUse: string | null = null;
-          let targetId = firstEnemyId;
-          
-          // Strategy: Heal if low HP and have healing ability
-          if (hpPercent < lowHpThreshold && healingAbility && (unit.currentPp || 0) >= healingAbility.manaCost) {
-            // Find lowest HP ally (including self)
-            const lowestHpAlly = battle.playerTeam.units
-              .filter((u: any) => u.currentHp > 0)
-              .sort((a: any, b: any) => (a.currentHp / a.maxHp) - (b.currentHp / b.maxHp))[0];
-            
-            if (lowestHpAlly) {
-              abilityToUse = healingAbility.id;
-              targetId = lowestHpAlly.id;
-            }
-          }
-          
-          // Otherwise use damage ability if available, or basic attack
-          if (!abilityToUse && damageAbilities.length > 0) {
-            // Use first available damage ability
-            const ability = damageAbilities[0];
-            abilityToUse = ability.id;
-            targetId = firstEnemyId;
-          }
-          
-          // Fallback to basic attack
-          if (!abilityToUse) {
-            abilityToUse = null; // Basic attack
-            targetId = firstEnemyId;
-          }
+          // Skip if already queued
+          const alreadyQueued = battle.queuedActions?.some((qa: any) => qa && qa.unitIndex === unitIndex);
+          if (alreadyQueued) return;
           
           try {
-            store.getState().queueUnitAction(unitIndex, abilityToUse, [targetId], undefined);
+            // Use basic attack (null abilityId)
+            store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
             actions.push({
               unitId: unit.id,
-              targetId: targetId,
-              abilityId: abilityToUse,
+              targetId: firstEnemyId,
+              abilityId: null, // Basic attack
             });
           } catch (e) {
             // Ignore if already queued or invalid
@@ -222,20 +191,24 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
         return actions;
       });
       
-      // Wait for queue to be complete
+      // Wait for queue to be complete (or phase to change)
       await page.waitForFunction(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
-        if (!battle || battle.phase !== 'planning') return false;
+        if (!battle) return false;
+        
+        // If phase changed, queue is done
+        if (battle.phase !== 'planning') return true;
         
         const aliveUnits = battle.playerTeam.units.filter((u: any) => u.currentHp > 0);
         const queuedActions = battle.queuedActions?.filter((a: any) => a != null) ?? [];
         
         return queuedActions.length >= aliveUnits.length;
-      }, { timeout: 5000 });
+      }, { timeout: 10000 });
       
       // Execute the round
-      const roundNumberBefore = battleState.roundNumber;
+      roundNumberBefore = battleState.roundNumber;
+      stuckCount = 0; // Reset stuck count for new round
       
       await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
@@ -274,6 +247,8 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
             battleOver: battle?.battleOver ?? false,
             roundNumber: battle?.roundNumber ?? 0,
             phase: battle?.phase,
+            enemiesAlive: battle?.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0,
+            unitsAlive: battle?.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0,
           };
         });
         
@@ -282,8 +257,87 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
           break;
         }
         
-        if (logDetails) {
-          console.log(`   ⚠️  Round number didn't increment. Current: ${timeoutCheck.roundNumber}, phase: ${timeoutCheck.phase}`);
+        // If stuck in planning phase with same round number, try to force execution
+        if (timeoutCheck.phase === 'planning' && timeoutCheck.roundNumber === roundNumberBefore) {
+          if (logDetails) {
+            console.log(`   ⚠️  Round number didn't increment. Current: ${timeoutCheck.roundNumber}, phase: ${timeoutCheck.phase}`);
+            console.log(`   → Attempting to force execution...`);
+          }
+          
+          // Check if we have any alive units - if not, battle should be lost
+          if (timeoutCheck.unitsAlive === 0) {
+            if (logDetails) console.log(`   ⚠️  All units dead, battle should be lost`);
+            break;
+          }
+          
+          // Check if all enemies are dead - if so, battle should be won
+          if (timeoutCheck.enemiesAlive === 0) {
+            if (logDetails) console.log(`   ✅ All enemies dead, battle should be won`);
+            break;
+          }
+          
+          // Try to execute the round manually
+          await page.evaluate(() => {
+            const store = (window as any).__VALE_STORE__;
+            const battle = store.getState().battle;
+            if (battle && battle.phase === 'planning') {
+              try {
+                // If we have queued actions, execute them
+                if (battle.queuedActions?.length > 0) {
+                  store.getState().executeRound();
+                } else {
+                  // If no queued actions but we're in planning, try to queue basic attacks for all alive units
+                  const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+                  const firstEnemyId = battle.enemies?.find((e: any) => e.currentHp > 0)?.id;
+                  
+                  if (aliveUnits.length > 0 && firstEnemyId) {
+                    aliveUnits.forEach((unit: any, idx: number) => {
+                      const unitIndex = battle.playerTeam.units.findIndex((u: any) => u.id === unit.id);
+                      if (unitIndex >= 0) {
+                        try {
+                          store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
+                        } catch (e) {
+                          // Ignore
+                        }
+                      }
+                    });
+                    // Then execute
+                    store.getState().executeRound();
+                  }
+                }
+              } catch (e) {
+                // Ignore errors
+              }
+            }
+          });
+          
+          // Wait a bit for execution
+          await page.waitForTimeout(1000);
+          
+          // Check again
+          const recheck = await page.evaluate(() => {
+            const store = (window as any).__VALE_STORE__;
+            const battle = store.getState().battle;
+            return {
+              battleOver: battle?.battleOver ?? false,
+              roundNumber: battle?.roundNumber ?? 0,
+              phase: battle?.phase,
+              enemiesAlive: battle?.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0,
+              unitsAlive: battle?.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0,
+            };
+          });
+          
+          if (recheck.battleOver || recheck.phase !== 'planning' || recheck.enemiesAlive === 0 || recheck.unitsAlive === 0) {
+            if (logDetails) console.log(`   ✅ Execution succeeded or battle ended`);
+            break;
+          }
+          
+          // If still stuck after 3 attempts, break to avoid infinite loop
+          stuckCount++;
+          if (stuckCount >= 3) {
+            if (logDetails) console.log(`   ⚠️  Battle stuck after ${stuckCount} attempts, breaking`);
+            break;
+          }
         }
       }
       

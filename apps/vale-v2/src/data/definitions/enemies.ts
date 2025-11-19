@@ -67,7 +67,7 @@ export const VENUS_WOLF: Enemy = {
   level: 1,
   element: 'Venus',
   stats: {
-    hp: 55,
+    hp: 275, // Increased from 55 (5x) for longer battles (target: 10-20 turns)
     pp: 8,
     atk: 16, // Increased from 11 to encourage defensive play
     def: 7,
@@ -157,7 +157,7 @@ export const MARS_WOLF: Enemy = {
   level: 2,
   element: 'Mars',
   stats: {
-    hp: 58,
+    hp: 290, // Increased from 58 (5x) for longer battles (target: 10-20 turns)
     pp: 10,
     atk: 18, // Increased from 12 to encourage defensive play
     def: 6,
@@ -179,7 +179,7 @@ export const MERCURY_WOLF: Enemy = {
   level: 2,
   element: 'Mercury',
   stats: {
-    hp: 56,
+    hp: 280, // Increased from 56 (5x) for longer battles (target: 10-20 turns)
     pp: 12,
     atk: 17, // Increased from 10 to encourage defensive play
     def: 7,
@@ -201,7 +201,7 @@ export const JUPITER_WOLF: Enemy = {
   level: 2,
   element: 'Jupiter',
   stats: {
-    hp: 52,
+    hp: 260, // Increased from 52 (5x) for longer battles (target: 10-20 turns)
     pp: 11,
     atk: 18, // Increased from 11 to encourage defensive play
     def: 6,
@@ -319,7 +319,7 @@ export const EARTH_SCOUT: Enemy = {
   level: 1,
   element: 'Venus',
   stats: {
-    hp: 50,
+    hp: 250, // Increased from 50 (5x) for longer battles (target: 10-20 turns)
     pp: 10,
     atk: 14, // Increased from 9 to encourage defensive play
     def: 8,
@@ -340,7 +340,7 @@ export const FLAME_SCOUT: Enemy = {
   level: 1,
   element: 'Mars',
   stats: {
-    hp: 45,
+    hp: 225, // Increased from 45 (5x) for longer battles (target: 10-20 turns)
     pp: 12,
     atk: 15, // Increased from 10 to encourage defensive play
     def: 6,
@@ -361,7 +361,7 @@ export const FROST_SCOUT: Enemy = {
   level: 1,
   element: 'Mercury',
   stats: {
-    hp: 48,
+    hp: 240, // Increased from 48 (5x) for longer battles (target: 10-20 turns)
     pp: 11,
     atk: 14, // Increased from 8 to encourage defensive play
     def: 7,
@@ -382,7 +382,7 @@ export const GALE_SCOUT: Enemy = {
   level: 1,
   element: 'Jupiter',
   stats: {
-    hp: 42,
+    hp: 210, // Increased from 42 (5x) for longer battles (target: 10-20 turns)
     pp: 13,
     atk: 15, // Increased from 9 to encourage defensive play
     def: 6,
@@ -1186,8 +1186,10 @@ export const GARET_ENEMY = unitDefinitionToEnemy(
   { 
     id: 'garet-enemy',
     stats: {
+      // Increase HP significantly for longer battles (target: 10-20 turns)
+      hp: (warMageDef.baseStats.hp + (1 * warMageDef.growthRates.hp)) * 5, // 5x HP (target: 10-20 turns)
       // Increase attack to encourage defensive play
-      atk: warMageDef.baseStats.atk + 4, // +4 ATK
+      atk: warMageDef.baseStats.atk + (1 * warMageDef.growthRates.atk) + 4, // +4 ATK
     }
   }
 );
