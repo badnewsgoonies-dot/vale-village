@@ -252,10 +252,8 @@ export async function completeBattle(
     processVictory(healedBattle);
   });
   
-  // Store encounterId on window so handleRewardsContinue can access it after battle is cleared
-  await page.evaluate((encId) => {
-    (window as any).__LAST_BATTLE_ENCOUNTER_ID__ = encId;
-  }, encounterId);
+  // Note: encounterId is now stored in rewardsSlice.lastBattleEncounterId during processVictory
+  // So handleRewardsContinue can access it from the store, no need for window storage
 
   // 2. Wait for rewards screen
   await waitForMode(page, 'rewards', 10000);
@@ -669,8 +667,8 @@ export async function jumpToHouse(page: Page, houseNumber: number): Promise<void
   });
   console.log(`   After clicking house ${houseNumber}, mode: ${modeAfterClick.mode}, pendingBattle: ${modeAfterClick.pendingBattleEncounterId}`);
   
-  // If pendingBattle is set but mode isn't team-select, manually set it
-  // This is a workaround - the DevModeOverlay should set mode to team-select when calling setPendingBattle
+  // setPendingBattle now automatically sets mode to 'team-select', so this should not be needed
+  // But keep as fallback in case of timing issues
   if (modeAfterClick.pendingBattleEncounterId && modeAfterClick.mode !== 'team-select') {
     await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
@@ -679,7 +677,7 @@ export async function jumpToHouse(page: Page, houseNumber: number): Promise<void
       }
     });
     await page.waitForTimeout(200);
-    console.log(`   Manually set mode to team-select`);
+    console.log(`   Fallback: manually set mode to team-select`);
   }
 }
 
@@ -761,7 +759,7 @@ export async function completeBattleFlow(page: Page, options?: {
   // Check current mode - might be 'dialogue' (recruitment) or 'overworld'
   const modeAfterClaim = await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
-    const lastEncounterId = (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
+    const lastEncounterId = store?.getState()?.lastBattleEncounterId ?? null;
     return {
       mode: store?.getState()?.mode ?? null,
       lastEncounterId,

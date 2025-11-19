@@ -11,7 +11,7 @@ import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
 import { DevModeOverlay } from './ui/components/DevModeOverlay';
-import { useStore } from './ui/state/store';
+import { useStore, store } from './ui/state/store';
 import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
@@ -164,15 +164,22 @@ function App() {
 
   // Handle continue from rewards screen
   const handleRewardsContinue = useCallback(() => {
+    // Get encounterId from rewards slice (stored during processVictory)
+    // This is more reliable than battle state since battle gets cleared
+    const storeState = store.getState();
+    const lastBattleEncounterId = storeState.lastBattleEncounterId;
+    // Fallback to battle state (for backwards compatibility)
+    const battleEncounterId = battle?.encounterId || battle?.meta?.encounterId;
+    const encounterId = lastBattleEncounterId || battleEncounterId;
+    
     // Check if this was the VS1 encounter
-    const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
-    // Get encounterId from battle OR from window (for E2E tests where battle might be cleared)
-    const encounterId = battle?.encounterId || battle?.meta?.encounterId || (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
+    const wasVS1Battle = encounterId === VS1_ENCOUNTER_ID;
 
-    claimRewards(); // This now sets mode to 'overworld'
+    claimRewards(); // This clears lastBattleRewards but keeps lastBattleEncounterId temporarily
     setBattle(null, 0);
+    
     // Clear the stored encounterId after using it
-    delete (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
+    store.setState({ lastBattleEncounterId: null });
 
     // VS1 specific: show post-scene after rewards
     if (wasVS1Battle) {
@@ -196,8 +203,11 @@ function App() {
       }
     }
 
-    // Fallback: return to overworld (shouldn't be needed as claimRewards sets mode)
-    returnToOverworld();
+    // If no dialogue was triggered, return to overworld
+    // (claimRewards doesn't set mode anymore, so we need to do it here)
+    if (!encounterId || (!wasVS1Battle && !ENCOUNTER_TO_RECRUITMENT_DIALOGUE[encounterId])) {
+      returnToOverworld();
+    }
   }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
 
   // Expose handleRewardsContinue for E2E tests (after it's defined)
