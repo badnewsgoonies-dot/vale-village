@@ -13,7 +13,7 @@ import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
 
 export interface GameFlowSlice {
-  mode: 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select';
+  mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
   currentShopId: string | null;
@@ -33,7 +33,7 @@ export const createGameFlowSlice: StateCreator<
   [],
   GameFlowSlice
 > = (set, get) => ({
-  mode: 'overworld',
+  mode: 'title-screen',
   lastTrigger: null,
   currentEncounter: null,
   currentShopId: null,
