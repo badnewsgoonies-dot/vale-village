@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getGameState, waitForMode, getUnitData, completeBattle } from './helpers';
+import { getGameState, waitForMode, getUnitData, completeBattle, claimRewardsAndReturnToOverworld } from './helpers';
 
 /**
  * Full Gameplay Loop E2E Test
@@ -73,6 +73,9 @@ test.describe('Full Gameplay Loop: Two Battles', () => {
     // Complete first battle using helper
     console.log('→ Simulating first battle completion...');
     await completeBattle(page, { logDetails: true });
+    
+    // Claim rewards and return to overworld (completeBattle only waits for rewards mode)
+    await claimRewardsAndReturnToOverworld(page);
     
     // Verify mode transition
     state = await getGameState(page);
@@ -334,14 +337,22 @@ test.describe('Full Gameplay Loop: Two Battles', () => {
 
     // Simulate second battle victory
     console.log('→ Simulating second battle completion...');
-    const finalState = await completeBattle(page, { 
-      captureStateAfterClaim: true,
-      logDetails: true,
+    await completeBattle(page, { logDetails: true });
+    
+    // Capture state before claiming (rewards are already processed by processVictory)
+    const finalState = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const state = store.getState();
+      return {
+        gold: state.gold ?? 0,
+        roster: state.roster ?? [],
+        equipment: state.equipment?.map((e: any) => e.id) ?? [],
+        djinn: state.team?.collectedDjinn ?? [],
+      };
     });
-
-    if (!finalState) {
-      throw new Error('Failed to capture final battle state');
-    }
+    
+    // Claim rewards and return to overworld
+    await claimRewardsAndReturnToOverworld(page);
 
     console.log('→ Returned to overworld. Full gameplay loop complete! 🎉');
 
