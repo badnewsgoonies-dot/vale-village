@@ -40,6 +40,10 @@ import { createTeam } from './core/models/Team';
 import { collectDjinn, equipDjinn } from './core/services/DjinnService';
 import { calculateEffectiveStats } from './core/algorithms/stats';
 import { getXpProgress } from './core/algorithms/xp';
+import { getDjinnGrantedAbilitiesForUnit, calculateDjinnBonusesForUnit } from './core/algorithms/djinnAbilities';
+import { queueDjinn, queueAction, executeRound, queueBattleServiceInternals } from './core/services/QueueBattleService';
+import { makePRNG } from './core/random/prng';
+import { updateBattleState } from './core/models/BattleState';
 
 function App() {
   // Enable dev mode keyboard shortcut (Ctrl+D)
@@ -54,6 +58,29 @@ function App() {
   };
   // Expose equipment definitions for E2E tests
   (window as any).__VALE_EQUIPMENT__ = EQUIPMENT;
+  // Expose Djinn ability functions for E2E tests
+  (window as any).__VALE_DJINN_HELPERS__ = {
+    getDjinnGrantedAbilitiesForUnit,
+    calculateDjinnBonusesForUnit,
+  };
+  // Expose battle service functions for E2E tests
+  (window as any).__VALE_BATTLE_HELPERS__ = {
+    queueDjinn,
+    queueAction,
+    executeRound,
+    transitionToPlanningPhase: queueBattleServiceInternals.transitionToPlanningPhase,
+  };
+  // Expose stats functions for E2E tests
+  (window as any).__VALE_STATS_HELPERS__ = {
+    calculateEffectiveStats,
+    calculateDjinnBonusesForUnit,
+  };
+  // Expose PRNG factory for E2E tests
+  (window as any).__VALE_PRNG__ = makePRNG;
+  // Expose battle state functions for E2E tests
+  (window as any).__VALE_BATTLE_STATE_HELPERS__ = {
+    updateBattleState,
+  };
 
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);

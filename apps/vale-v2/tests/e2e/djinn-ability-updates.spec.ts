@@ -25,13 +25,22 @@ test.describe('Djinn Ability Updates', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Wait for initial state
+    // Wait for initial state and helpers to be available
     await page.waitForFunction(
       () => {
         const store = (window as any).__VALE_STORE__;
-        return store && store.getState().mode === 'overworld';
+        const djinnHelpers = (window as any).__VALE_DJINN_HELPERS__;
+        const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+        const statsHelpers = (window as any).__VALE_STATS_HELPERS__;
+        const PRNG = (window as any).__VALE_PRNG__;
+        return store && 
+               djinnHelpers && 
+               battleHelpers && 
+               statsHelpers && 
+               PRNG &&
+               store.getState().mode === 'overworld';
       },
-      { timeout: 10000 }
+      { timeout: 15000 }
     );
   });
 
@@ -47,12 +56,14 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const helpers = (window as any).__VALE_DJINN_HELPERS__;
+      if (!helpers) return null;
+      
       const state = store.getState();
       const unit = state.team?.units[0];
       if (!unit) return null;
       
-      const { getDjinnGrantedAbilitiesForUnit } = require('../../src/core/algorithms/djinnAbilities');
-      const abilities = getDjinnGrantedAbilitiesForUnit(unit, state.team);
+      const abilities = helpers.getDjinnGrantedAbilitiesForUnit(unit, state.team);
       return abilities;
     });
 
@@ -98,14 +109,16 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const helpers = (window as any).__VALE_DJINN_HELPERS__;
+      if (!helpers) return null;
+      
       const battle = store.getState().battle;
       if (!battle) return null;
       
       const unit = battle.playerTeam?.units[0];
       if (!unit) return null;
       
-      const { getDjinnGrantedAbilitiesForUnit } = require('../../src/core/algorithms/djinnAbilities');
-      const abilities = getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
+      const abilities = helpers.getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
       return {
         abilityIds: abilities,
         abilityCount: unit.abilities.length,
@@ -127,13 +140,15 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      if (!battleHelpers) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle) return;
       
       // Queue Flint Djinn activation
-      const { queueDjinn } = require('../../src/core/services/QueueBattleService');
-      const result = queueDjinn(battle, 'flint');
+      const result = battleHelpers.queueDjinn(battle, 'flint');
       
       if (result.ok) {
         store.getState().setBattle(result.value, 0);
@@ -145,24 +160,24 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      const PRNG = (window as any).__VALE_PRNG__;
+      if (!battleHelpers || !PRNG) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle || battle.phase !== 'planning') return;
       
       // Fill queue with basic attacks if needed
-      const { queueAction } = require('../../src/core/services/QueueBattleService');
-      const { PRNG } = require('../../src/core/random/prng');
-      
       battle.playerTeam.units.forEach((unit: any, index: number) => {
         if (!battle.queuedActions[index] && unit.currentHp > 0) {
-          queueAction(battle, unit.id, null, [battle.enemies[0]?.id || ''], undefined);
+          battleHelpers.queueAction(battle, unit.id, null, [battle.enemies[0]?.id || ''], undefined);
         }
       });
       
       // Execute round
-      const { executeRound } = require('../../src/core/services/QueueBattleService');
-      const rng = new PRNG(12345);
-      const result = executeRound(battle, rng);
+      const rng = PRNG(12345);
+      const result = battleHelpers.executeRound(battle, rng);
       
       store.getState().setBattle(result.state, 0);
     });
@@ -174,14 +189,16 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const helpers = (window as any).__VALE_DJINN_HELPERS__;
+      if (!helpers) return null;
+      
       const battle = store.getState().battle;
       if (!battle) return null;
       
       const unit = battle.playerTeam?.units[0];
       if (!unit) return null;
       
-      const { getDjinnGrantedAbilitiesForUnit } = require('../../src/core/algorithms/djinnAbilities');
-      const abilities = getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
+      const abilities = helpers.getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
       return {
         abilityIds: abilities,
         abilityCount: unit.abilities.length,
@@ -221,26 +238,31 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      const PRNG = (window as any).__VALE_PRNG__;
+      if (!battleHelpers || !PRNG) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle) return;
       
-      const { queueDjinn, queueAction, executeRound } = require('../../src/core/services/QueueBattleService');
-      const { PRNG } = require('../../src/core/random/prng');
-      
       // Queue Djinn
-      queueDjinn(battle, 'flint');
+      const queueResult = battleHelpers.queueDjinn(battle, 'flint');
+      let currentBattle = queueResult.ok ? queueResult.value : battle;
       
       // Fill queue
-      battle.playerTeam.units.forEach((unit: any, index: number) => {
-        if (!battle.queuedActions[index] && unit.currentHp > 0) {
-          queueAction(battle, unit.id, null, [battle.enemies[0]?.id || ''], undefined);
+      currentBattle.playerTeam.units.forEach((unit: any, index: number) => {
+        if (!currentBattle.queuedActions[index] && unit.currentHp > 0) {
+          const actionResult = battleHelpers.queueAction(currentBattle, unit.id, null, [currentBattle.enemies[0]?.id || ''], undefined);
+          if (actionResult.ok) {
+            currentBattle = actionResult.value;
+          }
         }
       });
       
       // Execute
       const rng = new PRNG(12345);
-      const result = executeRound(battle, rng);
+      const result = battleHelpers.executeRound(currentBattle, rng);
       store.getState().setBattle(result.state, 0);
     });
 
@@ -268,24 +290,25 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      const battleStateHelpers = (window as any).__VALE_BATTLE_STATE_HELPERS__;
+      if (!battleHelpers || !battleStateHelpers) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle) return;
       
       // Manually set recovery timer to 0 to trigger recovery
-      const { updateBattleState } = require('../../src/core/models/BattleState');
-      const { transitionToPlanningPhase } = require('../../src/core/services/QueueBattleService');
-      
       // Set timer to 0
       const timers = { ...battle.djinnRecoveryTimers };
       timers['flint'] = 0;
       
-      const updatedBattle = updateBattleState(battle, {
+      const updatedBattle = battleStateHelpers.updateBattleState(battle, {
         djinnRecoveryTimers: timers,
       });
       
       // Trigger recovery
-      const recovered = transitionToPlanningPhase(updatedBattle);
+      const recovered = battleHelpers.transitionToPlanningPhase(updatedBattle);
       store.getState().setBattle(recovered, 0);
     });
 
@@ -296,14 +319,16 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const helpers = (window as any).__VALE_DJINN_HELPERS__;
+      if (!helpers) return null;
+      
       const battle = store.getState().battle;
       if (!battle) return null;
       
       const unit = battle.playerTeam?.units[0];
       if (!unit) return null;
       
-      const { getDjinnGrantedAbilitiesForUnit } = require('../../src/core/algorithms/djinnAbilities');
-      const abilities = getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
+      const abilities = helpers.getDjinnGrantedAbilitiesForUnit(unit, battle.playerTeam);
       return {
         abilityIds: abilities,
         abilityCount: unit.abilities.length,
@@ -342,15 +367,17 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const statsHelpers = (window as any).__VALE_STATS_HELPERS__;
+      if (!statsHelpers) return null;
+      
       const battle = store.getState().battle;
       if (!battle) return null;
       
       const unit = battle.playerTeam?.units[0];
       if (!unit) return null;
       
-      const { calculateEffectiveStats, calculateDjinnBonusesForUnit } = require('../../src/core/algorithms/stats');
-      const effectiveStats = calculateEffectiveStats(unit, battle.playerTeam);
-      const djinnBonuses = calculateDjinnBonusesForUnit(unit, battle.playerTeam);
+      const effectiveStats = statsHelpers.calculateEffectiveStats(unit, battle.playerTeam);
+      const djinnBonuses = statsHelpers.calculateDjinnBonusesForUnit(unit, battle.playerTeam);
       
       return {
         effectiveAtk: effectiveStats.atk,
@@ -370,22 +397,28 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      const PRNG = (window as any).__VALE_PRNG__;
+      if (!battleHelpers || !PRNG) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle) return;
       
-      const { queueDjinn, queueAction, executeRound } = require('../../src/core/services/QueueBattleService');
-      const { PRNG } = require('../../src/core/random/prng');
+      const queueResult = battleHelpers.queueDjinn(battle, 'flint');
+      let currentBattle = queueResult.ok ? queueResult.value : battle;
       
-      queueDjinn(battle, 'flint');
-      battle.playerTeam.units.forEach((unit: any, index: number) => {
-        if (!battle.queuedActions[index] && unit.currentHp > 0) {
-          queueAction(battle, unit.id, null, [battle.enemies[0]?.id || ''], undefined);
+      currentBattle.playerTeam.units.forEach((unit: any, index: number) => {
+        if (!currentBattle.queuedActions[index] && unit.currentHp > 0) {
+          const actionResult = battleHelpers.queueAction(currentBattle, unit.id, null, [currentBattle.enemies[0]?.id || ''], undefined);
+          if (actionResult.ok) {
+            currentBattle = actionResult.value;
+          }
         }
       });
       
       const rng = new PRNG(12345);
-      const result = executeRound(battle, rng);
+      const result = battleHelpers.executeRound(currentBattle, rng);
       store.getState().setBattle(result.state, 0);
     });
 
@@ -396,15 +429,17 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return null;
       
+      const statsHelpers = (window as any).__VALE_STATS_HELPERS__;
+      if (!statsHelpers) return null;
+      
       const battle = store.getState().battle;
       if (!battle) return null;
       
       const unit = battle.playerTeam?.units[0];
       if (!unit) return null;
       
-      const { calculateEffectiveStats, calculateDjinnBonusesForUnit } = require('../../src/core/algorithms/stats');
-      const effectiveStats = calculateEffectiveStats(unit, battle.playerTeam);
-      const djinnBonuses = calculateDjinnBonusesForUnit(unit, battle.playerTeam);
+      const effectiveStats = statsHelpers.calculateEffectiveStats(unit, battle.playerTeam);
+      const djinnBonuses = statsHelpers.calculateDjinnBonusesForUnit(unit, battle.playerTeam);
       
       return {
         effectiveAtk: effectiveStats.atk,
@@ -450,22 +485,28 @@ test.describe('Djinn Ability Updates', () => {
       const store = (window as any).__VALE_STORE__;
       if (!store) return;
       
+      const battleHelpers = (window as any).__VALE_BATTLE_HELPERS__;
+      const PRNG = (window as any).__VALE_PRNG__;
+      if (!battleHelpers || !PRNG) return;
+      
       const state = store.getState();
       const battle = state.battle;
       if (!battle) return;
       
-      const { queueDjinn, queueAction, executeRound } = require('../../src/core/services/QueueBattleService');
-      const { PRNG } = require('../../src/core/random/prng');
+      const queueResult = battleHelpers.queueDjinn(battle, 'flint');
+      let currentBattle = queueResult.ok ? queueResult.value : battle;
       
-      queueDjinn(battle, 'flint');
-      battle.playerTeam.units.forEach((unit: any, index: number) => {
-        if (!battle.queuedActions[index] && unit.currentHp > 0) {
-          queueAction(battle, unit.id, null, [battle.enemies[0]?.id || ''], undefined);
+      currentBattle.playerTeam.units.forEach((unit: any, index: number) => {
+        if (!currentBattle.queuedActions[index] && unit.currentHp > 0) {
+          const actionResult = battleHelpers.queueAction(currentBattle, unit.id, null, [currentBattle.enemies[0]?.id || ''], undefined);
+          if (actionResult.ok) {
+            currentBattle = actionResult.value;
+          }
         }
       });
       
       const rng = new PRNG(12345);
-      const result = executeRound(battle, rng);
+      const result = battleHelpers.executeRound(currentBattle, rng);
       store.getState().setBattle(result.state, 0);
     });
 
