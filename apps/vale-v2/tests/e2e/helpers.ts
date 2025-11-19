@@ -667,17 +667,11 @@ export async function jumpToHouse(page: Page, houseNumber: number): Promise<void
   });
   console.log(`   After clicking house ${houseNumber}, mode: ${modeAfterClick.mode}, pendingBattle: ${modeAfterClick.pendingBattleEncounterId}`);
   
-  // setPendingBattle now automatically sets mode to 'team-select', so this should not be needed
-  // But keep as fallback in case of timing issues
+  // setPendingBattle now automatically sets mode to 'team-select' in gameFlowSlice
+  // Verify it worked correctly
   if (modeAfterClick.pendingBattleEncounterId && modeAfterClick.mode !== 'team-select') {
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      if (store) {
-        store.getState().setMode('team-select');
-      }
-    });
-    await page.waitForTimeout(200);
-    console.log(`   Fallback: manually set mode to team-select`);
+    // This should not happen anymore, but log if it does for debugging
+    console.warn(`   WARNING: Mode is ${modeAfterClick.mode} but should be 'team-select'`);
   }
 }
 
@@ -732,15 +726,53 @@ export async function completeBattleFlow(page: Page, options?: {
   }
   if (logDetails) console.log('   Rewards screen shown');
 
-  // 6. Click continue/claim rewards button
+  // 6. Check if there's an equipment choice that needs to be selected first
+  const hasEquipmentChoice = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const rewards = store?.getState()?.lastBattleRewards;
+    return rewards?.equipmentChoice && !rewards?.choiceSelected;
+  });
+  
+  if (hasEquipmentChoice) {
+    // Select the first equipment option
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const rewards = store?.getState()?.lastBattleRewards;
+      if (rewards?.equipmentChoice && rewards.equipmentChoice.length > 0) {
+        store.getState().selectEquipmentChoice(rewards.equipmentChoice[0]);
+      }
+    });
+    await page.waitForTimeout(200);
+    if (logDetails) console.log('   Selected equipment choice');
+  }
+
+  // 7. Click continue/claim rewards button
   // This triggers handleRewardsContinue which handles recruitment dialogue
   const continueButton = page.getByRole('button', { name: /continue|claim/i });
   const buttonVisible = await continueButton.isVisible().catch(() => false);
+  const buttonEnabled = buttonVisible ? await continueButton.isEnabled().catch(() => false) : false;
   
-  if (buttonVisible) {
+  if (buttonVisible && buttonEnabled) {
     await continueButton.click();
     // Wait for the click to process and mode to transition
     await page.waitForTimeout(500);
+  } else if (!buttonEnabled && buttonVisible) {
+    // Button is visible but disabled - might still be processing equipment selection
+    await page.waitForTimeout(300);
+    // Try clicking again
+    const retryEnabled = await continueButton.isEnabled().catch(() => false);
+    if (retryEnabled) {
+      await continueButton.click();
+      await page.waitForTimeout(500);
+    } else {
+      // Fallback: call handleRewardsContinue directly
+      await page.evaluate(() => {
+        if ((window as any).handleRewardsContinue) {
+          (window as any).handleRewardsContinue();
+        }
+      });
+      await page.waitForTimeout(500);
+    }
   } else {
     // Fallback: call handleRewardsContinue directly (exposed on window for E2E tests)
     // This ensures the same flow as UI: claim rewards + check for recruitment dialogue
@@ -774,7 +806,7 @@ export async function completeBattleFlow(page: Page, options?: {
   // If we're in dialogue mode, that's expected for recruitment
   // The caller will handle dialogue if expectDialogue is true
 
-  // 7. If recruitment dialogue is expected, wait for it
+  // 8. If recruitment dialogue is expected, wait for it
   if (expectDialogue) {
     // Check if we're already in dialogue mode
     const currentModeCheck = await page.evaluate(() => {
@@ -799,7 +831,7 @@ export async function completeBattleFlow(page: Page, options?: {
     if (logDetails) console.log('   Recruitment dialogue completed');
   }
 
-  // 8. Should be back at overworld
+  // 9. Should be back at overworld
   await waitForMode(page, 'overworld', 5000);
   if (logDetails) console.log('   Returned to overworld');
 }
