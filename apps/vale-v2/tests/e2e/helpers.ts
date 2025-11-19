@@ -263,14 +263,14 @@ export async function completeBattle(
     console.log('   Victory! Rewards shown');
   }
 
-  // 3. Claim rewards (optionally capture state)
+  // 3. Don't claim rewards here - let completeBattleFlow handle it via handleRewardsContinue
+  // This ensures recruitment dialogue is triggered properly
   let capturedState: BattleResult | null = null;
 
   if (captureStateAfterClaim) {
+    // Capture state before claiming (rewards are already processed by processVictory)
     capturedState = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
-
       const state = store.getState();
       return {
         gold: state.gold ?? 0,
@@ -279,43 +279,10 @@ export async function completeBattle(
         djinn: state.team?.collectedDjinn ?? [],
       };
     });
-  } else {
-    // Just claim without capturing
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
-    });
   }
 
-  // 4. Click continue button - this triggers handleRewardsContinue which:
-  //    - Claims rewards
-  //    - Checks for recruitment dialogue
-  //    - Starts dialogue if applicable
-  //    - Returns to overworld if no dialogue
-  const claimButton = page.getByRole('button', { name: /claim|continue|next/i });
-  const isVisible = await claimButton.isVisible().catch(() => false);
-  if (isVisible) {
-    await claimButton.click();
-    // Wait a moment for the click to process
-    await page.waitForTimeout(200);
-  } else {
-    // Fallback: call claimRewards directly if button not found
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
-    });
-  }
-
-  // 5. Check if we're in dialogue mode (recruitment dialogue) or overworld
-  // Don't immediately wait for overworld - dialogue might be starting
-  const currentMode = await page.evaluate(() => {
-    const store = (window as any).__VALE_STORE__;
-    return store?.getState()?.mode ?? null;
-  });
-  
-  // If we're in dialogue mode, that's expected (recruitment dialogue)
-  // If we're in overworld, that's also fine (no recruitment dialogue)
-  // Don't force wait for overworld - let the caller handle dialogue if needed
+  // Note: We don't claim rewards here - completeBattleFlow will handle it
+  // This ensures handleRewardsContinue is called, which triggers recruitment dialogue
 
   return capturedState;
 }
@@ -771,10 +738,11 @@ export async function completeBattleFlow(page: Page, options?: {
   // This triggers handleRewardsContinue which handles recruitment dialogue
   const continueButton = page.getByRole('button', { name: /continue|claim/i });
   const buttonVisible = await continueButton.isVisible().catch(() => false);
+  
   if (buttonVisible) {
     await continueButton.click();
     // Wait for the click to process and mode to transition
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
   } else {
     // Fallback: call handleRewardsContinue directly (exposed on window for E2E tests)
     // This ensures the same flow as UI: claim rewards + check for recruitment dialogue
@@ -787,23 +755,46 @@ export async function completeBattleFlow(page: Page, options?: {
         store.getState().claimRewards();
       }
     });
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
   }
   
   // Check current mode - might be 'dialogue' (recruitment) or 'overworld'
   const modeAfterClaim = await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
-    return store?.getState()?.mode ?? null;
+    const lastEncounterId = (window as any).__LAST_BATTLE_ENCOUNTER_ID__;
+    return {
+      mode: store?.getState()?.mode ?? null,
+      lastEncounterId,
+      hasDialogue: !!store?.getState()?.currentDialogueTree,
+    };
   });
+  
+  if (logDetails) {
+    console.log(`   After claiming rewards, mode: ${modeAfterClaim.mode}, encounterId: ${modeAfterClaim.lastEncounterId}, hasDialogue: ${modeAfterClaim.hasDialogue}`);
+  }
   
   // If we're in dialogue mode, that's expected for recruitment
   // The caller will handle dialogue if expectDialogue is true
 
   // 7. If recruitment dialogue is expected, wait for it
   if (expectDialogue) {
-    // Wait for dialogue mode (with longer timeout as it might take a moment)
-    await waitForMode(page, 'dialogue', 10000);
-    if (logDetails) console.log('   Recruitment dialogue started');
+    // Check if we're already in dialogue mode
+    const currentModeCheck = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return {
+        mode: store?.getState()?.mode ?? null,
+        hasDialogue: !!store?.getState()?.currentDialogueTree,
+      };
+    });
+    
+    if (currentModeCheck.mode === 'dialogue' || currentModeCheck.hasDialogue) {
+      if (logDetails) console.log('   Recruitment dialogue already started');
+    } else {
+      // Wait for dialogue mode (with longer timeout as it might take a moment)
+      if (logDetails) console.log(`   Waiting for dialogue mode (current: ${currentModeCheck.mode})...`);
+      await waitForMode(page, 'dialogue', 10000);
+      if (logDetails) console.log('   Recruitment dialogue started');
+    }
 
     // Advance through dialogue until it ends
     await advanceDialogueUntilEnd(page);
