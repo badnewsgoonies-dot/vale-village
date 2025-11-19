@@ -42,6 +42,7 @@ function calculateStatsAtLevel(unitDef: UnitDefinition, level: number): Stats {
  */
 interface UnitToEnemyOptions {
   id?: string;
+  stats?: Partial<Stats>;
 }
 
 export function unitDefinitionToEnemy(
@@ -53,6 +54,11 @@ export function unitDefinitionToEnemy(
 ): Enemy {
   // Calculate stats at target level
   const statsAtLevel = calculateStatsAtLevel(unitDef, level);
+  
+  // Apply stat overrides if provided
+  const finalStats = options.stats 
+    ? { ...statsAtLevel, ...options.stats }
+    : statsAtLevel;
   
   // Get abilities unlocked at this level
   const abilitiesAtLevel = unitDef.abilities.filter(
@@ -69,7 +75,7 @@ export function unitDefinitionToEnemy(
     name: unitDef.name, // Use same name (e.g., "Garet" not "Garet Enemy")
     level,
     element: unitDef.element,
-    stats: statsAtLevel,
+    stats: finalStats,
     abilities: enemyAbilities,
     baseXp,
     baseGold,

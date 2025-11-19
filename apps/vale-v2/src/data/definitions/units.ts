@@ -28,6 +28,16 @@ import {
   BURN_TOUCH,
   FREEZE_BLAST,
   PARALYZE_SHOCK,
+  // Balanced ability sets
+  EARTH_SPIKE_DAMAGE,
+  STONE_SKIN_UTILITY,
+  FLAME_BURST_DAMAGE,
+  FIRE_WARD_UTILITY,
+  ICE_LANCE_DAMAGE,
+  AQUA_HEAL_UTILITY,
+  GALE_FORCE_DAMAGE,
+  WIND_BARRIER_UTILITY,
+  FOCUS_STRIKE_NEUTRAL,
 } from './abilities';
 
 // ============================================================================
@@ -57,9 +67,14 @@ export const ADEPT: UnitDefinition = {
   },
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
-    { ...GUARD_BREAK, unlockLevel: 2 },
-    { ...QUAKE, unlockLevel: 3 },
-    { ...POISON_STRIKE, unlockLevel: 4 },
+    // Same element (Venus): 1 damage, 1 utility
+    { ...EARTH_SPIKE_DAMAGE, unlockLevel: 1 },
+    { ...STONE_SKIN_UTILITY, unlockLevel: 1 },
+    // Counter element (Mercury counters Venus): 1 damage, 1 utility
+    { ...ICE_LANCE_DAMAGE, unlockLevel: 1 },
+    { ...AQUA_HEAL_UTILITY, unlockLevel: 1 },
+    // Neutral
+    { ...FOCUS_STRIKE_NEUTRAL, unlockLevel: 1 },
   ],
   manaContribution: 1,
   description: 'A sturdy Earth adept who breaks through enemy defenses',
@@ -88,9 +103,14 @@ export const WAR_MAGE: UnitDefinition = {
   },
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
-    { ...FIREBALL, unlockLevel: 1 },
-    { ...BOOST_ATK, unlockLevel: 2 },
-    { ...BURN_TOUCH, unlockLevel: 3 },
+    // Same element (Mars): 1 damage, 1 utility
+    { ...FLAME_BURST_DAMAGE, unlockLevel: 1 },
+    { ...FIRE_WARD_UTILITY, unlockLevel: 1 },
+    // Counter element (Jupiter counters Mars): 1 damage, 1 utility
+    { ...GALE_FORCE_DAMAGE, unlockLevel: 1 },
+    { ...WIND_BARRIER_UTILITY, unlockLevel: 1 },
+    // Neutral
+    { ...FOCUS_STRIKE_NEUTRAL, unlockLevel: 1 },
   ],
   manaContribution: 2,
   description: 'A fire mage who burns enemies with powerful psynergy',
@@ -119,10 +139,14 @@ export const MYSTIC: UnitDefinition = {
   },
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
-    { ...HEAL, unlockLevel: 1 },
-    { ...PARTY_HEAL, unlockLevel: 2 },
-    { ...ICE_SHARD, unlockLevel: 3 },
-    { ...FREEZE_BLAST, unlockLevel: 4 },
+    // Same element (Mercury): 1 damage, 1 utility
+    { ...ICE_LANCE_DAMAGE, unlockLevel: 1 },
+    { ...AQUA_HEAL_UTILITY, unlockLevel: 1 },
+    // Counter element (Venus counters Mercury): 1 damage, 1 utility
+    { ...EARTH_SPIKE_DAMAGE, unlockLevel: 1 },
+    { ...STONE_SKIN_UTILITY, unlockLevel: 1 },
+    // Neutral
+    { ...FOCUS_STRIKE_NEUTRAL, unlockLevel: 1 },
   ],
   manaContribution: 2,
   description: 'A water mystic who heals allies and freezes enemies',
@@ -151,10 +175,14 @@ export const RANGER: UnitDefinition = {
   },
   abilities: [
     { ...STRIKE, unlockLevel: 1 },
-    { ...PRECISE_JAB, unlockLevel: 1 },
-    { ...GUST, unlockLevel: 2 },
-    { ...BLIND, unlockLevel: 2 },
-    { ...PARALYZE_SHOCK, unlockLevel: 3 },
+    // Same element (Jupiter): 1 damage, 1 utility
+    { ...GALE_FORCE_DAMAGE, unlockLevel: 1 },
+    { ...WIND_BARRIER_UTILITY, unlockLevel: 1 },
+    // Counter element (Mars counters Jupiter): 1 damage, 1 utility
+    { ...FLAME_BURST_DAMAGE, unlockLevel: 1 },
+    { ...FIRE_WARD_UTILITY, unlockLevel: 1 },
+    // Neutral
+    { ...FOCUS_STRIKE_NEUTRAL, unlockLevel: 1 },
   ],
   manaContribution: 1,
   description: 'A swift wind ranger who strikes with precision and blinds foes',

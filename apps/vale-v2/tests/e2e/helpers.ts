@@ -478,23 +478,20 @@ export async function claimRewardsAndReturnToOverworld(page: Page): Promise<void
     return store?.getState()?.mode ?? null;
   });
   
-  if (modeAfterClaim === 'dialogue') {
+  // Check for dialogue mode or dialogue tree
+  const hasDialogue = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return !!store?.getState()?.currentDialogueTree;
+  });
+  
+  if (modeAfterClaim === 'dialogue' || hasDialogue) {
     // Advance through dialogue if present (house encounters trigger recruitment)
-    await page.keyboard.press('Space');
-    await page.waitForTimeout(500);
-    // Keep advancing until we're out of dialogue
-    for (let i = 0; i < 10; i++) {
-      const mode = await page.evaluate(() => {
-        const store = (window as any).__VALE_STORE__;
-        return store?.getState()?.mode ?? null;
-      });
-      if (mode !== 'dialogue') break;
-      await page.keyboard.press('Space');
-      await page.waitForTimeout(300);
-    }
+    // Use advanceDialogue helper which handles both button clicks and store methods
+    await advanceDialogueUntilEnd(page, 20);
   }
   
-  await waitForMode(page, 'overworld', 10000);
+  // Wait for overworld mode with longer timeout to allow dialogue to complete
+  await waitForMode(page, 'overworld', 15000);
 }
 
 /**

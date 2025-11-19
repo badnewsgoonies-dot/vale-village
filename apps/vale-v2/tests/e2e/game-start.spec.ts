@@ -226,6 +226,41 @@ test.describe('Battle Trigger & Team Selection', () => {
 });
 
 test.describe('Battle System', () => {
+  
+  test('battle state has enemies from encounter', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Navigate to battle trigger
+    for (let i = 0; i < 8; i++) {
+      await page.keyboard.press('ArrowLeft');
+      await page.waitForTimeout(100);
+    }
+
+    await waitForMode(page, 'team-select');
+
+    const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
+    await confirmButton.click();
+
+    await waitForMode(page, 'battle');
+
+    // Check battle state
+    const battleState = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      if (!store) return null;
+      const state = store.getState();
+      return {
+        enemyCount: state.battle?.enemies?.length ?? 0,
+        enemyIds: state.battle?.enemies?.map((e: any) => e.id) ?? [],
+      };
+    });
+
+    // house-01 has 1 enemy (garet-enemy)
+    expect(battleState?.enemyCount).toBeGreaterThanOrEqual(1);
+    expect(battleState?.enemyIds.length).toBeGreaterThanOrEqual(1);
+  });
+
+
   test('battle UI shows action buttons', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
