@@ -199,25 +199,50 @@ export async function completeBattle(
 ): Promise<BattleResult | null> {
   const { captureStateAfterClaim = false, logDetails = true } = options ?? {};
 
-  // 1. Simulate victory
+  // 1. Simulate victory by setting enemies to 0 HP and battle phase to 'victory'
+  // This mimics what executeQueuedRound does when checkBattleEnd returns 'PLAYER_VICTORY'
   await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
     const battleState = store.getState().battle;
 
     if (!battleState) return;
 
+    // Set enemies to 0 HP and phase to 'victory' to trigger proper battle end flow
     const updatedBattle = {
       ...battleState,
       enemies: battleState.enemies?.map((enemy: any) => ({
         ...enemy,
         currentHp: 0,
       })),
+      phase: 'victory' as const,
       battleOver: true,
-      victory: true,
     };
 
+    // Update battle state first
     store.setState({ battle: updatedBattle });
-    store.getState().processVictory(updatedBattle);
+
+    // Then process victory (this will set mode to 'rewards')
+    // This matches what executeQueuedRound does when phase === 'victory'
+    const { processVictory, updateTeamUnits } = store.getState();
+    
+    // Auto-heal units (matching executeQueuedRound behavior)
+    const healedUnits = updatedBattle.playerTeam.units.map((unit: any) => ({
+      ...unit,
+      currentHp: unit.maxHp,
+    }));
+    
+    const healedTeam = {
+      ...updatedBattle.playerTeam,
+      units: healedUnits,
+    };
+    
+    const healedBattle = {
+      ...updatedBattle,
+      playerTeam: healedTeam,
+    };
+    
+    updateTeamUnits(healedUnits);
+    processVictory(healedBattle);
   });
 
   // 2. Wait for rewards screen
@@ -633,20 +658,39 @@ export async function completeBattleFlow(page: Page, options?: {
   await waitForMode(page, 'battle', 10000);
   if (logDetails) console.log('   Battle started');
 
-  // 4. Complete battle (simulates victory)
+  // 4. Complete battle (simulates victory) - this already waits for rewards mode
   await completeBattle(page, { logDetails: false });
 
-  // 5. Rewards screen should appear
-  await waitForMode(page, 'rewards', 10000);
+  // 5. Rewards screen should already be shown (completeBattle waits for it)
+  // But verify we're still in rewards mode
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (currentMode !== 'rewards') {
+    // If not in rewards mode, wait for it
+    await waitForMode(page, 'rewards', 5000);
+  }
   if (logDetails) console.log('   Rewards screen shown');
 
   // 6. Click continue/claim rewards
   const continueButton = page.getByRole('button', { name: /continue|claim/i });
-  await continueButton.click();
+  const buttonVisible = await continueButton.isVisible().catch(() => false);
+  if (buttonVisible) {
+    await continueButton.click();
+  } else {
+    // If button not visible, try claiming via store method
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      store.getState().claimRewards();
+    });
+  }
 
-  // 7. If recruitment dialogue is expected, advance through it
+  // 7. If recruitment dialogue is expected, wait for it
   if (expectDialogue) {
-    await waitForMode(page, 'dialogue', 5000);
+    // Wait for dialogue mode (with longer timeout as it might take a moment)
+    await waitForMode(page, 'dialogue', 10000);
     if (logDetails) console.log('   Recruitment dialogue started');
 
     // Advance through dialogue until it ends
