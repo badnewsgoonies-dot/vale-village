@@ -87,8 +87,11 @@ export const createStorySlice: StateCreator<
         }
 
         // Process story flag for Unit recruitment (story joins)
+        // For house encounters, use the house ID directly (e.g., 'house-02') instead of flagKey
+        // because STORY_FLAG_TO_UNIT uses house-XX keys
+        const storyJoinFlagKey = e.encounterId.startsWith('house-') ? e.encounterId : flagKey;
         const avgLevel = team ? Math.max(1, Math.floor(team.units.reduce((sum, u) => sum + u.level, 0) / team.units.length)) : 1;
-        const unitResult = processStoryFlagForUnit(st, flagKey, true, avgLevel);
+        const unitResult = processStoryFlagForUnit(st, storyJoinFlagKey, true, avgLevel);
         st = unitResult.story;
 
         // Add recruited unit to roster if applicable

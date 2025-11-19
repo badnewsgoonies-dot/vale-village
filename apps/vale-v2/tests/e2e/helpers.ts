@@ -230,7 +230,7 @@ export async function completeBattle(
 
     // Then process victory (this will set mode to 'rewards')
     // This matches what executeQueuedRound does when phase === 'victory'
-    const { processVictory, updateTeamUnits } = store.getState();
+    const { processVictory, updateTeamUnits, onBattleEvents } = store.getState();
     
     // Auto-heal units (matching executeQueuedRound behavior)
     const healedUnits = updatedBattle.playerTeam.units.map((unit: any) => ({
@@ -250,6 +250,22 @@ export async function completeBattle(
     
     updateTeamUnits(healedUnits);
     processVictory(healedBattle);
+    
+    // Emit encounter-finished event (matching queueBattleSlice behavior)
+    const battleEncounterId = healedBattle.encounterId || healedBattle.meta?.encounterId;
+    if (battleEncounterId && onBattleEvents) {
+      onBattleEvents([
+        {
+          type: 'battle-end',
+          result: 'PLAYER_VICTORY',
+        },
+        {
+          type: 'encounter-finished',
+          outcome: 'PLAYER_VICTORY',
+          encounterId: battleEncounterId,
+        },
+      ]);
+    }
   });
   
   // Note: encounterId is now stored in rewardsSlice.lastBattleEncounterId during processVictory
