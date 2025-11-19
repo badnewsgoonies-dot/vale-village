@@ -10,21 +10,21 @@ describe('Battle Integration', () => {
     const team = mkTeam([mkUnit({ id: 'u1' })]);
     const rng = makePRNG(42);
     
-    const result = createBattleFromEncounter('c1_normal_3', team, rng);
+    const result = createBattleFromEncounter('house-03', team, rng);
     
     expect(result).toBeDefined();
     expect(result?.battle).toBeDefined();
     expect(result?.battle.phase).toBe('planning');
     expect(result?.encounter).toBeDefined();
-    expect(result?.encounter.id).toBe('c1_normal_3');
+    expect(result?.encounter.id).toBe('house-03');
   });
 
   test('should create battle with correct enemies', () => {
     const team = mkTeam([mkUnit()]);
     const rng = makePRNG(42);
     
-    const result = createBattleFromEncounter('c1_normal_3', team, rng);
-    const encounter = ENCOUNTERS['c1_normal_3'];
+    const result = createBattleFromEncounter('house-03', team, rng);
+    const encounter = ENCOUNTERS['house-03'];
     
     expect(result).toBeDefined();
     expect(result?.battle.enemies.length).toBe(encounter.enemies.length);
@@ -36,7 +36,7 @@ describe('Battle Integration', () => {
     const team = mkTeam([strongUnit]);
     const rng = makePRNG(42);
     
-    const result = createBattleFromEncounter('c1_normal_1', team, rng);
+    const result = createBattleFromEncounter('house-01', team, rng);
     if (!result) {
       throw new Error('Failed to create encounter');
     }

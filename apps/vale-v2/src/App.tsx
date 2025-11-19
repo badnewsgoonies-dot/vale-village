@@ -6,7 +6,7 @@ import { RewardsScreen } from './ui/components/RewardsScreen';
 import { OverworldMap } from './ui/components/OverworldMap';
 import { DialogueBox } from './ui/components/DialogueBox';
 import { SaveMenu } from './ui/components/SaveMenu';
-import { ShopScreen } from './ui/components/ShopScreen';
+import { ShopEquipScreen } from './ui/components/ShopEquipScreen';
 import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
@@ -290,8 +290,8 @@ function App() {
               <DialogueBox />
             </>
           )}
-          {mode === 'shop' && currentShopId && (
-            <ShopScreen shopId={currentShopId} onClose={() => setMode('overworld')} />
+          {mode === 'shop' && (
+            <ShopEquipScreen shopId={currentShopId || undefined} onClose={() => setMode('overworld')} />
           )}
         </>
       )}

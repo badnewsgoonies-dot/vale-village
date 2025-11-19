@@ -177,7 +177,7 @@ export function EquipmentSection({
               No {activeTab} available
             </div>
           ) : (
-            availableEquipment.slice(0, 5).map((item) => (
+            availableEquipment.map((item) => (
               <div
                 key={item.id}
                 className="compendium-item"
