@@ -10,6 +10,10 @@ import { DJINN } from '@/data/definitions/djinn';
 import { ENEMIES } from '@/data/definitions/enemies';
 import { ABILITIES } from '@/data/definitions/abilities';
 import { DJINN_ABILITIES } from '@/data/definitions/djinnAbilities';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPortraitSprite } from '../sprites/mappings/portraits';
+import { getAbilityIconSprite } from '../sprites/mappings/abilityIcons';
+import { EquipmentIcon } from './EquipmentIcon';
 import './CompendiumScreen.css';
 
 interface CompendiumScreenProps {
@@ -133,6 +137,14 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                       className="compendium-item clickable"
                       onClick={() => setSelectedUnitId(unit.id)}
                     >
+                      <div className="item-sprite">
+                        <SimpleSprite
+                          id={getPortraitSprite(unit.id)}
+                          width={64}
+                          height={64}
+                          style={{ borderRadius: '8px' }}
+                        />
+                      </div>
                       <div className="item-name">{unit.name}</div>
                       <div className="item-details">
                         <div>Element: {unit.element}</div>
@@ -155,6 +167,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                   const ability = equip.unlocksAbility ? ABILITIES[equip.unlocksAbility] : null;
                   return (
                     <div key={equip.id} className="compendium-item detailed">
+                      <div className="item-sprite">
+                        <EquipmentIcon equipment={equip} size="large" />
+                      </div>
                       <div className="item-name">{equip.name}</div>
                       <div className="item-details">
                         <div className="detail-row">
@@ -187,13 +202,20 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                         )}
                         {ability && (
                           <div className="ability-section">
-                            <div className="ability-name">{ability.name}</div>
+                            <div className="ability-header-with-icon">
+                              <SimpleSprite
+                                id={getAbilityIconSprite(ability.id)}
+                                width={24}
+                                height={24}
+                              />
+                              <div className="ability-name">{ability.name}</div>
+                            </div>
                             <div className="ability-description">{ability.description}</div>
                             <div className="ability-stats">
                               {ability.type && <span>Type: {ability.type}</span>}
-                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                          <span>Mana: {ability.manaCost}</span>
-                        )}
+                              {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                <span>Mana: {ability.manaCost}</span>
+                              )}
                               {ability.basePower !== undefined && ability.basePower > 0 && (
                                 <span>Power: {ability.basePower}</span>
                               )}
@@ -219,21 +241,31 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                 />
               ) : (
                 <div className="compendium-grid">
-                  {Object.values(DJINN).map((djinn) => (
-                    <div
-                      key={djinn.id}
-                      className="compendium-item clickable"
-                      onClick={() => setSelectedDjinnId(djinn.id)}
-                    >
-                      <div className="item-name">{djinn.name}</div>
-                      <div className="item-details">
-                        <div>Element: {djinn.element}</div>
-                        <div>Tier: {djinn.tier}</div>
-                        <div>Summon: {djinn.summonEffect.type}</div>
-                        <div className="click-hint">Click for ability network</div>
+                  {Object.values(DJINN).map((djinn) => {
+                    const elementLower = djinn.element.toLowerCase();
+                    return (
+                      <div
+                        key={djinn.id}
+                        className="compendium-item clickable"
+                        onClick={() => setSelectedDjinnId(djinn.id)}
+                      >
+                        <div className="item-sprite">
+                          <SimpleSprite
+                            id={`${elementLower}-djinn-front`}
+                            width={64}
+                            height={64}
+                          />
+                        </div>
+                        <div className="item-name">{djinn.name}</div>
+                        <div className="item-details">
+                          <div>Element: {djinn.element}</div>
+                          <div>Tier: {djinn.tier}</div>
+                          <div>Summon: {djinn.summonEffect.type}</div>
+                          <div className="click-hint">Click for ability network</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -246,6 +278,13 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                 {regularEnemies.map((enemy) => {
                   return (
                     <div key={enemy.id} className="compendium-item detailed">
+                      <div className="item-sprite">
+                        <SimpleSprite
+                          id={enemy.id.toLowerCase()}
+                          width={64}
+                          height={64}
+                        />
+                      </div>
                       <div className="item-name">{enemy.name}</div>
                       <div className="item-details">
                         <div className="detail-row">
@@ -271,13 +310,20 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                               if (!ability) return null;
                               return (
                                 <div key={idx} className="ability-item">
-                                  <div className="ability-name">{ability.name}</div>
+                                  <div className="ability-header-with-icon">
+                                    <SimpleSprite
+                                      id={getAbilityIconSprite(ability.id)}
+                                      width={24}
+                                      height={24}
+                                    />
+                                    <div className="ability-name">{ability.name}</div>
+                                  </div>
                                   <div className="ability-description">{ability.description}</div>
                                   <div className="ability-stats">
                                     {ability.type && <span>Type: {ability.type}</span>}
-                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                          <span>Mana: {ability.manaCost}</span>
-                        )}
+                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                      <span>Mana: {ability.manaCost}</span>
+                                    )}
                                     {ability.basePower !== undefined && ability.basePower > 0 && (
                                       <span>Power: {ability.basePower}</span>
                                     )}
@@ -310,6 +356,13 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                 {bossEnemies.map((enemy) => {
                   return (
                     <div key={enemy.id} className="compendium-item detailed boss">
+                      <div className="item-sprite">
+                        <SimpleSprite
+                          id={enemy.id.toLowerCase()}
+                          width={64}
+                          height={64}
+                        />
+                      </div>
                       <div className="item-name boss-name">{enemy.name}</div>
                       <div className="item-details">
                         <div className="detail-row">
@@ -335,13 +388,20 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                               if (!ability) return null;
                               return (
                                 <div key={idx} className="ability-item">
-                                  <div className="ability-name">{ability.name}</div>
+                                  <div className="ability-header-with-icon">
+                                    <SimpleSprite
+                                      id={getAbilityIconSprite(ability.id)}
+                                      width={24}
+                                      height={24}
+                                    />
+                                    <div className="ability-name">{ability.name}</div>
+                                  </div>
                                   <div className="ability-description">{ability.description}</div>
                                   <div className="ability-stats">
                                     {ability.type && <span>Type: {ability.type}</span>}
-                        {ability.manaCost !== undefined && ability.manaCost > 0 && (
-                          <span>Mana: {ability.manaCost}</span>
-                        )}
+                                    {ability.manaCost !== undefined && ability.manaCost > 0 && (
+                                      <span>Mana: {ability.manaCost}</span>
+                                    )}
                                     {ability.basePower !== undefined && ability.basePower > 0 && (
                                       <span>Power: {ability.basePower}</span>
                                     )}
@@ -412,11 +472,21 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
     <div className="unit-detail-view">
       <button className="back-btn" onClick={onBack}>← Back</button>
       <div className="unit-detail-header">
-        <h2>{unit.name}</h2>
-        <div className="unit-meta">
-          <span>Element: {unit.element}</span>
-          <span>Role: {unit.role}</span>
-          {unit.description && <p className="unit-description">{unit.description}</p>}
+        <div className="unit-header-with-sprite">
+          <SimpleSprite
+            id={getPortraitSprite(unit.id)}
+            width={96}
+            height={96}
+            style={{ borderRadius: '12px' }}
+          />
+          <div>
+            <h2>{unit.name}</h2>
+            <div className="unit-meta">
+              <span>Element: {unit.element}</span>
+              <span>Role: {unit.role}</span>
+            </div>
+            {unit.description && <p className="unit-description">{unit.description}</p>}
+          </div>
         </div>
       </div>
 
@@ -487,6 +557,11 @@ function UnitDetailView({ unitId, onBack }: { unitId: string; onBack: () => void
                 <div key={idx} className="ability-card">
                   <div className="ability-card-header">
                     <span className="ability-level">Lv {abilityRef.unlockLevel || 1}</span>
+                    <SimpleSprite
+                      id={getAbilityIconSprite(ability.id)}
+                      width={32}
+                      height={32}
+                    />
                     <span className="ability-name">{ability.name}</span>
                   </div>
                   <div className="ability-description">{ability.description}</div>
@@ -522,12 +597,21 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
     <div className="djinn-detail-view">
       <button className="back-btn" onClick={onBack}>← Back</button>
       <div className="djinn-detail-header">
-        <h2>{djinn.name}</h2>
-        <div className="djinn-meta">
-          <span>Element: {djinn.element}</span>
-          <span>Tier: {djinn.tier}</span>
-          <div className="summon-effect">
-            <strong>Summon Effect:</strong> {djinn.summonEffect.description}
+        <div className="djinn-header-with-sprite">
+          <SimpleSprite
+            id={`${djinn.element.toLowerCase()}-djinn-front`}
+            width={96}
+            height={96}
+          />
+          <div>
+            <h2>{djinn.name}</h2>
+            <div className="djinn-meta">
+              <span>Element: {djinn.element}</span>
+              <span>Tier: {djinn.tier}</span>
+            </div>
+            <div className="summon-effect">
+              <strong>Summon Effect:</strong> {djinn.summonEffect.description}
+            </div>
           </div>
         </div>
       </div>
@@ -568,7 +652,14 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                         if (!ability) return null;
                         return (
                           <div key={abilityId} className="network-ability">
-                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-header">
+                              <SimpleSprite
+                                id={getAbilityIconSprite(abilityId)}
+                                width={20}
+                                height={20}
+                              />
+                              <div className="network-ability-name">{ability.name}</div>
+                            </div>
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}
@@ -592,7 +683,14 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                         if (!ability) return null;
                         return (
                           <div key={abilityId} className="network-ability">
-                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-header">
+                              <SimpleSprite
+                                id={getAbilityIconSprite(abilityId)}
+                                width={20}
+                                height={20}
+                              />
+                              <div className="network-ability-name">{ability.name}</div>
+                            </div>
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}
@@ -616,7 +714,14 @@ function DjinnDetailView({ djinnId, onBack }: { djinnId: string; onBack: () => v
                         if (!ability) return null;
                         return (
                           <div key={abilityId} className="network-ability">
-                            <div className="network-ability-name">{ability.name}</div>
+                            <div className="network-ability-header">
+                              <SimpleSprite
+                                id={getAbilityIconSprite(abilityId)}
+                                width={20}
+                                height={20}
+                              />
+                              <div className="network-ability-name">{ability.name}</div>
+                            </div>
                             <div className="network-ability-desc">{ability.description}</div>
                             <div className="network-ability-stats">
                               {ability.type && <span>{ability.type}</span>}

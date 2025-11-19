@@ -166,11 +166,20 @@
   background: rgba(255, 200, 0, 0.05);
 }
 
+.item-sprite {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  min-height: 64px;
+}
+
 .item-name {
   color: #fff;
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 12px;
+  text-align: center;
 }
 
 .boss-name {
@@ -234,10 +243,16 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
+.ability-header-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
 .ability-name {
   font-weight: 600;
   color: #FFD700;
-  margin-bottom: 4px;
   font-size: 14px;
 }
 
@@ -278,7 +293,27 @@
   margin-bottom: 24px;
 }
 
-.unit-detail-header h2 {
+.unit-header-with-sprite {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.unit-header-with-sprite h2 {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: #FFD700;
+}
+
+.djinn-header-with-sprite {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.djinn-header-with-sprite h2 {
   font-size: 28px;
   margin: 0 0 12px 0;
   color: #FFD700;
@@ -375,6 +410,10 @@
   gap: 12px;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.ability-card-header .ability-name {
+  flex: 1;
 }
 
 .ability-level {
@@ -554,10 +593,16 @@
   margin-bottom: 0;
 }
 
+.network-ability-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
 .network-ability-name {
   font-weight: 600;
   color: #FFD700;
-  margin-bottom: 4px;
   font-size: 14px;
 }
 
