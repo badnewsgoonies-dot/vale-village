@@ -11,6 +11,7 @@ import type { SaveSlice } from './saveSlice';
 import type { TeamSlice } from './teamSlice';
 import { UNIT_DEFINITIONS } from '@/data/definitions/units';
 import { createUnit } from '@/core/models/Unit';
+import { collectDjinn } from '@/core/services/DjinnService';
 
 export interface DialogueSlice {
   currentDialogueTree: DialogueTree | null;
@@ -136,12 +137,19 @@ function processDialogueEffects(
   // Handle Djinn granting via dialogue
   if (typeof effects.grantDjinn === 'string') {
     const djinnId = effects.grantDjinn;
-    const canSetStoryFlag = typeof store.setStoryFlag === 'function';
-
-    if (canSetStoryFlag) {
-      // Use story flag system to grant Djinn (reuse existing logic)
-      store.setStoryFlag(`djinn:${djinnId}`, true);
-      console.warn(`🎉 Granted Djinn ${djinnId} via dialogue effect!`);
+    const team = store.team;
+    
+    if (team) {
+      const result = collectDjinn(team, djinnId);
+      
+      if (result.ok) {
+        store.updateTeam(result.value);
+        console.warn(`🎉 Granted Djinn ${djinnId} via dialogue effect!`);
+      } else {
+        console.warn(`Failed to grant Djinn ${djinnId}: ${result.error}`);
+      }
+    } else {
+      console.warn(`Cannot grant Djinn ${djinnId}: no team available`);
     }
   }
 

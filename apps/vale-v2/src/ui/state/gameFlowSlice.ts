@@ -39,7 +39,14 @@ export const createGameFlowSlice: StateCreator<
   preBattlePosition: null,
   pendingBattleEncounterId: null,
   setMode: (mode) => set({ mode }),
-  setPendingBattle: (encounterId) => set({ pendingBattleEncounterId: encounterId }),
+  setPendingBattle: (encounterId) => {
+    // When setting a pending battle, automatically transition to team-select mode
+    // This matches the behavior of handleTrigger when a battle trigger is encountered
+    set({ 
+      pendingBattleEncounterId: encounterId,
+      mode: encounterId ? 'team-select' : 'overworld'
+    });
+  },
   handleTrigger: (trigger) => {
     if (!trigger) {
       set({ lastTrigger: null });

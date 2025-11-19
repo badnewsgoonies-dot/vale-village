@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { QueueBattleView } from './ui/components/QueueBattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
@@ -11,27 +11,11 @@ import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
 import { DevModeOverlay } from './ui/components/DevModeOverlay';
-import { useStore } from './ui/state/store';
+import { useStore, store } from './ui/state/store';
 import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
-
-// Map encounter IDs to post-battle recruitment dialogue IDs
-const ENCOUNTER_TO_RECRUITMENT_DIALOGUE: Record<string, string> = {
-  'house-01': 'house-01-recruit',
-  'house-02': 'house-02-recruit',
-  'house-03': 'house-03-recruit',
-  'house-05': 'house-05-recruit',
-  'house-07': 'house-07-djinn',
-  'house-08': 'house-08-recruit',
-  'house-11': 'house-11-recruit',
-  'house-12': 'house-12-djinn',
-  'house-14': 'house-14-recruit',
-  'house-15': 'house-15-recruit',
-  'house-17': 'house-17-recruit',
-  'house-18': 'house-18-djinn',
-  'house-20': 'house-20-djinn',
-};
+import { getRecruitmentDialogue, hasRecruitmentDialogue } from './data/definitions/recruitmentData';
 import { UNIT_DEFINITIONS } from './data/definitions/units';
 import { DJINN } from './data/definitions/djinn';
 import { EQUIPMENT } from './data/definitions/equipment';
@@ -163,13 +147,23 @@ function App() {
   };
 
   // Handle continue from rewards screen
-  const handleRewardsContinue = () => {
+  const handleRewardsContinue = useCallback(() => {
+    // Get encounterId from rewards slice (stored during processVictory)
+    // This is more reliable than battle state since battle gets cleared
+    const storeState = store.getState();
+    const lastBattleEncounterId = storeState.lastBattleEncounterId;
+    // Fallback to battle state (for backwards compatibility)
+    const battleEncounterId = battle?.encounterId || battle?.meta?.encounterId;
+    const encounterId = lastBattleEncounterId || battleEncounterId;
+    
     // Check if this was the VS1 encounter
-    const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
-    const encounterId = battle?.encounterId || battle?.meta?.encounterId;
+    const wasVS1Battle = encounterId === VS1_ENCOUNTER_ID;
 
-    claimRewards(); // This now sets mode to 'overworld'
+    claimRewards(); // This clears lastBattleRewards but keeps lastBattleEncounterId temporarily
     setBattle(null, 0);
+    
+    // Clear the stored encounterId after using it
+    store.setState({ lastBattleEncounterId: null });
 
     // VS1 specific: show post-scene after rewards
     if (wasVS1Battle) {
@@ -180,22 +174,27 @@ function App() {
       }
     }
 
-    // Check for recruitment dialogue for Houses 1-20
-    if (encounterId && ENCOUNTER_TO_RECRUITMENT_DIALOGUE[encounterId]) {
-      const dialogueId = ENCOUNTER_TO_RECRUITMENT_DIALOGUE[encounterId];
-      const recruitmentDialogue = DIALOGUES[dialogueId];
+    // Check for recruitment dialogue (data-driven, not hard-coded)
+    if (encounterId && hasRecruitmentDialogue(encounterId)) {
+      const recruitmentDialogue = getRecruitmentDialogue(encounterId);
 
       if (recruitmentDialogue) {
         startDialogueTree(recruitmentDialogue); // This sets mode to 'dialogue'
         return;
       } else {
-        console.warn(`Recruitment dialogue ${dialogueId} not found for encounter ${encounterId}`);
+        console.warn(`Recruitment dialogue not found for encounter ${encounterId}`);
       }
     }
 
-    // Fallback: return to overworld (shouldn't be needed as claimRewards sets mode)
-    returnToOverworld();
-  };
+    // If no dialogue was triggered, return to overworld
+    // (claimRewards doesn't set mode anymore, so we need to do it here)
+    if (!encounterId || (!wasVS1Battle && !hasRecruitmentDialogue(encounterId))) {
+      returnToOverworld();
+    }
+  }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
+
+  // Expose handleRewardsContinue for E2E tests (after it's defined)
+  (window as any).handleRewardsContinue = handleRewardsContinue;
 
   return (
     <div>

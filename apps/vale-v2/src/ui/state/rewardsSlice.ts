@@ -16,6 +16,7 @@ import type { Equipment } from '../../data/schemas/EquipmentSchema';
 export interface RewardsSlice {
   lastBattleRewards: RewardDistribution | null;
   showRewards: boolean;
+  lastBattleEncounterId: string | null; // Store encounterId for post-battle dialogue
 
   processVictory: (battle: BattleState) => void;
   claimRewards: () => void;
@@ -31,9 +32,13 @@ export const createRewardsSlice: StateCreator<
 > = (set, get) => ({
   lastBattleRewards: null,
   showRewards: false,
+  lastBattleEncounterId: null,
 
   processVictory: (battle) => {
     const result = rewardsServiceProcessVictory(battle);
+    
+    // Capture encounterId before clearing battle state
+    const encounterId = battle.encounterId || (battle.meta as any)?.encounterId || null;
 
     const { setTeam } = get();
     setTeam(result.updatedTeam);
@@ -43,6 +48,7 @@ export const createRewardsSlice: StateCreator<
 
     set({
       lastBattleRewards: result.distribution,
+      lastBattleEncounterId: encounterId, // Store for post-battle dialogue
       mode: 'rewards', // Set mode instead of showRewards
     });
   },
@@ -51,7 +57,7 @@ export const createRewardsSlice: StateCreator<
     const { lastBattleRewards } = get();
     if (!lastBattleRewards) return;
 
-    const { addGold, addEquipment, setMode } = get();
+    const { addGold, addEquipment } = get();
     addGold(lastBattleRewards.goldEarned);
 
     const equipmentToAdd: Equipment[] = [];
@@ -66,8 +72,11 @@ export const createRewardsSlice: StateCreator<
       addEquipment(equipmentToAdd);
     }
 
+    // Clear rewards but keep encounterId until handleRewardsContinue uses it
+    // Don't clear lastBattleEncounterId here - handleRewardsContinue needs it
     set({ lastBattleRewards: null });
-    setMode('overworld'); // Return to overworld after claiming rewards
+    // Don't set mode here - let handleRewardsContinue handle mode transition
+    // (it needs to check for recruitment dialogue first)
   },
 
   setShowRewards: (visible) => {

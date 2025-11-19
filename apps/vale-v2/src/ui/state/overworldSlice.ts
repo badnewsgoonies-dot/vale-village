@@ -71,7 +71,7 @@ export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => 
           currentTrigger: filteredTrigger,
         });
 
-        // Handle NPC dialogue
+        // Handle NPC dialogue (use original trigger for NPCs)
         if (trigger?.type === 'npc') {
           const npcId = (trigger.data as { npcId?: string }).npcId;
           if (npcId && DIALOGUES[npcId]) {
@@ -79,8 +79,8 @@ export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => 
           }
         }
 
-        // Process trigger
-        store.handleTrigger(trigger);
+        // Process filtered trigger (respects unlock status and defeated state)
+        store.handleTrigger(filteredTrigger);
       }
     },
 

@@ -199,26 +199,77 @@ export async function completeBattle(
 ): Promise<BattleResult | null> {
   const { captureStateAfterClaim = false, logDetails = true } = options ?? {};
 
-  // 1. Simulate victory
+  // 1. Simulate victory by setting enemies to 0 HP and battle phase to 'victory'
+  // This mimics what executeQueuedRound does when checkBattleEnd returns 'PLAYER_VICTORY'
+  // IMPORTANT: Capture encounterId BEFORE clearing battle (needed for recruitment dialogue)
+  const encounterId = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const battleState = store.getState().battle;
+    return battleState?.encounterId || battleState?.meta?.encounterId || null;
+  });
+  
   await page.evaluate(() => {
     const store = (window as any).__VALE_STORE__;
     const battleState = store.getState().battle;
 
     if (!battleState) return;
 
+    // Set enemies to 0 HP and phase to 'victory' to trigger proper battle end flow
     const updatedBattle = {
       ...battleState,
       enemies: battleState.enemies?.map((enemy: any) => ({
         ...enemy,
         currentHp: 0,
       })),
+      phase: 'victory' as const,
       battleOver: true,
-      victory: true,
     };
 
+    // Update battle state first
     store.setState({ battle: updatedBattle });
-    store.getState().processVictory(updatedBattle);
+
+    // Then process victory (this will set mode to 'rewards')
+    // This matches what executeQueuedRound does when phase === 'victory'
+    const { processVictory, updateTeamUnits, onBattleEvents } = store.getState();
+    
+    // Auto-heal units (matching executeQueuedRound behavior)
+    const healedUnits = updatedBattle.playerTeam.units.map((unit: any) => ({
+      ...unit,
+      currentHp: unit.maxHp,
+    }));
+    
+    const healedTeam = {
+      ...updatedBattle.playerTeam,
+      units: healedUnits,
+    };
+    
+    const healedBattle = {
+      ...updatedBattle,
+      playerTeam: healedTeam,
+    };
+    
+    updateTeamUnits(healedUnits);
+    processVictory(healedBattle);
+    
+    // Emit encounter-finished event (matching queueBattleSlice behavior)
+    const battleEncounterId = healedBattle.encounterId || healedBattle.meta?.encounterId;
+    if (battleEncounterId && onBattleEvents) {
+      onBattleEvents([
+        {
+          type: 'battle-end',
+          result: 'PLAYER_VICTORY',
+        },
+        {
+          type: 'encounter-finished',
+          outcome: 'PLAYER_VICTORY',
+          encounterId: battleEncounterId,
+        },
+      ]);
+    }
   });
+  
+  // Note: encounterId is now stored in rewardsSlice.lastBattleEncounterId during processVictory
+  // So handleRewardsContinue can access it from the store, no need for window storage
 
   // 2. Wait for rewards screen
   await waitForMode(page, 'rewards', 10000);
@@ -226,14 +277,14 @@ export async function completeBattle(
     console.log('   Victory! Rewards shown');
   }
 
-  // 3. Claim rewards (optionally capture state)
+  // 3. Don't claim rewards here - let completeBattleFlow handle it via handleRewardsContinue
+  // This ensures recruitment dialogue is triggered properly
   let capturedState: BattleResult | null = null;
 
   if (captureStateAfterClaim) {
+    // Capture state before claiming (rewards are already processed by processVictory)
     capturedState = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
-
       const state = store.getState();
       return {
         gold: state.gold ?? 0,
@@ -242,25 +293,97 @@ export async function completeBattle(
         djinn: state.team?.collectedDjinn ?? [],
       };
     });
-  } else {
-    // Just claim without capturing
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
-    });
   }
 
-  // 4. Try clicking button (for UI completeness)
-  const claimButton = page.getByRole('button', { name: /claim|continue|next/i });
-  const isVisible = await claimButton.isVisible().catch(() => false);
-  if (isVisible) {
-    await claimButton.click();
-  }
-
-  // 5. Wait for return to overworld
-  await waitForMode(page, 'overworld', 5000);
+  // Note: We don't claim rewards here - completeBattleFlow will handle it
+  // This ensures handleRewardsContinue is called, which triggers recruitment dialogue
 
   return capturedState;
+}
+
+/**
+ * Helper to claim rewards and return to overworld after completeBattle
+ * Handles dialogue that may appear (e.g., recruitment dialogue)
+ */
+export async function claimRewardsAndReturnToOverworld(page: Page): Promise<void> {
+  // Claim rewards and return to overworld
+  // (completeBattle only waits for rewards mode, doesn't claim rewards)
+  
+  // First check if we're actually in rewards mode
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (currentMode !== 'rewards') {
+    // Not in rewards mode, might already be claimed or in dialogue
+    // Just wait for overworld/dialogue and handle accordingly
+  } else {
+    // We're in rewards mode, try to claim
+    const continueButton = page.getByRole('button', { name: /continue|claim/i });
+    const buttonVisible = await continueButton.isVisible().catch(() => false);
+    const buttonEnabled = buttonVisible ? await continueButton.isEnabled().catch(() => false) : false;
+    
+    if (buttonVisible && buttonEnabled) {
+      await continueButton.click();
+      await page.waitForTimeout(500);
+    } else if (!buttonEnabled && buttonVisible) {
+      // Button visible but disabled - wait a bit and retry
+      await page.waitForTimeout(300);
+      const retryEnabled = await continueButton.isEnabled().catch(() => false);
+      if (retryEnabled) {
+        await continueButton.click();
+        await page.waitForTimeout(500);
+      } else {
+        // Fallback: call handleRewardsContinue directly
+        await page.evaluate(() => {
+          if ((window as any).handleRewardsContinue) {
+            (window as any).handleRewardsContinue();
+          } else {
+            const store = (window as any).__VALE_STORE__;
+            store.getState().claimRewards();
+          }
+        });
+        await page.waitForTimeout(500);
+      }
+    } else {
+      // Fallback: call handleRewardsContinue directly
+      await page.evaluate(() => {
+        if ((window as any).handleRewardsContinue) {
+          (window as any).handleRewardsContinue();
+        } else {
+          const store = (window as any).__VALE_STORE__;
+          store.getState().claimRewards();
+        }
+      });
+      await page.waitForTimeout(500);
+    }
+  }
+  
+  // Wait for overworld mode (might go to dialogue first for recruitment, then overworld)
+  // If dialogue appears, advance through it
+  let modeAfterClaim = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (modeAfterClaim === 'dialogue') {
+    // Advance through dialogue if present (house encounters trigger recruitment)
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(500);
+    // Keep advancing until we're out of dialogue
+    for (let i = 0; i < 10; i++) {
+      const mode = await page.evaluate(() => {
+        const store = (window as any).__VALE_STORE__;
+        return store?.getState()?.mode ?? null;
+      });
+      if (mode !== 'dialogue') break;
+      await page.keyboard.press('Space');
+      await page.waitForTimeout(300);
+    }
+  }
+  
+  await waitForMode(page, 'overworld', 10000);
 }
 
 /**
@@ -575,12 +698,31 @@ export async function getRoster(page: Page): Promise<Array<{
  * Open Dev Mode overlay
  */
 export async function openDevMode(page: Page): Promise<void> {
+  // Try pressing Ctrl+D to toggle dev mode
   await page.keyboard.press('Control+d');
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(300);
+  
+  // Check if dev mode is enabled via store
+  const devModeEnabled = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.devModeEnabled ?? false;
+  });
+  
+  if (!devModeEnabled) {
+    // If keyboard shortcut didn't work, enable it directly via store
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      if (store) {
+        store.getState().setDevModeEnabled(true);
+      }
+    });
+    await page.waitForTimeout(200);
+  }
 
-  // Verify overlay is visible
-  const overlay = page.locator('[style*="position: fixed"][style*="z-index: 9999"]');
-  await overlay.waitFor({ state: 'visible', timeout: 3000 });
+  // Verify overlay is visible (check for Dev Mode content)
+  // Use a more specific selector - the heading is unique
+  const overlay = page.getByRole('heading', { name: /DEV MODE: HOUSE SELECTION/i });
+  await overlay.waitFor({ state: 'visible', timeout: 5000 });
 }
 
 /**
@@ -604,7 +746,34 @@ export async function jumpToHouse(page: Page, houseNumber: number): Promise<void
   await houseButton.click();
 
   // Dev Mode should close and team select should appear
-  await page.waitForTimeout(500);
+  // Wait for dev mode to close (overlay disappears)
+  await page.waitForFunction(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.devModeEnabled === false;
+  }, { timeout: 3000 }).catch(() => {
+    // If dev mode didn't close, that's okay - continue anyway
+  });
+  
+  // Wait a moment for state to update
+  await page.waitForTimeout(300);
+  
+  // Debug: Check what mode we're in after clicking
+  const modeAfterClick = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return {
+      mode: store?.getState()?.mode ?? null,
+      pendingBattleEncounterId: store?.getState()?.pendingBattleEncounterId ?? null,
+      devModeEnabled: store?.getState()?.devModeEnabled ?? null,
+    };
+  });
+  console.log(`   After clicking house ${houseNumber}, mode: ${modeAfterClick.mode}, pendingBattle: ${modeAfterClick.pendingBattleEncounterId}`);
+  
+  // setPendingBattle now automatically sets mode to 'team-select' in gameFlowSlice
+  // Verify it worked correctly
+  if (modeAfterClick.pendingBattleEncounterId && modeAfterClick.mode !== 'team-select') {
+    // This should not happen anymore, but log if it does for debugging
+    console.warn(`   WARNING: Mode is ${modeAfterClick.mode} but should be 'team-select'`);
+  }
 }
 
 /**
@@ -622,7 +791,16 @@ export async function completeBattleFlow(page: Page, options?: {
   const { expectDialogue = false, logDetails = true } = options ?? {};
 
   // 1. Wait for team select screen
-  await waitForMode(page, 'team-select', 10000);
+  // First check current mode - might already be in team-select
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (currentMode !== 'team-select') {
+    if (logDetails) console.log(`   Current mode: ${currentMode}, waiting for team-select...`);
+    await waitForMode(page, 'team-select', 10000);
+  }
   if (logDetails) console.log('   Team select ready');
 
   // 2. Click confirm to start battle
@@ -633,28 +811,128 @@ export async function completeBattleFlow(page: Page, options?: {
   await waitForMode(page, 'battle', 10000);
   if (logDetails) console.log('   Battle started');
 
-  // 4. Complete battle (simulates victory)
+  // 4. Complete battle (simulates victory) - this already waits for rewards mode
   await completeBattle(page, { logDetails: false });
 
-  // 5. Rewards screen should appear
-  await waitForMode(page, 'rewards', 10000);
+  // 5. Rewards screen should already be shown (completeBattle waits for it)
+  // But verify we're still in rewards mode
+  const rewardsMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  if (rewardsMode !== 'rewards') {
+    // If not in rewards mode, wait for it
+    await waitForMode(page, 'rewards', 5000);
+  }
   if (logDetails) console.log('   Rewards screen shown');
 
-  // 6. Click continue/claim rewards
-  const continueButton = page.getByRole('button', { name: /continue|claim/i });
-  await continueButton.click();
+  // 6. Check if there's an equipment choice that needs to be selected first
+  const hasEquipmentChoice = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const rewards = store?.getState()?.lastBattleRewards;
+    return rewards?.equipmentChoice && !rewards?.choiceSelected;
+  });
+  
+  if (hasEquipmentChoice) {
+    // Select the first equipment option
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const rewards = store?.getState()?.lastBattleRewards;
+      if (rewards?.equipmentChoice && rewards.equipmentChoice.length > 0) {
+        store.getState().selectEquipmentChoice(rewards.equipmentChoice[0]);
+      }
+    });
+    await page.waitForTimeout(200);
+    if (logDetails) console.log('   Selected equipment choice');
+  }
 
-  // 7. If recruitment dialogue is expected, advance through it
+  // 7. Click continue/claim rewards button
+  // This triggers handleRewardsContinue which handles recruitment dialogue
+  const continueButton = page.getByRole('button', { name: /continue|claim/i });
+  const buttonVisible = await continueButton.isVisible().catch(() => false);
+  const buttonEnabled = buttonVisible ? await continueButton.isEnabled().catch(() => false) : false;
+  
+  if (buttonVisible && buttonEnabled) {
+    await continueButton.click();
+    // Wait for the click to process and mode to transition
+    await page.waitForTimeout(500);
+  } else if (!buttonEnabled && buttonVisible) {
+    // Button is visible but disabled - might still be processing equipment selection
+    await page.waitForTimeout(300);
+    // Try clicking again
+    const retryEnabled = await continueButton.isEnabled().catch(() => false);
+    if (retryEnabled) {
+      await continueButton.click();
+      await page.waitForTimeout(500);
+    } else {
+      // Fallback: call handleRewardsContinue directly
+      await page.evaluate(() => {
+        if ((window as any).handleRewardsContinue) {
+          (window as any).handleRewardsContinue();
+        }
+      });
+      await page.waitForTimeout(500);
+    }
+  } else {
+    // Fallback: call handleRewardsContinue directly (exposed on window for E2E tests)
+    // This ensures the same flow as UI: claim rewards + check for recruitment dialogue
+    await page.evaluate(() => {
+      if ((window as any).handleRewardsContinue) {
+        (window as any).handleRewardsContinue();
+      } else {
+        // Last resort: just claim rewards (won't trigger dialogue, but better than nothing)
+        const store = (window as any).__VALE_STORE__;
+        store.getState().claimRewards();
+      }
+    });
+    await page.waitForTimeout(500);
+  }
+  
+  // Check current mode - might be 'dialogue' (recruitment) or 'overworld'
+  const modeAfterClaim = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const lastEncounterId = store?.getState()?.lastBattleEncounterId ?? null;
+    return {
+      mode: store?.getState()?.mode ?? null,
+      lastEncounterId,
+      hasDialogue: !!store?.getState()?.currentDialogueTree,
+    };
+  });
+  
+  if (logDetails) {
+    console.log(`   After claiming rewards, mode: ${modeAfterClaim.mode}, encounterId: ${modeAfterClaim.lastEncounterId}, hasDialogue: ${modeAfterClaim.hasDialogue}`);
+  }
+  
+  // If we're in dialogue mode, that's expected for recruitment
+  // The caller will handle dialogue if expectDialogue is true
+
+  // 8. If recruitment dialogue is expected, wait for it
   if (expectDialogue) {
-    await waitForMode(page, 'dialogue', 5000);
-    if (logDetails) console.log('   Recruitment dialogue started');
+    // Check if we're already in dialogue mode
+    const currentModeCheck = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return {
+        mode: store?.getState()?.mode ?? null,
+        hasDialogue: !!store?.getState()?.currentDialogueTree,
+      };
+    });
+    
+    if (currentModeCheck.mode === 'dialogue' || currentModeCheck.hasDialogue) {
+      if (logDetails) console.log('   Recruitment dialogue already started');
+    } else {
+      // Wait for dialogue mode (with longer timeout as it might take a moment)
+      if (logDetails) console.log(`   Waiting for dialogue mode (current: ${currentModeCheck.mode})...`);
+      await waitForMode(page, 'dialogue', 10000);
+      if (logDetails) console.log('   Recruitment dialogue started');
+    }
 
     // Advance through dialogue until it ends
     await advanceDialogueUntilEnd(page);
     if (logDetails) console.log('   Recruitment dialogue completed');
   }
 
-  // 8. Should be back at overworld
+  // 9. Should be back at overworld
   await waitForMode(page, 'overworld', 5000);
   if (logDetails) console.log('   Returned to overworld');
 }

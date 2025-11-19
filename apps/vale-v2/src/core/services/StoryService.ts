@@ -128,13 +128,24 @@ export function encounterIdToFlagKey(encounterId: string): string {
 /**
  * Process encounter completion
  * Sets flags based on encounter ID
+ * For house encounters, sets both the encounter flag and the house flag
  */
 export function processEncounterCompletion(
   state: StoryState,
   encounterId: string
 ): StoryState {
   const flagKey = encounterIdToFlagKey(encounterId);
-  return setFlag(state, flagKey, true);
+  let updatedState = setFlag(state, flagKey, true);
+  
+  // For house encounters, also set the house flag directly (e.g., 'house-02')
+  // This is needed for:
+  // 1. House unlocking (isHouseUnlocked checks house-XX flags)
+  // 2. Story joins (STORY_FLAG_TO_UNIT uses house-XX keys)
+  if (encounterId.startsWith('house-')) {
+    updatedState = setFlag(updatedState, encounterId, true);
+  }
+  
+  return updatedState;
 }
 
 /**

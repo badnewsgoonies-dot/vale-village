@@ -43,3 +43,6 @@ export function createStore() {
 export const useStore = import.meta.env.DEV
   ? create<Store>()(devtools(storeFactory, { name: 'vale-v2' }))
   : createStore();
+
+// Export store instance for direct access (used in App.tsx for handleRewardsContinue)
+export const store = useStore;

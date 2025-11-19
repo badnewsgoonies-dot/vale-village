@@ -184,6 +184,8 @@ test.describe('Battle Execution', () => {
     expect(initialBattleState?.playerUnitCount).toBeGreaterThan(0);
 
     // Queue actions for all units
+    // First, we need to select a unit for the execute button to be visible
+    // The execute button only renders when currentUnit !== null in QueueBattleView
     await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       const battle = store.getState().battle;
@@ -191,12 +193,77 @@ test.describe('Battle Execution', () => {
 
       // Queue attack for each unit
       battle.playerTeam.units.forEach((unit: any, idx: number) => {
-        const targetId = battle.enemies[0]?.id;
-        if (targetId) {
-          store.getState().queueUnitAction(idx, null, [targetId], undefined);
+        if (unit.currentHp > 0) {
+          const targetId = battle.enemies[0]?.id;
+          if (targetId) {
+            try {
+              store.getState().queueUnitAction(idx, null, [targetId], undefined);
+            } catch (e) {
+              // Ignore errors if action already queued
+            }
+          }
         }
       });
     });
+    
+    // Wait for battle UI to be fully rendered
+    await page.waitForFunction(() => {
+      const store = (window as any).__VALE_STORE__;
+      const battle = store?.getState()?.battle;
+      return battle && battle.phase === 'planning';
+    }, { timeout: 5000 });
+    
+    // Wait a moment for React to re-render after queuing actions
+    await page.waitForTimeout(500);
+    
+    // Click on the first player unit to select it (this makes the execute button visible)
+    // Use a more direct approach: find the div that contains "Player Team" and click the first unit div inside it
+    await page.evaluate(() => {
+      // Find the Player Team section
+      const allDivs = Array.from(document.querySelectorAll('div'));
+      const playerTeamDiv = allDivs.find(div => {
+        const text = div.textContent || '';
+        return text.includes('Player Team') && text.includes('Isaac');
+      });
+      
+      if (playerTeamDiv) {
+        // Find the first unit div (should be clickable)
+        const unitDivs = Array.from(playerTeamDiv.querySelectorAll('div'));
+        // Look for a div that contains unit info but is clickable (not nested too deep)
+        for (const div of unitDivs) {
+          const text = div.textContent || '';
+          if ((text.includes('Isaac') || text.includes('Adept')) && div.onclick === null) {
+            // This is likely the unit card wrapper - click it
+            (div as HTMLElement).click();
+            break;
+          }
+        }
+      }
+    });
+    
+    // Wait for React to update after unit selection
+    await page.waitForTimeout(500);
+    
+    // Verify unit is selected by checking if execute button area is now visible
+    const unitSelected = await page.evaluate(() => {
+      // Check if there's now an execute button or queue action UI visible
+      const buttons = Array.from(document.querySelectorAll('button'));
+      return buttons.some(btn => {
+        const text = btn.textContent?.trim() || '';
+        return text.includes('EXECUTE') || text.includes('QUEUE') || text.includes('Queue Action');
+      });
+    });
+    
+    if (!unitSelected) {
+      console.log('Warning: Unit selection may not have worked, trying alternative method');
+      // Try clicking directly on text containing "Isaac" or "Adept"
+      const unitText = page.locator('text=/isaac|adept/i').first();
+      const textVisible = await unitText.isVisible().catch(() => false);
+      if (textVisible) {
+        await unitText.click();
+        await page.waitForTimeout(500);
+      }
+    }
 
     // Wait for queue to be complete (all units have actions)
     await page.waitForFunction(
@@ -235,34 +302,76 @@ test.describe('Battle Execution', () => {
     expect(queueState.phase).toBe('planning');
 
     // Verify canExecute logic is correct before checking button
+    // This must match the isQueueComplete logic in QueueBattleView.tsx
     const canExecuteState = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       const battle = store.getState().battle;
-      if (!battle) return false;
+      if (!battle || battle.phase !== 'planning') return false;
+      
       const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
       const queuedActions = battle.queuedActions ?? [];
       const queuedCount = queuedActions.filter((a: any) => a !== null).length;
-      return battle.phase === 'planning' && queuedCount >= aliveUnits.length;
+      
+      // Check mana budget (matches QueueBattleView logic)
+      const totalQueuedManaCost = queuedActions
+        .filter((a: any) => a != null)
+        .reduce((sum: number, action: any) => sum + (action.manaCost || 0), 0);
+      const isOverBudget = totalQueuedManaCost > battle.maxMana;
+      
+      // Queue is complete when: all alive units have actions AND not over budget
+      const allUnitsHaveActions = queuedCount >= aliveUnits.length;
+      return allUnitsHaveActions && !isOverBudget;
     });
 
     expect(canExecuteState).toBe(true);
 
-    // Wait for button to exist and be visible in DOM
-    await page.waitForSelector('button:has-text("Execute Round")', { 
-      timeout: 5000,
-      state: 'visible' 
+    // Debug: Check what buttons are actually on the page
+    const debugInfo = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      const store = (window as any).__VALE_STORE__;
+      const battle = store?.getState()?.battle;
+      
+      return {
+        buttonCount: buttons.length,
+        buttonTexts: buttons.map(btn => btn.textContent?.trim()).filter(Boolean),
+        battlePhase: battle?.phase,
+        battleExists: !!battle,
+        hasQueuePanel: !!document.querySelector('[class*="queue"]') || !!document.querySelector('[class*="Queue"]'),
+      };
     });
+    console.log('Debug info:', JSON.stringify(debugInfo, null, 2));
+
+    // Wait for button to exist and be visible in DOM
+    // Button text is "EXECUTE ROUND" (all caps) when queue is complete
+    // Use a more flexible selector that finds the button regardless of text
+    await page.waitForFunction(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      return buttons.some(btn => {
+        const text = btn.textContent?.trim() || '';
+        return text === 'EXECUTE ROUND' || text === 'QUEUE ALL ACTIONS FIRST';
+      });
+    }, { timeout: 5000 });
+    
+    // Now wait specifically for the "EXECUTE ROUND" text to appear
+    await page.waitForFunction(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      return buttons.some(btn => btn.textContent?.trim() === 'EXECUTE ROUND');
+    }, { timeout: 5000 });
 
     // Now verify execute button is visible and enabled
     const executeButton = page.getByRole('button', { name: /execute.*round/i });
     const buttonVisible = await executeButton.isVisible().catch(() => false);
     const buttonEnabled = await executeButton.isEnabled().catch(() => false);
+    const buttonText = await executeButton.textContent().catch(() => '');
 
     // Button should be visible when queue is complete
     expect(buttonVisible).toBe(true);
 
     // Button should be enabled (clickable) when queue is complete
     expect(buttonEnabled).toBe(true);
+    
+    // Button text should be "EXECUTE ROUND" (not "QUEUE ALL ACTIONS FIRST")
+    expect(buttonText?.trim()).toBe('EXECUTE ROUND');
 
     console.log('✅ Execute button visible and enabled when queue is complete');
     console.log(`   Queue: ${queueState.queuedActions}/${queueState.playerUnitCount} actions`);
@@ -286,19 +395,27 @@ test.describe('Battle Execution', () => {
     // Execute multiple rounds by simulating actions
     let roundCount = 0;
     const maxRounds = 5;
+    let lastRoundNumber = 0;
 
     while (roundCount < maxRounds) {
-      const battleState = await page.evaluate(() => {
+      // Wait for battle state to be available
+      const battleState = await page.waitForFunction(() => {
         const store = (window as any).__VALE_STORE__;
         const battle = store.getState().battle;
-        if (!battle) return null;
+        return battle !== null && battle !== undefined;
+      }, { timeout: 5000 }).then(() => 
+        page.evaluate(() => {
+          const store = (window as any).__VALE_STORE__;
+          const battle = store.getState().battle;
+          if (!battle) return null;
 
-        return {
-          phase: battle.phase,
-          roundNumber: battle.roundNumber,
-          battleOver: battle.battleOver,
-        };
-      });
+          return {
+            phase: battle.phase,
+            roundNumber: battle.roundNumber,
+            battleOver: battle.battleOver,
+          };
+        })
+      ).catch(() => null);
 
       if (!battleState || battleState.battleOver) break;
 
@@ -311,12 +428,29 @@ test.describe('Battle Execution', () => {
 
           // Queue attack for each unit
           battle.playerTeam.units.forEach((unit: any, idx: number) => {
-            const targetId = battle.enemies[0]?.id;
-            if (targetId) {
-              store.getState().queueUnitAction(idx, null, [targetId], undefined);
+            if (unit.currentHp > 0) {
+              const targetId = battle.enemies[0]?.id;
+              if (targetId) {
+                try {
+                  store.getState().queueUnitAction(idx, null, [targetId], undefined);
+                } catch (e) {
+                  // Ignore errors if action already queued
+                }
+              }
             }
           });
         });
+
+        // Wait for queue to be complete
+        await page.waitForFunction(() => {
+          const store = (window as any).__VALE_STORE__;
+          const battle = store.getState().battle;
+          if (!battle || battle.phase !== 'planning') return false;
+          
+          const aliveUnits = battle.playerTeam.units.filter((u: any) => u.currentHp > 0);
+          const queuedActions = battle.queuedActions.filter((a: any) => a != null);
+          return queuedActions.length >= aliveUnits.length;
+        }, { timeout: 5000 });
 
         // Execute round
         await page.evaluate(() => {
@@ -324,10 +458,42 @@ test.describe('Battle Execution', () => {
           store.getState().executeQueuedRound();
         });
 
-        roundCount++;
-        await page.waitForTimeout(1000); // Wait for execution
+        // Wait for round number to increment (indicates round executed)
+        await page.waitForFunction(
+          (lastRound) => {
+            const store = (window as any).__VALE_STORE__;
+            const battle = store.getState().battle;
+            return battle && battle.roundNumber > lastRound;
+          },
+          lastRoundNumber,
+          { timeout: 10000 }
+        );
+
+        const newState = await page.evaluate(() => {
+          const store = (window as any).__VALE_STORE__;
+          return store.getState().battle?.roundNumber ?? 0;
+        });
+        
+        if (newState > lastRoundNumber) {
+          roundCount++;
+          lastRoundNumber = newState;
+        }
+
+        // Wait for execution phase to complete and return to planning
+        if (roundCount < maxRounds) {
+          await page.waitForFunction(() => {
+            const store = (window as any).__VALE_STORE__;
+            const battle = store.getState().battle;
+            return battle && (battle.phase === 'planning' || battle.battleOver);
+          }, { timeout: 10000 });
+        }
       } else {
-        await page.waitForTimeout(500); // Wait for phase transition
+        // Wait for phase to change to planning
+        await page.waitForFunction(() => {
+          const store = (window as any).__VALE_STORE__;
+          const battle = store.getState().battle;
+          return battle && (battle.phase === 'planning' || battle.battleOver);
+        }, { timeout: 10000 });
       }
     }
 
