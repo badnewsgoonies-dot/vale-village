@@ -44,14 +44,14 @@ describe('StoryService', () => {
 
   test('should process encounter completion and set flags', () => {
     let state = createStoryState(1);
-    state = processEncounterCompletion(state, 'c1_boss');
+    state = processEncounterCompletion(state, 'house-20');
     
     expect(hasFlag(state, 'boss:ch1')).toBe(true);
   });
 
   test('should track normal encounters', () => {
     let state = createStoryState(1);
-    state = processEncounterCompletion(state, 'c1_normal_1');
+    state = processEncounterCompletion(state, 'house-01');
     
     expect(hasFlag(state, 'encounter:ch1:1')).toBe(true);
   });

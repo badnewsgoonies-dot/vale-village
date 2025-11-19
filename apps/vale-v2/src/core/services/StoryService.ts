@@ -82,17 +82,27 @@ export function advanceChapter(
  * Centralized mapping for encounter IDs to story flag keys
  */
 export function encounterIdToFlagKey(encounterId: string): string {
-  // Boss encounters
+  // House-based encounters (Chapter 1: Liberation of Vale)
+  if (encounterId === 'house-20') return 'boss:ch1'; // Final boss
+  if (encounterId.startsWith('house-')) {
+    const match = encounterId.match(/^house-(\d+)$/);
+    if (match) {
+      const houseNum = parseInt(match[1]!, 10);
+      return `encounter:ch1:${houseNum}`;
+    }
+  }
+  
+  // Legacy boss encounters
   if (encounterId === 'c1_boss') return 'boss:ch1';
   if (encounterId === 'c2_boss') return 'boss:ch2';
   if (encounterId === 'c3_boss') return 'boss:ch3';
   
-  // Mini-boss encounters
+  // Legacy mini-boss encounters
   if (encounterId === 'c1_mini_boss' || encounterId === 'c1_miniboss') return 'miniboss:ch1';
   if (encounterId === 'c2_mini_boss' || encounterId === 'c2_miniboss') return 'miniboss:ch2';
   if (encounterId === 'c3_mini_boss' || encounterId === 'c3_miniboss') return 'miniboss:ch3';
   
-  // Normal encounters (track by chapter and number)
+  // Legacy normal encounters (track by chapter and number)
   if (encounterId.startsWith('c1_normal_')) {
     const encounterNum = encounterId.replace('c1_normal_', '');
     return `encounter:ch1:${encounterNum}`;

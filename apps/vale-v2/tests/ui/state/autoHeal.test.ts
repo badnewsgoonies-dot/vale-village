@@ -41,7 +41,7 @@ describe('Auto-Heal Flow (Victory / Defeat)', () => {
     const team = buildDamagedTeam();
     const battle = {
       ...createBattleState(team, [mkEnemy()]),
-      meta: { encounterId: 'training_dummy' },
+      meta: { encounterId: 'training-dummy' },
     };
 
     const victoryState: BattleEvent = {
@@ -78,7 +78,7 @@ describe('Auto-Heal Flow (Victory / Defeat)', () => {
     const team = buildDamagedTeam();
     const battle = {
       ...createBattleState(team, [mkEnemy()]),
-      meta: { encounterId: 'defeat-auto-heal' },
+      meta: { encounterId: 'training-dummy' },
     };
 
     const defeatState: BattleEvent = {
@@ -115,11 +115,11 @@ describe('Auto-Heal Flow (Victory / Defeat)', () => {
     const team = buildDamagedTeam();
     const firstBattle = {
       ...createBattleState(team, [mkEnemy()]),
-      meta: { encounterId: 'training_dummy' },
+      meta: { encounterId: 'training-dummy' },
     };
     const secondBattle = {
       ...createBattleState(team, [mkEnemy()]),
-      meta: { encounterId: 'c1_normal_1' },
+      meta: { encounterId: 'house-01' },
     };
 
     const victoryState: BattleEvent = {
