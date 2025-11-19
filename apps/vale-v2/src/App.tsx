@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { QueueBattleView } from './ui/components/QueueBattleView';
 import { CreditsScreen } from './ui/components/CreditsScreen';
 import { ChapterIndicator } from './ui/components/ChapterIndicator';
@@ -163,7 +163,7 @@ function App() {
   };
 
   // Handle continue from rewards screen
-  const handleRewardsContinue = () => {
+  const handleRewardsContinue = useCallback(() => {
     // Check if this was the VS1 encounter
     const wasVS1Battle = battle?.encounterId === VS1_ENCOUNTER_ID || battle?.meta?.encounterId === VS1_ENCOUNTER_ID;
     const encounterId = battle?.encounterId || battle?.meta?.encounterId;
@@ -195,7 +195,10 @@ function App() {
 
     // Fallback: return to overworld (shouldn't be needed as claimRewards sets mode)
     returnToOverworld();
-  };
+  }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
+
+  // Expose handleRewardsContinue for E2E tests (after it's defined)
+  (window as any).handleRewardsContinue = handleRewardsContinue;
 
   return (
     <div>

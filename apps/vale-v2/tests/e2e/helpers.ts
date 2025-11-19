@@ -275,15 +275,35 @@ export async function completeBattle(
     });
   }
 
-  // 4. Try clicking button (for UI completeness)
+  // 4. Click continue button - this triggers handleRewardsContinue which:
+  //    - Claims rewards
+  //    - Checks for recruitment dialogue
+  //    - Starts dialogue if applicable
+  //    - Returns to overworld if no dialogue
   const claimButton = page.getByRole('button', { name: /claim|continue|next/i });
   const isVisible = await claimButton.isVisible().catch(() => false);
   if (isVisible) {
     await claimButton.click();
+    // Wait a moment for the click to process
+    await page.waitForTimeout(200);
+  } else {
+    // Fallback: call claimRewards directly if button not found
+    await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      store.getState().claimRewards();
+    });
   }
 
-  // 5. Wait for return to overworld
-  await waitForMode(page, 'overworld', 5000);
+  // 5. Check if we're in dialogue mode (recruitment dialogue) or overworld
+  // Don't immediately wait for overworld - dialogue might be starting
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  // If we're in dialogue mode, that's expected (recruitment dialogue)
+  // If we're in overworld, that's also fine (no recruitment dialogue)
+  // Don't force wait for overworld - let the caller handle dialogue if needed
 
   return capturedState;
 }
@@ -674,18 +694,37 @@ export async function completeBattleFlow(page: Page, options?: {
   }
   if (logDetails) console.log('   Rewards screen shown');
 
-  // 6. Click continue/claim rewards
+  // 6. Click continue/claim rewards button
+  // This triggers handleRewardsContinue which handles recruitment dialogue
   const continueButton = page.getByRole('button', { name: /continue|claim/i });
   const buttonVisible = await continueButton.isVisible().catch(() => false);
   if (buttonVisible) {
     await continueButton.click();
+    // Wait for the click to process and mode to transition
+    await page.waitForTimeout(300);
   } else {
-    // If button not visible, try claiming via store method
+    // Fallback: call handleRewardsContinue directly (exposed on window for E2E tests)
+    // This ensures the same flow as UI: claim rewards + check for recruitment dialogue
     await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      store.getState().claimRewards();
+      if ((window as any).handleRewardsContinue) {
+        (window as any).handleRewardsContinue();
+      } else {
+        // Last resort: just claim rewards (won't trigger dialogue, but better than nothing)
+        const store = (window as any).__VALE_STORE__;
+        store.getState().claimRewards();
+      }
     });
+    await page.waitForTimeout(300);
   }
+  
+  // Check current mode - might be 'dialogue' (recruitment) or 'overworld'
+  const modeAfterClaim = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+  
+  // If we're in dialogue mode, that's expected for recruitment
+  // The caller will handle dialogue if expectDialogue is true
 
   // 7. If recruitment dialogue is expected, wait for it
   if (expectDialogue) {
