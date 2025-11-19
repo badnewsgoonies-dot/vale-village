@@ -64,6 +64,60 @@ export async function waitForMode(
 }
 
 /**
+ * Skip startup screens (title-screen → main-menu → intro → overworld)
+ * Use this at the start of tests that need to be in overworld mode
+ */
+export async function skipStartupScreens(page: Page): Promise<void> {
+  // Wait for store to be available
+  await page.waitForFunction(() => {
+    return typeof (window as any).__VALE_STORE__ !== 'undefined';
+  }, { timeout: 10000 });
+
+  // Check current mode
+  const currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+
+  // If already in overworld or other game modes, we're done
+  if (currentMode && !['title-screen', 'main-menu', 'intro'].includes(currentMode)) {
+    return;
+  }
+
+  // Skip title-screen (press any key)
+  if (currentMode === 'title-screen') {
+    await page.keyboard.press('Space');
+    await waitForMode(page, 'main-menu', 5000);
+  }
+
+  // Skip main-menu (select "New Game")
+  const menuMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+
+  if (menuMode === 'main-menu') {
+    // Press Enter to select "New Game" (first enabled option)
+    await page.keyboard.press('Enter');
+    await waitForMode(page, 'intro', 5000);
+  }
+
+  // Skip intro screen (press any key)
+  const introMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+
+  if (introMode === 'intro') {
+    await page.keyboard.press('Space');
+    await waitForMode(page, 'overworld', 5000);
+  }
+
+  // Final check - ensure we're in overworld
+  await waitForMode(page, 'overworld', 5000);
+}
+
+/**
  * Navigate player to target coordinates using arrow keys
  * Returns false if path is blocked
  */

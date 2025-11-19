@@ -5,6 +5,7 @@ import {
   navigateToPosition,
   assertStoreState,
   getUnitData,
+  skipStartupScreens,
 } from './helpers';
 
 /**
@@ -22,6 +23,9 @@ test.describe('Game Initialization', () => {
       return typeof (window as any).__VALE_STORE__ !== 'undefined';
     });
     expect(storeExists).toBe(true);
+
+    // Skip startup screens to get to overworld
+    await skipStartupScreens(page);
 
     // Get initial game state
     const state = await getGameState(page);
@@ -51,6 +55,9 @@ test.describe('Game Initialization', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const state = await getGameState(page);
     expect(state?.playerPosition).toEqual({ x: 15, y: 10 });
   });
@@ -60,6 +67,9 @@ test.describe('Overworld Movement', () => {
   test('moves right', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     const initialState = await getGameState(page);
     expect(initialState?.playerPosition).toEqual({ x: 15, y: 10 });
@@ -74,6 +84,9 @@ test.describe('Overworld Movement', () => {
   test('moves in all four directions', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Right
     await page.keyboard.press('ArrowRight');
@@ -109,6 +122,9 @@ test.describe('Overworld Movement', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const initialState = await getGameState(page);
     const startPos = initialState?.playerPosition;
 
@@ -128,6 +144,9 @@ test.describe('Battle Trigger & Team Selection', () => {
   test('triggers battle encounter at correct position', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Spawn is at (15, 10)
     // house-01 trigger is at (7, 10) - need to move left 8 times
@@ -151,6 +170,9 @@ test.describe('Battle Trigger & Team Selection', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     // Navigate to battle trigger
     for (let i = 0; i < 8; i++) {
       await page.keyboard.press('ArrowLeft');
@@ -168,6 +190,9 @@ test.describe('Battle Trigger & Team Selection', () => {
   test('clicking confirm transitions to battle', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Navigate to battle trigger
     for (let i = 0; i < 8; i++) {
@@ -194,6 +219,9 @@ test.describe('Battle System', () => {
   test('battle state has enemies from encounter', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Navigate to battle trigger
     for (let i = 0; i < 8; i++) {
@@ -228,6 +256,9 @@ test.describe('Battle System', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     // Navigate to battle and start
     for (let i = 0; i < 8; i++) {
       await page.keyboard.press('ArrowLeft');
@@ -255,6 +286,9 @@ test.describe('UI Elements', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const header = await page.locator('text=/Vale Chronicles/i').isVisible();
     expect(header).toBe(true);
   });
@@ -262,6 +296,9 @@ test.describe('UI Elements', () => {
   test('displays player position', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     const positionText = await page.locator('text=/Position:/i').isVisible();
     expect(positionText).toBe(true);
@@ -271,6 +308,9 @@ test.describe('UI Elements', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const partyButton = page.getByRole('button', { name: /party.*management/i });
     expect(await partyButton.isVisible()).toBe(true);
   });
@@ -279,6 +319,9 @@ test.describe('UI Elements', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const djinnButton = page.getByRole('button', { name: /djinn.*collection/i });
     expect(await djinnButton.isVisible()).toBe(true);
   });
@@ -286,6 +329,9 @@ test.describe('UI Elements', () => {
   test('has save game button', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     const saveButton = page.getByRole('button', { name: /save.*game/i });
     expect(await saveButton.isVisible()).toBe(true);
@@ -304,6 +350,9 @@ test.describe('Error Handling', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     // Move around a bit
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(100);
@@ -317,6 +366,9 @@ test.describe('Error Handling', () => {
   test('no React error boundaries triggered', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     const hasErrorBoundary = await page
       .locator('text=/something went wrong|error boundary|crash/i')
@@ -332,6 +384,9 @@ test.describe('Party Management Screen', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     const partyButton = page.getByRole('button', { name: /party.*management/i });
     await partyButton.click();
     await page.waitForTimeout(500);
@@ -344,6 +399,9 @@ test.describe('Party Management Screen', () => {
   test('closes party management screen', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Open party management
     await page.getByRole('button', { name: /party.*management/i }).click();
@@ -364,6 +422,9 @@ test.describe('Djinn Collection Screen', () => {
   test('opens djinn collection screen and shows collected Djinn', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     const djinnButton = page.getByRole('button', { name: /djinn.*collection/i });
     await djinnButton.click();
