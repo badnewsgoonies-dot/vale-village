@@ -332,9 +332,46 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
             break;
           }
           
-          // If still stuck after 3 attempts, break to avoid infinite loop
+          // If still stuck after 2 attempts, check if battle should end and break
           stuckCount++;
-          if (stuckCount >= 3) {
+          if (stuckCount >= 2) {
+            // Final check - if all enemies dead, force victory; if all units dead, force defeat
+            const finalCheck = await page.evaluate(() => {
+              const store = (window as any).__VALE_STORE__;
+              const battle = store.getState().battle;
+              if (!battle) return { shouldEnd: false };
+              
+              const enemiesAlive = battle.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0;
+              const unitsAlive = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0;
+              
+              if (enemiesAlive === 0 && unitsAlive > 0) {
+                // Force victory
+                try {
+                  const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                  store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                  return { shouldEnd: true, ended: true };
+                } catch (e) {
+                  return { shouldEnd: true, ended: false };
+                }
+              } else if (unitsAlive === 0) {
+                // Force defeat
+                try {
+                  const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+                  store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                  return { shouldEnd: true, ended: true };
+                } catch (e) {
+                  return { shouldEnd: true, ended: false };
+                }
+              }
+              
+              return { shouldEnd: false };
+            });
+            
+            if (finalCheck.shouldEnd) {
+              if (logDetails) console.log(`   ✅ Battle ended (forced)`);
+              break;
+            }
+            
             if (logDetails) console.log(`   ⚠️  Battle stuck after ${stuckCount} attempts, breaking`);
             break;
           }
