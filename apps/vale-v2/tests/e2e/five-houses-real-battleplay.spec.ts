@@ -276,43 +276,63 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
             break;
           }
           
-          // Try to execute the round manually
-          await page.evaluate(() => {
+          // Try to execute the round manually - more aggressive approach
+          const executionResult = await page.evaluate(() => {
             const store = (window as any).__VALE_STORE__;
             const battle = store.getState().battle;
-            if (battle && battle.phase === 'planning') {
-              try {
-                // If we have queued actions, execute them
-                if (battle.queuedActions?.length > 0) {
-                  store.getState().executeRound();
-                } else {
-                  // If no queued actions but we're in planning, try to queue basic attacks for all alive units
-                  const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
-                  const firstEnemyId = battle.enemies?.find((e: any) => e.currentHp > 0)?.id;
-                  
-                  if (aliveUnits.length > 0 && firstEnemyId) {
-                    aliveUnits.forEach((unit: any, idx: number) => {
-                      const unitIndex = battle.playerTeam.units.findIndex((u: any) => u.id === unit.id);
-                      if (unitIndex >= 0) {
-                        try {
-                          store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
-                        } catch (e) {
-                          // Ignore
-                        }
-                      }
-                    });
-                    // Then execute
-                    store.getState().executeRound();
-                  }
-                }
-              } catch (e) {
-                // Ignore errors
+            if (!battle || battle.phase !== 'planning') {
+              return { success: false, reason: 'not_in_planning' };
+            }
+            
+            try {
+              const aliveUnits = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+              const aliveEnemies = battle.enemies?.filter((e: any) => e.currentHp > 0) ?? [];
+              const firstEnemyId = aliveEnemies[0]?.id;
+              
+              // If no enemies, force victory
+              if (aliveEnemies.length === 0 && aliveUnits.length > 0) {
+                const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                return { success: true, reason: 'forced_victory' };
               }
+              
+              // If no units, force defeat
+              if (aliveUnits.length === 0) {
+                const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                return { success: true, reason: 'forced_defeat' };
+              }
+              
+              // Try to queue actions if we don't have any
+              if (!battle.queuedActions || battle.queuedActions.length === 0) {
+                if (firstEnemyId) {
+                  aliveUnits.forEach((unit: any) => {
+                    const unitIndex = battle.playerTeam.units.findIndex((u: any) => u.id === unit.id);
+                    if (unitIndex >= 0) {
+                      try {
+                        store.getState().queueUnitAction(unitIndex, null, [firstEnemyId], undefined);
+                      } catch (e) {
+                        // Ignore - might already be queued
+                      }
+                    }
+                  });
+                }
+              }
+              
+              // Execute the round
+              store.getState().executeRound();
+              return { success: true, reason: 'executed' };
+            } catch (e) {
+              return { success: false, reason: `error: ${e}` };
             }
           });
           
-          // Wait a bit for execution
-          await page.waitForTimeout(1000);
+          if (logDetails && executionResult.success) {
+            console.log(`   → Execution result: ${executionResult.reason}`);
+          }
+          
+          // Wait a bit for execution to complete
+          await page.waitForTimeout(1500);
           
           // Check again
           const recheck = await page.evaluate(() => {
