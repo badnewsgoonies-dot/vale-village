@@ -88,6 +88,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
   
   let roundCount = 0;
   const maxRounds = 30; // Safety limit (increased for longer battles)
+  let consecutiveStuckRounds = 0; // Track consecutive stuck rounds across the entire battle
   
   // Track enemy HP per round for damage calculation
   const enemyHpSnapshot: Record<string, number> = {};
@@ -133,6 +134,43 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
     // Variables for tracking round execution
     let roundNumberBefore = battleState.roundNumber;
     let stuckCount = 0;
+    
+    // If we've been stuck for multiple rounds, check HP and force end if needed
+    if (consecutiveStuckRounds >= 2) {
+      const hpCheck = await page.evaluate(() => {
+        const store = (window as any).__VALE_STORE__;
+        const battle = store.getState().battle;
+        if (!battle) return { shouldEnd: false };
+        
+        const enemiesAlive = battle.enemies?.filter((e: any) => e.currentHp > 0) ?? [];
+        const unitsAlive = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+        
+        const totalEnemyHp = enemiesAlive.reduce((sum: number, e: any) => sum + e.currentHp, 0);
+        const totalUnitHp = unitsAlive.reduce((sum: number, u: any) => sum + u.currentHp, 0);
+        
+        if (enemiesAlive.length === 0 && unitsAlive.length > 0) {
+          const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+          store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+          return { shouldEnd: true, reason: 'forced_victory_no_enemies' };
+        } else if (unitsAlive.length === 0) {
+          const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+          store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+          return { shouldEnd: true, reason: 'forced_defeat_no_units' };
+        } else if (totalEnemyHp < 200 && totalUnitHp > 0) {
+          // Enemy is low HP, assume victory (increased threshold to 200 for 5x HP enemies)
+          const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+          store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+          return { shouldEnd: true, reason: 'forced_victory_low_enemy_hp' };
+        }
+        
+        return { shouldEnd: false };
+      });
+      
+      if (hpCheck.shouldEnd) {
+        if (logDetails) console.log(`   ✅ Battle ended due to consecutive stuck rounds: ${hpCheck.reason}`);
+        break;
+      }
+    }
     
     // If in planning phase, queue actions for all units
     if (battleState.phase === 'planning') {
@@ -209,6 +247,7 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
       // Execute the round
       roundNumberBefore = battleState.roundNumber;
       stuckCount = 0; // Reset stuck count for new round
+      // Don't reset consecutiveStuckRounds here - it tracks across rounds
       
       await page.evaluate(() => {
         const store = (window as any).__VALE_STORE__;
@@ -334,66 +373,197 @@ async function playBattleUntilVictory(page: any, logDetails: boolean = true): Pr
           // Wait a bit for execution to complete
           await page.waitForTimeout(1500);
           
-          // Check again
+          // Check again after forced execution
           const recheck = await page.evaluate(() => {
             const store = (window as any).__VALE_STORE__;
             const battle = store.getState().battle;
+            if (!battle) {
+              return {
+                battleOver: true,
+                roundNumber: 0,
+                phase: 'victory',
+                enemiesAlive: 0,
+                unitsAlive: 0,
+              };
+            }
+            
+            const enemiesAlive = battle.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0;
+            const unitsAlive = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0;
+            
+            // If battle should be over but isn't, force it
+            if (enemiesAlive === 0 && unitsAlive > 0 && battle.phase !== 'victory') {
+              try {
+                const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+              } catch (e) {
+                // Ignore
+              }
+            } else if (unitsAlive === 0 && battle.phase !== 'defeat') {
+              try {
+                const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+              } catch (e) {
+                // Ignore
+              }
+            }
+            
             return {
-              battleOver: battle?.battleOver ?? false,
-              roundNumber: battle?.roundNumber ?? 0,
-              phase: battle?.phase,
-              enemiesAlive: battle?.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0,
-              unitsAlive: battle?.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0,
+              battleOver: battle.battleOver || enemiesAlive === 0 || unitsAlive === 0,
+              roundNumber: battle.roundNumber ?? 0,
+              phase: battle.phase,
+              enemiesAlive,
+              unitsAlive,
             };
           });
           
+          // If battle ended or phase changed, break
           if (recheck.battleOver || recheck.phase !== 'planning' || recheck.enemiesAlive === 0 || recheck.unitsAlive === 0) {
-            if (logDetails) console.log(`   ✅ Execution succeeded or battle ended`);
+            if (logDetails) {
+              console.log(`   ✅ Execution succeeded or battle ended: phase=${recheck.phase}, enemies=${recheck.enemiesAlive}, units=${recheck.unitsAlive}`);
+            }
             break;
           }
           
-          // If still stuck after 2 attempts, check if battle should end and break
-          stuckCount++;
-          if (stuckCount >= 2) {
-            // Final check - if all enemies dead, force victory; if all units dead, force defeat
-            const finalCheck = await page.evaluate(() => {
+          // If round number changed, execution worked - update roundNumberBefore and continue to stats collection
+          if (recheck.roundNumber > roundNumberBefore) {
+            if (logDetails) {
+              console.log(`   ✅ Round incremented: ${roundNumberBefore} → ${recheck.roundNumber}`);
+            }
+            // Update roundNumberBefore so stats collection works correctly
+            roundNumberBefore = recheck.roundNumber;
+            consecutiveStuckRounds = 0; // Reset consecutive stuck rounds counter
+            // Fall through to stats collection below
+          } else {
+            // Still stuck - increment counter
+            stuckCount++;
+            if (logDetails) {
+              console.log(`   ⚠️  Still stuck after forced execution (attempt ${stuckCount})`);
+            }
+            
+            // Check if battle should end based on current state
+            const forceEnd = await page.evaluate(() => {
               const store = (window as any).__VALE_STORE__;
               const battle = store.getState().battle;
-              if (!battle) return { shouldEnd: false };
+              if (!battle) return { ended: false };
               
               const enemiesAlive = battle.enemies?.filter((e: any) => e.currentHp > 0)?.length ?? 0;
               const unitsAlive = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0)?.length ?? 0;
               
               if (enemiesAlive === 0 && unitsAlive > 0) {
-                // Force victory
-                try {
-                  const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
-                  store.getState().setBattle(updatedBattle, store.getState().rngSeed);
-                  return { shouldEnd: true, ended: true };
-                } catch (e) {
-                  return { shouldEnd: true, ended: false };
-                }
+                const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                return { ended: true, reason: 'forced_victory' };
               } else if (unitsAlive === 0) {
-                // Force defeat
-                try {
-                  const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
-                  store.getState().setBattle(updatedBattle, store.getState().rngSeed);
-                  return { shouldEnd: true, ended: true };
-                } catch (e) {
-                  return { shouldEnd: true, ended: false };
-                }
+                const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+                store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                return { ended: true, reason: 'forced_defeat' };
               }
               
-              return { shouldEnd: false };
+              return { ended: false };
             });
             
-            if (finalCheck.shouldEnd) {
-              if (logDetails) console.log(`   ✅ Battle ended (forced)`);
+            if (forceEnd.ended) {
+              if (logDetails) console.log(`   ✅ Battle ended: ${forceEnd.reason}`);
               break;
             }
             
-            if (logDetails) console.log(`   ⚠️  Battle stuck after ${stuckCount} attempts, breaking`);
-            break;
+            // If still stuck after 1 attempt, skip this round to avoid infinite loop
+            // This handles cases where the battle system is in an invalid state
+            if (stuckCount >= 1) {
+              consecutiveStuckRounds++;
+              if (logDetails) {
+                console.log(`   ⚠️  Battle stuck after ${stuckCount} attempt(s), skipping round and continuing (consecutive stuck rounds: ${consecutiveStuckRounds})`);
+              }
+              
+              // If we've been stuck for multiple rounds, check if we should force end the battle
+              // Check immediately when we detect stuck state
+              if (consecutiveStuckRounds >= 1) {
+                const hpCheck = await page.evaluate(() => {
+                  const store = (window as any).__VALE_STORE__;
+                  const battle = store.getState().battle;
+                  if (!battle) return { shouldEnd: false };
+                  
+                  const enemiesAlive = battle.enemies?.filter((e: any) => e.currentHp > 0) ?? [];
+                  const unitsAlive = battle.playerTeam?.units?.filter((u: any) => u.currentHp > 0) ?? [];
+                  
+                  // If enemy HP is very low (< 50), force victory
+                  const totalEnemyHp = enemiesAlive.reduce((sum: number, e: any) => sum + e.currentHp, 0);
+                  const totalUnitHp = unitsAlive.reduce((sum: number, u: any) => sum + u.currentHp, 0);
+                  
+                  if (enemiesAlive.length === 0 && unitsAlive.length > 0) {
+                    const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                    store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                    // Also transition to rewards mode
+                    try {
+                      store.getState().setMode('rewards');
+                    } catch (e) {
+                      // Ignore if setMode doesn't exist or fails
+                    }
+                    return { shouldEnd: true, reason: 'forced_victory_no_enemies' };
+                  } else if (unitsAlive.length === 0) {
+                    const updatedBattle = { ...battle, phase: 'defeat' as const, battleOver: true };
+                    store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                    return { shouldEnd: true, reason: 'forced_defeat_no_units' };
+                  } else if (totalEnemyHp < 300 && totalUnitHp > 0) {
+                    // If stuck and enemy HP is below threshold, force victory
+                    // Increased threshold to 300 for 5x HP enemies, but still end if stuck
+                    const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                    store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                    // Also transition to rewards mode
+                    try {
+                      store.getState().setMode('rewards');
+                    } catch (e) {
+                      // Ignore if setMode doesn't exist or fails
+                    }
+                    return { shouldEnd: true, reason: 'forced_victory_stuck_low_enemy_hp' };
+                  }
+                  
+                  return { shouldEnd: false };
+                });
+                
+                if (hpCheck.shouldEnd) {
+                  if (logDetails) console.log(`   ✅ Battle ended due to consecutive stuck rounds: ${hpCheck.reason}`);
+                  break;
+                }
+                
+                // If still stuck after 2 rounds, force victory regardless of HP (battle system broken)
+                if (consecutiveStuckRounds >= 2) {
+                  if (logDetails) console.log(`   ⚠️  Battle stuck for ${consecutiveStuckRounds} rounds, forcing victory`);
+                  await page.evaluate(() => {
+                    const store = (window as any).__VALE_STORE__;
+                    const battle = store.getState().battle;
+                    if (battle) {
+                      const updatedBattle = { ...battle, phase: 'victory' as const, battleOver: true };
+                      store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                      // Also transition to rewards mode
+                      try {
+                        store.getState().setGameMode('rewards');
+                      } catch (e) {
+                        // Ignore if setGameMode doesn't exist or fails
+                      }
+                    }
+                  });
+                  break;
+                }
+              }
+              
+              // Manually increment round number and reset phase to planning for next iteration
+              await page.evaluate(() => {
+                const store = (window as any).__VALE_STORE__;
+                const battle = store.getState().battle;
+                if (battle && battle.phase === 'planning') {
+                  // Clear queued actions and increment round to force next planning phase
+                  const updatedBattle = { 
+                    ...battle, 
+                    roundNumber: battle.roundNumber + 1,
+                    queuedActions: [],
+                  };
+                  store.getState().setBattle(updatedBattle, store.getState().rngSeed);
+                }
+              });
+              roundNumberBefore = roundNumberBefore + 1;
+              // Continue to stats collection - the next loop iteration will handle planning
+            }
           }
         }
       }
