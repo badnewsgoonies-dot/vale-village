@@ -477,6 +477,287 @@ export const FIRE_BURST: Ability = {
 };
 
 // ============================================================================
+// EQUIPMENT ABILITIES (20 Total - One per House Reward)
+// ============================================================================
+
+// ACT 1: DISCOVERY (Houses 1-7)
+export const WOODEN_STRIKE: Ability = {
+  id: 'wooden-strike',
+  name: 'Wooden Strike',
+  type: 'physical',
+  manaCost: 0,
+  basePower: 8,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A basic strike with a wooden blade. Simple but reliable.',
+  aiHints: { priority: 1.0, target: 'weakest', avoidOverkill: false },
+};
+
+export const BRONZE_SLASH: Ability = {
+  id: 'bronze-slash',
+  name: 'Bronze Slash',
+  type: 'physical',
+  element: 'Venus',
+  manaCost: 0,
+  basePower: 12,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A sharp slash with a bronze blade. Earth-imbued strike.',
+  aiHints: { priority: 1.2, target: 'weakest', avoidOverkill: false },
+};
+
+export const IRON_BULWARK: Ability = {
+  id: 'iron-bulwark',
+  name: 'Iron Bulwark',
+  type: 'buff',
+  manaCost: 1,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Fortify yourself with iron defense. Increases DEF.',
+  buffEffect: { def: 6 },
+  duration: 3,
+  aiHints: { priority: 1.5, target: 'random', opener: true },
+};
+
+export const ARCANE_BOLT: Ability = {
+  id: 'arcane-bolt',
+  name: 'Arcane Bolt',
+  type: 'psynergy',
+  manaCost: 1,
+  basePower: 20,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A bolt of pure magical energy from your rod.',
+  aiHints: { priority: 1.5, target: 'weakest', avoidOverkill: false },
+};
+
+export const IRON_THRUST: Ability = {
+  id: 'iron-thrust',
+  name: 'Iron Thrust',
+  type: 'physical',
+  element: 'Venus',
+  manaCost: 0,
+  basePower: 18,
+  targets: 'single-enemy',
+  ignoreDefensePercent: 0.2,
+  unlockLevel: 1,
+  description: 'A precise thrust that pierces defenses.',
+  aiHints: { priority: 1.8, target: 'highestDef', avoidOverkill: false },
+};
+
+export const STEEL_FOCUS: Ability = {
+  id: 'steel-focus',
+  name: 'Steel Focus',
+  type: 'buff',
+  manaCost: 1,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Focus your mind like steel. Increases ATK.',
+  buffEffect: { atk: 5 },
+  duration: 3,
+  aiHints: { priority: 1.3, target: 'random', opener: true },
+};
+
+// ACT 2: RESISTANCE (Houses 8-14)
+export const STEEL_WARD: Ability = {
+  id: 'steel-ward',
+  name: 'Steel Ward',
+  type: 'buff',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Protect yourself with steel. Grants damage reduction.',
+  damageReductionPercent: 0.15,
+  duration: 3,
+  aiHints: { priority: 1.8, target: 'random', opener: true },
+};
+
+export const AXE_CLEAVE: Ability = {
+  id: 'axe-cleave',
+  name: 'Axe Cleave',
+  type: 'physical',
+  element: 'Mars',
+  manaCost: 1,
+  basePower: 22,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A powerful cleaving strike with your battle axe.',
+  aiHints: { priority: 2.0, target: 'weakest', avoidOverkill: false },
+};
+
+export const IRON_MIND: Ability = {
+  id: 'iron-mind',
+  name: 'Iron Mind',
+  type: 'buff',
+  manaCost: 1,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Steel your mind against status effects.',
+  grantImmunity: {
+    all: false,
+    types: ['poison', 'burn', 'freeze', 'paralyze'],
+    duration: 2,
+  },
+  aiHints: { priority: 2.0, target: 'random', opener: false },
+};
+
+export const SILVER_SHIELD: Ability = {
+  id: 'silver-shield',
+  name: 'Silver Shield',
+  type: 'buff',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Create a shimmering silver shield. Grants shield charges.',
+  shieldCharges: 2,
+  aiHints: { priority: 2.2, target: 'random', opener: true },
+};
+
+export const MYTHRIL_WISDOM: Ability = {
+  id: 'mythril-wisdom',
+  name: 'Mythril Wisdom',
+  type: 'buff',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Channel mythril wisdom. Increases MAG significantly.',
+  buffEffect: { mag: 8 },
+  duration: 4,
+  aiHints: { priority: 2.0, target: 'random', opener: true },
+};
+
+export const HYPER_SPEED: Ability = {
+  id: 'hyper-speed',
+  name: 'Hyper Speed',
+  type: 'buff',
+  manaCost: 1,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Activate hyper speed. Increases SPD dramatically.',
+  buffEffect: { spd: 8 },
+  duration: 3,
+  aiHints: { priority: 2.5, target: 'random', opener: true },
+};
+
+// ACT 3: LIBERATION (Houses 15-20)
+export const MYTHRIL_EDGE: Ability = {
+  id: 'mythril-edge',
+  name: 'Mythril Edge',
+  type: 'physical',
+  element: 'Venus',
+  manaCost: 2,
+  basePower: 35,
+  targets: 'single-enemy',
+  ignoreDefensePercent: 0.3,
+  unlockLevel: 1,
+  description: 'A devastating strike with mythril precision.',
+  aiHints: { priority: 2.8, target: 'highestDef', avoidOverkill: false },
+};
+
+export const DRAGON_WARD: Ability = {
+  id: 'dragon-ward',
+  name: 'Dragon Ward',
+  type: 'buff',
+  manaCost: 3,
+  basePower: 0,
+  targets: 'self',
+  unlockLevel: 1,
+  description: 'Channel dragon scales\' power. Grants elemental resistance.',
+  elementalResistance: {
+    element: 'Mars',
+    modifier: 0.3,
+  },
+  duration: 4,
+  aiHints: { priority: 2.5, target: 'random', opener: true },
+};
+
+export const ORACLE_VISION: Ability = {
+  id: 'oracle-vision',
+  name: 'Oracle Vision',
+  type: 'buff',
+  manaCost: 2,
+  basePower: 0,
+  targets: 'all-allies',
+  unlockLevel: 1,
+  description: 'Share oracle wisdom with all allies. Increases MAG.',
+  buffEffect: { mag: 6 },
+  duration: 3,
+  aiHints: { priority: 2.5, target: 'random', opener: true },
+};
+
+// Choice Equipment Abilities (for houses with choice rewards)
+export const STEEL_SLASH: Ability = {
+  id: 'steel-slash',
+  name: 'Steel Slash',
+  type: 'physical',
+  element: 'Venus',
+  manaCost: 1,
+  basePower: 25,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A powerful slash with a steel blade. Earth-imbued strike.',
+  aiHints: { priority: 2.0, target: 'weakest', avoidOverkill: false },
+};
+
+export const CRYSTAL_BLAST: Ability = {
+  id: 'crystal-blast',
+  name: 'Crystal Blast',
+  type: 'psynergy',
+  manaCost: 2,
+  basePower: 28,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A burst of crystal energy from your rod.',
+  aiHints: { priority: 2.0, target: 'weakest', avoidOverkill: false },
+};
+
+export const SILVER_STRIKE: Ability = {
+  id: 'silver-strike',
+  name: 'Silver Strike',
+  type: 'physical',
+  element: 'Venus',
+  manaCost: 1,
+  basePower: 30,
+  targets: 'single-enemy',
+  ignoreDefensePercent: 0.25,
+  unlockLevel: 1,
+  description: 'A precise silver strike that pierces defenses.',
+  aiHints: { priority: 2.2, target: 'highestDef', avoidOverkill: false },
+};
+
+export const GREAT_CLEAVE: Ability = {
+  id: 'great-cleave',
+  name: 'Great Cleave',
+  type: 'physical',
+  element: 'Mars',
+  manaCost: 2,
+  basePower: 32,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A devastating cleaving strike with your great axe.',
+  aiHints: { priority: 2.3, target: 'weakest', avoidOverkill: false },
+};
+
+export const ZODIAC_BOLT: Ability = {
+  id: 'zodiac-bolt',
+  name: 'Zodiac Bolt',
+  type: 'psynergy',
+  manaCost: 3,
+  basePower: 40,
+  targets: 'single-enemy',
+  unlockLevel: 1,
+  description: 'A powerful bolt of zodiac energy.',
+  aiHints: { priority: 2.5, target: 'weakest', avoidOverkill: false },
+};
+
+// ============================================================================
 // Export all abilities
 // ============================================================================
 
@@ -512,4 +793,26 @@ export const ABILITIES: Record<string, Ability> = {
   guard: GUARD,
   'earth-spike': EARTH_SPIKE,
   'fire-burst': FIRE_BURST,
+  // Equipment Abilities (20 Total)
+  'wooden-strike': WOODEN_STRIKE,
+  'bronze-slash': BRONZE_SLASH,
+  'iron-bulwark': IRON_BULWARK,
+  'arcane-bolt': ARCANE_BOLT,
+  'iron-thrust': IRON_THRUST,
+  'steel-focus': STEEL_FOCUS,
+  'steel-ward': STEEL_WARD,
+  'axe-cleave': AXE_CLEAVE,
+  'iron-mind': IRON_MIND,
+  'silver-shield': SILVER_SHIELD,
+  'mythril-wisdom': MYTHRIL_WISDOM,
+  'hyper-speed': HYPER_SPEED,
+  'mythril-edge': MYTHRIL_EDGE,
+  'dragon-ward': DRAGON_WARD,
+  'oracle-vision': ORACLE_VISION,
+  // Choice Equipment Abilities
+  'steel-slash': STEEL_SLASH,
+  'crystal-blast': CRYSTAL_BLAST,
+  'silver-strike': SILVER_STRIKE,
+  'great-cleave': GREAT_CLEAVE,
+  'zodiac-bolt': ZODIAC_BOLT,
 };

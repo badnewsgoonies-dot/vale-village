@@ -562,7 +562,7 @@ assert(enemy.actionsTaken === 2);
 - Physical: ATK vs DEF
 - Psynergy: MAG vs (DEF * 0.3)
 - Element modifiers (1.5x advantage, 0.67x disadvantage)
-- Random variance (0.9 - 1.1)
+- Random variance (removed, purely deterministic)
 - Minimum 1 damage
 
 **Acceptance Criteria:**
@@ -571,7 +571,7 @@ assert(enemy.actionsTaken === 2);
 - [x] Element advantage works
 - [x] Element disadvantage works
 - [x] Always deals at least 1 damage
-- [x] Damage has variance
+- [x] Damage is deterministic (no variance)
 
 **Context-Aware Test:**
 ```typescript
@@ -580,16 +580,16 @@ const enemy = new Enemy("Goblin", 3); // DEF 10
 
 // Physical attack
 const physicalDmg = calculatePhysicalDamage(isaac, enemy, { basePower: 0 });
-// Expected: (27 - 5) * (0.9 to 1.1) = ~20-24 damage
-assert(physicalDmg >= 19 && physicalDmg <= 25);
+// Expected: (27 - 5) = 22 damage (no variance)
+assert(physicalDmg === 22);
 
 // Psynergy attack (Quake, base power 30)
 const psynergyDmg = calculatePsynergyDamage(isaac, enemy, {
   basePower: 30,
   element: "Venus"
 });
-// Expected: (30 + 20 - 3) * 1.0 * (0.9-1.1) = ~42-51 damage
-assert(psynergyDmg >= 40 && psynergyDmg <= 53);
+// Expected: (30 + 20 - 3) * 1.0 = 47 damage
+assert(psynergyDmg === 47);
 
 // Element advantage (Venus → Jupiter)
 const windEnemy = new Enemy("WindSprite", 3);
@@ -599,8 +599,8 @@ const advantageDmg = calculatePsynergyDamage(isaac, windEnemy, {
   basePower: 30,
   element: "Venus"  // Strong vs Jupiter
 });
-// Expected: ~63-77 damage (1.5x modifier)
-assert(advantageDmg >= 60 && advantageDmg <= 80);
+// Expected: 47 * 1.5 = 70 damage
+assert(advantageDmg === 70);
 ```
 
 **Time Estimate:** 5 hours
@@ -666,101 +666,15 @@ assert(commonRate >= 0.25 && commonRate <= 0.35);  // ~30%
 
 ---
 
-## TASK 14: Implement Critical Hit System
+## TASK 14: (REMOVED) Critical Hit System
 
-**Objective:** Add critical hits with 2x damage
-
-**Requirements:**
-- Base crit chance: 5%
-- SPD bonus: +0.2% per SPD point
-- Crits deal 2x damage
-- Visual/audio feedback for crits
-
-**Acceptance Criteria:**
-- [x] Crits occur at correct rate
-- [x] Crits deal 2x damage
-- [x] SPD increases crit chance
-- [x] Crit indicator shown in battle log
-
-**Context-Aware Test:**
-```typescript
-const isaac = new Unit("isaac", 5);  // SPD 16
-const enemy = new Enemy("Goblin", 3);
-
-// Crit chance: 0.05 + (16 * 0.002) = 0.082 = 8.2%
-
-let crits = 0;
-let attacks = 1000;
-
-for (let i = 0; i < attacks; i++) {
-  const isCrit = checkCriticalHit(isaac);
-  if (isCrit) crits++;
-}
-
-const critRate = crits / attacks;
-assert(critRate >= 0.07 && critRate <= 0.09);  // ~8.2%
-
-// Crit damage
-const normalDmg = calculatePhysicalDamage(isaac, enemy, {});
-const critDmg = calculatePhysicalDamage(isaac, enemy, {}, true);  // isCrit = true
-
-assert(critDmg >= normalDmg * 1.9 && critDmg <= normalDmg * 2.1);
-```
-
-**Time Estimate:** 2 hours
-
-**Dependencies:** Task 12
+**Note:** Critical hits were explicitly removed from the design; damage is fully deterministic based on stats and formulas only. This task is obsolete and should not be implemented.
 
 ---
 
-## TASK 15: Implement Flee System
+## TASK 15: (REMOVED) Flee System
 
-**Objective:** Allow player to flee from non-boss battles
-
-**Requirements:**
-- Base flee chance: 50%
-- Modified by SPD ratio (player avg vs enemy avg)
-- Cannot flee from bosses or recruitment battles
-- Failed flee costs a turn
-
-**Acceptance Criteria:**
-- [x] Can attempt to flee
-- [x] Flee chance based on SPD
-- [x] Cannot flee from bosses
-- [x] Failed flee wastes turn
-- [x] Successful flee ends battle
-
-**Context-Aware Test:**
-```typescript
-const fastParty = [new Unit("felix", 5)];  // SPD 30
-const slowEnemy = new Enemy("Goblin", 3);  // SPD 12
-
-const battle = new Battle(fastParty, [slowEnemy]);
-const fleeChance = battle.calculateFleeChance();
-
-// Speed ratio: 30 / 12 = 2.5
-// Flee chance: 0.5 * 2.5 = 1.25 → clamped to 0.9 (90%)
-assert(fleeChance === 0.9);
-
-// Boss battle - cannot flee
-const bossBattle = new Battle(fastParty, [new Enemy("Nox Typhon", 10, true)]);
-const canFlee = bossBattle.canFlee();
-assert(canFlee === false);
-
-// Test actual flee attempts
-let successes = 0;
-for (let i = 0; i < 100; i++) {
-  const fled = battle.attemptFlee();
-  if (fled) successes++;
-  battle.reset();
-}
-const successRate = successes / 100;
-assert(successRate >= 0.85 && successRate <= 0.95);  // ~90%
-```
-
-**Time Estimate:** 3 hours
-
-**Dependencies:** Task 11
+**Note:** There is no escape/flee mechanic in the current design; all battles resolve via victory or defeat. This task is obsolete and should not be implemented.
 
 ---
 

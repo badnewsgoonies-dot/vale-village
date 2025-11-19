@@ -29,7 +29,7 @@ function createEventLog(events: readonly ReturnType<typeof playReplay>['events']
 }> {
   return events.map(e => {
     if (e.type === 'hit') {
-      return { type: 'hit', targetId: e.targetId, amount: e.amount, crit: e.crit };
+      return { type: 'hit', targetId: e.targetId, amount: e.amount };
     }
     if (e.type === 'heal') {
       return { type: 'heal', targetId: e.targetId, amount: e.amount };

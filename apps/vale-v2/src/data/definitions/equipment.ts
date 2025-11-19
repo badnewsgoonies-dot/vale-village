@@ -21,6 +21,7 @@ export const WOODEN_SWORD: Equipment = {
   cost: 50,
   statBonus: { atk: 5 },
   allowedElements: ['Venus', 'Jupiter'], // Adept, Sentinel, Ranger
+  unlocksAbility: 'wooden-strike',
 };
 
 export const BRONZE_SWORD: Equipment = {
@@ -31,6 +32,7 @@ export const BRONZE_SWORD: Equipment = {
   cost: 120,
   statBonus: { atk: 9 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'bronze-slash',
 };
 
 export const IRON_SWORD: Equipment = {
@@ -41,6 +43,7 @@ export const IRON_SWORD: Equipment = {
   cost: 200,
   statBonus: { atk: 14 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'iron-thrust',
 };
 
 export const STEEL_SWORD: Equipment = {
@@ -51,6 +54,7 @@ export const STEEL_SWORD: Equipment = {
   cost: 500,
   statBonus: { atk: 22 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'steel-slash',
 };
 
 export const SILVER_BLADE: Equipment = {
@@ -61,6 +65,7 @@ export const SILVER_BLADE: Equipment = {
   cost: 1200,
   statBonus: { atk: 32 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'silver-strike',
 };
 
 export const MYTHRIL_BLADE: Equipment = {
@@ -71,6 +76,7 @@ export const MYTHRIL_BLADE: Equipment = {
   cost: 3000,
   statBonus: { atk: 45 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'mythril-edge',
 };
 
 export const GAIA_BLADE: Equipment = {
@@ -81,6 +87,7 @@ export const GAIA_BLADE: Equipment = {
   cost: 7500,
   statBonus: { atk: 58 },
   allowedElements: ['Venus'], // Adept, Sentinel
+  unlocksAbility: 'mythril-edge', // Reuse mythril-edge for legendary tier
 };
 
 export const SOL_BLADE: Equipment = {
@@ -91,7 +98,7 @@ export const SOL_BLADE: Equipment = {
   cost: 15000,
   statBonus: { atk: 72 },
   allowedElements: ['Venus'], // Adept, Sentinel
-  // Note: megiddo ability not yet implemented
+  unlocksAbility: 'mythril-edge', // Reuse mythril-edge for artifact tier
 };
 
 // ========================================
@@ -115,6 +122,7 @@ export const BATTLE_AXE: Equipment = {
   cost: 280,
   statBonus: { atk: 18, spd: -2 },
   allowedElements: ['Mars'], // War Mage
+  unlocksAbility: 'axe-cleave',
 };
 
 export const GREAT_AXE: Equipment = {
@@ -125,6 +133,7 @@ export const GREAT_AXE: Equipment = {
   cost: 800,
   statBonus: { atk: 30, spd: -3 },
   allowedElements: ['Mars'], // War Mage
+  unlocksAbility: 'great-cleave',
 };
 
 export const TITANS_AXE: Equipment = {
@@ -135,6 +144,7 @@ export const TITANS_AXE: Equipment = {
   cost: 9000,
   statBonus: { atk: 65, def: 10, spd: -2 },
   allowedElements: ['Mars'], // War Mage
+  unlocksAbility: 'great-cleave', // Reuse great-cleave for legendary tier
 };
 
 // ========================================
@@ -191,6 +201,7 @@ export const MAGIC_ROD: Equipment = {
   cost: 180,
   statBonus: { atk: 6, mag: 8 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller
+  unlocksAbility: 'arcane-bolt',
 };
 
 export const SHAMAN_ROD: Equipment = {
@@ -211,6 +222,7 @@ export const CRYSTAL_ROD: Equipment = {
   cost: 1500,
   statBonus: { atk: 18, mag: 24 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller
+  unlocksAbility: 'crystal-blast',
 };
 
 export const ZODIAC_WAND: Equipment = {
@@ -221,6 +233,7 @@ export const ZODIAC_WAND: Equipment = {
   cost: 4000,
   statBonus: { atk: 28, mag: 38 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller
+  unlocksAbility: 'zodiac-bolt',
 };
 
 export const STAFF_OF_AGES: Equipment = {
@@ -231,7 +244,7 @@ export const STAFF_OF_AGES: Equipment = {
   cost: 18000,
   statBonus: { atk: 42, mag: 58, pp: 25 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller
-  // Note: odyssey ability not yet implemented
+  unlocksAbility: 'zodiac-bolt', // Reuse zodiac-bolt for artifact tier
 };
 
 // ========================================
@@ -275,6 +288,7 @@ export const IRON_ARMOR: Equipment = {
   cost: 350,
   statBonus: { def: 15, hp: 25 },
   allowedElements: ['Venus', 'Mars'], // Adept, Sentinel, War Mage - heavy/medium armor
+  unlocksAbility: 'iron-bulwark',
 };
 
 export const STEEL_ARMOR: Equipment = {
@@ -285,6 +299,7 @@ export const STEEL_ARMOR: Equipment = {
   cost: 800,
   statBonus: { def: 24, hp: 40 },
   allowedElements: ['Venus'], // Adept, Sentinel - heavy armor
+  unlocksAbility: 'steel-ward',
 };
 
 export const SILVER_ARMOR: Equipment = {
@@ -295,6 +310,7 @@ export const SILVER_ARMOR: Equipment = {
   cost: 2000,
   statBonus: { def: 35, hp: 60 },
   allowedElements: ['Venus'], // Adept, Sentinel - heavy armor
+  unlocksAbility: 'silver-shield',
 };
 
 export const MYTHRIL_ARMOR: Equipment = {
@@ -305,6 +321,7 @@ export const MYTHRIL_ARMOR: Equipment = {
   cost: 5000,
   statBonus: { def: 48, hp: 85 },
   allowedElements: ['Venus'], // Adept, Sentinel - heavy armor
+  unlocksAbility: 'steel-ward', // Reuse steel-ward for mythril tier
 };
 
 export const DRAGON_SCALES: Equipment = {
@@ -316,6 +333,7 @@ export const DRAGON_SCALES: Equipment = {
   statBonus: { def: 62, hp: 110 },
   allowedElements: ['Venus'], // Adept, Sentinel - legendary heavy armor
   elementalResist: 0.25,
+  unlocksAbility: 'dragon-ward',
 };
 
 export const VALKYRIE_MAIL: Equipment = {
@@ -370,6 +388,7 @@ export const IRON_HELM: Equipment = {
   cost: 220,
   statBonus: { def: 9 },
   allowedElements: ['Venus'], // Adept, Sentinel - heavy helms
+  unlocksAbility: 'iron-mind',
 };
 
 export const STEEL_HELM: Equipment = {
@@ -380,6 +399,7 @@ export const STEEL_HELM: Equipment = {
   cost: 500,
   statBonus: { def: 14 },
   allowedElements: ['Venus'], // Adept, Sentinel - heavy helms
+  unlocksAbility: 'steel-focus',
 };
 
 export const SILVER_CIRCLET: Equipment = {
@@ -400,6 +420,7 @@ export const MYTHRIL_CROWN: Equipment = {
   cost: 3200,
   statBonus: { def: 28, mag: 8 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller - mage crowns
+  unlocksAbility: 'mythril-wisdom',
 };
 
 export const ORACLES_CROWN: Equipment = {
@@ -410,6 +431,7 @@ export const ORACLES_CROWN: Equipment = {
   cost: 8000,
   statBonus: { def: 38, mag: 14, pp: 20 },
   allowedElements: ['Jupiter'], // Stormcaller - specialized Jupiter crown
+  unlocksAbility: 'oracle-vision',
 };
 
 export const GLORY_HELM: Equipment = {
@@ -473,6 +495,7 @@ export const HYPER_BOOTS: Equipment = {
   cost: 2800,
   statBonus: { spd: 10, def: 8 },
   allowedElements: ['Jupiter'], // Ranger, Stormcaller - speed boots
+  unlocksAbility: 'hyper-speed',
 };
 
 export const QUICK_BOOTS: Equipment = {
@@ -568,6 +591,7 @@ export const ELEMENTAL_STAR: Equipment = {
   statBonus: { mag: 18, pp: 20 },
   allowedElements: ['Mercury', 'Jupiter'], // Mystic, Stormcaller - powerful mage accessory
   elementalResist: 0.15,
+  unlocksAbility: 'mythril-wisdom', // Reuse mythril-wisdom for mage accessory
 };
 
 export const DRAGONS_EYE: Equipment = {
@@ -610,6 +634,7 @@ export const COSMOS_SHIELD: Equipment = {
   statBonus: { def: 30, hp: 50 },
   allowedElements: ['Venus'], // Adept, Sentinel - ultimate tank accessory
   elementalResist: 0.25,
+  unlocksAbility: 'silver-shield', // Reuse silver-shield for artifact tier
 };
 
 // ========================================

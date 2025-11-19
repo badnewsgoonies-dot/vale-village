@@ -76,7 +76,7 @@ const ISAAC_STATS = {
     5: { hp: 180, pp: 36, atk: 26, def: 18, mag: 20, spd: 16 }
   }
 };
-// BALANCE CHANGES: ATK base 15→14, PP base 20→24, PP growth 4→3 (same L5 PP, better early game)
+// BALANCE CHANGES: ATK base 15→14 (better early-game pacing)
 ```
 
 #### Garet (Mars - Pure DPS)
@@ -722,81 +722,36 @@ function calculateFinalStats(unit: Unit, team: Team): Stats {
 
 ## 4. BATTLE REWARDS
 
-### 4.1 XP Formula
+### 4.1 XP & GOLD (Predetermined)
+
+All xp, gold, and equipment rewards are **deterministic** values defined per encounter in `ENCOUNTERS`.  The encounter definition drives every reward, so there is no roll-based formula or RNG — koders look up the encounter by ID and read `encounter.reward.xp`, `.gold`, and `.equipment`.  This matches the implementation in `src/core/algorithms/rewards.ts`, which simply returns those totals and splits the xp among survivors.
 
 ```typescript
-function calculateBattleXP(enemyLevel: number, partySize: number): number {
-  const BASE_XP = 50;
-  const LEVEL_MULTIPLIER = 10;
-  const SIZE_PENALTY = partySize > 1 ? 0.8 : 1.0;  // -20% for parties
-
-  return Math.floor(
-    (BASE_XP + (LEVEL_MULTIPLIER * enemyLevel)) * SIZE_PENALTY
-  );
-}
-
-// Examples:
-// Solo vs Level 1 enemy: 50 + (10 * 1) = 60 XP
-// Party of 4 vs Level 1 enemy: 60 * 0.8 = 48 XP
-// Solo vs Level 5 enemy: 50 + (10 * 5) = 100 XP
-// Party of 4 vs Level 5 enemy: 100 * 0.8 = 80 XP
-```
-
-### 4.1.5 XP Distribution
-
-**🚨 CRITICAL: How XP is distributed to party members**
-
-```typescript
-const XP_DISTRIBUTION = {
-  mode: "FULL_TO_EACH",  // Each active unit gets full XP amount
-
-  // Example: Battle rewards 80 XP
-  // Party of 4 units → Each gets 80 XP
-  // Total XP awarded: 80 × 4 = 320 XP
-
-  koUnitsGetXP: false,   // KO'd units don't gain XP
-  benchUnitsGetXP: false // Only active party members gain XP
+const encounter = ENCOUNTERS[encounterId];
+return {
+  totalXp: encounter.reward.xp,
+  totalGold: encounter.reward.gold,
+  xpPerUnit: Math.floor(encounter.reward.xp / survivorCount),
+  equipmentReward: encounter.reward.equipment,
+  ...
 };
 ```
 
-**Reasoning:**
-- Prevents grinding weak enemies (party penalty already applies)
-- Encourages rotating party members (everyone levels equally)
-- Standard RPG practice (Final Fantasy, Golden Sun, etc.)
-- **Not split:** Splitting would make parties level too slowly
-
-**Example:**
+**XP Distribution Reminder:**
 ```typescript
-// Battle: 4-unit party defeats Level 3 enemy
-const xp = calculateBattleXP(3, 4); // 80 XP
-
-// Distribution:
-isaac.xp += 80;  // ✅ Gets full 80
-garet.xp += 80;  // ✅ Gets full 80
-ivan.xp += 80;   // ✅ Gets full 80
-mia.xp += 80;    // ✅ Gets full 80
-
-// Felix on bench: +0 XP ❌
-// Garet (KO'd): +0 XP ❌
+const XP_DISTRIBUTION = {
+  mode: "FULL_TO_EACH",  // Each surviving, active unit receives the full xp amount.
+  koUnitsGetXP: false,
+  benchUnitsGetXP: false
+};
 ```
+This enforces deterministic rewards: no splitting, no variance, and no random encounters.
 
 ---
 
-### 4.2 Gold Formula
+### 4.2 Gold (Predetermined)
 
-```typescript
-function calculateBattleGold(enemyLevel: number): number {
-  const BASE_GOLD = 25;
-  const LEVEL_MULTIPLIER = 15;
-
-  return BASE_GOLD + (LEVEL_MULTIPLIER * enemyLevel);
-}
-
-// Examples:
-// Level 1 enemy: 25 + (15 * 1) = 40 gold
-// Level 3 enemy: 25 + (15 * 3) = 70 gold
-// Level 5 enemy: 25 + (15 * 5) = 100 gold
-```
+Gold rewards come straight from the encounter definition (`encounter.reward.gold`).  There are no formulas or randomness; the encounter writer explicitly defines how much gold the battle drops.  The same goes for equipment rewards — they are “predetermined” choices listed on each encounter, so battles are fully deterministic from start to finish.
 
 ### 4.3 Equipment Rewards
 
@@ -861,11 +816,11 @@ const RECRUITMENT_REWARDS = {
 ```typescript
 enum AbilityType {
   PHYSICAL_ATTACK = "physical",  // Uses ATK stat
-  PSYNERGY_ATTACK = "psynergy",  // Uses MAG stat, costs PP
-  HEALING = "healing",           // Uses MAG stat, costs PP
-  BUFF = "buff",                 // Uses MAG stat, costs PP
-  DEBUFF = "debuff",             // Uses MAG stat, costs PP
-  SUMMON = "summon"              // Requires Djinn, costs PP
+  PSYNERGY_ATTACK = "psynergy",  // Uses MAG stat, costs mana
+  HEALING = "healing",           // Uses MAG stat, costs mana
+  BUFF = "buff",                 // Uses MAG stat, costs mana
+  DEBUFF = "debuff",             // Uses MAG stat, costs mana
+  SUMMON = "summon"              // Requires Djinn, costs mana
 }
 ```
 
@@ -889,10 +844,9 @@ function calculatePhysicalDamage(
   return Math.max(1, damage);  // Minimum 1 damage
 }
 
-// NOTE: Random damage variance removed in Phase 1
+// Note: Random damage variance removed
 // Damage is now fully deterministic
 function getRandomMultiplier(rng: PRNG): number {
-  // Placeholder for future variance if needed
   return 1.0;  // No variance
 }
 ```
@@ -1001,7 +955,7 @@ function calculateHealAmount(
 
 ### 5.2.6 Mana System
 
-**🚨 CRITICAL: Mana-based ability system (NO PP)**
+**🚨 CRITICAL: Mana-based ability system**
 
 ```typescript
 const MANA_SYSTEM = {
@@ -1026,7 +980,7 @@ const MANA_SYSTEM = {
 };
 ```
 
-**Why Mana Instead of PP:**
+**Why a Mana-Based System:**
 - Simplifies resource management (no cross-battle conservation)
 - Focus on tactical round planning, not resource hoarding
 - Mana generation creates interesting turn order decisions
@@ -1052,7 +1006,6 @@ function onBattleEnd(units: Unit[], battleResult: "victory" | "defeat"): void {
     unit.statusAilments = [];     // ✅ Cure all status
   });
   
-  // No PP to restore (mana-only system)
   // Mana automatically resets to max at start of next battle's planning phase
 }
 ```
@@ -1303,8 +1256,7 @@ Damage is consistent based on stats and formulas only.
 ```typescript
 enum BattleResult {
   PLAYER_VICTORY,  // All enemies defeated
-  PLAYER_DEFEAT,   // All player units KO'd
-  PLAYER_FLEE      // Player chose to flee
+  PLAYER_DEFEAT    // All player units KO'd
 }
 
 function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleResult | null {
@@ -1316,15 +1268,6 @@ function checkBattleEnd(playerUnits: Unit[], enemyUnits: Unit[]): BattleResult |
 
   return null;  // Battle continues
 }
-```
-
-### 6.4 Flee Mechanics
-
-```typescript
-// FLEEING SYSTEM REMOVED
-// Game design: No fleeing from battles
-// All battles are NPC-triggered and intentional
-// Players can prepare before each battle
 ```
 
 ---
@@ -1929,19 +1872,7 @@ function getRandomMultiplier(): number {
 
 // ✅ CORRECT (deterministic)
 function getRandomMultiplier(rng: SeededRNG): number {
-  return 0.9 + (rng.float() * 0.2);
-}
-
-// ❌ WRONG
-function checkCriticalHit(attacker: Unit): boolean {
-  const totalChance = 0.05 + (attacker.stats.spd * 0.002);
-  return Math.random() < totalChance;
-}
-
-// ✅ CORRECT
-function checkCriticalHit(attacker: Unit, rng: SeededRNG): boolean {
-  const totalChance = 0.05 + (attacker.stats.spd * 0.002);
-  return rng.float() < totalChance;
+  return 1.0; // No variance in current design
 }
 ```
 
@@ -1968,31 +1899,9 @@ class Battle {
 
 ---
 
-### 11.2 Critical Hit Formula Clarification
+### 11.2 Battle Design Principles
 
-**🚨 FIXED: Wording correction**
-
-```typescript
-// Critical hit formula
-const baseCritRate = 0.05;  // 5% base
-const speedBonus = attacker.stats.spd * 0.002;  // 0.2 percentage points per SPD
-
-// NOT "0.2% per SPD" ← WRONG wording
-// CORRECT: "0.2 percentage points per SPD"
-
-// Example:
-// Felix (SPD 30): 0.05 + (30 * 0.002) = 0.05 + 0.06 = 0.11 = 11% crit chance
-//                                              ↑
-//                                        6 percentage points, not 6%
-```
-
----
-
-### 11.3 Battle Design Principles
-
-**🚨 NO FLEEING SYSTEM**
-
-Vale Chronicles does not include a flee/escape mechanic:
+Vale Chronicles battles always resolve via victory or defeat; there is no escape mechanic:
 
 **Design Rationale:**
 - All battles are NPC-triggered (no random encounters)
@@ -2509,7 +2418,6 @@ function onBattleEnd(units: Unit[], battleResult: "victory" | "defeat"): void {
     unit.statusAilments = [];     // Clear all status effects
   });
   
-  // No PP to restore (mana-only system)
   // No gold cost
   // Always triggers (cannot be disabled)
 }
@@ -2551,7 +2459,7 @@ function onBattleEnd(units: Unit[], battleResult: "victory" | "defeat"): void {
 - Auto-heal after every battle (win or lose)
 
 **Abilities:**
-- Mana-based system (no PP)
+- Mana-based system
 - Basic attack: 0 mana
 - Low-cost: 1 mana
 - Mid-tier: 2-3 mana

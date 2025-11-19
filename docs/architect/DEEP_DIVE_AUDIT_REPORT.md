@@ -141,41 +141,26 @@ const baseGoldReward = 25 + (enemy.level * 15);  // ✅ Should be formula-based
 
 **GAME_MECHANICS.md Specification:**
 ```typescript
-Physical: (ATK - DEF×0.5) × random(0.9-1.1)
-Psynergy: (basePower + MAG - DEF×0.3) × elementModifier × random(0.9-1.1)
+Physical: (ATK - DEF×0.5)
+Psynergy: (basePower + MAG - DEF×0.3) × elementModifier
 ```
 
 **Implementation:** `src/types/Battle.ts`
 - ✅ Physical damage formula correct
 - ✅ Psynergy formula correct
 - ✅ Element modifiers (1.5× / 0.67×) correct
-- ✅ Random variance (0.9-1.1) correct
+- ✅ Random variance (Removed, fully deterministic)
 - ✅ Minimum 1 damage enforced
 
 **Verdict:** **PASS** ✅
 
 ---
 
-### ✅ 1.6 Critical Hits - CORRECT
+### ✅ 1.6 Critical Hits - REMOVED
 
-**GAME_MECHANICS.md Specification:**
-```typescript
-Base chance: 5%
-SPD bonus: +0.2% per SPD point
-Critical multiplier: 2.0×
-```
+Critical hits were removed from the design; damage is now fully deterministic based on stats and formulas only (see `GAME_MECHANICS.md` Section 6.2).
 
-**Implementation:** `src/types/Battle.ts` - `checkCriticalHit()`
-```typescript
-const BASE_CRIT_CHANCE = 0.05;
-const SPEED_BONUS = attacker.stats.spd * 0.002;
-const totalChance = BASE_CRIT_CHANCE + SPEED_BONUS;
-```
-
-- ✅ Formula matches exactly
-- ✅ 2.0× multiplier applied correctly
-
-**Verdict:** **PASS** ✅
+**Verdict:** **NOT APPLICABLE (system removed)** ⚠️
 
 ---
 
@@ -396,6 +381,7 @@ const newTeam = {
 3. **Battle Transition** - Planned for Graphics Phase 2
 4. **Shop System** - Defined in spec, not implemented
 5. **Inn System** - Defined in spec, not implemented
+6. **State management** - Zustand implemented (see ADR 002)
 
 **Status:** ✅ All documented in TASK_BREAKDOWN.md
 
@@ -411,7 +397,7 @@ const newTeam = {
 
 **Missing for Graphics:**
 - ❌ React component structure (not started)
-- ❌ State management (Context/Reducer not implemented)
+- ⚠️ State management (Zustand implemented via ADR 002; Context/Reducer plan retired)
 - ❌ Screen routing (not implemented)
 
 ---
@@ -474,8 +460,8 @@ const newTeam = {
 
 ### LONG-TERM (Priority 3)
 
-6. **Architectural Enhancements**
-   - Implement React Context for state management
+6. **Architectural Enhancements (COMPLETE - Zustand implemented via ADR 002)**
+   - State management now uses Zustand with feature-based slices (Context/Reducer retired)
    - Create screen routing system
    - Design component hierarchy
    - **Timeline:** 12 hours (Task 23)

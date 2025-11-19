@@ -34,6 +34,7 @@ const ENCOUNTER_TO_RECRUITMENT_DIALOGUE: Record<string, string> = {
 };
 import { UNIT_DEFINITIONS } from './data/definitions/units';
 import { DJINN } from './data/definitions/djinn';
+import { EQUIPMENT } from './data/definitions/equipment';
 import { createUnit } from './core/models/Unit';
 import { createTeam } from './core/models/Team';
 import { collectDjinn, equipDjinn } from './core/services/DjinnService';
@@ -51,6 +52,8 @@ function App() {
     getXpProgress,
     DJINN,
   };
+  // Expose equipment definitions for E2E tests
+  (window as any).__VALE_EQUIPMENT__ = EQUIPMENT;
 
   // PR-QUEUE-BATTLE: Use queueBattleSlice instead of battleSlice
   const setBattle = useStore((s) => s.setBattle);
@@ -74,6 +77,7 @@ function App() {
   const [showSaveMenu, setShowSaveMenu] = useState(false);
   const [showDjinnCollection, setShowDjinnCollection] = useState(false);
   const [showPartyManagement, setShowPartyManagement] = useState(false);
+  const [showShopEquip, setShowShopEquip] = useState(false);
 
   // Initialize team on app startup (needed for battle triggers)
   useEffect(() => {
@@ -216,6 +220,20 @@ function App() {
           >
             Party Management
           </button>
+          <button
+            onClick={() => setShowShopEquip(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#607D8B',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            Shop & Equipment
+          </button>
           {canAccessCredits && (
             <button
               onClick={() => setShowCredits(true)}
@@ -260,6 +278,9 @@ function App() {
       )}
       {showPartyManagement && (
         <PartyManagementScreen onClose={() => setShowPartyManagement(false)} />
+      )}
+      {showShopEquip && (
+        <ShopEquipScreen shopId={currentShopId || 'vale-armory'} onClose={() => setShowShopEquip(false)} />
       )}
       {mode === 'rewards' && lastBattleRewards && team ? (
         <RewardsScreen

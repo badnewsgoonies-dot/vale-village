@@ -117,6 +117,7 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
     addEquipment([result.value.item]);
   };
 
+
   // Equipment tab logic
   const handleEquip = (equipment: Equipment) => {
     if (!selectedUnit || !selectedSlot) return;

@@ -35,7 +35,10 @@ export const HOUSE_01_VS1: Encounter = {
   reward: {
     xp: 60,
     gold: 20,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'wooden-sword',
+    },
     djinn: 'forge', // Mars T1 Djinn
     unlockUnit: 'war-mage', // Recruit Garet
   },
@@ -113,7 +116,10 @@ export const HOUSE_05: Encounter = {
   reward: {
     xp: 100,
     gold: 28,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'iron-sword',
+    },
     unlockUnit: 'blaze', // Recruit Blaze (Mars Balanced Warrior)
   },
 };
@@ -176,7 +182,10 @@ export const HOUSE_08: Encounter = {
   reward: {
     xp: 200,
     gold: 55,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'steel-armor',
+    },
     djinn: 'fizz', // Mercury T1 Djinn
     unlockUnit: 'sentinel', // Recruit Sentinel (Venus Support Buffer)
   },
@@ -213,7 +222,10 @@ export const HOUSE_10: Encounter = {
   reward: {
     xp: 235,
     gold: 62,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'iron-helm',
+    },
   },
 };
 
@@ -251,7 +263,10 @@ export const HOUSE_12: Encounter = {
   reward: {
     xp: 275,
     gold: 72,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'mythril-crown',
+    },
     djinn: 'granite', // Venus T2 Djinn - POWER SPIKE
   },
 };
@@ -318,7 +333,7 @@ export const HOUSE_15: Encounter = {
     unlockUnit: 'stormcaller', // Recruit Stormcaller (Jupiter AoE Mage)
     equipment: {
       type: 'choice',
-      options: ['tempest-spear', 'mythril-armor', 'elemental-star'],
+      options: ['mythril-armor', 'zodiac-wand', 'elemental-star'],
     },
   },
 };
@@ -377,7 +392,10 @@ export const HOUSE_18: Encounter = {
   reward: {
     xp: 550,
     gold: 140,
-    equipment: { type: 'none' },
+    equipment: {
+      type: 'fixed',
+      itemId: 'oracles-crown',
+    },
     djinn: 'bane', // Venus T3 Djinn
   },
 };

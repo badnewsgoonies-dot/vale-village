@@ -157,7 +157,7 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 ## Game Systems
 
 ### Battle System
-- **Damage Formula:** `(basePower + ATK - DEF×0.5) × randomMultiplier × elementAdvantage`
+- **Damage Formula:** `(basePower + ATK - DEF×0.5) × elementAdvantage`
 - **Element Advantages:** 1.5× damage when strong, 0.67× when weak (Venus > Mars > Jupiter > Mercury > Venus)
 - **Turn Order:** Speed-based with turn queue, recalculated each round
 - **Critical Hits:** Chance based on unit level and luck

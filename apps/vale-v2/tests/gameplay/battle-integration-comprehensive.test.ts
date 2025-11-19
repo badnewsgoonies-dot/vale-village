@@ -558,49 +558,6 @@ describe('Battle Integration - Determinism', () => {
     );
   });
 
-  test.skip('different seeds produce different results (legacy variance test)', () => {
-    const runBattle = (seed: number) => {
-      const team = mkTeam([
-        mkUnit({ id: 'u1', level: 5 }),
-        mkUnit({ id: 'u2', level: 5 }),
-        mkUnit({ id: 'u3', level: 5 }),
-        mkUnit({ id: 'u4', level: 5 }),
-      ]);
-      const enemies = [mkEnemy('slime', { id: 'e1', currentHp: 50 })];
-      let state = createBattleState(team, enemies);
-      const rng = makePRNG(seed);
-
-      const strikeAbility = ABILITIES['strike'];
-
-      let rounds = 0;
-      while (state.phase === 'planning' && rounds < 10) {
-        for (const unit of state.playerTeam.units) {
-          const result = queueAction(state, unit.id, 'strike', ['e1'], strikeAbility);
-          if (result.ok) {
-            state = result.value;
-          }
-        }
-
-        const roundResult = executeRound(state, rng);
-        state = roundResult.state;
-        rounds++;
-      }
-
-      return { finalState: state, rounds };
-    };
-
-    const result1 = runBattle(111);
-    const result2 = runBattle(999);
-
-    // Different seeds should produce different outcomes
-    // (at least HP should differ due to damage variance)
-    const hp1 = result1.finalState.enemies[0]?.currentHp ?? 0;
-    const hp2 = result2.finalState.enemies[0]?.currentHp ?? 0;
-
-    // HP should differ (damage has variance)
-    // Note: there's a small chance they could match, but very unlikely
-    expect(hp1).not.toBe(hp2);
-  });
 
   test('no hidden non-determinism (Math.random detection)', () => {
     // Override Math.random to detect usage

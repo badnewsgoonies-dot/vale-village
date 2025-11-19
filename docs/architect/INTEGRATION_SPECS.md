@@ -82,7 +82,7 @@ const SYSTEM_DEPENDENCIES = {
 │ OVERWORLD  │
 │ - Walking  │
 └─────┬──────┘
-      │ Random encounter triggered (5% per step)
+      │ ~~Random encounter triggered (5% per step)~~ REMOVED; all battles are scripted NPC encounters
       │
 ┌─────▼───────────┐
 │ TRANSITION      │  Duration: 2.3s
@@ -360,14 +360,13 @@ const GAME_EVENTS = {
 eventBus.emit("battle:damage:dealt", {
   attacker: isaac,
   defender: goblin,
-  damage: 47,
-  isCrit: false
+  damage: 47
 });
 
 // UI listens for damage event to show animation
 eventBus.on("battle:damage:dealt", (data) => {
   showDamageAnimation(data.defender, data.damage);
-  playSound(data.isCrit ? "crit.mp3" : "hit.mp3");
+  playSound("hit.mp3");
 });
 
 // Stats tracker listens for damage event
@@ -459,8 +458,7 @@ interface BattleAPI {
   calculateTurnOrder(units: Unit[]): Unit[];
 
   // Special
-  checkCriticalHit(attacker: Unit): boolean;
-  attemptFlee(battle: Battle): boolean;
+  // (No critical hit or escape systems in current design)
 }
 
 // Return types
@@ -697,6 +695,21 @@ interface BattleSceneProps {
 ```
 
 ### 6.3 State Management in React
+
+⚠️ **NOTE:** This section describes the Context/Reducer pattern (dated Nov 2, 2025).
+**Current Implementation:** Zustand with feature-based slices (see ADR 002, Nov 10, 2025).
+**Status:** Historical reference only - do not implement Context/Reducer.
+
+For current state management patterns, see:
+- `docs/adr/002-state-management.md` - Official decision
+- `apps/vale-v2/src/ui/state/store.ts` - Actual implementation
+- `apps/vale-v2/CLAUDE.md` - Usage patterns
+
+⚠️ Archived context/reducer templates moved to `docs/archive/legacy-state-management/` for historical reference only.
+
+---
+
+[Original Context/Reducer example code below - for reference only]
 
 ```typescript
 // Context-based state management

@@ -81,7 +81,7 @@ const TECH_STACK = {
     framework: "React 18+",
     language: "TypeScript 5+",
     styling: "CSS Modules + tokens.css (from mockups)",
-    state: "React Context + useReducer",
+    state: "Zustand with feature-based slices", // Updated: See ADR 002 (was: Context + useReducer)
     routing: "React Router 6+"
   },
 

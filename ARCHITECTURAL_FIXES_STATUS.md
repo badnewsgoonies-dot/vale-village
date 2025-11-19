@@ -553,3 +553,4 @@ apps/vale-v2/src/core/services/BattleService.ts
 **Confidence:** HIGH (E2E tests provide safety net)  
 **Estimated Total Time:** 12-17 hours across all phases
 
+

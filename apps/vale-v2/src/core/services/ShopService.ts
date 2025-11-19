@@ -116,3 +116,4 @@ export function getPriceByTier(tier: Equipment['tier']): number {
   };
   return tierPrices[tier] ?? 100;
 }
+
