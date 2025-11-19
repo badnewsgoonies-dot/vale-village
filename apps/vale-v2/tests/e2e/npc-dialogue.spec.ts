@@ -8,6 +8,7 @@ import {
   advanceDialogue,
   selectDialogueChoice,
   endDialogue,
+  skipStartupScreens,
 } from './helpers';
 import { ELDER_DIALOGUE } from '../../src/data/definitions/dialogues';
 
@@ -28,6 +29,9 @@ test.describe('NPC Dialogue', () => {
   test('triggers dialogue when walking to NPC', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Initial state
     let state = await getGameState(page);
@@ -155,6 +159,9 @@ test.describe('NPC Dialogue', () => {
   test('exit dialogue returns to overworld', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Trigger dialogue
     await triggerNPCDialogue(page, 'vale-village', 15, 5);

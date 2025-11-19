@@ -107,6 +107,21 @@ export const HOUSE_03_RECRUIT: DialogueTree = {
   ],
 };
 
+// HOUSE 04: Post-Battle (no unit recruitment, just victory dialogue)
+export const HOUSE_04_POST_BATTLE: DialogueTree = {
+  id: 'house-04-post',
+  name: 'House 04: Victory',
+  startNodeId: 'victory',
+  nodes: [
+    {
+      id: 'victory',
+      speaker: 'Isaac',
+      text: 'Another house freed. The villagers are grateful for our help.',
+      portrait: 'isaac',
+    },
+  ],
+};
+
 // HOUSE 05: Blaze
 export const HOUSE_05_RECRUIT: DialogueTree = {
   id: 'house-05-recruit',
@@ -404,6 +419,7 @@ export const RECRUITMENT_DIALOGUES: Record<string, DialogueTree> = {
   'house-01-recruit': HOUSE_01_RECRUIT,
   'house-02-recruit': HOUSE_02_RECRUIT,
   'house-03-recruit': HOUSE_03_RECRUIT,
+  'house-04-post': HOUSE_04_POST_BATTLE,
   'house-05-recruit': HOUSE_05_RECRUIT,
   'house-07-djinn': HOUSE_07_DJINN,
   'house-08-recruit': HOUSE_08_RECRUIT,

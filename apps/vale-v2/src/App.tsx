@@ -11,6 +11,10 @@ import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
 import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
 import { DevModeOverlay } from './ui/components/DevModeOverlay';
+import { TitleScreen } from './ui/components/TitleScreen';
+import { MainMenu } from './ui/components/MainMenu';
+import { IntroScreen } from './ui/components/IntroScreen';
+import { CompendiumScreen } from './ui/components/CompendiumScreen';
 import { useStore, store } from './ui/state/store';
 import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
@@ -196,76 +200,23 @@ function App() {
   // Expose handleRewardsContinue for E2E tests (after it's defined)
   (window as any).handleRewardsContinue = handleRewardsContinue;
 
+  // Hide dev header on startup screens
+  const isStartupScreen = mode === 'title-screen' || mode === 'main-menu' || mode === 'intro';
+
   return (
     <div>
-      <div style={{ padding: '1rem', backgroundColor: '#f0f0f0', borderBottom: '1px solid #ccc' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-          <h1 style={{ margin: 0 }}>Vale Chronicles V2</h1>
-          <ChapterIndicator chapter={story.chapter} />
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setShowSaveMenu(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#4CAF50',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
-            Save Game
-          </button>
-          <button
-            onClick={() => setShowDjinnCollection(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#9C27B0',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
-            Djinn Collection
-          </button>
-          <button
-            onClick={() => setShowPartyManagement(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#FF9800',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
-            Party Management
-          </button>
-          <button
-            onClick={() => setShowShopEquip(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#607D8B',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
-            Shop & Equipment
-          </button>
-          {canAccessCredits && (
+      {!isStartupScreen && (
+        <div style={{ padding: '1rem', backgroundColor: '#f0f0f0', borderBottom: '1px solid #ccc' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <h1 style={{ margin: 0 }}>Vale Chronicles V2</h1>
+            <ChapterIndicator chapter={story.chapter} />
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button
-              onClick={() => setShowCredits(true)}
+              onClick={() => setShowSaveMenu(true)}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: '#2196F3',
+                backgroundColor: '#4CAF50',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '4px',
@@ -273,26 +224,84 @@ function App() {
                 fontSize: '0.9rem',
               }}
             >
-              View Credits
+              Save Game
             </button>
-          )}
-          <button
-            onClick={startVS1Game}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#E91E63',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-              fontWeight: 'bold',
-            }}
-          >
-            🎮 Play VS1 Demo
-          </button>
+            <button
+              onClick={() => setShowDjinnCollection(true)}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#9C27B0',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              Djinn Collection
+            </button>
+            <button
+              onClick={() => setShowPartyManagement(true)}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#FF9800',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              Party Management
+            </button>
+            <button
+              onClick={() => setShowShopEquip(true)}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#607D8B',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              Shop & Equipment
+            </button>
+            {canAccessCredits && (
+              <button
+                onClick={() => setShowCredits(true)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#2196F3',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >
+                View Credits
+              </button>
+            )}
+            <button
+              onClick={startVS1Game}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#E91E63',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+              }}
+            >
+              🎮 Play VS1 Demo
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       {showCredits && (
         <CreditsScreen onExit={() => setShowCredits(false)} />
       )}
@@ -308,6 +317,16 @@ function App() {
       {showShopEquip && (
         <ShopEquipScreen shopId={currentShopId || 'vale-armory'} onClose={() => setShowShopEquip(false)} />
       )}
+      
+      {/* Startup screens */}
+      {mode === 'title-screen' && <TitleScreen />}
+      {mode === 'main-menu' && <MainMenu />}
+      {mode === 'intro' && <IntroScreen />}
+      {mode === 'compendium' && (
+        <CompendiumScreen onClose={() => setMode('main-menu')} />
+      )}
+      
+      {/* Game screens */}
       {mode === 'rewards' && lastBattleRewards && team ? (
         <RewardsScreen
           rewards={lastBattleRewards}

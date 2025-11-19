@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   getGameState,
   getDjinnState,
+  skipStartupScreens,
 } from './helpers';
 
 /**
@@ -20,6 +21,9 @@ test.describe('Djinn Collection Screen', () => {
   test('opens Djinn collection screen', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Verify initial mode
     let state = await getGameState(page);
@@ -45,6 +49,9 @@ test.describe('Djinn Collection Screen', () => {
   test('displays Djinn sprites with element colors', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Open Djinn Collection screen
     await page.keyboard.press('j');

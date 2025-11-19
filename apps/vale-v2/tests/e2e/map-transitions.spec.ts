@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@playwright/test';
-import { getGameState, waitForMode, navigateToPosition } from './helpers';
+import { getGameState, waitForMode, navigateToPosition, skipStartupScreens } from './helpers';
 
 /**
  * Map Transition E2E Tests
@@ -40,6 +40,9 @@ test.describe('Map Transitions', () => {
   test('transitions from vale-village to weapon-shop-interior', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Initial state
     let state = await getGameState(page);
@@ -85,6 +88,9 @@ test.describe('Map Transitions', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Skip startup screens
+    await skipStartupScreens(page);
+
     // First transition to weapon-shop-interior (manual navigation)
     // From (15, 10): move up 4, then left 7
     for (let i = 0; i < 4; i++) {
@@ -126,6 +132,9 @@ test.describe('Map Transitions', () => {
   test('transition preserves overworld mode', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Transition to weapon-shop-interior (manual navigation)
     for (let i = 0; i < 4; i++) {

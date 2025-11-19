@@ -7,6 +7,7 @@ import {
   equipItem,
   openPartyManagement,
   isPartyManagementOpen,
+  skipStartupScreens,
 } from './helpers';
 import { WOODEN_SWORD, BRONZE_SWORD } from '../../src/data/definitions/equipment';
 
@@ -26,6 +27,9 @@ test.describe('Equipment Management', () => {
   test('opens party management screen', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Verify initial mode
     let state = await getGameState(page);

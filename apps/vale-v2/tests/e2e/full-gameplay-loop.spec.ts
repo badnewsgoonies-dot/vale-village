@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
+
 import { getGameState, waitForMode, getUnitData, completeBattle, claimRewardsAndReturnToOverworld } from './helpers';
+
 
 /**
  * Full Gameplay Loop E2E Test
@@ -20,6 +22,9 @@ test.describe('Full Gameplay Loop: Two Battles', () => {
     
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Verify initial state - just Isaac and Flint
     let state = await getGameState(page);

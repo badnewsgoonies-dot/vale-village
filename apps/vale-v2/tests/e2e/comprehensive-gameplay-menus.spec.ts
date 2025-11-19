@@ -20,6 +20,7 @@ import {
   grantEquipment,
   equipItem,
   getDjinnState,
+  skipStartupScreens,
 } from './helpers';
 import { EQUIPMENT } from '../../src/data/definitions/equipment';
 
@@ -28,14 +29,8 @@ test.describe('Comprehensive Gameplay & Menus', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Wait for initial state
-    await page.waitForFunction(
-      () => {
-        const store = (window as any).__VALE_STORE__;
-        return store && store.getState().mode === 'overworld';
-      },
-      { timeout: 10000 }
-    );
+    // Skip startup screens
+    await skipStartupScreens(page);
   });
 
   test('complete gameplay flow: menus, shop, abilities, equipment', async ({ page }) => {

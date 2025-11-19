@@ -1,0 +1,28 @@
+.title-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #1a2332 0%, #0f1620 100%);
+  color: #f0f0f0;
+  cursor: pointer;
+}
+
+.title-screen-content {
+  text-align: center;
+}
+
+.title-screen-logo {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #d4af37;
+  margin: 0 0 2rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.title-screen-subtitle {
+  font-size: 1.2rem;
+  color: #a0aec0;
+  margin: 0;
+}

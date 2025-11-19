@@ -25,6 +25,7 @@ import {
   activateDjinnInBattle,
   equipItem,
   grantEquipment,
+  skipStartupScreens,
 } from './helpers';
 
 // Configure this test to always record video
@@ -41,6 +42,9 @@ test.describe('Epic Gameplay Journey', () => {
 
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Add comprehensive diagnostic logging
     const diagnostic = await page.evaluate(() => {
@@ -92,27 +96,7 @@ test.describe('Epic Gameplay Journey', () => {
       console.log('⚠️  Console errors:', consoleMessages);
     }
 
-    // Wait for store to be ready and mode to be overworld
-    await page.waitForFunction(
-      () => {
-        const store = (window as any).__VALE_STORE__;
-        if (!store) {
-          console.log('Store not found');
-          return false;
-        }
-        try {
-          const state = store.getState();
-          const mode = state?.mode;
-          console.log('Current mode:', mode);
-          return mode === 'overworld';
-        } catch (e) {
-          console.log('Error getting state:', e);
-          return false;
-        }
-      },
-      { timeout: 60000 } // Increased to 60s
-    );
-
+    // skipStartupScreens already handled above, so we should be in overworld now
     console.log('✅ Game initialized - Overworld mode active');
 
     // Verify initial state

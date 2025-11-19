@@ -27,6 +27,7 @@ import {
   completeBattle,
   getUnitData,
   advanceDialogueUntilEnd,
+  skipStartupScreens,
 } from './helpers';
 
 test.describe('Five Houses Progression', () => {
@@ -39,14 +40,8 @@ test.describe('Five Houses Progression', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Wait for initial state
-    await page.waitForFunction(
-      () => {
-        const store = (window as any).__VALE_STORE__;
-        return store && store.getState().mode === 'overworld';
-      },
-      { timeout: 10000 }
-    );
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     let state = await getGameState(page);
     expect(state?.mode).toBe('overworld');

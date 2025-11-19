@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getGameState, waitForMode, navigateToPosition } from './helpers';
+import { getGameState, waitForMode, navigateToPosition, skipStartupScreens } from './helpers';
 
 /**
  * Shop Interaction E2E Tests
@@ -17,6 +17,9 @@ test.describe('Shop Interactions', () => {
   test('triggers shop when walking to shop trigger', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Skip startup screens
+    await skipStartupScreens(page);
 
     // Initial state
     let state = await getGameState(page);
