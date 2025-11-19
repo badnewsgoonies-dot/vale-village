@@ -64,6 +64,63 @@ export async function waitForMode(
 }
 
 /**
+ * Advance through pre-battle dialogue until reaching team-select mode
+ * Use this when triggering a battle that has pre-battle dialogue
+ */
+export async function advancePreBattleDialogue(page: Page): Promise<void> {
+  // Wait a bit for mode transition after triggering battle
+  await page.waitForTimeout(500);
+
+  // Check if we're in dialogue mode (or wait for it to appear)
+  let currentMode = await page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    return store?.getState()?.mode ?? null;
+  });
+
+  // If we're already in team-select or battle, we're done
+  if (currentMode === 'team-select' || currentMode === 'battle') {
+    return;
+  }
+
+  // If we're in dialogue mode, advance through it
+  if (currentMode === 'dialogue') {
+    // Advance through dialogue until we reach team-select
+    for (let i = 0; i < 20; i++) { // Max 20 dialogue nodes
+      // Press Space or Enter to advance dialogue
+      await page.keyboard.press('Space');
+      await page.waitForTimeout(300);
+
+      const mode = await page.evaluate(() => {
+        const store = (window as any).__VALE_STORE__;
+        return store?.getState()?.mode ?? null;
+      });
+
+      if (mode === 'team-select' || mode === 'battle') {
+        break;
+      }
+
+      if (mode !== 'dialogue') {
+        break;
+      }
+    }
+  }
+
+  // Wait for team-select mode (with timeout)
+  try {
+    await waitForMode(page, 'team-select', 5000);
+  } catch (error) {
+    // If we're already in battle mode, that's also fine
+    const finalMode = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store?.getState()?.mode ?? null;
+    });
+    if (finalMode !== 'team-select' && finalMode !== 'battle') {
+      throw error;
+    }
+  }
+}
+
+/**
  * Skip startup screens (title-screen → main-menu → intro → overworld)
  * Use this at the start of tests that need to be in overworld mode
  */

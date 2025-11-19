@@ -6,6 +6,7 @@ import {
   assertStoreState,
   getUnitData,
   skipStartupScreens,
+  advancePreBattleDialogue,
 } from './helpers';
 
 /**
@@ -157,6 +158,9 @@ test.describe('Battle Trigger & Team Selection', () => {
       await page.waitForTimeout(150);
     }
 
+    // Advance through pre-battle dialogue if present
+    await advancePreBattleDialogue(page);
+
     // Wait for mode change to team-select
     await waitForMode(page, 'team-select', 5000);
 
@@ -179,6 +183,9 @@ test.describe('Battle Trigger & Team Selection', () => {
       await page.waitForTimeout(150);
     }
 
+    // Advance through pre-battle dialogue if present
+    await advancePreBattleDialogue(page);
+
     await waitForMode(page, 'team-select');
 
     // Verify confirm button exists
@@ -199,6 +206,9 @@ test.describe('Battle Trigger & Team Selection', () => {
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(100);
     }
+
+    // Advance through pre-battle dialogue if present
+    await advancePreBattleDialogue(page);
 
     await waitForMode(page, 'team-select');
 
@@ -228,6 +238,9 @@ test.describe('Battle System', () => {
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(100);
     }
+
+    // Advance through pre-battle dialogue if present
+    await advancePreBattleDialogue(page);
 
     await waitForMode(page, 'team-select');
 
@@ -264,6 +277,10 @@ test.describe('Battle System', () => {
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(150);
     }
+
+    // Advance through pre-battle dialogue if present
+    await advancePreBattleDialogue(page);
+
     await waitForMode(page, 'team-select');
     
     const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
