@@ -11,12 +11,6 @@ import { calculateBattleRewards, distributeRewards } from '../algorithms/rewards
 import { getEncounterId } from '../models/BattleState';
 import { EQUIPMENT } from '../../data/definitions/equipment';
 import type { EquipmentReward } from '../../data/schemas/EncounterSchema';
-import { ENCOUNTERS } from '../../data/definitions/encounters';
-import { collectDjinn } from './DjinnService';
-import { UNIT_DEFINITIONS } from '../../data/definitions/units';
-import { ENEMIES } from '../../data/definitions/enemies';
-import { createUnit } from '../models/Unit';
-import type { Unit } from '../models/Unit';
 
 type EquipmentResolution =
   | { type: 'none' }
@@ -25,7 +19,7 @@ type EquipmentResolution =
 
 export function processVictory(
   battle: BattleState
-): { distribution: RewardDistribution; updatedTeam: Team; recruitedUnit?: Unit } {
+): { distribution: RewardDistribution; updatedTeam: Team } {
   const encounterId = getEncounterId(battle);
   if (!encounterId) {
     throw new Error('Cannot process victory without encounter ID');
@@ -37,17 +31,11 @@ export function processVictory(
   const distribution = distributeRewards(battle.playerTeam, rewards);
   const equipmentResolution = resolveEquipmentReward(rewards.equipmentReward);
 
-  // Check for Djinn reward
-  const encounter = ENCOUNTERS[encounterId];
+  // NOTE: Djinn rewards and unit recruitment are now handled via post-battle recruitment dialogues
+  // The encounter.reward.djinn and encounter.reward.unlockUnit fields are kept for validation
+  // but not processed here. All rewards are narrative-driven via dialogue effects.
+
   let updatedTeam = distribution.updatedTeam;
-  if (encounter?.reward.djinn) {
-    const djinnResult = collectDjinn(updatedTeam, encounter.reward.djinn);
-    if (djinnResult.ok) {
-      updatedTeam = djinnResult.value;
-    }
-    // Note: If collection fails (e.g., already collected), we silently continue
-    // The player already has the Djinn, so no error is needed
-  }
 
   // Reset all Djinn to Set state after battle (like units heal to full)
   const resetDjinnTrackers = { ...updatedTeam.djinnTrackers };
@@ -66,23 +54,9 @@ export function processVictory(
     djinnTrackers: resetDjinnTrackers,
   };
 
-  // Check for unit recruitment
-  let recruitedUnit: Unit | undefined;
-  if (encounter?.reward.unlockUnit) {
-    const unitDef = UNIT_DEFINITIONS[encounter.reward.unlockUnit];
-    if (!unitDef) {
-      console.error(`Unit definition ${encounter.reward.unlockUnit} not found`);
-    } else {
-      // Get level from first enemy (should be the recruitable unit enemy)
-      const firstEnemyId = encounter.enemies[0];
-      const enemy = firstEnemyId ? ENEMIES[firstEnemyId] : null;
-      const enemyLevel = enemy?.level ?? 1; // Default to level 1 if not found
-      
-      recruitedUnit = createUnit(unitDef, enemyLevel, 0);
-      
-      // Note: Don't add to active party automatically - add to roster, let player choose
-    }
-  }
+  // NOTE: Unit recruitment is now handled via post-battle recruitment dialogues
+  // The encounter.reward.unlockUnit field is kept for validation but not processed here
+  // All recruitment is narrative-driven via dialogue effects (recruitUnit)
 
   const resolvedDistribution: RewardDistribution = {
     ...distribution,
@@ -93,7 +67,7 @@ export function processVictory(
   return {
     distribution: resolvedDistribution,
     updatedTeam,
-    recruitedUnit, // New: return recruited unit
+    // No recruitedUnit - all recruitment is narrative-driven
   };
 }
 

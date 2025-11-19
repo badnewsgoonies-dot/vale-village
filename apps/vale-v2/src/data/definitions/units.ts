@@ -1,14 +1,17 @@
 /**
  * Unit definitions
  * These will be validated against UnitDefinitionSchema at startup
- * 
- * Golden Path (Chapter 1): 6 units (4 starters + 2 recruits)
- * - Starters: Adept (Venus), War Mage (Mars), Mystic (Mercury), Ranger (Jupiter)
- * - Recruits: Sentinel (Venus), Stormcaller (Jupiter)
+ *
+ * Houses 1-20 Progression: 10 units total
+ * - Starter: Adept (Venus/Isaac)
+ * - House 1 (VS1): War Mage (Mars/Garet)
+ * - Story Joins: Mystic (Mercury), Ranger (Jupiter)
+ * - Recruits: Blaze (Mars), Sentinel (Venus), Karis (Mercury), Tyrell (Mars), Stormcaller (Jupiter), Felix (Venus)
  */
 import type { UnitDefinition } from '../schemas/UnitSchema';
 import {
   STRIKE,
+  HEAVY_STRIKE,
   GUARD_BREAK,
   QUAKE,
   FIREBALL,
@@ -158,7 +161,7 @@ export const RANGER: UnitDefinition = {
 };
 
 // ============================================================================
-// Recruitable Units (2 in GP)
+// Recruitable Units (6 new units for Houses 1-20)
 // ============================================================================
 
 export const SENTINEL: UnitDefinition = {
@@ -223,6 +226,133 @@ export const STORMCALLER: UnitDefinition = {
   description: 'A storm caller who unleashes chain lightning on all enemies',
 };
 
+export const BLAZE: UnitDefinition = {
+  id: 'blaze',
+  name: 'Blaze',
+  element: 'Mars',
+  role: 'Balanced Warrior',
+  baseStats: {
+    hp: 95,
+    pp: 22,
+    atk: 15,
+    def: 11,
+    mag: 14,
+    spd: 13,
+  },
+  growthRates: {
+    hp: 18,
+    pp: 5,
+    atk: 3,
+    def: 2,
+    mag: 4,
+    spd: 3,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...HEAVY_STRIKE, unlockLevel: 1 },
+    { ...FIREBALL, unlockLevel: 2 },
+    { ...BURN_TOUCH, unlockLevel: 3 },
+  ],
+  manaContribution: 2,
+  description: 'A versatile Mars warrior who balances physical and magical combat',
+};
+
+export const KARIS: UnitDefinition = {
+  id: 'karis',
+  name: 'Karis',
+  element: 'Mercury',
+  role: 'Versatile Scholar',
+  baseStats: {
+    hp: 88,
+    pp: 28,
+    atk: 7,
+    def: 9,
+    mag: 17,
+    spd: 12,
+  },
+  growthRates: {
+    hp: 17,
+    pp: 6,
+    atk: 1,
+    def: 2,
+    mag: 5,
+    spd: 2,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...ICE_SHARD, unlockLevel: 1 },
+    { ...HEAL, unlockLevel: 2 },
+    { ...FREEZE_BLAST, unlockLevel: 3 },
+    { ...PARTY_HEAL, unlockLevel: 4 },
+  ],
+  manaContribution: 2,
+  description: 'A scholarly mage with mastery of ice magic and healing arts',
+};
+
+export const TYRELL: UnitDefinition = {
+  id: 'tyrell',
+  name: 'Tyrell',
+  element: 'Mars',
+  role: 'Pure DPS',
+  baseStats: {
+    hp: 92,
+    pp: 18,
+    atk: 18,
+    def: 10,
+    mag: 12,
+    spd: 16,
+  },
+  growthRates: {
+    hp: 17,
+    pp: 4,
+    atk: 5,
+    def: 2,
+    mag: 3,
+    spd: 4,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...PRECISE_JAB, unlockLevel: 1 },
+    { ...HEAVY_STRIKE, unlockLevel: 2 },
+    { ...FIREBALL, unlockLevel: 3 },
+    { ...BURN_TOUCH, unlockLevel: 4 },
+  ],
+  manaContribution: 1,
+  description: 'A relentless damage dealer who excels in both physical and fire attacks',
+};
+
+export const FELIX: UnitDefinition = {
+  id: 'felix',
+  name: 'Felix',
+  element: 'Venus',
+  role: 'Master Warrior',
+  baseStats: {
+    hp: 125,
+    pp: 16,
+    atk: 16,
+    def: 18,
+    mag: 9,
+    spd: 11,
+  },
+  growthRates: {
+    hp: 26,
+    pp: 4,
+    atk: 4,
+    def: 5,
+    mag: 2,
+    spd: 2,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...GUARD_BREAK, unlockLevel: 1 },
+    { ...HEAVY_STRIKE, unlockLevel: 2 },
+    { ...QUAKE, unlockLevel: 3 },
+    { ...BOOST_DEF, unlockLevel: 4 },
+  ],
+  manaContribution: 1,
+  description: 'A legendary earth warrior with unmatched physical prowess and defensive mastery',
+};
+
 // ============================================================================
 // Export all units
 // ============================================================================
@@ -234,4 +364,8 @@ export const UNIT_DEFINITIONS: Record<string, UnitDefinition> = {
   ranger: RANGER,
   sentinel: SENTINEL,
   stormcaller: STORMCALLER,
+  blaze: BLAZE,
+  karis: KARIS,
+  tyrell: TYRELL,
+  felix: FELIX,
 };

@@ -2,37 +2,38 @@ import { test, expect } from '@playwright/test';
 import { ENCOUNTERS } from '../../src/data/definitions/encounters';
 
 /**
- * Encounter Progression Regression Tests
+ * Encounter Progression Tests
  *
- * These tests validate the exact XP/gold values from the Nov 2025 progression fixes.
+ * These tests validate the Houses 1-20 progression with VS1 as House 1.
  *
- * CONTEXT:
- * - Fixed XP regressions at H09 (175→185) and H13 (220→230)
- * - Fixed gold drop bug at H14 (48→62)
- * - Smoothed Act 2 progression (H09-H14)
- * - Smoothed Act 3 progression (H16-H19)
- * - Preserved intentional spikes at H08 (+70 XP) and H15 (+55 XP)
+ * CONTEXT (Nov 2025 - Phase 2 Implementation):
+ * - House 1 = VS1 Tutorial (Garet recruitment + Forge Djinn)
+ * - 6 new recruitable units (Blaze, Sentinel, Karis, Tyrell, Stormcaller, Felix)
+ * - Djinn redistributed with Flint pre-game, Forge at House 1
+ * - Complete 20-house progression with smooth XP/gold curves
+ * - Act transitions: H7→H8 (+50 XP), H14→H15 (+80 XP), H19→H20 (+900 XP finale)
  *
  * PURPOSE:
- * - Catch if someone accidentally reverts the encounter fixes
- * - Document intended progression values
+ * - Validate XP/gold progression matches HOUSES_1-20_COMPLETE_PROGRESSION.md blueprint
+ * - Ensure smooth within-act progression
+ * - Verify unit recruitment rewards are correctly defined
  * - Prevent future XP/gold regressions
  *
  * NOTE: These are data validation tests, not true E2E navigation tests.
- * True E2E tests require map triggers for houses 03-20 (not yet implemented).
+ * True E2E tests require map triggers for houses 02-20 (not yet implemented).
  */
 
 test.describe('Encounter Progression - Data Validation', () => {
   test('Act 1 progression is smooth (+10 XP, +2 gold per house)', () => {
     // Act 1: Houses 1-7 (Discovery Phase)
     const act1Houses = [
-      { id: 'house-01', xp: 50, gold: 18 },
-      { id: 'house-02', xp: 60, gold: 20 }, // Fixed from 19→20
-      { id: 'house-03', xp: 70, gold: 22 },
-      { id: 'house-04', xp: 80, gold: 24 },
-      { id: 'house-05', xp: 90, gold: 26 },
-      { id: 'house-06', xp: 100, gold: 28 },
-      { id: 'house-07', xp: 110, gold: 30 },
+      { id: 'house-01', xp: 60, gold: 20 }, // VS1 Tutorial
+      { id: 'house-02', xp: 70, gold: 22 },
+      { id: 'house-03', xp: 80, gold: 24 },
+      { id: 'house-04', xp: 90, gold: 26 },
+      { id: 'house-05', xp: 100, gold: 28 },
+      { id: 'house-06', xp: 120, gold: 32 },
+      { id: 'house-07', xp: 150, gold: 40 }, // End of Act 1, 3rd Djinn (summons unlock)
     ];
 
     act1Houses.forEach(({ id, xp, gold }) => {
@@ -44,28 +45,27 @@ test.describe('Encounter Progression - Data Validation', () => {
   });
 
   test('House 08 has intentional spike (unit recruitment milestone)', () => {
-    // H07→H08: +70 XP jump (Sentinel recruitment, Medium→Hard)
+    // H07→H08: +50 XP jump (Sentinel recruitment + Fizz Djinn, Act 1→Act 2 transition)
     const h07 = ENCOUNTERS['house-07'];
     const h08 = ENCOUNTERS['house-08'];
 
-    expect(h07?.reward.xp).toBe(110);
-    expect(h08?.reward.xp).toBe(180);
-    expect(h08.reward.xp - h07.reward.xp).toBe(70); // Intentional spike
+    expect(h07?.reward.xp).toBe(150);
+    expect(h08?.reward.xp).toBe(200);
+    expect(h08.reward.xp - h07.reward.xp).toBe(50); // Intentional spike
 
-    expect(h08?.reward.gold).toBe(50);
+    expect(h08?.reward.gold).toBe(55);
   });
 
   test('Act 2 progression is smooth after H08 spike (no regressions)', () => {
     // Act 2: Houses 8-14 (Resistance Phase)
-    // Validates fixes for XP regressions and gold drop
     const act2Houses = [
-      { id: 'house-08', xp: 180, gold: 50 }, // Spike (intentional)
-      { id: 'house-09', xp: 185, gold: 52 }, // Fixed from 175→185
-      { id: 'house-10', xp: 195, gold: 54 },
-      { id: 'house-11', xp: 210, gold: 56 },
-      { id: 'house-12', xp: 220, gold: 58 },
-      { id: 'house-13', xp: 230, gold: 60 }, // Fixed from 220→230
-      { id: 'house-14', xp: 245, gold: 62 }, // Fixed from 48→62 (gold drop bug)
+      { id: 'house-08', xp: 200, gold: 55 }, // Spike (intentional, +Sentinel +Fizz)
+      { id: 'house-09', xp: 215, gold: 58 },
+      { id: 'house-10', xp: 235, gold: 62 },
+      { id: 'house-11', xp: 255, gold: 68 }, // +Karis
+      { id: 'house-12', xp: 275, gold: 72 }, // +Granite (T2 Djinn)
+      { id: 'house-13', xp: 295, gold: 76 },
+      { id: 'house-14', xp: 320, gold: 82 }, // +Tyrell
     ];
 
     act2Houses.forEach(({ id, xp, gold }) => {
@@ -76,47 +76,44 @@ test.describe('Encounter Progression - Data Validation', () => {
     });
   });
 
-  test('XP regression bugs are fixed (H09 and H13)', () => {
-    // These encounters previously had LOWER XP than previous house (bug)
-    const h09 = ENCOUNTERS['house-09'];
-    const h08 = ENCOUNTERS['house-08'];
-    expect(h09?.reward.xp).toBeGreaterThan(h08?.reward.xp ?? 0);
+  test('Recruitment milestones have correct XP values', () => {
+    // Validate all 6 battle recruitment houses
+    const recruitmentHouses = [
+      { id: 'house-01', xp: 60, unit: 'Garet' },
+      { id: 'house-05', xp: 100, unit: 'Blaze' },
+      { id: 'house-08', xp: 200, unit: 'Sentinel' },
+      { id: 'house-11', xp: 255, unit: 'Karis' },
+      { id: 'house-14', xp: 320, unit: 'Tyrell' },
+      { id: 'house-15', xp: 400, unit: 'Stormcaller' },
+    ];
 
-    const h13 = ENCOUNTERS['house-13'];
-    const h12 = ENCOUNTERS['house-12'];
-    expect(h13?.reward.xp).toBeGreaterThan(h12?.reward.xp ?? 0);
-  });
-
-  test('Gold drop bug is fixed (H14 now has 62 gold, not 48)', () => {
-    const h13 = ENCOUNTERS['house-13'];
-    const h14 = ENCOUNTERS['house-14'];
-
-    expect(h13?.reward.gold).toBe(60);
-    expect(h14?.reward.gold).toBe(62); // Was 48 (bug)
-    expect(h14.reward.gold).toBeGreaterThan(h13.reward.gold); // No regression
+    recruitmentHouses.forEach(({ id, xp }) => {
+      const encounter = ENCOUNTERS[id];
+      expect(encounter?.reward.xp).toBe(xp);
+      expect(encounter?.reward.unlockUnit).toBeDefined();
+    });
   });
 
   test('House 15 has intentional spike (unit recruitment milestone)', () => {
-    // H14→H15: +55 XP jump (Stormcaller recruitment, Hard→Boss)
+    // H14→H15: +80 XP jump (Stormcaller recruitment + Squall Djinn, Act 2→Act 3 transition)
     const h14 = ENCOUNTERS['house-14'];
     const h15 = ENCOUNTERS['house-15'];
 
-    expect(h14?.reward.xp).toBe(245);
-    expect(h15?.reward.xp).toBe(300);
-    expect(h15.reward.xp - h14.reward.xp).toBe(55); // Intentional spike
+    expect(h14?.reward.xp).toBe(320);
+    expect(h15?.reward.xp).toBe(400);
+    expect(h15.reward.xp - h14.reward.xp).toBe(80); // Intentional spike
 
-    expect(h15?.reward.gold).toBe(90);
+    expect(h15?.reward.gold).toBe(110);
   });
 
-  test('Act 3 progression is smooth with boss-tier scaling (+25 XP increments)', () => {
+  test('Act 3 progression is smooth with +50 XP increments', () => {
     // Act 3: Houses 15-19 (Liberation Phase)
-    // Validates smoothed boss-tier progression
     const act3Houses = [
-      { id: 'house-15', xp: 300, gold: 90 }, // Spike (intentional)
-      { id: 'house-16', xp: 325, gold: 95 }, // Fixed from 320→325
-      { id: 'house-17', xp: 350, gold: 100 }, // Fixed from 380→350
-      { id: 'house-18', xp: 375, gold: 105 }, // Fixed from 400→375
-      { id: 'house-19', xp: 400, gold: 110 }, // Fixed from 480→400
+      { id: 'house-15', xp: 400, gold: 110 }, // Spike (intentional, +Stormcaller +Squall)
+      { id: 'house-16', xp: 450, gold: 120 },
+      { id: 'house-17', xp: 500, gold: 130 }, // +Felix
+      { id: 'house-18', xp: 550, gold: 140 }, // +Bane (T3 Djinn)
+      { id: 'house-19', xp: 600, gold: 150 },
     ];
 
     act3Houses.forEach(({ id, xp, gold }) => {
@@ -131,11 +128,11 @@ test.describe('Encounter Progression - Data Validation', () => {
     const h19 = ENCOUNTERS['house-19'];
     const h20 = ENCOUNTERS['house-20'];
 
-    expect(h19?.reward.xp).toBe(400);
-    expect(h20?.reward.xp).toBe(1000);
-    expect(h20.reward.xp - h19.reward.xp).toBe(600); // Epic finale
+    expect(h19?.reward.xp).toBe(600);
+    expect(h20?.reward.xp).toBe(1500);
+    expect(h20.reward.xp - h19.reward.xp).toBe(900); // Epic finale
 
-    expect(h20?.reward.gold).toBe(250);
+    expect(h20?.reward.gold).toBe(300);
   });
 
   test('All encounters have non-negative rewards', () => {
@@ -193,26 +190,21 @@ test.describe('Encounter Progression - Curve Analysis', () => {
     const h14 = ENCOUNTERS['house-14'];
     const h15 = ENCOUNTERS['house-15'];
 
-    // Act 1→Act 2 spike
-    expect(h08?.reward.xp - h07?.reward.xp).toBe(70);
-    expect(h08?.difficulty).toBe('hard');
+    // Act 1→Act 2 spike (+50 XP)
+    expect(h08?.reward.xp - h07?.reward.xp).toBe(50);
+    expect(h08?.difficulty).toBe('medium');
 
-    // Act 2→Act 3 spike
-    expect(h15?.reward.xp - h14?.reward.xp).toBe(55);
-    expect(h15?.difficulty).toBe('boss');
+    // Act 2→Act 3 spike (+80 XP)
+    expect(h15?.reward.xp - h14?.reward.xp).toBe(80);
+    expect(h15?.difficulty).toBe('hard');
   });
 
-  test('Within-act progression is consistent', () => {
-    // Act 1: +10 XP per house
-    const act1Deltas = [10, 10, 10, 10, 10, 10]; // H02-H07
-    for (let i = 2; i <= 7; i++) {
-      const prev = ENCOUNTERS[`house-0${i - 1}`];
-      const curr = ENCOUNTERS[`house-0${i}`];
-      expect(curr?.reward.xp - prev?.reward.xp).toBe(act1Deltas[i - 2]);
-    }
+  test('Within-act progression has consistent growth', () => {
+    // Act 1: Variable growth (H01-H07)
+    // H01→H02: +10, H02→H03: +10, H03→H04: +10, H04→H05: +10, H05→H06: +20, H06→H07: +30
 
-    // Act 3: +25 XP per house (boss-tier scaling)
-    const act3Deltas = [25, 25, 25, 25]; // H16-H19
+    // Act 3: +50 XP per house (H16-H19)
+    const act3Deltas = [50, 50, 50, 50]; // H16-H19
     for (let i = 16; i <= 19; i++) {
       const prev = ENCOUNTERS[`house-${i - 1}`];
       const curr = ENCOUNTERS[`house-${i}`];
@@ -221,15 +213,32 @@ test.describe('Encounter Progression - Curve Analysis', () => {
   });
 
   test('Gold progression is monotonically increasing', () => {
-    // Gold should never decrease (validates fix for H14 bug)
+    // Gold should never decrease
     const goldValues = [
-      18, 20, 22, 24, 26, 28, 30, // Act 1
-      50, 52, 54, 56, 58, 60, 62, // Act 2
-      90, 95, 100, 105, 110, // Act 3 (excluding H20)
+      20, 22, 24, 26, 28, 32, 40, // Act 1
+      55, 58, 62, 68, 72, 76, 82, // Act 2
+      110, 120, 130, 140, 150, // Act 3 (excluding H20)
     ];
 
     for (let i = 1; i < goldValues.length; i++) {
       expect(goldValues[i]).toBeGreaterThan(goldValues[i - 1]);
     }
+  });
+
+  test('Djinn rewards appear at correct houses', () => {
+    const djinnHouses = [
+      { id: 'house-01', djinn: 'forge' }, // Mars T1
+      { id: 'house-07', djinn: 'breeze' }, // Jupiter T1 (summons unlock!)
+      { id: 'house-08', djinn: 'fizz' }, // Mercury T1
+      { id: 'house-12', djinn: 'granite' }, // Venus T2
+      { id: 'house-15', djinn: 'squall' }, // Jupiter T2
+      { id: 'house-18', djinn: 'bane' }, // Venus T3
+      { id: 'house-20', djinn: 'storm' }, // Jupiter T3
+    ];
+
+    djinnHouses.forEach(({ id, djinn }) => {
+      const encounter = ENCOUNTERS[id];
+      expect(encounter?.reward.djinn).toBe(djinn);
+    });
   });
 });

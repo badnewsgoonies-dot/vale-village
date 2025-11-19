@@ -545,6 +545,187 @@ export async function endDialogue(page: Page): Promise<void> {
 }
 
 /**
+ * Recruitment Testing Helpers
+ */
+
+/**
+ * Get full roster with unit details
+ */
+export async function getRoster(page: Page): Promise<Array<{
+  id: string;
+  name: string;
+  level: number;
+  xp: number;
+}>> {
+  return page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    if (!store) return [];
+
+    const roster = store.getState().roster ?? [];
+    return roster.map((u: any) => ({
+      id: u.id,
+      name: u.name,
+      level: u.level,
+      xp: u.xp,
+    }));
+  });
+}
+
+/**
+ * Open Dev Mode overlay
+ */
+export async function openDevMode(page: Page): Promise<void> {
+  await page.keyboard.press('Control+d');
+  await page.waitForTimeout(500);
+
+  // Verify overlay is visible
+  const overlay = page.locator('[style*="position: fixed"][style*="z-index: 9999"]');
+  await overlay.waitFor({ state: 'visible', timeout: 3000 });
+}
+
+/**
+ * Jump to specific house via Dev Mode
+ * @param page - Playwright page
+ * @param houseNumber - House number (1-20)
+ */
+export async function jumpToHouse(page: Page, houseNumber: number): Promise<void> {
+  if (houseNumber < 1 || houseNumber > 20) {
+    throw new Error(`Invalid house number: ${houseNumber}. Must be 1-20.`);
+  }
+
+  // Open Dev Mode if not already open
+  await openDevMode(page);
+
+  // Click house button (format: "House 01", "House 02", etc.)
+  const houseLabel = `House ${String(houseNumber).padStart(2, '0')}`;
+  const houseButton = page.locator(`button:has-text("${houseLabel}")`);
+
+  await houseButton.waitFor({ state: 'visible', timeout: 3000 });
+  await houseButton.click();
+
+  // Dev Mode should close and team select should appear
+  await page.waitForTimeout(500);
+}
+
+/**
+ * Complete battle flow including post-battle dialogue (for recruitment)
+ * This handles the NEW narrative-driven recruitment system where:
+ * 1. Battle victory
+ * 2. Rewards screen (claim XP/gold/items)
+ * 3. Recruitment dialogue (if applicable)
+ * 4. Return to overworld
+ */
+export async function completeBattleFlow(page: Page, options?: {
+  expectDialogue?: boolean;
+  logDetails?: boolean;
+}): Promise<void> {
+  const { expectDialogue = false, logDetails = true } = options ?? {};
+
+  // 1. Wait for team select screen
+  await waitForMode(page, 'team-select', 10000);
+  if (logDetails) console.log('   Team select ready');
+
+  // 2. Click confirm to start battle
+  const confirmButton = page.getByRole('button', { name: /confirm|start/i });
+  await confirmButton.click();
+
+  // 3. Wait for battle to start
+  await waitForMode(page, 'battle', 10000);
+  if (logDetails) console.log('   Battle started');
+
+  // 4. Complete battle (simulates victory)
+  await completeBattle(page, { logDetails: false });
+
+  // 5. Rewards screen should appear
+  await waitForMode(page, 'rewards', 10000);
+  if (logDetails) console.log('   Rewards screen shown');
+
+  // 6. Click continue/claim rewards
+  const continueButton = page.getByRole('button', { name: /continue|claim/i });
+  await continueButton.click();
+
+  // 7. If recruitment dialogue is expected, advance through it
+  if (expectDialogue) {
+    await waitForMode(page, 'dialogue', 5000);
+    if (logDetails) console.log('   Recruitment dialogue started');
+
+    // Advance through dialogue until it ends
+    await advanceDialogueUntilEnd(page);
+    if (logDetails) console.log('   Recruitment dialogue completed');
+  }
+
+  // 8. Should be back at overworld
+  await waitForMode(page, 'overworld', 5000);
+  if (logDetails) console.log('   Returned to overworld');
+}
+
+/**
+ * Advance dialogue until it ends (no more nodes)
+ */
+export async function advanceDialogueUntilEnd(page: Page, maxSteps: number = 20): Promise<void> {
+  let steps = 0;
+
+  while (steps < maxSteps) {
+    const dialogueState = await getDialogueState(page);
+
+    // Check if dialogue has ended
+    if (!dialogueState || !dialogueState.currentDialogueTree) {
+      return; // Dialogue ended
+    }
+
+    // Advance to next node
+    await advanceDialogue(page);
+    await page.waitForTimeout(300);
+
+    steps++;
+  }
+
+  console.warn(`Dialogue did not end after ${maxSteps} steps`);
+}
+
+/**
+ * Navigate to House 1 trigger from starting position
+ * Starting position: (15, 10)
+ * House 1 trigger: (7, 10)
+ */
+export async function navigateToHouse1(page: Page): Promise<void> {
+  // Move left 8 times from (15, 10) to (7, 10)
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(150);
+  }
+}
+
+/**
+ * Get debug state for troubleshooting
+ */
+export async function getDebugState(page: Page): Promise<{
+  mode: string;
+  rosterSize: number;
+  roster: Array<{ id: string; name: string }>;
+  teamSize: number;
+  collectedDjinn: string[];
+  storyFlags: Record<string, boolean | number>;
+}> {
+  return page.evaluate(() => {
+    const store = (window as any).__VALE_STORE__;
+    const state = store.getState();
+
+    return {
+      mode: state.mode ?? 'unknown',
+      rosterSize: state.roster?.length ?? 0,
+      roster: (state.roster ?? []).map((u: any) => ({
+        id: u.id,
+        name: u.name
+      })),
+      teamSize: state.team?.units?.length ?? 0,
+      collectedDjinn: state.team?.collectedDjinn ?? [],
+      storyFlags: state.story?.flags ?? {},
+    };
+  });
+}
+
+/**
  * Battle Action Testing Helpers
  */
 
