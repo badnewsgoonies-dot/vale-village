@@ -26,6 +26,67 @@
   overflow: hidden;
 }
 
+/* One-time Pre-Battle Tutorial Overlay */
+.pre-battle-tutorial-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.pre-battle-tutorial-box {
+  max-width: 520px;
+  width: 100%;
+  background: #1e1e1e;
+  border-radius: 6px;
+  border: 1px solid #4a9eff;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.pre-battle-tutorial-title {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #4a9eff;
+}
+
+.pre-battle-tutorial-content {
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  color: #ddd;
+  margin-bottom: 0.75rem;
+}
+
+.pre-battle-tutorial-content ul {
+  padding-left: 1.1rem;
+  margin: 0.35rem 0 0.1rem;
+}
+
+.pre-battle-tutorial-content li {
+  margin-bottom: 0.25rem;
+}
+
+.pre-battle-tutorial-btn {
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.9rem;
+  font-size: clamp(0.75rem, 1vw, 0.85rem);
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  background: #4a9eff;
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.15s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.pre-battle-tutorial-btn:hover {
+  background: #5aaeff;
+  transform: translateY(-1px);
+}
+
 /* Header - Fixed Height */
 .pre-battle-header {
   height: 60px;

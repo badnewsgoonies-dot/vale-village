@@ -65,6 +65,19 @@ export const createOverworldSlice: StateCreator<OverworldSlice> = (set, get) => 
           }
         }
 
+        // First Djinn intro: intercept House 1 door before the first battle
+        if (trigger?.type === 'transition' && trigger.id === 'house-01-door') {
+          const hasSeenDjinnIntro = Boolean(store.story.flags['first_djinn_intro_completed']);
+          if (!hasSeenDjinnIntro) {
+            const djinnIntro = DIALOGUES['tutorial:djinn-intro'];
+            if (djinnIntro) {
+              store.startDialogueTree(djinnIntro);
+              // Prevent immediate transition into the house until the intro is complete
+              filteredTrigger = null;
+            }
+          }
+        }
+
         set({
           playerPosition: result.newPos,
           facing: direction,

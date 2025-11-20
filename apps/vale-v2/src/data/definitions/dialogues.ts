@@ -53,6 +53,53 @@ export const VS1_POST_SCENE: DialogueTree = {
   ],
 };
 
+// First Djinn Intro - Flint explains the global Djinn pool
+export const DJINN_INTRO_DIALOGUE: DialogueTree = {
+  id: 'tutorial:djinn-intro',
+  name: 'Djinn Tutorial: Flint\'s Guidance',
+  startNodeId: 'flint-appears',
+  nodes: [
+    {
+      id: 'flint-appears',
+      speaker: 'Flint',
+      text: "Hey Isaac! I\'m Flint, your first Djinn. Mind if I explain how my power works?",
+      portrait: 'djinn-venus',
+      nextNodeId: 'djinn-explain-pool',
+    },
+    {
+      id: 'djinn-explain-pool',
+      speaker: 'Flint',
+      text: 'Djinn travel as a shared pool for your whole party. You can Set up to three of us at once.',
+      portrait: 'djinn-venus',
+      nextNodeId: 'djinn-explain-team',
+    },
+    {
+      id: 'djinn-explain-team',
+      speaker: 'Flint',
+      text: 'When we\'re Set, we empower every Adept in your active team with new abilities and stat boosts.',
+      portrait: 'djinn-venus',
+      nextNodeId: 'djinn-prebattle-reminder',
+    },
+    {
+      id: 'djinn-prebattle-reminder',
+      speaker: 'Flint',
+      text: 'Before big fights, you\'ll see a Djinn panel during battle prep. That\'s where you pick which three of us travel into combat.',
+      portrait: 'djinn-venus',
+      nextNodeId: 'djinn-outro',
+    },
+    {
+      id: 'djinn-outro',
+      speaker: 'Flint',
+      text: "That\'s all you need for now. I\'ll handle the rest—just remember to keep an eye on those three slots!",
+      portrait: 'djinn-venus',
+      effects: {
+        // Use story flag for tutorial completion; Djinn is already present from the starting team setup
+        first_djinn_intro_completed: true,
+      },
+    },
+  ],
+};
+
 export const ELDER_DIALOGUE: DialogueTree = {
   id: 'elder-vale',
   name: 'Elder of Vale',
@@ -125,6 +172,8 @@ export const DIALOGUES: Record<string, DialogueTree> = {
   // VS1 Demo
   [VS1_SCENE_PRE]: VS1_PRE_SCENE,
   [VS1_SCENE_POST]: VS1_POST_SCENE,
+  // Tutorials
+  'tutorial:djinn-intro': DJINN_INTRO_DIALOGUE,
   // Existing dialogues
   'elder-vale': ELDER_DIALOGUE,
   'shopkeeper-weapons': SHOPKEEPER_DIALOGUE,
