@@ -7,6 +7,9 @@ import {
   getUnitData,
   skipStartupScreens,
   advancePreBattleDialogue,
+  getHouseEntrancePosition,
+  STARTING_POSITION,
+  LINEAR_ROAD_Y,
 } from './helpers';
 
 /**
@@ -60,7 +63,7 @@ test.describe('Game Initialization', () => {
     await skipStartupScreens(page);
 
     const state = await getGameState(page);
-    expect(state?.playerPosition).toEqual({ x: 15, y: 10 });
+    expect(state?.playerPosition).toEqual(STARTING_POSITION);
   });
 });
 
@@ -73,13 +76,13 @@ test.describe('Overworld Movement', () => {
     await skipStartupScreens(page);
 
     const initialState = await getGameState(page);
-    expect(initialState?.playerPosition).toEqual({ x: 15, y: 10 });
+    expect(initialState?.playerPosition).toEqual(STARTING_POSITION);
 
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(100);
 
     const newState = await getGameState(page);
-    expect(newState?.playerPosition).toEqual({ x: 16, y: 10 });
+    expect(newState?.playerPosition).toEqual({ x: STARTING_POSITION.x + 1, y: LINEAR_ROAD_Y });
   });
 
   test('moves in all four directions', async ({ page }) => {
@@ -89,34 +92,30 @@ test.describe('Overworld Movement', () => {
     // Skip startup screens
     await skipStartupScreens(page);
 
-    // Right
+    // Right (should move one tile)
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(100);
     let state = await getGameState(page);
-    expect(state?.playerPosition.x).toBe(16);
+    expect(state?.playerPosition.x).toBe(STARTING_POSITION.x + 1);
+    expect(state?.playerPosition.y).toBe(LINEAR_ROAD_Y);
 
-    // Down
+    // Down (blocked by grass)
     await page.keyboard.press('ArrowDown');
-    await page.waitForTimeout(200); // Increased timeout for state update
+    await page.waitForTimeout(200);
     state = await getGameState(page);
-    // Note: Movement may be blocked by obstacles, so we check if position changed OR stayed same
-    expect(state?.playerPosition.y).toBeGreaterThanOrEqual(10);
+    expect(state?.playerPosition).toEqual({ x: STARTING_POSITION.x + 1, y: LINEAR_ROAD_Y });
 
-    // Left (may be blocked by obstacles)
+    // Left (returns to spawn)
     await page.keyboard.press('ArrowLeft');
     await page.waitForTimeout(200);
     state = await getGameState(page);
-    expect(state?.playerPosition.x).toBeLessThanOrEqual(16);
+    expect(state?.playerPosition).toEqual(STARTING_POSITION);
 
-    // Up (may be blocked by obstacles)
+    // Up (also blocked)
     await page.keyboard.press('ArrowUp');
     await page.waitForTimeout(200);
     state = await getGameState(page);
-    expect(state?.playerPosition.y).toBeLessThanOrEqual(11);
-
-    // Verify we're somewhere reasonable (not stuck at an invalid position)
-    expect(state?.playerPosition.x).toBeGreaterThanOrEqual(14);
-    expect(state?.playerPosition.y).toBeGreaterThanOrEqual(9);
+    expect(state?.playerPosition).toEqual(STARTING_POSITION);
   });
 
   test('movement works in multiple directions', async ({ page }) => {
@@ -149,14 +148,9 @@ test.describe('Battle Trigger & Team Selection', () => {
     // Skip startup screens
     await skipStartupScreens(page);
 
-    // Spawn is at (15, 10)
-    // house-01 trigger is at (7, 10) - need to move left 8 times
-    // house-02 trigger is at (10, 10) - need to move left 5 times
-    // Move left to house-01
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
+    const houseOne = getHouseEntrancePosition(1);
+    await navigateToPosition(page, houseOne.x + 1, houseOne.y);
+    await navigateToPosition(page, houseOne.x, houseOne.y);
 
     // Advance through pre-battle dialogue if present
     await advancePreBattleDialogue(page);
@@ -166,8 +160,7 @@ test.describe('Battle Trigger & Team Selection', () => {
 
     const state = await getGameState(page);
     expect(state?.mode).toBe('team-select');
-    // Should be one of the house encounters (exact ID depends on which trigger was hit)
-    expect(state?.pendingBattleEncounterId).toMatch(/^house-0[1-7]$/);
+    expect(state?.pendingBattleEncounterId).toBe('house-01');
   });
 
   test('pre-battle screen shows encounter', async ({ page }) => {
@@ -177,11 +170,9 @@ test.describe('Battle Trigger & Team Selection', () => {
     // Skip startup screens
     await skipStartupScreens(page);
 
-    // Navigate to battle trigger
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
+    const houseEntrance = getHouseEntrancePosition(1);
+    await navigateToPosition(page, houseEntrance.x + 1, houseEntrance.y);
+    await navigateToPosition(page, houseEntrance.x, houseEntrance.y);
 
     // Advance through pre-battle dialogue if present
     await advancePreBattleDialogue(page);
@@ -201,11 +192,9 @@ test.describe('Battle Trigger & Team Selection', () => {
     // Skip startup screens
     await skipStartupScreens(page);
 
-    // Navigate to battle trigger
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(100);
-    }
+    const entrance = getHouseEntrancePosition(1);
+    await navigateToPosition(page, entrance.x + 1, entrance.y);
+    await navigateToPosition(page, entrance.x, entrance.y);
 
     // Advance through pre-battle dialogue if present
     await advancePreBattleDialogue(page);
@@ -231,11 +220,9 @@ test.describe('Battle System', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Navigate to battle trigger
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(100);
-    }
+    const firstHouse = getHouseEntrancePosition(1);
+    await navigateToPosition(page, firstHouse.x + 1, firstHouse.y);
+    await navigateToPosition(page, firstHouse.x, firstHouse.y);
 
     await waitForMode(page, 'team-select');
 
@@ -268,11 +255,9 @@ test.describe('Battle System', () => {
     // Skip startup screens
     await skipStartupScreens(page);
 
-    // Navigate to battle and start
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
+    const entrance = getHouseEntrancePosition(1);
+    await navigateToPosition(page, entrance.x + 1, entrance.y);
+    await navigateToPosition(page, entrance.x, entrance.y);
 
     // Advance through pre-battle dialogue if present
     await advancePreBattleDialogue(page);
