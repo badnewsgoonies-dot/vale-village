@@ -1,7 +1,8 @@
 import type { StateCreator } from 'zustand';
 import type { MapTrigger } from '@/core/models/overworld';
 import type { Encounter } from '@/data/schemas/EncounterSchema';
-import type { Team } from '@/core/models/Team';
+import type { Unit } from '@/core/models/Unit';
+import { createTeam, updateTeam, type Team } from '@/core/models/Team';
 import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
 import { makePRNG } from '@/core/random/prng';
@@ -11,6 +12,9 @@ import type { QueueBattleSlice } from './queueBattleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
+import { MIN_PARTY_SIZE } from '@/core/constants';
+import type { BattleConfig } from './battleConfig';
+import { buildBattleConfigForNextBattle, getActiveSlotUnitIds } from './battleConfig';
 
 export interface GameFlowSlice {
   mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select' | 'compendium';
@@ -18,11 +22,14 @@ export interface GameFlowSlice {
   currentEncounter: Encounter | null;
   currentShopId: string | null;
   preBattlePosition: { mapId: string; position: { x: number; y: number } } | null;
+  currentBattleConfig: BattleConfig | null;
   pendingBattleEncounterId: string | null;
   setMode: (mode: GameFlowSlice['mode']) => void;
   setPendingBattle: (encounterId: string | null) => void;
   handleTrigger: (trigger: MapTrigger | null, skipPreBattleDialogue?: boolean) => void;
-  confirmBattleTeam: (team: Team) => void;
+  confirmBattleTeam: (team?: Team | null) => void;
+  updateBattleConfigSlot: (slotIndex: number, unitId: string | null) => void;
+  clearBattleConfig: () => void;
   resetLastTrigger: () => void;
   returnToOverworld: () => void;
 }
@@ -32,20 +39,68 @@ export const createGameFlowSlice: StateCreator<
   [['zustand/devtools', never]],
   [],
   GameFlowSlice
-> = (set, get) => ({
-  mode: 'title-screen',
-  lastTrigger: null,
-  currentEncounter: null,
-  currentShopId: null,
-  preBattlePosition: null,
-  pendingBattleEncounterId: null,
-  setMode: (mode) => set({ mode }),
-  setPendingBattle: (encounterId) => {
+> = (set, get) => {
+  const buildTeamFromBattleConfig = (): Team | null => {
+    const store = get();
+    const { currentBattleConfig, team: existingTeam } = store;
+
+    if (!currentBattleConfig) {
+      console.error('No battle configuration available when building team');
+      return null;
+    }
+
+    const activeUnitIds = getActiveSlotUnitIds(currentBattleConfig);
+    if (activeUnitIds.length < MIN_PARTY_SIZE) {
+      console.error(`Battle requires at least ${MIN_PARTY_SIZE} units, found ${activeUnitIds.length}`);
+      return null;
+    }
+
+    const units: Unit[] = [];
+    for (const unitId of activeUnitIds) {
+      let unit = store.getUnitFromRoster(unitId);
+      if (!unit && existingTeam) {
+        unit = existingTeam.units.find((candidate) => candidate.id === unitId);
+      }
+
+      if (!unit) {
+        console.error(`Unit ${unitId} missing from roster/team when building battle team`);
+        return null;
+      }
+
+      units.push(unit);
+    }
+
+    if (existingTeam) {
+      return updateTeam(existingTeam, { units });
+    }
+
+    try {
+      return createTeam(units);
+    } catch (error) {
+      console.error('Failed to create team from BattleConfig', error);
+      return null;
+    }
+  };
+
+  const initializeBattleConfig = () => buildBattleConfigForNextBattle(get().team, get().roster);
+
+  return {
+    mode: 'title-screen',
+    lastTrigger: null,
+    currentEncounter: null,
+    currentShopId: null,
+    preBattlePosition: null,
+    currentBattleConfig: null,
+    pendingBattleEncounterId: null,
+    setMode: (mode) => set({ mode }),
+    setPendingBattle: (encounterId) => {
     // When setting a pending battle, automatically transition to team-select mode
     // This matches the behavior of handleTrigger when a battle trigger is encountered
+    const battleConfig = encounterId ? initializeBattleConfig() : null;
     set({ 
       pendingBattleEncounterId: encounterId,
-      mode: encounterId ? 'team-select' : 'overworld'
+      mode: encounterId ? 'team-select' : 'overworld',
+      currentBattleConfig: battleConfig,
     });
   },
   handleTrigger: (trigger, skipPreBattleDialogue = false) => {
@@ -87,6 +142,7 @@ export const createGameFlowSlice: StateCreator<
         mode: 'team-select',
         pendingBattleEncounterId: encounterId,
         lastTrigger: trigger,
+        currentBattleConfig: initializeBattleConfig(),
       });
       return;
     }
@@ -152,7 +208,7 @@ export const createGameFlowSlice: StateCreator<
   },
   resetLastTrigger: () => set({ lastTrigger: null }),
 
-  confirmBattleTeam: (team: Team) => {
+  confirmBattleTeam: (team?: Team | null) => {
     const { pendingBattleEncounterId } = get();
     if (!pendingBattleEncounterId) {
       console.error('No pending battle encounter');
@@ -162,6 +218,12 @@ export const createGameFlowSlice: StateCreator<
     const encounter = ENCOUNTERS[pendingBattleEncounterId];
     if (!encounter) {
       console.error(`Encounter ${pendingBattleEncounterId} not found`);
+      return;
+    }
+
+    const selectedTeam = team ?? buildTeamFromBattleConfig();
+    if (!selectedTeam) {
+      console.error('Could not resolve team for battle');
       return;
     }
 
@@ -177,24 +239,43 @@ export const createGameFlowSlice: StateCreator<
     const rng = makePRNG(seed);
 
     try {
-      const result = createBattleFromEncounter(pendingBattleEncounterId, team, rng);
+      const result = createBattleFromEncounter(pendingBattleEncounterId, selectedTeam, rng);
       if (!result || !result.battle) {
         console.error(`Failed to create battle from encounter ${pendingBattleEncounterId}`);
         return;
       }
 
       get().setBattle(result.battle, seed);
-      get().setTeam(team);
+      get().setTeam(selectedTeam);
 
       set({
         currentEncounter: encounter,
         mode: 'battle',
         preBattlePosition,
         pendingBattleEncounterId: null,
+        currentBattleConfig: null,
       });
     } catch (error) {
       console.error('Error creating battle:', error);
     }
+  },
+
+  updateBattleConfigSlot: (slotIndex, unitId) =>
+    set((state) => {
+      const { currentBattleConfig } = state;
+      if (!currentBattleConfig) return state;
+
+      const slots = currentBattleConfig.slots.map((slot) =>
+        slot.slotIndex === slotIndex ? { ...slot, unitId } : slot
+      );
+
+      return {
+        currentBattleConfig: { ...currentBattleConfig, slots },
+      };
+    }),
+
+  clearBattleConfig: () => {
+    set({ currentBattleConfig: null });
   },
 
   returnToOverworld: () => {
@@ -211,6 +292,8 @@ export const createGameFlowSlice: StateCreator<
       preBattlePosition: null,
       currentEncounter: null,
       lastTrigger: null,
+      currentBattleConfig: null,
     });
   },
-});
+};
+};

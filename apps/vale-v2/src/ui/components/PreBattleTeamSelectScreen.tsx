@@ -5,7 +5,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '../state/store';
-import type { Team } from '@/core/models/Team';
 import type { EquipmentSlot } from '@/core/models/Equipment';
 import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '@/core/constants';
@@ -17,7 +16,7 @@ import './PreBattleTeamSelectScreen.css';
 
 interface PreBattleTeamSelectScreenProps {
   encounterId: string;
-  onConfirm: (team: Team) => void;
+  onConfirm: () => void;
   onCancel: () => void;
 }
 
@@ -26,10 +25,11 @@ export function PreBattleTeamSelectScreen({
   onConfirm,
   onCancel,
 }: PreBattleTeamSelectScreenProps) {
-  const { roster, team, swapPartyMember } = useStore((s) => ({
+  const { roster, team, currentBattleConfig, updateBattleConfigSlot } = useStore((s) => ({
     roster: s.roster,
     team: s.team,
-    swapPartyMember: s.swapPartyMember,
+    currentBattleConfig: s.currentBattleConfig,
+    updateBattleConfigSlot: s.updateBattleConfigSlot,
   }));
 
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(0);
@@ -37,6 +37,70 @@ export function PreBattleTeamSelectScreen({
   const [selectedDjinnSlot, setSelectedDjinnSlot] = useState<number | null>(null);
 
   const encounter = ENCOUNTERS[encounterId];
+  const battleConfig = currentBattleConfig;
+  const slots = battleConfig?.slots ?? [];
+  const findUnitById = (unitId: string) =>
+    roster.find((unit) => unit.id === unitId) ?? team?.units.find((unit) => unit.id === unitId) ?? null;
+
+  const activeUnitIds = slots
+    .map((slot) => slot.unitId)
+    .filter((unitId): unitId is string => Boolean(unitId));
+
+  const filledUnitCount = activeUnitIds.length;
+
+  const handleAddToSlot = (slotIndex: number, unitId: string) => {
+    updateBattleConfigSlot(slotIndex, unitId);
+    setSelectedSlotIndex(slotIndex);
+  };
+
+  const handleStartBattle = useCallback(() => {
+    if (!battleConfig) {
+      alert('Battle configuration missing');
+      return;
+    }
+
+    if (filledUnitCount < MIN_PARTY_SIZE) {
+      alert(`Team must have at least ${MIN_PARTY_SIZE} units`);
+      return;
+    }
+
+    if (filledUnitCount > MAX_PARTY_SIZE) {
+      alert(`Team cannot exceed ${MAX_PARTY_SIZE} units`);
+      return;
+    }
+
+    onConfirm();
+  }, [battleConfig, filledUnitCount, onConfirm]);
+
+  // Keyboard handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        onCancel();
+        return;
+      }
+
+      if (event.key === 'Enter' || event.code === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (
+          battleConfig &&
+          filledUnitCount >= MIN_PARTY_SIZE &&
+          filledUnitCount <= MAX_PARTY_SIZE
+        ) {
+          handleStartBattle();
+        }
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true); // Use capture phase
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [battleConfig, filledUnitCount, handleStartBattle, onCancel]);
+
   if (!encounter) {
     return (
       <div className="pre-battle-overlay">
@@ -59,61 +123,26 @@ export function PreBattleTeamSelectScreen({
     );
   }
 
-  // Get current active party (1-4 units)
-  const activeParty = team.units || [];
+  if (!battleConfig) {
+    return (
+      <div className="pre-battle-overlay">
+        <div className="pre-battle-container">
+          <div>Error: Battle configuration missing</div>
+          <button onClick={onCancel}>Close</button>
+        </div>
+      </div>
+    );
+  }
 
-  // Get bench units (roster units not in active party)
-  const benchUnits = roster.filter(
-    (unit) => !activeParty.some((active) => active.id === unit.id)
+  const activeParty = battleConfig.slots.map((slot) =>
+    slot.unitId ? findUnitById(slot.unitId) : null
   );
 
-  // Get selected unit for equipment/Djinn management
-  const selectedUnit = selectedSlotIndex !== null ? activeParty[selectedSlotIndex] : null;
+  const benchUnits = roster.filter((unit) => !activeUnitIds.includes(unit.id));
 
-  // Handle adding unit to slot
-  const handleAddToSlot = (slotIndex: number, unitId: string) => {
-    swapPartyMember(slotIndex, unitId);
-    setSelectedSlotIndex(slotIndex);
-  };
-
-  // Handle removing unit from party
-  // Handle start battle
-  const handleStartBattle = useCallback(() => {
-    if (!team || team.units.length < MIN_PARTY_SIZE) {
-      alert(`Team must have at least ${MIN_PARTY_SIZE} unit`);
-      return;
-    }
-    if (team.units.length > MAX_PARTY_SIZE) {
-      alert(`Team cannot exceed ${MAX_PARTY_SIZE} units`);
-      return;
-    }
-    onConfirm(team);
-  }, [team, onConfirm]);
-
-  // Keyboard handler
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        onCancel();
-        return;
-      }
-
-      if (event.key === 'Enter' || event.code === 'Enter') {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (team && team.units.length >= MIN_PARTY_SIZE && team.units.length <= MAX_PARTY_SIZE) {
-          handleStartBattle();
-        }
-        return;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown, true); // Use capture phase
-    return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [team, onCancel, handleStartBattle]);
+  const selectedSlotConfig =
+    selectedSlotIndex !== null ? battleConfig.slots[selectedSlotIndex] : null;
+  const selectedUnit = selectedSlotConfig?.unitId ? findUnitById(selectedSlotConfig.unitId) : null;
 
   return (
     <div className="pre-battle-overlay">
@@ -181,7 +210,7 @@ export function PreBattleTeamSelectScreen({
           <button
             className="start-battle-btn"
             onClick={handleStartBattle}
-            disabled={!team || team.units.length < MIN_PARTY_SIZE}
+            disabled={!currentBattleConfig || filledUnitCount < MIN_PARTY_SIZE}
           >
             Start Battle
           </button>

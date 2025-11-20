@@ -4,9 +4,10 @@
  */
 
 import type { Unit } from '@/core/models/Unit';
+import { MAX_PARTY_SIZE } from '@/core/constants';
 
 interface TeamBenchSectionProps {
-  activeParty: readonly Unit[];
+  activeParty: readonly (Unit | null)[];
   benchUnits: readonly Unit[];
   selectedSlotIndex: number | null;
   onSelectSlot: (index: number | null) => void;
@@ -21,13 +22,7 @@ export function TeamBenchSection({
   onAddToSlot,
 }: TeamBenchSectionProps) {
   const handleSlotClick = (index: number) => {
-    if (activeParty[index]) {
-      // Slot has unit - select it
-      onSelectSlot(index);
-    } else {
-      // Empty slot - select it for adding
-      onSelectSlot(index);
-    }
+    onSelectSlot(index);
   };
 
   const handleBenchUnitClick = (unitId: string) => {
@@ -37,7 +32,8 @@ export function TeamBenchSection({
   };
 
   // Create array of 4 slots (filled or empty)
-  const slots = Array.from({ length: 4 }, (_, i) => ({
+  const filledUnitCount = activeParty.filter((unit): unit is Unit => Boolean(unit)).length;
+  const slots = Array.from({ length: MAX_PARTY_SIZE }, (_, i) => ({
     index: i,
     unit: activeParty[i],
   }));
@@ -45,7 +41,7 @@ export function TeamBenchSection({
   return (
     <div className="section-card team-bench-section">
       <div className="current-party-panel">
-        <div className="section-title">YOUR TEAM ({activeParty.length}/4)</div>
+        <div className="section-title">YOUR TEAM ({filledUnitCount}/{MAX_PARTY_SIZE})</div>
         <div className="current-party-grid">
           {slots.map(({ index, unit }) => (
             <div

@@ -15,12 +15,18 @@ import { test, expect } from '@playwright/test';
 import {
   getGameState,
   waitForMode,
+  waitForCurrentMap,
   navigateToPosition,
   completeBattle,
+  claimRewardsAndReturnToOverworld,
   grantEquipment,
   equipItem,
   getDjinnState,
   skipStartupScreens,
+  getHouseEntrancePosition,
+  SHOP_TRIGGER_POSITION,
+  HOUSE_INTERIOR_ENEMY_POSITION,
+  advanceDialogueUntilEnd,
 } from './helpers';
 import { EQUIPMENT } from '../../src/data/definitions/equipment';
 
@@ -112,7 +118,7 @@ test.describe('Comprehensive Gameplay & Menus', () => {
 
     // Navigate to shop
     console.log('   → Navigating to shop...');
-    await navigateToPosition(page, 12, 5);
+    await navigateToPosition(page, SHOP_TRIGGER_POSITION.x, SHOP_TRIGGER_POSITION.y);
     
     // Wait a bit for trigger to fire, then check mode
     await page.waitForTimeout(500);
@@ -125,17 +131,17 @@ test.describe('Comprehensive Gameplay & Menus', () => {
     
     if (currentMode !== 'shop') {
       console.log('   → Shop not triggered automatically, manually triggering...');
-      await page.evaluate(() => {
+      await page.evaluate((position) => {
         const store = (window as any).__VALE_STORE__;
         if (store) {
           store.getState().handleTrigger({
             id: 'shop-vale-armory',
             type: 'shop',
-            position: { x: 12, y: 5 },
+            position,
             data: { shopId: 'vale-armory' }
           });
         }
-      });
+      }, SHOP_TRIGGER_POSITION);
     }
     
     // Wait for shop mode with longer timeout
@@ -227,8 +233,17 @@ test.describe('Comprehensive Gameplay & Menus', () => {
 
     // Navigate to battle trigger
     console.log('   → Navigating to House 1 battle...');
-    await navigateToPosition(page, 7, 10);
-    await waitForMode(page, 'team-select', 5000);
+    const houseOneEntrance = getHouseEntrancePosition(1);
+    await navigateToPosition(page, houseOneEntrance.x + 1, houseOneEntrance.y);
+    await navigateToPosition(page, houseOneEntrance.x, houseOneEntrance.y);
+    await waitForCurrentMap(page, 'house-01-interior', 5000);
+    const reachedEnemy = await navigateToPosition(page, HOUSE_INTERIOR_ENEMY_POSITION.x, HOUSE_INTERIOR_ENEMY_POSITION.y);
+    expect(reachedEnemy).toBe(true);
+    const positionAtEnemy = await getGameState(page);
+    expect(positionAtEnemy?.playerPosition).toEqual(HOUSE_INTERIOR_ENEMY_POSITION);
+    await waitForMode(page, 'dialogue', 5000);
+    await advanceDialogueUntilEnd(page, 5);
+    await waitForMode(page, 'team-select', 10000);
 
     // Confirm team selection
     const confirmButton = page.getByRole('button', { name: /confirm|start/i });
@@ -251,6 +266,7 @@ test.describe('Comprehensive Gameplay & Menus', () => {
 
     // Complete battle (completeBattle handles victory, rewards, and return to overworld)
     await completeBattle(page, { logDetails: false });
+    await claimRewardsAndReturnToOverworld(page);
     console.log('   ✅ Battle completed and returned to overworld');
 
     // ============================================================================
@@ -316,7 +332,7 @@ test.describe('Comprehensive Gameplay & Menus', () => {
     console.log('\n🛒 Testing Shop Display...');
 
     // Navigate to shop
-    await navigateToPosition(page, 12, 5);
+    await navigateToPosition(page, SHOP_TRIGGER_POSITION.x, SHOP_TRIGGER_POSITION.y);
     await page.waitForTimeout(500);
     
     // Check if shop mode activated, if not manually trigger
@@ -326,17 +342,17 @@ test.describe('Comprehensive Gameplay & Menus', () => {
     });
     
     if (currentMode !== 'shop') {
-      await page.evaluate(() => {
+      await page.evaluate((position) => {
         const store = (window as any).__VALE_STORE__;
         if (store) {
           store.getState().handleTrigger({
             id: 'shop-vale-armory',
             type: 'shop',
-            position: { x: 12, y: 5 },
+            position,
             data: { shopId: 'vale-armory' }
           });
         }
-      });
+      }, SHOP_TRIGGER_POSITION);
     }
     
     await waitForMode(page, 'shop', 10000);

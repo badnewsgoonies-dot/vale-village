@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Quick Reference Card
 
 **Most Common Commands (from apps/vale-v2/):**
+
 ```bash
 pnpm test              # Run all tests with coverage
 pnpm dev               # Start dev server
@@ -18,6 +19,7 @@ vitest run tests/core/algorithms/damage.test.ts    # Specific test
 ```
 
 **Important Files:**
+
 - [../../CLAUDE.md](../../CLAUDE.md) - Root CLAUDE.md with repository-wide guidance
 - [../../CHANGELOG.md](../../CHANGELOG.md) - Recent changes & breaking changes
 - [docs/NAMING_CONVENTIONS.md](docs/NAMING_CONVENTIONS.md) - ID formatting rules
@@ -29,6 +31,7 @@ vitest run tests/core/algorithms/damage.test.ts    # Specific test
 Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. Golden Sun-inspired turn-based RPG built with React, TypeScript, Zustand, and Zod.
 
 **Game Features:**
+
 - 10 recruitable units with 20 levels of progression (abilities unlock per level)
 - 12 collectible Djinn (3 per element) providing team-wide buffs and ability unlocking
 - 5-slot equipment system (weapon/armor/helm/boots/accessory) - unit-locked
@@ -44,12 +47,14 @@ Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. Golden Su
 ### Core Principles
 
 **Clean Architecture with Strict Boundaries:**
+
 - `src/core/` - Pure TypeScript, no React, fully deterministic
 - `src/ui/` - React components, UI logic
 - `src/data/` - JSON data files and Zod schemas
 - `src/infra/` - Infrastructure (save system, localStorage)
 
 **Dependency Flow:**
+
 ```
 UI → State (Zustand slices) → Services → Algorithms → Models
 ```
@@ -59,6 +64,7 @@ UI → State (Zustand slices) → Services → Algorithms → Models
 1. **No React in `core/**`** - ESLint enforces this. Core is React-free for testability and determinism.
 
 2. **No classes in `core/models/**`** - Models are POJOs with factory functions and immutable updates:
+
    ```typescript
    export interface BattleState { readonly playerTeam: Team; /* ... */ }
    export function createBattleState(/* ... */): BattleState { /* ... */ }
@@ -78,6 +84,7 @@ UI → State (Zustand slices) → Services → Algorithms → Models
 ### ESLint Import Restrictions
 
 The following import rules are enforced:
+
 - ❌ `src/ui/` cannot import from `src/core/`
 - ❌ `src/core/algorithms/` cannot import from `src/core/services/`
 - ✅ Services can use algorithms and models
@@ -159,6 +166,7 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 **📖 For detailed flow documentation, see [docs/GAME_MECHANICS_FLOW.md](docs/GAME_MECHANICS_FLOW.md)**
 
 ### Battle System
+
 - **Damage Formula:** `(basePower + ATK - DEF×0.5) × elementAdvantage`
 - **Element Advantages:** 1.5× damage when strong, 0.67× when weak (Venus > Mars > Jupiter > Mercury > Venus)
 - **Turn Order:** Speed-based with turn queue, recalculated each round
@@ -166,6 +174,7 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 - **Status Effects:** Buffs/debuffs tracked per unit with duration counters
 
 ### Mode Transitions
+
 - **Flow:** `overworld → team-select → battle → rewards → dialogue (if recruitment) → overworld`
 - **Key Points:**
   - `setPendingBattle()` automatically sets mode to `'team-select'`
@@ -174,6 +183,7 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 - See [docs/GAME_MECHANICS_FLOW.md](docs/GAME_MECHANICS_FLOW.md) for complete flow
 
 ### Djinn System
+
 - **Team-Wide:** 3 Djinn slots affect entire party (not per-unit)
 - **Synergy Bonuses:** All same element = +12 ATK/+8 DEF, mixed = balanced bonuses
 - **Activation:** Using a Djinn in battle enters "Standby" mode (loses passive, recovers after turns)
@@ -184,12 +194,14 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 - **Location:** Core logic in `src/core/algorithms/djinnCalculations.ts` and `src/core/services/DjinnService.ts`
 
 ### Leveling System
+
 - **XP Curve:** Non-linear [0, 100, 350, 850, 1850...92,800] for levels 1-20
 - **Ability Unlocks:** Each level unlocks new abilities (defined in unit data)
 - **Stat Growth:** Base stats + (level × growthRates) + equipment + djinn
 - **Level-Up:** Restores HP to full, persists across battles
 
 ### Equipment System
+
 - **5 Slots:** Weapon (ATK), Armor (DEF/HP), Helm (DEF), Boots (SPD), Accessory (various)
 - **Element-Based:** Equipment restricted by element (not unit-specific)
 - **Stat Bonuses:** Applied during `Unit.calculateStats()` calculation
@@ -197,6 +209,7 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 - **Reward System:** Predetermined rewards (no RNG), may offer choice of 1 of 3 items
 
 ### Recruitment System
+
 - **Two Methods:**
   1. **Recruitment Dialogues** - Post-battle dialogues for Houses 1, 5, 8, 11, 14, 15, 17
   2. **Story Joins** - Automatic via story flags (Houses 2, 3)
@@ -210,12 +223,14 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 **Testing Philosophy:** Context-aware testing that proves gameplay works, not isolated unit tests. Tests focus on meaningful scenarios like "Level 1 loses, Level 5 wins" rather than "function returns number".
 
 **Test Patterns:**
+
 - Unit tests for pure functions (algorithms)
 - Integration tests for services
 - Property-based tests for invariants (e.g., damage non-negative, turn order deterministic)
 - Use `makePRNG(seed)` for deterministic test data
 
 **Running Specific Tests:**
+
 ```bash
 vitest run tests/core/algorithms/damage.test.ts
 vitest tests/core/services/BattleService.test.ts
@@ -223,6 +238,7 @@ vitest run tests/gameplay/                          # Gameplay tests
 ```
 
 **Test Conventions:**
+
 - Use `test()` for all test functions (not `it()`)
 - Test factories use `mk*` prefix, located in `src/test/factories.ts`
 - Tests mirror `src/` structure in `tests/` directory
@@ -232,6 +248,7 @@ vitest run tests/gameplay/                          # Gameplay tests
 ## Data Validation
 
 All game data must validate against Zod schemas:
+
 1. Define data in `src/data/definitions/*.ts`
 2. Create/update schema in `src/data/schemas/*Schema.ts`
 3. Run `pnpm validate:data` to ensure validity

@@ -14,7 +14,14 @@ export function canMoveTo(map: GameMap, position: Position): boolean {
   if (!tile) return false;
   if (!tile.walkable) return false;
   const npcCollision = map.npcs.find(npc => npc.position.x === position.x && npc.position.y === position.y);
-  if (npcCollision) return false;
+  if (npcCollision) {
+    const hasNpcTrigger = map.triggers.some(trigger =>
+      trigger.type === 'npc' && trigger.position.x === position.x && trigger.position.y === position.y
+    );
+    if (!hasNpcTrigger) {
+      return false;
+    }
+  }
   return true;
 }
 

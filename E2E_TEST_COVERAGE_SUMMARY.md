@@ -8,6 +8,7 @@
 ## 📊 Test Coverage Overview
 
 ### **Total E2E Test Files:** 32 files
+
 ### **New Comprehensive Test:** `comprehensive-gameplay-menus.spec.ts`
 
 ---
@@ -54,23 +55,27 @@
 ## 📋 Existing Test Coverage (31 Files)
 
 ### **Battle & Combat:**
+
 - ✅ `battle-execution.spec.ts` - Battle mechanics
 - ✅ `combat-mechanics.spec.ts` - Damage formulas, equipment, Djinn, level-ups
 - ✅ `counter-element.spec.ts` - Element advantages
 - ✅ `auto-heal.spec.ts` - Post-battle healing
 
 ### **Djinn System:**
+
 - ✅ `djinn-collection.spec.ts` - Collection UI
 - ✅ `djinn-standby.spec.ts` - Standby mechanics
 - ✅ `djinn-state-transitions.spec.ts` - State transitions
 - ✅ `djinn-and-mana-progression.spec.ts` - Progression & mana
 
 ### **Equipment & Rewards:**
+
 - ✅ `equipment-management.spec.ts` - Equipping/unequipping
 - ✅ `rewards-integration.spec.ts` - Reward distribution
 - ✅ `shop-interactions.spec.ts` - Shop buying (now enhanced with abilities)
 
 ### **Progression & Recruitment:**
+
 - ✅ `encounter-progression.spec.ts` - XP/gold curves
 - ✅ `recruitment-validation.spec.ts` - Recruitment data
 - ✅ `recruited-units-in-battle.spec.ts` - Recruited units in battle
@@ -80,24 +85,28 @@
 - ✅ `progressive-unlock.spec.ts` - House unlocks
 
 ### **Game Flow:**
+
 - ✅ `full-gameplay-loop.spec.ts` - Full gameplay loop
 - ✅ `epic-gameplay-journey.spec.ts` - Epic journey demo
 - ✅ `game-start.spec.ts` - Initial state
 - ✅ `initial-game-state.spec.ts` - State validation
 
 ### **System Integration:**
+
 - ✅ `save-load.spec.ts` - Save/load roundtrips
 - ✅ `map-transitions.spec.ts` - Map navigation
 - ✅ `npc-dialogue.spec.ts` - Dialogue system
 - ✅ `mana-generation.spec.ts` - Mana system
 
 ### **UI & Polish:**
+
 - ✅ `button-sprites.spec.ts` - UI sprites
 - ✅ `verify-sprites.spec.ts` - Sprite loading
 - ✅ `wall-collision.spec.ts` - Collision detection
 - ✅ `debug-mounting.spec.ts` - React mounting
 
 ### **Smoke Tests:**
+
 - ✅ `smoke-recruitment.spec.ts` - Quick smoke tests
 
 ---
@@ -105,6 +114,7 @@
 ## 🆕 New Features Tested
 
 ### **Shop Abilities System:**
+
 - ✅ Ability scroll definitions (25 scrolls)
 - ✅ Shop interface supports `availableAbilities`
 - ✅ Shop service functions (`buyAbilityScroll`, `learnAbilityFromScroll`, `purchaseAndLearnAbility`)
@@ -114,11 +124,13 @@
 - ✅ Level requirements validation
 
 ### **Equipment Abilities:**
+
 - ✅ 20 equipment items with `unlocksAbility` property
 - ✅ Equipment ability unlock on equip
 - ✅ Ability availability in battle
 
 ### **Menu Navigation:**
+
 - ✅ Save Menu open/close
 - ✅ Djinn Collection open/close
 - ✅ Party Management open/close
@@ -130,22 +142,26 @@
 ## 🧪 Test Execution
 
 ### **Run All E2E Tests:**
+
 ```bash
 cd apps/vale-v2
 pnpm test:e2e
 ```
 
 ### **Run Comprehensive Test Only:**
+
 ```bash
 npx playwright test comprehensive-gameplay-menus --headed --workers=1
 ```
 
 ### **Run Specific Test:**
+
 ```bash
 npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 ```
 
 ### **Requirements:**
+
 - Dev server must be running (or Playwright will start it automatically)
 - Port 5173 (default) must be available
 - Browser: Chromium (configured in `playwright.config.ts`)
@@ -165,6 +181,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 ## 📈 Coverage Metrics
 
 ### **Gameplay Systems Covered:**
+
 - ✅ Battle execution (100%)
 - ✅ Equipment system (100%)
 - ✅ Djinn system (100%)
@@ -175,6 +192,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 - ✅ Progression (100%)
 
 ### **UI Screens Covered:**
+
 - ✅ Overworld (100%)
 - ✅ Battle (100%)
 - ✅ Rewards (100%)
@@ -190,6 +208,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 ## 🎯 Test Quality
 
 ### **Strengths:**
+
 - ✅ **Real UI Interactions** - Tests use actual browser interactions
 - ✅ **State Validation** - Verifies Zustand store state
 - ✅ **Error Handling** - Graceful fallbacks for optional features
@@ -197,6 +216,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 - ✅ **Reusable Helpers** - Common operations abstracted
 
 ### **Test Patterns:**
+
 - ✅ **BeforeEach Setup** - Consistent initial state
 - ✅ **State Verification** - Checks before/after state changes
 - ✅ **Error Messages** - Clear console logging
@@ -207,6 +227,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 ## 🚀 Next Steps
 
 ### **Recommended Enhancements:**
+
 1. **Add keyboard shortcut tests** - Test ESC for menus, Q for quest log
 2. **Add equipment screen tests** - Test equipment management UI
 3. **Add Djinn equipping tests** - Test Djinn slot management
@@ -214,6 +235,7 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 5. **Add error state tests** - Test error handling in menus
 
 ### **Performance:**
+
 - Current test suite runs in ~2-5 minutes (depending on test count)
 - Individual comprehensive test: ~30-60 seconds
 - All tests: ~5-10 minutes
@@ -233,4 +255,3 @@ npx playwright test comprehensive-gameplay-menus -g "complete gameplay flow"
 **Status:** ✅ **COMPREHENSIVE E2E TEST SUITE COMPLETE**
 
 All gameplay systems, menus, and new features (shop abilities, equipment abilities) are now covered by E2E tests.
-

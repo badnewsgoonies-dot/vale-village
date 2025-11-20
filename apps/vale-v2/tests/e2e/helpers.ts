@@ -27,6 +27,7 @@ export const HOUSE_SPACING = 4;
 export const SHOP_TRIGGER_POSITION = { x: 1, y: LINEAR_ROAD_Y } as const;
 export const SHOP_ENTRANCE_POSITION = { x: 2, y: LINEAR_ROAD_Y } as const;
 export const ELDER_NPC_POSITION = { x: 3, y: LINEAR_ROAD_Y } as const;
+export const HOUSE_INTERIOR_ENEMY_POSITION = { x: 5, y: 3 } as const;
 
 export function getHouseEntrancePosition(houseNumber: number): { x: number; y: number } {
   if (houseNumber < 1 || houseNumber > 20) {
@@ -79,6 +80,22 @@ export async function waitForMode(
       return store.getState().mode === mode;
     },
     expectedMode,
+    { timeout }
+  );
+}
+
+export async function waitForCurrentMap(
+  page: Page,
+  expectedMapId: string,
+  timeout: number = 5000
+): Promise<void> {
+  await page.waitForFunction(
+    (mapId) => {
+      const store = (window as any).__VALE_STORE__;
+      if (!store) return false;
+      return store.getState().currentMapId === mapId;
+    },
+    expectedMapId,
     { timeout }
   );
 }

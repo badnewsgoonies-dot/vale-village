@@ -339,9 +339,7 @@ function App() {
           {mode === 'team-select' && pendingBattleEncounterId && (
             <PreBattleTeamSelectScreen
               encounterId={pendingBattleEncounterId}
-              onConfirm={(team) => {
-                confirmBattleTeam(team);
-              }}
+              onConfirm={() => confirmBattleTeam()}
               onCancel={() => {
                 setPendingBattle(null);
                 setMode('overworld');

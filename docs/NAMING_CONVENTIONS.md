@@ -9,12 +9,14 @@ This document defines the naming conventions used throughout the Vale Chronicles
 IDs are used for data lookups and serialization. They should be lowercase with hyphens separating words.
 
 **Examples:**
+
 - `'iron-sword'` - Equipment ID
 - `'clay-spire'` - Ability ID
 - `'hermes-sandals'` - Equipment ID
 - `'dragon-scales'` - Equipment ID
 
 **Files:**
+
 - [src/data/abilities.ts](../src/data/abilities.ts)
 - [src/data/equipment.ts](../src/data/equipment.ts)
 - [src/data/djinn.ts](../src/data/djinn.ts)
@@ -27,6 +29,7 @@ IDs are used for data lookups and serialization. They should be lowercase with h
 Data exports (abilities, equipment, djinn, units) use uppercase with underscores.
 
 **Examples:**
+
 ```typescript
 export const IRON_SWORD: Equipment = { id: 'iron-sword', ... };
 export const CLAY_SPIRE: Ability = { id: 'clay-spire', ... };
@@ -41,6 +44,7 @@ export const ISAAC: UnitDefinition = { id: 'isaac', ... };
 Type names, interfaces, and classes use PascalCase.
 
 **Examples:**
+
 ```typescript
 export type Element = 'Venus' | 'Mars' | 'Mercury' | 'Jupiter';
 export type EquipmentSlot = 'weapon' | 'armor' | 'helm' | 'boots';
@@ -57,6 +61,7 @@ export class Team { ... }
 Functions start with a verb and use camelCase.
 
 **Examples:**
+
 ```typescript
 export function calculateTurnOrder(units: Unit[]): Unit[] { ... }
 export function executeAbility(caster: Unit, ability: Ability): ActionResult { ... }
@@ -71,6 +76,7 @@ export function applyElementalMultiplier(damage: number, ...): number { ... }
 Local variables, parameters, and object properties use camelCase.
 
 **Examples:**
+
 ```typescript
 const playerTeam = new Team([isaac, garet]);
 const currentTurn = 1;
@@ -85,6 +91,7 @@ let abilityId: string;
 Boolean properties should use a prefix that indicates a true/false state.
 
 **Examples:**
+
 ```typescript
 get isKO(): boolean { ... }
 canUseAbility(abilityId: string): boolean { ... }
@@ -104,6 +111,7 @@ chainDamage?: boolean;
 Enum members use uppercase with underscores.
 
 **Examples:**
+
 ```typescript
 export enum BattleResult {
   PLAYER_VICTORY = 'PLAYER_VICTORY',
@@ -121,11 +129,13 @@ export enum DjinnState {
 ## File Names
 
 ### Type/Class Files
+
 **Pattern:** `PascalCase`
 
 Files that primarily export types, interfaces, or classes.
 
 **Examples:**
+
 - `Unit.ts`
 - `Battle.ts`
 - `Equipment.ts`
@@ -133,22 +143,26 @@ Files that primarily export types, interfaces, or classes.
 - `Team.ts`
 
 ### Data Files
+
 **Pattern:** `camelCase`
 
 Files that primarily export data definitions.
 
 **Examples:**
+
 - `abilities.ts`
 - `equipment.ts`
 - `unitDefinitions.ts`
 - `djinn.ts`
 
 ### Utility Files
+
 **Pattern:** `camelCase`
 
 Utility and helper files.
 
 **Examples:**
+
 - `rng.ts`
 - `Result.ts`
 - `battle.ts`
@@ -158,6 +172,7 @@ Utility and helper files.
 When creating lookup objects, use ID-based keys that match the object's `id` property:
 
 **Correct Pattern:**
+
 ```typescript
 export const ABILITIES: Record<string, Ability> = {
   'slash': SLASH,
@@ -171,6 +186,7 @@ const ability = ABILITIES[someAbility.id]; // ✓ Works!
 ```
 
 **Incorrect Pattern (DO NOT USE):**
+
 ```typescript
 // Old shorthand syntax - prevents ID lookups
 export const ABILITIES: Record<string, Ability> = {
@@ -184,6 +200,7 @@ const ability = ABILITIES['clay-spire']; // ✗ undefined!
 ## Import Patterns
 
 ### Importing Constants
+
 Import specific constants directly from data files:
 
 ```typescript
@@ -193,6 +210,7 @@ import { ISAAC, GARET } from '@/data/unitDefinitions';
 ```
 
 ### Importing Types
+
 Import types with the `type` keyword:
 
 ```typescript
@@ -210,6 +228,7 @@ import type { Unit, UnitDefinition } from '@/types/Unit';
 This exception exists for technical reasons:
 
 #### 1. Object Keys
+
 Area IDs are used as JavaScript object keys throughout the codebase:
 
 ```typescript
@@ -235,6 +254,7 @@ areaStates: {
 ```
 
 #### 2. Story Flags Are Interface Properties
+
 Story flags are TypeScript interface properties and must be valid JavaScript identifiers:
 
 ```typescript
@@ -260,6 +280,7 @@ if (state.storyFlags['quest-forest-complete']) { ... }
 ```
 
 #### 3. Type Safety
+
 All game world IDs are strongly typed with TypeScript string literal unions:
 
 ```typescript
@@ -287,6 +308,7 @@ export interface GameState {
 ```
 
 **TypeScript catches typos at compile time:**
+
 ```typescript
 // This will cause a TypeScript error:
 const area = AREAS['vale_vilage'];  // ✗ Typo caught at compile time!
@@ -296,6 +318,7 @@ const area = AREAS['vale_vilage'];  // ✗ Typo caught at compile time!
 #### Examples
 
 **Game World IDs (snake_case):**
+
 - ✓ Area IDs: `vale_village`, `forest_path`, `ancient_ruins`
 - ✓ Quest IDs: `quest_clear_forest`, `quest_ancient_ruins`
 - ✓ Story Flags: `intro_seen`, `quest_forest_complete`, `forest_path_unlocked`
@@ -303,6 +326,7 @@ const area = AREAS['vale_vilage'];  // ✗ Typo caught at compile time!
 - ✓ Chest IDs: `forest_chest_1`, `ruins_chest_2`, `village_starter_chest`
 
 **Battle System IDs (kebab-case):**
+
 - ✓ Equipment: `iron-sword`, `dragon-scales`, `hermes-sandals`
 - ✓ Enemies: `wild-wolf`, `fire-sprite`, `earth-golem`
 - ✓ Abilities: `slash`, `clay-spire`, `fireball`
@@ -318,15 +342,18 @@ const area = AREAS['vale_vilage'];  // ✗ Typo caught at compile time!
 Both are type-safe via TypeScript string literal unions, preventing typos at compile time.
 
 **References:**
+
 - Type definitions: [src/types/Area.ts](../src/types/Area.ts)
 - Area data: [src/data/areas.ts](../src/data/areas.ts)
 - Game state types: [src/context/types.ts](../src/context/types.ts)
 - Quest data: [src/data/quests.ts](../src/data/quests.ts)
 
 ### "ID" vs "Id"
+
 Use `Id` as a camelCase continuation (not `ID`):
 
 **Correct:**
+
 ```typescript
 abilityId: string;    // ✓
 djinnId: string;      // ✓
@@ -335,6 +362,7 @@ targetIds: string[];  // ✓
 ```
 
 **Incorrect:**
+
 ```typescript
 abilityID: string;    // ✗
 djinnID: string;      // ✗
@@ -342,6 +370,7 @@ unitID: string;       // ✗
 ```
 
 ### Multi-word Type Unions
+
 Use PascalCase for each word:
 
 ```typescript
@@ -366,6 +395,7 @@ type AbilityType = 'physical' | 'psynergy' | 'healing' | 'buff' | 'debuff';
 ## References
 
 These conventions are consistently applied throughout:
+
 - Core type definitions: [src/types/](../src/types/)
 - Data definitions: [src/data/](../src/data/)
 - Battle system: [src/types/Battle.ts](../src/types/Battle.ts)

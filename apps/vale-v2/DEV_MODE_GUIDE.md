@@ -9,12 +9,14 @@ This guide explains how to enable dev mode for testing Vale Chronicles V2.
 **Best for:** Long testing sessions, content development, balance testing
 
 **How to enable:**
+
 1. Open `src/App.tsx`
 2. Find line ~27: `const ENABLE_DEV_MODE_ON_START = false;`
 3. Change to: `const ENABLE_DEV_MODE_ON_START = true;`
 4. Save and reload the page
 
 **What you get:**
+
 - All 10 units unlocked at level 5
 - All 12 Djinn collected and Set
 - All 57 equipment items in inventory
@@ -22,6 +24,7 @@ This guide explains how to enable dev mode for testing Vale Chronicles V2.
 - Everything available immediately on game start
 
 **Advantages:**
+
 - ✅ All screens show correct data from the start
 - ✅ No need to remember hotkeys
 - ✅ Persistent across page reloads
@@ -33,16 +36,19 @@ This guide explains how to enable dev mode for testing Vale Chronicles V2.
 **Best for:** Quick testing during play, debugging specific scenarios
 
 **How to use:**
+
 1. Start the game normally
 2. Press **F1** from the overworld
 3. Check console for confirmation
 4. Close and reopen screens to see changes (D for Djinn, P for units, etc.)
 
 **What you get:**
+
 - Same as Option 1 (all content unlocked)
 - Triggered on-demand mid-game
 
 **Limitations:**
+
 - ⚠️ Already-open screens won't auto-refresh
 - ⚠️ Must navigate away and back to see changes
 - ⚠️ Console shows instructions after activation
@@ -62,6 +68,7 @@ React components only re-render when they're subscribed to the state that change
 | Gold | 99,999 | Max |
 
 ### Units Unlocked
+
 - Adept (Venus Warrior)
 - Squire (Mars Warrior)
 - Mage (Mercury Mage)
@@ -70,7 +77,9 @@ React components only re-render when they're subscribed to the state that change
 - Guard Elite (Venus Tank Elite)
 
 ### Djinn Unlocked
+
 All 12 Djinn (3 per element):
+
 - **Venus:** Flint, Granite, Quartz
 - **Mars:** Forge, Fever, Corona
 - **Mercury:** Sleet, Mist, Spritz
@@ -81,6 +90,7 @@ All 12 Djinn (3 per element):
 ## Technical Details
 
 ### Service Location
+
 - **Service:** `src/core/services/DevModeService.ts`
 - **Hook:** `src/ui/hooks/useDevMode.ts`
 - **Integration:** `src/App.tsx` (lines ~27 and ~58)
@@ -88,6 +98,7 @@ All 12 Djinn (3 per element):
 ### How It Works
 
 **Start-Up Mode:**
+
 ```typescript
 if (ENABLE_DEV_MODE_ON_START) {
   const devState = initFullDevMode();
@@ -99,6 +110,7 @@ if (ENABLE_DEV_MODE_ON_START) {
 ```
 
 **Runtime Mode:**
+
 ```typescript
 // Press F1 → useDevMode hook triggers
 // → Updates Zustand state directly
@@ -114,6 +126,7 @@ Zustand state updates are synchronous, but React re-renders are asynchronous and
 3. ✅ Closing and reopening screens remounts them, so they read fresh state
 
 **Example:**
+
 - DjinnCollectionScreen only reads `team.djinn` when it mounts
 - Pressing F1 updates `team.djinn` in the store
 - But DjinnCollectionScreen is still showing old state from when it mounted
@@ -124,15 +137,18 @@ Zustand state updates are synchronous, but React re-renders are asynchronous and
 ## Troubleshooting
 
 ### "Equipment still shows 0 items after F1"
+
 - Check console - should show "Inventory after adding: 57 items"
 - If it shows 0, there's a bug in addEquipment
 - Try start-up dev mode instead
 
 ### "Djinn screen doesn't update after F1"
+
 - This is expected! Close the screen (Esc) and reopen (D)
 - Or use start-up dev mode for immediate results
 
 ### "Units not showing in party management"
+
 - Same issue - close and reopen the screen
 - Or use start-up dev mode
 
@@ -141,12 +157,14 @@ Zustand state updates are synchronous, but React re-renders are asynchronous and
 ## Future Improvements
 
 **Potential Enhancements:**
+
 1. Add "Force Refresh" button to screens that reads current state
 2. Auto-close all open screens when F1 is pressed
 3. Add visual notification banner when dev mode activates
 4. Create custom dev mode configs (e.g., "Level 10 mode", "All equipment mode")
 
 **Implementation Ideas:**
+
 ```typescript
 // Auto-close screens on F1
 if (event.key === 'F1') {
