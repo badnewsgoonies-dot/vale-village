@@ -1,6 +1,7 @@
 import type { DialogueTree } from '@/core/models/dialogue';
 import { VS1_SCENE_PRE, VS1_SCENE_POST, VS1_ENCOUNTER_ID } from '../../story/vs1Constants';
 import { RECRUITMENT_DIALOGUES } from './recruitmentDialogues';
+import { HOUSE_ENEMY_DIALOGUES } from './houseEnemyDialogues';
 
 export const VS1_PRE_SCENE: DialogueTree = {
   id: VS1_SCENE_PRE,
@@ -129,4 +130,6 @@ export const DIALOGUES: Record<string, DialogueTree> = {
   'shopkeeper-weapons': SHOPKEEPER_DIALOGUE,
   // Recruitment dialogues (Houses 1-20)
   ...RECRUITMENT_DIALOGUES,
+  // Overworld house defenders (Houses 1-20)
+  ...HOUSE_ENEMY_DIALOGUES,
 };

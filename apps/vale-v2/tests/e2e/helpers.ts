@@ -1,3 +1,4 @@
+/// <reference lib="es2017" />
 import { Page } from '@playwright/test';
 
 /**
@@ -17,6 +18,25 @@ export interface GameState {
   battle: any;
   lastBattleRewards: any;
   equipment: any[];
+}
+
+export const STARTING_POSITION = { x: 7, y: 2 } as const;
+export const LINEAR_ROAD_Y = 2;
+export const FIRST_HOUSE_X = 7;
+export const HOUSE_SPACING = 4;
+export const SHOP_TRIGGER_POSITION = { x: 1, y: LINEAR_ROAD_Y } as const;
+export const SHOP_ENTRANCE_POSITION = { x: 2, y: LINEAR_ROAD_Y } as const;
+export const ELDER_NPC_POSITION = { x: 3, y: LINEAR_ROAD_Y } as const;
+
+export function getHouseEntrancePosition(houseNumber: number): { x: number; y: number } {
+  if (houseNumber < 1 || houseNumber > 20) {
+    throw new Error(`House number out of range (1-20): ${houseNumber}`);
+  }
+
+  return {
+    x: FIRST_HOUSE_X + (houseNumber - 1) * HOUSE_SPACING,
+    y: LINEAR_ROAD_Y,
+  };
 }
 
 /**
@@ -1070,16 +1090,14 @@ export async function advanceDialogueUntilEnd(page: Page, maxSteps: number = 20)
 }
 
 /**
- * Navigate to House 1 trigger from starting position
- * Starting position: (15, 10)
- * House 1 trigger: (7, 10)
+ * Navigate to House 1 trigger (player now spawns directly on the entrance)
+ * Step off the doorway and back on to ensure the trigger fires.
  */
 export async function navigateToHouse1(page: Page): Promise<void> {
-  // Move left 8 times from (15, 10) to (7, 10)
-  for (let i = 0; i < 8; i++) {
-    await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(150);
-  }
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('ArrowLeft');
+  await page.waitForTimeout(150);
 }
 
 /**
