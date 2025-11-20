@@ -31,6 +31,7 @@ const NPCStateSchema = z.object({
 export const SaveV1Schema = z.object({
   version: z.literal('1.0.0'),
   timestamp: z.number().int().positive(),
+  chapter: z.number().int().min(1).default(1),  // Story chapter (defaults to 1 for backward compatibility)
 
   // Player progress
   playerData: z.object({

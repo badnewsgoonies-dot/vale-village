@@ -78,6 +78,7 @@ function createSaveData(
   return {
     version: '1.0.0' as const,
     timestamp: Date.now(),
+    chapter: story.chapter,
     playerData: {
       unitsCollected: roster.map(u => {
         // Clamp HP to base max (Djinn bonuses not persisted)
@@ -126,7 +127,7 @@ function getStoryStateFromSave(saveData: SaveV1): StoryState {
   const storySection = (saveData as SaveWithOptionalStory).story;
   const flags = storySection?.flags ?? saveData.playerData.storyFlags ?? {};
   return {
-    chapter: storySection?.chapter ?? 1,
+    chapter: saveData.chapter ?? storySection?.chapter ?? 1,
     flags: { ...flags },
   };
 }
