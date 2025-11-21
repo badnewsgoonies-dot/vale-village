@@ -59,17 +59,17 @@ pnpm typecheck
 ```
 
 #### Files Modified ✅
-- ✅ `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx` (new)
-- ✅ `apps/vale-v2/src/main.tsx`
-- ✅ `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
-- ✅ `apps/vale-v2/src/core/services/BattleService.ts`
-- ✅ `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- ✅ `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
-- ✅ `apps/vale-v2/src/ui/state/inventorySlice.ts`
-- ✅ `apps/vale-v2/src/core/validation/validateAll.ts`
-- ✅ `apps/vale-v2/src/core/algorithms/xp.ts`
-- ✅ `apps/vale-v2/src/core/constants.ts` (new)
-- ✅ `apps/vale-v2/src/core/algorithms/targeting.ts` (updated)
+- ✅ `src/ui/components/GameErrorBoundary.tsx` (new)
+- ✅ `src/main.tsx`
+- ✅ `src/ui/components/ActionQueuePanel.tsx`
+- ✅ `src/core/services/BattleService.ts`
+- ✅ `src/core/services/QueueBattleService.ts`
+- ✅ `src/ui/state/queueBattleSlice.ts`
+- ✅ `src/ui/state/inventorySlice.ts`
+- ✅ `src/core/validation/validateAll.ts`
+- ✅ `src/core/algorithms/xp.ts`
+- ✅ `src/core/constants.ts` (new)
+- ✅ `src/core/algorithms/targeting.ts` (updated)
 
 **Total:** 11 files modified ✅
 

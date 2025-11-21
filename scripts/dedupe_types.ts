@@ -8,7 +8,8 @@
  * Reports duplicates and suggests consolidation strategy.
  * 
  * Usage:
- *   npx tsx scripts/dedupe_types.ts --root apps/vale-v2
+ *   npx tsx scripts/dedupe_types.ts
+ *   npx tsx scripts/dedupe_types.ts --root <path>  # Optional: specify custom root
  */
 
 import * as fs from 'fs';

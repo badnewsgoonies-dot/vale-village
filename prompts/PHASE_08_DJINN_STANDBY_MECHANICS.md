@@ -117,7 +117,7 @@ const djinnBonuses = calculateDjinnBonuses(setDjinn, unit);
 ### **Task 8.1: VERIFY Djinn Bonus Calculation Filters by State** ✅
 
 **Status:** Already Implemented  
-**File:** `apps/vale-v2/src/core/algorithms/djinnAbilities.ts` (line 34)
+**File:** `src/core/algorithms/djinnAbilities.ts` (line 34)
 
 **Existing Implementation:**
 ```typescript
@@ -179,7 +179,7 @@ export function calculateDjinnBonuses(team: Team): Partial<Stats> {
 ### **Task 8.2: VERIFY Per-Unit Djinn Bonuses Filter by State** ✅
 
 **Status:** Already Implemented  
-**File:** `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+**File:** `src/core/algorithms/djinnAbilities.ts`
 
 **Existing Implementation:**
 ```typescript
@@ -239,7 +239,7 @@ export function calculateDjinnBonusesForUnit(
 ### **Task 8.3: VERIFY Ability Unlocking Filters by State** ✅
 
 **Status:** Already Implemented  
-**File:** `apps/vale-v2/src/core/algorithms/djinnAbilities.ts` (line 72)
+**File:** `src/core/algorithms/djinnAbilities.ts` (line 72)
 
 **Existing Implementation:**
 ```typescript
@@ -310,7 +310,7 @@ export function getDjinnGrantedAbilities(
 ### **Task 8.4: VERIFY calculateEffectiveStats Uses State** ✅
 
 **Status:** Already Working (via Task 8.1)  
-**File:** `apps/vale-v2/src/core/algorithms/stats.ts`
+**File:** `src/core/algorithms/stats.ts`
 
 **How It Works:**
 ```typescript
@@ -344,7 +344,7 @@ export function calculateEffectiveStats(unit: Unit, team: Team): Stats {
 ### **Task 8.5: ADD BattleEvents for Stat Changes** ⚠️ NEEDED
 
 **Status:** Not Implemented  
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Purpose:** Add battle log feedback so players see when bonuses are lost/restored
 
@@ -422,7 +422,7 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
 ### **Task 8.6: VERIFY Ability Availability Updates** ✅
 
 **Status:** Already Implemented via `mergeDjinnAbilitiesIntoUnit()`  
-**Files:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**Files:** `src/core/services/QueueBattleService.ts`
 
 **How It Works:**
 - Activation: `mergeDjinnAbilitiesIntoUnit()` called (line 467-469)
@@ -474,7 +474,7 @@ function getAvailableAbilities(unit: Unit, team: Team): Ability[] {
 ### **Task 8.7: ADD BattleEvent Types for Stat Changes** ⚠️ NEEDED
 
 **Status:** Not Implemented  
-**File:** `apps/vale-v2/src/core/services/types.ts`
+**File:** `src/core/services/types.ts`
 
 **Add New Event Types:**
 ```typescript
@@ -512,7 +512,7 @@ case 'djinn-bonus-restored':
 ### **Task 8.8: ADD UI Indicators for Locked Abilities** ⚠️ NEEDED
 
 **Status:** Not Implemented  
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx` (or ability selection UI)
+**File:** `src/ui/components/QueueBattleView.tsx` (or ability selection UI)
 
 **Purpose:** Visual feedback showing which abilities are unavailable due to Djinn in Standby
 
@@ -555,7 +555,7 @@ case 'djinn-bonus-restored':
 
 ### **Test 8.1: Stat Loss on Activation**
 
-**File:** `apps/vale-v2/tests/core/algorithms/djinnStandby.test.ts` (NEW)
+**File:** `tests/core/algorithms/djinnStandby.test.ts` (NEW)
 
 ```typescript
 import { describe, test, expect } from 'vitest';
@@ -957,8 +957,8 @@ If issues arise:
 
 ```bash
 # Revert changes
-git checkout apps/vale-v2/src/core/algorithms/stats.ts
-git checkout apps/vale-v2/src/core/algorithms/djinnAbilities.ts
+git checkout src/core/algorithms/stats.ts
+git checkout src/core/algorithms/djinnAbilities.ts
 # ... other files
 
 # Or revert entire phase

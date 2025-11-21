@@ -239,7 +239,7 @@ Risk mitigated by:
 
 ### Task 1: Refactor `executeRound()` into Composable Phases
 
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current Structure:**
 ```typescript
@@ -352,7 +352,7 @@ export function executeRound(state: BattleState, rng: PRNG): ExecutionResult {
 
 ### Task 2: Split `BattleState` into Focused Interfaces
 
-**File:** `apps/vale-v2/src/core/models/BattleState.ts`
+**File:** `src/core/models/BattleState.ts`
 
 **Current Structure:**
 ```typescript
@@ -496,7 +496,7 @@ export interface BattleState {
 
 ### Task 3: Extract Remaining Magic Numbers
 
-**File:** `apps/vale-v2/src/core/constants.ts`
+**File:** `src/core/constants.ts`
 
 **Status:** ✅ Most constants already extracted!
 
@@ -505,7 +505,7 @@ export interface BattleState {
 1. **Step 3.1:** Audit codebase for magic numbers
    ```bash
    # Search for numeric literals in core/
-   grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' apps/vale-v2/src/core/ \
+   grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' src/core/ \
      --include='*.ts' \
      | grep -v '\.test\.ts' \
      | grep -v 'node_modules'
@@ -547,7 +547,7 @@ export interface BattleState {
 ### Task 4: Introduce `AbilityId` Union Type
 
 **Files:**
-- New: `apps/vale-v2/src/data/types/AbilityId.ts`
+- New: `src/data/types/AbilityId.ts`
 - Update: 19 files using `abilityId: string`
 
 **Target Type Definition:**

@@ -73,10 +73,10 @@ Review and resolve TODO comments throughout the codebase. Some are critical, som
 
 ## Files to Review
 - All files with TODO comments (17 found)
-- `apps/vale-v2/src/ui/state/saveSlice.ts`
-- `apps/vale-v2/src/ui/components/UnitCard.tsx`
-- `apps/vale-v2/src/ui/components/ActionBar.tsx`
-- `apps/vale-v2/src/core/services/SaveService.ts`
+- `src/ui/state/saveSlice.ts`
+- `src/ui/components/UnitCard.tsx`
+- `src/ui/components/ActionBar.tsx`
+- `src/core/services/SaveService.ts`
 
 ## Recommended Model
 **Claude 3.5 Sonnet** (200k context) - Sufficient for mixed complexity tasks

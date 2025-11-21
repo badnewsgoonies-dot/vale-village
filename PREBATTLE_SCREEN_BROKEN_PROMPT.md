@@ -36,16 +36,16 @@ See: `/tmp/mate-screenshot.1079100.0/Screenshot.png`
 
 **Main Component:**
 ```
-apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx
-apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css
+src/ui/components/PreBattleTeamSelectScreen.tsx
+src/ui/components/PreBattleTeamSelectScreen.css
 ```
 
 **Child Components:**
 ```
-apps/vale-v2/src/ui/components/TeamBenchSection.tsx
-apps/vale-v2/src/ui/components/EquipmentSection.tsx
-apps/vale-v2/src/ui/components/DjinnSection.tsx
-apps/vale-v2/src/ui/components/EnemyPortalTile.tsx
+src/ui/components/TeamBenchSection.tsx
+src/ui/components/EquipmentSection.tsx
+src/ui/components/DjinnSection.tsx
+src/ui/components/EnemyPortalTile.tsx
 ```
 
 **All components exist and code looks correct** - This appears to be a CSS/rendering issue, not a logic issue.

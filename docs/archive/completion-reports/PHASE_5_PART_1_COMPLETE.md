@@ -173,10 +173,10 @@ const quake = ABILITIES.quake;
 
 ## Files Modified
 
-1. `apps/vale-v2/src/test/factories.ts` - Enhanced `mkUnit()` to handle level/xp
-2. `apps/vale-v2/tests/core/services/QueueBattleService.test.ts` - Fixed unit creation
-3. `apps/vale-v2/tests/core/services/queue-battle.test.ts` - Fixed unit creation
-4. `apps/vale-v2/tests/gameplay/Progression.test.ts` - Fixed unit creation and ability references
+1. `src/test/factories.ts` - Enhanced `mkUnit()` to handle level/xp
+2. `tests/core/services/QueueBattleService.test.ts` - Fixed unit creation
+3. `tests/core/services/queue-battle.test.ts` - Fixed unit creation
+4. `tests/gameplay/Progression.test.ts` - Fixed unit creation and ability references
 
 ---
 

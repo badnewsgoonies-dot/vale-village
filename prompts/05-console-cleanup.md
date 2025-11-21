@@ -12,7 +12,7 @@ Review and clean up console statements according to project rules: only console.
 ## Tasks
 
 ### Task 1: Audit All Console Statements
-**Action:** Review all console statements in `apps/vale-v2/src/`
+**Action:** Review all console statements in `src/`
 
 **Rules:**
 - ✅ `console.error()` - Allowed for errors
@@ -68,7 +68,7 @@ console.error('Error:', error);
 
 ## Files to Review
 - All files with console statements (45 found)
-- `apps/vale-v2/.eslintrc` (verify rules)
+- `.eslintrc` (verify rules)
 
 ## Recommended Model
 **Claude 3.5 Sonnet** (200k context) - Sufficient for simple cleanup task

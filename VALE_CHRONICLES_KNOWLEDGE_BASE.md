@@ -93,7 +93,7 @@
 
 ### File Structure
 ```
-apps/vale-v2/src/
+src/
 ├── core/
 │   ├── algorithms/  # Pure functions (damage, stats, djinn, xp)
 │   ├── models/      # POJOs (Unit, Team, BattleState)
@@ -456,7 +456,7 @@ Uses fast-check for invariants (damage ≥ 0, turn order deterministic)
 
 **Developer (Primary):**
 1. `CLAUDE.md` - Project overview
-2. `apps/vale-v2/CLAUDE.md` - Architecture details
+2. `CLAUDE.md` - Architecture details
 3. `docs/architect/GAME_MECHANICS.md` - Technical specifications
 4. `prompts/` - Implementation guides for each phase
 

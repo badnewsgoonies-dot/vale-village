@@ -69,7 +69,7 @@ if (battleStateStr) {
 ```
 
 ### Files to Modify
-- `apps/vale-v2/src/ui/state/saveSlice.ts` (lines 127-160)
+- `src/ui/state/saveSlice.ts` (lines 127-160)
 
 ### Testing
 ```bash
@@ -111,21 +111,21 @@ const ppPercent = maxPp > 0 ? (currentPp / maxPp) * 100 : 0;
 
 **Step 2: Check ActionBar.tsx**
 ```bash
-grep -n "TODO.*PP" apps/vale-v2/src/ui/components/ActionBar.tsx
+grep -n "TODO.*PP" src/ui/components/ActionBar.tsx
 ```
 If TODO exists, remove PP checks and use team mana instead.
 
 **Step 3: Search for remaining PP references**
 ```bash
-cd apps/vale-v2
+cd root
 grep -r "currentPp\|maxPp\|ppPercent" src/ui/components/ --include="*.tsx"
 ```
 
 Remove any remaining PP UI logic.
 
 ### Files to Modify
-- `apps/vale-v2/src/ui/components/UnitCard.tsx`
-- `apps/vale-v2/src/ui/components/ActionBar.tsx` (if exists)
+- `src/ui/components/UnitCard.tsx`
+- `src/ui/components/ActionBar.tsx` (if exists)
 
 ### Testing
 ```bash
@@ -147,7 +147,7 @@ Currently story progress is saved but not which chapter player is on.
 
 **Step 1: Update SaveV1Schema**
 ```typescript
-// apps/vale-v2/src/data/schemas/SaveV1Schema.ts
+// src/data/schemas/SaveV1Schema.ts
 export const SaveV1Schema = z.object({
   version: z.literal(1),
   timestamp: z.number(),
@@ -164,7 +164,7 @@ export const SaveV1Schema = z.object({
 
 **Step 2: Update SaveService createSaveData()**
 ```typescript
-// apps/vale-v2/src/core/services/SaveService.ts
+// src/core/services/SaveService.ts
 story: {
   flags: story.flags,
   chapter: story.chapter || 1,  // ADD THIS
@@ -188,10 +188,10 @@ if (saveData.story) {
 ```
 
 ### Files to Modify
-- `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
-- `apps/vale-v2/src/core/services/SaveService.ts`
-- `apps/vale-v2/src/ui/state/saveSlice.ts`
-- `apps/vale-v2/src/ui/state/storySlice.ts` (verify chapter field exists)
+- `src/data/schemas/SaveV1Schema.ts`
+- `src/core/services/SaveService.ts`
+- `src/ui/state/saveSlice.ts`
+- `src/ui/state/storySlice.ts` (verify chapter field exists)
 
 ### Testing
 ```bash

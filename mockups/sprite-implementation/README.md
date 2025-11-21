@@ -165,7 +165,7 @@ When implementing these into the actual game:
 
 ## 📝 Notes
 
-- All paths in the mocks use relative paths: `../../apps/vale-v2/public/sprites/`
+- All paths in the mocks use relative paths: `../../public/sprites/`
 - When implementing in React, use `/sprites/` (served from `public/`)
 - The sprite catalog API (`catalog.ts`) already indexes all these sprites
 - These mocks use NO game logic - purely visual demonstrations

@@ -15,7 +15,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
 
 ### 1. SaveMenu Sprite Integration ✨ NEW
 
-**File:** [SaveMenu.tsx](apps/vale-v2/src/ui/components/SaveMenu.tsx)
+**File:** [SaveMenu.tsx](src/ui/components/SaveMenu.tsx)
 **Status:** ✅ Completed
 
 #### Changes Made:
@@ -35,7 +35,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
    - Styled with golden border and dark background
    - Future enhancement: dynamically show lead character from save data
 
-4. **CSS Updates** ([SaveMenu.css](apps/vale-v2/src/ui/components/SaveMenu.css))
+4. **CSS Updates** ([SaveMenu.css](src/ui/components/SaveMenu.css))
    - Added flexbox layout to buttons for inline sprite + text
    - Added `.save-slot-portrait` styling with golden border
    - Added `position: relative` to container for background sprite
@@ -67,7 +67,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
 
 ### 2. Sprite Mockup Gallery ✅ ALREADY INTEGRATED
 
-**File:** [StoryboardGallery.tsx](apps/vale-v2/src/ui/components/StoryboardGallery.tsx)
+**File:** [StoryboardGallery.tsx](src/ui/components/StoryboardGallery.tsx)
 **Status:** Already complete
 
 - `SpriteMockup` component already imported (line 14)
@@ -76,7 +76,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
 
 ### 3. Battle Background Sprites ✅ ALREADY INTEGRATED
 
-**File:** [Battlefield.tsx](apps/vale-v2/src/ui/components/battle/Battlefield.tsx)
+**File:** [Battlefield.tsx](src/ui/components/battle/Battlefield.tsx)
 **Status:** Already complete
 
 - `BackgroundSprite` component already imported (line 8)
@@ -85,7 +85,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
 
 ### 4. Battle Unit Sprites ✅ ALREADY INTEGRATED
 
-**File:** [BattleUnitSprite.tsx](apps/vale-v2/src/ui/components/BattleUnitSprite.tsx)
+**File:** [BattleUnitSprite.tsx](src/ui/components/BattleUnitSprite.tsx)
 **Status:** Already complete
 
 - Complete mapping of 10+ player units to character sprites
@@ -125,7 +125,7 @@ Phase 1 focused on integrating sprites into UI/settings menus as the starting po
 
 ### View SaveMenu Sprites
 ```bash
-cd apps/vale-v2
+cd root
 pnpm dev
 ```
 
@@ -195,13 +195,13 @@ pnpm dev
 
 ## Files Modified This Session
 
-1. ✅ [SaveMenu.tsx](apps/vale-v2/src/ui/components/SaveMenu.tsx)
+1. ✅ [SaveMenu.tsx](src/ui/components/SaveMenu.tsx)
    - Added sprite imports
    - Added BackgroundSprite to container
    - Added SimpleSprite to buttons
    - Added character portrait to save slots
 
-2. ✅ [SaveMenu.css](apps/vale-v2/src/ui/components/SaveMenu.css)
+2. ✅ [SaveMenu.css](src/ui/components/SaveMenu.css)
    - Added flexbox to action buttons
    - Added .save-slot-portrait styling
    - Added position: relative to container

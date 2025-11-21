@@ -28,7 +28,7 @@
 
 ### Directory Structure to Create
 ```
-apps/vale-v2/
+
 ├── src/
 │   ├── core/
 │   │   ├── algorithms/

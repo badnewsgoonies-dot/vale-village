@@ -22,8 +22,8 @@
 
 ### 1. Save Pipeline: Type Mismatch & Unsafe Casting
 **Files:** 
-- `apps/vale-v2/src/ui/state/saveSlice.ts:34, 48, 58`
-- `apps/vale-v2/src/core/services/SaveService.ts:16, 36`
+- `src/ui/state/saveSlice.ts:34, 48, 58`
+- `src/core/services/SaveService.ts:16, 36`
 
 **Risk Level:** 🔴 **7/10**
 
@@ -132,10 +132,10 @@ function buildSaveV1(team: Team | null, battle: BattleState | null): Result<Save
 
 ### 2. StatusEffect Type Divergence: Model vs Schema
 **Files:**
-- `apps/vale-v2/src/core/models/types.ts:46`
-- `apps/vale-v2/src/data/schemas/UnitSchema.ts:44`
-- `apps/vale-v2/src/ui/state/battleSlice.ts:101`
-- `apps/vale-v2/src/ui/state/saveSlice.ts:58`
+- `src/core/models/types.ts:46`
+- `src/data/schemas/UnitSchema.ts:44`
+- `src/ui/state/battleSlice.ts:101`
+- `src/ui/state/saveSlice.ts:58`
 
 **Risk Level:** 🔴 **7/10**
 
@@ -211,7 +211,7 @@ unitsCollected: team.units.map(u => ({
 ---
 
 ### 3. LocalStorageSavePort: No Runtime Validation
-**File:** `apps/vale-v2/src/infra/save/LocalStorageSavePort.ts:14, 19`
+**File:** `src/infra/save/LocalStorageSavePort.ts:14, 19`
 
 **Risk Level:** 🔴 **6/10**
 
@@ -290,7 +290,7 @@ version: '1.0.0'
 ---
 
 ### 4. QueueBattleService: Empty Target Array Bug
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:374-378`
+**File:** `src/core/services/QueueBattleService.ts:374-378`
 
 **Risk Level:** 🔴 **6/10**
 
@@ -347,9 +347,9 @@ if (hitEnemyIds.length > 0) {
 
 ### 5. Zustand Slices: Cross-Slice Access with `as any`
 **Files:**
-- `apps/vale-v2/src/ui/state/rewardsSlice.ts:56, 71`
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts:122`
-- `apps/vale-v2/src/ui/state/battleSlice.ts:129, 198, 219`
+- `src/ui/state/rewardsSlice.ts:56, 71`
+- `src/ui/state/queueBattleSlice.ts:122`
+- `src/ui/state/battleSlice.ts:129, 198, 219`
 
 **Risk Level:** 🟠 **5/10**
 
@@ -411,8 +411,8 @@ export const createRewardsSlice: StateCreator<
 
 ### 6. Non-Exhaustive Switch Statements
 **Files:**
-- `apps/vale-v2/src/core/services/BattleService.ts:237`
-- `apps/vale-v2/src/ui/utils/text.ts:9`
+- `src/core/services/BattleService.ts:237`
+- `src/ui/utils/text.ts:9`
 
 **Risk Level:** 🟠 **6/10**
 
@@ -498,7 +498,7 @@ switch (e.type) {
 ---
 
 ### 7. main.tsx: Unsafe Non-Null Assertion
-**File:** `apps/vale-v2/src/main.tsx:19`
+**File:** `src/main.tsx:19`
 
 **Risk Level:** 🟠 **5/10**
 
@@ -544,7 +544,7 @@ if (!rootElement) {
 ---
 
 ### 8. RewardsScreen: Silent Filter Failure
-**File:** `apps/vale-v2/src/ui/components/RewardsScreen.tsx:20-23`
+**File:** `src/ui/components/RewardsScreen.tsx:20-23`
 
 **Risk Level:** 🟠 **4/10**
 
@@ -594,7 +594,7 @@ const levelUpUnits = rewards.levelUps
 ---
 
 ### 9. CreditsScreen: Unsafe Type Assertion
-**File:** `apps/vale-v2/src/ui/components/CreditsScreen.tsx:32`
+**File:** `src/ui/components/CreditsScreen.tsx:32`
 
 **Risk Level:** 🟠 **4/10**
 
@@ -638,7 +638,7 @@ const creditsData = importedCreditsJson satisfies CreditsData;
 ---
 
 ### 10. AIService: Non-Null Assertions (Guarded but Risky)
-**File:** `apps/vale-v2/src/core/services/AIService.ts:184, 192, 198, 207, 216, 218, 227, 231, 285, 286, 290`
+**File:** `src/core/services/AIService.ts:184, 192, 198, 207, 216, 218, 227, 231, 285, 286, 290`
 
 **Risk Level:** 🟠 **3/10** (Guarded but could be safer)
 
@@ -676,7 +676,7 @@ return [target.target.id];
 ## 🟡 MEDIUM PRIORITY ISSUES (Risk 3-4)
 
 ### 11. Equipment: `as any` for Stat Accumulation
-**File:** `apps/vale-v2/src/core/models/Equipment.ts:75`
+**File:** `src/core/models/Equipment.ts:75`
 
 **Risk Level:** 🟡 **3/10**
 

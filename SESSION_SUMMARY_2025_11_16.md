@@ -11,9 +11,9 @@
 - ✅ Created implementation documentation
 
 **Files Modified:**
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx` - Added try/catch
-- `apps/vale-v2/src/ui/state/inventorySlice.ts` - Added setEquipment/setGold methods
-- `apps/vale-v2/src/App.tsx` - Changed to use set* instead of add* methods
+- `src/ui/components/OverworldMap.tsx` - Added try/catch
+- `src/ui/state/inventorySlice.ts` - Added setEquipment/setGold methods
+- `src/App.tsx` - Changed to use set* instead of add* methods
 
 **Grade Improvement:** B → B+ (can reach A- with tests + visual indicator)
 
@@ -106,9 +106,9 @@
 
 ### Uncommitted Changes:
 ```
-Modified: apps/vale-v2/src/ui/components/OverworldMap.tsx
-Modified: apps/vale-v2/src/ui/state/inventorySlice.ts
-Modified: apps/vale-v2/src/App.tsx
+Modified: src/ui/components/OverworldMap.tsx
+Modified: src/ui/state/inventorySlice.ts
+Modified: src/App.tsx
 
 New: DEV_MODE_FIXES_APPLIED.md
 New: PREBATTLE_SCREEN_DEBUG_GUIDE.md
@@ -116,9 +116,9 @@ New: PREBATTLE_SCREEN_DEBUG_GUIDE.md
 
 ### Recommended Commit (after testing):
 ```bash
-git add apps/vale-v2/src/ui/components/OverworldMap.tsx
-git add apps/vale-v2/src/ui/state/inventorySlice.ts
-git add apps/vale-v2/src/App.tsx
+git add src/ui/components/OverworldMap.tsx
+git add src/ui/state/inventorySlice.ts
+git add src/App.tsx
 git commit -m "fix: Add localStorage error handling and prevent dev mode stacking
 
 - Add try/catch for localStorage.setItem in dev mode button

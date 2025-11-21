@@ -50,7 +50,7 @@ const XP_CURVE = {
 };
 
 // Total XP needed to reach level 20: 92,800 XP
-// See: apps/vale-v2/src/core/algorithms/xp.ts
+// See: src/core/algorithms/xp.ts
 ```
 
 ### 1.2 Stat Growth Formulas

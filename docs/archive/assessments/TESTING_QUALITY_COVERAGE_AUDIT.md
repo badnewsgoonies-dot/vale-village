@@ -64,7 +64,7 @@
 ## 🔴 USELESS / LOW-VALUE TESTS
 
 ### 1. AI Scoring Tests: Assert Only Existence, Not Behavior
-**File:** `apps/vale-v2/tests/ai/scoring.test.ts:12-24, 63-80`  
+**File:** `tests/ai/scoring.test.ts:12-24, 63-80`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -129,7 +129,7 @@ it('should prefer targeting weakest player unit', () => {
 ---
 
 ### 2. AI Targeting Tests: Weak Assertions
-**File:** `apps/vale-v2/tests/ai/targeting.test.ts:34-66`  
+**File:** `tests/ai/targeting.test.ts:34-66`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -168,7 +168,7 @@ it('should prefer weakest effective HP target', () => {
 ---
 
 ### 3. Stats Test: Placeholder Test
-**File:** `apps/vale-v2/tests/core/algorithms/stats.test.ts:70-83`  
+**File:** `tests/core/algorithms/stats.test.ts:70-83`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -210,7 +210,7 @@ it('should sum bonuses from multiple equipment pieces', () => {
 ---
 
 ### 4. Preview Determinism: Tests Wrong Thing
-**File:** `apps/vale-v2/tests/core/services/preview-determinism.test.ts:35-99`  
+**File:** `tests/core/services/preview-determinism.test.ts:35-99`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -258,7 +258,7 @@ it('preview does not advance live RNG', () => {
 ---
 
 ### 5. Validation Test: Only Checks "Doesn't Throw"
-**File:** `apps/vale-v2/tests/core/validation/validateAll.test.ts:5-9`  
+**File:** `tests/core/validation/validateAll.test.ts:5-9`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -302,7 +302,7 @@ it('should reject invalid ability data', () => {
 ## 🟠 MISSING CONTEXT-AWARE / END-TO-END TESTS
 
 ### 6. Queue Battle Execution: Zero Coverage
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:170-493`  
+**File:** `src/core/services/QueueBattleService.ts:170-493`  
 **Severity:** 🔴 **CRITICAL**
 
 **Missing Coverage:**
@@ -360,7 +360,7 @@ describe('executeRound', () => {
 ---
 
 ### 7. Encounter Service: No Tests
-**File:** `apps/vale-v2/src/core/services/EncounterService.ts:23-94`  
+**File:** `src/core/services/EncounterService.ts:23-94`  
 **Severity:** 🔴 **CRITICAL**
 
 **Missing Coverage:**
@@ -471,8 +471,8 @@ describe('Progression Impact', () => {
 
 ### 9. Equipment/Djinn: Only Stat Tests, Not Battle Impact
 **Files:**
-- `apps/vale-v2/tests/core/algorithms/stats-integration.test.ts:5-110`
-- `apps/vale-v2/tests/core/algorithms/djinn.test.ts:1-48`
+- `tests/core/algorithms/stats-integration.test.ts:5-110`
+- `tests/core/algorithms/djinn.test.ts:1-48`
 
 **Severity:** 🟠 **HIGH**
 
@@ -504,8 +504,8 @@ it('equipment bonuses affect performAction damage', () => {
 
 ### 10. Property-Based Tests: No Fixed Seeds
 **Files:**
-- `apps/vale-v2/tests/battle/invariants.test.ts:15-181`
-- `apps/vale-v2/tests/core/algorithms/damage-properties.test.ts:46-127`
+- `tests/battle/invariants.test.ts:15-181`
+- `tests/core/algorithms/damage-properties.test.ts:46-127`
 
 **Severity:** 🟠 **HIGH**
 
@@ -542,7 +542,7 @@ fc.assert(
 ---
 
 ### 11. Queue Battle RNG Cloning: Untested
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:170-296`  
+**File:** `src/core/services/QueueBattleService.ts:170-296`  
 **Severity:** 🟠 **MEDIUM**
 
 **Issue:**
@@ -570,7 +570,7 @@ it('should use separate RNG streams for preview and execution', () => {
 ## 🟡 UNTESTED EDGE CASES
 
 ### 12. KO Retargeting: Not Tested
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:424-448`  
+**File:** `src/core/services/QueueBattleService.ts:424-448`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -599,7 +599,7 @@ it('should retarget when original target dies mid-round', () => {
 ---
 
 ### 13. Mana Validation During Execution: Not Tested
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:184`  
+**File:** `src/core/services/QueueBattleService.ts:184`  
 **Severity:** 🟠 **MEDIUM**
 
 **Issue:**
@@ -623,7 +623,7 @@ it('should reject execution if actions exceed mana budget', () => {
 ---
 
 ### 14. Djinn Activation Paths: Not Tested
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:303-380`  
+**File:** `src/core/services/QueueBattleService.ts:303-380`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -668,7 +668,7 @@ it('should apply correct damage for 3-Djinn summon', () => {
 ---
 
 ### 15. XP Overflow at Max Level: Not Tested
-**File:** `apps/vale-v2/src/core/algorithms/xp.ts:67-113`  
+**File:** `src/core/algorithms/xp.ts:67-113`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -694,7 +694,7 @@ it('should handle XP overflow at max level', () => {
 ---
 
 ### 16. Invalid Equipment Combos: Not Guarded or Tested
-**File:** `apps/vale-v2/src/core/models/Equipment.ts:33-86`  
+**File:** `src/core/models/Equipment.ts:33-86`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -721,7 +721,7 @@ it('should handle extreme stat bonuses', () => {
 ---
 
 ### 17. HP/PP Zero & Battle Termination: Indirect Coverage
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:269-296`  
+**File:** `src/core/services/QueueBattleService.ts:269-296`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -769,7 +769,7 @@ it('should refresh mana after round completes', () => {
 ## 🟢 PROPERTY-BASED TESTING OPPORTUNITIES
 
 ### 18. EncounterService: Property Test All Encounters
-**File:** `apps/vale-v2/src/core/services/EncounterService.ts:23-71`  
+**File:** `src/core/services/EncounterService.ts:23-71`  
 **Severity:** 🟢 **LOW**
 
 **Opportunity:**
@@ -791,7 +791,7 @@ it('should instantiate battle for every encounter definition', () => {
 ---
 
 ### 19. resolveValidTargets: Property Test
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:424-448`  
+**File:** `src/core/services/QueueBattleService.ts:424-448`  
 **Severity:** 🟢 **LOW**
 
 **Opportunity:**
@@ -831,7 +831,7 @@ it('should never return empty array if any opponent is alive', () => {
 ---
 
 ### 20. distributeRewards: XP Conservation Property
-**File:** `apps/vale-v2/src/core/algorithms/rewards.test.ts:178-208`  
+**File:** `src/core/algorithms/rewards.test.ts:178-208`  
 **Severity:** 🟢 **LOW**
 
 **Opportunity:**

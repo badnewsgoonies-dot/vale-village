@@ -144,7 +144,7 @@
 ### **Run All E2E Tests:**
 
 ```bash
-cd apps/vale-v2
+cd root
 pnpm test:e2e
 ```
 

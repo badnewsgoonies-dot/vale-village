@@ -12,7 +12,7 @@ Improve error handling throughout Vale Chronicles V2 to prevent crashes and prov
 ## Tasks
 
 ### Task 1: Add React Error Boundary
-**File:** `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx` (exists but needs enhancement)
+**File:** `src/ui/components/GameErrorBoundary.tsx` (exists but needs enhancement)
 
 **Requirements:**
 - Catch all React errors
@@ -22,7 +22,7 @@ Improve error handling throughout Vale Chronicles V2 to prevent crashes and prov
 - Wrap App component in ErrorBoundary
 
 ### Task 2: Convert queueAction to Result Type
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
+**File:** `src/ui/state/queueBattleSlice.ts`
 
 **Current:** Throws errors or uses console.error
 
@@ -38,7 +38,7 @@ type QueueActionResult = Result<void, QueueActionError>;
 - Invalid targets
 
 ### Task 3: Handle AI Decision Failures
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current:** AI failures can crash round execution
 
@@ -53,7 +53,7 @@ try {
 ```
 
 ### Task 4: Fix Action Queue Edge Cases
-**File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
+**File:** `src/ui/components/ActionQueuePanel.tsx`
 
 **Issues:**
 - `ABILITIES.find()` can return undefined (crashes)
@@ -73,10 +73,10 @@ try {
 - All tests pass
 
 ## Files to Review
-- `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx`
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
+- `src/ui/components/GameErrorBoundary.tsx`
+- `src/ui/state/queueBattleSlice.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/ui/components/ActionQueuePanel.tsx`
 
 ## Recommended Model
 **Claude 3.5 Sonnet** (200k context) - Sufficient for pattern-based improvements

@@ -1,10 +1,10 @@
 # Vale Chronicles V2 – AI workspace instructions
 
-These instructions apply to all AI agents working in this repo. Focus new work on the greenfield app in `apps/vale-v2` unless a task explicitly calls out legacy code in `src/`.
+These instructions apply to all AI agents working in this repo.
 
 ## Architecture & boundaries
-- Main app: React + TypeScript + Vite in `apps/vale-v2`; entrypoint `src/main.tsx`, root component `src/App.tsx`.
-- Core game logic lives in `apps/vale-v2/src/core/**` (algorithms, models, services, PRNG). It must stay **pure, deterministic, and React-free**.
+- Main app: React + TypeScript + Vite; entrypoint `src/main.tsx`, root component `src/App.tsx`.
+- Core game logic lives in `src/core/**` (algorithms, models, services, PRNG). It must stay **pure, deterministic, and React-free**.
 - UI and state live in `src/ui/**` (components, hooks, Zustand slices). Business rules belong in `core/services/**`, not in components or slices.
 - Data and schemas live in `src/data/definitions/**` and `src/data/schemas/**`. Zod schemas are the single source of truth for all game content.
 - Infrastructure (save system, persistence) is under `src/infra/**`; story/overworld content is under `src/story/**`.
@@ -21,14 +21,14 @@ These instructions apply to all AI agents working in this repo. Focus new work o
 - Recruitment and Djinn rewards are **data-driven**: encounters set an `encounterId`, rewards store it in `lastBattleEncounterId`, then dialogue/recruitment lookups use that ID. Keep this pipe intact when adding new encounters or story beats.
 
 ## Commands and workflows
-- From repo root (preferred): `pnpm dev`, `pnpm test`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm validate:data`, `pnpm precommit`. These all forward to `apps/vale-v2`.
-- From `apps/vale-v2`: use the same script names; unit tests use Vitest, E2E uses Playwright with tests under `tests/e2e/**`.
+- From repo root: `pnpm dev`, `pnpm test`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm validate:data`, `pnpm precommit`.
+- Unit tests use Vitest, E2E uses Playwright with tests under `tests/e2e/**`.
 - After editing anything in `src/data/definitions/**`, always run `pnpm validate:data` and fix schema or data issues rather than weakening validation.
 
 ## Testing philosophy
 - Prefer **context-aware scenario tests** that prove real gameplay (e.g. “Lv1 loses, Lv5 wins”, “no-Djinn vs 3-Djinn team”) over trivial unit tests. Mirror this style when adding tests.
-- New core logic should come with unit/service tests in `apps/vale-v2/tests/**` (mirroring the `src/**` structure) and, where relevant, shared factories in `src/test/**`.
-- When tests fail, **fix the game, not the tests**: E2E helpers are thin and should reflect real player flows (see `E2E_TEST_COVERAGE_SUMMARY.md` and `apps/vale-v2/tests/e2e/comprehensive-gameplay-menus.spec.ts`).
+- New core logic should come with unit/service tests in `tests/**` (mirroring the `src/**` structure) and, where relevant, shared factories in `src/test/**`.
+- When tests fail, **fix the game, not the tests**: E2E helpers are thin and should reflect real player flows (see `E2E_TEST_COVERAGE_SUMMARY.md` and `tests/e2e/comprehensive-gameplay-menus.spec.ts`).
 
 ## Dev mode, debugging, and test hooks
 - Dev-mode behavior and hotkeys are implemented via `ui/hooks/useDevMode.ts` and `DevModeOverlay`. Use them for test-only shortcuts; avoid wiring new permanent cheats into production flows.
@@ -36,6 +36,6 @@ These instructions apply to all AI agents working in this repo. Focus new work o
 - Before opening a PR, ensure core checks pass from the repo root: `pnpm precommit`, then run at least the critical E2E suites if you touched battles, rewards, recruitment, or menus.
 
 ## Key references
-- High-level architecture and rules: `apps/vale-v2/CLAUDE.md`, `VALE_CHRONICLES_ARCHITECTURE.md`, `VALE_CHRONICLES_KNOWLEDGE_BASE.md`.
-- E2E structure and scenarios: `E2E_TEST_COVERAGE_SUMMARY.md`, `apps/vale-v2/tests/e2e/**`.
-- Naming and data conventions: `docs/NAMING_CONVENTIONS.md`, `apps/vale-v2/src/data/schemas/**`.
+- High-level architecture and rules: `CLAUDE.md`, `VALE_CHRONICLES_ARCHITECTURE.md`, `VALE_CHRONICLES_KNOWLEDGE_BASE.md`.
+- E2E structure and scenarios: `E2E_TEST_COVERAGE_SUMMARY.md`, `tests/e2e/**`.
+- Naming and data conventions: `docs/NAMING_CONVENTIONS.md`, `src/data/schemas/**`.

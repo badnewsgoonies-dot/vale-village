@@ -23,10 +23,10 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 1.1: Remove Critical Hit System
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/damage.ts`
-- `apps/vale-v2/src/core/services/BattleService.ts`
-- `apps/vale-v2/src/core/constants.ts`
-- `apps/vale-v2/tests/core/algorithms/damage.test.ts`
+- `src/core/algorithms/damage.ts`
+- `src/core/services/BattleService.ts`
+- `src/core/constants.ts`
+- `tests/core/algorithms/damage.test.ts`
 
 **Actions:**
 
@@ -61,11 +61,11 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 1.2: Remove Evasion/Dodge System
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/damage.ts`
-- `apps/vale-v2/src/core/services/BattleService.ts`
-- `apps/vale-v2/src/core/constants.ts`
-- `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
-- `apps/vale-v2/src/core/models/Equipment.ts`
+- `src/core/algorithms/damage.ts`
+- `src/core/services/BattleService.ts`
+- `src/core/constants.ts`
+- `src/data/schemas/EquipmentSchema.ts`
+- `src/core/models/Equipment.ts`
 
 **Actions:**
 
@@ -108,8 +108,8 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 1.3: Remove Equipment Selling
 
 **Files to Modify:**
-- `apps/vale-v2/src/ui/components/ShopScreen.tsx`
-- `apps/vale-v2/src/ui/state/inventorySlice.ts`
+- `src/ui/components/ShopScreen.tsx`
+- `src/ui/state/inventorySlice.ts`
 
 **Actions:**
 
@@ -140,8 +140,8 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 1.4: Remove Random Damage Variance
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/damage.ts`
-- `apps/vale-v2/src/core/constants.ts`
+- `src/core/algorithms/damage.ts`
+- `src/core/constants.ts`
 
 **Actions:**
 
@@ -171,9 +171,9 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 2.1: Add Post-Battle Auto-Heal
 
 **Files to Modify:**
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
-- `apps/vale-v2/src/ui/state/battleSlice.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts` (optional helper)
+- `src/ui/state/queueBattleSlice.ts`
+- `src/ui/state/battleSlice.ts`
+- `src/core/services/QueueBattleService.ts` (optional helper)
 
 **Actions:**
 
@@ -227,8 +227,8 @@ The **VALE_CHRONICLES_INSTRUCTION_BOOKLET.md** defines the final game design. Th
 ### Task 3.1: Basic Attack Mana Generation
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/models/BattleState.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/models/BattleState.ts`
 
 **Actions:**
 
@@ -308,9 +308,9 @@ test('basic attack hit generates +1 mana for later units', () => {
 ### Task 4.1: Replace RNG Drops with Fixed Rewards
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/rewards.ts`
-- `apps/vale-v2/src/data/definitions/encounters.ts`
-- `apps/vale-v2/src/data/schemas/EncounterSchema.ts`
+- `src/core/algorithms/rewards.ts`
+- `src/data/definitions/encounters.ts`
+- `src/data/schemas/EncounterSchema.ts`
 
 **Actions:**
 
@@ -389,8 +389,8 @@ test('basic attack hit generates +1 mana for later units', () => {
 ### Task 5.1: Variable Recovery Based on Activation Count
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/models/BattleState.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/models/BattleState.ts`
 
 **Actions:**
 
@@ -470,9 +470,9 @@ test('Djinn recovery timing based on activation count', () => {
 ### Task 6.1: Add Unit Restrictions to Equipment
 
 **Files to Modify:**
-- `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
-- `apps/vale-v2/src/core/models/Equipment.ts`
-- `apps/vale-v2/src/data/definitions/equipment.ts`
+- `src/data/schemas/EquipmentSchema.ts`
+- `src/core/models/Equipment.ts`
+- `src/data/definitions/equipment.ts`
 
 **Actions:**
 
@@ -534,12 +534,12 @@ test('Djinn recovery timing based on activation count', () => {
 ### Task 6.2: Implement Starter Kit System
 
 **Files to Create:**
-- `apps/vale-v2/src/data/definitions/starterKits.ts`
-- `apps/vale-v2/src/ui/components/StarterKitPurchase.tsx`
+- `src/data/definitions/starterKits.ts`
+- `src/ui/components/StarterKitPurchase.tsx`
 
 **Files to Modify:**
-- `apps/vale-v2/src/ui/components/ShopScreen.tsx`
-- `apps/vale-v2/src/ui/state/inventorySlice.ts`
+- `src/ui/components/ShopScreen.tsx`
+- `src/ui/state/inventorySlice.ts`
 
 **Actions:**
 
@@ -614,11 +614,11 @@ test('Djinn recovery timing based on activation count', () => {
 ### Task 7.1: Implement Element Compatibility Logic
 
 **Files to Create:**
-- `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+- `src/core/algorithms/djinnAbilities.ts`
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/djinn.ts`
-- `apps/vale-v2/src/core/algorithms/stats.ts`
+- `src/core/algorithms/djinn.ts`
+- `src/core/algorithms/stats.ts`
 
 **Actions:**
 
@@ -689,8 +689,8 @@ test('Djinn recovery timing based on activation count', () => {
 ### Task 7.2: Create Djinn-Granted Abilities Data
 
 **Files to Create:**
-- `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
-- `apps/vale-v2/src/data/definitions/djinn.ts` (12 Djinn)
+- `src/data/definitions/djinnAbilities.ts`
+- `src/data/definitions/djinn.ts` (12 Djinn)
 
 **Actions:**
 
@@ -810,8 +810,8 @@ test('Djinn recovery timing based on activation count', () => {
 ### Task 8.1: Djinn Standby Removes Abilities
 
 **Files to Modify:**
-- `apps/vale-v2/src/core/algorithms/djinn.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
+- `src/core/algorithms/djinn.ts`
+- `src/core/services/QueueBattleService.ts`
 
 **Actions:**
 

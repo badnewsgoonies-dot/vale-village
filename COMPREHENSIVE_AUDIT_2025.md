@@ -111,13 +111,13 @@ With your architecture foundation, you can rapidly build a **demo-ready Chapter 
 ### Progress Update (Nov 14, 2025)
 
 - **Djinn ability audit complete** – `tests/core/data/djinnAbilityConsistency.test.ts` now verifies every Djinn-granted ability ID exists in `DJINN_ABILITIES`, the registry contains no duplicates, and each Djinn still supplies granted abilities for all six unit types. The registry now exposes the missing `FURY_MOLTEN_TORRENT`, the nine Forge abilities, the Fury unlock, and the corrected `corona-flare-revival` ID while relying on a single `djinnAbilities.ts` definition file (legacy `djinnAbilitiesNew.ts` and `djinnAbilities.old.ts` deleted).
-- **Liberation village encounters wired** – `apps/vale-v2/src/data/definitions/maps.ts` now populates `house-01` and `house-02` in `buildTriggers()` and the `encounterPool`, while `liberationDialogues` links those encounters to their narration nodes so the Liberation attack flow can progress from overworld → encounter → rewards.
+- **Liberation village encounters wired** – `src/data/definitions/maps.ts` now populates `house-01` and `house-02` in `buildTriggers()` and the `encounterPool`, while `liberationDialogues` links those encounters to their narration nodes so the Liberation attack flow can progress from overworld → encounter → rewards.
 
 #### Playtest Notes: Liberation Houses
 
 - Load the `vale-village` overworld (via the liberation campaign or the debug spawn) and head toward the numbered houses.
 - Stepping into the `house-01` or `house-02` trigger volume now immediately pushes the configured encounter; clearing the battle returns to the same map so you can retest without restarting the session.
-- Use these battles to confirm Djinn ability unlocks, reward flow, and encounter re-entry by referencing the same `house-01`/`house-02` IDs defined in `apps/vale-v2/src/data/definitions/encounters.ts` and `liberationDialogues.ts`.
+- Use these battles to confirm Djinn ability unlocks, reward flow, and encounter re-entry by referencing the same `house-01`/`house-02` IDs defined in `src/data/definitions/encounters.ts` and `liberationDialogues.ts`.
 
 ---
 

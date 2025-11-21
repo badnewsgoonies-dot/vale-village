@@ -23,7 +23,7 @@ Generated complete "Liberation of Vale Village" content package for Chapter 1:
 
 ### ✅ **Phase 1: Enemies + Encounters**
 
-**File:** `apps/vale-v2/src/data/definitions/enemies.ts` (1,200+ lines)
+**File:** `src/data/definitions/enemies.ts` (1,200+ lines)
 
 #### **50 Enemies Generated:**
 
@@ -81,7 +81,7 @@ Generated complete "Liberation of Vale Village" content package for Chapter 1:
 
 ### ✅ **20 House Encounters**
 
-**File:** `apps/vale-v2/src/data/definitions/encounters.ts`
+**File:** `src/data/definitions/encounters.ts`
 
 #### **Act 1: Discovery (Houses 1-7)**
 
@@ -148,7 +148,7 @@ Generated complete "Liberation of Vale Village" content package for Chapter 1:
 
 ### ✅ **Phase 2: Liberation Dialogues**
 
-**File:** `apps/vale-v2/src/data/definitions/liberationDialogues.ts` (1,062 lines)
+**File:** `src/data/definitions/liberationDialogues.ts` (1,062 lines)
 
 #### **20 Full Dialogue Trees:**
 
@@ -311,7 +311,7 @@ Each house includes:
 
 ### **Schema Updates**
 
-**File:** `apps/vale-v2/src/data/schemas/EncounterSchema.ts`
+**File:** `src/data/schemas/EncounterSchema.ts`
 
 **Added:**
 ```typescript
@@ -332,12 +332,12 @@ export const EncounterRewardsSchema = z.object({
 ### **File Structure**
 
 ```
-apps/vale-v2/src/data/definitions/
+src/data/definitions/
 ├── enemies.ts (UPDATED: 9 → 50 enemies, all elemental)
 ├── encounters.ts (UPDATED: 6 → 21 encounters)
 └── liberationDialogues.ts (NEW: 20 dialogue trees)
 
-apps/vale-v2/src/data/schemas/
+src/data/schemas/
 └── EncounterSchema.ts (UPDATED: Added djinn field)
 ```
 

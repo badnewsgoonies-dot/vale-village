@@ -12,12 +12,12 @@
 
 ### 2. Generated Sprite Manifest ✅
 - **Generated:** 1,627 sprite entries
-- **Output:** `/workspace/apps/vale-v2/src/ui/sprites/sprite-list-generated.ts`
+- **Output:** `/workspace/src/ui/sprites/sprite-list-generated.ts`
 - **File size:** 242 KB
 - **Lines:** 9,777 lines of TypeScript
 
 ### 3. Created Sprite Catalog API ✅
-- **File:** `/workspace/apps/vale-v2/src/ui/sprites/catalog.ts`
+- **File:** `/workspace/src/ui/sprites/catalog.ts`
 - **Features:**
   - `getSpriteByPath(path)` - Get sprite by exact path
   - `getSpritesByCategory(category)` - Get all sprites in category
@@ -63,7 +63,7 @@ Top Categories:
 
 ### Regenerate Manifest (if sprites change)
 ```bash
-cd /workspace/apps/vale-v2
+cd /workspace/root
 npm run generate:sprites
 ```
 
@@ -104,11 +104,11 @@ The sprite manifest is complete and validated. Now we can:
 
 ## Files Created
 
-- ✅ `/workspace/apps/vale-v2/scripts/generate-sprite-manifest.cjs`
-- ✅ `/workspace/apps/vale-v2/scripts/validate-sprites.cjs`
-- ✅ `/workspace/apps/vale-v2/scripts/test-sprite-catalog.cjs`
-- ✅ `/workspace/apps/vale-v2/src/ui/sprites/sprite-list-generated.ts`
-- ✅ `/workspace/apps/vale-v2/src/ui/sprites/catalog.ts`
+- ✅ `/workspace/scripts/generate-sprite-manifest.cjs`
+- ✅ `/workspace/scripts/validate-sprites.cjs`
+- ✅ `/workspace/scripts/test-sprite-catalog.cjs`
+- ✅ `/workspace/src/ui/sprites/sprite-list-generated.ts`
+- ✅ `/workspace/src/ui/sprites/catalog.ts`
 
 ## Verification
 

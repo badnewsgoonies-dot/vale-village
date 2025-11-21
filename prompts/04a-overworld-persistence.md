@@ -18,7 +18,7 @@ System 4 (Overworld Integration) is 90% complete. Battle transitions work, but o
 
 ## Tasks
 ### Task 1: Add Overworld State to Save Schema
-- **File:** `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
+- **File:** `src/data/schemas/SaveV1Schema.ts`
 - **Add fields:**
 ```ts
 overworld: {
@@ -31,14 +31,14 @@ overworld: {
 ```
 
 ### Task 2: Save Overworld State
-- **File:** `apps/vale-v2/src/core/services/SaveService.ts` or `saveSlice.ts`
+- **File:** `src/core/services/SaveService.ts` or `saveSlice.ts`
 - **Implementation:**
   - When saving, include overworld state from `overworldSlice`
   - Save current map, position, facing, step count
   - Optionally save visited maps
 
 ### Task 3: Restore Overworld State on Load
-- **File:** `apps/vale-v2/src/ui/state/saveSlice.ts`
+- **File:** `src/ui/state/saveSlice.ts`
 - **Implementation:**
   - On load, restore overworld state
   - Set current map, position, facing
@@ -46,7 +46,7 @@ overworld: {
   - This is the TODO at line 130, 210
 
 ### Task 4: Implement Defeat Handling
-- **File:** `apps/vale-v2/src/ui/state/gameFlowSlice.ts` or `App.tsx`
+- **File:** `src/ui/state/gameFlowSlice.ts` or `App.tsx`
 - **Requirements:**
   - When battle ends in defeat, don't return to overworld position
   - Instead, return to last save point or inn
@@ -76,11 +76,11 @@ const handleBattleDefeat = () => {
 - ✅ Save/load cycle works correctly
 
 ## Files to Modify
-- `apps/vale-v2/src/data/schemas/SaveV1Schema.ts` - Add overworld fields
-- `apps/vale-v2/src/core/services/SaveService.ts` - Save overworld state
-- `apps/vale-v2/src/ui/state/saveSlice.ts` - Restore overworld state (lines 130, 210)
-- `apps/vale-v2/src/ui/state/gameFlowSlice.ts` - Add defeat handling
-- `apps/vale-v2/src/App.tsx` - Handle defeat case
+- `src/data/schemas/SaveV1Schema.ts` - Add overworld fields
+- `src/core/services/SaveService.ts` - Save overworld state
+- `src/ui/state/saveSlice.ts` - Restore overworld state (lines 130, 210)
+- `src/ui/state/gameFlowSlice.ts` - Add defeat handling
+- `src/App.tsx` - Handle defeat case
 
 ## Testing
 # Test save/load with overworld state
@@ -90,7 +90,7 @@ pnpm test tests/core/save/
 pnpm dev  # Manual test: save, load, verify position
 
 ## Reference
-- Current save schema: `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
-- Overworld slice: `apps/vale-v2/src/ui/state/overworldSlice.ts`
-- Game flow slice: `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- Starting map: `apps/vale-v2/src/data/definitions/maps.ts` (vale-village spawnPoint)
+- Current save schema: `src/data/schemas/SaveV1Schema.ts`
+- Overworld slice: `src/ui/state/overworldSlice.ts`
+- Game flow slice: `src/ui/state/gameFlowSlice.ts`
+- Starting map: `src/data/definitions/maps.ts` (vale-village spawnPoint)

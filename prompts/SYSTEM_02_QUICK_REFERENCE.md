@@ -301,7 +301,7 @@ state.queue.queuedActions
 
 **To Audit:**
 ```bash
-grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' apps/vale-v2/src/core/ \
+grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' src/core/ \
   --include='*.ts' | grep -v '\.test\.ts'
 ```
 
@@ -368,19 +368,19 @@ abilityId: AbilityIdOrNull
 
 ```bash
 # Find all uses of abilityId
-grep -rn 'abilityId' apps/vale-v2/src --include='*.ts'
+grep -rn 'abilityId' src --include='*.ts'
 
 # Find magic numbers in core
-grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' apps/vale-v2/src/core/ --include='*.ts'
+grep -rn '\b[0-9]\+\(\.[0-9]\+\)\?\b' src/core/ --include='*.ts'
 
 # Find BattleState imports
-grep -rn 'import.*BattleState' apps/vale-v2/src --include='*.ts'
+grep -rn 'import.*BattleState' src --include='*.ts'
 
 # Find executeRound calls
-grep -rn 'executeRound' apps/vale-v2 --include='*.ts'
+grep -rn 'executeRound' root --include='*.ts'
 
 # Find test files for a module
-find apps/vale-v2/tests -name '*queue-battle*'
+find tests -name '*queue-battle*'
 ```
 
 ---
@@ -390,7 +390,7 @@ find apps/vale-v2/tests -name '*queue-battle*'
 - 📄 Full Plan: `prompts/SYSTEM_02_REFACTORING_PLAN.md`
 - 📄 Requirements: `prompts/02-code-quality-refactoring.md`
 - 📄 Architecture: `VALE_CHRONICLES_ARCHITECTURE.md`
-- 📄 Dev Guide: `apps/vale-v2/CLAUDE.md`
+- 📄 Dev Guide: `CLAUDE.md`
 - 📄 ADRs: `docs/adr/`
 
 ---
