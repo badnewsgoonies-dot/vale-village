@@ -26,17 +26,17 @@ jobs:
         run: pnpm install --frozen-lockfile
       
       - name: Type check
-        run: pnpm --filter vale-v2 typecheck
+        run: pnpm typecheck
       
       - name: Lint
-        run: pnpm --filter vale-v2 lint
+        run: pnpm lint
       
       - name: Validate data
-        run: pnpm --filter vale-v2 validate:data
+        run: pnpm validate:data
       
       - name: Test
-        run: pnpm --filter vale-v2 test
+        run: pnpm test
       
       - name: Build
-        run: pnpm --filter vale-v2 build
+        run: pnpm build
 

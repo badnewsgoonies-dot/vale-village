@@ -8,10 +8,10 @@
  * 
  * Usage:
  *   # Dry run (no writes)
- *   npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2 --dry
+ *   npx tsx scripts/convert_ability_ids_to_kebab.ts --dry
  * 
  *   # Apply changes
- *   npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2
+ *   npx tsx scripts/convert_ability_ids_to_kebab.ts
  * 
  * IMPORTANT:
  * - Review git diffs and run tests after applying
@@ -26,7 +26,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const argv = await yargs(hideBin(process.argv))
-  .option('root', { type: 'string', default: 'apps/vale-v2' })
+  .option('root', { type: 'string', default: '.' })
   .option('dry', { type: 'boolean', default: true })
   .option('skip-backup', { type: 'boolean', default: false })
   .parseAsync();
