@@ -743,85 +743,31 @@ const useKeyboardNavigation = (targetSelection: TargetSelectionState) => {
 
 ---
 
-## Accessibility Features
-
-### Screen Reader Support
-
-```typescript
-<div 
-  className="unit-card"
-  role="button"
-  tabIndex={isValidTarget ? 0 : -1}
-  aria-label={`${unit.name}, ${unit.currentHp} of ${unit.maxHp} HP, ${isValidTarget ? 'valid target' : 'not targetable'}`}
-  aria-pressed={isSelected}
-  aria-disabled={!isValidTarget}
-  onClick={handleTargetClick}
->
-  {/* Card content */}
-</div>
-```
-
----
-
-### Visual Focus Indicators
-
-**High Contrast Mode:**
-```css
-@media (prefers-contrast: high) {
-  .unit-card.valid-target {
-    border: 4px solid #FFFF00;
-    box-shadow: 0 0 0 4px #000000;
-  }
-  
-  .unit-card.selected-target {
-    border: 4px solid #00FF00;
-    box-shadow: 0 0 0 4px #000000;
-  }
-}
-```
-
----
-
-### Reduced Motion
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .unit-card.valid-target {
-    animation: none;
-  }
-  
-  .hp-bar-fill {
-    transition: none;
-  }
-}
-```
-
----
-
 ## Summary
 
 ### Targeting System
-✅ **Click anywhere on card** to target  
-✅ **Clear visual states** (valid, selected, confirmed)  
-✅ **Auto-selection for all-targets** abilities  
-✅ **Smart filtering** (only show valid targets)  
-✅ **Damage preview** on hover  
-✅ **Confirmation before queueing**  
+✅ **Click anywhere on card** to target (sprite, name, HP bar, everything)  
+✅ **Clear visual states** (valid targets glow yellow, selected = green + checkmark)  
+✅ **Auto-selection for all-targets** abilities (Thunder Storm → all enemies selected instantly)  
+✅ **Smart filtering** (Heal only shows damaged allies, Revive only shows KO'd)  
+✅ **Damage preview** on hover (estimated damage, kill probability)  
+✅ **Confirmation before queueing** (with [CONFIRM] [CANCEL] buttons)  
 
 ### Keyboard Navigation
-✅ **Full battle control** via keyboard  
+✅ **Full battle control** via keyboard (never need mouse)  
 ✅ **Tab through units** in portrait panel  
 ✅ **Arrow keys** for ability/target navigation  
-✅ **Number keys** for quick target selection  
+✅ **Number keys** for quick target selection (1-9)  
 ✅ **Enter to confirm**, **Esc to cancel**  
-✅ **Visual keyboard focus** indicators  
-
-### Accessibility
-✅ **Screen reader support** (ARIA labels)  
-✅ **High contrast mode** support  
-✅ **Reduced motion** support  
-✅ **Keyboard-only operation** fully functional  
+✅ **Visual keyboard focus** indicators (yellow borders)  
 
 ---
 
-Ready to implement the targeting and keyboard navigation system?
+Ready to start implementing? We have complete designs for:
+- ✅ Fixed battlefield with overlay abilities panel
+- ✅ Two-column abilities (list + details on hover)
+- ✅ Djinn cascading menu (top-right, 3 columns)
+- ✅ Unit portraits (left panel, expand on hover)
+- ✅ Targeting system (click anywhere, keyboard nav)
+
+Should I begin implementation?
