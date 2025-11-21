@@ -18,6 +18,7 @@ import {
   navigateToPosition,
   completeBattle,
   getUnitData,
+  completeFlintIntro,
 } from './helpers';
 
 test.describe('Djinn Ability Updates', () => {
@@ -42,6 +43,8 @@ test.describe('Djinn Ability Updates', () => {
       },
       { timeout: 15000 }
     );
+
+      await completeFlintIntro(page);
   });
 
   test('Set Djinn grant abilities to units', async ({ page }) => {

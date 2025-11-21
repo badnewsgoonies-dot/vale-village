@@ -1,106 +1,100 @@
 /**
- * VS1 Recruitment Flow Tests
- * Tests the complete flow: battle → victory → recruitment → roster update
+ * VS1 Recruitment Flow Tests (dialogue-driven)
+ *
+ * These tests validate that the VS1 demo path uses the narrative system to
+ * recruit Garet (war-mage) and grant the Forge Djinn via the VS1 post-scene
+ * dialogue, rather than relying on RewardsService.processVictory to return
+ * recruitment payloads.
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createStore } from '@/ui/state/store';
-import { VS1_ENCOUNTER_ID } from '@/story/vs1Constants';
+import { VS1_ENCOUNTER_ID, VS1_SCENE_POST } from '@/story/vs1Constants';
+import { DIALOGUES } from '@/data/definitions/dialogues';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
+import type { BattleState } from '@/core/models/BattleState';
 import { makePRNG } from '@/core/random/prng';
-import { UNIT_DEFINITIONS } from '@/data/definitions/units';
-import { createUnit } from '@/core/models/Unit';
-import { createTeam } from '@/core/models/Team';
-import { collectDjinn, equipDjinn } from '@/core/services/DjinnService';
-import { processVictory } from '@/core/services/RewardsService';
+import { createVs1IsaacTeam } from '@/utils/teamSetup';
 
-describe('VS1 Recruitment Flow', () => {
+describe('VS1 Recruitment Flow (dialogue-driven)', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
     store = createStore();
 
-    // Initialize team: Isaac (adept) at level 1 with Flint equipped (mirrors App.tsx)
-    const adeptDef = UNIT_DEFINITIONS['adept'];
-    if (!adeptDef) {
-      throw new Error('Adept unit definition not found');
-    }
-
-    const isaac = createUnit(adeptDef, 1, 0);
-    let team = createTeam([isaac]);
-
-    const flintCollectResult = collectDjinn(team, 'flint');
-    if (!flintCollectResult.ok) {
-      throw new Error(`Failed to collect Flint: ${flintCollectResult.error}`);
-    }
-
-    const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
-    if (!flintEquipResult.ok) {
-      throw new Error(`Failed to equip Flint: ${flintEquipResult.error}`);
-    }
-
-    team = flintEquipResult.value;
+    const { isaac, team } = createVs1IsaacTeam();
     store.getState().setTeam(team);
     store.getState().setRoster([isaac]);
   });
 
-  it('recruits Garet after VS1 victory', () => {
+  function createDefeatedVs1Battle(seed: number): BattleState {
     const team = store.getState().team;
     expect(team).toBeTruthy();
-    if (!team) return;
+    if (!team) throw new Error('Team not initialized');
 
-    const rng = makePRNG(42);
+    const rng = makePRNG(seed);
     const battleResult = createBattleFromEncounter(VS1_ENCOUNTER_ID, team, rng);
 
     expect(battleResult).toBeTruthy();
-    if (!battleResult) return;
+    if (!battleResult) throw new Error('Failed to create VS1 battle');
 
     const { battle } = battleResult;
-    const defeatedBattle = {
+    return {
       ...battle,
-      enemies: battle.enemies.map(enemy => ({ ...enemy, currentHp: 0 })),
-      phase: 'victory' as const,
-    };
+      enemies: battle.enemies.map((enemy) => ({ ...enemy, currentHp: 0 })),
+      phase: 'victory',
+    } as BattleState;
+  }
 
-    const result = processVictory(defeatedBattle);
+  function playDialogue(treeId: string, maxSteps = 10) {
+    const tree = DIALOGUES[treeId];
+    if (!tree) throw new Error(`Dialogue ${treeId} not found`);
 
-    expect(result.recruitedUnit).toBeTruthy();
-    expect(result.recruitedUnit?.id).toBe('war-mage');
-    expect(result.recruitedUnit?.level).toBe(2);
+    store.getState().startDialogueTree(tree);
 
+    for (let step = 0; step < maxSteps; step += 1) {
+      const state = store.getState();
+      if (!state.currentDialogueTree || !state.currentDialogueState) {
+        break;
+      }
+      state.advanceCurrentDialogue();
+    }
+  }
+
+  it('recruits Garet and grants Forge after VS1 victory via post-scene dialogue', () => {
+    const defeatedBattle = createDefeatedVs1Battle(42);
+
+    // Process victory through the rewards slice to populate lastBattleRewards
+    // and lastBattleEncounterId, mirroring the in-game flow.
     store.getState().processVictory(defeatedBattle);
-    const roster = store.getState().roster;
 
-    expect(roster.length).toBe(2);
-    expect(roster.some(unit => unit.id === 'adept')).toBe(true);
-    expect(roster.some(unit => unit.id === 'war-mage')).toBe(true);
-  });
+    // Rewards should now be present and tied to the VS1 encounter.
+    const afterVictory = store.getState();
+    expect(afterVictory.lastBattleRewards).toBeTruthy();
+    expect(afterVictory.lastBattleEncounterId).toBe(VS1_ENCOUNTER_ID);
 
-  it('grants Forge Djinn after VS1 victory', () => {
-    const team = store.getState().team;
-    expect(team).toBeTruthy();
-    if (!team) return;
+    const rosterBefore = afterVictory.roster.map((u) => u.id);
+    expect(rosterBefore).toEqual(['adept']);
 
-    const rng = makePRNG(99);
-    const battleResult = createBattleFromEncounter(VS1_ENCOUNTER_ID, team, rng);
+    // Simulate clicking Continue on the rewards screen: claim loot and
+    // transition into the VS1 post-scene dialogue. In the real app this is
+    // wired via App.handleRewardsContinue; here we mirror that logic.
+    store.getState().claimRewards();
+    playDialogue(VS1_SCENE_POST);
 
-    expect(battleResult).toBeTruthy();
-    if (!battleResult) return;
+    const finalState = store.getState();
+    const finalRosterIds = finalState.roster.map((u) => u.id);
+    const finalTeam = finalState.team;
 
-    const { battle } = battleResult;
-    const defeatedBattle = {
-      ...battle,
-      enemies: battle.enemies.map(enemy => ({ ...enemy, currentHp: 0 })),
-      phase: 'victory' as const,
-    };
+    // Garet (war-mage) should have joined the roster alongside Isaac.
+    expect(finalRosterIds).toContain('adept');
+    expect(finalRosterIds).toContain('war-mage');
 
-    store.getState().processVictory(defeatedBattle);
-    const updatedTeam = store.getState().team;
-
-    expect(updatedTeam).toBeTruthy();
-    if (!updatedTeam) return;
-
-    expect(updatedTeam.collectedDjinn.includes('forge')).toBe(true);
+    // Forge Djinn should be granted to the team via dialogue effect.
+    expect(finalTeam).toBeTruthy();
+    if (!finalTeam) return;
+    expect(finalTeam.collectedDjinn.includes('forge')).toBe(true);
   });
 });
+
 

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getGameState, waitForMode, completeBattle } from './helpers';
+import { getGameState, waitForMode, completeBattle, completeFlintIntro } from './helpers';
 
 /**
  * Rewards Integration Test
@@ -22,6 +22,8 @@ test.describe('Rewards System Integration', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    await completeFlintIntro(page);
+
     // ============================================================================
     // INITIAL STATE
     // ============================================================================
@@ -42,7 +44,7 @@ test.describe('Rewards System Integration', () => {
     expect(isaacInitial.level).toBe(1);
     expect(isaacInitial.xp).toBe(0);
     
-    // Verify Flint Djinn starts equipped (game initialization)
+    // Verify Flint Djinn is now available after the tutorial intro
     const initialDjinn = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
       return store.getState().team?.collectedDjinn ?? [];

@@ -20,15 +20,13 @@ import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 import { getRecruitmentDialogue, hasRecruitmentDialogue } from './data/definitions/recruitmentData';
-import { UNIT_DEFINITIONS } from './data/definitions/units';
+import { createBaseIsaacTeam, createVs1IsaacTeam } from './utils/teamSetup';
 import { DJINN } from './data/definitions/djinn';
 import { EQUIPMENT } from './data/definitions/equipment';
-import { createUnit } from './core/models/Unit';
-import { createTeam } from './core/models/Team';
-import { collectDjinn, equipDjinn } from './core/services/DjinnService';
 import { calculateEffectiveStats } from './core/algorithms/stats';
 import { getXpProgress } from './core/algorithms/xp';
 import { getDjinnGrantedAbilitiesForUnit, calculateDjinnBonusesForUnit } from './core/algorithms/djinnAbilities';
+import { collectDjinn, equipDjinn } from './core/services/DjinnService';
 import { queueDjinn, queueAction, executeRound, queueBattleServiceInternals } from './core/services/QueueBattleService';
 import { makePRNG } from './core/random/prng';
 import { updateBattleState } from './core/models/BattleState';
@@ -46,10 +44,12 @@ function App() {
   };
   // Expose equipment definitions for E2E tests
   (window as any).__VALE_EQUIPMENT__ = EQUIPMENT;
-  // Expose Djinn ability functions for E2E tests
+  // Expose Djinn ability + service helpers for E2E tests
   (window as any).__VALE_DJINN_HELPERS__ = {
     getDjinnGrantedAbilitiesForUnit,
     calculateDjinnBonusesForUnit,
+    collectDjinn,
+    equipDjinn,
   };
   // Expose battle service functions for E2E tests
   (window as any).__VALE_BATTLE_HELPERS__ = {
@@ -96,42 +96,10 @@ function App() {
 
   // Initialize team on app startup (needed for battle triggers)
   useEffect(() => {
-    // Only initialize if team doesn't exist
     if (!team) {
-      // Create Isaac (Adept) at level 1
-      const adeptDef = UNIT_DEFINITIONS['adept'];
-      if (!adeptDef) {
-        console.error('Adept unit definition not found');
-        return;
-      }
-      const isaac = createUnit(adeptDef, 1, 0);
-      
-      // Create initial team with just Isaac
-      const initialTeam = createTeam([isaac]);
-      
-      // Collect Flint Djinn (Venus T1)
-      const flintCollectResult = collectDjinn(initialTeam, 'flint');
-      if (!flintCollectResult.ok) {
-        // Fallback if Djinn collection fails
-        console.error('Failed to collect Flint Djinn:', flintCollectResult.error);
-        setTeam(initialTeam);
-        setRoster([isaac]);
-        return;
-      }
-      
-      // Equip Flint to first slot (slot 0)
-      const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
-      if (!flintEquipResult.ok) {
-        // Fallback if equipping fails (shouldn't happen, but handle gracefully)
-        console.error('Failed to equip Flint Djinn:', flintEquipResult.error);
-        setTeam(flintCollectResult.value); // Still use team with collected Djinn
-        setRoster([isaac]);
-        return;
-      }
-      
-      // Success: Set team with Isaac + equipped Flint Djinn
-      setTeam(flintEquipResult.value);
-      setRoster([isaac]); // Roster starts with just Isaac
+      const { isaac, team: baseTeam } = createBaseIsaacTeam();
+      setTeam(baseTeam);
+      setRoster([isaac]);
     }
   }, [team, setTeam, setRoster]);
 
@@ -144,6 +112,10 @@ function App() {
 
   // Start VS1 demo flow
   const startVS1Game = () => {
+    const { isaac, team: vs1Team } = createVs1IsaacTeam();
+    setTeam(vs1Team);
+    setRoster([isaac]);
+
     const preScene = DIALOGUES[VS1_SCENE_PRE];
     if (preScene) {
       startDialogueTree(preScene);

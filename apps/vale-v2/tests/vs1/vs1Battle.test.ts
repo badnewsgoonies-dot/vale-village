@@ -11,38 +11,16 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createStore } from '@/ui/state/store';
 import { VS1_ENCOUNTER_ID } from '@/story/vs1Constants';
 import type { BattleState } from '@/core/models/BattleState';
-import { calculateMaxHp, createUnit } from '@/core/models/Unit';
-import { UNIT_DEFINITIONS } from '@/data/definitions/units';
-import { createTeam } from '@/core/models/Team';
-import { collectDjinn, equipDjinn } from '@/core/services/DjinnService';
+import { calculateMaxHp } from '@/core/models/Unit';
+import { createVs1IsaacTeam } from '@/utils/teamSetup';
 
 describe('VS1 vs1-garet encounter (feel & balance)', () => {
   let store: ReturnType<typeof createStore>;
 
   beforeEach(() => {
     store = createStore();
-
-    // Initialize team exactly like App.tsx: Isaac (adept) + Flint Djinn equipped
-    const adeptDef = UNIT_DEFINITIONS['adept'];
-    if (!adeptDef) {
-      throw new Error('Adept unit definition not found');
-    }
-
-    const isaac = createUnit(adeptDef, 1, 0);
-    let team = createTeam([isaac]);
-
-    const flintCollectResult = collectDjinn(team, 'flint');
-    if (!flintCollectResult.ok) {
-      throw new Error(`Failed to collect Flint: ${flintCollectResult.error}`);
-    }
-
-    const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
-    if (!flintEquipResult.ok) {
-      throw new Error(`Failed to equip Flint: ${flintEquipResult.error}`);
-    }
-
-    team = flintEquipResult.value;
-    store.getState().setTeam(team);
+    const { isaac, team: vs1Team } = createVs1IsaacTeam();
+    store.getState().setTeam(vs1Team);
     store.getState().setRoster([isaac]);
   });
 

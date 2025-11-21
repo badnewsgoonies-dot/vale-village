@@ -1,12 +1,14 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@playwright/test';
 import {
-  getGameState,
   waitForMode,
   getDjinnState,
   getDjinnRecoveryTimer,
   activateDjinnInBattle,
   completeBattle,
+  completeFlintIntro,
+  enterHouseBattle,
+  stabilizeBattleDurability,
 } from './helpers';
 
 /**
@@ -23,19 +25,41 @@ import {
  * Note: Uses actual battle mechanics, not simulated
  */
 
-function waitForBattlePlanningPhase(page: Page, timeout: number = 10000) {
-  return page.waitForFunction(
-    () => {
+async function waitForBattlePlanningPhase(page: Page, timeout: number = 30000) {
+  const deadline = Date.now() + timeout;
+  let lastSnapshot: { phase: string; executionIndex: number; queuedDjinnLength: number } | null = null;
+
+  while (Date.now() < deadline) {
+    const snapshot = await page.evaluate(() => {
       const store = (window as any).__VALE_STORE__;
-      const battle = store?.getState().battle;
-      if (!battle) return true;
-      // Wait for planning phase and ensure queuedDjinn is cleared
-      // Also check that round execution completed (not stuck in executing phase)
-      return battle.phase === 'planning' && 
-             (battle.queuedDjinn?.length ?? 0) === 0 &&
-             battle.executionIndex === 0;
-    },
-    { timeout }
+      const battle = store?.getState()?.battle;
+      if (!battle) return null;
+      return {
+        phase: battle.phase,
+        executionIndex: battle.executionIndex,
+        queuedDjinnLength: battle.queuedDjinn?.length ?? 0,
+      };
+    });
+
+    lastSnapshot = snapshot;
+
+    if (!snapshot) {
+      return;
+    }
+
+    if (
+      snapshot.phase === 'planning' &&
+      snapshot.executionIndex === 0 &&
+      snapshot.queuedDjinnLength === 0
+    ) {
+      return;
+    }
+
+    await page.waitForTimeout(250);
+  }
+
+  throw new Error(
+    `Timed out waiting for battle planning phase (last snapshot: ${JSON.stringify(lastSnapshot)})`
   );
 }
 
@@ -43,6 +67,7 @@ test.describe('Djinn State Transitions', () => {
   test('djinn activation transitions Set to Standby', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
 
     // Verify initial state - flint should be Set
     let djinnState = await getDjinnState(page, 'flint');
@@ -52,15 +77,11 @@ test.describe('Djinn State Transitions', () => {
     console.log('→ Initial Djinn state: Set');
 
     // Navigate to battle
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    await waitForMode(page, 'team-select', 5000);
+    await enterHouseBattle(page);
     const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
     await confirmButton.click();
     await waitForMode(page, 'battle', 10000);
+      await stabilizeBattleDurability(page);
 
     // Verify we're in battle planning phase
     const battleState = await page.evaluate(() => {
@@ -111,17 +132,14 @@ test.describe('Djinn State Transitions', () => {
   test('djinn recovery timer countdown', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
 
     // Navigate to battle
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    await waitForMode(page, 'team-select', 5000);
+    await enterHouseBattle(page);
     const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
     await confirmButton.click();
     await waitForMode(page, 'battle', 10000);
+      await stabilizeBattleDurability(page);
 
     // Activate flint (1 Djinn = 2 rounds recovery)
     await activateDjinnInBattle(page, 'flint');
@@ -142,7 +160,8 @@ test.describe('Djinn State Transitions', () => {
       store.getState().executeQueuedRound();
     });
 
-    await waitForBattlePlanningPhase(page);
+      await stabilizeBattleDurability(page);
+      await waitForBattlePlanningPhase(page);
 
     // Check recovery timer (should be 2 for 1 Djinn activated)
     let recoveryTimer = await getDjinnRecoveryTimer(page, 'flint');
@@ -166,7 +185,8 @@ test.describe('Djinn State Transitions', () => {
       store.getState().executeQueuedRound();
     });
 
-    await waitForBattlePlanningPhase(page);
+      await stabilizeBattleDurability(page);
+      await waitForBattlePlanningPhase(page);
 
     // Timer should decrement
     recoveryTimer = await getDjinnRecoveryTimer(page, 'flint');
@@ -190,7 +210,8 @@ test.describe('Djinn State Transitions', () => {
       store.getState().executeQueuedRound();
     });
 
-    await waitForBattlePlanningPhase(page);
+      await stabilizeBattleDurability(page);
+      await waitForBattlePlanningPhase(page);
 
     // Djinn should recover (timer cleared, state back to Set)
     recoveryTimer = await getDjinnRecoveryTimer(page, 'flint');
@@ -206,6 +227,7 @@ test.describe('Djinn State Transitions', () => {
   test('multiple djinn activated simultaneously', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
 
     // Grant additional Djinn for testing
     await page.evaluate(() => {
@@ -234,15 +256,11 @@ test.describe('Djinn State Transitions', () => {
     });
 
     // Navigate to battle
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    await waitForMode(page, 'team-select', 5000);
+    await enterHouseBattle(page);
     const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
     await confirmButton.click();
     await waitForMode(page, 'battle', 10000);
+      await stabilizeBattleDurability(page);
 
     // Activate all 3 Djinn
     await activateDjinnInBattle(page, 'flint');
@@ -294,17 +312,14 @@ test.describe('Djinn State Transitions', () => {
   test('djinn state persists through save/load', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
 
     // Navigate to battle
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    await waitForMode(page, 'team-select', 5000);
+    await enterHouseBattle(page);
     const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
     await confirmButton.click();
     await waitForMode(page, 'battle', 10000);
+    await stabilizeBattleDurability(page);
 
     // Activate flint
     await activateDjinnInBattle(page, 'flint');

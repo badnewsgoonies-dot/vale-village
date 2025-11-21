@@ -5,10 +5,7 @@ import { VS1_ENCOUNTER_ID, VS1_SCENE_PRE, VS1_SCENE_POST } from '@/story/vs1Cons
 import { DIALOGUES } from '@/data/definitions/dialogues';
 import { executeRound } from '@/core/services/QueueBattleService';
 import type { BattleState } from '@/core/models/BattleState';
-import { UNIT_DEFINITIONS } from '@/data/definitions/units';
-import { createUnit } from '@/core/models/Unit';
-import { createTeam } from '@/core/models/Team';
-import { collectDjinn, equipDjinn } from '@/core/services/DjinnService';
+import { createVs1IsaacTeam } from '@/utils/teamSetup';
 
 vi.mock('@/core/services/QueueBattleService', async () => {
   const actual = await vi.importActual<typeof import('@/core/services/QueueBattleService')>(
@@ -31,25 +28,7 @@ describe('VS1 demo flow (store-only)', () => {
     store = createStore();
 
     // Initialize team exactly like App.tsx (Isaac + Flint)
-    const adeptDef = UNIT_DEFINITIONS['adept'];
-    if (!adeptDef) {
-      throw new Error('Adept unit definition not found');
-    }
-
-    const isaac = createUnit(adeptDef, 1, 0);
-    let team = createTeam([isaac]);
-
-    const flintCollectResult = collectDjinn(team, 'flint');
-    if (!flintCollectResult.ok) {
-      throw new Error(`Failed to collect Flint: ${flintCollectResult.error}`);
-    }
-
-    const flintEquipResult = equipDjinn(flintCollectResult.value, 'flint', 0);
-    if (!flintEquipResult.ok) {
-      throw new Error(`Failed to equip Flint: ${flintEquipResult.error}`);
-    }
-
-    team = flintEquipResult.value;
+    const { isaac, team } = createVs1IsaacTeam();
     store.getState().setTeam(team);
     store.getState().setRoster([isaac]);
   });
@@ -71,7 +50,7 @@ describe('VS1 demo flow (store-only)', () => {
     const selectedTeam = store.getState().team;
     expect(selectedTeam).toBeTruthy();
     if (!selectedTeam) return;
-    store.getState().confirmBattleTeam(selectedTeam);
+    store.getState().confirmBattleTeam();
 
     expect(store.getState().mode).toBe('battle');
     const b = store.getState().battle;
@@ -114,7 +93,7 @@ describe('VS1 demo flow (store-only)', () => {
     const selectedTeam = store.getState().team;
     expect(selectedTeam).toBeTruthy();
     if (!selectedTeam) return;
-    store.getState().confirmBattleTeam(selectedTeam);
+    store.getState().confirmBattleTeam();
 
     const b = store.getState().battle;
     expect(store.getState().mode).toBe('battle');

@@ -26,6 +26,7 @@ import {
   completeBattleFlow,
   getDebugState,
   getGameState,
+  completeFlintIntro,
 } from './helpers';
 
 test.describe('House 1: Natural Recruitment Flow (NO Dev Mode)', () => {
@@ -46,6 +47,8 @@ test.describe('House 1: Natural Recruitment Flow (NO Dev Mode)', () => {
     expect(initialRoster[0]?.name).toBe('Adept');
     console.log('✅ Initial state verified: Isaac (Adept) only');
 
+    await completeFlintIntro(page);
+
     // ===== STEP 2: Navigate to House 1 trigger =====
     console.log('\n🚶 Navigating to House 1...');
     const startPosition = await page.evaluate(() => {
@@ -61,6 +64,18 @@ test.describe('House 1: Natural Recruitment Flow (NO Dev Mode)', () => {
       return store.getState().playerPosition;
     });
     console.log(`Final position: (${finalPosition.x}, ${finalPosition.y})`);
+
+    const stateAfterDoor = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const state = store.getState();
+      return {
+        mode: state.mode,
+        pendingBattleEncounterId: state.pendingBattleEncounterId,
+        dialogueTree: state.currentDialogueTree?.id ?? null,
+        dialogueNode: state.currentDialogueState?.currentNodeId ?? null,
+      };
+    });
+    console.log('State after stepping onto door:', stateAfterDoor);
 
     // ===== STEP 3: Battle should trigger automatically =====
     console.log('\n⚔️  Waiting for battle to trigger...');
@@ -109,7 +124,7 @@ test.describe('House 1: Natural Recruitment Flow (NO Dev Mode)', () => {
     const debugState = await getDebugState(page);
     console.log(`\nCollected Djinn: ${debugState.collectedDjinn.join(', ')}`);
 
-    expect(debugState.collectedDjinn).toContain('flint'); // Pre-game
+    expect(debugState.collectedDjinn).toContain('flint'); // Granted by the Flint intro tutorial
     expect(debugState.collectedDjinn).toContain('forge'); // House 1 reward
 
     console.log('✅ PROOF: Forge Djinn granted after House 1!');

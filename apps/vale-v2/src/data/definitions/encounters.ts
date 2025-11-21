@@ -7,14 +7,31 @@
  * - Act 2: Resistance (Houses 8-14)
  * - Act 3: Liberation (Houses 15-20)
  *
- * NEW PROGRESSION (based on HOUSES_1-20_COMPLETE_PROGRESSION.md):
+ * LOCKED PROGRESSION: Rewards in this file must stay aligned with HOUSES_1-20_COMPLETE_PROGRESSION.md.
+ * Any future changes must first update the locked spreadsheet before touching these definitions.
+ *
+ * SUMMARY:
  * - Pre-game: Isaac + Flint Djinn (story gift)
- * - House 1 (VS1): Garet recruit + Forge Djinn
+ * - House 1 (VS1): Garet recruit + Forge Djinn (no equipment)
  * - Houses 2-3: Mystic and Ranger story joins
  * - Houses 5, 8, 11, 14, 15, 17: New recruits (Blaze, Sentinel, Karis, Tyrell, Stormcaller, Felix)
  * - Djinn: Forge (H1), Breeze (H7), Fizz (H8), Granite (H12), Squall (H15), Bane (H18), Storm (H20)
  */
 import type { Encounter } from '../schemas/EncounterSchema';
+
+const createVs1Encounter = (id: string, name: string): Encounter => ({
+  id,
+  name,
+  enemies: ['garet-enemy'], // Enemy version of War Mage
+  difficulty: 'easy',
+  reward: {
+    xp: 60,
+    gold: 20,
+    equipment: { type: 'none' }, // Locked: no equipment from House 1 (per blueprint)
+    djinn: 'forge', // Mars T1 Djinn
+    unlockUnit: 'war-mage', // Recruit Garet
+  },
+});
 
 // ============================================================================
 // ACT 1: DISCOVERY (Houses 1-7)
@@ -24,25 +41,11 @@ import type { Encounter } from '../schemas/EncounterSchema';
  * HOUSE 1 (VS1 Tutorial)
  * - First battle, introduces combat
  * - Recruit: Garet (War Mage, Mars)
- * - Reward: Forge Djinn (Mars T1)
+ * - Reward: Forge Djinn (Mars T1) without any equipment (locked blueprint)
  * - Milestone: First unit recruitment from battle!
  */
-export const HOUSE_01_VS1: Encounter = {
-  id: 'house-01',
-  name: 'House 1: Garet\'s Liberation',
-  enemies: ['garet-enemy'], // Enemy version of War Mage
-  difficulty: 'easy',
-  reward: {
-    xp: 60,
-    gold: 20,
-    equipment: {
-      type: 'fixed',
-      itemId: 'wooden-sword',
-    },
-    djinn: 'forge', // Mars T1 Djinn
-    unlockUnit: 'war-mage', // Recruit Garet
-  },
-};
+export const HOUSE_01_VS1: Encounter = createVs1Encounter('house-01', "House 1: Garet's Liberation");
+export const VS1_GARET_ENCOUNTER: Encounter = createVs1Encounter('vs1-garet', "VS1: Garet's Liberation");
 
 /**
  * HOUSE 2
@@ -107,6 +110,7 @@ export const HOUSE_04: Encounter = {
  * HOUSE 5
  * - Recruit: Blaze (Mars, Balanced Warrior)
  * - First recruitable Mars unit (shares equipment with Garet)
+ * - Reward: Blaze is the upgrade – no equipment drop per blueprint
  */
 export const HOUSE_05: Encounter = {
   id: 'house-05',
@@ -116,10 +120,7 @@ export const HOUSE_05: Encounter = {
   reward: {
     xp: 100,
     gold: 28,
-    equipment: {
-      type: 'fixed',
-      itemId: 'iron-sword',
-    },
+    equipment: { type: 'none' }, // Blueprint says no equipment on House 5; Blaze is the reward
     unlockUnit: 'blaze', // Recruit Blaze (Mars Balanced Warrior)
   },
 };
@@ -146,7 +147,7 @@ export const HOUSE_06: Encounter = {
 /**
  * HOUSE 7
  * - Reward: Breeze Djinn (Jupiter T1)
- * - Equipment Choice (weapons)
+ * - Equipment Choice (steel-sword vs battle-axe per locked blueprint)
  * - MILESTONE: 3rd Djinn = SUMMONS UNLOCKED! (Flint + Forge + Breeze)
  */
 export const HOUSE_07: Encounter = {
@@ -160,7 +161,7 @@ export const HOUSE_07: Encounter = {
     djinn: 'breeze', // Jupiter T1 Djinn - SUMMONS UNLOCK!
     equipment: {
       type: 'choice',
-      options: ['steel-sword', 'battle-axe', 'crystal-rod'],
+      options: ['steel-sword', 'battle-axe'],
     },
   },
 };
@@ -172,7 +173,7 @@ export const HOUSE_07: Encounter = {
 /**
  * HOUSE 8
  * - Reward: Fizz Djinn (Mercury T1) + Sentinel recruit (Venus Support Buffer)
- * - Milestone: Complete T1 Djinn set (4 elements)
+ * - Milestone: Complete T1 Djinn set (4 elements) with no equipment drop
  */
 export const HOUSE_08: Encounter = {
   id: 'house-08',
@@ -182,10 +183,7 @@ export const HOUSE_08: Encounter = {
   reward: {
     xp: 200,
     gold: 55,
-    equipment: {
-      type: 'fixed',
-      itemId: 'steel-armor',
-    },
+    equipment: { type: 'none' }, // Sentinel is the reward, no gear drop
     djinn: 'fizz', // Mercury T1 Djinn
     unlockUnit: 'sentinel', // Recruit Sentinel (Venus Support Buffer)
   },
@@ -222,10 +220,7 @@ export const HOUSE_10: Encounter = {
   reward: {
     xp: 235,
     gold: 62,
-    equipment: {
-      type: 'fixed',
-      itemId: 'iron-helm',
-    },
+    equipment: { type: 'none' }, // No gear at House 10 per blueprint
   },
 };
 
@@ -252,7 +247,7 @@ export const HOUSE_11: Encounter = {
 
 /**
  * HOUSE 12
- * - Reward: Granite Djinn (Venus T2)
+ * - Reward: Granite Djinn (Venus T2) only - no equipment drop per locked table
  * - MILESTONE: First T2 Djinn! (Djinn swapping strategy unlocked)
  */
 export const HOUSE_12: Encounter = {
@@ -263,10 +258,7 @@ export const HOUSE_12: Encounter = {
   reward: {
     xp: 275,
     gold: 72,
-    equipment: {
-      type: 'fixed',
-      itemId: 'mythril-crown',
-    },
+    equipment: { type: 'none' }, // Granite Djinn only; no equipment drop
     djinn: 'granite', // Venus T2 Djinn - POWER SPIKE
   },
 };
@@ -381,7 +373,7 @@ export const HOUSE_17: Encounter = {
 
 /**
  * HOUSE 18
- * - Reward: Bane Djinn (Venus T3)
+ * - Reward: Bane Djinn (Venus T3) only - no equipment drop (locked blueprint)
  * - MILESTONE: First T3 Djinn!
  */
 export const HOUSE_18: Encounter = {
@@ -392,10 +384,7 @@ export const HOUSE_18: Encounter = {
   reward: {
     xp: 550,
     gold: 140,
-    equipment: {
-      type: 'fixed',
-      itemId: 'oracles-crown',
-    },
+    equipment: { type: 'none' }, // Only the Bane Djinn drops here
     djinn: 'bane', // Venus T3 Djinn
   },
 };
@@ -470,6 +459,7 @@ export const TRAINING_DUMMY: Encounter = {
 export const ENCOUNTERS: Record<string, Encounter> = {
   // Act 1: Discovery (Houses 1-7)
   'house-01': HOUSE_01_VS1,
+  'vs1-garet': VS1_GARET_ENCOUNTER,
   'house-02': HOUSE_02,
   'house-03': HOUSE_03,
   'house-04': HOUSE_04,

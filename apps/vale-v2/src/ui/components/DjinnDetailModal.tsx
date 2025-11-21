@@ -162,6 +162,11 @@ export function DjinnDetailModal({ djinnId, onClose }: DjinnDetailModalProps) {
             </div>
           </div>
 
+          <div className="djinn-detail-note" style={{ fontSize: '0.85rem', color: '#ccc', margin: '0.5rem 0', padding: '0 0.25rem' }}>
+            Djinn live in the shared 3-slot team pool. Updates here affect that pool, and the Pre-Battle screen lets you
+            choose which of the equipped Djinn apply to the next encounter.
+          </div>
+
           <div className="djinn-summon-effect">
             <h3>Summon Effect</h3>
             <p>{djinn.summonEffect.description}</p>
@@ -169,7 +174,7 @@ export function DjinnDetailModal({ djinnId, onClose }: DjinnDetailModalProps) {
 
           {isCollected && (
             <div className="djinn-assignment">
-              <h3>Team Slots</h3>
+              <h3>Global Team Slots</h3>
               <div className="slot-buttons">
                 {[0, 1, 2].map((slotIndex) => {
                   const slotDjinnId = team.equippedDjinn[slotIndex];

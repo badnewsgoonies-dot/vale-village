@@ -50,6 +50,7 @@ export const createRewardsSlice: StateCreator<
       lastBattleRewards: result.distribution,
       lastBattleEncounterId: encounterId, // Store for post-battle dialogue
       mode: 'rewards', // Set mode instead of showRewards
+      showRewards: true,
     });
   },
 
@@ -74,7 +75,7 @@ export const createRewardsSlice: StateCreator<
 
     // Clear rewards but keep encounterId until handleRewardsContinue uses it
     // Don't clear lastBattleEncounterId here - handleRewardsContinue needs it
-    set({ lastBattleRewards: null });
+    set({ lastBattleRewards: null, showRewards: false });
     // Don't set mode here - let handleRewardsContinue handle mode transition
     // (it needs to check for recruitment dialogue first)
   },

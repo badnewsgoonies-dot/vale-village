@@ -54,7 +54,7 @@ describe('VS1 demo flow (UI, happy-dom)', () => {
     expect(team).toBeTruthy();
     if (!team) return;
 
-    store.confirmBattleTeam(team);
+    store.confirmBattleTeam();
 
     await waitFor(() => {
       expect(useStore.getState().mode).toBe('battle');

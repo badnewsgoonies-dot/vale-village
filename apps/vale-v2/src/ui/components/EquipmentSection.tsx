@@ -5,31 +5,31 @@
 
 import { useState, useEffect } from 'react';
 import type { Unit } from '@/core/models/Unit';
-import type { Team } from '@/core/models/Team';
-import type { EquipmentSlot, Equipment } from '@/core/models/Equipment';
-import { useStore } from '../state/store';
-import { updateUnit } from '@/core/models/Unit';
+import type { EquipmentSlot, Equipment, EquipmentLoadout } from '@/core/models/Equipment';
 import { calculateEquipmentBonuses } from '@/core/models/Equipment';
 import { calculateLevelBonuses } from '@/core/algorithms/stats';
 
 interface EquipmentSectionProps {
   unit: Unit;
-  team: Team;
   selectedSlot: EquipmentSlot | null;
   onSelectSlot: (slot: EquipmentSlot | null) => void;
+  equipmentLoadout: EquipmentLoadout;
+  inventory: Equipment[];
+  onEquip: (slot: EquipmentSlot, item: Equipment) => void;
+  onUnequip: (slot: EquipmentSlot) => void;
 }
 
 const EQUIPMENT_SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'helm', 'boots', 'accessory'];
 
 export function EquipmentSection({
   unit,
-  team,
   selectedSlot,
   onSelectSlot,
+  equipmentLoadout,
+  inventory,
+  onEquip,
+  onUnequip,
 }: EquipmentSectionProps) {
-  const { equipment: inventory } = useStore((s) => ({ equipment: s.equipment }));
-  const { updateTeamUnits } = useStore((s) => ({ updateTeamUnits: s.updateTeamUnits }));
-
   const [activeTab, setActiveTab] = useState<EquipmentSlot>('weapon');
 
   // Sync activeTab with selectedSlot
@@ -45,24 +45,16 @@ export function EquipmentSection({
   );
 
   const handleEquip = (equipment: Equipment) => {
-    const newEquipment = { ...unit.equipment, [activeTab]: equipment };
-    const updatedUnit = updateUnit(unit, { equipment: newEquipment });
-    
-    // Update unit in team
-    const updatedUnits = team.units.map((u) => (u.id === unit.id ? updatedUnit : u));
-    updateTeamUnits(updatedUnits);
+    onEquip(activeTab, equipment);
     onSelectSlot(null);
   };
 
   const handleUnequip = (slot: EquipmentSlot) => {
-    const newEquipment = { ...unit.equipment, [slot]: null };
-    const updatedUnit = updateUnit(unit, { equipment: newEquipment });
-    
-    const updatedUnits = team.units.map((u) => (u.id === unit.id ? updatedUnit : u));
-    updateTeamUnits(updatedUnits);
+    onUnequip(slot);
+    onSelectSlot(null);
   };
 
-  const equipmentBonuses = calculateEquipmentBonuses(unit.equipment);
+  const equipmentBonuses = calculateEquipmentBonuses(equipmentLoadout);
   const levelBonuses = calculateLevelBonuses(unit);
   
   // Calculate preview stats (base + level + equipment)
@@ -79,7 +71,7 @@ export function EquipmentSection({
         <div className="section-title">EQUIPMENT ({unit.name})</div>
         <div className="equipment-grid">
           {EQUIPMENT_SLOTS.map((slot) => {
-            const eq = unit.equipment[slot];
+            const eq = equipmentLoadout[slot];
             const isSelected = selectedSlot === slot;
             return (
               <div
@@ -106,7 +98,6 @@ export function EquipmentSection({
                         onClick={(e) => {
                           e.stopPropagation();
                           handleUnequip(slot);
-                          onSelectSlot(null);
                         }}
                         style={{
                           marginTop: '0.5rem',

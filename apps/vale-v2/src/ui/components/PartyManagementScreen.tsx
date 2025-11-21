@@ -48,13 +48,16 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
         </div>
 
         <div className="party-instructions">
-          <p>View all recruited units and their stats. Units are added to your active party before battles.</p>
+          <p>
+            Browse your full roster and review each unit's stats. The battle formation and loadouts you see here
+            are only a snapshot—final selections happen on the Pre-Battle screen before each fight.
+          </p>
         </div>
 
         <div className="party-content">
           {/* Unit List */}
           <div className="party-section">
-            <h2>Recruited Units ({roster.length})</h2>
+            <h2>Roster ({roster.length})</h2>
             <div className="party-grid">
               {roster.map((unit) => {
                 const isActive = activeUnitIds.has(unit.id);
@@ -79,7 +82,7 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
                       <div className="member-stats">Lv: {unit.level}</div>
                       <div className="member-element">{unit.element}</div>
                       <div className="member-role">{unit.role}</div>
-                      {isActive && <div className="active-badge">In Party</div>}
+                      {isActive && <div className="active-badge">Roster Slot</div>}
                     </div>
                     {isSelected && (
                       <div className="selection-indicator">Selected</div>

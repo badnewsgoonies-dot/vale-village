@@ -87,6 +87,11 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
           </button>
         </div>
 
+        <div className="djinn-collection-note" style={{ padding: '0 1rem', fontSize: '0.85rem', color: '#ccc' }}>
+          Your collected Djinn live in a global 3-slot team configuration. Use the Pre-Battle screen to lock in which
+          Djinn you want active for the upcoming fight—the bonuses apply to every unit at once.
+        </div>
+
         <div className="djinn-stats">
           <div className="stat-item">
             <span className="stat-label">Collected:</span>
@@ -96,6 +101,10 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
             <span className="stat-label">Equipped:</span>
             <span className="stat-value">{equippedDjinn.length} / 3</span>
           </div>
+        </div>
+
+        <div className="djinn-collection-subnote" style={{ fontSize: '0.8rem', color: '#888', textAlign: 'center', marginBottom: '0.25rem' }}>
+          Equipped Djinn occupy the shared team slots; swapping them is done here, but final confirmation happens pre-battle.
         </div>
 
         <div className="djinn-collection-content">
@@ -131,7 +140,7 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
                           <div className="djinn-name">{djinn.name}</div>
                           <div className="djinn-tier">Tier {djinn.tier}</div>
                           {isEquipped && (
-                            <div className="djinn-status">Equipped ({state})</div>
+                            <div className="djinn-status">Equipped · Team Slot ({state})</div>
                           )}
                         </div>
                       </div>

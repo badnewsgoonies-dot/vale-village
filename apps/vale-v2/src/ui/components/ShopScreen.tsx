@@ -124,6 +124,11 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
           </button>
         </div>
 
+        <div className="shop-note" style={{ fontSize: '0.85rem', color: '#a8b3c0', padding: '0 1rem', marginBottom: '0.5rem' }}>
+          Unlock shared, element-locked equipment for your roster here. Each item lives in the shared inventory and
+          the Pre-Battle screen determines who wields it during the next encounter.
+        </div>
+
         <div className="shop-gold">
           <span className="gold-label">Gold:</span>
           <span className="gold-value">{gold}g</span>

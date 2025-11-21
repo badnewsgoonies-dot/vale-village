@@ -10,6 +10,7 @@ import {
   getHouseEntrancePosition,
   STARTING_POSITION,
   LINEAR_ROAD_Y,
+  completeFlintIntro,
 } from './helpers';
 
 /**
@@ -35,9 +36,9 @@ test.describe('Game Initialization', () => {
     const state = await getGameState(page);
     expect(state).not.toBeNull();
 
-    // Verify initial team state (Isaac + Flint)
+    // Verify initial team state (just Isaac)
     expect(state?.hasTeam).toBe(true);
-    expect(state?.teamSize).toBe(1); // Just Isaac
+    expect(state?.teamSize).toBe(1);
     expect(state?.rosterSize).toBe(1);
     expect(state?.gold).toBe(0);
     expect(state?.mode).toBe('overworld');
@@ -53,6 +54,44 @@ test.describe('Game Initialization', () => {
     // Verify overworld map is visible
     const overworldVisible = await page.locator('text=/Position:/i').isVisible();
     expect(overworldVisible).toBe(true);
+
+    const initialDjinn = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const team = store.getState().team;
+      return team?.collectedDjinn ?? [];
+    });
+
+    expect(initialDjinn).toHaveLength(0);
+    const hasSeenIntro = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      return store.getState().story?.flags?.['first_djinn_intro_completed'] ?? false;
+    });
+    expect(hasSeenIntro).toBe(false);
+  });
+
+  test('completing Flint intro collects Flint Djinn', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    await completeFlintIntro(page);
+
+    const flintState = await page.evaluate(() => {
+      const store = (window as any).__VALE_STORE__;
+      const team = store.getState().team;
+      return {
+        collected: team?.collectedDjinn ?? [],
+        equipped: team?.equippedDjinn ?? [],
+        tracker: team?.djinnTrackers?.flint,
+        flag: store.getState().story?.flags?.['first_djinn_intro_completed'],
+        position: store.getState().playerPosition,
+      };
+    });
+
+    expect(flintState.collected).toContain('flint');
+    expect(flintState.equipped).toContain('flint');
+    expect(flintState.tracker?.state).toBe('Set');
+    expect(flintState.flag).toBe(true);
+    expect(flintState.position).toEqual(STARTING_POSITION);
   });
 
   test('starts at correct spawn point', async ({ page }) => {

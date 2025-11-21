@@ -49,6 +49,11 @@ export const VS1_POST_SCENE: DialogueTree = {
       speaker: 'Garet',
       text: "And take this Forge Djinn - it'll help us both in battle.",
       portrait: 'garet',
+      effects: {
+        // Mirror House 1 rewards in a narrative, VS1-only context
+        recruitUnit: 'war-mage',
+        grantDjinn: 'forge',
+      },
     },
   ],
 };
@@ -94,6 +99,7 @@ export const DJINN_INTRO_DIALOGUE: DialogueTree = {
       portrait: 'djinn-venus',
       effects: {
         // Use story flag for tutorial completion; Djinn is already present from the starting team setup
+        grantDjinn: 'flint',
         first_djinn_intro_completed: true,
       },
     },

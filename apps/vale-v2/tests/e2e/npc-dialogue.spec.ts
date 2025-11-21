@@ -11,6 +11,7 @@ import {
   skipStartupScreens,
 } from './helpers';
 import { ELDER_DIALOGUE } from '../../src/data/definitions/dialogues';
+import { ELDER_NPC_POSITION } from './helpers';
 
 /**
  * NPC Dialogue E2E Tests
@@ -38,13 +39,10 @@ test.describe('NPC Dialogue', () => {
     expect(state?.mode).toBe('overworld');
     expect(state?.currentMapId).toBe('vale-village');
 
-    // Navigate to elder NPC at (15, 5)
-    // From spawn (15, 10), move up 5 steps
-    console.log('→ Navigating to elder NPC (15, 5)...');
-    for (let i = 0; i < 5; i++) {
-      await page.keyboard.press('ArrowUp');
-      await page.waitForTimeout(150);
-    }
+    // Navigate to elder NPC at its canonical position on the main road
+    console.log(`→ Navigating to elder NPC at (${ELDER_NPC_POSITION.x}, ${ELDER_NPC_POSITION.y})...`);
+    const reached = await navigateToPosition(page, ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
+    expect(reached).toBe(true);
 
     // Wait for dialogue mode
     await waitForMode(page, 'dialogue', 5000);
@@ -61,7 +59,7 @@ test.describe('NPC Dialogue', () => {
     await page.waitForLoadState('networkidle');
 
     // Navigate to elder NPC
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
 
     // Get dialogue state
@@ -81,7 +79,7 @@ test.describe('NPC Dialogue', () => {
     await page.waitForLoadState('networkidle');
 
     // Trigger dialogue
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
 
     // Get initial node
@@ -104,7 +102,7 @@ test.describe('NPC Dialogue', () => {
     await page.waitForLoadState('networkidle');
 
     // Trigger dialogue
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
 
     // Advance to choice node
@@ -139,7 +137,7 @@ test.describe('NPC Dialogue', () => {
     expect(storyFlag).toBe(false);
 
     // Trigger dialogue and select accept choice
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
     await advanceDialogue(page);
     await page.waitForTimeout(300);
@@ -160,11 +158,8 @@ test.describe('NPC Dialogue', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Skip startup screens
-    await skipStartupScreens(page);
-
     // Trigger dialogue
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
 
     // Verify in dialogue mode
@@ -190,7 +185,7 @@ test.describe('NPC Dialogue', () => {
     await page.waitForLoadState('networkidle');
 
     // Trigger dialogue (this navigates player to NPC position)
-    await triggerNPCDialogue(page, 'vale-village', 15, 5);
+    await triggerNPCDialogue(page, 'vale-village', ELDER_NPC_POSITION.x, ELDER_NPC_POSITION.y);
     await waitForMode(page, 'dialogue', 5000);
 
     // Get position during dialogue (should be at NPC position)
@@ -209,7 +204,7 @@ test.describe('NPC Dialogue', () => {
     });
 
     expect(afterPos).toEqual(dialoguePos);
-    expect(afterPos).toEqual({ x: 15, y: 5 }); // NPC position
+    expect(afterPos).toEqual(ELDER_NPC_POSITION); // NPC position
 
     console.log('✅ Player position preserved after dialogue');
   });

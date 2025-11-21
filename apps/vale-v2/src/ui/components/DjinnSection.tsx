@@ -5,8 +5,6 @@
 
 import type { Unit } from '@/core/models/Unit';
 import type { Team } from '@/core/models/Team';
-import { useStore } from '../state/store';
-import { equipDjinn, unequipDjinn } from '@/core/services/DjinnService';
 import { getDjinnAbilityMetadataForUnit } from '@/core/algorithms/djinnAbilities';
 import { DJINN } from '@/data/definitions/djinn';
 
@@ -15,6 +13,9 @@ interface DjinnSectionProps {
   team: Team;
   selectedSlot: number | null;
   onSelectSlot: (slot: number | null) => void;
+  djinnSlots: readonly (string | null)[];
+  onEquipDjinn: (djinnId: string, slotIndex: number) => void;
+  onUnequipDjinn: (slotIndex: number) => void;
 }
 
 export function DjinnSection({
@@ -22,39 +23,21 @@ export function DjinnSection({
   team,
   selectedSlot,
   onSelectSlot,
+  djinnSlots,
+  onEquipDjinn,
+  onUnequipDjinn,
 }: DjinnSectionProps) {
-  const { setTeam } = useStore((s) => ({ setTeam: s.setTeam }));
-
-  const handleEquipDjinn = (djinnId: string, slotIndex: number) => {
-    const result = equipDjinn(team, djinnId, slotIndex);
-    if (result.ok) {
-      setTeam(result.value);
-      onSelectSlot(null);
-    } else {
-      console.error('Failed to equip Djinn:', result.error);
-    }
-  };
-
-  const handleUnequipDjinn = (slotIndex: number) => {
-    const djinnId = team.equippedDjinn[slotIndex];
-    if (!djinnId) return;
-
-    const result = unequipDjinn(team, djinnId);
-    if (result.ok) {
-      setTeam(result.value);
-      onSelectSlot(null);
-    } else {
-      console.error('Failed to unequip Djinn:', result.error);
-    }
-  };
+  const selectedDjinnIds = djinnSlots.filter((id): id is string => Boolean(id));
+  const availableDjinn = team.collectedDjinn.filter((djinnId) => !selectedDjinnIds.includes(djinnId));
 
   // Get granted abilities for this unit
   const abilityMetadata = getDjinnAbilityMetadataForUnit(unit, team);
 
-  // Get available Djinn (collected but not equipped)
-  const availableDjinn = team.collectedDjinn.filter(
-    (djinnId) => !team.equippedDjinn.includes(djinnId)
-  );
+  const handleEquipClick = (djinnId: string) => {
+    if (selectedSlot === null) return;
+    onEquipDjinn(djinnId, selectedSlot);
+    onSelectSlot(null);
+  };
 
   return (
     <div className="section-card djinn-section">
@@ -62,9 +45,9 @@ export function DjinnSection({
         <div className="section-title">DJINN CONFIGURATION</div>
         <div className="djinn-slots-grid">
           {[0, 1, 2].map((slotIndex) => {
-            const djinnId = team.equippedDjinn[slotIndex];
-        const hasDjinn = Boolean(djinnId);
-        const djinn = hasDjinn ? DJINN[djinnId as keyof typeof DJINN] : null;
+            const djinnId = djinnSlots[slotIndex];
+            const hasDjinn = Boolean(djinnId);
+            const djinn = hasDjinn ? DJINN[djinnId as keyof typeof DJINN] : null;
             const isSelected = selectedSlot === slotIndex;
 
             return (
@@ -79,7 +62,7 @@ export function DjinnSection({
                     <div className="djinn-name">{djinn.name}</div>
                     <div className="djinn-element">{djinn.element}</div>
                     <div className="djinn-state">
-              {hasDjinn && djinnId ? team.djinnTrackers[djinnId]?.state : 'Set'}
+                      {hasDjinn && djinnId ? team.djinnTrackers[djinnId]?.state : 'Set'}
                     </div>
                     {isSelected && (
                       <button
@@ -87,7 +70,8 @@ export function DjinnSection({
                         style={{ marginTop: '0.5rem', width: '100%', fontSize: '0.7rem' }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleUnequipDjinn(slotIndex);
+                          onUnequipDjinn(slotIndex);
+                          onSelectSlot(null);
                         }}
                       >
                         Unequip
@@ -114,11 +98,11 @@ export function DjinnSection({
               const djinn = DJINN[djinnId];
               if (!djinn) return null;
               return (
-                <button
-                  key={djinnId}
-                  className="compendium-tab"
-                  onClick={() => handleEquipDjinn(djinnId, selectedSlot)}
-                >
+                  <button
+                    key={djinnId}
+                    className="compendium-tab"
+                    onClick={() => handleEquipClick(djinnId)}
+                  >
                   {djinn.name} ({djinn.element})
                 </button>
               );

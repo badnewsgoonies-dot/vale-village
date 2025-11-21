@@ -34,6 +34,8 @@ const PRE_BATTLE_DIALOGUE_MAP: Record<string, DialogueTree> = {
   'house-05-escalation': HOUSE_05_DIALOGUE,
 };
 
+const PRE_BATTLE_DIALOGUE_IDS = new Set<string>(Object.values(ENCOUNTER_TO_PRE_BATTLE_DIALOGUE));
+
 /**
  * Get pre-battle dialogue for an encounter ID
  * Returns null if encounter doesn't have a pre-battle dialogue
@@ -50,4 +52,8 @@ export function getPreBattleDialogue(encounterId: string): DialogueTree | null {
  */
 export function hasPreBattleDialogue(encounterId: string): boolean {
   return encounterId in ENCOUNTER_TO_PRE_BATTLE_DIALOGUE;
+}
+
+export function isPreBattleDialogueTree(dialogueId?: string): boolean {
+  return Boolean(dialogueId && PRE_BATTLE_DIALOGUE_IDS.has(dialogueId));
 }

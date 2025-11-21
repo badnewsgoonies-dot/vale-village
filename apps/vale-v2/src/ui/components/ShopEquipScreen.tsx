@@ -192,6 +192,11 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
           <span className="gold-value">{gold}g</span>
         </div>
 
+        <div className="shop-equip-note" style={{ fontSize: '0.8rem', color: '#a9b1c8', padding: '0 1rem', marginBottom: '0.5rem' }}>
+          Equipment in your inventory is shared across the roster and locked to elements. Use the Pre-Battle screen to finalize
+          which pieces each unit actually carries into combat.
+        </div>
+
         {error && (
           <div className="shop-equip-error" role="alert">
             {error}
@@ -352,6 +357,9 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
 
           {activeTab === 'equip' && (
             <div className="equip-tab-content">
+              <div className="equipment-tab-note" style={{ fontSize: '0.8rem', color: '#9ea6b7', marginBottom: '0.5rem', textAlign: 'center' }}>
+                This view shows each unit's preferred loadout. The Pre-Battle screen is still the final say for actual gear per battle.
+              </div>
               {!team || team.units.length === 0 ? (
                 <div className="shop-empty">No units available.</div>
               ) : (

@@ -11,7 +11,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { waitForMode } from './helpers';
+import { waitForMode, completeFlintIntro } from './helpers';
 
 test.describe('Djinn Standby Mechanics', () => {
   /**
@@ -28,6 +28,7 @@ test.describe('Djinn Standby Mechanics', () => {
     // 1. Initialize game
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
     // 2. Verify Flint is Set (check in overworld)
@@ -189,6 +190,7 @@ test.describe('Djinn Standby Mechanics', () => {
     // 1. Initialize and start battle
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
     console.log('   Starting battle...');

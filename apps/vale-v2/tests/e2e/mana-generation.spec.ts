@@ -10,7 +10,15 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { waitForMode } from './helpers';
+import {
+  waitForMode,
+  completeFlintIntro,
+  startHouseBattle,
+  setDjinnState,
+  completeBattle,
+  claimRewardsAndReturnToOverworld,
+  stabilizeBattleDurability,
+} from './helpers';
 
 test.describe('Mana Generation Mechanics', () => {
   /**
@@ -29,42 +37,16 @@ test.describe('Mana Generation Mechanics', () => {
   test('basic attack generates +1 mana', async ({ page }) => {
     console.log('\n🧪 Test: Basic Attack Mana Generation');
 
-    // 1. Initialize game
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
-    // Remove Flint bonus for clean baseline testing
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      const team = store.getState().team;
-      const updatedTrackers = {
-        ...team.djinnTrackers,
-        flint: { ...team.djinnTrackers?.flint, state: 'Standby' as const },
-      };
-      store.setState({
-        team: {
-          ...team,
-          djinnTrackers: updatedTrackers,
-        },
-      });
-    });
+    await setDjinnState(page, 'flint', 'Standby');
 
     console.log('   Starting from overworld...');
 
-    // 2. Navigate to first encounter (house-01)
-    console.log('   Navigating to encounter...');
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    // 3. Enter battle
-    await waitForMode(page, 'team-select', 15000);
-    const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
-    await confirmButton.waitFor({ state: 'visible', timeout: 10000 });
-    await confirmButton.click();
-    await waitForMode(page, 'battle', 15000);
+    await startHouseBattle(page, 1);
 
     console.log('   Battle started - Planning phase');
 
@@ -194,7 +176,11 @@ test.describe('Mana Generation Mechanics', () => {
       expect(manaEvent.source).toBeDefined(); // Source unit ID
     }
 
-    console.log('   ✅ Basic attack mana generation verified!');
+      console.log('   ✅ Basic attack mana generation verified!');
+
+      await completeBattle(page);
+      await claimRewardsAndReturnToOverworld(page);
+      await waitForMode(page, 'overworld', 10000);
   });
 
   /**
@@ -224,9 +210,9 @@ test.describe('Mana Generation Mechanics', () => {
   test('mana generation caps at max pool', async ({ page }) => {
     console.log('\n🧪 Test: Mana Generation Caps at Max Pool');
 
-    // 1. Initialize game and start battle
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
     // Remove Flint for baseline
@@ -245,18 +231,7 @@ test.describe('Mana Generation Mechanics', () => {
       });
     });
 
-    // Navigate to encounter
-    console.log('   Navigating to encounter...');
-    for (let i = 0; i < 8; i++) {
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForTimeout(150);
-    }
-
-    await waitForMode(page, 'team-select', 15000);
-    const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
-    await confirmButton.waitFor({ state: 'visible', timeout: 10000 });
-    await confirmButton.click();
-    await waitForMode(page, 'battle', 15000);
+    await startHouseBattle(page, 1);
 
     // 2. Set mana to near-max (maxMana - 0.5) to test cap
     console.log('   Setting mana to near-max...');
@@ -329,5 +304,10 @@ test.describe('Mana Generation Mechanics', () => {
     expect(manaAfterCap.remainingMana).toBe(manaAfterCap.maxMana); // Should be exactly maxMana
 
     console.log(`   ✅ Mana capped at max pool: ${manaAfterCap.remainingMana}/${manaAfterCap.maxMana}`);
+
+    await completeBattle(page);
+    await claimRewardsAndReturnToOverworld(page);
+    await waitForMode(page, 'overworld', 10000);
   });
 });
+

@@ -9,6 +9,7 @@ const createTile = (type: TileType, walkableOverride?: boolean): { type: TileTyp
 
 const VALLE_VILLAGE_WIDTH = 84;
 const VALLE_VILLAGE_HEIGHT = 5;
+// Single horizontal road row; houses and any building entrances sit one tile above this
 const ROAD_ROW = 2;
 const HOUSE_COUNT = 20;
 const HOUSE_WIDTH = 11;
@@ -23,14 +24,25 @@ const HOUSE_POSITIONS = HOUSE_IDS.map((houseNum, index) => ({
   overworldX: 7 + index * 4,
 }));
 
+// Overworld house entrances sit one tile above the road row
+const HOUSE_ENTRANCE_ROW = ROAD_ROW - 1;
+
+// Precompute doorway columns for houses
+const HOUSE_DOOR_COLUMNS = new Set(HOUSE_POSITIONS.map(({ overworldX }) => overworldX));
+
 const buildValeVillageTiles = (): GameMap['tiles'] => {
   const tiles: GameMap['tiles'] = [];
   for (let y = 0; y < VALLE_VILLAGE_HEIGHT; y++) {
     const row: GameMap['tiles'][number] = [];
     for (let x = 0; x < VALLE_VILLAGE_WIDTH; x++) {
       if (y === ROAD_ROW) {
+        // Main road through the village
         row.push(createTile('path'));
+      } else if (y === HOUSE_ENTRANCE_ROW && HOUSE_DOOR_COLUMNS.has(x)) {
+        // Walkable doorway tiles for houses, one row above the road
+        row.push(createTile('door'));
       } else {
+        // Non-walkable background (prevents wandering off the road/door tiles)
         row.push(createTile('grass', false));
       }
     }
@@ -52,7 +64,7 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
   const houseTriggers = HOUSE_POSITIONS.map(({ houseNum, overworldX }, index) => ({
     id: `house-${houseNum}-door`,
     type: 'transition' as const,
-    position: { x: overworldX, y: ROAD_ROW },
+    position: { x: overworldX, y: HOUSE_ENTRANCE_ROW },
     data: {
       targetMap: `house-${houseNum}-interior`,
       targetPos: { x: HOUSE_CENTER_X, y: HOUSE_EXIT_Y },

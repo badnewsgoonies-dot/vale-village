@@ -3,6 +3,9 @@ import type { MapTrigger } from '@/core/models/overworld';
 import type { Encounter } from '@/data/schemas/EncounterSchema';
 import type { Unit } from '@/core/models/Unit';
 import { createTeam, updateTeam, type Team } from '@/core/models/Team';
+import { updateUnit } from '@/core/models/Unit';
+import type { EquipmentSlot, Equipment } from '@/core/models/Equipment';
+import { createEmptyLoadout } from '@/core/models/Equipment';
 import { ENCOUNTERS } from '@/data/definitions/encounters';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
 import { makePRNG } from '@/core/random/prng';
@@ -12,9 +15,10 @@ import type { QueueBattleSlice } from './queueBattleSlice';
 import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
+import type { InventorySlice } from './inventorySlice';
 import { MIN_PARTY_SIZE } from '@/core/constants';
 import type { BattleConfig } from './battleConfig';
-import { buildBattleConfigForNextBattle, getActiveSlotUnitIds } from './battleConfig';
+import { buildBattleConfigForNextBattle, cloneEquipmentLoadout, updateDjinnSlots, validateBattleConfig } from './battleConfig';
 
 export interface GameFlowSlice {
   mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select' | 'compendium';
@@ -27,15 +31,17 @@ export interface GameFlowSlice {
   setMode: (mode: GameFlowSlice['mode']) => void;
   setPendingBattle: (encounterId: string | null) => void;
   handleTrigger: (trigger: MapTrigger | null, skipPreBattleDialogue?: boolean) => void;
-  confirmBattleTeam: (team?: Team | null) => void;
+  confirmBattleTeam: () => void;
   updateBattleConfigSlot: (slotIndex: number, unitId: string | null) => void;
+  updateBattleSlotEquipment: (slotIndex: number, equipmentSlot: EquipmentSlot, equipment: Equipment | null) => void;
+  setBattleConfigDjinnSlot: (slotIndex: number, djinnId: string | null) => void;
   clearBattleConfig: () => void;
   resetLastTrigger: () => void;
   returnToOverworld: () => void;
 }
 
 export const createGameFlowSlice: StateCreator<
-  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice & OverworldSlice,
+  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice & OverworldSlice & InventorySlice,
   [['zustand/devtools', never]],
   [],
   GameFlowSlice
@@ -49,37 +55,45 @@ export const createGameFlowSlice: StateCreator<
       return null;
     }
 
-    const activeUnitIds = getActiveSlotUnitIds(currentBattleConfig);
-    if (activeUnitIds.length < MIN_PARTY_SIZE) {
-      console.error(`Battle requires at least ${MIN_PARTY_SIZE} units, found ${activeUnitIds.length}`);
-      return null;
-    }
-
     const units: Unit[] = [];
-    for (const unitId of activeUnitIds) {
-      let unit = store.getUnitFromRoster(unitId);
+    for (const slot of currentBattleConfig.slots) {
+      if (!slot.unitId) {
+        continue;
+      }
+
+      let unit = store.getUnitFromRoster(slot.unitId);
       if (!unit && existingTeam) {
-        unit = existingTeam.units.find((candidate) => candidate.id === unitId);
+        unit = existingTeam.units.find((candidate) => candidate.id === slot.unitId);
       }
 
       if (!unit) {
-        console.error(`Unit ${unitId} missing from roster/team when building battle team`);
+        console.error(`Unit ${slot.unitId} missing from roster/team when building battle team`);
         return null;
       }
 
-      units.push(unit);
+      const equipmentLoadout = slot.equipmentLoadout ?? createEmptyLoadout();
+      const unitWithEquipment = updateUnit(unit, { equipment: cloneEquipmentLoadout(equipmentLoadout) });
+      units.push(unitWithEquipment);
     }
 
-    if (existingTeam) {
-      return updateTeam(existingTeam, { units });
-    }
-
-    try {
-      return createTeam(units);
-    } catch (error) {
-      console.error('Failed to create team from BattleConfig', error);
+    if (units.length < MIN_PARTY_SIZE) {
+      console.error(`Battle requires at least ${MIN_PARTY_SIZE} units, found ${units.length}`);
       return null;
     }
+
+    const baseTeam = existingTeam ? updateTeam(existingTeam, { units }) : createTeam(units);
+
+    const selectedDjinn = currentBattleConfig.djinnSlots.filter((djinnId): djinnId is string => Boolean(djinnId));
+    if (selectedDjinn.length > 0) {
+      try {
+        return updateTeam(baseTeam, { equippedDjinn: selectedDjinn });
+      } catch (error) {
+        console.error('Failed to apply Djinn selection from BattleConfig', error);
+        return null;
+      }
+    }
+
+    return baseTeam;
   };
 
   const initializeBattleConfig = () => buildBattleConfigForNextBattle(get().team, get().roster);
@@ -208,10 +222,31 @@ export const createGameFlowSlice: StateCreator<
   },
   resetLastTrigger: () => set({ lastTrigger: null }),
 
-  confirmBattleTeam: (team?: Team | null) => {
-    const { pendingBattleEncounterId } = get();
+  confirmBattleTeam: () => {
+    const store = get();
+    const {
+      pendingBattleEncounterId,
+      currentBattleConfig,
+      equipment,
+      roster,
+      team,
+      currentMapId,
+      playerPosition,
+    } = store;
+
     if (!pendingBattleEncounterId) {
       console.error('No pending battle encounter');
+      return;
+    }
+
+    if (!currentBattleConfig) {
+      console.error('Missing battle configuration when confirming battle');
+      return;
+    }
+
+    const validation = validateBattleConfig(currentBattleConfig, equipment, roster, team);
+    if (!validation.valid) {
+      console.error('Battle configuration validation failed', validation.message);
       return;
     }
 
@@ -221,14 +256,12 @@ export const createGameFlowSlice: StateCreator<
       return;
     }
 
-    const selectedTeam = team ?? buildTeamFromBattleConfig();
+    const selectedTeam = buildTeamFromBattleConfig();
     if (!selectedTeam) {
       console.error('Could not resolve team for battle');
       return;
     }
 
-    // Save current overworld position before entering battle
-    const { currentMapId, playerPosition } = get();
     const preBattlePosition = {
       mapId: currentMapId,
       position: { x: playerPosition.x, y: playerPosition.y },
@@ -271,6 +304,50 @@ export const createGameFlowSlice: StateCreator<
 
       return {
         currentBattleConfig: { ...currentBattleConfig, slots },
+      };
+    }),
+
+  updateBattleSlotEquipment: (slotIndex, equipmentSlot, equipment) =>
+    set((state) => {
+      const { currentBattleConfig } = state;
+      if (!currentBattleConfig) return state;
+
+      const slots = currentBattleConfig.slots.map((slot) =>
+        slot.slotIndex === slotIndex
+          ? {
+              ...slot,
+              equipmentLoadout: {
+                ...slot.equipmentLoadout,
+                [equipmentSlot]: equipment,
+              },
+            }
+          : slot
+      );
+
+      return {
+        currentBattleConfig: { ...currentBattleConfig, slots },
+      };
+    }),
+
+  setBattleConfigDjinnSlot: (slotIndex, djinnId) =>
+    set((state) => {
+      const { currentBattleConfig } = state;
+      if (!currentBattleConfig) return state;
+
+      const normalizedDjinnId = djinnId ?? null;
+      if (
+        normalizedDjinnId &&
+        currentBattleConfig.djinnSlots.some((existingId, index) =>
+          index !== slotIndex && existingId === normalizedDjinnId
+        )
+      ) {
+        console.warn('Cannot equip the same Djinn more than once', normalizedDjinnId);
+        return state;
+      }
+
+      const djinnSlots = updateDjinnSlots(currentBattleConfig.djinnSlots, slotIndex, normalizedDjinnId);
+      return {
+        currentBattleConfig: { ...currentBattleConfig, djinnSlots },
       };
     }),
 

@@ -10,14 +10,30 @@ A clean architecture rebuild with React, TypeScript, Zustand, and Zod.
 
 ### **Development:**
 
-```bash
-cd apps/vale-v2
-pnpm dev              # Start dev server (loads the queue battle sandbox)
-pnpm test             # Run tests from apps/vale-v2/tests
-pnpm validate:data    # Validate game data
-pnpm typecheck        # Type check
-pnpm lint             # Lint code
-```
+> **Workspace note**
+>
+> This repo is a small pnpm workspace. The main app lives in `apps/vale-v2`, and the root `package.json` exposes convenience scripts that forward to that app via `pnpm --filter vale-v2 ...`. You can work from **either** location:
+>
+> - **From `apps/vale-v2/`** (preferred for app-local work):
+>
+>   ```bash
+>   cd apps/vale-v2
+>   pnpm dev              # Start dev server (loads the queue battle sandbox)
+>   pnpm test             # Run tests from apps/vale-v2/tests
+>   pnpm validate:data    # Validate game data
+>   pnpm typecheck        # Type check
+>   pnpm lint             # Lint code
+>   ```
+>
+> - **From the repo root** (matches older docs):
+>
+>   ```bash
+>   pnpm dev              # Forwards to apps/vale-v2 dev
+>   pnpm test             # Forwards to apps/vale-v2 test
+>   pnpm validate:data    # Forwards to apps/vale-v2 validate:data
+>   pnpm typecheck        # Forwards to apps/vale-v2 typecheck
+>   pnpm lint             # Forwards to apps/vale-v2 lint
+>   ```
 
 > ℹ️ The current `App` mounts a deterministic queue-battle playground via `createTestBattle()`.  
 > Story/overworld work is staged separately while the queue battle loop is being finalized.

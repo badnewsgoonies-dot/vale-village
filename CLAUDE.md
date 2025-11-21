@@ -4,7 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Vale Chronicles V2** - A Golden Sun-inspired tactical RPG built with clean architecture principles. This is a pnpm workspace monorepo with the main application in `apps/vale-v2/`.
+**Vale Chronicles V2** - A Golden Sun-inspired tactical RPG built with clean architecture principles. The codebase is organized as a light pnpm workspace, with the main application in `apps/vale-v2/`.
+
+> **Workspace layout (important for commands)**
+>
+> - **Primary app package:** `apps/vale-v2` (has its own `package.json`, scripts, and lockfile)
+> - **Workspace root:** this directory; provides convenience scripts that forward to `apps/vale-v2` via `pnpm --filter vale-v2 ...`
+> - **Workspace config:** `pnpm-workspace.yaml` declares `apps/*` as workspaces so pnpm understands the layout (and stops warning about `workspaces` in `package.json`).
+>
+> You can run dev/test commands **either** from the root (using the forwarded scripts) **or** from `apps/vale-v2` directly:
+>
+> - From **root** (recommended for consistency with existing docs): `pnpm dev`, `pnpm test`, `pnpm validate:data`, etc.
+> - From **apps/vale-v2/** (inside the app): `pnpm dev`, `pnpm test`, etc.
+>
+> Both entry points are supported; the root scripts are thin wrappers and are **not** deprecated.
 
 **For detailed development guidance**, see [apps/vale-v2/CLAUDE.md](apps/vale-v2/CLAUDE.md) - it contains comprehensive architecture details, testing philosophy, and development workflows.
 

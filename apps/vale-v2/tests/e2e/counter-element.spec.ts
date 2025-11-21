@@ -19,8 +19,46 @@
  * PR-DJINN-CORE: Element compatibility system
  */
 
+import type { Page } from '@playwright/test';
 import { test, expect } from '@playwright/test';
-import { waitForMode } from './helpers';
+import {
+  waitForMode,
+  completeFlintIntro,
+  enterHouseBattle,
+  stabilizeBattleDurability,
+  completeBattle,
+  claimRewardsAndReturnToOverworld,
+  addUnitToTeam,
+  formatHouseEncounterId,
+} from './helpers';
+import type { TestUnitDefinition } from './helpers';
+
+const WAR_MAGE_TEST_UNIT: TestUnitDefinition = {
+  id: 'war-mage',
+  name: 'War Mage',
+  element: 'Mars',
+  role: 'Elemental Mage',
+  baseStats: {
+    hp: 80,
+    pp: 25,
+    atk: 10,
+    def: 12,
+    mag: 18,
+    spd: 14,
+  },
+  growthRates: {
+    hp: 20,
+    pp: 5,
+    atk: 2,
+    def: 3,
+    mag: 4,
+    spd: 2,
+  },
+  abilities: [],
+  unlockedAbilityIds: [],
+  manaContribution: 2,
+  description: 'A fiery Mars mage',
+};
 
 test.describe('Counter Element Mechanics', () => {
   /**
@@ -35,6 +73,7 @@ test.describe('Counter Element Mechanics', () => {
     // 1. Initialize game
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
     // 2. Verify Adept (Venus) + Flint (Venus) = bonuses
@@ -73,6 +112,9 @@ test.describe('Counter Element Mechanics', () => {
     console.log(`   ATK: ${sameElementStats.baseAtk} + ${sameElementStats.atkBonus} = ${sameElementStats.effectiveAtk}`);
     console.log(`   DEF: ${sameElementStats.baseDef} + ${sameElementStats.defBonus} = ${sameElementStats.effectiveDef}`);
     console.log(`   ✅ Same element gives +4 ATK, +3 DEF`);
+
+    console.log('   Running a quick battle to exercise the same-element flow...');
+    await runHouseBattleAndReturn(page);
   });
 
   /**
@@ -89,73 +131,11 @@ test.describe('Counter Element Mechanics', () => {
     // 1. Initialize game
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+    await completeFlintIntro(page);
     await waitForMode(page, 'overworld', 30000);
 
-    // 2. Manually add War Mage (Mars element) to the team for testing
     console.log('   Adding War Mage (Mars) to team for counter element testing...');
-    await page.evaluate(() => {
-      const store = (window as any).__VALE_STORE__;
-      const { createUnit } = (window as any).__VALE_TEST_HELPERS__;
-      const team = store.getState().team;
-
-      // Import WAR_MAGE definition from definitions
-      const WAR_MAGE = {
-        id: 'war-mage',
-        name: 'War Mage',
-        element: 'Mars' as const,
-        role: 'Elemental Mage',
-        baseStats: {
-          hp: 80,
-          pp: 25,
-          atk: 10,
-          def: 12,
-          mag: 18,
-          spd: 14,
-        },
-        growthRates: {
-          hp: 20,
-          pp: 5,
-          atk: 2,
-          def: 3,
-          mag: 4,
-          spd: 2,
-        },
-        abilities: [], // Simplified for test
-        manaContribution: 2,
-        description: 'A fiery Mars mage',
-      };
-
-      // Create War Mage unit
-      // Note: createUnit is not exposed in test helpers, so we'll create manually
-      const warMage = {
-        id: 'war-mage',
-        name: 'War Mage',
-        element: 'Mars' as const,
-        baseStats: WAR_MAGE.baseStats,
-        growthRates: WAR_MAGE.growthRates,
-        abilities: [],
-        unlockedAbilityIds: [],
-        manaContribution: WAR_MAGE.manaContribution,
-        description: WAR_MAGE.description,
-        level: 1,
-        xp: 0,
-        currentHp: WAR_MAGE.baseStats.hp,
-        equipment: {
-          weapon: null,
-          armor: null,
-          accessory: null,
-        },
-        statusEffects: [],
-      };
-
-      // Add to team
-      store.setState({
-        team: {
-          ...team,
-          units: [...team.units, warMage],
-        },
-      });
-    });
+    await addUnitToTeam(page, WAR_MAGE_TEST_UNIT, 1);
 
     // 3. Verify War Mage (Mars) + Flint (Venus) = penalties
     const counterElementStats = await page.evaluate(() => {
@@ -195,6 +175,9 @@ test.describe('Counter Element Mechanics', () => {
     console.log(`   DEF: ${counterElementStats.baseDef} + ${counterElementStats.defPenalty} = ${counterElementStats.effectiveDef}`);
     console.log(`   ✅ Counter element gives -3 ATK, -2 DEF`);
 
+    console.log('   Running battle flow to verify counter-element penalties stay stable...');
+    await runHouseBattleAndReturn(page);
+
     // 4. Verify counter abilities are still granted
     // (We would need to enter battle to see merged abilities, but for now
     //  we just verify the penalty mechanic works)
@@ -219,3 +202,19 @@ test.describe('Counter Element Mechanics', () => {
     // Skipped because we don't have a Jupiter Djinn in the initial game state.
   });
 });
+
+async function runHouseBattleAndReturn(page: Page, houseNumber: number = 1): Promise<void> {
+  const encounterId = formatHouseEncounterId(houseNumber);
+  console.log(`   Entering ${encounterId} to exercise the counter element battle flow...`);
+  await enterHouseBattle(page, houseNumber);
+
+  const confirmButton = page.getByRole('button', { name: /confirm|start|begin/i });
+  await confirmButton.click();
+  await waitForMode(page, 'battle', 10000);
+  await stabilizeBattleDurability(page);
+
+  await completeBattle(page);
+  await claimRewardsAndReturnToOverworld(page);
+  await waitForMode(page, 'overworld', 10000);
+  console.log('   Battle flow complete and returned to overworld.');
+}
