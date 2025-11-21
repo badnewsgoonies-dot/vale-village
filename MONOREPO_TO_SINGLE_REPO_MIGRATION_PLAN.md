@@ -92,23 +92,42 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 ### Phase 3: Dependency & Configuration Updates
 1. **Merge package.json:**
    - Merge dependencies from `apps/vale-v2/package.json` into root
-   - Remove workspace configuration
-   - Update scripts to work from root
-   - Remove `--filter vale-v2` references
+   - Remove workspace configuration (`workspaces` field)
+   - Update scripts to work from root (remove `--filter vale-v2`)
+   - **Keep root devDependencies that are used by scripts:**
+     - `ts-morph` (used by `convert_ability_ids_to_kebab.ts`)
+     - `yargs` (used by all scripts)
+     - `@dqbd/tiktoken` (verify if used, otherwise remove)
+   - **Remove duplicate `vite` from root** (already in apps/vale-v2 dependencies)
 
-2. **Update path references:**
+2. **Handle ESLint configuration:**
+   - **Keep `apps/vale-v2/.eslintrc.cjs`** (more complete, has proper path resolution)
+   - Move `apps/vale-v2/.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
+   - Update `__dirname` path resolution in ESLint config if needed
+
+3. **Update path references:**
    - Update all `apps/vale-v2` references in:
-     - Scripts (`scripts/*.ts`)
+     - Scripts (`scripts/*.ts`) - Change default `--root` from `apps/vale-v2` to `.`
+     - CI/CD workflows (`.github/workflows/*.yml`) - Remove `--filter vale-v2`
+     - GitHub instructions (`.github/copilot-instructions.md`)
      - Documentation (markdown files)
      - Configuration files
      - Code comments
 
-3. **Remove workspace files:**
+4. **Update scripts path resolution:**
+   - **Root scripts** (`scripts/validate_transforms.ts`, etc.):
+     - Change default `--root` from `apps/vale-v2` to `.`
+     - Update `process.cwd()` usage if needed
+   - **App scripts** (`apps/vale-v2/scripts/*.cjs`, `*.ts`):
+     - Scripts using `__dirname` with relative paths (`../src`, `../public`) will work correctly after move
+     - Verify paths after moving to root `scripts/` directory
+
+5. **Remove workspace files:**
    - Delete `pnpm-workspace.yaml`
    - Delete `apps/vale-v2/pnpm-lock.yaml`
-   - Keep root `pnpm-lock.yaml` (will regenerate)
+   - **Regenerate root `pnpm-lock.yaml`** after merging package.json
 
-4. **Clean up stale files:**
+6. **Clean up stale files:**
    - Remove root `src/` (old v1 files)
    - Remove `dinerdash/` directory
    - Remove `libatomic1_14.2.0-4ubuntu2~24.04_amd64.deb`
@@ -116,39 +135,55 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 
 ### Phase 4: Path Alias & Import Updates
 1. **Verify path aliases:**
-   - Ensure `@/*` alias points to `./src/*` (should already be correct)
+   - Ensure `@/*` alias points to `./src/*` in `vite.config.ts` and `vitest.config.ts`
+   - Both use `path.resolve(__dirname, './src')` which will work correctly after move
    - Update any absolute imports if needed
 
 2. **Update script paths:**
-   - Update `scripts/validate_transforms.ts` (remove `--root` option or default to `.`)
-   - Update `scripts/dedupe_types.ts` (remove `--root` option)
-   - Update `scripts/update_ability_schema.ts` (remove `--root` option)
-   - Update `scripts/convert_ability_ids_to_kebab.ts` (remove `--root` option)
+   - Update `scripts/validate_transforms.ts` (change default `--root` from `apps/vale-v2` to `.`)
+   - Update `scripts/dedupe_types.ts` (already defaults to `.`, but update usage docs)
+   - Update `scripts/update_ability_schema.ts` (change default `--root` from `apps/vale-v2` to `.`)
+   - Update `scripts/convert_ability_ids_to_kebab.ts` (change default `--root` from `apps/vale-v2` to `.`)
+   - **Note:** Scripts using `__dirname` with relative paths will work correctly after move
 
 ### Phase 5: Testing & Validation
 1. **Run validation:**
-   - `pnpm install` - Verify dependencies install correctly
+   - `pnpm install` - Verify dependencies install correctly (regenerates lockfile)
    - `pnpm typecheck` - Verify TypeScript compiles
-   - `pnpm lint` - Verify linting passes
+   - `pnpm lint` - Verify linting passes (uses new ESLint config)
    - `pnpm validate:data` - Verify data validation
    - `pnpm test` - Verify all tests pass
    - `pnpm test:e2e` - Verify E2E tests pass
    - `pnpm dev` - Verify dev server starts
    - `pnpm build` - Verify production build works
 
-2. **Manual verification:**
-   - Check that all imports resolve correctly
-   - Verify sprite paths work
-   - Test game functionality
+2. **Verify scripts work:**
+   - Test `scripts/validate_transforms.ts` (should work without `--root` flag)
+   - Test `scripts/convert_ability_ids_to_kebab.ts --dry` (should work without `--root` flag)
+   - Test sprite generation scripts (`pnpm generate:sprites`)
 
-### Phase 6: Documentation Updates
-1. **Update documentation:**
+3. **Manual verification:**
+   - Check that all imports resolve correctly
+   - Verify sprite paths work (check `public/sprites/` access)
+   - Test game functionality
+   - Verify CI would pass (check workflow syntax)
+
+### Phase 6: Documentation & CI/CD Updates
+1. **Update CI/CD workflows:**
+   - Update `.github/workflows/ci.yml` - Remove all `--filter vale-v2` flags
+   - Update `.github/workflows/claude.yml` (if exists) - Remove workspace references
+   - Update `.github/workflows/claude-code-review.yml` (if exists) - Remove workspace references
+
+2. **Update GitHub instructions:**
+   - Update `.github/copilot-instructions.md` - Replace all `apps/vale-v2` references with root paths
+
+3. **Update documentation:**
    - Update `README.md` - Remove workspace references
    - Update `CLAUDE.md` - Remove workspace references
-   - Update all markdown files that reference `apps/vale-v2`
+   - Update all markdown files that reference `apps/vale-v2` (112+ files)
    - Update `CHANGELOG.md` with migration notes
 
-2. **Clean up:**
+4. **Clean up:**
    - Remove `apps/` directory
    - Final review of file structure
 
@@ -187,13 +222,18 @@ libatomic1_14.2.0-4ubuntu2~24.04_amd64.deb → (delete)
 ### Files to Update
 ```
 package.json                          → (merge dependencies, remove workspace config)
-scripts/validate_transforms.ts        → (update paths)
-scripts/dedupe_types.ts               → (update paths)
-scripts/update_ability_schema.ts      → (update paths)
-scripts/convert_ability_ids_to_kebab.ts → (update paths)
+.eslintrc.cjs                         → (replace with apps/vale-v2 version)
+scripts/validate_transforms.ts        → (change default --root to ".")
+scripts/dedupe_types.ts               → (update usage docs, already defaults to ".")
+scripts/update_ability_schema.ts      → (change default --root to ".")
+scripts/convert_ability_ids_to_kebab.ts → (change default --root to ".")
+.github/workflows/ci.yml              → (remove --filter vale-v2 flags)
+.github/workflows/claude.yml          → (remove workspace references if exists)
+.github/workflows/claude-code-review.yml → (remove workspace references if exists)
+.github/copilot-instructions.md       → (update all apps/vale-v2 references)
 README.md                             → (remove workspace references)
 CLAUDE.md                             → (remove workspace references)
-All .md files with "apps/vale-v2"     → (update paths)
+All .md files with "apps/vale-v2"     → (update paths - 112+ files)
 ```
 
 ---
@@ -209,11 +249,15 @@ All .md files with "apps/vale-v2"     → (update paths)
 - Path reference updates (many files, need thorough search)
 - Documentation updates (easy to miss references)
 - Script path updates (need to test thoroughly)
+- ESLint config merge (two configs exist, need to choose correct one)
+- CI/CD workflow updates (need to verify syntax)
 
 ### High Risk
 - Dependency conflicts (root has some devDependencies that might conflict)
-- Lockfile regeneration (need to ensure consistency)
+- Lockfile regeneration (need to ensure consistency - two lockfiles exist)
 - Import path resolution (need to verify all imports work)
+- Script path resolution (scripts use `__dirname` and `process.cwd()` - need to verify)
+- ESLint path restrictions (config has path-based rules that need to work after move)
 
 ### Mitigation Strategies
 1. **Create backup branch** before starting
@@ -248,7 +292,10 @@ All .md files with "apps/vale-v2"     → (update paths)
 ### Phase 2: Configuration Updates
 - [ ] Merge `apps/vale-v2/package.json` into root `package.json`
 - [ ] Remove workspace configuration from `package.json`
-- [ ] Update scripts in `package.json`
+- [ ] Update scripts in `package.json` (remove `--filter vale-v2`)
+- [ ] Keep root devDependencies: `ts-morph`, `yargs` (used by scripts)
+- [ ] Remove duplicate `vite` from root devDependencies
+- [ ] Move `apps/vale-v2/.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
 - [ ] Delete `pnpm-workspace.yaml`
 - [ ] Delete root `src/` (old v1 files)
 - [ ] Delete `dinerdash/` directory
@@ -256,22 +303,28 @@ All .md files with "apps/vale-v2"     → (update paths)
 - [ ] Commit: "Update configuration for single repo structure"
 
 ### Phase 3: Path Reference Updates
-- [ ] Update `scripts/validate_transforms.ts`
-- [ ] Update `scripts/dedupe_types.ts`
-- [ ] Update `scripts/update_ability_schema.ts`
-- [ ] Update `scripts/convert_ability_ids_to_kebab.ts`
-- [ ] Search and update all markdown files with `apps/vale-v2` references
+- [ ] Update `scripts/validate_transforms.ts` (default `--root` to `.`)
+- [ ] Update `scripts/dedupe_types.ts` (update usage docs)
+- [ ] Update `scripts/update_ability_schema.ts` (default `--root` to `.`)
+- [ ] Update `scripts/convert_ability_ids_to_kebab.ts` (default `--root` to `.`)
+- [ ] Update `.github/workflows/ci.yml` (remove `--filter vale-v2`)
+- [ ] Update `.github/workflows/claude.yml` (if exists, remove workspace refs)
+- [ ] Update `.github/workflows/claude-code-review.yml` (if exists, remove workspace refs)
+- [ ] Update `.github/copilot-instructions.md` (replace all `apps/vale-v2` references)
+- [ ] Search and update all markdown files with `apps/vale-v2` references (112+ files)
 - [ ] Commit: "Update path references from apps/vale-v2 to root"
 
 ### Phase 4: Testing
-- [ ] Run `pnpm install`
+- [ ] Run `pnpm install` (regenerates lockfile)
 - [ ] Run `pnpm typecheck`
-- [ ] Run `pnpm lint`
+- [ ] Run `pnpm lint` (uses new ESLint config)
 - [ ] Run `pnpm validate:data`
 - [ ] Run `pnpm test`
 - [ ] Run `pnpm test:e2e`
 - [ ] Run `pnpm dev` (verify it starts)
 - [ ] Run `pnpm build` (verify it builds)
+- [ ] Test `scripts/validate_transforms.ts` (without `--root` flag)
+- [ ] Test `pnpm generate:sprites` (verify sprite scripts work)
 - [ ] Commit: "Verify all tests and builds pass"
 
 ### Phase 5: Cleanup
@@ -306,8 +359,9 @@ All .md files with "apps/vale-v2"     → (update paths)
 ├── story/                  # Story content
 ├── mockups/                # Mockup files
 ├── eslint/                 # ESLint rules
+├── .eslintrc.cjs           # ESLint config (from apps/vale-v2)
 ├── package.json            # Dependencies and scripts
-├── pnpm-lock.yaml          # Dependency lockfile
+├── pnpm-lock.yaml          # Dependency lockfile (regenerated)
 ├── tsconfig.json           # TypeScript config
 ├── tsconfig.node.json      # TypeScript node config
 ├── vite.config.ts          # Vite config
@@ -377,6 +431,66 @@ If issues arise during migration:
 
 ---
 
+## Audit Findings & Additional Considerations
+
+### Critical Issues Found During Audit
+
+1. **ESLint Configuration Conflict:**
+   - Two `.eslintrc.cjs` files exist (root and `apps/vale-v2/`)
+   - `apps/vale-v2/.eslintrc.cjs` is more complete with proper path resolution
+   - **Solution:** Use `apps/vale-v2` version as the canonical config
+
+2. **CI/CD Workflow Dependencies:**
+   - `.github/workflows/ci.yml` uses `pnpm --filter vale-v2` in all steps
+   - Must update all workflow files to remove workspace references
+   - **Solution:** Remove `--filter vale-v2` from all workflow commands
+
+3. **GitHub Copilot Instructions:**
+   - `.github/copilot-instructions.md` has extensive `apps/vale-v2` references
+   - Used by AI agents, must be accurate
+   - **Solution:** Update all path references to root structure
+
+4. **Script Path Resolution:**
+   - Root scripts use `--root apps/vale-v2` as default
+   - App scripts use `__dirname` with relative paths (`../src`, `../public`)
+   - **Solution:** Change root script defaults to `.`, verify app scripts after move
+
+5. **Dependency Management:**
+   - Root has `vite` in devDependencies (duplicate)
+   - Root has `@dqbd/tiktoken` (verify if actually used)
+   - `ts-morph` and `yargs` are needed by scripts
+   - **Solution:** Merge carefully, remove duplicates, verify usage
+
+6. **Lockfile Strategy:**
+   - Two lockfiles exist (root workspace + app-specific)
+   - Must regenerate after merging package.json
+   - **Solution:** Delete app lockfile, regenerate root lockfile after merge
+
+7. **Path Alias Configuration:**
+   - `vite.config.ts` and `vitest.config.ts` use `path.resolve(__dirname, './src')`
+   - Will work correctly after move (relative to config file location)
+   - **Solution:** No changes needed, but verify after move
+
+8. **ESLint Path Restrictions:**
+   - ESLint config has path-based import restrictions (`./src/core`, `./src/ui`)
+   - These are relative paths, should work after move
+   - **Solution:** Verify ESLint rules work correctly after migration
+
+### Verification Checklist
+
+After migration, verify:
+- [ ] All scripts work without `--root` flag
+- [ ] ESLint rules still enforce architecture boundaries
+- [ ] CI/CD workflows pass
+- [ ] Sprite generation scripts work (`pnpm generate:sprites`)
+- [ ] Path aliases resolve correctly (`@/*` → `src/*`)
+- [ ] All imports resolve (no broken paths)
+- [ ] Dev server starts and serves assets correctly
+- [ ] Production build succeeds
+- [ ] Tests pass (unit + E2E)
+
+---
+
 ## Notes
 
 - This migration preserves all git history
@@ -384,9 +498,10 @@ If issues arise during migration:
 - Can be done incrementally with commits after each phase
 - All tests should pass before and after migration
 - Documentation updates can be done gradually after core migration
+- **Important:** Test scripts thoroughly after path updates (they use dynamic path resolution)
 
 ---
 
-**Status:** Ready for execution
+**Status:** Ready for execution (audited and optimized)
 **Last Updated:** 2025-01-XX
-**Author:** Migration Plan Generator
+**Author:** Migration Plan Generator (with comprehensive audit)
