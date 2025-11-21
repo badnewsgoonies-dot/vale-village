@@ -108,7 +108,7 @@ export function jumpToHouse(
   // Start with fresh state
   let updatedStory = story;
   let updatedTeam = team;
-  let updatedRoster = [...roster];
+  const updatedRoster = [...roster];
 
   // Collect Djinn IDs that should be granted
   const djinnToCollect: string[] = [];

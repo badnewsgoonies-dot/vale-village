@@ -5,7 +5,7 @@
 
 ## Critical TODOs (Must Implement)
 ### TODO 1: Hydrate Team and Battle from Save Data
-- **Files:** `apps/vale-v2/src/ui/state/saveSlice.ts:130, 210`
+- **Files:** `src/ui/state/saveSlice.ts:130, 210`
 - **Priority:** CRITICAL
 - **Impact:** Save/load doesn't restore game state
 - **Current:**
@@ -25,8 +25,8 @@ setBattle(hydratedBattle, saveData.rngSeed || 0);
 
 ### TODO 2: Migrate PP to Team Mana
 - **Files:**
-  - `apps/vale-v2/src/ui/components/UnitCard.tsx:24`
-  - `apps/vale-v2/src/ui/components/ActionBar.tsx:47`
+  - `src/ui/components/UnitCard.tsx:24`
+  - `src/ui/components/ActionBar.tsx:47`
 - **Priority:** HIGH
 - **Impact:** Technical debt, inconsistent system
 - **Current:**
@@ -42,7 +42,7 @@ const currentPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
 
 ## High Priority TODOs (Should Implement)
 ### TODO 3: Add Chapter to SaveV1Schema
-- **File:** `apps/vale-v2/src/core/services/SaveService.ts:246`
+- **File:** `src/core/services/SaveService.ts:246`
 - **Priority:** HIGH
 - **Implementation:**
   - Add `chapter: number` to `SaveV1Schema`
@@ -72,13 +72,13 @@ const currentPp = unit.baseStats.pp + (unit.level - 1) * unit.growthRates.pp;
 
 ## Files to Modify
 **Critical:**
-- `apps/vale-v2/src/ui/state/saveSlice.ts` - Hydrate state
-- `apps/vale-v2/src/ui/components/UnitCard.tsx` - Remove PP
-- `apps/vale-v2/src/ui/components/ActionBar.tsx` - Remove PP
+- `src/ui/state/saveSlice.ts` - Hydrate state
+- `src/ui/components/UnitCard.tsx` - Remove PP
+- `src/ui/components/ActionBar.tsx` - Remove PP
 
 **High Priority:**
-- `apps/vale-v2/src/data/schemas/SaveV1Schema.ts` - Add chapter
-- `apps/vale-v2/src/core/services/SaveService.ts` - Save chapter
+- `src/data/schemas/SaveV1Schema.ts` - Add chapter
+- `src/core/services/SaveService.ts` - Save chapter
 
 ## Testing
 # Test save/load with all state
@@ -87,6 +87,6 @@ pnpm test tests/core/save/
 pnpm dev  # Manual test save/load
 
 ## Reference
-- Save slice: `apps/vale-v2/src/ui/state/saveSlice.ts`
-- Save schema: `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
+- Save slice: `src/ui/state/saveSlice.ts`
+- Save schema: `src/data/schemas/SaveV1Schema.ts`
 - Current TODOs: Found 13 total across codebase

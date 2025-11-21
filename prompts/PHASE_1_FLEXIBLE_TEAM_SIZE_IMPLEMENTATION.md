@@ -15,7 +15,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase A: Foundation (Steps 1-3)
 
 **Step 1: Update Constants**
-- File: `apps/vale-v2/src/core/constants.ts`
+- File: `src/core/constants.ts`
 - Add constants:
   ```typescript
   export const MIN_PARTY_SIZE = 1;
@@ -34,7 +34,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 2: Update Team Model**
-- File: `apps/vale-v2/src/core/models/Team.ts`
+- File: `src/core/models/Team.ts`
 - Add import: `import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../constants';`
 - Update `createTeam()` function:
   ```typescript
@@ -48,7 +48,7 @@ Follow this exact order to ensure dependencies are met:
 - Update comment for `units` property: `/** Party members (1-4 units) */`
 
 **Step 3: Update Team Schema**
-- File: `apps/vale-v2/src/data/schemas/TeamSchema.ts`
+- File: `src/data/schemas/TeamSchema.ts`
 - Add import: `import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';`
 - Change line 19:
   ```typescript
@@ -62,7 +62,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase B: Core Logic (Steps 4-7)
 
 **Step 4: Update Battle State Creation**
-- File: `apps/vale-v2/src/core/models/BattleState.ts`
+- File: `src/core/models/BattleState.ts`
 - Update `createBattleState()` function (around line 208):
   ```typescript
   // BEFORE:
@@ -83,7 +83,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 4.5: Update Battle State Invariants**
-- File: `apps/vale-v2/src/core/validation/battleStateInvariants.ts`
+- File: `src/core/validation/battleStateInvariants.ts`
 - Update `validateQueueInvariants()` function (lines 110-118):
   ```typescript
   // BEFORE:
@@ -107,7 +107,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 5: Update Battle State Schema**
-- File: `apps/vale-v2/src/data/schemas/BattleStateSchema.ts`
+- File: `src/data/schemas/BattleStateSchema.ts`
 - Add import: `import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';`
 - Update schema (around lines 49-50):
   ```typescript
@@ -157,7 +157,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 6: Update Queue Service Functions**
-- File: `apps/vale-v2/src/core/services/QueueBattleService.ts`
+- File: `src/core/services/QueueBattleService.ts`
 - Update `queueAction()` function (after line 68):
   ```typescript
   const unitIndex = state.playerTeam.units.findIndex(u => u.id === unitId);
@@ -205,7 +205,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 7: Update Mana Algorithm**
-- File: `apps/vale-v2/src/core/algorithms/mana.ts`
+- File: `src/core/algorithms/mana.ts`
 - Update `isQueueComplete()` function (around line 91):
   ```typescript
   // BEFORE:
@@ -231,7 +231,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase C: State Management (Steps 6.5-6.6)
 
 **Step 6.5: Update Team Slice**
-- File: `apps/vale-v2/src/ui/state/teamSlice.ts`
+- File: `src/ui/state/teamSlice.ts`
 - Update `swapPartyMember()` function (lines 65-76):
   ```typescript
   // BEFORE:
@@ -267,7 +267,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase D: Persistence (Steps 8-9.3)
 
 **Step 8: Update Save Schema**
-- File: `apps/vale-v2/src/data/schemas/SaveV1Schema.ts`
+- File: `src/data/schemas/SaveV1Schema.ts`
 - Add import: `import { MIN_PARTY_SIZE, MAX_PARTY_SIZE } from '../../core/constants';`
 - Update schema (around line 28):
   ```typescript
@@ -279,7 +279,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 9: Update Save Slice - createSaveData()**
-- File: `apps/vale-v2/src/ui/state/saveSlice.ts`
+- File: `src/ui/state/saveSlice.ts`
 - Update `createSaveData()` function (around lines 55-60):
   ```typescript
   // BEFORE:
@@ -296,7 +296,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 9.1: Update Save Slice - loadGame()**
-- File: `apps/vale-v2/src/ui/state/saveSlice.ts`
+- File: `src/ui/state/saveSlice.ts`
 - Update `loadGame()` function (around lines 133-159):
   ```typescript
   // BEFORE:
@@ -345,7 +345,7 @@ Follow this exact order to ensure dependencies are met:
   ```
 
 **Step 9.2: Update Save Slice - loadGameSlot()**
-- File: `apps/vale-v2/src/ui/state/saveSlice.ts`
+- File: `src/ui/state/saveSlice.ts`
 - Update `loadGameSlot()` function (around lines 274-300):
   - Apply IDENTICAL changes as `loadGame()` above
   - Filter empty strings, remove padding, remove slice
@@ -353,7 +353,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase E: Testing Support (Step 9.5)
 
 **Step 9.5: Update Test Factories**
-- File: `apps/vale-v2/src/test/factories.ts`
+- File: `src/test/factories.ts`
 - Update `mkTeam()` function (around lines 76-90):
   ```typescript
   // BEFORE:
@@ -410,7 +410,7 @@ Follow this exact order to ensure dependencies are met:
 ### Phase F: UI Verification (Step 10)
 
 **Step 10: Verify UI Components**
-- File: `apps/vale-v2/src/ui/components/QueueBattleView.tsx`
+- File: `src/ui/components/QueueBattleView.tsx`
 - Check for hardcoded loops: `for (let i = 0; i < 4; i++)`
 - Check for hardcoded array access: `units[0]`, `units[1]`, `units[2]`, `units[3]`
 - Verify uses dynamic approach: `battle.playerTeam.units.map()` or `battle.playerTeam.units.length`

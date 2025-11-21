@@ -23,7 +23,7 @@
 ## 🔴 ERROR BOUNDARIES
 
 ### 1. No React Error Boundary
-**File:** `apps/vale-v2/src/main.tsx:19-22`  
+**File:** `src/main.tsx:19-22`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/ui/App.errorBoundary.test.tsx
+// tests/ui/App.errorBoundary.test.tsx
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import App from '@/App';
@@ -74,7 +74,7 @@ it('shows a fallback UI instead of crashing when the battle view throws', () => 
 ## 🟠 RESULT TYPES
 
 ### 2. queueAction Throws Instead of Returning Result
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:41-75`  
+**File:** `src/core/services/QueueBattleService.ts:41-75`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -85,7 +85,7 @@ it('shows a fallback UI instead of crashing when the battle view throws', () => 
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/QueueBattleService.result.test.ts
+// tests/battle/QueueBattleService.result.test.ts
 import { queueAction } from '@/core/services/QueueBattleService';
 import { mkBattle } from '@/test/factories';
 import { FIREBALL } from '@/data/definitions/abilities';
@@ -116,7 +116,7 @@ it('returns Err when the queued ability exceeds the remaining mana budget', () =
 ---
 
 ### 3. generateEnemyActions Doesn't Handle AI Failures
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:461-473`  
+**File:** `src/core/services/QueueBattleService.ts:461-473`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -126,7 +126,7 @@ it('returns Err when the queued ability exceeds the remaining mana budget', () =
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/EnemyDecision.resilience.test.ts
+// tests/battle/EnemyDecision.resilience.test.ts
 import { executeRound } from '@/core/services/QueueBattleService';
 import { mkBattle, mkEnemy } from '@/test/factories';
 import { makePRNG } from '@/core/random/prng';
@@ -151,7 +151,7 @@ it('keeps executing when an enemy definition exposes no usable abilities', () =>
 ## 🟠 NULL/UNDEFINED HANDLING
 
 ### 4. ActionQueuePanel Treats Record as Array
-**File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx:51-88`  
+**File:** `src/ui/components/ActionQueuePanel.tsx:51-88`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -168,7 +168,7 @@ const ability = action?.abilityId
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/ui/ActionQueuePanel.test.tsx
+// tests/ui/ActionQueuePanel.test.tsx
 import { render, screen } from '@testing-library/react';
 import { mkBattle } from '@/test/factories';
 import { FIREBALL } from '@/data/definitions/abilities';
@@ -204,7 +204,7 @@ it('shows the ability name when an action is queued', () => {
 ---
 
 ### 5. QueueBattleView Calls getAbilityManaCost Before Validation
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx:123-129`  
+**File:** `src/ui/components/QueueBattleView.tsx:123-129`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -214,7 +214,7 @@ it('shows the ability name when an action is queued', () => {
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/QueueBattleService.missingAbility.test.ts
+// tests/battle/QueueBattleService.missingAbility.test.ts
 import { queueAction } from '@/core/services/QueueBattleService';
 import { mkBattle } from '@/test/factories';
 
@@ -245,7 +245,7 @@ it('fails gracefully when an ability id has no metadata', () => {
 ## 🟠 BATTLE EDGE CASES
 
 ### 6. Simultaneous Wipe-Out Counts as Player Victory
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:486-491`  
+**File:** `src/core/services/BattleService.ts:486-491`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -268,7 +268,7 @@ export function checkBattleEnd(state: BattleState): BattleResult | null {
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/BattleService.tie.test.ts
+// tests/battle/BattleService.tie.test.ts
 import { checkBattleEnd } from '@/core/services/BattleService';
 import { mkBattle } from '@/test/factories';
 
@@ -295,7 +295,7 @@ it('does not grant victory when both teams are KO at the same time', () => {
 ---
 
 ### 7. Mana Validation Logic Error
-**File:** `apps/vale-v2/src/core/algorithms/mana.ts:78-84`  
+**File:** `src/core/algorithms/mana.ts:78-84`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -305,7 +305,7 @@ it('does not grant victory when both teams are KO at the same time', () => {
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/ManaBudget.test.ts
+// tests/battle/ManaBudget.test.ts
 import { validateQueuedActions } from '@/core/algorithms/mana';
 
 it('treats a fully funded queue as valid even when remaining mana is low', () => {
@@ -328,7 +328,7 @@ it('treats a fully funded queue as valid even when remaining mana is low', () =>
 ---
 
 ### 8. Retargeting Changes Single-Target to Multi-Target
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:424-445`  
+**File:** `src/core/services/QueueBattleService.ts:424-445`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -338,7 +338,7 @@ it('treats a fully funded queue as valid even when remaining mana is low', () =>
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/battle/Retargeting.test.ts
+// tests/battle/Retargeting.test.ts
 import { executeRound } from '@/core/services/QueueBattleService';
 import { mkBattle, mkEnemy } from '@/test/factories';
 import { FIREBALL } from '@/data/definitions/abilities';
@@ -404,7 +404,7 @@ it('retargets single-target abilities to one new enemy when the original target 
 ## 🟡 EQUIPMENT EDGE CASES
 
 ### 10. Duplicate Equipment Removal Bug
-**File:** `apps/vale-v2/src/ui/state/inventorySlice.ts:31-38`  
+**File:** `src/ui/state/inventorySlice.ts:31-38`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -414,7 +414,7 @@ it('retargets single-target abilities to one new enemy when the original target 
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/ui/InventorySlice.duplicates.test.ts
+// tests/ui/InventorySlice.duplicates.test.ts
 import { create } from 'zustand';
 import { createInventorySlice, type InventorySlice } from '@/ui/state/inventorySlice';
 import { EQUIPMENT } from '@/data/definitions/equipment';
@@ -438,7 +438,7 @@ it('keeps remaining duplicates when removing one piece of gear', () => {
 ---
 
 ### 11. Equipment References Non-Existent Abilities
-**File:** `apps/vale-v2/src/data/definitions/equipment.ts:75-83, 202-209`  
+**File:** `src/data/definitions/equipment.ts:75-83, 202-209`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -448,7 +448,7 @@ it('keeps remaining duplicates when removing one piece of gear', () => {
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/data/equipmentAbilities.test.ts
+// tests/data/equipmentAbilities.test.ts
 import { ABILITIES } from '@/data/definitions/abilities';
 import { EQUIPMENT } from '@/data/definitions/equipment';
 
@@ -473,7 +473,7 @@ it('requires every unlocksAbility id to correspond to a defined ability', () => 
 ## 🟡 PROGRESSION EDGE CASES
 
 ### 12. Negative XP Causes Level-Down
-**File:** `apps/vale-v2/src/core/algorithms/xp.ts:97-120`  
+**File:** `src/core/algorithms/xp.ts:97-120`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -483,7 +483,7 @@ it('requires every unlocksAbility id to correspond to a defined ability', () => 
 
 **Test Case:**
 ```typescript
-// apps/vale-v2/tests/core/xpNegative.test.ts
+// tests/core/xpNegative.test.ts
 import { addXp, getXpForLevel } from '@/core/algorithms/xp';
 import { mkUnit } from '@/test/factories';
 

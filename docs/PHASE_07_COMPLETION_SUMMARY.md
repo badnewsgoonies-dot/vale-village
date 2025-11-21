@@ -23,10 +23,10 @@ Phase 7 successfully implemented a comprehensive Djinn ability unlocking system 
 ### **Phase 7A: Foundation (Element Compatibility + Per-Unit Bonuses)** ✅
 
 **Files Created:**
-- `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+- `src/core/algorithms/djinnAbilities.ts`
 
 **Files Modified:**
-- `apps/vale-v2/src/core/algorithms/stats.ts`
+- `src/core/algorithms/stats.ts`
 
 **Key Features:**
 - Element compatibility calculation (`getElementCompatibility()`)
@@ -44,9 +44,9 @@ Phase 7 successfully implemented a comprehensive Djinn ability unlocking system 
 ### **Phase 7B: Djinn Schema + Definitions** ✅
 
 **Files Created:**
-- `apps/vale-v2/src/data/schemas/DjinnSchema.ts`
-- `apps/vale-v2/src/data/definitions/djinn.ts` (12 Djinn definitions)
-- `apps/vale-v2/src/data/definitions/djinnAbilities.ts` (initial ~60 abilities)
+- `src/data/schemas/DjinnSchema.ts`
+- `src/data/definitions/djinn.ts` (12 Djinn definitions)
+- `src/data/definitions/djinnAbilities.ts` (initial ~60 abilities)
 
 **Key Features:**
 - Zod schema validation for Djinn data
@@ -69,9 +69,9 @@ Phase 7 successfully implemented a comprehensive Djinn ability unlocking system 
 ### **Phase 7C: Ability Integration** ✅
 
 **Files Modified:**
-- `apps/vale-v2/src/core/models/BattleState.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+- `src/core/models/BattleState.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/algorithms/djinnAbilities.ts`
 
 **Key Features:**
 - `getDjinnGrantedAbilitiesForUnit()` - Extracts ability IDs from Set Djinn
@@ -93,8 +93,8 @@ Phase 7 successfully implemented a comprehensive Djinn ability unlocking system 
 ### **Phase 7D: Ability Expansion** ✅
 
 **Files Modified:**
-- `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
-- `apps/vale-v2/src/data/definitions/djinn.ts`
+- `src/data/definitions/djinnAbilities.ts`
+- `src/data/definitions/djinn.ts`
 
 **Implementation Strategy:**
 - Batch-by-batch expansion (Venus → Mars → Mercury → Jupiter)
@@ -224,17 +224,17 @@ mergeDjinnAbilitiesIntoUnit(unit, team): Unit
 ## FILES CHANGED
 
 ### **Created:**
-- `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
-- `apps/vale-v2/src/data/schemas/DjinnSchema.ts`
-- `apps/vale-v2/src/data/definitions/djinn.ts`
-- `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
-- `apps/vale-v2/tests/core/algorithms/djinnAbilities.test.ts`
+- `src/core/algorithms/djinnAbilities.ts`
+- `src/data/schemas/DjinnSchema.ts`
+- `src/data/definitions/djinn.ts`
+- `src/data/definitions/djinnAbilities.ts`
+- `tests/core/algorithms/djinnAbilities.test.ts`
 
 ### **Modified:**
-- `apps/vale-v2/src/core/algorithms/stats.ts`
-- `apps/vale-v2/src/core/models/BattleState.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/models/types.ts` (documentation)
+- `src/core/algorithms/stats.ts`
+- `src/core/models/BattleState.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/models/types.ts` (documentation)
 
 ---
 

@@ -27,7 +27,7 @@
 
 ### ✅ Completed: E2E Combat Mechanics Tests
 
-**File:** `apps/vale-v2/tests/e2e/combat-mechanics.spec.ts`
+**File:** `tests/e2e/combat-mechanics.spec.ts`
 
 **5 Tests Implemented:**
 1. **Damage Formula Validation** - Verifies `2×ATK - DEF/2` formula
@@ -59,21 +59,21 @@
 
 #### Dead UI Components to Delete:
 
-1. **`apps/vale-v2/src/ui/components/BattleScreen.tsx`**
+1. **`src/ui/components/BattleScreen.tsx`**
    - Status: Never imported, dead code
    - Action: Delete file
 
-2. **`apps/vale-v2/src/ui/components/BattleView.tsx`**
+2. **`src/ui/components/BattleView.tsx`**
    - Status: Only exported, never imported
    - Action: Delete file
 
-3. **`apps/vale-v2/src/ui/components/battle/` folder**
+3. **`src/ui/components/battle/` folder**
    - Status: Entire folder is dead code
    - Contains: `UnitCard.tsx`, `TurnOrderStrip.tsx` (duplicates exist elsewhere)
    - Action: Delete entire folder
 
 4. **Associated CSS Files:**
-   - `apps/vale-v2/src/ui/components/battle/*.css`
+   - `src/ui/components/battle/*.css`
    - Action: Delete all CSS files in battle folder
 
 #### Verification:
@@ -82,10 +82,10 @@
 
 **Files to Delete:**
 ```
-apps/vale-v2/src/ui/components/BattleScreen.tsx
-apps/vale-v2/src/ui/components/BattleView.tsx
-apps/vale-v2/src/ui/components/battle/ (entire folder)
-apps/vale-v2/src/ui/components/battle/*.css (all CSS files)
+src/ui/components/BattleScreen.tsx
+src/ui/components/BattleView.tsx
+src/ui/components/battle/ (entire folder)
+src/ui/components/battle/*.css (all CSS files)
 ```
 
 **Estimated LOC Reduction:** ~1,617 lines
@@ -144,9 +144,9 @@ Two Zustand slices manage nearly identical battle state:
 
 #### Files to Modify:
 ```
-apps/vale-v2/src/ui/state/battleSlice.ts          → DELETE
-apps/vale-v2/src/ui/state/queueBattleSlice.ts     → MERGE methods if needed
-apps/vale-v2/src/ui/store.ts                      → Remove battleSlice import
+src/ui/state/battleSlice.ts          → DELETE
+src/ui/state/queueBattleSlice.ts     → MERGE methods if needed
+src/ui/store.ts                      → Remove battleSlice import
 ```
 
 #### Verification Steps:
@@ -166,7 +166,7 @@ apps/vale-v2/src/ui/store.ts                      → Remove battleSlice import
 
 #### Problem:
 
-**File:** `apps/vale-v2/src/core/services/BattleService.ts`
+**File:** `src/core/services/BattleService.ts`
 
 **Function:** `executeAbility()` (lines 340-673, ~334 lines)
 
@@ -239,7 +239,7 @@ function executeAbility(...): ActionResult {
 
 #### Files to Modify:
 ```
-apps/vale-v2/src/core/services/BattleService.ts
+src/core/services/BattleService.ts
   → Extract executeAbility() into smaller functions
 ```
 
@@ -258,16 +258,16 @@ apps/vale-v2/src/core/services/BattleService.ts
 1. **Verify Dead Code:**
    ```bash
    # Search for imports
-   grep -r "BattleScreen" apps/vale-v2/src
-   grep -r "BattleView" apps/vale-v2/src
-   grep -r "from.*battle/" apps/vale-v2/src
+   grep -r "BattleScreen" src
+   grep -r "BattleView" src
+   grep -r "from.*battle/" src
    ```
 
 2. **Delete Files:**
    ```bash
-   rm apps/vale-v2/src/ui/components/BattleScreen.tsx
-   rm apps/vale-v2/src/ui/components/BattleView.tsx
-   rm -rf apps/vale-v2/src/ui/components/battle/
+   rm src/ui/components/BattleScreen.tsx
+   rm src/ui/components/BattleView.tsx
+   rm -rf src/ui/components/battle/
    ```
 
 3. **Verify No Breakage:**
@@ -295,13 +295,13 @@ apps/vale-v2/src/core/services/BattleService.ts
 1. **Audit Current Usage:**
    ```bash
    # Find all imports of battleSlice
-   grep -r "battleSlice" apps/vale-v2/src
-   grep -r "from.*battleSlice" apps/vale-v2/src
+   grep -r "battleSlice" src
+   grep -r "from.*battleSlice" src
    ```
 
 2. **Check Store Configuration:**
    ```typescript
-   // apps/vale-v2/src/ui/store.ts
+   // src/ui/store.ts
    // Verify battleSlice is imported/used
    ```
 
@@ -492,21 +492,21 @@ apps/vale-v2/src/core/services/BattleService.ts
 ## 📚 Reference Files
 
 ### Test Files (Validation):
-- `apps/vale-v2/tests/e2e/combat-mechanics.spec.ts` - E2E combat tests
-- `apps/vale-v2/tests/e2e/helpers.ts` - Test helpers (including `executeBattleActionAndCaptureDamage`)
+- `tests/e2e/combat-mechanics.spec.ts` - E2E combat tests
+- `tests/e2e/helpers.ts` - Test helpers (including `executeBattleActionAndCaptureDamage`)
 
 ### Files to Modify:
-- `apps/vale-v2/src/ui/components/BattleScreen.tsx` → DELETE
-- `apps/vale-v2/src/ui/components/BattleView.tsx` → DELETE
-- `apps/vale-v2/src/ui/components/battle/` → DELETE (entire folder)
-- `apps/vale-v2/src/ui/state/battleSlice.ts` → DELETE (after merge)
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts` → MODIFY (merge methods)
-- `apps/vale-v2/src/ui/store.ts` → MODIFY (remove battleSlice)
-- `apps/vale-v2/src/core/services/BattleService.ts` → MODIFY (extract executeAbility)
+- `src/ui/components/BattleScreen.tsx` → DELETE
+- `src/ui/components/BattleView.tsx` → DELETE
+- `src/ui/components/battle/` → DELETE (entire folder)
+- `src/ui/state/battleSlice.ts` → DELETE (after merge)
+- `src/ui/state/queueBattleSlice.ts` → MODIFY (merge methods)
+- `src/ui/store.ts` → MODIFY (remove battleSlice)
+- `src/core/services/BattleService.ts` → MODIFY (extract executeAbility)
 
 ### Architecture Docs:
-- `apps/vale-v2/CLAUDE.md` - Architecture principles
-- `apps/vale-v2/CHANGELOG.md` - Breaking changes log
+- `CLAUDE.md` - Architecture principles
+- `CHANGELOG.md` - Breaking changes log
 
 ---
 

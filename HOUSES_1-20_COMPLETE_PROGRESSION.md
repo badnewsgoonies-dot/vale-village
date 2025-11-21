@@ -512,7 +512,7 @@ Total: 10 units (1 starter + 9 recruits)
 ## 🚀 IMPLEMENTATION CHECKLIST
 
 ### Phase 1: Code Implementation
-- [ ] Add 4 new units to `apps/vale-v2/src/data/definitions/units.ts`
+- [ ] Add 4 new units to `src/data/definitions/units.ts`
   - [ ] Blaze (Mars, Balanced Warrior)
   - [ ] Karis (Mercury, Versatile Scholar)
   - [ ] Tyrell (Mars, Pure DPS)

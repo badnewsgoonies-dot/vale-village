@@ -142,6 +142,7 @@ export function isImmuneToStatus(unit: Unit, statusType: string): boolean {
   }
 
   // Check if any immunity specifically lists this status type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return immunities.some(s => s.types?.includes(statusType as any));
 }
 
@@ -150,6 +151,7 @@ export function isImmuneToStatus(unit: Unit, statusType: string): boolean {
  * Negative statuses: poison, burn, freeze, paralyze, stun, debuffs
  * NOT negative: buffs, healOverTime, shields, resistance buffs
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isNegativeStatus(status: { type: string; [key: string]: any }): boolean {
   // Damage-over-time and action-preventing statuses
   if (['poison', 'burn', 'freeze', 'paralyze', 'stun'].includes(status.type)) {

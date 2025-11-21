@@ -109,7 +109,7 @@ npm run test:sprites       # Test catalog
 
 **File Locations:**
 ```
-/workspace/apps/vale-v2/
+/workspace/
 ├── scripts/
 │   ├── generate-sprite-manifest.cjs    ✅ Created
 │   ├── validate-sprites.cjs            ✅ Created

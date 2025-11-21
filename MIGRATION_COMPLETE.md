@@ -2,7 +2,7 @@
 
 ## Migration Summary
 
-Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structure (`apps/vale-v2/`) to a single, flat repository structure.
+Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structure (``) to a single, flat repository structure.
 
 **Date:** 2025-01-XX
 **Status:** ✅ Complete
@@ -12,20 +12,20 @@ Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structur
 ## What Was Done
 
 ### Phase 1: File Movement ✅
-- Moved `apps/vale-v2/src/` → `src/`
-- Moved `apps/vale-v2/tests/` → `tests/`
-- Moved `apps/vale-v2/public/` → `public/`
-- Moved `apps/vale-v2/sprite-sheets/` → `sprite-sheets/`
-- Merged `apps/vale-v2/scripts/` → `scripts/`
-- Merged `apps/vale-v2/mockups/` → `mockups/`
-- Moved `apps/vale-v2/docs/` → `docs/app/`
+- Moved `src/` → `src/`
+- Moved `tests/` → `tests/`
+- Moved `public/` → `public/`
+- Moved `sprite-sheets/` → `sprite-sheets/`
+- Merged `scripts/` → `scripts/`
+- Merged `mockups/` → `mockups/`
+- Moved `docs/` → `docs/app/`
 - Moved all configuration files to root
 - Moved all markdown files to root
 
 ### Phase 2: Configuration Updates ✅
 - Merged `package.json` files (removed workspace config)
 - Updated scripts (removed `--filter vale-v2`)
-- Moved `.eslintrc.cjs` from `apps/vale-v2/` to root
+- Moved `.eslintrc.cjs` from `` to root
 - Deleted `pnpm-workspace.yaml`
 - Removed stale files (`dinerdash/`, old `src/`, system package)
 
@@ -59,7 +59,7 @@ Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structur
 ├── sprite-sheets/          # Sprite sheet PNGs
 ├── scripts/                # Build and utility scripts
 ├── docs/                   # Documentation
-│   ├── app/                # App-specific docs (from apps/vale-v2/docs/)
+│   ├── app/                # App-specific docs (from docs/)
 │   ├── adr/                # Architecture Decision Records
 │   ├── architect/          # Technical specifications
 │   └── archive/            # Archived docs
@@ -99,7 +99,7 @@ Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structur
 
 ## Verification Checklist
 
-- [x] All files moved from `apps/vale-v2/` to root
+- [x] All files moved from `` to root
 - [x] `package.json` merged and workspace config removed
 - [x] Scripts updated (default `--root` changed to `.`)
 - [x] CI/CD workflows updated
@@ -119,7 +119,7 @@ Successfully migrated Vale Chronicles V2 from a pnpm workspace monorepo structur
    - Address ESLint code quality issues
 
 2. **Update Documentation:**
-   - Bulk update remaining markdown files that reference `apps/vale-v2` (112+ files)
+   - Bulk update remaining markdown files that reference `root` (112+ files)
    - Update any external documentation
 
 3. **Verify CI/CD:**

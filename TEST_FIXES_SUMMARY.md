@@ -22,9 +22,9 @@
 - Check if story state is being reset on page reload before `loadGame()` is called
 
 **Files to Check**:
-- `/workspace/apps/vale-v2/src/ui/state/saveSlice.ts` - `getStoryStateFromSave()` function
-- `/workspace/apps/vale-v2/src/data/schemas/SaveV1Schema.ts` - Verify schema structure
-- `/workspace/apps/vale-v2/src/core/services/SaveService.ts` - Verify save/load logic
+- `/workspace/src/ui/state/saveSlice.ts` - `getStoryStateFromSave()` function
+- `/workspace/src/data/schemas/SaveV1Schema.ts` - Verify schema structure
+- `/workspace/src/core/services/SaveService.ts` - Verify save/load logic
 
 ## Key Fixes Applied
 

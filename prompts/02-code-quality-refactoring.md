@@ -20,7 +20,7 @@ The battle system has several code quality issues:
 ## Tasks
 
 ### Task 1: Refactor executeRound into Composable Phases
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current Structure:**
 ```typescript
@@ -81,7 +81,7 @@ export function executeRound(state: BattleState, rng: PRNG): ExecutionResult {
 - Add new tests for each phase function
 
 ### Task 2: Split BattleState into Focused Interfaces
-**File:** `apps/vale-v2/src/core/models/BattleState.ts`
+**File:** `src/core/models/BattleState.ts`
 
 **Current:** Single `BattleState` interface with 20+ fields
 
@@ -135,7 +135,7 @@ export interface BattleState {
 - Update all tests
 
 ### Task 3: Extract Magic Numbers to Constants
-**File:** `apps/vale-v2/src/core/constants.ts`
+**File:** `src/core/constants.ts`
 
 **Extract:**
 - `PARTY_SIZE = 4` (replace hard-coded `[null, null, null, null]`)
@@ -151,7 +151,7 @@ export interface BattleState {
 - Document constants with JSDoc
 
 ### Task 4: Introduce AbilityId Union Type
-**File:** `apps/vale-v2/src/data/types/AbilityId.ts` (new)
+**File:** `src/data/types/AbilityId.ts` (new)
 
 **Create:**
 ```typescript
@@ -179,11 +179,11 @@ export type AbilityId =
 - Documentation updated
 
 ## Files to Review
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/models/BattleState.ts`
-- `apps/vale-v2/src/core/constants.ts`
-- `apps/vale-v2/src/data/definitions/abilities.ts`
-- `apps/vale-v2/tests/core/services/queue-battle.test.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/models/BattleState.ts`
+- `src/core/constants.ts`
+- `src/data/definitions/abilities.ts`
+- `tests/core/services/queue-battle.test.ts`
 - All files that reference BattleState or ability IDs
 
 ## Recommended Model

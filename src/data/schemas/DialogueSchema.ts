@@ -18,7 +18,7 @@ export const DialogueEffectsSchema = z
     questAccepted: z.boolean().optional(),
     openShop: z.boolean().optional(),
   })
-  .catchall(z.boolean());
+  .passthrough();
 
 export const DialogueChoiceSchema = z.object({
   id: z.string(),

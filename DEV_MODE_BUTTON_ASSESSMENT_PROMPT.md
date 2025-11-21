@@ -22,7 +22,7 @@ A "🎮 Dev Mode" button was added to the overworld screen that unlocks all game
 ## Files Modified
 
 ### 1. OverworldMap.tsx
-**File:** `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+**File:** `src/ui/components/OverworldMap.tsx`
 
 **Changes:**
 ```tsx
@@ -51,7 +51,7 @@ if (confirmed) {
 - `setTeam`, `setRoster` (no longer needed from useStore selector)
 
 ### 2. App.tsx
-**File:** `apps/vale-v2/src/App.tsx`
+**File:** `src/App.tsx`
 
 **Changes:**
 ```tsx
@@ -275,13 +275,13 @@ if (devModeFlag === 'true') {
 
 **Project Architecture:**
 - See: `CLAUDE.md` (root) - Repository-wide architecture
-- See: `apps/vale-v2/CLAUDE.md` - Detailed development patterns
+- See: `CLAUDE.md` - Detailed development patterns
 - See: `ARCHITECTURE_REBUILD_SUMMARY.md` - Recent Zustand migration
 
 **Related Services:**
-- `apps/vale-v2/src/core/services/DevModeService.ts` - Creates dev state object
-- `apps/vale-v2/src/ui/state/teamSlice.ts` - Team state management
-- `apps/vale-v2/src/ui/state/inventorySlice.ts` - Equipment/gold state
+- `src/core/services/DevModeService.ts` - Creates dev state object
+- `src/ui/state/teamSlice.ts` - Team state management
+- `src/ui/state/inventorySlice.ts` - Equipment/gold state
 
 **Current Git Branch:** `main` (latest commit: `00a46f2`)
 

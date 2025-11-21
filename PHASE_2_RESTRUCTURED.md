@@ -6,7 +6,7 @@ Phase 2 has been restructured to match the planned architecture. All algorithms 
 
 ## New Structure
 
-### Algorithms (`apps/vale-v2/src/core/algorithms/`)
+### Algorithms (`src/core/algorithms/`)
 - ✅ **damage.ts** - Physical/psynergy damage, healing, critical hits, dodge, element modifiers
 - ✅ **turn-order.ts** - SPD-based turn order calculation with tiebreaker randomization
 - ✅ **status.ts** - Status effect processing (poison, burn, freeze, paralyze)
@@ -15,7 +15,7 @@ Phase 2 has been restructured to match the planned architecture. All algorithms 
 - ✅ **xp.ts** - XP curve, level calculation, level-up detection
 - ✅ **index.ts** - Centralized exports
 
-### Services (`apps/vale-v2/src/core/services/`)
+### Services (`src/core/services/`)
 - ✅ **BattleService.ts** - High-level battle coordination:
   - `startBattle()` - Initialize battle with turn order
   - `performAction()` - Execute ability and return updated state
@@ -74,7 +74,7 @@ Phase 2 has been restructured to match the planned architecture. All algorithms 
 ## File Structure
 
 ```
-apps/vale-v2/src/core/
+src/core/
 ├── algorithms/
 │   ├── damage.ts          # ✅ Damage, healing, crits, dodge, elements
 │   ├── turn-order.ts      # ✅ SPD-based ordering

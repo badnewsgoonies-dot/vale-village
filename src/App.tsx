@@ -36,15 +36,19 @@ function App() {
   useDevMode();
   // Expose store and test helpers for debugging and E2E tests
   // Always expose (TODO: restrict in production builds if needed)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_STORE__ = useStore;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_TEST_HELPERS__ = {
     calculateEffectiveStats,
     getXpProgress,
     DJINN,
   };
   // Expose equipment definitions for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_EQUIPMENT__ = EQUIPMENT;
   // Expose Djinn ability + service helpers for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_DJINN_HELPERS__ = {
     getDjinnGrantedAbilitiesForUnit,
     calculateDjinnBonusesForUnit,
@@ -52,6 +56,7 @@ function App() {
     equipDjinn,
   };
   // Expose battle service functions for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_BATTLE_HELPERS__ = {
     queueDjinn,
     queueAction,
@@ -59,13 +64,16 @@ function App() {
     transitionToPlanningPhase: queueBattleServiceInternals.transitionToPlanningPhase,
   };
   // Expose stats functions for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_STATS_HELPERS__ = {
     calculateEffectiveStats,
     calculateDjinnBonusesForUnit,
   };
   // Expose PRNG factory for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_PRNG__ = makePRNG;
   // Expose battle state functions for E2E tests
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).__VALE_BATTLE_STATE_HELPERS__ = {
     updateBattleState,
   };

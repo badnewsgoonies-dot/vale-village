@@ -27,7 +27,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ✅ 1. Units: 6 Total (Complete)
 
-**File:** `apps/vale-v2/src/data/definitions/units.ts`
+**File:** `src/data/definitions/units.ts`
 
 **Starter Units (4):**
 1. **Adept** (Venus) - Defensive Tank
@@ -61,7 +61,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ✅ 2. Djinn: 12 Total (Complete)
 
-**File:** `apps/vale-v2/src/data/definitions/djinn.ts`
+**File:** `src/data/definitions/djinn.ts`
 
 **Full Roster:**
 
@@ -87,7 +87,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ✅ 3. Djinn Abilities: 180 Abilities (Complete)
 
-**File:** `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
+**File:** `src/data/definitions/djinnAbilities.ts`
 
 **All 180 abilities implemented:**
 - **Flint:** 15 abilities (Venus T1)
@@ -114,7 +114,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ✅ 4. Core Abilities: 18 Abilities (Complete)
 
-**File:** `apps/vale-v2/src/data/definitions/abilities.ts`
+**File:** `src/data/definitions/abilities.ts`
 
 **Physical Abilities (5):**
 - `strike` - Basic physical attack (0 mana)
@@ -149,7 +149,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ⚠️ 5. Enemies: 9 Total (Limited Coverage)
 
-**File:** `apps/vale-v2/src/data/definitions/enemies.ts`
+**File:** `src/data/definitions/enemies.ts`
 
 **Current Enemies:**
 
@@ -208,7 +208,7 @@ This report verifies the **actual state** of Chapter 1 data in the Vale Chronicl
 
 ### ⚠️ 6. Encounters: 6 Total (Limited Coverage)
 
-**File:** `apps/vale-v2/src/data/definitions/encounters.ts`
+**File:** `src/data/definitions/encounters.ts`
 
 **Current Encounters:**
 
@@ -384,7 +384,7 @@ Clarify the verification goal:
 ## File Locations
 
 ```
-apps/vale-v2/src/data/definitions/
+src/data/definitions/
 ├── units.ts              # 6 units (complete)
 ├── djinn.ts              # 12 Djinn (complete)
 ├── djinnAbilities.ts     # 180 abilities (complete)

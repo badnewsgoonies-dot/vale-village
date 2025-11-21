@@ -8,17 +8,17 @@
 ## ✅ COMPLETED
 
 ### Phase 1: Assets Migration ✅
-- ✅ Moved `/public/` → `/apps/vale-v2/public/` (2,572 sprites)
-- ✅ Moved `/sprite-sheets/` → `/apps/vale-v2/sprite-sheets/` (25 PNG sheets)
+- ✅ Moved `/public/` → `/public/` (2,572 sprites)
+- ✅ Moved `/sprite-sheets/` → `/sprite-sheets/` (25 PNG sheets)
 
 ### Phase 2: Equipment Data ✅
 - ✅ Migrated all 58 equipment items from v1 to v2
 - ✅ Updated to use v2's EquipmentSchema
-- ✅ File: `/apps/vale-v2/src/data/definitions/equipment.ts`
+- ✅ File: `/src/data/definitions/equipment.ts`
 - ✅ Validated against Zod schemas
 
 ### Phase 3: Documentation Cleanup ✅
-- ✅ Archived `CAMERA_SYSTEM.md` → `apps/vale-v2/docs/legacy/` (generic pattern)
+- ✅ Archived `CAMERA_SYSTEM.md` → `docs/legacy/` (generic pattern)
 - ✅ Deleted 6 V1 root docs (GAME_VISION_SUMMARY.md, OVERWORLD_ENHANCEMENT_SPEC.md, etc.)
 - ✅ Deleted 6 ROLE onboarding files (V1 workflow artifacts)
 - ✅ Deleted all status/audit files (PHASE_*.md, IMPLEMENTATION_*.md, *_AUDIT*.md, etc.)
@@ -29,7 +29,7 @@
 - ✅ Deleted v1 config files (index.html, vite.config.ts, tsconfig.json, etc.)
 
 ### Phase 5: Documentation Updates ✅
-- ✅ Updated `apps/vale-v2/CLAUDE.md` with current status (~80% migration complete)
+- ✅ Updated `CLAUDE.md` with current status (~80% migration complete)
 - ✅ Updated `README.md` for v2-only structure
 - ✅ Updated `START_HERE.md` for v2 quick start
 - ✅ Verified `VALE_CHRONICLES_ARCHITECTURE.md` is clean (merge conflict resolved)
@@ -94,14 +94,14 @@
 
 **V2 Status:** 
 - Core systems functional (battle, progression, equipment, djinn)
-- Assets accessible at `apps/vale-v2/public/`
+- Assets accessible at `public/`
 - Equipment data validated and working
 - Documentation updated for v2-only structure
 
 **Next Steps:**
 - Continue v2 development with clean architecture
 - Add enemies/overworld data incrementally as features are built
-- Reference archived design docs in `apps/vale-v2/docs/legacy/` if needed
+- Reference archived design docs in `docs/legacy/` if needed
 - See `MIGRATION_COMPLETE.md` for detailed migration summary and next steps
 
 ---

@@ -62,7 +62,7 @@ Set → Standby → (recovery countdown) → Set
 
 ### **Task 5.1: Update Djinn Summon Execution to Set Recovery Timers**
 
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Location:** `executeDjinnSummons()` function (around line 396)
 
@@ -175,7 +175,7 @@ function executeDjinnSummons(
 
 ### **Task 5.2: Decrement Recovery Timers and Restore State**
 
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current Code:**
 ```typescript
@@ -240,7 +240,7 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
 
 ### **Task 5.3: Optional Djinn Events**
 
-Add `djinn-activated`/`djinn-recovered` to `apps/vale-v2/src/core/services/types.ts` and render them in `text.ts` for player feedback.
+Add `djinn-activated`/`djinn-recovered` to `src/core/services/types.ts` and render them in `text.ts` for player feedback.
 
 ---
 

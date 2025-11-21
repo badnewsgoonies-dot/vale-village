@@ -143,7 +143,7 @@
 
 4. **Re-run Tests**
    ```bash
-   cd apps/vale-v2
+   cd root
    pnpm test
    ```
    Should see ~400+ passing tests now (slime fix)

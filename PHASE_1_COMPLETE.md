@@ -6,7 +6,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 
 ## What Was Built
 
-### 1. Core Models (`apps/vale-v2/src/core/models/`)
+### 1. Core Models (`src/core/models/`)
 - ✅ **types.ts** - Base types (Element, Stats, GrowthRates, UnitRole, StatusEffect, DjinnState)
 - ✅ **Equipment.ts** - Equipment and EquipmentLoadout POJOs with factory functions
 - ✅ **Unit.ts** - Unit and UnitDefinition POJOs with helper functions
@@ -14,7 +14,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 - ✅ **BattleState.ts** - BattleState POJO for battle management
 - ✅ **index.ts** - Centralized exports
 
-### 2. Zod Schemas (`apps/vale-v2/src/data/schemas/`)
+### 2. Zod Schemas (`src/data/schemas/`)
 - ✅ **StatsSchema.ts** - Stats validation
 - ✅ **EquipmentSchema.ts** - Equipment and EquipmentLoadout validation
 - ✅ **UnitSchema.ts** - Unit, UnitDefinition, StatusEffect, Element, UnitRole, DjinnState validation
@@ -24,7 +24,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 - ✅ **SaveV1Schema.ts** - Save file version 1.0.0 schema
 - ✅ **index.ts** - Centralized schema exports
 
-### 3. Data Definitions (`apps/vale-v2/src/data/definitions/`)
+### 3. Data Definitions (`src/data/definitions/`)
 - ✅ **equipment.ts** - Placeholder for equipment definitions
 - ✅ **units.ts** - Placeholder for unit definitions
 - ✅ **enemies.ts** - Placeholder for enemy definitions
@@ -35,12 +35,12 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 - ✅ Validation runs at startup via `npm run validate:data`
 - ✅ Clear error messages for invalid data
 
-### 5. Migration System (`apps/vale-v2/src/core/migrations/`)
+### 5. Migration System (`src/core/migrations/`)
 - ✅ **types.ts** - Migration types and interfaces
 - ✅ **index.ts** - Migration registry and scaffold
 - ✅ Ready for future save format changes
 
-### 6. Tests (`apps/vale-v2/tests/core/models/`)
+### 6. Tests (`tests/core/models/`)
 - ✅ **Unit.test.ts** - Unit model tests (creation, updates, validation)
 - ✅ **Equipment.test.ts** - Equipment model tests (loadout, bonuses, validation)
 - ✅ **Team.test.ts** - Team model tests (creation, updates, validation)
@@ -77,7 +77,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 ## File Structure Created
 
 ```
-apps/vale-v2/
+
 ├── src/
 │   ├── core/
 │   │   ├── models/           # ✅ POJO models
@@ -145,7 +145,7 @@ Ready to proceed with Phase 2: Algorithms & Services
 
 ```bash
 # Navigate to v2 app
-cd apps/vale-v2
+cd root
 
 # Run validation
 npm run validate:data

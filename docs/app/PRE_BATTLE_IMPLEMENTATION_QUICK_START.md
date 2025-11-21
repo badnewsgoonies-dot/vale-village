@@ -9,7 +9,7 @@ This guide provides step-by-step prompts for implementing the pre-battle team se
 ## Implementation Order
 
 ### 1. Foundation: State Management
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 1)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 1)
 
 **What it does:**
 - Updates `gameFlowSlice.ts` to support team selection mode
@@ -19,13 +19,13 @@ This guide provides step-by-step prompts for implementing the pre-battle team se
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 1: Update GameFlowSlice for Team Selection Mode
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 1: Update GameFlowSlice for Team Selection Mode
 ```
 
 ---
 
 ### 2. Main Component Structure
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 2)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 2)
 
 **What it does:**
 - Creates `PreBattleTeamSelectScreen.tsx` main component
@@ -34,13 +34,13 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 2: Create Main Component Structure
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 2: Create Main Component Structure
 ```
 
 ---
 
 ### 3. Styling
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 3)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 3)
 
 **What it does:**
 - Creates `PreBattleTeamSelectScreen.css`
@@ -50,14 +50,14 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 3: Create CSS File
-Reference the visual mockup at apps/vale-v2/mockups/pre-battle-team-select-final.html for exact styling
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 3: Create CSS File
+Reference the visual mockup at mockups/pre-battle-team-select-final.html for exact styling
 ```
 
 ---
 
 ### 4. Team & Bench Section
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 4)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 4)
 
 **What it does:**
 - Creates `TeamBenchSection.tsx` component
@@ -67,13 +67,13 @@ Reference the visual mockup at apps/vale-v2/mockups/pre-battle-team-select-final
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 4: Create TeamBenchSection Component
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 4: Create TeamBenchSection Component
 ```
 
 ---
 
 ### 5. Equipment Section
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 5)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 5)
 
 **What it does:**
 - Creates `EquipmentSection.tsx` component
@@ -83,13 +83,13 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 5: Create EquipmentSection Component
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 5: Create EquipmentSection Component
 ```
 
 ---
 
 ### 6. Djinn Section
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 6)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 6)
 
 **What it does:**
 - Creates `DjinnSection.tsx` component
@@ -99,13 +99,13 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 6: Create DjinnSection Component
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 6: Create DjinnSection Component
 ```
 
 ---
 
 ### 7. Enemy Portal Tile
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 7)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 7)
 
 **What it does:**
 - Creates `EnemyPortalTile.tsx` component
@@ -115,13 +115,13 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 7: Create EnemyPortalTile Component
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 7: Create EnemyPortalTile Component
 ```
 
 ---
 
 ### 8. Integration
-**Prompt File:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 8)
+**Prompt File:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md` (Step 8)
 
 **What it does:**
 - Integrates `PreBattleTeamSelectScreen` into `App.tsx`
@@ -130,7 +130,7 @@ Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement S
 
 **Command to feed Composer:**
 ```
-Read apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 8: Integrate into App.tsx
+Read docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md and implement Step 8: Integrate into App.tsx
 ```
 
 ---
@@ -185,11 +185,11 @@ pnpm validate:data
 
 ## Reference Files
 
-- **Main Prompt:** `apps/vale-v2/docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md`
-- **Visual Mockup:** `apps/vale-v2/mockups/pre-battle-team-select-final.html`
-- **Design Doc:** `apps/vale-v2/docs/IMPROVED_PRE_BATTLE_DESIGN.md`
-- **Architecture:** `apps/vale-v2/CLAUDE.md`
-- **Quality Guidelines:** `apps/vale-v2/CLAUDE.md` (sections on Clean Architecture, TypeScript, React Patterns)
+- **Main Prompt:** `docs/IMPLEMENTATION_PROMPT_PRE_BATTLE_FINAL.md`
+- **Visual Mockup:** `mockups/pre-battle-team-select-final.html`
+- **Design Doc:** `docs/IMPROVED_PRE_BATTLE_DESIGN.md`
+- **Architecture:** `CLAUDE.md`
+- **Quality Guidelines:** `CLAUDE.md` (sections on Clean Architecture, TypeScript, React Patterns)
 
 ---
 
@@ -223,7 +223,7 @@ pnpm validate:data
 ## Support
 
 If you encounter issues:
-1. Check `apps/vale-v2/CLAUDE.md` for architecture guidelines
-2. Review `apps/vale-v2/mockups/pre-battle-team-select-final.html` for visual reference
+1. Check `CLAUDE.md` for architecture guidelines
+2. Review `mockups/pre-battle-team-select-final.html` for visual reference
 3. Check existing components for patterns (e.g., `QueueBattleView.tsx`)
 

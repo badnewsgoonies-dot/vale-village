@@ -288,9 +288,9 @@ If a sprite doesn't appear:
 
 See these files for real usage examples:
 
-- `apps/vale-v2/src/ui/components/BattleView.tsx` - Battle scene
-- `apps/vale-v2/src/ui/components/UnitCard.tsx` - Unit sprites
-- `apps/vale-v2/src/ui/sprites/ButtonIcon.tsx` - Button icons
+- `src/ui/components/BattleView.tsx` - Battle scene
+- `src/ui/components/UnitCard.tsx` - Unit sprites
+- `src/ui/sprites/ButtonIcon.tsx` - Button icons
 
 ---
 

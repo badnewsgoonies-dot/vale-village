@@ -234,17 +234,17 @@ Your improved test suite must:
 
 ## Files You'll Need to Reference
 
-- `apps/vale-v2/src/data/definitions/maps.ts` - Map data
-- `apps/vale-v2/src/data/definitions/encounters.ts` - Encounter data
-- `apps/vale-v2/src/data/definitions/enemies.ts` - Enemy stats
-- `apps/vale-v2/src/data/definitions/units.ts` - Unit definitions
-- `apps/vale-v2/src/ui/state/store.ts` - Store type definitions
-- `apps/vale-v2/src/core/models/BattleState.ts` - Battle state structure
-- `apps/vale-v2/src/ui/components/QueueBattleView.tsx` - Battle UI selectors
+- `src/data/definitions/maps.ts` - Map data
+- `src/data/definitions/encounters.ts` - Encounter data
+- `src/data/definitions/enemies.ts` - Enemy stats
+- `src/data/definitions/units.ts` - Unit definitions
+- `src/ui/state/store.ts` - Store type definitions
+- `src/core/models/BattleState.ts` - Battle state structure
+- `src/ui/components/QueueBattleView.tsx` - Battle UI selectors
 
 ## Current Test to Replace
 
-File: `apps/vale-v2/tests/e2e/game-start.spec.ts`
+File: `tests/e2e/game-start.spec.ts`
 
 Replace it entirely with your comprehensive test suite.
 

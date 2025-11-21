@@ -22,7 +22,7 @@ The game has several critical bugs that need immediate fixing:
 ## Tasks
 
 ### Task 1: Fix HP Validation
-**File:** `apps/vale-v2/src/core/models/Unit.ts`
+**File:** `src/core/models/Unit.ts`
 - Add validation in `applyDamage()` to clamp HP to [0, maxHP]
 - Add validation in `applyHealing()` to:
   - Reject negative healing values (return error)
@@ -37,7 +37,7 @@ The game has several critical bugs that need immediate fixing:
 - Test negative healing value is rejected
 
 ### Task 2: Fix PRNG Negative Seeds
-**File:** `apps/vale-v2/src/core/random/prng.ts`
+**File:** `src/core/random/prng.ts`
 - Validate seed is non-negative in constructor
 - Throw error or convert negative seeds to positive (document decision)
 - Ensure `next()` always returns [0, 1)
@@ -47,7 +47,7 @@ The game has several critical bugs that need immediate fixing:
 - Test all PRNG methods return valid ranges
 
 ### Task 3: Fix Duplicate Djinn Equip
-**File:** `apps/vale-v2/src/core/models/Team.ts`
+**File:** `src/core/models/Team.ts`
 - Add validation in Djinn equip function to check for duplicates
 - Return Result type with error if duplicate detected
 
@@ -56,7 +56,7 @@ The game has several critical bugs that need immediate fixing:
 - Test equipping different Djinn works normally
 
 ### Task 4: Fix Equipment Validation
-**File:** `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
+**File:** `src/data/schemas/EquipmentSchema.ts`
 - Ensure statBonus is required or has default empty object
 - Add validation to prevent crashes on malformed data
 
@@ -72,12 +72,12 @@ The game has several critical bugs that need immediate fixing:
 - All error cases return Result types or throw appropriately
 
 ## Files to Review
-- `apps/vale-v2/src/core/models/Unit.ts`
-- `apps/vale-v2/src/core/models/Team.ts`
-- `apps/vale-v2/src/core/random/prng.ts`
-- `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
-- `apps/vale-v2/tests/core/models/Unit.test.ts`
-- `apps/vale-v2/tests/core/random/prng.test.ts`
+- `src/core/models/Unit.ts`
+- `src/core/models/Team.ts`
+- `src/core/random/prng.ts`
+- `src/data/schemas/EquipmentSchema.ts`
+- `tests/core/models/Unit.test.ts`
+- `tests/core/random/prng.test.ts`
 
 ## Recommended Model
 **Claude 3.5 Sonnet** (200k context) - Sufficient for straightforward bug fixes

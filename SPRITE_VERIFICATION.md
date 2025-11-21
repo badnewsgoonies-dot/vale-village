@@ -205,14 +205,14 @@ All sprite types are displaying correctly:
 ## Files Modified
 
 ### Core Components
-- `apps/vale-v2/src/ui/components/battle/UnitCard.tsx` - Added `getPortraitSprite()` mapping
-- `apps/vale-v2/src/ui/sprites/mappings/portraits.ts` - Portrait mapping utility
-- `apps/vale-v2/src/ui/sprites/mappings/abilityIcons.ts` - Ability icon mapping utility
-- `apps/vale-v2/src/ui/sprites/mappings/statusIcons.ts` - Status icon mapping utility
-- `apps/vale-v2/src/ui/components/battle/StatusIcon.tsx` - Status icon component
+- `src/ui/components/battle/UnitCard.tsx` - Added `getPortraitSprite()` mapping
+- `src/ui/sprites/mappings/portraits.ts` - Portrait mapping utility
+- `src/ui/sprites/mappings/abilityIcons.ts` - Ability icon mapping utility
+- `src/ui/sprites/mappings/statusIcons.ts` - Status icon mapping utility
+- `src/ui/components/battle/StatusIcon.tsx` - Status icon component
 
 ### Testing
-- `apps/vale-v2/tests/e2e/check-sprites.spec.ts` - Automated sprite verification tests
+- `tests/e2e/check-sprites.spec.ts` - Automated sprite verification tests
 
 ---
 

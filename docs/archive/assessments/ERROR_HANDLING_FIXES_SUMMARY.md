@@ -8,7 +8,7 @@
 ## ✅ Completed Fixes
 
 ### 1. React Error Boundary ✅
-**File:** `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx` (new)  
+**File:** `src/ui/components/GameErrorBoundary.tsx` (new)  
 **Changes:**
 - Created `GameErrorBoundary` component with fallback UI
 - Wrapped `<App />` in error boundary in `main.tsx`
@@ -20,7 +20,7 @@
 ---
 
 ### 2. ActionQueuePanel ABILITIES.find Bug ✅
-**File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx:56`  
+**File:** `src/ui/components/ActionQueuePanel.tsx:56`  
 **Changes:**
 - Changed `ABILITIES.find(a => a.id === action.abilityId)` to `ABILITIES[action.abilityId] ?? null`
 - Handles missing abilities gracefully
@@ -30,7 +30,7 @@
 ---
 
 ### 3. Simultaneous Wipe-Out Logic ✅
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:492-507`  
+**File:** `src/core/services/BattleService.ts:492-507`  
 **Changes:**
 - Updated `checkBattleEnd()` to check both teams simultaneously
 - Returns `PLAYER_DEFEAT` if both teams KO'd at same time (player loses ties)
@@ -40,7 +40,7 @@
 ---
 
 ### 4. AI Decision Failure Handling ✅
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:472-494`  
+**File:** `src/core/services/QueueBattleService.ts:472-494`  
 **Changes:**
 - Wrapped `makeAIDecision()` in try/catch
 - Falls back to basic attack if AI decision fails
@@ -51,7 +51,7 @@
 ---
 
 ### 5. Retargeting Preserves Target Type ✅
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:432-493`  
+**File:** `src/core/services/QueueBattleService.ts:432-493`  
 **Changes:**
 - Updated `resolveValidTargets()` to check ability target type
 - Single-target abilities retarget to ONE enemy/player (not all)
@@ -63,7 +63,7 @@
 ---
 
 ### 6. Duplicate Equipment Removal ✅
-**File:** `apps/vale-v2/src/ui/state/inventorySlice.ts:31-49`  
+**File:** `src/ui/state/inventorySlice.ts:31-49`  
 **Changes:**
 - `addEquipment()` deep clones items (prevents reference sharing)
 - `removeEquipment()` removes only first occurrence (preserves duplicates)
@@ -74,7 +74,7 @@
 ---
 
 ### 7. Equipment Ability Validation ✅
-**File:** `apps/vale-v2/src/core/validation/validateAll.ts:99-106`  
+**File:** `src/core/validation/validateAll.ts:99-106`  
 **Changes:**
 - Added check for `equipment.unlocksAbility` references
 - Validates all `unlocksAbility` IDs exist in `ABILITIES`
@@ -85,7 +85,7 @@
 ---
 
 ### 8. Negative XP Clamping ✅
-**File:** `apps/vale-v2/src/core/algorithms/xp.ts:97-134`  
+**File:** `src/core/algorithms/xp.ts:97-134`  
 **Changes:**
 - Added `Math.max(0, unit.xp + xpGain)` to prevent negative XP
 - Added `leveledDown` detection
@@ -97,7 +97,7 @@
 ---
 
 ### 9. queueAction Returns Result Type ✅
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:36-82`  
+**File:** `src/core/services/QueueBattleService.ts:36-82`  
 **Changes:**
 - Converted `queueAction()` to return `Result<BattleState, string>`
 - All error cases return `Err()` instead of throwing
@@ -110,14 +110,14 @@
 ## 📊 Verification
 
 ### Mana Validation Logic ✅
-**File:** `apps/vale-v2/src/core/algorithms/mana.ts:78-84`  
+**File:** `src/core/algorithms/mana.ts:78-84`  
 **Status:** Logic is correct
 - Checks `totalCost <= remainingMana` ✓
 - Test case in audit expects `validateQueuedActions(4, [cost3, cost3, null, null])` to return `false` ✓
 - This is correct behavior (6 > 4) ✓
 
 ### Unit Dies Before Action ✅
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:214-227`  
+**File:** `src/core/services/QueueBattleService.ts:214-227`  
 **Status:** Already handled
 - Checks `if (!actor || isUnitKO(actor))` before executing ✓
 - Emits miss event and continues ✓
@@ -127,15 +127,15 @@
 
 ## 📋 Files Modified
 
-1. ✅ `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx` (new)
-2. ✅ `apps/vale-v2/src/main.tsx`
-3. ✅ `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
-4. ✅ `apps/vale-v2/src/core/services/BattleService.ts`
-5. ✅ `apps/vale-v2/src/core/services/QueueBattleService.ts`
-6. ✅ `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
-7. ✅ `apps/vale-v2/src/ui/state/inventorySlice.ts`
-8. ✅ `apps/vale-v2/src/core/validation/validateAll.ts`
-9. ✅ `apps/vale-v2/src/core/algorithms/xp.ts`
+1. ✅ `src/ui/components/GameErrorBoundary.tsx` (new)
+2. ✅ `src/main.tsx`
+3. ✅ `src/ui/components/ActionQueuePanel.tsx`
+4. ✅ `src/core/services/BattleService.ts`
+5. ✅ `src/core/services/QueueBattleService.ts`
+6. ✅ `src/ui/state/queueBattleSlice.ts`
+7. ✅ `src/ui/state/inventorySlice.ts`
+8. ✅ `src/core/validation/validateAll.ts`
+9. ✅ `src/core/algorithms/xp.ts`
 
 ---
 

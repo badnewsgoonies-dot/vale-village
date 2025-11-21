@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a pnpm workspace monorepo structure (`apps/vale-v2/`) to a single, flat repository structure. This will simplify the project structure, reduce complexity, and align with the goal of having the game as the only project in the repository.
+This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a pnpm workspace monorepo structure (``) to a single, flat repository structure. This will simplify the project structure, reduce complexity, and align with the goal of having the game as the only project in the repository.
 
 ---
 
@@ -22,7 +22,7 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 
 - **Legacy/Stale Files:**
   - `src/` - Contains old `main.tsx` and `EquipmentSchema.ts` (likely from v1)
-  - `scripts/` - Utility scripts that reference `apps/vale-v2` paths
+  - `scripts/` - Utility scripts that reference `root` paths
   - `story/` - Story content (15 .ts files, 5 .md files)
   - `eslint/` - ESLint rules
   - `dinerdash/` - Old project directory (should be removed)
@@ -33,7 +33,7 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
   - `libatomic1_14.2.0-4ubuntu2~24.04_amd64.deb` - System package (should be removed)
   - `screenshot-mockups.cjs`, `take-screenshots.cjs` - Utility scripts
 
-### Game Directory (`/workspace/apps/vale-v2/`)
+### Game Directory (`/workspace/`)
 - **Core Application:**
   - `src/` - All game source code (211 files)
   - `tests/` - Test suite (115 files)
@@ -68,46 +68,46 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 
 ### Phase 2: File Consolidation
 1. **Move game code to root:**
-   - Move `apps/vale-v2/src/` → `src/`
-   - Move `apps/vale-v2/tests/` → `tests/`
-   - Move `apps/vale-v2/public/` → `public/`
-   - Move `apps/vale-v2/sprite-sheets/` → `sprite-sheets/`
-   - Move `apps/vale-v2/scripts/` → `scripts/` (merge with existing)
-   - Move `apps/vale-v2/mockups/` → `mockups/` (merge with existing)
+   - Move `src/` → `src/`
+   - Move `tests/` → `tests/`
+   - Move `public/` → `public/`
+   - Move `sprite-sheets/` → `sprite-sheets/`
+   - Move `scripts/` → `scripts/` (merge with existing)
+   - Move `mockups/` → `mockups/` (merge with existing)
 
 2. **Move configuration files:**
-   - Move `apps/vale-v2/tsconfig.json` → `tsconfig.json`
-   - Move `apps/vale-v2/tsconfig.node.json` → `tsconfig.node.json`
-   - Move `apps/vale-v2/vite.config.ts` → `vite.config.ts`
-   - Move `apps/vale-v2/vitest.config.ts` → `vitest.config.ts`
-   - Move `apps/vale-v2/playwright.config.ts` → `playwright.config.ts`
-   - Move `apps/vale-v2/index.html` → `index.html`
+   - Move `tsconfig.json` → `tsconfig.json`
+   - Move `tsconfig.node.json` → `tsconfig.node.json`
+   - Move `vite.config.ts` → `vite.config.ts`
+   - Move `vitest.config.ts` → `vitest.config.ts`
+   - Move `playwright.config.ts` → `playwright.config.ts`
+   - Move `index.html` → `index.html`
 
 3. **Handle documentation:**
    - Keep root `docs/` as-is (architectural docs)
-   - Move `apps/vale-v2/docs/` → `docs/app/` (app-specific docs)
-   - Move `apps/vale-v2/CLAUDE.md` → `CLAUDE.md` (replace root version)
+   - Move `docs/` → `docs/app/` (app-specific docs)
+   - Move `CLAUDE.md` → `CLAUDE.md` (replace root version)
    - Consolidate duplicate markdown files
 
 ### Phase 3: Dependency & Configuration Updates
 1. **Merge package.json:**
-   - Merge dependencies from `apps/vale-v2/package.json` into root
+   - Merge dependencies from `package.json` into root
    - Remove workspace configuration (`workspaces` field)
    - Update scripts to work from root (remove `--filter vale-v2`)
    - **Keep root devDependencies that are used by scripts:**
      - `ts-morph` (used by `convert_ability_ids_to_kebab.ts`)
      - `yargs` (used by all scripts)
      - `@dqbd/tiktoken` (verify if used, otherwise remove)
-   - **Remove duplicate `vite` from root** (already in apps/vale-v2 dependencies)
+   - **Remove duplicate `vite` from root** (already in root dependencies)
 
 2. **Handle ESLint configuration:**
-   - **Keep `apps/vale-v2/.eslintrc.cjs`** (more complete, has proper path resolution)
-   - Move `apps/vale-v2/.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
+   - **Keep `.eslintrc.cjs`** (more complete, has proper path resolution)
+   - Move `.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
    - Update `__dirname` path resolution in ESLint config if needed
 
 3. **Update path references:**
-   - Update all `apps/vale-v2` references in:
-     - Scripts (`scripts/*.ts`) - Change default `--root` from `apps/vale-v2` to `.`
+   - Update all `root` references in:
+     - Scripts (`scripts/*.ts`) - Change default `--root` from `root` to `.`
      - CI/CD workflows (`.github/workflows/*.yml`) - Remove `--filter vale-v2`
      - GitHub instructions (`.github/copilot-instructions.md`)
      - Documentation (markdown files)
@@ -116,15 +116,15 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 
 4. **Update scripts path resolution:**
    - **Root scripts** (`scripts/validate_transforms.ts`, etc.):
-     - Change default `--root` from `apps/vale-v2` to `.`
+     - Change default `--root` from `root` to `.`
      - Update `process.cwd()` usage if needed
-   - **App scripts** (`apps/vale-v2/scripts/*.cjs`, `*.ts`):
+   - **App scripts** (`scripts/*.cjs`, `*.ts`):
      - Scripts using `__dirname` with relative paths (`../src`, `../public`) will work correctly after move
      - Verify paths after moving to root `scripts/` directory
 
 5. **Remove workspace files:**
    - Delete `pnpm-workspace.yaml`
-   - Delete `apps/vale-v2/pnpm-lock.yaml`
+   - Delete `pnpm-lock.yaml`
    - **Regenerate root `pnpm-lock.yaml`** after merging package.json
 
 6. **Clean up stale files:**
@@ -140,10 +140,10 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
    - Update any absolute imports if needed
 
 2. **Update script paths:**
-   - Update `scripts/validate_transforms.ts` (change default `--root` from `apps/vale-v2` to `.`)
+   - Update `scripts/validate_transforms.ts` (change default `--root` from `root` to `.`)
    - Update `scripts/dedupe_types.ts` (already defaults to `.`, but update usage docs)
-   - Update `scripts/update_ability_schema.ts` (change default `--root` from `apps/vale-v2` to `.`)
-   - Update `scripts/convert_ability_ids_to_kebab.ts` (change default `--root` from `apps/vale-v2` to `.`)
+   - Update `scripts/update_ability_schema.ts` (change default `--root` from `root` to `.`)
+   - Update `scripts/convert_ability_ids_to_kebab.ts` (change default `--root` from `root` to `.`)
    - **Note:** Scripts using `__dirname` with relative paths will work correctly after move
 
 ### Phase 5: Testing & Validation
@@ -175,12 +175,12 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
    - Update `.github/workflows/claude-code-review.yml` (if exists) - Remove workspace references
 
 2. **Update GitHub instructions:**
-   - Update `.github/copilot-instructions.md` - Replace all `apps/vale-v2` references with root paths
+   - Update `.github/copilot-instructions.md` - Replace all `root` references with root paths
 
 3. **Update documentation:**
    - Update `README.md` - Remove workspace references
    - Update `CLAUDE.md` - Remove workspace references
-   - Update all markdown files that reference `apps/vale-v2` (112+ files)
+   - Update all markdown files that reference `root` (112+ files)
    - Update `CHANGELOG.md` with migration notes
 
 4. **Clean up:**
@@ -193,21 +193,21 @@ This document outlines a comprehensive plan to migrate Vale Chronicles V2 from a
 
 ### Files to Move
 ```
-apps/vale-v2/src/                    → src/
-apps/vale-v2/tests/                  → tests/
-apps/vale-v2/public/                 → public/
-apps/vale-v2/sprite-sheets/          → sprite-sheets/
-apps/vale-v2/scripts/                → scripts/ (merge)
-apps/vale-v2/mockups/                → mockups/ (merge)
-apps/vale-v2/docs/                   → docs/app/
-apps/vale-v2/tsconfig.json           → tsconfig.json (replace)
-apps/vale-v2/tsconfig.node.json      → tsconfig.node.json (replace)
-apps/vale-v2/vite.config.ts          → vite.config.ts (replace)
-apps/vale-v2/vitest.config.ts        → vitest.config.ts (replace)
-apps/vale-v2/playwright.config.ts    → playwright.config.ts (replace)
-apps/vale-v2/index.html              → index.html (replace)
-apps/vale-v2/CLAUDE.md               → CLAUDE.md (replace)
-apps/vale-v2/README.md               → README.md (merge/replace)
+src/                    → src/
+tests/                  → tests/
+public/                 → public/
+sprite-sheets/          → sprite-sheets/
+scripts/                → scripts/ (merge)
+mockups/                → mockups/ (merge)
+docs/                   → docs/app/
+tsconfig.json           → tsconfig.json (replace)
+tsconfig.node.json      → tsconfig.node.json (replace)
+vite.config.ts          → vite.config.ts (replace)
+vitest.config.ts        → vitest.config.ts (replace)
+playwright.config.ts    → playwright.config.ts (replace)
+index.html              → index.html (replace)
+CLAUDE.md               → CLAUDE.md (replace)
+README.md               → README.md (merge/replace)
 ```
 
 ### Files to Delete
@@ -222,7 +222,7 @@ libatomic1_14.2.0-4ubuntu2~24.04_amd64.deb → (delete)
 ### Files to Update
 ```
 package.json                          → (merge dependencies, remove workspace config)
-.eslintrc.cjs                         → (replace with apps/vale-v2 version)
+.eslintrc.cjs                         → (replace with root version)
 scripts/validate_transforms.ts        → (change default --root to ".")
 scripts/dedupe_types.ts               → (update usage docs, already defaults to ".")
 scripts/update_ability_schema.ts      → (change default --root to ".")
@@ -230,10 +230,10 @@ scripts/convert_ability_ids_to_kebab.ts → (change default --root to ".")
 .github/workflows/ci.yml              → (remove --filter vale-v2 flags)
 .github/workflows/claude.yml          → (remove workspace references if exists)
 .github/workflows/claude-code-review.yml → (remove workspace references if exists)
-.github/copilot-instructions.md       → (update all apps/vale-v2 references)
+.github/copilot-instructions.md       → (update all root references)
 README.md                             → (remove workspace references)
 CLAUDE.md                             → (remove workspace references)
-All .md files with "apps/vale-v2"     → (update paths - 112+ files)
+All .md files with "root"     → (update paths - 112+ files)
 ```
 
 ---
@@ -277,25 +277,25 @@ All .md files with "apps/vale-v2"     → (update paths - 112+ files)
 - [ ] Verify all scripts work from root
 
 ### Phase 1: File Movement
-- [ ] Move `apps/vale-v2/src/` → `src/`
-- [ ] Move `apps/vale-v2/tests/` → `tests/`
-- [ ] Move `apps/vale-v2/public/` → `public/`
-- [ ] Move `apps/vale-v2/sprite-sheets/` → `sprite-sheets/`
-- [ ] Move `apps/vale-v2/scripts/` → `scripts/` (merge)
-- [ ] Move `apps/vale-v2/mockups/` → `mockups/` (merge)
-- [ ] Move `apps/vale-v2/docs/` → `docs/app/`
+- [ ] Move `src/` → `src/`
+- [ ] Move `tests/` → `tests/`
+- [ ] Move `public/` → `public/`
+- [ ] Move `sprite-sheets/` → `sprite-sheets/`
+- [ ] Move `scripts/` → `scripts/` (merge)
+- [ ] Move `mockups/` → `mockups/` (merge)
+- [ ] Move `docs/` → `docs/app/`
 - [ ] Move configuration files
-- [ ] Move `apps/vale-v2/index.html` → `index.html`
-- [ ] Move `apps/vale-v2/CLAUDE.md` → `CLAUDE.md` (replace)
-- [ ] Commit: "Move game files from apps/vale-v2 to root"
+- [ ] Move `index.html` → `index.html`
+- [ ] Move `CLAUDE.md` → `CLAUDE.md` (replace)
+- [ ] Commit: "Move game files from root to root"
 
 ### Phase 2: Configuration Updates
-- [ ] Merge `apps/vale-v2/package.json` into root `package.json`
+- [ ] Merge `package.json` into root `package.json`
 - [ ] Remove workspace configuration from `package.json`
 - [ ] Update scripts in `package.json` (remove `--filter vale-v2`)
 - [ ] Keep root devDependencies: `ts-morph`, `yargs` (used by scripts)
 - [ ] Remove duplicate `vite` from root devDependencies
-- [ ] Move `apps/vale-v2/.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
+- [ ] Move `.eslintrc.cjs` → `.eslintrc.cjs` (replace root version)
 - [ ] Delete `pnpm-workspace.yaml`
 - [ ] Delete root `src/` (old v1 files)
 - [ ] Delete `dinerdash/` directory
@@ -310,9 +310,9 @@ All .md files with "apps/vale-v2"     → (update paths - 112+ files)
 - [ ] Update `.github/workflows/ci.yml` (remove `--filter vale-v2`)
 - [ ] Update `.github/workflows/claude.yml` (if exists, remove workspace refs)
 - [ ] Update `.github/workflows/claude-code-review.yml` (if exists, remove workspace refs)
-- [ ] Update `.github/copilot-instructions.md` (replace all `apps/vale-v2` references)
-- [ ] Search and update all markdown files with `apps/vale-v2` references (112+ files)
-- [ ] Commit: "Update path references from apps/vale-v2 to root"
+- [ ] Update `.github/copilot-instructions.md` (replace all `root` references)
+- [ ] Search and update all markdown files with `root` references (112+ files)
+- [ ] Commit: "Update path references from root to root"
 
 ### Phase 4: Testing
 - [ ] Run `pnpm install` (regenerates lockfile)
@@ -351,7 +351,7 @@ All .md files with "apps/vale-v2"     → (update paths - 112+ files)
 ├── sprite-sheets/          # Sprite sheet PNGs
 ├── scripts/                # Build and utility scripts
 ├── docs/                   # Documentation
-│   ├── app/                # App-specific docs (from apps/vale-v2/docs/)
+│   ├── app/                # App-specific docs (from docs/)
 │   ├── adr/                # Architecture Decision Records
 │   ├── architect/          # Technical specifications
 │   └── archive/            # Archived docs
@@ -359,7 +359,7 @@ All .md files with "apps/vale-v2"     → (update paths - 112+ files)
 ├── story/                  # Story content
 ├── mockups/                # Mockup files
 ├── eslint/                 # ESLint rules
-├── .eslintrc.cjs           # ESLint config (from apps/vale-v2)
+├── .eslintrc.cjs           # ESLint config (from root)
 ├── package.json            # Dependencies and scripts
 ├── pnpm-lock.yaml          # Dependency lockfile (regenerated)
 ├── tsconfig.json           # TypeScript config
@@ -436,9 +436,9 @@ If issues arise during migration:
 ### Critical Issues Found During Audit
 
 1. **ESLint Configuration Conflict:**
-   - Two `.eslintrc.cjs` files exist (root and `apps/vale-v2/`)
-   - `apps/vale-v2/.eslintrc.cjs` is more complete with proper path resolution
-   - **Solution:** Use `apps/vale-v2` version as the canonical config
+   - Two `.eslintrc.cjs` files exist (root and ``)
+   - `.eslintrc.cjs` is more complete with proper path resolution
+   - **Solution:** Use `root` version as the canonical config
 
 2. **CI/CD Workflow Dependencies:**
    - `.github/workflows/ci.yml` uses `pnpm --filter vale-v2` in all steps
@@ -446,12 +446,12 @@ If issues arise during migration:
    - **Solution:** Remove `--filter vale-v2` from all workflow commands
 
 3. **GitHub Copilot Instructions:**
-   - `.github/copilot-instructions.md` has extensive `apps/vale-v2` references
+   - `.github/copilot-instructions.md` has extensive `root` references
    - Used by AI agents, must be accurate
    - **Solution:** Update all path references to root structure
 
 4. **Script Path Resolution:**
-   - Root scripts use `--root apps/vale-v2` as default
+   - Root scripts use `--root root` as default
    - App scripts use `__dirname` with relative paths (`../src`, `../public`)
    - **Solution:** Change root script defaults to `.`, verify app scripts after move
 

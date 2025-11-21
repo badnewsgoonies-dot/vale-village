@@ -4,7 +4,7 @@
 You are completing the final task of System 2 Code Quality Refactoring. Tasks 2, 3, and 4 are already complete. Only Task 1 remains: refactoring `executeRound()` from a 130-line monolith into composable phases.
 
 ## Current State
-- **File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+- **File:** `src/core/services/QueueBattleService.ts`
 - **Function:** `executeRound()` (lines 176-303, ~130 lines)
 - **Complexity:** ~12-15 cyclomatic complexity
 - **Status:** Monolithic function with interleaved logic
@@ -266,8 +266,8 @@ export function executeRound(
 - ✅ Code complexity reduced (cyclomatic complexity < 8)
 
 ## Files to Modify
-- `apps/vale-v2/src/core/services/QueueBattleService.ts` - Refactor executeRound
-- `apps/vale-v2/tests/core/services/queue-battle.test.ts` - Add phase tests
+- `src/core/services/QueueBattleService.ts` - Refactor executeRound
+- `tests/core/services/queue-battle.test.ts` - Add phase tests
 
 ## Testing Commands
 # After refactoring, run these:
@@ -279,4 +279,4 @@ pnpm typecheck
 ## Reference
 - See `prompts/SYSTEM_02_REFACTORING_PLAN.md` for detailed plan
 - See `prompts/SYSTEM_02_QUICK_REFERENCE.md` for quick lookup
-- Current implementation: `apps/vale-v2/src/core/services/QueueBattleService.ts:176-303`
+- Current implementation: `src/core/services/QueueBattleService.ts:176-303`

@@ -31,7 +31,7 @@ Transform VS1 from "bandit boss" battle to:
 
 ### Step 1: Create Garet Enemy Definition
 
-**File:** `apps/vale-v2/src/data/definitions/enemies.ts` (MODIFY)
+**File:** `src/data/definitions/enemies.ts` (MODIFY)
 
 **Changes:**
 - Add `GARET_ENEMY` enemy definition
@@ -74,7 +74,7 @@ export const ENEMIES: Record<string, Enemy> = {
 
 ### Step 2: Update VS1 Encounter
 
-**File:** `apps/vale-v2/src/data/definitions/encounters.ts` (MODIFY)
+**File:** `src/data/definitions/encounters.ts` (MODIFY)
 
 **Changes:**
 - Rename `VS1_BANDITS` to `VS1_GARET`
@@ -109,7 +109,7 @@ export const ENCOUNTERS: Record<string, Encounter> = {
 };
 ```
 
-**Also update:** `apps/vale-v2/src/story/vs1Constants.ts`
+**Also update:** `src/story/vs1Constants.ts`
 ```typescript
 export const VS1_ENCOUNTER_ID = 'vs1-garet'; // Changed from 'vs1-bandits'
 ```
@@ -118,7 +118,7 @@ export const VS1_ENCOUNTER_ID = 'vs1-garet'; // Changed from 'vs1-bandits'
 
 ### Step 3: Implement Unit Recruitment System
 
-**File:** `apps/vale-v2/src/core/services/RewardsService.ts` (MODIFY)
+**File:** `src/core/services/RewardsService.ts` (MODIFY)
 
 **Changes:**
 - Add unit recruitment processing after Djinn reward
@@ -187,7 +187,7 @@ export function processVictory(
 }
 ```
 
-**Update Type:** `apps/vale-v2/src/core/models/Rewards.ts`
+**Update Type:** `src/core/models/Rewards.ts`
 ```typescript
 export interface RewardDistribution {
   // ... existing fields
@@ -199,7 +199,7 @@ export interface RewardDistribution {
 
 ### Step 4: Update RewardsSlice to Handle Recruitment
 
-**File:** `apps/vale-v2/src/ui/state/rewardsSlice.ts` (MODIFY)
+**File:** `src/ui/state/rewardsSlice.ts` (MODIFY)
 
 **Changes:**
 - Handle `recruitedUnit` from `processVictory()` result
@@ -228,7 +228,7 @@ processVictory: (battle) => {
 
 ### Step 5: Update Initial Team Setup for VS1
 
-**File:** `apps/vale-v2/src/App.tsx` (MODIFY)
+**File:** `src/App.tsx` (MODIFY)
 
 **Changes:**
 - Create initial team with 1 unit (Isaac/Adept)
@@ -277,7 +277,7 @@ useEffect(() => {
 
 ### Step 6: Update VS1 Constants
 
-**File:** `apps/vale-v2/src/story/vs1Constants.ts` (MODIFY)
+**File:** `src/story/vs1Constants.ts` (MODIFY)
 
 **Changes:**
 - Update `VS1_ENCOUNTER_ID` to `'vs1-garet'`
@@ -291,7 +291,7 @@ export const VS1_ENCOUNTER_ID = 'vs1-garet'; // Changed from 'vs1-bandits'
 
 ### Step 7: Update Dialogue (Optional)
 
-**File:** `apps/vale-v2/src/data/definitions/dialogues.ts` (MODIFY)
+**File:** `src/data/definitions/dialogues.ts` (MODIFY)
 
 **Changes:**
 - Update VS1 pre/post scenes to reference Garet instead of bandits
@@ -329,16 +329,16 @@ export const VS1_ENCOUNTER_ID = 'vs1-garet'; // Changed from 'vs1-bandits'
 **New Files:** None
 
 **Modified Files (7):**
-1. `apps/vale-v2/src/data/definitions/enemies.ts` - Add Garet enemy
-2. `apps/vale-v2/src/data/definitions/encounters.ts` - Update VS1 encounter
-3. `apps/vale-v2/src/core/services/RewardsService.ts` - Add unit recruitment
-4. `apps/vale-v2/src/core/models/Rewards.ts` - Add `recruitedUnit` field
-5. `apps/vale-v2/src/ui/state/rewardsSlice.ts` - Handle recruitment
-6. `apps/vale-v2/src/App.tsx` - Update initial team setup
-7. `apps/vale-v2/src/story/vs1Constants.ts` - Update encounter ID
+1. `src/data/definitions/enemies.ts` - Add Garet enemy
+2. `src/data/definitions/encounters.ts` - Update VS1 encounter
+3. `src/core/services/RewardsService.ts` - Add unit recruitment
+4. `src/core/models/Rewards.ts` - Add `recruitedUnit` field
+5. `src/ui/state/rewardsSlice.ts` - Handle recruitment
+6. `src/App.tsx` - Update initial team setup
+7. `src/story/vs1Constants.ts` - Update encounter ID
 
 **Optional Files:**
-8. `apps/vale-v2/src/data/definitions/dialogues.ts` - Update VS1 dialogue
+8. `src/data/definitions/dialogues.ts` - Update VS1 dialogue
 
 ---
 
@@ -366,12 +366,12 @@ export const VS1_ENCOUNTER_ID = 'vs1-garet'; // Changed from 'vs1-bandits'
 
 ## Reference Files
 
-- Unit definitions: `apps/vale-v2/src/data/definitions/units.ts`
-- Enemy definitions: `apps/vale-v2/src/data/definitions/enemies.ts`
-- Encounter definitions: `apps/vale-v2/src/data/definitions/encounters.ts`
-- Djinn definitions: `apps/vale-v2/src/data/definitions/djinn.ts`
-- RewardsService: `apps/vale-v2/src/core/services/RewardsService.ts`
-- TeamSlice: `apps/vale-v2/src/ui/state/teamSlice.ts`
-- VS1 Constants: `apps/vale-v2/src/story/vs1Constants.ts`
+- Unit definitions: `src/data/definitions/units.ts`
+- Enemy definitions: `src/data/definitions/enemies.ts`
+- Encounter definitions: `src/data/definitions/encounters.ts`
+- Djinn definitions: `src/data/definitions/djinn.ts`
+- RewardsService: `src/core/services/RewardsService.ts`
+- TeamSlice: `src/ui/state/teamSlice.ts`
+- VS1 Constants: `src/story/vs1Constants.ts`
 
 

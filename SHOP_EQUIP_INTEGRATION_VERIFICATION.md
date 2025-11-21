@@ -106,7 +106,7 @@ Comprehensive E2E tests created and critical integration bugs fixed for the Shop
 
 ```bash
 # Run shop/equip integration tests
-cd apps/vale-v2
+cd root
 pnpm test:e2e shop-equip-integration
 
 # Run with UI visible (for debugging)

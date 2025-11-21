@@ -20,7 +20,7 @@ Sprites were showing placeholders instead of actual images despite:
 ## Fixes Applied
 
 ### 1. Fixed UnitCard.tsx
-**File:** `apps/vale-v2/src/ui/components/battle/UnitCard.tsx`
+**File:** `src/ui/components/battle/UnitCard.tsx`
 
 **Before:**
 ```typescript
@@ -107,5 +107,5 @@ Debug mode will:
 
 ## Files Changed
 
-- `apps/vale-v2/src/ui/components/battle/UnitCard.tsx` - Added `getPortraitSprite()` import and usage
+- `src/ui/components/battle/UnitCard.tsx` - Added `getPortraitSprite()` import and usage
 

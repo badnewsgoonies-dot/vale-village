@@ -11,9 +11,9 @@ The migration plan has been thoroughly audited and optimized. This document summ
 ### 1. ESLint Configuration (CRITICAL)
 **Issue:** Two conflicting `.eslintrc.cjs` files exist
 - Root version: Simpler, no path resolution
-- `apps/vale-v2` version: Complete, uses `__dirname` for path resolution
+- `root` version: Complete, uses `__dirname` for path resolution
 
-**Fix:** Use `apps/vale-v2/.eslintrc.cjs` as canonical (more complete)
+**Fix:** Use `.eslintrc.cjs` as canonical (more complete)
 
 ---
 
@@ -27,7 +27,7 @@ The migration plan has been thoroughly audited and optimized. This document summ
 ---
 
 ### 3. GitHub Copilot Instructions (HIGH PRIORITY)
-**Issue:** `.github/copilot-instructions.md` has 10+ references to `apps/vale-v2`
+**Issue:** `.github/copilot-instructions.md` has 10+ references to `root`
 - Used by AI agents
 - Must be accurate for proper AI assistance
 
@@ -37,7 +37,7 @@ The migration plan has been thoroughly audited and optimized. This document summ
 
 ### 4. Script Path Resolution (MEDIUM PRIORITY)
 **Issue:** 
-- Root scripts default to `--root apps/vale-v2`
+- Root scripts default to `--root root`
 - App scripts use `__dirname` with relative paths
 
 **Fix:** 

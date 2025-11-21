@@ -122,7 +122,7 @@ Phase 3 implements Zustand state management and React UI components, creating a 
 ## File Structure
 
 ```
-apps/vale-v2/src/
+src/
 ├── core/
 │   ├── algorithms/        # ✅ Pure functions, deterministic
 │   ├── services/          # ✅ Battle coordination, RNG, Save

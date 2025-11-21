@@ -14,7 +14,7 @@ Create a single-screen, no-scrolling pre-battle team selection UI that allows pl
 
 ## Step 1: Update GameFlowSlice for Team Selection Mode
 
-**File:** `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
+**File:** `src/ui/state/gameFlowSlice.ts`
 
 **Changes:**
 1. Add `pendingBattleEncounterId: string | null` to `GameFlowSlice` interface
@@ -102,7 +102,7 @@ confirmBattleTeam: (team: Team) => {
 
 ## Step 2: Create PreBattleTeamSelectScreen Component
 
-**File:** `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx` (NEW)
+**File:** `src/ui/components/PreBattleTeamSelectScreen.tsx` (NEW)
 
 **Requirements:**
 - Single screen layout (no scrolling)
@@ -345,7 +345,7 @@ export function PreBattleTeamSelectScreen({
 
 ## Step 3: Create CSS for Single-Screen Layout
 
-**File:** `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css` (NEW)
+**File:** `src/ui/components/PreBattleTeamSelectScreen.css` (NEW)
 
 **Requirements:**
 - No scrolling (`overflow: hidden` on container)
@@ -460,7 +460,7 @@ export function PreBattleTeamSelectScreen({
 
 ## Step 4: Integrate into App.tsx
 
-**File:** `apps/vale-v2/src/App.tsx`
+**File:** `src/App.tsx`
 
 **Changes:**
 1. Import `PreBattleTeamSelectScreen`
@@ -497,7 +497,7 @@ const returnToOverworld = useStore((s) => s.returnToOverworld);
 
 ## Step 5: Equipment Management Modal
 
-**File:** `apps/vale-v2/src/ui/components/EquipmentSelectModal.tsx` (NEW or extend existing)
+**File:** `src/ui/components/EquipmentSelectModal.tsx` (NEW or extend existing)
 
 **Requirements:**
 - Overlay modal (not part of main screen)
@@ -514,7 +514,7 @@ const returnToOverworld = useStore((s) => s.returnToOverworld);
 
 ## Step 6: Djinn Management Modal
 
-**File:** `apps/vale-v2/src/ui/components/DjinnSelectModal.tsx` (NEW or extend existing)
+**File:** `src/ui/components/DjinnSelectModal.tsx` (NEW or extend existing)
 
 **Requirements:**
 - Overlay modal (not part of main screen)
@@ -531,7 +531,7 @@ const returnToOverworld = useStore((s) => s.returnToOverworld);
 
 ## Step 7: Sync PartyManagementScreen with Roster
 
-**File:** `apps/vale-v2/src/ui/components/PartyManagementScreen.tsx`
+**File:** `src/ui/components/PartyManagementScreen.tsx`
 
 **Changes:**
 - Update to use `roster` from state instead of `UNIT_DEFINITIONS`
@@ -597,10 +597,10 @@ const benchUnits = roster.filter(
 
 ## Reference Files
 
-- Mockup: `apps/vale-v2/docs/PRE_BATTLE_TEAM_SELECT_MOCKUP.md`
-- GameFlowSlice: `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- TeamSlice: `apps/vale-v2/src/ui/state/teamSlice.ts`
-- Encounters: `apps/vale-v2/src/data/definitions/encounters.ts`
-- Enemies: `apps/vale-v2/src/data/definitions/enemies.ts`
-- Constants: `apps/vale-v2/src/core/constants.ts` (MIN_PARTY_SIZE, MAX_PARTY_SIZE)
+- Mockup: `docs/PRE_BATTLE_TEAM_SELECT_MOCKUP.md`
+- GameFlowSlice: `src/ui/state/gameFlowSlice.ts`
+- TeamSlice: `src/ui/state/teamSlice.ts`
+- Encounters: `src/data/definitions/encounters.ts`
+- Enemies: `src/data/definitions/enemies.ts`
+- Constants: `src/core/constants.ts` (MIN_PARTY_SIZE, MAX_PARTY_SIZE)
 

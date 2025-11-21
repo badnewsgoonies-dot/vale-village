@@ -49,6 +49,7 @@ export type SaveFileValidationError =
  * 6. Validate game state using Zod schemas
  * 7. Return validated data or detailed error
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function validateSaveFile(_data: unknown): Result<unknown, SaveFileValidationError> {
   // TODO: Implement validation when building save system
   return Err({
@@ -116,6 +117,7 @@ export function verifyChecksum(data: unknown, expectedChecksum: string): boolean
  * 3. If backup corrupted, offer to start new game
  * 4. Never crash - always provide graceful fallback
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function loadSaveFileSafe(_slot: number): Result<unknown, SaveFileValidationError> {
   // TODO: Implement safe loading with recovery
   return Err({

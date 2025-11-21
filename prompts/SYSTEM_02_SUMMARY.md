@@ -324,7 +324,7 @@ pnpm dev  # Manual smoke test
 ## Questions?
 
 **Architecture:** See `VALE_CHRONICLES_ARCHITECTURE.md`
-**Development:** See `apps/vale-v2/CLAUDE.md`
+**Development:** See `CLAUDE.md`
 **Full Plan:** See `SYSTEM_02_REFACTORING_PLAN.md`
 **Risk Details:** See `SYSTEM_02_RISK_ASSESSMENT.md`
 **Quick Ref:** See `SYSTEM_02_QUICK_REFERENCE.md`

@@ -230,16 +230,16 @@ Full context and ready to lead implementation
 
 ### Project Documentation
 - `../../VALE_CHRONICLES_ARCHITECTURE.md` - Complete system architecture
-- `../../apps/vale-v2/CLAUDE.md` - Development guide
+- `../../CLAUDE.md` - Development guide
 - `../../docs/adr/` - Architecture Decision Records
 - `../../docs/NAMING_CONVENTIONS.md` - Naming standards
 
 ### Code Locations
-- Battle Service: `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- Battle State: `apps/vale-v2/src/core/models/BattleState.ts`
-- Constants: `apps/vale-v2/src/core/constants.ts`
-- Abilities: `apps/vale-v2/src/data/definitions/abilities.ts`
-- Tests: `apps/vale-v2/tests/core/services/queue-battle.test.ts`
+- Battle Service: `src/core/services/QueueBattleService.ts`
+- Battle State: `src/core/models/BattleState.ts`
+- Constants: `src/core/constants.ts`
+- Abilities: `src/data/definitions/abilities.ts`
+- Tests: `tests/core/services/queue-battle.test.ts`
 
 ---
 
@@ -354,7 +354,7 @@ _To be filled after completion_
 
 ### Need Help?
 - **Architecture questions:** Review ADRs in `docs/adr/`
-- **Battle system questions:** See `apps/vale-v2/CLAUDE.md`
+- **Battle system questions:** See `CLAUDE.md`
 - **Test failures:** Check golden test baselines
 - **Type errors:** Review existing patterns in codebase
 - **Stuck?** Review rollback procedures and consider pausing

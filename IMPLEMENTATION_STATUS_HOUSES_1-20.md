@@ -8,7 +8,7 @@
 ## ✅ Phase 1: Unit Definitions (COMPLETE)
 
 ### What Was Implemented
-Added 4 new recruitable units to `apps/vale-v2/src/data/definitions/units.ts`:
+Added 4 new recruitable units to `src/data/definitions/units.ts`:
 
 1. **Blaze** (Mars, Balanced Warrior) - House 5
 2. **Karis** (Mercury, Versatile Scholar) - House 11
@@ -23,7 +23,7 @@ Added 4 new recruitable units to `apps/vale-v2/src/data/definitions/units.ts`:
 - ✅ All 10 UnitSchema roles covered
 
 ### Files Modified
-- `apps/vale-v2/src/data/definitions/units.ts` (+139 lines, -5 lines)
+- `src/data/definitions/units.ts` (+139 lines, -5 lines)
 
 ### Commit
 - `7baaa20` - feat: add 4 new recruitable units for Houses 1-20 progression
@@ -33,7 +33,7 @@ Added 4 new recruitable units to `apps/vale-v2/src/data/definitions/units.ts`:
 ## 🔄 Phase 2: Encounter Definitions (IN PROGRESS)
 
 ### What Needs to Be Done
-Rewrite `apps/vale-v2/src/data/definitions/encounters.ts` based on new blueprint:
+Rewrite `src/data/definitions/encounters.ts` based on new blueprint:
 
 #### Current State (OLD - needs updating)
 ```typescript
@@ -191,8 +191,8 @@ const teamWithFlint = collectDjinn(initialTeam, 'flint');
 ```
 
 ### Files to Modify
-- `apps/vale-v2/src/App.tsx` - Update initial team creation
-- OR `apps/vale-v2/src/ui/state/teamSlice.ts` - Update default state
+- `src/App.tsx` - Update initial team creation
+- OR `src/ui/state/teamSlice.ts` - Update default state
 
 ---
 

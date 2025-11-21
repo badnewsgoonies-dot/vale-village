@@ -181,7 +181,7 @@ Comprehensive analysis and E2E tests created for the Djinn ability update system
 
 ```bash
 # Run Djinn ability update tests
-cd apps/vale-v2
+cd root
 pnpm test:e2e djinn-ability-updates
 
 # Run with UI visible (for debugging)

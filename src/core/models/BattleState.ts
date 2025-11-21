@@ -231,6 +231,7 @@ export function updateBattleState(state: BattleState, updates: Partial<BattleSta
   if (process.env.NODE_ENV !== 'production') {
     try {
       // Dynamic import to avoid bundling in production
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { validateBattleState } = require('../validation/battleStateInvariants');
       validateBattleState(newState);
     } catch (error) {

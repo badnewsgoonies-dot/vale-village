@@ -100,8 +100,8 @@ vitest run tests/battle/golden/
 **Rollback Plan:**
 ```bash
 # If regressions detected
-git checkout HEAD -- apps/vale-v2/src/core/services/QueueBattleService.ts
-git add apps/vale-v2/src/core/services/QueueBattleService.ts
+git checkout HEAD -- src/core/services/QueueBattleService.ts
+git add src/core/services/QueueBattleService.ts
 git commit -m "Rollback Task 1: Regressions detected"
 ```
 
@@ -130,8 +130,8 @@ pnpm typecheck
 pnpm test
 
 # Manual: Search for old patterns
-grep -rn 'state\.queuedActions' apps/vale-v2/src
-grep -rn 'state\.phase' apps/vale-v2/src
+grep -rn 'state\.queuedActions' src
+grep -rn 'state\.phase' src
 ```
 
 **Indicators:**
@@ -144,10 +144,10 @@ grep -rn 'state\.phase' apps/vale-v2/src
 1. **Pre-Mitigation:**
    ```bash
    # Document all BattleState field access patterns
-   grep -rn 'state\.' apps/vale-v2/src --include='*.ts' > state-access-baseline.txt
+   grep -rn 'state\.' src --include='*.ts' > state-access-baseline.txt
 
    # Count references to each field
-   grep -oh 'state\.[a-zA-Z]*' apps/vale-v2/src/**/*.ts | sort | uniq -c
+   grep -oh 'state\.[a-zA-Z]*' src/**/*.ts | sort | uniq -c
    ```
 
 2. **During Refactor:**
@@ -167,9 +167,9 @@ grep -rn 'state\.phase' apps/vale-v2/src
    pnpm test
 
    # 3. No old patterns remain
-   grep -rn 'state\.queuedActions\b' apps/vale-v2/src  # Should be: state.queue.queuedActions
-   grep -rn 'state\.phase\b' apps/vale-v2/src          # Should be: state.status.phase
-   grep -rn 'state\.remainingMana\b' apps/vale-v2/src  # Should be: state.mana.remainingMana
+   grep -rn 'state\.queuedActions\b' src  # Should be: state.queue.queuedActions
+   grep -rn 'state\.phase\b' src          # Should be: state.status.phase
+   grep -rn 'state\.remainingMana\b' src  # Should be: state.mana.remainingMana
    ```
 
 **Rollback Plan:**
@@ -218,7 +218,7 @@ pnpm validate:data
    pnpm validate:data
 
    # Extract all ability ID string literals
-   grep -roh "'[a-z-]*'" apps/vale-v2/src --include='*.ts' | \
+   grep -roh "'[a-z-]*'" src --include='*.ts' | \
      grep -E '(strike|heal|fireball)' | \
      sort | uniq
    ```
@@ -243,10 +243,10 @@ pnpm validate:data
 **Rollback Plan:**
 ```bash
 # Single file to revert
-rm apps/vale-v2/src/data/types/AbilityId.ts
+rm src/data/types/AbilityId.ts
 
 # Revert type changes in other files
-git checkout HEAD -- apps/vale-v2/src/core/models/BattleState.ts
+git checkout HEAD -- src/core/models/BattleState.ts
 # ... (revert other files)
 
 # Or use git revert

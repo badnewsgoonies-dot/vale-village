@@ -23,7 +23,7 @@
 ## 🔴 FUNCTION COMPLEXITY
 
 ### 1. executeRound: 120+ Line Monolith
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:170-297`  
+**File:** `src/core/services/QueueBattleService.ts:170-297`  
 **Lines:** 127  
 **Parameters:** 2  
 **Cyclomatic Complexity:** ~15  
@@ -102,7 +102,7 @@ export function executeRound(state: BattleState, rng: PRNG): ExecutionResult {
 ---
 
 ### 2. performAction: Dense Guard Clauses + 5 Parameters
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:64-214`  
+**File:** `src/core/services/BattleService.ts:64-214`  
 **Lines:** 150  
 **Parameters:** 5  
 **Cyclomatic Complexity:** ~12  
@@ -177,7 +177,7 @@ export function performAction(
 ---
 
 ### 3. executeAbility: Large Switch Block
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:219-410`  
+**File:** `src/core/services/BattleService.ts:219-410`  
 **Lines:** 191  
 **Parameters:** 6  
 **Cyclomatic Complexity:** ~10  
@@ -252,7 +252,7 @@ function executeAbility(
 ---
 
 ### 4. QueueBattleView: 380-Line Component
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx:19-377`  
+**File:** `src/ui/components/QueueBattleView.tsx:19-377`  
 **Lines:** 358  
 **Severity:** 🟠 **HIGH**
 
@@ -311,9 +311,9 @@ export function QueueBattleView() {
 
 ### 6. Battle Completion Logic: Copy-Pasted 3x
 **Files:**
-- `apps/vale-v2/src/ui/state/battleSlice.ts:71-95` (perform)
-- `apps/vale-v2/src/ui/state/battleSlice.ts:140-173` (performAIAction)
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts:120-142` (executeQueuedRound)
+- `src/ui/state/battleSlice.ts:71-95` (perform)
+- `src/ui/state/battleSlice.ts:140-173` (performAIAction)
+- `src/ui/state/queueBattleSlice.ts:120-142` (executeQueuedRound)
 
 **Issue:**
 ```typescript
@@ -399,8 +399,8 @@ export function handleBattleCompletion(
 
 ### 7. Target Selection Logic: Duplicated
 **Files:**
-- `apps/vale-v2/src/ui/components/QueueBattleView.tsx:286-304`
-- `apps/vale-v2/src/ui/components/ActionBar.tsx:127-139`
+- `src/ui/components/QueueBattleView.tsx:286-304`
+- `src/ui/components/ActionBar.tsx:127-139`
 
 **Issue:**
 ```typescript
@@ -472,8 +472,8 @@ export function getValidTargets(
 
 ### 8. Mana/Affordability Checks: Duplicated
 **Files:**
-- `apps/vale-v2/src/ui/components/QueueBattleView.tsx:259`
-- `apps/vale-v2/src/ui/components/ActionBar.tsx:52`
+- `src/ui/components/QueueBattleView.tsx:259`
+- `src/ui/components/ActionBar.tsx:52`
 
 **Issue:**
 - QueueBattleView uses `canAffordAction(battle.remainingMana, manaCost)`
@@ -528,7 +528,7 @@ export function createRNGStream(
 ## 🟡 NAMING ISSUES
 
 ### 10. selectedAbility: Misleading Sentinel Value
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx:31, 86, 287`
+**File:** `src/ui/components/QueueBattleView.tsx:31, 86, 287`
 
 **Issue:**
 ```typescript
@@ -573,7 +573,7 @@ if (selectedAction?.type === 'basic-attack') {
 ---
 
 ### 11. perform: Generic Name
-**File:** `apps/vale-v2/src/ui/state/battleSlice.ts:21, 60`
+**File:** `src/ui/state/battleSlice.ts:21, 60`
 
 **Issue:**
 ```typescript
@@ -609,7 +609,7 @@ performActionAndAdvanceTurn: (/* ... */) => void;
 ## 🟠 GOD OBJECTS / FILES
 
 ### 13. BattleState: 20+ Fields
-**File:** `apps/vale-v2/src/core/models/BattleState.ts:44-116`
+**File:** `src/core/models/BattleState.ts:44-116`
 
 **Issue:**
 ```typescript
@@ -699,7 +699,7 @@ export interface BattleState {
 ---
 
 ### 14. equipment.ts: 600+ Line File
-**File:** `apps/vale-v2/src/data/definitions/equipment.ts`
+**File:** `src/data/definitions/equipment.ts`
 
 **Issue:**
 - 632 lines of hand-authored constants
@@ -786,7 +786,7 @@ makePRNG(rngSeed + battle.roundNumber * 1000)      // Queue round
 ---
 
 ### 17. Queue Size: Hard-Coded Array
-**File:** `apps/vale-v2/src/core/models/BattleState.ts:148, 286`
+**File:** `src/core/models/BattleState.ts:148, 286`
 
 **Issue:**
 ```typescript

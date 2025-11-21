@@ -34,6 +34,7 @@ function isBasicAttack(action: QueuedAction): boolean {
 
 function shouldGenerateMana(
   action: QueuedAction,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   __actionResult: PerformActionResult
 ): boolean {
   return isBasicAttack(action);

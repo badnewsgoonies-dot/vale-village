@@ -7,7 +7,7 @@
 
 ## What Was Created
 
-### 1. SimpleSprite Component (`apps/vale-v2/src/ui/sprites/SimpleSprite.tsx`)
+### 1. SimpleSprite Component (`src/ui/sprites/SimpleSprite.tsx`)
 
 A robust, flexible sprite component optimized for mockups and scene redesigns.
 
@@ -26,7 +26,7 @@ A robust, flexible sprite component optimized for mockups and scene redesigns.
 <SimpleSprite id="isaac-lblade-front" width={64} height={64} debug={true} />
 ```
 
-### 2. BackgroundSprite Component (`apps/vale-v2/src/ui/sprites/BackgroundSprite.tsx`)
+### 2. BackgroundSprite Component (`src/ui/sprites/BackgroundSprite.tsx`)
 
 Specialized component for battle/overworld backgrounds.
 
@@ -139,16 +139,16 @@ Three ways to find sprites:
 ## Files Modified/Created
 
 **Created:**
-- `apps/vale-v2/src/ui/sprites/SimpleSprite.tsx` (343 lines)
-- `apps/vale-v2/src/ui/sprites/BackgroundSprite.tsx` (245 lines)
-- `apps/vale-v2/docs/SPRITE_COMPONENTS_GUIDE.md` (comprehensive guide)
-- `apps/vale-v2/docs/SPRITE_COMPONENTS_IMPLEMENTATION.md` (this file)
+- `src/ui/sprites/SimpleSprite.tsx` (343 lines)
+- `src/ui/sprites/BackgroundSprite.tsx` (245 lines)
+- `docs/SPRITE_COMPONENTS_GUIDE.md` (comprehensive guide)
+- `docs/SPRITE_COMPONENTS_IMPLEMENTATION.md` (this file)
 
 **Verified:**
-- `apps/vale-v2/src/ui/sprites/index.ts` (exports correct)
-- `apps/vale-v2/src/ui/components/UnitCard.tsx` (imports correct)
-- `apps/vale-v2/src/ui/components/BattleView.tsx` (imports correct)
-- `apps/vale-v2/src/ui/sprites/ButtonIcon.tsx` (imports correct)
+- `src/ui/sprites/index.ts` (exports correct)
+- `src/ui/components/UnitCard.tsx` (imports correct)
+- `src/ui/components/BattleView.tsx` (imports correct)
+- `src/ui/sprites/ButtonIcon.tsx` (imports correct)
 
 ---
 

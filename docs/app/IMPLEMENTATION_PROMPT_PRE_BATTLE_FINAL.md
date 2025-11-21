@@ -15,9 +15,9 @@ You are implementing a pre-battle team selection screen for Vale Chronicles V2. 
 - **Responsive** - Scales to different viewport sizes using `clamp()` for fonts
 
 **Reference Files:**
-- Visual mockup: `apps/vale-v2/mockups/pre-battle-team-select-final.html`
-- Design doc: `apps/vale-v2/docs/IMPROVED_PRE_BATTLE_DESIGN.md`
-- Architecture: `apps/vale-v2/CLAUDE.md`
+- Visual mockup: `mockups/pre-battle-team-select-final.html`
+- Design doc: `docs/IMPROVED_PRE_BATTLE_DESIGN.md`
+- Architecture: `CLAUDE.md`
 
 ---
 
@@ -63,7 +63,7 @@ You are implementing a pre-battle team selection screen for Vale Chronicles V2. 
 
 ### Step 1: Update GameFlowSlice for Team Selection Mode
 
-**File:** `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
+**File:** `src/ui/state/gameFlowSlice.ts`
 
 **Changes:**
 1. Add `'team-select'` to `mode` union type
@@ -155,7 +155,7 @@ confirmBattleTeam: (team: Team) => {
 
 ### Step 2: Create Main Component Structure
 
-**File:** `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx` (NEW)
+**File:** `src/ui/components/PreBattleTeamSelectScreen.tsx` (NEW)
 
 **Structure:**
 ```typescript
@@ -320,7 +320,7 @@ export function PreBattleTeamSelectScreen({
 
 ### Step 3: Create CSS File
 
-**File:** `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css` (NEW)
+**File:** `src/ui/components/PreBattleTeamSelectScreen.css` (NEW)
 
 **Requirements:**
 - Fixed heights for all sections (NO scrolling)
@@ -376,7 +376,7 @@ export function PreBattleTeamSelectScreen({
 .unit-level { font-size: clamp(0.65rem, 0.9vw, 0.75rem); }
 ```
 
-**Reference:** See `apps/vale-v2/mockups/pre-battle-team-select-final.html` for complete CSS.
+**Reference:** See `mockups/pre-battle-team-select-final.html` for complete CSS.
 
 **Validation:**
 - [ ] No vertical scrolling
@@ -388,7 +388,7 @@ export function PreBattleTeamSelectScreen({
 
 ### Step 4: Create TeamBenchSection Component
 
-**File:** `apps/vale-v2/src/ui/components/TeamBenchSection.tsx` (NEW)
+**File:** `src/ui/components/TeamBenchSection.tsx` (NEW)
 
 **Props:**
 ```typescript
@@ -422,7 +422,7 @@ interface TeamBenchSectionProps {
 
 ### Step 5: Create EquipmentSection Component
 
-**File:** `apps/vale-v2/src/ui/components/EquipmentSection.tsx` (NEW)
+**File:** `src/ui/components/EquipmentSection.tsx` (NEW)
 
 **Props:**
 ```typescript
@@ -469,7 +469,7 @@ interface EquipmentSectionProps {
 
 ### Step 6: Create DjinnSection Component
 
-**File:** `apps/vale-v2/src/ui/components/DjinnSection.tsx` (NEW)
+**File:** `src/ui/components/DjinnSection.tsx` (NEW)
 
 **Props:**
 ```typescript
@@ -508,7 +508,7 @@ interface DjinnSectionProps {
 
 ### Step 7: Create EnemyPortalTile Component
 
-**File:** `apps/vale-v2/src/ui/components/EnemyPortalTile.tsx` (NEW)
+**File:** `src/ui/components/EnemyPortalTile.tsx` (NEW)
 
 **Props:**
 ```typescript
@@ -540,7 +540,7 @@ interface EnemyPortalTileProps {
 
 ### Step 8: Integrate into App.tsx
 
-**File:** `apps/vale-v2/src/App.tsx` (MODIFY)
+**File:** `src/App.tsx` (MODIFY)
 
 **Changes:**
 1. Import `PreBattleTeamSelectScreen`
@@ -617,16 +617,16 @@ const setMode = useStore((s) => s.setMode);
 ## File Summary
 
 **New Files (6):**
-1. `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx`
-2. `apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css`
-3. `apps/vale-v2/src/ui/components/TeamBenchSection.tsx`
-4. `apps/vale-v2/src/ui/components/EquipmentSection.tsx`
-5. `apps/vale-v2/src/ui/components/DjinnSection.tsx`
-6. `apps/vale-v2/src/ui/components/EnemyPortalTile.tsx`
+1. `src/ui/components/PreBattleTeamSelectScreen.tsx`
+2. `src/ui/components/PreBattleTeamSelectScreen.css`
+3. `src/ui/components/TeamBenchSection.tsx`
+4. `src/ui/components/EquipmentSection.tsx`
+5. `src/ui/components/DjinnSection.tsx`
+6. `src/ui/components/EnemyPortalTile.tsx`
 
 **Modified Files (2):**
-1. `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-2. `apps/vale-v2/src/App.tsx`
+1. `src/ui/state/gameFlowSlice.ts`
+2. `src/App.tsx`
 
 ---
 
@@ -656,11 +656,11 @@ const setMode = useStore((s) => s.setMode);
 
 ## Reference Files
 
-- Visual mockup: `apps/vale-v2/mockups/pre-battle-team-select-final.html`
-- Design doc: `apps/vale-v2/docs/IMPROVED_PRE_BATTLE_DESIGN.md`
-- Architecture: `apps/vale-v2/CLAUDE.md`
-- Constants: `apps/vale-v2/src/core/constants.ts` (MIN_PARTY_SIZE, MAX_PARTY_SIZE)
-- Encounters: `apps/vale-v2/src/data/definitions/encounters.ts`
-- Team model: `apps/vale-v2/src/core/models/Team.ts`
-- Unit model: `apps/vale-v2/src/core/models/Unit.ts`
+- Visual mockup: `mockups/pre-battle-team-select-final.html`
+- Design doc: `docs/IMPROVED_PRE_BATTLE_DESIGN.md`
+- Architecture: `CLAUDE.md`
+- Constants: `src/core/constants.ts` (MIN_PARTY_SIZE, MAX_PARTY_SIZE)
+- Encounters: `src/data/definitions/encounters.ts`
+- Team model: `src/core/models/Team.ts`
+- Unit model: `src/core/models/Unit.ts`
 
