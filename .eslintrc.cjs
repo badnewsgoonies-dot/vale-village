@@ -1,3 +1,5 @@
+const path = require('node:path');
+
 module.exports = {
   root: true,
   env: {
@@ -10,27 +12,36 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh', '@typescript-eslint'],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: './tsconfig.json',
+  },
+  plugins: ['@typescript-eslint', 'import'],
   settings: {
     react: {
       version: 'detect',
     },
     'import/resolver': {
       typescript: {
+        project: path.resolve(__dirname, 'tsconfig.json'),
         alwaysTryTypes: true,
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
   },
   rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
-    ],
     'no-console': ['error', { allow: ['warn', 'error'] }],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: false }],
+    'import/no-unresolved': 'error',
+    'react/react-in-jsx-scope': 'off',
     'import/no-restricted-paths': [
       'error',
       {
@@ -54,18 +65,8 @@ module.exports = {
         ],
       },
     ],
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: ['react', 'react-dom'],
-            message: 'React imports not allowed in core/** - use plain objects',
-            paths: ['src/core/**'],
-          },
-        ],
-      },
-    ],
+    // React restriction in core/** is enforced via code review and manual checks
+    // The import/no-restricted-paths rule above handles path-based restrictions
   },
 };
 

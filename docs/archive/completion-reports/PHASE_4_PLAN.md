@@ -16,7 +16,7 @@
 **Note:** If pnpm not available, document verification steps for manual execution.
 
 ### 2. Clean Up Phase Documentation
-**In `apps/vale-v2/`:**
+**In ``:**
 - Delete or archive phase completion docs:
   - `PHASE_1_COMPLETE.md`
   - `PHASE_1_FIXES_APPLIED.md`
@@ -26,10 +26,10 @@
   - `PHASE_3_HARDENING.md`
   - `PHASE_4_PLAN.md` (this file)
 
-**Decision:** Archive to `apps/vale-v2/docs/legacy/` or delete? These are v2 phase docs, not v1 artifacts.
+**Decision:** Archive to `docs/legacy/` or delete? These are v2 phase docs, not v1 artifacts.
 
 ### 3. Final Documentation Polish
-- Verify `apps/vale-v2/CLAUDE.md` is accurate and up-to-date
+- Verify `CLAUDE.md` is accurate and up-to-date
 - Verify `README.md` (root) points to correct v2 paths
 - Verify `START_HERE.md` has correct v2 instructions
 - Update `V1_TO_V2_MIGRATION_STATUS.md` with Phase 4 completion

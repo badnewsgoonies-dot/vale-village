@@ -72,7 +72,7 @@ The game has several critical bugs that need immediate fixing:
 ## Tasks
 
 ### Task 1: Fix HP Validation
-**File:** `apps/vale-v2/src/core/models/Unit.ts`
+**File:** `src/core/models/Unit.ts`
 - Add validation in `applyDamage()` to clamp HP to [0, maxHP]
 - Add validation in `applyHealing()` to:
   - Reject negative healing values (return error)
@@ -87,7 +87,7 @@ The game has several critical bugs that need immediate fixing:
 - Test negative healing value is rejected
 
 ### Task 2: Fix PRNG Negative Seeds
-**File:** `apps/vale-v2/src/core/random/prng.ts`
+**File:** `src/core/random/prng.ts`
 - Validate seed is non-negative in constructor
 - Throw error or convert negative seeds to positive (document decision)
 - Ensure `next()` always returns [0, 1)
@@ -97,7 +97,7 @@ The game has several critical bugs that need immediate fixing:
 - Test all PRNG methods return valid ranges
 
 ### Task 3: Fix Duplicate Djinn Equip
-**File:** `apps/vale-v2/src/core/models/Team.ts`
+**File:** `src/core/models/Team.ts`
 - Add validation in Djinn equip function to check for duplicates
 - Return Result type with error if duplicate detected
 
@@ -106,7 +106,7 @@ The game has several critical bugs that need immediate fixing:
 - Test equipping different Djinn works normally
 
 ### Task 4: Fix Equipment Validation
-**File:** `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
+**File:** `src/data/schemas/EquipmentSchema.ts`
 - Ensure statBonus is required or has default empty object
 - Add validation to prevent crashes on malformed data
 
@@ -122,12 +122,12 @@ The game has several critical bugs that need immediate fixing:
 - All error cases return Result types or throw appropriately
 
 ## Files to Review
-- `apps/vale-v2/src/core/models/Unit.ts`
-- `apps/vale-v2/src/core/models/Team.ts`
-- `apps/vale-v2/src/core/random/prng.ts`
-- `apps/vale-v2/src/data/schemas/EquipmentSchema.ts`
-- `apps/vale-v2/tests/core/models/Unit.test.ts`
-- `apps/vale-v2/tests/core/random/prng.test.ts`
+- `src/core/models/Unit.ts`
+- `src/core/models/Team.ts`
+- `src/core/random/prng.ts`
+- `src/data/schemas/EquipmentSchema.ts`
+- `tests/core/models/Unit.test.ts`
+- `tests/core/random/prng.test.ts`
 ```
 
 ---
@@ -179,7 +179,7 @@ The battle system has several code quality issues:
 ## Tasks
 
 ### Task 1: Refactor executeRound into Composable Phases
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current Structure:**
 ```typescript
@@ -240,7 +240,7 @@ export function executeRound(state: BattleState, rng: PRNG): ExecutionResult {
 - Add new tests for each phase function
 
 ### Task 2: Split BattleState into Focused Interfaces
-**File:** `apps/vale-v2/src/core/models/BattleState.ts`
+**File:** `src/core/models/BattleState.ts`
 
 **Current:** Single `BattleState` interface with 20+ fields
 
@@ -294,7 +294,7 @@ export interface BattleState {
 - Update all tests
 
 ### Task 3: Extract Magic Numbers to Constants
-**File:** `apps/vale-v2/src/core/constants.ts`
+**File:** `src/core/constants.ts`
 
 **Extract:**
 - `PARTY_SIZE = 4` (replace hard-coded `[null, null, null, null]`)
@@ -310,7 +310,7 @@ export interface BattleState {
 - Document constants with JSDoc
 
 ### Task 4: Introduce AbilityId Union Type
-**File:** `apps/vale-v2/src/data/types/AbilityId.ts` (new)
+**File:** `src/data/types/AbilityId.ts` (new)
 
 **Create:**
 ```typescript
@@ -338,11 +338,11 @@ export type AbilityId =
 - Documentation updated
 
 ## Files to Review
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/core/models/BattleState.ts`
-- `apps/vale-v2/src/core/constants.ts`
-- `apps/vale-v2/src/data/definitions/abilities.ts`
-- `apps/vale-v2/tests/core/services/queue-battle.test.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/core/models/BattleState.ts`
+- `src/core/constants.ts`
+- `src/data/definitions/abilities.ts`
+- `tests/core/services/queue-battle.test.ts`
 - All files that reference BattleState or ability IDs
 ```
 
@@ -378,7 +378,7 @@ Improve error handling throughout Vale Chronicles V2 to prevent crashes and prov
 ## Tasks
 
 ### Task 1: Add React Error Boundary
-**File:** `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx` (exists but needs enhancement)
+**File:** `src/ui/components/GameErrorBoundary.tsx` (exists but needs enhancement)
 
 **Requirements:**
 - Catch all React errors
@@ -388,7 +388,7 @@ Improve error handling throughout Vale Chronicles V2 to prevent crashes and prov
 - Wrap App component in ErrorBoundary
 
 ### Task 2: Convert queueAction to Result Type
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
+**File:** `src/ui/state/queueBattleSlice.ts`
 
 **Current:** Throws errors or uses console.error
 
@@ -404,7 +404,7 @@ type QueueActionResult = Result<void, QueueActionError>;
 - Invalid targets
 
 ### Task 3: Handle AI Decision Failures
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts`
+**File:** `src/core/services/QueueBattleService.ts`
 
 **Current:** AI failures can crash round execution
 
@@ -419,7 +419,7 @@ try {
 ```
 
 ### Task 4: Fix Action Queue Edge Cases
-**File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
+**File:** `src/ui/components/ActionQueuePanel.tsx`
 
 **Issues:**
 - `ABILITIES.find()` can return undefined (crashes)
@@ -439,10 +439,10 @@ try {
 - All tests pass
 
 ## Files to Review
-- `apps/vale-v2/src/ui/components/GameErrorBoundary.tsx`
-- `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
-- `apps/vale-v2/src/core/services/QueueBattleService.ts`
-- `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
+- `src/ui/components/GameErrorBoundary.tsx`
+- `src/ui/state/queueBattleSlice.ts`
+- `src/core/services/QueueBattleService.ts`
+- `src/ui/components/ActionQueuePanel.tsx`
 ```
 
 ---
@@ -477,8 +477,8 @@ Complete the overworld system integration to enable seamless transitions between
 
 ### Task 1: Complete Battle Transition Flow
 **Files:**
-- `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+- `src/ui/state/gameFlowSlice.ts`
+- `src/ui/components/OverworldMap.tsx`
 
 **Requirements:**
 - When encounter trigger fires, transition to battle mode
@@ -487,7 +487,7 @@ Complete the overworld system integration to enable seamless transitions between
 - After battle defeat, return to last save point or inn
 
 ### Task 2: Implement Encounter Triggers
-**File:** `apps/vale-v2/src/core/services/EncounterService.ts`
+**File:** `src/core/services/EncounterService.ts`
 
 **Requirements:**
 - Random encounters based on map difficulty
@@ -496,7 +496,7 @@ Complete the overworld system integration to enable seamless transitions between
 - Encounter rate configurable per map
 
 ### Task 3: Add Overworld State Persistence
-**File:** `apps/vale-v2/src/ui/state/overworldSlice.ts`
+**File:** `src/ui/state/overworldSlice.ts`
 
 **Requirements:**
 - Save current map ID
@@ -505,7 +505,7 @@ Complete the overworld system integration to enable seamless transitions between
 - Restore on game load
 
 ### Task 4: Enhance OverworldMap UI
-**File:** `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+**File:** `src/ui/components/OverworldMap.tsx`
 
 **Requirements:**
 - Display current map name
@@ -522,11 +522,11 @@ Complete the overworld system integration to enable seamless transitions between
 - No regressions in battle system
 
 ## Files to Review
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx`
-- `apps/vale-v2/src/ui/state/overworldSlice.ts`
-- `apps/vale-v2/src/core/services/EncounterService.ts`
-- `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- `apps/vale-v2/src/data/definitions/maps.ts`
+- `src/ui/components/OverworldMap.tsx`
+- `src/ui/state/overworldSlice.ts`
+- `src/core/services/EncounterService.ts`
+- `src/ui/state/gameFlowSlice.ts`
+- `src/data/definitions/maps.ts`
 ```
 
 ---
@@ -560,7 +560,7 @@ Review and clean up console statements according to project rules: only console.
 ## Tasks
 
 ### Task 1: Audit All Console Statements
-**Action:** Review all console statements in `apps/vale-v2/src/`
+**Action:** Review all console statements in `src/`
 
 **Rules:**
 - ✅ `console.error()` - Allowed for errors
@@ -616,7 +616,7 @@ console.error('Error:', error);
 
 ## Files to Review
 - All files with console statements (45 found)
-- `apps/vale-v2/.eslintrc` (verify rules)
+- `.eslintrc` (verify rules)
 ```
 
 ---
@@ -710,10 +710,10 @@ Review and resolve TODO comments throughout the codebase. Some are critical, som
 
 ## Files to Review
 - All files with TODO comments (17 found)
-- `apps/vale-v2/src/ui/state/saveSlice.ts`
-- `apps/vale-v2/src/ui/components/UnitCard.tsx`
-- `apps/vale-v2/src/ui/components/ActionBar.tsx`
-- `apps/vale-v2/src/core/services/SaveService.ts`
+- `src/ui/state/saveSlice.ts`
+- `src/ui/components/UnitCard.tsx`
+- `src/ui/components/ActionBar.tsx`
+- `src/core/services/SaveService.ts`
 ```
 
 ---

@@ -17,19 +17,19 @@ See earlier session - screen showed:
 
 ## Files Involved
 ```
-apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx
-apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css
-apps/vale-v2/src/ui/components/TeamBenchSection.tsx
-apps/vale-v2/src/ui/components/EquipmentSection.tsx
-apps/vale-v2/src/ui/components/DjinnSection.tsx
-apps/vale-v2/src/ui/components/EnemyPortalTile.tsx
+src/ui/components/PreBattleTeamSelectScreen.tsx
+src/ui/components/PreBattleTeamSelectScreen.css
+src/ui/components/TeamBenchSection.tsx
+src/ui/components/EquipmentSection.tsx
+src/ui/components/DjinnSection.tsx
+src/ui/components/EnemyPortalTile.tsx
 ```
 
 ## Quick Diagnostic Steps
 1. **Hard refresh browser** (Ctrl+Shift+R) - Try this FIRST
 2. **Check browser console** for React errors or CSS 404s
-3. **Verify CSS file exists:** `ls -la apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css`
-4. **Check CSS import:** `grep "import.*css" apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx`
+3. **Verify CSS file exists:** `ls -la src/ui/components/PreBattleTeamSelectScreen.css`
+4. **Check CSS import:** `grep "import.*css" src/ui/components/PreBattleTeamSelectScreen.tsx`
 
 ## Most Likely Causes
 1. **Vite HMR confused** - Browser cached old broken version (FIX: hard refresh)

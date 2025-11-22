@@ -9,7 +9,7 @@
 ## REPOSITORIES ANALYSIS
 
 ### Vale-v2 Assets
-**Location:** `/workspace/apps/vale-v2/public/sprites/`  
+**Location:** `/workspace/public/sprites/`  
 **Total:** 2,572 GIF files  
 **Strengths:**
 - ✅ Complete battle sprites (party, enemies, bosses)
@@ -83,7 +83,7 @@ const categories = {
 };
 ```
 
-**Output:** `/workspace/apps/vale-v2/src/ui/sprites/sprite-list-generated.ts`
+**Output:** `/workspace/src/ui/sprites/sprite-list-generated.ts`
 
 **Expected Size:** ~3,500+ sprite entries (2,572 vale-v2 + dinerdash terrain/buildings)
 
@@ -94,19 +94,19 @@ const categories = {
 ```bash
 # Curated terrain tiles (323 files)
 cp -r /workspace/dinerdash/assets/terrain-curated/* \
-  /workspace/apps/vale-v2/public/sprites/terrain/
+  /workspace/public/sprites/terrain/
 
 # Buildings (organized by town)
 cp -r /workspace/dinerdash/assets/buildings/* \
-  /workspace/apps/vale-v2/public/sprites/scenery/buildings/
+  /workspace/public/sprites/scenery/buildings/
 
 # Decorations (144 files)
 cp -r /workspace/dinerdash/assets/decorations/* \
-  /workspace/apps/vale-v2/public/sprites/scenery/decorations/
+  /workspace/public/sprites/scenery/decorations/
 
 # Infrastructure (143 files)
 cp -r /workspace/dinerdash/assets/infrastructure/* \
-  /workspace/apps/vale-v2/public/sprites/scenery/infrastructure/
+  /workspace/public/sprites/scenery/infrastructure/
 ```
 
 **Result:** Vale-v2 gains ~600 additional organized sprites + 323 terrain tiles
@@ -114,11 +114,11 @@ cp -r /workspace/dinerdash/assets/infrastructure/* \
 ### Phase 3: Unified Sprite Manifest
 **Action:** Generate single manifest for all sprites
 
-**Script Location:** `/workspace/apps/vale-v2/scripts/generate-sprite-manifest.js`
+**Script Location:** `/workspace/scripts/generate-sprite-manifest.js`
 
 **Execution:**
 ```bash
-cd /workspace/apps/vale-v2
+cd /workspace/root
 node scripts/generate-sprite-manifest.js
 ```
 
@@ -255,7 +255,7 @@ const search = searchSprites('venus');
 
 ### Step 1: Copy Dinerdash Script
 ```bash
-cd /workspace/apps/vale-v2
+cd /workspace/root
 mkdir -p scripts
 cp /workspace/dinerdash/scripts/generate-sprite-list.js scripts/generate-sprite-manifest.js
 ```
@@ -270,9 +270,9 @@ Edit `scripts/generate-sprite-manifest.js`:
 ### Step 3: Copy Useful Dinerdash Assets
 ```bash
 # Terrain tiles
-mkdir -p /workspace/apps/vale-v2/public/sprites/terrain
+mkdir -p /workspace/public/sprites/terrain
 cp -r /workspace/dinerdash/assets/terrain-curated/* \
-  /workspace/apps/vale-v2/public/sprites/terrain/
+  /workspace/public/sprites/terrain/
 
 # Buildings (optional - if needed)
 # cp -r /workspace/dinerdash/assets/buildings/* ...
@@ -280,7 +280,7 @@ cp -r /workspace/dinerdash/assets/terrain-curated/* \
 
 ### Step 4: Run Generator
 ```bash
-cd /workspace/apps/vale-v2
+cd /workspace/root
 node scripts/generate-sprite-manifest.js
 ```
 
@@ -303,11 +303,11 @@ Breakdown by category:
 ### Step 5: Create Sprite Catalog API
 ```bash
 # Create catalog wrapper
-touch /workspace/apps/vale-v2/src/ui/sprites/catalog.ts
+touch /workspace/src/ui/sprites/catalog.ts
 ```
 
 ### Step 6: Update Sprite Component
-Modify `/workspace/apps/vale-v2/src/ui/sprites/Sprite.tsx` to use catalog:
+Modify `/workspace/src/ui/sprites/Sprite.tsx` to use catalog:
 ```typescript
 import { getSpriteById, getSpriteByPath } from './catalog';
 
@@ -352,7 +352,7 @@ describe('Sprite Catalog', () => {
 ### Visual Tests
 ```typescript
 // Create sprite browser dev tool
-// /workspace/apps/vale-v2/src/ui/dev/SpriteBrowser.tsx
+// /workspace/src/ui/dev/SpriteBrowser.tsx
 
 export function SpriteBrowser() {
   const [category, setCategory] = useState('all');
@@ -406,7 +406,7 @@ export function SpriteBrowser() {
 
 ## NEXT STEPS
 
-1. ✅ **Copy dinerdash script** → `/workspace/apps/vale-v2/scripts/`
+1. ✅ **Copy dinerdash script** → `/workspace/scripts/`
 2. ⬜ **Adapt script** for vale-v2 directory structure
 3. ⬜ **Run generator** → create manifest
 4. ⬜ **Create catalog API** → flexible sprite access

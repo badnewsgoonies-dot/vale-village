@@ -702,8 +702,8 @@ interface BattleSceneProps {
 
 For current state management patterns, see:
 - `docs/adr/002-state-management.md` - Official decision
-- `apps/vale-v2/src/ui/state/store.ts` - Actual implementation
-- `apps/vale-v2/CLAUDE.md` - Usage patterns
+- `src/ui/state/store.ts` - Actual implementation
+- `CLAUDE.md` - Usage patterns
 
 ⚠️ Archived context/reducer templates moved to `docs/archive/legacy-state-management/` for historical reference only.
 

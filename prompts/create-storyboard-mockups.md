@@ -170,13 +170,13 @@ export function StoryboardGallery() {
 
 ## Reference Files
 
-- `apps/vale-v2/src/ui/components/SpriteMockup.tsx` - Current battle mockup
-- `apps/vale-v2/src/ui/sprites/SimpleSprite.tsx` - Sprite component
-- `apps/vale-v2/src/ui/sprites/BackgroundSprite.tsx` - Background component
-- `apps/vale-v2/src/ui/sprites/catalog.ts` - Sprite catalog API
-- `apps/vale-v2/src/ui/components/QueueBattleView.tsx` - Actual battle component
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx` - Actual overworld component
-- `apps/vale-v2/src/ui/components/RewardsScreen.tsx` - Actual rewards component
+- `src/ui/components/SpriteMockup.tsx` - Current battle mockup
+- `src/ui/sprites/SimpleSprite.tsx` - Sprite component
+- `src/ui/sprites/BackgroundSprite.tsx` - Background component
+- `src/ui/sprites/catalog.ts` - Sprite catalog API
+- `src/ui/components/QueueBattleView.tsx` - Actual battle component
+- `src/ui/components/OverworldMap.tsx` - Actual overworld component
+- `src/ui/components/RewardsScreen.tsx` - Actual rewards component
 
 Start by creating the `StoryboardGallery` component, then add storyboard mockups for each screen one at a time. Focus on visual composition and sprite placement - these are design references, not fully functional screens.
 

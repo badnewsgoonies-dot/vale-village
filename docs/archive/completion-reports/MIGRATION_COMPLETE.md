@@ -14,8 +14,8 @@ The Vale Chronicles V1 codebase has been successfully migrated to V2, with criti
 ## What Was Accomplished
 
 ### ✅ Phase 1: Assets Migration
-- **2,572 sprites** migrated from `/public/` → `/apps/vale-v2/public/`
-- **25 sprite sheets** migrated from `/sprite-sheets/` → `/apps/vale-v2/sprite-sheets/`
+- **2,572 sprites** migrated from `/public/` → `/public/`
+- **25 sprite sheets** migrated from `/sprite-sheets/` → `/sprite-sheets/`
 - All assets accessible and organized in V2 structure
 - Total: ~400MB of game assets
 
@@ -23,11 +23,11 @@ The Vale Chronicles V1 codebase has been successfully migrated to V2, with criti
 - **58 equipment items** migrated from V1 to V2 format
 - Updated to use V2's Zod schemas (`EquipmentSchema`)
 - Validated against V2 architecture
-- File: `/apps/vale-v2/src/data/definitions/equipment.ts`
+- File: `/src/data/definitions/equipment.ts`
 - All equipment properly typed and validated
 
 ### ✅ Phase 3: Documentation Cleanup
-- Archived generic design patterns (`CAMERA_SYSTEM.md` → `apps/vale-v2/docs/legacy/`)
+- Archived generic design patterns (`CAMERA_SYSTEM.md` → `docs/legacy/`)
 - Deleted 12 V1 documentation files (6 root docs + 6 ROLE workflow files)
 - Deleted all status/audit files (PHASE_*, IMPLEMENTATION_*, *_AUDIT*, etc.)
 - Cleaned up duplicate sprite directories (`complete/`, `archive/`)
@@ -40,7 +40,7 @@ The Vale Chronicles V1 codebase has been successfully migrated to V2, with criti
 - Removed 2,586 files total (14,642 lines of code)
 
 ### ✅ Phase 5: Documentation Updates
-- Updated `apps/vale-v2/CLAUDE.md` with current status (~80% migration complete)
+- Updated `CLAUDE.md` with current status (~80% migration complete)
 - Updated root `README.md` for V2-only structure
 - Updated `START_HERE.md` for V2 quick start
 - Verified `VALE_CHRONICLES_ARCHITECTURE.md` is clean
@@ -105,7 +105,7 @@ The Vale Chronicles V1 codebase has been successfully migrated to V2, with criti
 
 ```
 vale-village/
-├── apps/vale-v2/          # ONLY CODEBASE
+├──           # ONLY CODEBASE
 │   ├── public/            # Migrated sprites (2,572 files)
 │   ├── sprite-sheets/     # Migrated sheets (25 files)
 │   ├── src/
@@ -158,16 +158,16 @@ vale-village/
    - Add abilities/Djinn as gameplay needs arise
 
 ### Development Workflow
-- All development happens in `apps/vale-v2/`
-- Follow V2 architecture patterns (see `apps/vale-v2/CLAUDE.md`)
+- All development happens in ``
+- Follow V2 architecture patterns (see `CLAUDE.md`)
 - Use Zod schemas for all data validation
 - Maintain clean separation: core/ (no React), ui/ (React components)
 - Continue context-aware testing approach
 
 ### Reference Documentation
-- `apps/vale-v2/CLAUDE.md` - Complete architecture guide
+- `CLAUDE.md` - Complete architecture guide
 - `VALE_CHRONICLES_ARCHITECTURE.md` - System architecture overview
-- `apps/vale-v2/docs/legacy/CAMERA_SYSTEM.md` - Generic camera pattern (if needed)
+- `docs/legacy/CAMERA_SYSTEM.md` - Generic camera pattern (if needed)
 
 ---
 

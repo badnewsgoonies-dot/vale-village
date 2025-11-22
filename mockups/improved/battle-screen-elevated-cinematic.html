@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Battle Screen - Elevated Mock 2 (Cinematic Split-Lane)</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(800px 480px at 50% 60%, #101a36, #0a1227 70%, #070e1f);
+      overflow: hidden; /* zero scrolling */
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #e8f0ff;
+    }
+
+    .wrap {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 64px 1fr 260px;
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "top"
+        "main"
+        "dock";
+    }
+
+    /* Top bar */
+    .top {
+      grid-area: top;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px;
+      background: linear-gradient(180deg, #141f46, #0f1836);
+      border-bottom: 2px solid #35538e;
+    }
+    .top-left { display: flex; align-items: center; gap: 14px; }
+    .mana-circles { display: flex; gap: 6px; }
+    .mana-circle {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #3a6a9a; background: #0b1a2a;
+    }
+    .mana-circle.filled { background: #47cf73; border-color: #69ff9c; box-shadow: 0 0 8px rgba(71,207,115,0.7); }
+    .djinn { display: flex; align-items: center; gap: 8px; }
+    .djinn-icon { width: 28px; height: 28px; border: 2px solid #3a6a9a; border-radius: 6px; overflow: hidden; background: #0e1b2f; }
+    .djinn-icon img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .top-right { display: flex; align-items: center; gap: 10px; }
+
+    /* Quick nav */
+    .quick-nav {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 1000;
+      background: rgba(10,16,36,0.8); border: 1px solid #2a3f6a; border-radius: 8px; padding: 6px 8px;
+    }
+    .quick-nav a { color: #ffd87f; text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 4px 8px; border-radius: 6px; }
+    .quick-nav a:hover { background: rgba(255,216,127,0.12); }
+
+    /* Main split-lane stage */
+    .main {
+      grid-area: main;
+      position: relative;
+      overflow: hidden; /* keep zero scrolling */
+    }
+    #battlefield {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .bg { position: absolute; inset: 0; opacity: 0.28; }
+    .bg img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+
+    .lane {
+      position: absolute; width: 44vw; height: 42vh; pointer-events: none;
+      display: flex; gap: 28px; align-items: center; justify-content: center;
+      transform: skewX(-8deg);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.6));
+    }
+    .lane.enemy { top: 6%; right: 2%; }
+    .lane.party { bottom: 8%; left: 2%; }
+
+    .plate {
+      width: 112px; height: 112px; transform: skewX(8deg); /* cancel skew for content */
+      display: grid; justify-items: center; gap: 6px;
+    }
+    .plate img { width: 112px; height: 112px; object-fit: contain; image-rendering: pixelated; }
+    .plate .name { font-weight: 800; color: #fff; text-shadow: 0 1px 0 #000; }
+    .plate .pip {
+      width: 20px; height: 20px; border-radius: 50%; background: #ffa500; border: 2px solid #fff;
+      display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800;
+      transform: translateY(-8px);
+    }
+
+    /* Timeline bar (top-center) */
+    .timeline {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      top: 8px; width: 480px; height: 28px; border-radius: 16px;
+      background: rgba(10,16,36,0.7); border: 1px solid #2a3f6a; display: flex; gap: 8px; padding: 4px 8px;
+    }
+    .tl-pill {
+      flex: 1; min-width: 0; border-radius: 12px; text-align: center; font-weight: 700; font-size: 0.85rem;
+      background: linear-gradient(180deg, #1b2a4f, #152140); border: 1px solid #314a78; color: #aab7d8;
+    }
+    .tl-pill.active { color: #0a172b; background: linear-gradient(180deg, #ffd87f, #f3c866); border-color: #ffde8a; }
+
+    /* Dock: Radial commands + log */
+    .dock {
+      grid-area: dock;
+      display: grid;
+      grid-template-columns: 360px 2px 1fr;
+      gap: 12px; padding: 12px;
+      background: linear-gradient(180deg, #121d42, #0d1732);
+      border-top: 2px solid #35538e;
+    }
+    .divider { width: 2px; background: #4a6a8a; }
+
+    .radial {
+      position: relative; width: 360px; height: 236px; display: grid; place-items: center;
+      background: radial-gradient(220px 160px at 50% 65%, #0c1736, #09122e);
+      border: 1px solid #2a3f6a; border-radius: 16px;
+    }
+    .wheel {
+      position: relative; width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(32,49,79,0.8); border: 2px solid #3a5a8a;
+      display: grid; place-items: center;
+    }
+    .wheel-center { width: 60px; height: 60px; border-radius: 50%; background: #0e1b2f; border: 2px solid #3a6a9a; }
+    .wheel-btn {
+      position: absolute; width: 52px; height: 52px; border-radius: 50%;
+      background: #20314f; border: 2px solid #3a5a8a; display: grid; place-items: center; cursor: pointer;
+      transition: transform 120ms, box-shadow 120ms, border-color 120ms;
+      overflow: hidden;
+    }
+    .wheel-btn:hover { transform: translateY(-2px) scale(1.04); border-color: #6a8aaa; box-shadow: 0 8px 18px rgba(0,0,0,0.35); }
+    .wheel-btn img { width: 80%; height: 80%; object-fit: contain; image-rendering: pixelated; }
+    .wheel-btn:nth-child(2) { top: 8px; left: 50%; transform: translate(-50%, 0); }
+    .wheel-btn:nth-child(3) { right: 8px; top: 50%; transform: translate(0, -50%); }
+    .wheel-btn:nth-child(4) { bottom: 8px; left: 50%; transform: translate(-50%, 0); }
+    .wheel-btn:nth-child(5) { left: 8px; top: 50%; transform: translate(0, -50%); }
+
+    .log {
+      background: #0a1a2a; border: 1px solid #4a6a8a; border-radius: 10px; padding: 10px;
+      font-family: Consolas, Monaco, monospace; font-size: 0.9rem; overflow: hidden; /* no scroll */
+    }
+    .log h4 { margin: 0 0 8px 0; color: #ffd87f; }
+    .log-entry { margin: 4px 0; }
+    .a { color: #87ceeb; } .d { color: #ff6347; } .he { color: #7cfc00; } .s { color: #ffa500; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="quick-nav">
+      <a href="./battle-screen-queue-based-final.html">Final (current)</a>
+      <a href="./battle-screen-elevated-hero-centric.html">Elevated 1</a>
+      <a href="./battle-screen-elevated-cinematic.html">Elevated 2</a>
+    </div>
+
+    <div class="top">
+      <div class="top-left">
+        <div style="color:#ffd87f;font-weight:800;">💠 Mana</div>
+        <div class="mana-circles">
+          <div class="mana-circle filled"></div>
+          <div class="mana-circle filled"></div>
+          <div class="mana-circle filled"></div>
+          <div class="mana-circle filled"></div>
+          <div class="mana-circle"></div>
+        </div>
+        <div style="color:#aab7d8;">4/5</div>
+      </div>
+      <div class="top-right">
+        <div class="djinn">
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div id="battlefield">
+        <div class="bg"><img src="./sprites/backgrounds/gs1/Altmillar_Cave.gif" alt="BG" /></div>
+
+        <div class="timeline">
+          <div class="tl-pill">Isaac</div>
+          <div class="tl-pill active">Garet</div>
+          <div class="tl-pill">Mia</div>
+          <div class="tl-pill">Ivan</div>
+        </div>
+
+        <div class="lane enemy">
+          <div class="plate" id="enemy-a">
+            <div class="pip">1</div>
+            <img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin A" />
+            <div class="name">Goblin A</div>
+          </div>
+          <div class="plate" id="enemy-b">
+            <div class="pip">2</div>
+            <img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin B" />
+            <div class="name">Goblin B</div>
+          </div>
+          <div class="plate" id="enemy-c">
+            <div class="pip">3</div>
+            <img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin C" />
+            <div class="name">Goblin C</div>
+          </div>
+        </div>
+
+        <div class="lane party">
+          <div class="plate" id="ally-isaac">
+            <img src="./sprites/battle/party/isaac/Isaac_lBlade_Front.gif" alt="Isaac" />
+            <div class="name">Isaac</div>
+          </div>
+          <div class="plate" id="ally-garet">
+            <img src="./sprites/battle/party/garet/Garet_lSword_Front.gif" alt="Garet" />
+            <div class="name">Garet</div>
+          </div>
+          <div class="plate" id="ally-mia">
+            <img src="./sprites/battle/party/mia/Mia_Staff_Front.gif" alt="Mia" />
+            <div class="name">Mia</div>
+          </div>
+          <div class="plate" id="ally-ivan">
+            <img src="./sprites/battle/party/ivan/Ivan_lBlade_Front.gif" alt="Ivan" />
+            <div class="name">Ivan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="radial">
+        <div class="wheel">
+          <div class="wheel-center"></div>
+          <div class="wheel-btn" title="Attack">
+            <img src="./sprites/icons/buttons/Attack.gif" alt="Attack" />
+          </div>
+          <div class="wheel-btn" title="Fireball">
+            <img src="./sprites/icons/buttons/Djinni.gif" alt="Fireball" />
+          </div>
+          <div class="wheel-btn" title="Heal">
+            <img src="./sprites/icons/buttons/Cure_Poison.gif" alt="Heal" />
+          </div>
+          <div class="wheel-btn" title="Spark">
+            <img src="./sprites/icons/buttons/Battle.gif" alt="Spark" />
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="log">
+        <h4>Combat Log</h4>
+        <div class="log-entry a"><strong>Round 1 begins!</strong></div>
+        <div class="log-entry a">Isaac uses <strong>Fireball</strong> on Goblin A!</div>
+        <div class="log-entry d">Goblin A takes <strong>52 damage</strong>! (Critical)</div>
+        <div class="log-entry s">Goblin A is <strong>Burned</strong> (3 turns)</div>
+        <div class="log-entry a">Mia uses <strong>Heal</strong> on Isaac</div>
+        <div class="log-entry he">Isaac recovers <strong>35 HP</strong></div>
+      </div>
+    </div>
+  </div>
+  <script src="./js/ability-animations-foundation.js"></script>
+</body>
+</html>
+
+

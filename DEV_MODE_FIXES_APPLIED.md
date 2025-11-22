@@ -5,7 +5,7 @@
 ## Fixes Applied
 
 ### ✅ FIX 1: localStorage Error Handling (CRITICAL)
-**File:** `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+**File:** `src/ui/components/OverworldMap.tsx`
 
 **Problem:** Browsers that block localStorage would throw uncaught error before reload.
 
@@ -27,8 +27,8 @@ try {
 
 ### ✅ FIX 2: Prevent Equipment/Gold Stacking (HIGH)
 **Files:** 
-- `apps/vale-v2/src/ui/state/inventorySlice.ts`
-- `apps/vale-v2/src/App.tsx`
+- `src/ui/state/inventorySlice.ts`
+- `src/App.tsx`
 
 **Problem:** Clicking dev mode button multiple times would ADD equipment/gold each time:
 - Click 1: 99,999 gold ✅
@@ -221,16 +221,16 @@ Add section:
 
 **Recommended Actions:**
 - User should hard refresh browser first
-- If that fails, restart dev server: `pkill -f "vite.*8000" && cd apps/vale-v2 && pnpm dev`
+- If that fails, restart dev server: `pkill -f "vite.*8000" && cd root && pnpm dev`
 
 ---
 
 ## Git Commit Recommendation
 
 ```bash
-git add apps/vale-v2/src/ui/components/OverworldMap.tsx
-git add apps/vale-v2/src/ui/state/inventorySlice.ts
-git add apps/vale-v2/src/App.tsx
+git add src/ui/components/OverworldMap.tsx
+git add src/ui/state/inventorySlice.ts
+git add src/App.tsx
 git commit -m "fix: Add localStorage error handling and prevent dev mode stacking
 
 - Add try/catch for localStorage.setItem in dev mode button

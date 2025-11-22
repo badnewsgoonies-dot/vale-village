@@ -20,7 +20,7 @@
 ### Top 10 Performance Improvements by Impact Score
 
 #### 1. calculateTurnOrder: O(n²) Lookups in Comparator
-**File:** `apps/vale-v2/src/core/algorithms/turn-order.ts:52-95`  
+**File:** `src/core/algorithms/turn-order.ts:52-95`  
 **Impact:** 🔴 **5/5**  
 **Current Complexity:** O(n² log n)  
 **Target Complexity:** O(n log n)
@@ -91,7 +91,7 @@ export function calculateTurnOrder(
 ---
 
 #### 2. sortActionsBySPD: Rebuilds Array + Linear Searches
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:388-417`  
+**File:** `src/core/services/QueueBattleService.ts:388-417`  
 **Impact:** 🔴 **5/5**  
 **Current Complexity:** O(n²)  
 **Target Complexity:** O(n log n)
@@ -170,7 +170,7 @@ function sortActionsBySPD(
 ---
 
 #### 3. BattleState: Repeated Array Concatenation
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:72-170`  
+**File:** `src/core/services/BattleService.ts:72-170`  
 **Impact:** 🟠 **4/5**  
 **Current Complexity:** O(n) per call  
 **Target Complexity:** O(1) with index
@@ -239,7 +239,7 @@ const isPlayer = index.playerIds.has(actorId); // O(1)
 ---
 
 #### 4. executeAbility: Repeated find() Calls Per Target
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:243-352`  
+**File:** `src/core/services/BattleService.ts:243-352`  
 **Impact:** 🟠 **4/5**  
 **Current Complexity:** O(n×m) where m = targets  
 **Target Complexity:** O(n + m)
@@ -299,7 +299,7 @@ function executeAbility(
 ---
 
 #### 5. Battle Log: Continuous Array Copying
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:166-170, 447-449`  
+**File:** `src/core/services/BattleService.ts:166-170, 447-449`  
 **Impact:** 🟠 **4/5**  
 **Current Complexity:** O(n) per append  
 **Target Complexity:** O(1) with ring buffer
@@ -364,7 +364,7 @@ function getLogArray(buffer: LogBuffer): readonly string[] {
 ---
 
 #### 6. Event Queue: Quadratic Array Operations
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts:118, 151`  
+**File:** `src/ui/state/queueBattleSlice.ts:118, 151`  
 **Impact:** 🟠 **3/5**  
 **Current Complexity:** O(n) per enqueue/dequeue  
 **Target Complexity:** O(1) with proper queue
@@ -413,7 +413,7 @@ function dequeueEvent(queue: EventQueue): { queue: EventQueue; event: BattleEven
 ---
 
 #### 7. Queue Action: Linear Unit Index Search
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:46-49`  
+**File:** `src/core/services/QueueBattleService.ts:46-49`  
 **Impact:** 🟠 **3/5**  
 **Current Complexity:** O(n) per queue  
 **Target Complexity:** O(1) with map
@@ -446,7 +446,7 @@ const unitIndex = state.unitSlotIndex.get(unitId); // O(1)
 ---
 
 #### 8. Effective Stats: Redundant Recalculation
-**File:** `apps/vale-v2/src/core/algorithms/stats.ts:70-140`  
+**File:** `src/core/algorithms/stats.ts:70-140`  
 **Impact:** 🟠 **3/5**  
 **Current Complexity:** O(n) per lookup  
 **Target Complexity:** O(1) with memoization
@@ -498,7 +498,7 @@ function clearStatCache() {
 ---
 
 #### 9. ActionQueuePanel: Linear Ability Search
-**File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx:56`  
+**File:** `src/ui/components/ActionQueuePanel.tsx:56`  
 **Impact:** 🟡 **2/5**  
 **Current Complexity:** O(n) per render  
 **Target Complexity:** O(1) with dictionary
@@ -533,7 +533,7 @@ const ability = action?.abilityId
 ---
 
 #### 10. Target Validation: Repeated Array Filtering
-**File:** `apps/vale-v2/src/core/services/BattleService.ts:136-145`  
+**File:** `src/core/services/BattleService.ts:136-145`  
 **Impact:** 🟡 **2/5**  
 **Current Complexity:** O(n×m)  
 **Target Complexity:** O(n + m) with Sets
@@ -570,7 +570,7 @@ const aliveTargets = targets.filter(t => {
 ### Input Validation & Data Integrity
 
 #### 1. Production Swallows Validation Errors
-**File:** `apps/vale-v2/src/main.tsx:8-17`  
+**File:** `src/main.tsx:8-17`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -614,7 +614,7 @@ try {
 ---
 
 #### 2. Save Migration: No Re-Validation After Migration
-**File:** `apps/vale-v2/src/core/save/migrations.ts:161-166`  
+**File:** `src/core/save/migrations.ts:161-166`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -657,7 +657,7 @@ if (migrator) {
 ---
 
 #### 3. LocalStorageSavePort: No Runtime Validation
-**File:** `apps/vale-v2/src/infra/save/LocalStorageSavePort.ts:14-20`  
+**File:** `src/infra/save/LocalStorageSavePort.ts:14-20`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -706,7 +706,7 @@ async read(): Promise<SaveEnvelope | null> {
 ---
 
 #### 4. SaveV1Schema: z.any() for NPC States
-**File:** `apps/vale-v2/src/data/schemas/SaveV1Schema.ts:31`  
+**File:** `src/data/schemas/SaveV1Schema.ts:31`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -734,7 +734,7 @@ npcStates: z.record(z.string(), NPCStateSchema),
 ---
 
 #### 5. ReplayService: No Validation of Replay Tapes
-**File:** `apps/vale-v2/src/core/save/ReplayService.ts:28-38, 44-91`  
+**File:** `src/core/save/ReplayService.ts:28-38, 44-91`  
 **Severity:** 🔴 **CRITICAL**
 
 **Issue:**
@@ -790,7 +790,7 @@ function playReplay(tape: unknown): ReplayResult {
 ---
 
 #### 6. saveSlice: Unsigned Battle State in localStorage
-**File:** `apps/vale-v2/src/ui/state/saveSlice.ts:83-89`  
+**File:** `src/ui/state/saveSlice.ts:83-89`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -851,7 +851,7 @@ function loadBattleState(): BattleState | null {
 ---
 
 #### 7. Migration Fallback: Pretends Success
-**File:** `apps/vale-v2/src/core/save/migrations.ts:168-177`  
+**File:** `src/core/save/migrations.ts:168-177`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -900,7 +900,7 @@ function loadBattleState(): BattleState | null {
 ### State Manipulation & Cheating
 
 #### 9. Zustand Devtools Always Enabled
-**File:** `apps/vale-v2/src/ui/state/store.ts:18-30`  
+**File:** `src/ui/state/store.ts:18-30`  
 **Severity:** 🟠 **HIGH**
 
 **Issue:**
@@ -956,7 +956,7 @@ export const useStore = create<Store>()(
 ---
 
 #### 11. Queue APIs Trust Inputs
-**File:** `apps/vale-v2/src/core/services/QueueBattleService.ts:47-102`  
+**File:** `src/core/services/QueueBattleService.ts:47-102`  
 **Severity:** 🟡 **MEDIUM**
 
 **Issue:**
@@ -1018,7 +1018,7 @@ export function queueAction(
 ### Dependency Vulnerabilities
 
 #### 12. Package Audit Required
-**File:** `apps/vale-v2/package.json`  
+**File:** `package.json`  
 **Severity:** 🟡 **MEDIUM**
 
 **Status:**
@@ -1032,7 +1032,7 @@ export function queueAction(
 **Action Required:**
 ```bash
 # Once Node.js 18+ is available:
-cd apps/vale-v2
+cd root
 pnpm install
 pnpm audit --prod
 ```

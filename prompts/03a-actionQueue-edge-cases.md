@@ -5,23 +5,23 @@ System 3 (Error Handling) is 80% complete. The error boundary and Result types a
 
 ## Current Issues
 ### Issue 1: ABILITIES.find() Can Return Undefined
-- **File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx:56`
+- **File:** `src/ui/components/ActionQueuePanel.tsx:56`
 - **Problem:** `ABILITIES[action.abilityId]` can return `undefined` if abilityId is invalid
 - **Impact:** Component may crash or display incorrectly
 
 ### Issue 2: Need to Verify Simultaneous Wipe-Out Logic
-- **File:** `apps/vale-v2/src/core/services/QueueBattleService.ts` or `BattleService.ts`
+- **File:** `src/core/services/QueueBattleService.ts` or `BattleService.ts`
 - **Problem:** Need to verify victory condition when both teams wipe out simultaneously
 - **Impact:** May incorrectly determine winner
 
 ### Issue 3: Retargeting Preserves Target Type
-- **File:** `apps/vale-v2/src/core/services/QueueBattleService.ts` (resolveValidTargets)
+- **File:** `src/core/services/QueueBattleService.ts` (resolveValidTargets)
 - **Problem:** Need to verify retargeting preserves single-target vs multi-target type
 - **Impact:** Single-target abilities may become multi-target after retargeting
 
 ## Tasks
 ### Task 1: Fix ABILITIES.find() Undefined Access
-- **File:** `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx`
+- **File:** `src/ui/components/ActionQueuePanel.tsx`
 - **Current Code (line 55-57):**
 ```ts
 const ability = action?.abilityId  ? ABILITIES[action.abilityId] ?? null  : null;
@@ -42,7 +42,7 @@ const ability = action?.abilityId && action.abilityId in ABILITIES  ? ABILITIES[
   - Maintain existing display layout
 
 ### Task 2: Verify Simultaneous Wipe-Out Logic
-- **File:** `apps/vale-v2/src/core/services/QueueBattleService.ts` or `BattleService.ts`
+- **File:** `src/core/services/QueueBattleService.ts` or `BattleService.ts`
 - **Check:**
   - Find `checkBattleEnd()` function
   - Verify logic when all player units KO'd AND all enemies KO'd simultaneously
@@ -72,9 +72,9 @@ const ability = action?.abilityId && action.abilityId in ABILITIES  ? ABILITIES[
 - ✅ No regressions
 
 ## Files to Modify
-- `apps/vale-v2/src/ui/components/ActionQueuePanel.tsx` - Fix undefined access
-- `apps/vale-v2/src/core/services/QueueBattleService.ts` - Verify retargeting
-- `apps/vale-v2/src/core/services/BattleService.ts` - Verify wipe-out logic
+- `src/ui/components/ActionQueuePanel.tsx` - Fix undefined access
+- `src/core/services/QueueBattleService.ts` - Verify retargeting
+- `src/core/services/BattleService.ts` - Verify wipe-out logic
 
 ## Testing
 # Test ActionQueuePanel with invalid ability IDs

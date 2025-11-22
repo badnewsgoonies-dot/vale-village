@@ -6,14 +6,14 @@ Successfully implemented **145 new abilities** for all 10 playable units, comple
 
 ## What Was Done
 
-### 1. Ability Definitions (`apps/vale-v2/src/data/definitions/abilities.ts`)
+### 1. Ability Definitions (`src/data/definitions/abilities.ts`)
 - ✅ Added 145 new ability constants (lines 893-3139)
 - ✅ All abilities validated against `AbilitySchema`
 - ✅ Fixed 2 schema violations (removed invalid `hp` property from `buffEffect`)
 - ✅ Added all 145 abilities to `ABILITIES` export object
 - **File grew from 960 → 3,369 lines**
 
-### 2. Unit Definitions (`apps/vale-v2/src/data/definitions/units.ts`)
+### 2. Unit Definitions (`src/data/definitions/units.ts`)
 - ✅ Updated all 10 units with complete ability progressions
 - ✅ Added 145 new ability imports
 - ✅ Assigned correct `unlockLevel` (1-20) for each ability per unit
@@ -119,16 +119,16 @@ Successfully implemented **145 new abilities** for all 10 playable units, comple
 
 ## Files Modified
 
-1. **`apps/vale-v2/src/data/definitions/abilities.ts`**
+1. **`src/data/definitions/abilities.ts`**
    - Lines added: ~2,409
    - New exports: 145 abilities
 
-2. **`apps/vale-v2/src/data/definitions/units.ts`**
+2. **`src/data/definitions/units.ts`**
    - Lines added: ~333
    - New imports: 145 abilities
    - Units updated: 10
 
-3. **`apps/vale-v2/src/ui/state/gameFlowSlice.ts`** *(incidental fix)*
+3. **`src/ui/state/gameFlowSlice.ts`** *(incidental fix)*
    - Fixed syntax error (missing closing brace)
 
 ---

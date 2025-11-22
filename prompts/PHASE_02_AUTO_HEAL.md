@@ -43,7 +43,7 @@ After every battle (win or lose):
 
 ### **Task 2.1: Create Auto-Heal Utility Function**
 
-**File:** `apps/vale-v2/src/core/algorithms/healing.ts` (or add to existing file)
+**File:** `src/core/algorithms/healing.ts` (or add to existing file)
 
 **Create:**
 ```typescript
@@ -77,7 +77,7 @@ export function autoHealUnits(units: readonly Unit[]): readonly Unit[] {
 
 ### **Task 2.2: Add Auto-Heal to Victory Flow**
 
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
+**File:** `src/ui/state/queueBattleSlice.ts`
 
 **Location:** In `executeQueuedRound()`, when `result.state.phase === 'victory'`
 
@@ -151,7 +151,7 @@ if (result.state.phase === 'victory') {
 
 ### **Task 2.3: Add Auto-Heal to Defeat Flow**
 
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
+**File:** `src/ui/state/queueBattleSlice.ts`
 
 **Location:** In `executeQueuedRound()`, when `result.state.phase === 'defeat'`
 
@@ -219,7 +219,7 @@ if (result.state.phase === 'defeat') {
 
 ### **Task 2.4: Add BattleEvent Type for Auto-Heal**
 
-**File:** `apps/vale-v2/src/core/services/types.ts`
+**File:** `src/core/services/types.ts`
 
 **Add Event Type:**
 ```typescript
@@ -245,7 +245,7 @@ export type BattleEvent =
 
 ### **Task 2.5: Update Battle Log Renderer**
 
-**File:** `apps/vale-v2/src/ui/utils/text.ts`
+**File:** `src/ui/utils/text.ts`
 
 **Add Case:**
 ```typescript
@@ -275,7 +275,7 @@ export function renderEventText(e: BattleEvent): string {
 
 ### **Task 2.6: Add Team Update Helper to teamSlice**
 
-**File:** `apps/vale-v2/src/ui/state/teamSlice.ts`
+**File:** `src/ui/state/teamSlice.ts`
 
 **Add Method:**
 ```typescript
@@ -309,7 +309,7 @@ export const createTeamSlice: StateCreator<TeamSlice> = (set, get) => ({
 
 ### **Task 2.7: Optional - Show Auto-Heal Visual**
 
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx` (or new component)
+**File:** `src/ui/components/QueueBattleView.tsx` (or new component)
 
 **Add Visual Feedback (Optional):**
 ```typescript
@@ -345,7 +345,7 @@ export const createTeamSlice: StateCreator<TeamSlice> = (set, get) => ({
 
 ### **Test 2.1: Victory Auto-Heal Test**
 
-**File:** `apps/vale-v2/tests/ui/state/autoHeal.test.ts` (NEW)
+**File:** `tests/ui/state/autoHeal.test.ts` (NEW)
 
 ```typescript
 import { describe, test, expect } from 'vitest';
@@ -518,26 +518,26 @@ Status icons fade out
 ## FILES TO MODIFY
 
 ### **Core Logic:**
-1. `apps/vale-v2/src/core/algorithms/healing.ts` (create or extend)
+1. `src/core/algorithms/healing.ts` (create or extend)
    - Add `autoHealUnits()` function
 
 ### **State Management:**
-2. `apps/vale-v2/src/ui/state/queueBattleSlice.ts`
+2. `src/ui/state/queueBattleSlice.ts`
    - Add auto-heal to victory flow
    - Add auto-heal to defeat flow
 
-3. `apps/vale-v2/src/ui/state/teamSlice.ts`
+3. `src/ui/state/teamSlice.ts`
    - Add `updateTeamUnits()` method (if doesn't exist)
 
 ### **Types:**
-4. `apps/vale-v2/src/core/services/types.ts`
+4. `src/core/services/types.ts`
    - Add `auto-heal` event type
 
-5. `apps/vale-v2/src/ui/utils/text.ts`
+5. `src/ui/utils/text.ts`
    - Add auto-heal message rendering
 
 ### **Tests:**
-6. `apps/vale-v2/tests/ui/state/autoHeal.test.ts` (NEW)
+6. `tests/ui/state/autoHeal.test.ts` (NEW)
    - Victory auto-heal tests
    - Defeat auto-heal tests
    - Integration tests
@@ -635,8 +635,8 @@ If issues arise:
 
 ```bash
 # Revert changes
-git checkout apps/vale-v2/src/ui/state/queueBattleSlice.ts
-git checkout apps/vale-v2/src/core/algorithms/healing.ts
+git checkout src/ui/state/queueBattleSlice.ts
+git checkout src/core/algorithms/healing.ts
 # ... other files
 
 # Or revert entire commit

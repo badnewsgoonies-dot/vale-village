@@ -180,7 +180,7 @@
 ## File Structure
 
 ```
-apps/vale-v2/src/
+src/
 ├── core/
 │   └── services/
 │       └── AIService.ts          # NEW - AI policy & decision-making

@@ -10,7 +10,7 @@
 /home/geni/Documents/vale-village
 ```
 
-**Project root. All development happens in `apps/vale-v2/`**
+**Project root. All development happens in ``**
 
 ---
 
@@ -19,7 +19,7 @@
 ### **1. Navigate to V2:**
 
 ```bash
-cd apps/vale-v2
+cd root
 ```
 
 ### **2. Install Dependencies:**
@@ -37,7 +37,7 @@ pnpm dev   # boots the queue battle sandbox via createTestBattle()
 ### **4. Run Tests:**
 
 ```bash
-pnpm test  # executes suites under apps/vale-v2/tests
+pnpm test  # executes suites under tests
 ```
 
 ### **5. Validate Data:**
@@ -50,7 +50,7 @@ pnpm validate:data
 
 ## 📚 ONBOARDING
 
-**Read this first:** `apps/vale-v2/CLAUDE.md`
+**Read this first:** `CLAUDE.md`
 
 This file contains:
 - Complete architecture overview
@@ -66,7 +66,7 @@ This file contains:
 
 ```
 vale-village/
-├── apps/vale-v2/          # Main codebase
+├──           # Main codebase
 │   ├── src/
 │   │   ├── core/          # Pure game logic (NO React)
 │   │   ├── ui/            # React components
@@ -114,4 +114,4 @@ pnpm test:watch           # Watch mode
 
 ---
 
-**Ready to code? Read `apps/vale-v2/CLAUDE.md` for complete guidance!**
+**Ready to code? Read `CLAUDE.md` for complete guidance!**

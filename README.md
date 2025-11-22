@@ -1,129 +1,49 @@
-# 🎮 Vale Chronicles V2
+# Vale Chronicles V2
 
-**Golden Sun-inspired Tactical RPG**
+Greenfield rebuild with clean architecture.
 
-A clean architecture rebuild with React, TypeScript, Zustand, and Zod.
+## Architecture
 
----
+See `/docs/adr/` for Architecture Decision Records.
 
-## 🚀 QUICK START
+## Development
 
-### **Development:**
+```bash
+# Install dependencies
+pnpm install
 
-> **Workspace note**
->
-> This repo is a small pnpm workspace. The main app lives in `apps/vale-v2`, and the root `package.json` exposes convenience scripts that forward to that app via `pnpm --filter vale-v2 ...`. You can work from **either** location:
->
-> - **From `apps/vale-v2/`** (preferred for app-local work):
->
->   ```bash
->   cd apps/vale-v2
->   pnpm dev              # Start dev server (loads the queue battle sandbox)
->   pnpm test             # Run tests from apps/vale-v2/tests
->   pnpm validate:data    # Validate game data
->   pnpm typecheck        # Type check
->   pnpm lint             # Lint code
->   ```
->
-> - **From the repo root** (matches older docs):
->
->   ```bash
->   pnpm dev              # Forwards to apps/vale-v2 dev
->   pnpm test             # Forwards to apps/vale-v2 test
->   pnpm validate:data    # Forwards to apps/vale-v2 validate:data
->   pnpm typecheck        # Forwards to apps/vale-v2 typecheck
->   pnpm lint             # Forwards to apps/vale-v2 lint
->   ```
+# Type check
+pnpm typecheck
 
-> ℹ️ The current `App` mounts a deterministic queue-battle playground via `createTestBattle()`.  
-> Story/overworld work is staged separately while the queue battle loop is being finalized.
+# Lint
+pnpm lint
 
-### **For New Contributors:**
+# Test
+pnpm test
 
-Read `apps/vale-v2/CLAUDE.md` for complete architecture guide and development workflow.
+# Validate data
+pnpm validate:data
 
----
-
-## 📚 DOCUMENTATION
-
-### **Architecture:**
-- `apps/vale-v2/CLAUDE.md` - Complete architecture guide and onboarding
-- `VALE_CHRONICLES_ARCHITECTURE.md` - System architecture overview
-- `ARCHITECTURE_REBUILD_SUMMARY.md` - Migration status
-
-### **Design Docs:**
-- `apps/vale-v2/docs/legacy/` - Archived design patterns
-- `docs/adr/` - Architecture Decision Records
-- `docs/architect/` - Technical specifications
-
----
-
-## 🎯 GAME DESIGN
-
-**Core Features:**
-- **Battles:** 4v4 turn-based combat with elemental advantages
-- **Units:** 10 recruitable, Levels 1-20, ability unlocks
-- **Djinn:** 12 collectible (3 per element), team synergy bonuses + ability unlocking (~180 unique abilities)
-- **Equipment:** 5 slots (Weapon/Armor/Helm/Boots/Accessory) - 58 items available, unit-locked
-- **Progression:** XP-based leveling with curve [0, 100, 350...92,800] for levels 1-20
-
----
-
-## 🧪 TESTING PHILOSOPHY
-
-**Context-Aware Testing:**
-
-```typescript
-// ✅ GOOD TEST (Proves game works)
-test('Level 1 loses to Boss, Level 5 wins', () => {
-  // Tests real progression
-});
-
-// ❌ BAD TEST (Tests nothing)
-test('function returns number', () => {
-  // Useless!
-});
+# Dev server
+pnpm dev
 ```
 
----
+## Structure
 
-## 📊 PROJECT STATUS
+```
+src/
+├── core/           # React-free, deterministic
+├── ui/             # React components and Zustand slices
+└── data/           # Content + schemas
+tests/              # Tests
+```
 
-**Current Status:** Core systems (battle, progression, equipment, djinn) run inside a queue-battle sandbox powered by the Zustand store.
+## Guardrails
 
-**State Management:** GameProvider has been fully retired; all state lives in slices under `apps/vale-v2/src/ui/state/`.
+- No React in `core/**`
+- No classes in `core/models/**`
+- No `any` in `core/**`
+- Seeded RNG only in core
+- Zod is single source of truth
+- State in Zustand, not components
 
-**Recent Work:** Queue-based planning/execution loop, post-battle rewards/victory UX, deterministic RNG previews, and story progression hooks via `storySlice`.
-
----
-
-## 🏗️ ARCHITECTURE
-
-**Clean Architecture with Strict Boundaries:**
-- `apps/vale-v2/src/core/` - Pure TypeScript, no React
-- `apps/vale-v2/src/ui/` - React components and UI logic
-- `apps/vale-v2/src/data/` - Game data with Zod schemas
-- `apps/vale-v2/src/infra/` - Infrastructure (save system)
-
-**Key Principles:**
-- No React in `core/**` (ESLint enforced)
-- No `any` types in `core/**` (ESLint error level)
-- Seeded RNG only (deterministic, reproducible)
-- Zod is single source of truth for data validation
-
----
-
-## 📦 ASSETS
-
-**Sprites:** 2,572 sprites migrated to `apps/vale-v2/public/sprites/`
-**Sprite Sheets:** 25 PNG sheets in `apps/vale-v2/sprite-sheets/`
-
----
-
-## 📞 QUESTIONS?
-
-See `apps/vale-v2/CLAUDE.md` for complete architectural guidance and development workflow.
-
----
-
-**Built with clean architecture and context-aware testing**

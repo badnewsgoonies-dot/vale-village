@@ -92,21 +92,21 @@ Categories:
 ## Files Created
 
 **Scripts:**
-- `/workspace/apps/vale-v2/scripts/generate-sprite-manifest.cjs`
-- `/workspace/apps/vale-v2/scripts/validate-sprites.cjs`
-- `/workspace/apps/vale-v2/scripts/test-sprite-catalog.cjs`
+- `/workspace/scripts/generate-sprite-manifest.cjs`
+- `/workspace/scripts/validate-sprites.cjs`
+- `/workspace/scripts/test-sprite-catalog.cjs`
 
 **Sprite System:**
-- `/workspace/apps/vale-v2/src/ui/sprites/sprite-list-generated.ts` (9,777 lines!)
-- `/workspace/apps/vale-v2/src/ui/sprites/catalog.ts`
-- `/workspace/apps/vale-v2/src/ui/sprites/SimpleSprite.tsx`
-- `/workspace/apps/vale-v2/src/ui/sprites/BackgroundSprite.tsx`
-- `/workspace/apps/vale-v2/src/ui/sprites/ButtonIcon.tsx`
+- `/workspace/src/ui/sprites/sprite-list-generated.ts` (9,777 lines!)
+- `/workspace/src/ui/sprites/catalog.ts`
+- `/workspace/src/ui/sprites/SimpleSprite.tsx`
+- `/workspace/src/ui/sprites/BackgroundSprite.tsx`
+- `/workspace/src/ui/sprites/ButtonIcon.tsx`
 
 **Updated:**
-- `/workspace/apps/vale-v2/src/ui/components/BattleView.tsx`
-- `/workspace/apps/vale-v2/src/ui/components/UnitCard.tsx`
-- `/workspace/apps/vale-v2/package.json` (added npm scripts)
+- `/workspace/src/ui/components/BattleView.tsx`
+- `/workspace/src/ui/components/UnitCard.tsx`
+- `/workspace/package.json` (added npm scripts)
 
 ---
 
@@ -128,7 +128,7 @@ npm run test:sprites
 ## Testing
 
 ```bash
-cd /workspace/apps/vale-v2
+cd /workspace/root
 npm run validate:sprites
 # Output: ✅ All 1627 sprites validated successfully!
 

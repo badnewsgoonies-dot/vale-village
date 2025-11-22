@@ -5,9 +5,9 @@
 
 ## Phase 1: Archive/Delete Documentation
 
-**Create `apps/vale-v2/docs/legacy/` and archive generic patterns:**
-- `docs/CAMERA_SYSTEM.md` → `apps/vale-v2/docs/legacy/` (generic React camera pattern)
-- `docs/MOVEMENT_OPTIMIZATION.md` → `apps/vale-v2/docs/legacy/` (if generic, else delete)
+**Create `docs/legacy/` and archive generic patterns:**
+- `docs/CAMERA_SYSTEM.md` → `docs/legacy/` (generic React camera pattern)
+- `docs/MOVEMENT_OPTIMIZATION.md` → `docs/legacy/` (if generic, else delete)
 
 **Delete V1 Root Docs (6 files):**
 - `GAME_VISION_SUMMARY.md` (V1 vision, MetaPrompt references)
@@ -40,7 +40,7 @@
 
 ## Phase 4: Update Documentation
 
-**Update `apps/vale-v2/CLAUDE.md`:**
+**Update `CLAUDE.md`:**
 - Change migration status from "in progress" to "~80% complete"
 - Add recent progress: Post-battle rewards, victory UI, turn handling improvements
 - Clarify ESLint import rules (verify UI can import from core)
@@ -49,7 +49,7 @@
 
 **Update `README.md`:**
 - Remove v1 references, 6-role workflow mentions
-- Point all paths to `apps/vale-v2/`
+- Point all paths to ``
 - Remove `/src/` directory mentions
 
 **Update `START_HERE.md`:**
@@ -63,7 +63,7 @@
 - Already resolved, verify clean
 
 ## Phase 5: Verify
-- `cd apps/vale-v2 && pnpm validate:data && pnpm test && pnpm typecheck && pnpm lint`
+- `cd root && pnpm validate:data && pnpm test && pnpm typecheck && pnpm lint`
 
 ## Phase 6: Commit
 ```
@@ -72,7 +72,7 @@ git commit -m "refactor: complete v1 to v2 migration and remove legacy codebase
 
 - Migrated assets (2,572 sprites, 25 sprite sheets) to v2
 - Migrated equipment data (58 items) to v2
-- Archived generic design docs to apps/vale-v2/docs/legacy/
+- Archived generic design docs to docs/legacy/
 - Deleted v1 codebase (/src/, /tests/)
 - Deleted v1 documentation (12 files: 6 root docs + 6 role files)
 - Cleaned up root config files
@@ -83,7 +83,7 @@ git commit -m "refactor: complete v1 to v2 migration and remove legacy codebase
 ## Final Structure
 ```
 vale-village/
-├── apps/vale-v2/          # ONLY CODEBASE
+├──           # ONLY CODEBASE
 │   ├── public/            # Migrated sprites
 │   ├── sprite-sheets/     # Migrated sheets
 │   ├── src/data/definitions/equipment.ts  # 58 items

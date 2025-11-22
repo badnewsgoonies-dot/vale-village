@@ -6,7 +6,7 @@ Convert fake smoke test into real integration test that validates actual gamepla
 ## Current Problems (In Priority Order)
 
 ### 1. **processVictory() Clears Roster** (CRITICAL)
-**Location:** `apps/vale-v2/src/core/services/RewardsService.ts` or wherever processVictory is
+**Location:** `src/core/services/RewardsService.ts` or wherever processVictory is
 **Symptom:** After victory, roster size = 0
 **Need to:** Find and fix why roster gets wiped
 
@@ -26,7 +26,7 @@ Convert fake smoke test into real integration test that validates actual gamepla
 
 **Step 1.1:** Locate processVictory function
 ```bash
-cd apps/vale-v2
+cd root
 grep -rn "processVictory" src/ --include="*.ts" --include="*.tsx"
 ```
 
@@ -105,7 +105,7 @@ while (!battleOver && attempts < 20) {
 
 **Step 3.2:** Update encounter definitions
 ```typescript
-// Check apps/vale-v2/src/data/definitions/encounters.ts
+// Check src/data/definitions/encounters.ts
 // Ensure house-01 or house-02 gives:
 // - War Mage unit reward
 // - Forge Djinn reward
@@ -242,7 +242,7 @@ console.log('BATTLE:', battleInfo);
 
 ```bash
 # Find processVictory
-cd apps/vale-v2
+cd root
 grep -rn "processVictory" src/ --include="*.ts" --include="*.tsx"
 ```
 

@@ -8,7 +8,8 @@
  * 4. TypeScript compiles
  * 
  * Usage:
- *   npx tsx scripts/validate_transforms.ts --root apps/vale-v2
+ *   npx tsx scripts/validate_transforms.ts
+ *   npx tsx scripts/validate_transforms.ts --root <path>  # Optional: specify custom root
  */
 
 import * as fs from 'fs';
@@ -18,7 +19,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const argv = await yargs(hideBin(process.argv))
-  .option('root', { type: 'string', default: 'apps/vale-v2' })
+  .option('root', { type: 'string', default: '.' })
   .parseAsync();
 
 const root = path.resolve(process.cwd(), argv.root as string);

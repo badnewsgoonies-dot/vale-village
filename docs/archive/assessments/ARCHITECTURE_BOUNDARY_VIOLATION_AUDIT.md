@@ -21,7 +21,7 @@
 ## 🔴 CRITICAL VIOLATIONS
 
 ### 1. BattleSlice: Direct Algorithm Import & Business Logic
-**File:** `apps/vale-v2/src/ui/state/battleSlice.ts:12`  
+**File:** `src/ui/state/battleSlice.ts:12`  
 **Severity:** 🔴 **CRITICAL**
 
 **Violation:**
@@ -65,7 +65,7 @@ startTurnTick: () => {
 ---
 
 ### 2. RewardsSlice: Direct Algorithm Import & Business Logic
-**File:** `apps/vale-v2/src/ui/state/rewardsSlice.ts:12-16`  
+**File:** `src/ui/state/rewardsSlice.ts:12-16`  
 **Severity:** 🔴 **CRITICAL**
 
 **Violation:**
@@ -116,7 +116,7 @@ processVictory: (battle, rng) => {
 ---
 
 ### 3. QueueBattleView: Direct Algorithm Import for Validation
-**File:** `apps/vale-v2/src/ui/components/QueueBattleView.tsx:17-18`  
+**File:** `src/ui/components/QueueBattleView.tsx:17-18`  
 **Severity:** 🔴 **CRITICAL**
 
 **Violation:**
@@ -163,7 +163,7 @@ if (!validation.valid) {
 ## 🟠 HIGH PRIORITY VIOLATIONS
 
 ### 4. UnitCard: Direct Algorithm Import for Display
-**File:** `apps/vale-v2/src/ui/components/UnitCard.tsx:11`  
+**File:** `src/ui/components/UnitCard.tsx:11`  
 **Severity:** 🟠 **HIGH**
 
 **Violation:**
@@ -200,7 +200,7 @@ export function getEffectiveStats(unitId: string, team: Team): Stats {
 ---
 
 ### 5. DjinnBar: Direct Algorithm Import for Validation
-**File:** `apps/vale-v2/src/ui/components/DjinnBar.tsx:8`  
+**File:** `src/ui/components/DjinnBar.tsx:8`  
 **Severity:** 🟠 **HIGH**
 
 **Violation:**
@@ -226,7 +226,7 @@ export function canActivateDjinn(team: Team, djinnId: string): boolean {
 ---
 
 ### 6. BattleSlice: Multiple `as any` Type Assertions
-**File:** `apps/vale-v2/src/ui/state/battleSlice.ts:101, 129, 198, 219`  
+**File:** `src/ui/state/battleSlice.ts:101, 129, 198, 219`  
 **Severity:** 🟠 **HIGH**
 
 **Violation:**
@@ -265,7 +265,7 @@ if (store.processVictory) {
 ## 🟡 MEDIUM PRIORITY VIOLATIONS
 
 ### 7. Migrations: Pervasive `any` Types
-**File:** `apps/vale-v2/src/core/save/migrations.ts:11, 19, 42, 50, 51, 83, 84`  
+**File:** `src/core/save/migrations.ts:11, 19, 42, 50, 51, 83, 84`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -319,7 +319,7 @@ const migrations: Record<string, Migrator<any, any>> = {
 ---
 
 ### 8. ReplayService: `as any` Type Assertion
-**File:** `apps/vale-v2/src/core/save/ReplayService.ts:90`  
+**File:** `src/core/save/ReplayService.ts:90`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -351,7 +351,7 @@ if (command.type === 'ability' || command.type === 'end-turn' || command.type ==
 ---
 
 ### 9. Equipment: `as any` for Stat Bonus Accumulation
-**File:** `apps/vale-v2/src/core/models/Equipment.ts:75`  
+**File:** `src/core/models/Equipment.ts:75`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -392,7 +392,7 @@ function calculateEquipmentBonuses(loadout: EquipmentLoadout): Partial<Stats> {
 ---
 
 ### 10. RewardsSlice: `as any` for Cross-Slice Access
-**File:** `apps/vale-v2/src/ui/state/rewardsSlice.ts:56, 71`  
+**File:** `src/ui/state/rewardsSlice.ts:56, 71`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -419,7 +419,7 @@ store.addGold(lastBattleRewards.goldEarned);
 ---
 
 ### 11. QueueBattleSlice: `as any` for Store Access
-**File:** `apps/vale-v2/src/ui/state/queueBattleSlice.ts:122`  
+**File:** `src/ui/state/queueBattleSlice.ts:122`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -442,7 +442,7 @@ const store = get() as QueueBattleSliceDependencies;
 ---
 
 ### 12. SaveSlice: `as any` for Type Compatibility
-**File:** `apps/vale-v2/src/ui/state/saveSlice.ts:58`  
+**File:** `src/ui/state/saveSlice.ts:58`  
 **Severity:** 🟡 **MEDIUM**
 
 **Violation:**
@@ -480,9 +480,9 @@ function unitToSaveFormat(unit: Unit): SavedUnit {
 
 ### 13-15. Console Statements in Core
 **Files:** 
-- `apps/vale-v2/src/core/algorithms/rewards.ts:105, 122`
-- `apps/vale-v2/src/core/save/migrations.ts:137, 171`
-- `apps/vale-v2/src/core/services/EncounterService.ts:42, 50`
+- `src/core/algorithms/rewards.ts:105, 122`
+- `src/core/save/migrations.ts:137, 171`
+- `src/core/services/EncounterService.ts:42, 50`
 
 **Severity:** 🟢 **LOW**
 
@@ -511,7 +511,7 @@ export function getEnemyXP(enemyId: string): Result<number, string> {
 // Or use proper logging service (if needed)
 ```
 
-**Note:** `apps/vale-v2/src/core/validation/validateAll.ts:104` console.warn is acceptable for validation scripts.
+**Note:** `src/core/validation/validateAll.ts:104` console.warn is acceptable for validation scripts.
 
 ---
 

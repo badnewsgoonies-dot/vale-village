@@ -30,7 +30,7 @@
 
 **Sprite Assets (2,572 GIFs organized):**
 ```
-/workspace/apps/vale-v2/public/sprites/
+/workspace/public/sprites/
 ├── backgrounds/        (72 GIFs: 36 GS1 + 36 GS2)
 ├── battle/
 │   ├── party/          (292 GIFs: Isaac, Garet, Ivan, Mia animations)
@@ -129,7 +129,7 @@
 ```bash
 # Adapt dinerdash's sprite generation script for vale-v2
 # Source: /workspace/dinerdash/scripts/generate-sprite-list.js
-cp /workspace/dinerdash/scripts/generate-sprite-list.js /workspace/apps/vale-v2/scripts/generate-sprite-manifest.js
+cp /workspace/dinerdash/scripts/generate-sprite-list.js /workspace/scripts/generate-sprite-manifest.js
 ```
 
 **Dinerdash Approach (Proven Working):**
@@ -184,7 +184,7 @@ export const SPRITE_LIST = [
 **Integration Strategy:**
 ```bash
 # Copy curated terrain tiles to vale-v2
-cp -r /workspace/dinerdash/assets/terrain-curated/* /workspace/apps/vale-v2/public/sprites/terrain/
+cp -r /workspace/dinerdash/assets/terrain-curated/* /workspace/public/sprites/terrain/
 
 # Use dinerdash's sprite list as reference
 # Contains ~800 sprites with proven organization

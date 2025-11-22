@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - Repository Structure Migration (2025-01-XX)
+
+#### Monorepo to Single Repository Migration
+
+- **Repository Structure:** Migrated from pnpm workspace monorepo (`apps/vale-v2/`) to single flat repository structure
+  - All game code moved to root level (`src/`, `tests/`, `public/`, etc.)
+  - Removed workspace configuration (`pnpm-workspace.yaml`)
+  - Merged `package.json` files and updated all scripts
+  - Updated CI/CD workflows to remove workspace filters
+  - Updated all documentation references (87+ markdown files)
+  - Simplified project structure for better maintainability
+
+- **Configuration Updates:**
+  - Scripts now run directly from root (no `--filter vale-v2` needed)
+  - ESLint config moved to root (using app version)
+  - All path aliases and imports verified working
+
+- **Breaking Changes:**
+  - None - all functionality preserved, only structure changed
+  - Commands remain the same (`pnpm dev`, `pnpm test`, etc.)
+
+- **Files Moved:**
+  - `apps/vale-v2/src/` → `src/`
+  - `apps/vale-v2/tests/` → `tests/`
+  - `apps/vale-v2/public/` → `public/`
+  - `apps/vale-v2/docs/` → `docs/app/`
+  - All config files moved to root
+
 ### Added - Phase 7: Djinn Ability Unlocking System (2025-11-12)
 
 #### Complete Djinn Ability System Implementation
@@ -17,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `getElementCompatibility()` - Calculates same/counter/neutral compatibility
   - `calculateDjinnBonusesForUnit()` - Per-unit stat bonuses based on compatibility
   - Stat bonuses: Same (+4 ATK, +3 DEF), Counter (-3 ATK, -2 DEF), Neutral (+2 ATK, +2 DEF)
-  - Location: `apps/vale-v2/src/core/algorithms/djinnAbilities.ts`
+  - Location: `src/core/algorithms/djinnAbilities.ts`
 
 -- **Djinn Schema & Definitions**
   - Zod schema validation for Djinn data (`DjinnSchema.ts`)
@@ -25,9 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 180 Djinn-granted abilities (15 per Djinn)
   - `DJINN` registry and `DJINN_ABILITIES` map for lookups
   - Locations:
-    - `apps/vale-v2/src/data/schemas/DjinnSchema.ts`
-    - `apps/vale-v2/src/data/definitions/djinn.ts`
-    - `apps/vale-v2/src/data/definitions/djinnAbilities.ts`
+    - `src/data/schemas/DjinnSchema.ts`
+    - `src/data/definitions/djinn.ts`
+    - `src/data/definitions/djinnAbilities.ts`
 
 -- **Battle Integration**
   - `getDjinnGrantedAbilitiesForUnit()` - Extracts ability IDs from Set Djinn
@@ -67,7 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prevents healing KO'd units unless ability explicitly supports revival
   - Throws `Error` when attempting to heal KO'd unit without revive capability
   - Validates healing amounts are non-negative (throws on negative values)
-  - Location: `apps/vale-v2/src/core/algorithms/damage.ts:241`
+  - Location: `src/core/algorithms/damage.ts:241`
 
   **Breaking Change:** `applyHealing()` signature changed from:
 
@@ -94,7 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Reject negative seeds** - `XorShiftPRNG` constructor and `makePRNG()` now throw `Error` on negative seeds
 - **Zero seed handling** - Zero seeds are automatically converted to 1 (XorShift requires non-zero state)
-- Location: `apps/vale-v2/src/core/random/prng.ts`
+- Location: `src/core/random/prng.ts`
 
   **Impact:** Prevents invalid PRNG states that could cause determinism failures
 
@@ -111,7 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Prevent duplicate Djinn** - `updateTeam()` now validates that `equippedDjinn` contains no duplicates
 - **Enforce 3-Djinn limit** - Throws `Error` if more than 3 Djinn are equipped
-- Location: `apps/vale-v2/src/core/models/Team.ts:75`
+- Location: `src/core/models/Team.ts:75`
 
   **Examples:**
 
@@ -129,7 +157,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Equipment Schema Default (`EquipmentSchema.ts:44`)
 
 - **`statBonus` defaults to `{}`** - Missing `statBonus` field now defaults to empty object instead of `undefined`
-- Location: `apps/vale-v2/src/data/schemas/EquipmentSchema.ts:44`
+- Location: `src/data/schemas/EquipmentSchema.ts:44`
 
   **Impact:** Prevents `undefined` access errors when equipment has no stat bonuses
 
@@ -170,7 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Liberation Village Encounters
 
-- `apps/vale-v2/src/data/definitions/maps.ts` now wires the `house-01` and `house-02` encounters into the `vale-village` map via `buildTriggers()` and the `encounterPool`, so the Liberation playtest path can trigger the new battles when visiting those houses.
+- `src/data/definitions/maps.ts` now wires the `house-01` and `house-02` encounters into the `vale-village` map via `buildTriggers()` and the `encounterPool`, so the Liberation playtest path can trigger the new battles when visiting those houses.
 - Playtesters can now trigger the Liberation encounters by entering the `house-01` or `house-02` trigger volumes in the overworld; the encounter definitions for those houses are also linked in the `liberationDialogues` scripts for narrative flow.
 
 ### Technical Details

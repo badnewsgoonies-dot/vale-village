@@ -34,7 +34,7 @@ This clears browser cache and forces full reload.
 pkill -f "vite.*8000"
 
 # Start fresh server
-cd /home/geni/Documents/vale-village/apps/vale-v2
+cd /home/geni/Documents/vale-village/root
 pnpm dev
 ```
 
@@ -42,7 +42,7 @@ Then refresh browser and check if issue persists.
 
 ### 4. Clear Vite Cache (3 minutes)
 ```bash
-cd /home/geni/Documents/vale-village/apps/vale-v2
+cd /home/geni/Documents/vale-village/root
 rm -rf node_modules/.vite
 pnpm dev
 ```
@@ -65,25 +65,25 @@ This forces Vite to rebuild all modules from scratch.
 
 ### Check if CSS file exists
 ```bash
-ls -la /home/geni/Documents/vale-village/apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.css
+ls -la /home/geni/Documents/vale-village/src/ui/components/PreBattleTeamSelectScreen.css
 ```
 **Expected:** File exists with ~10KB size
 
 ### Check if component imports CSS
 ```bash
-grep "import.*PreBattleTeamSelectScreen.css" /home/geni/Documents/vale-village/apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx
+grep "import.*PreBattleTeamSelectScreen.css" /home/geni/Documents/vale-village/src/ui/components/PreBattleTeamSelectScreen.tsx
 ```
 **Expected:** `import './PreBattleTeamSelectScreen.css';`
 
 ### Check recent git changes to component
 ```bash
 cd /home/geni/Documents/vale-village
-git log --oneline -5 -- apps/vale-v2/src/ui/components/PreBattleTeamSelectScreen.tsx
+git log --oneline -5 -- src/ui/components/PreBattleTeamSelectScreen.tsx
 ```
 
 ### Check TypeScript compilation
 ```bash
-cd /home/geni/Documents/vale-village/apps/vale-v2
+cd /home/geni/Documents/vale-village/root
 pnpm typecheck
 ```
 **Expected:** Warnings OK, but no ERRORS related to PreBattleTeamSelectScreen
@@ -130,10 +130,10 @@ pnpm typecheck
 
 **Files to Check:**
 ```
-apps/vale-v2/src/ui/components/TeamBenchSection.tsx
-apps/vale-v2/src/ui/components/EquipmentSection.tsx
-apps/vale-v2/src/ui/components/DjinnSection.tsx
-apps/vale-v2/src/ui/components/EnemyPortalTile.tsx
+src/ui/components/TeamBenchSection.tsx
+src/ui/components/EquipmentSection.tsx
+src/ui/components/DjinnSection.tsx
+src/ui/components/EnemyPortalTile.tsx
 ```
 
 **Fixes:** Verify exports, fix imports
@@ -161,7 +161,7 @@ Run this to gather diagnostic info:
 
 ```bash
 #!/bin/bash
-cd /home/geni/Documents/vale-village/apps/vale-v2
+cd /home/geni/Documents/vale-village/root
 
 echo "=== CHECKING FILES ==="
 ls -lh src/ui/components/PreBattleTeamSelectScreen.*
@@ -202,7 +202,7 @@ cd /home/geni/Documents/vale-village
 pkill -f vite
 
 # Clean everything
-cd apps/vale-v2
+cd root
 rm -rf node_modules/.vite
 rm -rf dist
 

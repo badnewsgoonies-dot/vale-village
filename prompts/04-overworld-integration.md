@@ -13,8 +13,8 @@ Complete the overworld system integration to enable seamless transitions between
 
 ### Task 1: Complete Battle Transition Flow
 **Files:**
-- `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+- `src/ui/state/gameFlowSlice.ts`
+- `src/ui/components/OverworldMap.tsx`
 
 **Requirements:**
 - When encounter trigger fires, transition to battle mode
@@ -23,7 +23,7 @@ Complete the overworld system integration to enable seamless transitions between
 - After battle defeat, return to last save point or inn
 
 ### Task 2: Implement Encounter Triggers
-**File:** `apps/vale-v2/src/core/services/EncounterService.ts`
+**File:** `src/core/services/EncounterService.ts`
 
 **Requirements:**
 - Random encounters based on map difficulty
@@ -32,7 +32,7 @@ Complete the overworld system integration to enable seamless transitions between
 - Encounter rate configurable per map
 
 ### Task 3: Add Overworld State Persistence
-**File:** `apps/vale-v2/src/ui/state/overworldSlice.ts`
+**File:** `src/ui/state/overworldSlice.ts`
 
 **Requirements:**
 - Save current map ID
@@ -41,7 +41,7 @@ Complete the overworld system integration to enable seamless transitions between
 - Restore on game load
 
 ### Task 4: Enhance OverworldMap UI
-**File:** `apps/vale-v2/src/ui/components/OverworldMap.tsx`
+**File:** `src/ui/components/OverworldMap.tsx`
 
 **Requirements:**
 - Display current map name
@@ -58,11 +58,11 @@ Complete the overworld system integration to enable seamless transitions between
 - No regressions in battle system
 
 ## Files to Review
-- `apps/vale-v2/src/ui/components/OverworldMap.tsx`
-- `apps/vale-v2/src/ui/state/overworldSlice.ts`
-- `apps/vale-v2/src/core/services/EncounterService.ts`
-- `apps/vale-v2/src/ui/state/gameFlowSlice.ts`
-- `apps/vale-v2/src/data/definitions/maps.ts`
+- `src/ui/components/OverworldMap.tsx`
+- `src/ui/state/overworldSlice.ts`
+- `src/core/services/EncounterService.ts`
+- `src/ui/state/gameFlowSlice.ts`
+- `src/data/definitions/maps.ts`
 
 ## Recommended Model
 **Claude 3.5 Sonnet** (200k context) - Sufficient for integration work

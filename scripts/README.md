@@ -10,10 +10,10 @@ Converts ability IDs from snake_case to kebab-case.
 **Usage:**
 ```bash
 # Dry run (preview changes)
-npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2 --dry
+npx tsx scripts/convert_ability_ids_to_kebab.ts --root root --dry
 
 # Apply changes
-npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2
+npx tsx scripts/convert_ability_ids_to_kebab.ts --root root
 ```
 
 **What it does:**
@@ -34,7 +34,7 @@ Updates the Zod schema to enforce kebab-case for ability IDs.
 
 **Usage:**
 ```bash
-npx tsx scripts/update_ability_schema.ts --root apps/vale-v2
+npx tsx scripts/update_ability_schema.ts --root root
 ```
 
 **What it does:**
@@ -64,7 +64,7 @@ Validates that transforms were applied correctly.
 
 **Usage:**
 ```bash
-npx tsx scripts/validate_transforms.ts --root apps/vale-v2
+npx tsx scripts/validate_transforms.ts --root root
 ```
 
 **What it checks:**
@@ -78,11 +78,11 @@ npx tsx scripts/validate_transforms.ts --root apps/vale-v2
 
 1. **Ability ID Conversion** (Critical)
    ```bash
-   npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2 --dry
+   npx tsx scripts/convert_ability_ids_to_kebab.ts --root root --dry
    # Review output, then:
-   npx tsx scripts/convert_ability_ids_to_kebab.ts --root apps/vale-v2
-   npx tsx scripts/update_ability_schema.ts --root apps/vale-v2
-   npx tsx scripts/validate_transforms.ts --root apps/vale-v2
+   npx tsx scripts/convert_ability_ids_to_kebab.ts --root root
+   npx tsx scripts/update_ability_schema.ts --root root
+   npx tsx scripts/validate_transforms.ts --root root
    ```
 
 2. **Type Deduplication** (High Priority)
@@ -139,7 +139,7 @@ git checkout -b fix/code-consistency
 pnpm typecheck
 
 # Review git diff
-git diff apps/vale-v2/src/data/definitions/abilities.ts
+git diff src/data/definitions/abilities.ts
 ```
 
 ---
