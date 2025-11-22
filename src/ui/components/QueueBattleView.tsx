@@ -289,9 +289,9 @@ export function QueueBattleView() {
 
   // --- HANDLERS ---
 
-  const handleAbilityHover = (id: string | null) => {
-    setHoveredAbilityId(id);
-  };
+  // const handleAbilityHover = (id: string | null) => {
+  //   setHoveredAbilityId(id);
+  // };
 
   const handleAbilitySelect = (id: string | null) => {
     // Toggle selection
@@ -321,7 +321,10 @@ export function QueueBattleView() {
     const order = getPlanningTurnOrder(battle);
     const currentOrderIdx = order.indexOf(selectedUnitIndex);
     if (currentOrderIdx !== -1 && currentOrderIdx < order.length - 1) {
-      setSelectedUnitIndex(order[currentOrderIdx + 1]);
+      const nextIndex = order[currentOrderIdx + 1];
+      if (nextIndex !== undefined) {
+        setSelectedUnitIndex(nextIndex);
+      }
     }
   };
 
@@ -397,7 +400,7 @@ export function QueueBattleView() {
   */
 
   // --- HELPERS FOR DETAILS PANEL ---
-  const activeDetailId = hoveredAbilityId ?? selectedAbilityId;
+  // const activeDetailId = hoveredAbilityId ?? selectedAbilityId; // Unused - commented out
   // Unused variables - commented out to fix TypeScript warnings
   /*
   const activeAbility = activeDetailId && currentUnit 
