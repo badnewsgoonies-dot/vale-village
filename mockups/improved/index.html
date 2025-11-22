@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Chronicles - Battle UI Mockups</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #1a0a00 0%, #2a1a0a 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8f8f0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #FFD87F;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 3rem;
+    }
+
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .mockup-card {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 2px solid #8b6a4a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .mockup-card:hover {
+      border-color: #ffd87f;
+      box-shadow: 0 8px 32px rgba(255, 216, 127, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .mockup-preview {
+      height: 200px;
+      background: #1a0a00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid #6a5a4a;
+      font-size: 4rem;
+    }
+
+    .mockup-info {
+      padding: 1.5rem;
+    }
+
+    .mockup-title {
+      font-size: 1.3rem;
+      color: #FFD87F;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .mockup-description {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .mockup-link {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(180deg, #ffd87f 0%, #f3c866 100%);
+      color: #1a0a00;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .mockup-link:hover {
+      background: linear-gradient(180deg, #ffe8a0 0%, #ffd87f 100%);
+      box-shadow: 0 4px 12px rgba(255, 216, 127, 0.4);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .badge-new {
+      background: #4CAF50;
+      color: #fff;
+    }
+
+    .badge-updated {
+      background: #2196F3;
+      color: #fff;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #4a3a2a;
+      color: #666;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚔️ Vale Chronicles</h1>
+    <p class="subtitle">Battle UI Mockups - Queue-Based System</p>
+
+    <div class="mockup-grid">
+      <!-- Planning Phase (Final) -->
+      <div class="mockup-card">
+        <div class="mockup-preview">📋</div>
+        <div class="mockup-info">
+          <div class="mockup-title">Planning Phase <span class="badge badge-updated">Updated</span></div>
+          <p class="mockup-description">
+            Main battle screen with ability selection, unit portraits, combat log, and Djinn menu.
+            Shows the full two-column layout with ability tooltips on hover.
+          </p>
+          <a href="battle-screen-queue-based-final.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+
+      <!-- Target Selection -->
+      <div class="mockup-card">
+        <div class="mockup-preview">🎯</div>
+        <div class="mockup-info">
+          <div class="mockup-title">Target Selection <span class="badge badge-new">New</span></div>
+          <p class="mockup-description">
+            Shows the target selection state when an ability has been chosen.
+            Enemies glow and pulse to indicate valid targets. Click to confirm.
+          </p>
+          <a href="battle-target-selection.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+
+      <!-- All Queued -->
+      <div class="mockup-card">
+        <div class="mockup-preview">✅</div>
+        <div class="mockup-info">
+          <div class="mockup-title">All Actions Queued <span class="badge badge-new">New</span></div>
+          <p class="mockup-description">
+            All 4 party members have actions queued. Shows the queue summary panel
+            with mana costs and the glowing "Execute Round" button.
+          </p>
+          <a href="battle-all-queued.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+
+      <!-- Execution Phase -->
+      <div class="mockup-card">
+        <div class="mockup-preview">⚔️</div>
+        <div class="mockup-info">
+          <div class="mockup-title">Execution Phase <span class="badge badge-new">New</span></div>
+          <p class="mockup-description">
+            Battle execution in progress. Shows damage numbers, unit action states,
+            defeated enemies, and the scrolling combat log with animations.
+          </p>
+          <a href="battle-execution-phase.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+
+      <!-- Victory Screen -->
+      <div class="mockup-card">
+        <div class="mockup-preview">🏆</div>
+        <div class="mockup-info">
+          <div class="mockup-title">Victory Screen <span class="badge badge-new">New</span></div>
+          <p class="mockup-description">
+            Post-battle victory overlay with rewards panel showing XP, gold,
+            items found, and level up notifications with sparkle effects.
+          </p>
+          <a href="battle-victory-screen.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+
+      <!-- Team Select -->
+      <div class="mockup-card">
+        <div class="mockup-preview">👥</div>
+        <div class="mockup-info">
+          <div class="mockup-title">Pre-Battle Team Select</div>
+          <p class="mockup-description">
+            Team selection screen before entering battle.
+            Choose your party composition and review unit stats.
+          </p>
+          <a href="../pre-battle-team-select-final.html" class="mockup-link">View Mockup →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Vale Chronicles V2 - Golden Sun-inspired RPG</p>
+      <p>Last updated: November 2025</p>
+    </div>
+  </div>
+</body>
+</html>
