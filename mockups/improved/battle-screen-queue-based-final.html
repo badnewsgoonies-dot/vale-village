@@ -589,23 +589,33 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 2rem;
+      gap: 1rem;
       flex-wrap: wrap;
-      padding-bottom: 2rem;
+      padding-bottom: 1rem;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     .player-card {
       background: transparent;
       border: none;
       border-radius: 0;
-      padding: 1rem;
-      min-width: 120px;
+      padding: 0.5rem;
+      min-width: 100px;
       text-align: center;
+      position: relative;
     }
 
+    /* Stagger the units for natural formation */
+    .player-card:nth-child(1) { transform: translateY(-15px); }
+    .player-card:nth-child(2) { transform: translateY(0px); }
+    .player-card:nth-child(3) { transform: translateY(-10px); }
+    .player-card:nth-child(4) { transform: translateY(5px); }
+
     .player-sprite {
-      width: 80px;
-      height: 80px;
+      width: 96px;
+      height: 96px;
       background: transparent;
       border-radius: 0;
       margin: 0 auto 0.5rem;
@@ -1219,19 +1229,19 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
 
       <div class="player-area">
         <div class="player-card">
-          <div class="player-sprite"><img src="./sprites/battle/party/isaac/Isaac_lBlade_Front.gif" alt="Isaac" /></div>
+          <div class="player-sprite"><img src="./sprites/battle/party/isaac/Isaac_lBlade_Back.gif" alt="Isaac" /></div>
           <div class="player-name">Isaac</div>
         </div>
         <div class="player-card">
-          <div class="player-sprite"><img src="./sprites/battle/party/garet/Garet_lSword_Front.gif" alt="Garet" /></div>
+          <div class="player-sprite"><img src="./sprites/battle/party/garet/Garet_lSword_Back.gif" alt="Garet" /></div>
           <div class="player-name">Garet</div>
         </div>
         <div class="player-card">
-          <div class="player-sprite"><img src="./sprites/battle/party/mia/Mia_Staff_Front.gif" alt="Mia" /></div>
+          <div class="player-sprite"><img src="./sprites/battle/party/mia/Mia_Staff_Back.gif" alt="Mia" /></div>
           <div class="player-name">Mia</div>
         </div>
         <div class="player-card">
-          <div class="player-sprite"><img src="./sprites/battle/party/ivan/Ivan_lBlade_Front.gif" alt="Ivan" /></div>
+          <div class="player-sprite"><img src="./sprites/battle/party/ivan/Ivan_lBlade_Back.gif" alt="Ivan" /></div>
           <div class="player-name">Ivan</div>
         </div>
       </div>
