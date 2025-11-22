@@ -593,6 +593,7 @@ export function QueueBattleView() {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* Bottom Panel: Planning or Execution */}
       {battle.phase === 'planning' ? (
         <div style={{ 
