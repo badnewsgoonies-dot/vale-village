@@ -14,6 +14,7 @@
 
 import type { BattleState } from '../models/BattleState';
 import { isUnitKO } from '../models/Unit';
+import type { DjinnState } from '../models/types';
 
 /**
  * Validation error with context
@@ -266,7 +267,7 @@ function validateDjinnInvariants(state: BattleState): void {
   const validDjinnStates = ['Set', 'Standby', 'Recovery'] as const;
 
   for (const [djinnId, tracker] of Object.entries(state.playerTeam.djinnTrackers)) {
-    if (!validDjinnStates.includes(tracker.state as any)) {
+    if (!validDjinnStates.includes(tracker.state as DjinnState)) {
       throw new BattleStateInvariantError(
         `Djinn ${djinnId} has invalid state: ${tracker.state}`,
         'DJINN_INVALID_STATE',

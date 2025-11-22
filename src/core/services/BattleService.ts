@@ -320,7 +320,8 @@ function applyPhase2Effects(
       } else if (removeSpec.type === 'byType') {
         // Remove specific status types
         const typesToRemove = removeSpec.statuses;
-        filteredStatuses = filteredStatuses.filter(s => !typesToRemove.includes(s.type as any));
+        // Type assertion is safe here as we know s.type matches StatusEffect union types
+        filteredStatuses = filteredStatuses.filter(s => !typesToRemove.includes(s.type as 'buff' | 'debuff' | 'poison' | 'burn' | 'freeze' | 'paralyze' | 'stun' | 'healOverTime' | 'elementResistance'));
       }
 
       modifiedTarget = {

@@ -88,8 +88,8 @@ importers:
         specifier: ^27.1.0
         version: 27.2.0
       pnpm:
-        specifier: ^8.15.0
-        version: 8.15.9
+        specifier: ^10.23.0
+        version: 10.23.0
       ts-morph:
         specifier: ^27.0.2
         version: 27.0.2
@@ -2231,9 +2231,9 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  pnpm@8.15.9:
-    resolution: {integrity: sha512-SZQ0ydj90aJ5Tr9FUrOyXApjOrzuW7Fee13pDzL0e1E6ypjNXP0AHDHw20VLw4BO3M1XhQHkyik6aBYWa72fgQ==}
-    engines: {node: '>=16.14'}
+  pnpm@10.23.0:
+    resolution: {integrity: sha512-IcTlaYACrel+Tv6Li0qJqN48haN5GflX56DzDzj7xbvdBZgP/ikXmy+25uaRJC4JjZRdFgF3LK0P71+2QR4qSw==}
+    engines: {node: '>=18.12'}
     hasBin: true
 
   possible-typed-array-names@1.1.0:
@@ -5132,7 +5132,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  pnpm@8.15.9: {}
+  pnpm@10.23.0: {}
 
   possible-typed-array-names@1.1.0: {}
 

@@ -196,6 +196,7 @@ function App() {
   }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
 
   // Expose handleRewardsContinue for E2E tests (after it's defined)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).handleRewardsContinue = handleRewardsContinue;
 
   // Hide dev header on startup screens

@@ -103,7 +103,7 @@ export function ShopStoryboard() {
             lineHeight: '1.6',
             textAlign: 'center',
           }}>
-            "Welcome! Unlock powerful equipment to strengthen your party!"
+            &quot;Welcome! Unlock powerful equipment to strengthen your party!&quot;
           </div>
         </div>
 
