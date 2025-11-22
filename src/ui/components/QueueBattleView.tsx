@@ -214,7 +214,21 @@ export function QueueBattleView() {
   };
 
   return (
-    <div className="queue-battle-root" style={{ padding: '1rem' }}>
+    <div className="queue-battle-root" style={{ 
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100dvh',
+      maxHeight: '100dvh',
+      padding: '1rem',
+      background: '#0a0a0a',
+      color: '#fff',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      boxSizing: 'border-box',
+    }}>
       {/* Top Bar: Mana + Djinn */}
       <div
         style={{
@@ -222,8 +236,8 @@ export function QueueBattleView() {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '0.75rem',
-          backgroundColor: '#1a2a4a',
-          border: '2px solid #4a6a8a',
+          backgroundColor: '#1a1a1a',
+          border: '2px solid #444',
           borderRadius: '4px',
           marginBottom: '1rem',
           // Phase 4: Dim during execution
@@ -254,8 +268,8 @@ export function QueueBattleView() {
         <div
           style={{
             padding: '0.75rem',
-            backgroundColor: '#4a2a1a',
-            border: '2px solid #8a4a2a',
+            backgroundColor: '#2a2a2a',
+            border: '2px solid #666',
             borderRadius: '4px',
             marginBottom: '1rem',
             textAlign: 'center',
@@ -269,10 +283,17 @@ export function QueueBattleView() {
       )}
 
       {/* Battlefield */}
-      <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
+      <div style={{ 
+        display: 'flex', 
+        gap: '2rem', 
+        marginBottom: '1rem',
+        flex: '1 1 auto',
+        minHeight: 0,
+        overflow: 'auto',
+      }}>
         {/* Enemy Side (NO HP BARS) */}
         <div style={{ flex: 1 }}>
-          <h3>Enemies</h3>
+          <h3 style={{ color: '#fff' }}>Enemies</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {battle.enemies.map((enemy) => (
               <UnitCard
@@ -288,7 +309,7 @@ export function QueueBattleView() {
 
         {/* Player Side */}
         <div style={{ flex: 1 }}>
-          <h3>Player Team</h3>
+          <h3 style={{ color: '#fff' }}>Player Team</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {battle.playerTeam.units.map((unit, index) => (
               <div
@@ -319,7 +340,14 @@ export function QueueBattleView() {
 
       {/* Bottom Panel: Planning or Execution */}
       {battle.phase === 'planning' ? (
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem',
+          flex: '0 0 auto',
+          minHeight: 0,
+          maxHeight: '40vh',
+          overflow: 'auto',
+        }}>
           {/* Action Queue Panel */}
           <div
             style={{
@@ -336,10 +364,14 @@ export function QueueBattleView() {
           <div
             style={{
               flex: '1',
-              backgroundColor: '#1a2a4a',
-              border: '2px solid #4a6a8a',
+              backgroundColor: '#1a1a1a',
+              border: '2px solid #444',
               borderRadius: '4px',
               padding: '1rem',
+              fontFamily: "'Press Start 2P', monospace",
+              fontSize: '10px',
+              minHeight: 0,
+              overflow: 'auto',
               // Phase 4: Dim during execution
               opacity: isPlanningLocked ? 0.6 : 1,
               pointerEvents: isPlanningLocked ? 'none' : 'auto',
@@ -347,8 +379,13 @@ export function QueueBattleView() {
           >
             {selectedUnitIndex !== null && currentUnit ? (
               <>
-                <h3 style={{ marginTop: 0, color: '#FFD87F' }}>
-                  Current: {currentUnit.name}
+                <h3 style={{ 
+                  marginTop: 0, 
+                  color: '#FFD87F',
+                  fontSize: '10px',
+                  textShadow: '2px 2px 0 #000',
+                }}>
+                  CURRENT: {currentUnit.name.toUpperCase()}
                 </h3>
 
                 {/* Phase 4: Queue error message */}
@@ -370,20 +407,27 @@ export function QueueBattleView() {
 
                 {/* Abilities */}
                 <div style={{ marginBottom: '1rem' }}>
-                  <h4>Abilities:</h4>
+                  <h4 style={{ color: '#FFD87F', fontSize: '8px', marginBottom: '0.5rem', textShadow: '1px 1px 0 #000' }}>
+                    ABILITIES:
+                  </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <button
                       onClick={() => handleAbilitySelect(null)}
                       style={{
                         padding: '0.5rem',
-                        backgroundColor: selectedAbility === null ? '#4CAF50' : '#444',
+                        backgroundColor: selectedAbility === null ? '#4CAF50' : '#2a2a2a',
                         color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
+                        border: '2px solid #444',
+                        borderRightColor: '#666',
+                        borderBottomColor: '#666',
+                        borderRadius: '0',
                         cursor: 'pointer',
+                        fontSize: '8px',
+                        fontFamily: "'Press Start 2P', monospace",
+                        textShadow: '1px 1px 0 #000',
                       }}
                     >
-                      Attack [0○]
+                      ATTACK [0○]
                     </button>
                     {currentUnit.abilities
                       .filter(a => currentUnit.unlockedAbilityIds.includes(a.id))
@@ -400,14 +444,19 @@ export function QueueBattleView() {
                             title={!canAfford ? 'Not enough mana' : isDjinnAbility ? 'Djinn ability' : ''}
                             style={{
                               padding: '0.5rem',
-                              backgroundColor: selectedAbility === ability.id ? '#4CAF50' : canAfford ? '#444' : '#222',
+                              backgroundColor: selectedAbility === ability.id ? '#4CAF50' : canAfford ? '#2a2a2a' : '#1a1a1a',
                               color: canAfford ? '#fff' : '#666',
-                              border: isDjinnAbility ? '1px solid #9C27B0' : 'none',
-                              borderRadius: '4px',
+                              border: isDjinnAbility ? '2px solid #9C27B0' : '2px solid #444',
+                              borderRightColor: isDjinnAbility ? '#BA68C8' : '#666',
+                              borderBottomColor: isDjinnAbility ? '#BA68C8' : '#666',
+                              borderRadius: '0',
                               cursor: canAfford ? 'pointer' : 'not-allowed',
+                              fontSize: '8px',
+                              fontFamily: "'Press Start 2P', monospace",
+                              textShadow: canAfford ? '1px 1px 0 #000' : 'none',
                             }}
                           >
-                            {isDjinnAbility && '✦ '}{ability.name} [{manaCost}○]
+                            {isDjinnAbility && '✦ '}{ability.name.toUpperCase()} [{manaCost}○]
                           </button>
                         );
                       })}
@@ -417,7 +466,9 @@ export function QueueBattleView() {
                 {/* Phase 4: Locked Djinn abilities with improved clarity */}
                 {lockedDjinnAbilitiesForCurrentUnit.length > 0 && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#ccc' }}>🔒 Locked Djinn Abilities</h5>
+                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#aaa', fontSize: '8px', textShadow: '1px 1px 0 #000' }}>
+                      🔒 LOCKED DJINN ABILITIES
+                    </h5>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {lockedDjinnAbilitiesForCurrentUnit.map((meta) => {
                         const ability = DJINN_ABILITIES[meta.abilityId];
@@ -429,15 +480,17 @@ export function QueueBattleView() {
                             title={`${ability.name} locked because ${formatLockedReason(meta)}`}
                             style={{
                               padding: '0.5rem',
-                              backgroundColor: '#222',
+                              backgroundColor: '#1a1a1a',
                               color: '#888',
-                              border: '1px dashed #555',
-                              borderRadius: '4px',
+                              border: '2px dashed #555',
+                              borderRadius: '0',
                               cursor: 'not-allowed',
                               textAlign: 'left',
+                              fontSize: '8px',
+                              fontFamily: "'Press Start 2P', monospace",
                             }}
                           >
-                            🔒 {ability.name} [{ability.manaCost ?? 0}○] — {formatLockedReason(meta)}
+                            🔒 {ability.name.toUpperCase()} [{ability.manaCost ?? 0}○] — {formatLockedReason(meta)}
                           </button>
                         );
                       })}
@@ -448,7 +501,9 @@ export function QueueBattleView() {
                 {/* Target Selection */}
                 {selectedAbility !== undefined && currentUnit && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4>Select Targets:</h4>
+                    <h4 style={{ color: '#FFD87F', fontSize: '8px', marginBottom: '0.5rem', textShadow: '1px 1px 0 #000' }}>
+                      SELECT TARGETS:
+                    </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {(() => {
                         const ability = selectedAbility
@@ -461,14 +516,19 @@ export function QueueBattleView() {
                           onClick={() => handleTargetSelect(target.id)}
                           style={{
                             padding: '0.5rem',
-                            backgroundColor: selectedTargets.includes(target.id) ? '#2196F3' : '#444',
+                            backgroundColor: selectedTargets.includes(target.id) ? '#2196F3' : '#2a2a2a',
                             color: '#fff',
-                            border: 'none',
-                            borderRadius: '4px',
+                            border: '2px solid #444',
+                            borderRightColor: '#666',
+                            borderBottomColor: '#666',
+                            borderRadius: '0',
                             cursor: 'pointer',
+                            fontSize: '8px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            textShadow: '1px 1px 0 #000',
                           }}
                         >
-                          {target.name}
+                          {target.name.toUpperCase()}
                         </button>
                       ))}
                     </div>
@@ -482,15 +542,19 @@ export function QueueBattleView() {
                     style={{
                       padding: '0.75rem 1.5rem',
                       backgroundColor: '#4CAF50',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
+                      color: '#000',
+                      border: '2px solid #66bb6a',
+                      borderRightColor: '#2E7D32',
+                      borderBottomColor: '#2E7D32',
+                      borderRadius: '0',
                       cursor: 'pointer',
-                      fontSize: '1rem',
-                      fontWeight: 'bold',
+                      fontSize: '8px',
+                      fontFamily: "'Press Start 2P', monospace",
+                      fontWeight: 'normal',
+                      textShadow: 'none',
                     }}
                   >
-                    Queue Action
+                    QUEUE ACTION
                   </button>
                 )}
 
@@ -502,10 +566,10 @@ export function QueueBattleView() {
                       style={{
                         padding: '0.5rem',
                         marginBottom: '0.5rem',
-                        backgroundColor: '#3a3a1a',
-                        border: '1px solid #6a6a2a',
+                        backgroundColor: '#2a2a2a',
+                        border: '1px solid #666',
                         borderRadius: '4px',
-                        color: '#ffee88',
+                        color: '#FFD87F',
                         fontSize: '0.9rem',
                         textAlign: 'center',
                       }}
@@ -521,11 +585,16 @@ export function QueueBattleView() {
                       padding: '0.75rem 1.5rem',
                       backgroundColor: isQueueComplete ? '#FFD87F' : '#666',
                       color: isQueueComplete ? '#000' : '#999',
-                      border: 'none',
-                      borderRadius: '4px',
+                      border: '2px solid',
+                      borderColor: isQueueComplete ? '#FFE082' : '#888',
+                      borderRightColor: isQueueComplete ? '#F9A825' : '#555',
+                      borderBottomColor: isQueueComplete ? '#F9A825' : '#555',
+                      borderRadius: '0',
                       cursor: isQueueComplete ? 'pointer' : 'not-allowed',
-                      fontSize: '1rem',
-                      fontWeight: 'bold',
+                      fontSize: '8px',
+                      fontFamily: "'Press Start 2P', monospace",
+                      fontWeight: 'normal',
+                      textShadow: 'none',
                     }}
                   >
                     {isQueueComplete ? 'EXECUTE ROUND' : 'QUEUE ALL ACTIONS FIRST'}
@@ -533,9 +602,16 @@ export function QueueBattleView() {
                 </div>
               </>
             ) : (
-              <div style={{ color: '#888', textAlign: 'center', padding: '2rem' }}>
-                Select a unit to queue an action
-              </div>
+                <div style={{ 
+                  color: '#aaa', 
+                  textAlign: 'center', 
+                  padding: '2rem',
+                  fontSize: '8px',
+                  fontFamily: "'Press Start 2P', monospace",
+                  textShadow: '1px 1px 0 #000',
+                }}>
+                  SELECT A UNIT TO QUEUE AN ACTION
+                </div>
             )}
           </div>
         </div>
