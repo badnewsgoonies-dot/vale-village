@@ -1,7 +1,7 @@
 /**
  * Combat Mechanics Integration Tests
  *
- * These tests validate core combat systems by executing REAL battle actions
+ * These tests validate core combat systems by executing real battle actions
  * and verifying actual damage calculations (not simulated victories).
  *
  * Coverage:

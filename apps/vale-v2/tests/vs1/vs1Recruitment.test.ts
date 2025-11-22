@@ -8,12 +8,12 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createStore } from '@/ui/state/store';
+import { createStore } from '../../src/ui/state/store';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST } from '@/story/vs1Constants';
 import { DIALOGUES } from '@/data/definitions/dialogues';
 import { createBattleFromEncounter } from '@/core/services/EncounterService';
-import type { BattleState } from '@/core/models/BattleState';
-import { makePRNG } from '@/core/random/prng';
+import type { BattleState } from '@/core/models/Battle';
+import { makePRNG } from '@/core/utils/prng';
 import { createVs1IsaacTeam } from '@/utils/teamSetup';
 
 describe('VS1 Recruitment Flow (dialogue-driven)', () => {

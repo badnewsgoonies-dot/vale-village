@@ -8,17 +8,16 @@ export const DialogueConditionSchema = z.object({
 });
 
 // Typed dialogue effects
-// - Known keys are explicitly modeled (startBattle, recruitUnit, grantDjinn, etc.)
-// - Additional boolean keys are allowed for story flags (e.g. first_djinn_intro_completed)
-export const DialogueEffectsSchema = z
-  .object({
-    startBattle: z.string().optional(),
-    recruitUnit: z.string().optional(),
-    grantDjinn: z.string().optional(),
-    questAccepted: z.boolean().optional(),
-    openShop: z.boolean().optional(),
-  })
-  .catchall(z.boolean());
+// Known effect types with their value types
+export const DialogueEffectsSchema = z.object({
+  startBattle: z.string().optional(),
+  recruitUnit: z.string().optional(),
+  grantDjinn: z.string().optional(),
+  questAccepted: z.boolean().optional(),
+  openShop: z.boolean().optional(),
+  // Story flags (boolean)
+  first_djinn_intro_completed: z.boolean().optional(),
+});
 
 export const DialogueChoiceSchema = z.object({
   id: z.string(),

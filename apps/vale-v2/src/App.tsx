@@ -20,6 +20,7 @@ import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 import { getRecruitmentDialogue, hasRecruitmentDialogue } from './data/definitions/recruitmentData';
+import { ENCOUNTER_TO_POST_BATTLE_DIALOGUE } from './data/definitions/postBattleDialogues';
 import { createBaseIsaacTeam, createVs1IsaacTeam } from './utils/teamSetup';
 import { DJINN } from './data/definitions/djinn';
 import { EQUIPMENT } from './data/definitions/equipment';
@@ -147,6 +148,21 @@ function App() {
       if (postScene) {
         startDialogueTree(postScene); // This sets mode to 'dialogue'
         return;
+      }
+    }
+
+    // Check for post-battle dialogue (celebration after liberation)
+    // This comes BEFORE recruitment dialogue
+    if (encounterId) {
+      const postBattleDialogueId = ENCOUNTER_TO_POST_BATTLE_DIALOGUE[encounterId];
+      if (postBattleDialogueId) {
+        const postBattleDialogue = DIALOGUES[postBattleDialogueId];
+        if (postBattleDialogue) {
+          startDialogueTree(postBattleDialogue); // This sets mode to 'dialogue'
+          return;
+        } else {
+          console.warn(`Post-battle dialogue not found: ${postBattleDialogueId}`);
+        }
       }
     }
 
