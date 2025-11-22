@@ -7,7 +7,7 @@
  * Phase 1: Read-only state display (no action handlers yet)
  */
 
-import React from 'react';
+import { useState, useCallback } from 'react';
 import { useStore } from '../state/store';
 import type { StatusEffect } from '../../core/models/types';
 import type { Unit } from '../../core/models/Unit';
@@ -183,9 +183,9 @@ export function BattleScreen(): JSX.Element | null {
   // Local UI state (Phase 1: placeholders)
   // ========================================================================
 
-  const [selectedCommand, setSelectedCommand] = React.useState<CommandType | null>(null);
-  const [targetingMode, setTargetingMode] = React.useState(false);
-  const [pendingAbilityId, setPendingAbilityId] = React.useState<string | null>(null);
+  const [selectedCommand, setSelectedCommand] = useState<CommandType | null>(null);
+  const [targetingMode, setTargetingMode] = useState(false);
+  const [pendingAbilityId, setPendingAbilityId] = useState<string | null>(null);
 
   // ========================================================================
   // Early return if no battle
@@ -327,85 +327,90 @@ export function BattleScreen(): JSX.Element | null {
   // Event Handlers (Phase 1: Stubs with TODOs)
   // ========================================================================
 
-  const handleSelectUnit = React.useCallback((unitId: string) => {
+  const handleSelectUnit = useCallback((unitId: string) => {
     // TODO Phase 2: Implement unit selection logic
     // - If in targeting mode, apply target
     // - Otherwise, select unit for planning
-    console.log('[TODO] Selected unit:', unitId);
+    // TODO: Add proper logging
+    // console.log('[TODO] Selected unit:', unitId);
   }, []);
 
-  const handleSelectCommand = React.useCallback((command: CommandType) => {
+  const handleSelectCommand = useCallback((command: CommandType) => {
     // TODO Phase 2: Implement command selection logic
     setSelectedCommand(command);
-    console.log('[TODO] Selected command:', command);
+    // TODO: Add proper logging
+    // console.log('[TODO] Selected command:', command);
   }, []);
 
-  const handleSelectAbility = React.useCallback((abilityId: string) => {
+  const handleSelectAbility = useCallback((abilityId: string) => {
     // TODO Phase 2: Implement ability selection logic
     // - Enter targeting mode
     // - Store pending ability ID
     setPendingAbilityId(abilityId);
     setTargetingMode(true);
-    console.log('[TODO] Selected ability:', abilityId);
+    // TODO: Add proper logging
+    // console.log('[TODO] Selected ability:', abilityId);
   }, []);
 
-  const handleSelectTarget = React.useCallback((targetId: string) => {
+  const handleSelectTarget = useCallback((targetId: string) => {
     // TODO Phase 2: Implement target selection logic
     // - Call queueUnitAction with pendingAbilityId and targetId
     // - Exit targeting mode
-    console.log('[TODO] Selected target:', targetId, 'for ability:', pendingAbilityId);
+    // TODO: Add proper logging
+    // console.log('[TODO] Selected target:', targetId, 'for ability:', pendingAbilityId);
 
     setPendingAbilityId(null);
     setTargetingMode(false);
   }, [pendingAbilityId]);
 
-  const handleSelectDjinn = React.useCallback((djinnId: string) => {
+  const handleSelectDjinn = useCallback((djinnId: string) => {
     // TODO Phase 2: Implement Djinn selection logic
-    console.log('[TODO] Selected Djinn:', djinnId);
+    // TODO: Add proper logging
+    // console.log('[TODO] Selected Djinn:', djinnId);
   }, []);
 
-  const handleClearQueueSlot = React.useCallback((unitId: string) => {
+  const handleClearQueueSlot = useCallback((unitId: string) => {
     // TODO Phase 2: Find unit index and call clearUnitAction
     const unitIndex = battle.playerTeam.units.findIndex((u) => u.id === unitId);
     console.log('[TODO] Clear queue slot for unit:', unitId, 'index:', unitIndex);
   }, [battle.playerTeam.units]);
 
-  const handleSelectQueueSlot = React.useCallback((unitId: string) => {
+  const handleSelectQueueSlot = useCallback((unitId: string) => {
     // TODO Phase 2: Switch currentQueueIndex to selected unit
     console.log('[TODO] Select queue slot:', unitId);
   }, []);
 
-  const handlePrevUnit = React.useCallback(() => {
+  const handlePrevUnit = useCallback(() => {
     // TODO Phase 2: Navigate to previous unit in queue
     console.log('[TODO] Navigate to previous unit');
   }, []);
 
-  const handleNextUnit = React.useCallback(() => {
+  const handleNextUnit = useCallback(() => {
     // TODO Phase 2: Navigate to next unit in queue
     console.log('[TODO] Navigate to next unit');
   }, []);
 
-  const handleExecuteRound = React.useCallback(() => {
+  const handleExecuteRound = useCallback(() => {
     // TODO Phase 2: Validate and execute round
     console.log('[TODO] Execute round - button clicked');
   }, []);
 
-  const handleContinue = React.useCallback(() => {
+  const handleContinue = useCallback(() => {
     // TODO Phase 2: Transition to rewards screen
     console.log('[TODO] Continue to rewards');
   }, []);
 
-  const handleReturnToVillage = React.useCallback(() => {
+  const handleReturnToVillage = useCallback(() => {
     // TODO Phase 2: Transition to overworld
     console.log('[TODO] Return to village');
   }, []);
 
-  const handleRetry = React.useCallback(() => {
+  const handleRetry = useCallback(() => {
     // TODO Phase 2: Restart battle
     console.log('[TODO] Retry battle');
   }, []);
 
-  const handleReturnToTitle = React.useCallback(() => {
+  const handleReturnToTitle = useCallback(() => {
     // TODO Phase 2: Return to title screen
     console.log('[TODO] Return to title');
   }, []);
