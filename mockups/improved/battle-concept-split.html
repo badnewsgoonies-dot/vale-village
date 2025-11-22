@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=0.5, maximum-scale=2, user-scalable=yes">
+  <title>Battle Concept B: Split Command</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a0a00;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8f8f0;
+      overflow: hidden;
+    }
+
+    .battle-split {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 60% 40%;
+    }
+
+    /* =========================
+       LEFT SIDE: PURE BATTLEFIELD
+       ========================= */
+    .battlefield-view {
+      position: relative;
+      overflow: hidden;
+      border-right: 3px solid #8b6a4a;
+    }
+
+    .battlefield-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      opacity: 0.9;
+    }
+
+    .battlefield-vignette {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+
+    /* Enemy formation */
+    .enemies-zone {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2rem;
+    }
+
+    .battlefield-enemy {
+      position: relative;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .battlefield-enemy:hover {
+      transform: scale(1.08);
+    }
+
+    .battlefield-enemy.targeted {
+      filter: drop-shadow(0 0 20px rgba(255,165,0,1));
+    }
+
+    .enemy-overhead {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .overhead-hp {
+      width: 70px;
+      height: 6px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .overhead-hp-fill {
+      height: 100%;
+      background: #ef5350;
+      transition: width 0.3s;
+    }
+
+    .overhead-hp-fill.high { background: #4CAF50; }
+    .overhead-hp-fill.mid { background: #ffa726; }
+    .overhead-hp-fill.low { background: #ef5350; }
+
+    .enemy-sprite-large {
+      width: 90px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .enemy-sprite-large img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    /* Player formation */
+    .players-zone {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+    }
+
+    .battlefield-player {
+      position: relative;
+      text-align: center;
+    }
+
+    .battlefield-player:nth-child(1) { transform: translateY(-25px); }
+    .battlefield-player:nth-child(2) { transform: translateY(0); }
+    .battlefield-player:nth-child(3) { transform: translateY(-15px); }
+    .battlefield-player:nth-child(4) { transform: translateY(10px); }
+
+    .battlefield-player.selecting {
+      filter: drop-shadow(0 0 20px rgba(255,216,127,0.9));
+    }
+
+    .battlefield-player.queued::before {
+      content: '✓';
+      position: absolute;
+      top: -15px;
+      right: 0;
+      color: #4CAF50;
+      font-size: 1.4rem;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .player-sprite-large {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-sprite-large img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    /* Action animation zone */
+    .action-zone {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .floating-damage {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ff6666;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(255,0,0,0.5);
+    }
+
+    /* =========================
+       RIGHT SIDE: COMMAND CENTER
+       ========================= */
+    .command-center {
+      background: linear-gradient(180deg, #2a1a0a 0%, #1a0a00 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header bar */
+    .command-header {
+      background: #3a2a1a;
+      padding: 10px 16px;
+      border-bottom: 2px solid #8b6a4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .round-badge {
+      color: #ffd87f;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .mana-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mana-pip {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #6a5a4a;
+      background: #2a1a0a;
+    }
+
+    .mana-pip.full {
+      background: radial-gradient(circle at 30% 30%, #fff4d0, #ffd87f);
+      border-color: #ffd87f;
+      box-shadow: 0 0 8px rgba(255,216,127,0.5);
+    }
+
+    /* Party status strip */
+    .party-strip {
+      display: flex;
+      border-bottom: 2px solid #6a5a4a;
+    }
+
+    .party-member-mini {
+      flex: 1;
+      padding: 8px;
+      border-right: 1px solid #6a5a4a;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .party-member-mini:last-child {
+      border-right: none;
+    }
+
+    .party-member-mini:hover {
+      background: rgba(255,216,127,0.1);
+    }
+
+    .party-member-mini.active {
+      background: rgba(255,216,127,0.2);
+      box-shadow: inset 0 -3px 0 #ffd87f;
+    }
+
+    .party-member-mini.done {
+      opacity: 0.6;
+    }
+
+    .mini-portrait {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-portrait img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .mini-name {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .mini-hp {
+      width: 90%;
+      height: 5px;
+      margin: 4px auto 0;
+      background: #1a0a00;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-hp-fill {
+      height: 100%;
+      background: #4CAF50;
+    }
+
+    .mini-hp-fill.med { background: #ffa726; }
+    .mini-hp-fill.low { background: #ef5350; }
+
+    /* Current unit section */
+    .current-unit-section {
+      padding: 12px;
+      background: #3a2a1a;
+      border-bottom: 2px solid #8b6a4a;
+    }
+
+    .current-unit-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .current-portrait {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ffd87f;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .current-portrait img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .current-info h3 {
+      color: #ffd87f;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .current-info .meta {
+      color: #aaa;
+      font-size: 0.8rem;
+    }
+
+    .current-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .stat-box {
+      background: rgba(0,0,0,0.3);
+      padding: 4px 6px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    /* Abilities section */
+    .abilities-section {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      color: #ffd87f;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #6a5a4a;
+    }
+
+    .ability-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ability-card {
+      padding: 10px;
+      background: #4a3a2a;
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ability-card:hover {
+      border-color: #ffd87f;
+      background: #5a4a3a;
+    }
+
+    .ability-card.selected {
+      background: #ffd87f;
+      border-color: #fff;
+    }
+
+    .ability-card.selected .ability-card-name,
+    .ability-card.selected .ability-card-cost {
+      color: #1a0a00;
+    }
+
+    .ability-card.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .ability-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .ability-card-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .ability-card-icon img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .ability-card-name {
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #fff;
+    }
+
+    .ability-card-cost {
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+
+    /* Enemies section */
+    .enemies-section {
+      padding: 12px;
+      background: #2a1a0a;
+      border-top: 2px solid #8b6a4a;
+    }
+
+    .enemy-list {
+      display: flex;
+      gap: 10px;
+    }
+
+    .enemy-mini {
+      flex: 1;
+      padding: 8px;
+      background: #3a2a1a;
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .enemy-mini:hover {
+      border-color: #ffa500;
+    }
+
+    .enemy-mini.targeted {
+      border-color: #ffd87f;
+      background: rgba(255,216,127,0.1);
+      box-shadow: 0 0 10px rgba(255,216,127,0.3);
+    }
+
+    .enemy-mini-sprite {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .enemy-mini-sprite img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .enemy-mini-name {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .enemy-mini-hp {
+      width: 100%;
+      height: 6px;
+      background: #1a0a00;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .enemy-mini-hp-fill {
+      height: 100%;
+      background: #ef5350;
+    }
+
+    .enemy-mini-element {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    /* Action footer */
+    .action-footer {
+      padding: 12px;
+      background: #3a2a1a;
+      border-top: 2px solid #8b6a4a;
+      display: flex;
+      gap: 10px;
+    }
+
+    .footer-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-confirm {
+      background: linear-gradient(180deg, #ffd87f 0%, #f3c866 100%);
+      color: #1a0a00;
+    }
+
+    .btn-confirm:hover {
+      background: linear-gradient(180deg, #ffe8a0 0%, #ffd87f 100%);
+    }
+
+    .btn-confirm:disabled {
+      background: #666;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-back {
+      background: #4a3a2a;
+      color: #fff;
+      border: 1px solid #6a5a4a;
+    }
+
+    .btn-back:hover {
+      background: #5a4a3a;
+    }
+
+    /* Djinn bar at very bottom of command */
+    .djinn-bar {
+      padding: 8px 12px;
+      background: #1a0a00;
+      border-top: 1px solid #6a5a4a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .djinn-bar-label {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    .djinn-slot {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid #6a5a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .djinn-slot img {
+      width: 20px;
+      height: 20px;
+      image-rendering: pixelated;
+    }
+
+    .djinn-slot:hover {
+      border-color: #ffd87f;
+    }
+
+    .djinn-slot.standby {
+      opacity: 0.4;
+    }
+
+    /* Mockup label */
+    .mockup-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #aaa;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-split">
+    <!-- LEFT: Battlefield View -->
+    <div class="battlefield-view">
+      <img src="./sprites/backgrounds/gs1/World_Map_Shore.gif" alt="Battlefield" class="battlefield-bg" />
+      <div class="battlefield-vignette"></div>
+
+      <div class="mockup-label">CONCEPT B: Split Command - Battlefield + Tactical Panel</div>
+
+      <!-- Enemies -->
+      <div class="enemies-zone">
+        <div class="battlefield-enemy">
+          <div class="enemy-overhead">
+            <div class="overhead-hp"><div class="overhead-hp-fill mid" style="width: 55%"></div></div>
+          </div>
+          <div class="enemy-sprite-large"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+        </div>
+        <div class="battlefield-enemy targeted">
+          <div class="enemy-overhead">
+            <div class="overhead-hp"><div class="overhead-hp-fill low" style="width: 20%"></div></div>
+          </div>
+          <div class="enemy-sprite-large"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+        </div>
+        <div class="battlefield-enemy">
+          <div class="enemy-overhead">
+            <div class="overhead-hp"><div class="overhead-hp-fill high" style="width: 100%"></div></div>
+          </div>
+          <div class="enemy-sprite-large"><img src="./sprites/battle/enemies/Goblin.gif" alt="Troll" /></div>
+        </div>
+      </div>
+
+      <!-- Players -->
+      <div class="players-zone">
+        <div class="battlefield-player queued">
+          <div class="player-sprite-large"><img src="./sprites/battle/party/isaac/Isaac_lBlade_Back.gif" alt="Isaac" /></div>
+        </div>
+        <div class="battlefield-player selecting">
+          <div class="player-sprite-large"><img src="./sprites/battle/party/garet/Garet_lSword_Back.gif" alt="Garet" /></div>
+        </div>
+        <div class="battlefield-player">
+          <div class="player-sprite-large"><img src="./sprites/battle/party/mia/Mia_Staff_Back.gif" alt="Mia" /></div>
+        </div>
+        <div class="battlefield-player">
+          <div class="player-sprite-large"><img src="./sprites/battle/party/ivan/Ivan_lBlade_Back.gif" alt="Ivan" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Command Center -->
+    <div class="command-center">
+      <!-- Header -->
+      <div class="command-header">
+        <div class="round-badge">ROUND 2</div>
+        <div class="mana-display">
+          <div class="mana-pip full"></div>
+          <div class="mana-pip full"></div>
+          <div class="mana-pip full"></div>
+          <div class="mana-pip"></div>
+          <div class="mana-pip"></div>
+          <span style="font-size: 0.8rem; color: #aaa; margin-left: 6px;">3/5</span>
+        </div>
+      </div>
+
+      <!-- Party strip -->
+      <div class="party-strip">
+        <div class="party-member-mini done">
+          <div class="mini-portrait"><img src="./sprites/icons/characters/Isaac1.gif" alt="Isaac" /></div>
+          <div class="mini-name">Isaac</div>
+          <div class="mini-hp"><div class="mini-hp-fill" style="width: 80%"></div></div>
+        </div>
+        <div class="party-member-mini active">
+          <div class="mini-portrait"><img src="./sprites/icons/characters/Garet1.gif" alt="Garet" /></div>
+          <div class="mini-name">Garet</div>
+          <div class="mini-hp"><div class="mini-hp-fill" style="width: 100%"></div></div>
+        </div>
+        <div class="party-member-mini">
+          <div class="mini-portrait"><img src="./sprites/icons/characters/Mia.gif" alt="Mia" /></div>
+          <div class="mini-name">Mia</div>
+          <div class="mini-hp"><div class="mini-hp-fill med" style="width: 55%"></div></div>
+        </div>
+        <div class="party-member-mini">
+          <div class="mini-portrait"><img src="./sprites/icons/characters/Ivan.gif" alt="Ivan" /></div>
+          <div class="mini-name">Ivan</div>
+          <div class="mini-hp"><div class="mini-hp-fill low" style="width: 25%"></div></div>
+        </div>
+      </div>
+
+      <!-- Current unit -->
+      <div class="current-unit-section">
+        <div class="current-unit-header">
+          <div class="current-portrait"><img src="./sprites/icons/characters/Garet1.gif" alt="Garet" /></div>
+          <div class="current-info">
+            <h3>GARET</h3>
+            <div class="meta">Lv 5 Mars | 100/100 HP</div>
+          </div>
+        </div>
+        <div class="current-stats">
+          <div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">48</div></div>
+          <div class="stat-box"><div class="stat-label">DEF</div><div class="stat-value">35</div></div>
+          <div class="stat-box"><div class="stat-label">MAG</div><div class="stat-value">22</div></div>
+          <div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">38</div></div>
+        </div>
+      </div>
+
+      <!-- Abilities -->
+      <div class="abilities-section">
+        <div class="section-title">SELECT ABILITY</div>
+        <div class="ability-grid">
+          <div class="ability-card">
+            <div class="ability-card-header">
+              <div class="ability-card-icon"><img src="./sprites/icons/buttons/Attack.gif" alt="" /></div>
+              <div class="ability-card-name">Attack</div>
+            </div>
+            <div class="ability-card-cost">0 MP - Physical</div>
+          </div>
+          <div class="ability-card selected">
+            <div class="ability-card-header">
+              <div class="ability-card-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+              <div class="ability-card-name">Fireball</div>
+            </div>
+            <div class="ability-card-cost">2 MP - Mars</div>
+          </div>
+          <div class="ability-card">
+            <div class="ability-card-header">
+              <div class="ability-card-icon"><img src="./sprites/icons/buttons/Cure_Poison.gif" alt="" /></div>
+              <div class="ability-card-name">Heal</div>
+            </div>
+            <div class="ability-card-cost">1 MP - Support</div>
+          </div>
+          <div class="ability-card">
+            <div class="ability-card-header">
+              <div class="ability-card-icon"><img src="./sprites/icons/buttons/Defend.gif" alt="" /></div>
+              <div class="ability-card-name">Guard Break</div>
+            </div>
+            <div class="ability-card-cost">0 MP - Physical</div>
+          </div>
+          <div class="ability-card locked">
+            <div class="ability-card-header">
+              <div class="ability-card-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+              <div class="ability-card-name">Quake</div>
+            </div>
+            <div class="ability-card-cost">3 MP - Locked</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enemies section -->
+      <div class="enemies-section">
+        <div class="section-title">SELECT TARGET</div>
+        <div class="enemy-list">
+          <div class="enemy-mini">
+            <div class="enemy-mini-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="" /></div>
+            <div class="enemy-mini-name">Goblin A</div>
+            <div class="enemy-mini-hp"><div class="enemy-mini-hp-fill" style="width: 55%"></div></div>
+            <div class="enemy-mini-element">Mars</div>
+          </div>
+          <div class="enemy-mini targeted">
+            <div class="enemy-mini-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="" /></div>
+            <div class="enemy-mini-name">Goblin B</div>
+            <div class="enemy-mini-hp"><div class="enemy-mini-hp-fill" style="width: 20%"></div></div>
+            <div class="enemy-mini-element">Mars</div>
+          </div>
+          <div class="enemy-mini">
+            <div class="enemy-mini-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="" /></div>
+            <div class="enemy-mini-name">Troll</div>
+            <div class="enemy-mini-hp"><div class="enemy-mini-hp-fill" style="width: 100%"></div></div>
+            <div class="enemy-mini-element">Venus</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action footer -->
+      <div class="action-footer">
+        <button class="footer-btn btn-back">Back</button>
+        <button class="footer-btn btn-confirm">Confirm</button>
+      </div>
+
+      <!-- Djinn bar -->
+      <div class="djinn-bar">
+        <span class="djinn-bar-label">DJINN:</span>
+        <div class="djinn-slot"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+        <div class="djinn-slot"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+        <div class="djinn-slot standby"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
