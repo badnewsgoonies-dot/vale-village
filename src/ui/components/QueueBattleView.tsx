@@ -400,7 +400,7 @@ export function QueueBattleView() {
   */
 
   // --- HELPERS FOR DETAILS PANEL ---
-  // const activeDetailId = hoveredAbilityId ?? selectedAbilityId; // Unused - commented out
+  // const activeDetailId = hoveredAbilityId ?? selectedAbilityId; // Unused - hoveredAbilityId is used elsewhere
   // Unused variables - commented out to fix TypeScript warnings
   /*
   const activeAbility = activeDetailId && currentUnit 
