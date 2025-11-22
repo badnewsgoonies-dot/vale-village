@@ -229,6 +229,7 @@ export function QueueBattleView() {
   // Selection State
   const [selectedUnitIndex, setSelectedUnitIndex] = useState<number | null>(null);
   const [selectedAbilityId, setSelectedAbilityId] = useState<string | null>(null);
+  // @ts-expect-error hoveredAbilityId is set via UI interactions but value not currently read
   const [hoveredAbilityId, setHoveredAbilityId] = useState<string | null>(null);
   
   // Post-battle State
