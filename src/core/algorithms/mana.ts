@@ -262,8 +262,15 @@ export function getEncounterId(battle: BattleState): string | undefined {
  */
 
 import type { Team } from '../models/Team';
+import type { QueuedAction } from '../models/BattleState';
 import type { Ability } from '../../data/schemas/AbilitySchema';
-import { calculateTeamManaPool } from '../models/BattleState';
+
+/**
+ * Calculate total team mana pool from unit contributions
+ */
+function calculateTeamManaPool(team: Team): number {
+  return team.units.reduce((total, unit) => total + unit.manaContribution, 0);
+}
 
 /**
  * Calculate total team mana pool from unit contributions
@@ -301,15 +308,6 @@ export function getAbilityManaCost(
 
 /**
  * Check if action can be afforded with remaining mana
- * 
- * @param remainingMana - Current mana pool
- * @param manaCost - Cost of the action
- * @returns True if affordable
- */
-export function canAffordAction(remainingMana: number, manaCost: number): boolean {
-  return remainingMana >= manaCost;
-}
-
 /**
  * Calculate total mana cost of all queued actions
  * 
@@ -317,14 +315,14 @@ export function canAffordAction(remainingMana: number, manaCost: number): boolea
  * @returns Total mana cost
  */
 export function calculateTotalQueuedManaCost(
-  queuedActions: readonly (import('../models/BattleState').QueuedAction | null)[]
+  queuedActions: readonly (QueuedAction | null)[]
 ): number {
-  return queuedActions.reduce((total, action) => {
-    if (!action) return total;
-    return total + action.manaCost;
-  }, 0);
-}
-
+/**
+ * Calculate total mana cost of all queued actions
+ * 
+ * @param queuedActions - Array of queued actions (null if not queued)
+ * @returns Total mana cost
+ */
 /**
  * Validate that all queued actions are affordable
  * 
@@ -334,14 +332,23 @@ export function calculateTotalQueuedManaCost(
  */
 export function validateQueuedActions(
   remainingMana: number,
-  queuedActions: readonly (import('../models/BattleState').QueuedAction | null)[]
+  queuedActions: readonly (QueuedAction | null)[]
 ): boolean {
-  const totalCost = calculateTotalQueuedManaCost(queuedActions);
-  return canAffordAction(remainingMana, totalCost);
-}
-
+ * 
+ * @param remainingMana - Current mana pool
+ * @param queuedActions - Array of queued actions
+ * @returns True if all actions are affordable
 /**
  * Check if all unit actions are queued
+ * 
+ * @param queuedActions - Array of queued actions
+ * @param teamSize - Expected team size (1-4). If not provided, uses queuedActions.length
+ * @returns True if all actions are queued
+ */
+export function isQueueComplete(
+  queuedActions: readonly (QueuedAction | null)[],
+  teamSize?: number
+): boolean {
  * 
  * @param queuedActions - Array of queued actions
  * @param teamSize - Expected team size (1-4). If not provided, uses queuedActions.length

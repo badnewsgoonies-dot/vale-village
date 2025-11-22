@@ -94,7 +94,7 @@ test('Check sprites are loading', async ({ page }) => {
   console.log('\n=== Checking for sprite elements ===');
   const spriteElements = await page.evaluate(() => {
     // Look for SimpleSprite components (they render img tags)
-    const imgs = Array.from(document.querySelectorAll('img[src*="sprites"]'));
+    const imgs = Array.from(document.querySelectorAll('img[src*="sprites"]')) as HTMLImageElement[];
     return imgs.map(img => ({
       src: img.src,
       alt: img.alt,
