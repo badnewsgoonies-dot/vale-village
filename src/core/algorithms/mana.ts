@@ -267,13 +267,6 @@ import type { Ability } from '../../data/schemas/AbilitySchema';
 
 /**
  * Calculate total team mana pool from unit contributions
- */
-function calculateTeamManaPool(team: Team): number {
-  return team.units.reduce((total, unit) => total + unit.manaContribution, 0);
-}
-
-/**
- * Calculate total team mana pool from unit contributions
  * 
  * @param team - Player's team
  * @returns Total mana circles available
@@ -308,6 +301,15 @@ export function getAbilityManaCost(
 
 /**
  * Check if action can be afforded with remaining mana
+ * 
+ * @param remainingMana - Current mana pool
+ * @param manaCost - Cost of the action
+ * @returns True if affordable
+ */
+export function canAffordAction(remainingMana: number, manaCost: number): boolean {
+  return remainingMana >= manaCost;
+}
+
 /**
  * Calculate total mana cost of all queued actions
  * 
@@ -317,12 +319,12 @@ export function getAbilityManaCost(
 export function calculateTotalQueuedManaCost(
   queuedActions: readonly (QueuedAction | null)[]
 ): number {
-/**
- * Calculate total mana cost of all queued actions
- * 
- * @param queuedActions - Array of queued actions (null if not queued)
- * @returns Total mana cost
- */
+  return queuedActions.reduce((total, action) => {
+    if (!action) return total;
+    return total + action.manaCost;
+  }, 0);
+}
+
 /**
  * Validate that all queued actions are affordable
  * 
@@ -334,10 +336,10 @@ export function validateQueuedActions(
   remainingMana: number,
   queuedActions: readonly (QueuedAction | null)[]
 ): boolean {
- * 
- * @param remainingMana - Current mana pool
- * @param queuedActions - Array of queued actions
- * @returns True if all actions are affordable
+  const totalCost = calculateTotalQueuedManaCost(queuedActions);
+  return canAffordAction(remainingMana, totalCost);
+}
+
 /**
  * Check if all unit actions are queued
  * 
@@ -347,15 +349,6 @@ export function validateQueuedActions(
  */
 export function isQueueComplete(
   queuedActions: readonly (QueuedAction | null)[],
-  teamSize?: number
-): boolean {
- * 
- * @param queuedActions - Array of queued actions
- * @param teamSize - Expected team size (1-4). If not provided, uses queuedActions.length
- * @returns True if all actions are queued
- */
-export function isQueueComplete(
-  queuedActions: readonly (import('../models/BattleState').QueuedAction | null)[],
   teamSize?: number
 ): boolean {
   const expectedSize = teamSize ?? queuedActions.length;
