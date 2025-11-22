@@ -38,7 +38,8 @@ const STYLES = {
     alignItems: 'center',
     padding: '0.75rem 1.5rem',
     background: 'linear-gradient(180deg, rgba(10,15,25,0.95) 0%, rgba(10,15,25,0.8) 100%)',
-    borderBottom: '1px solid #2a3b55',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
     zIndex: 100,
   },
   battlefield: {
@@ -47,7 +48,6 @@ const STYLES = {
     flexDirection: 'column' as const,
     justifyContent: 'center',
     alignItems: 'center',
-    // Placeholder gradient - ideally a background image
     background: 'radial-gradient(circle at 50% 30%, #1a253a 0%, #050810 80%)',
     perspective: '1000px',
   },
@@ -65,24 +65,24 @@ const STYLES = {
   },
   commandDeck: {
     height: '280px',
-    backgroundColor: '#0f1218',
-    borderTop: '2px solid #ffd700',
+    background: 'linear-gradient(180deg, #1a202c 0%, #0f1218 100%)',
+    borderTop: '4px double #4a5568', // Double border for RPG feel
     display: 'grid',
-    gridTemplateColumns: '260px 1fr', // 30% approx (fixed width is safer for list) vs 70%
+    gridTemplateColumns: '260px 1fr',
     zIndex: 20,
-    boxShadow: '0 -4px 20px rgba(0,0,0,0.5)',
+    boxShadow: '0 -4px 20px rgba(0,0,0,0.6)',
   },
   deckLeft: {
-    borderRight: '1px solid #2a3b55',
+    borderRight: '2px solid #2d3748',
     display: 'flex',
     flexDirection: 'column' as const,
-    backgroundColor: '#12161f',
+    background: 'rgba(0,0,0,0.2)',
   },
   deckRight: {
     position: 'relative' as const,
     display: 'flex',
     flexDirection: 'column' as const,
-    backgroundColor: '#0a0b10',
+    background: 'rgba(0,0,0,0.4)',
     overflow: 'hidden',
   },
   abilityList: {
@@ -97,47 +97,46 @@ const STYLES = {
     padding: '0.75rem 1rem',
     background: 'transparent',
     border: 'none',
-    borderBottom: '1px solid #1f293a',
-    color: '#aaa',
+    borderBottom: '1px solid rgba(255,255,255,0.05)',
+    color: '#a0aec0',
     cursor: 'pointer',
     textAlign: 'left' as const,
     transition: 'all 0.1s',
+    fontFamily: 'inherit', // Inherit font for consistent feel
   },
   abilityBtnSelected: {
-    background: '#1e2532',
+    background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0) 100%)',
     color: '#ffd700',
     borderLeft: '4px solid #ffd700',
+    textShadow: '0 0 8px rgba(255, 215, 0, 0.3)',
   },
   abilityBtnHover: {
-    background: '#1a202c',
-    color: '#fff',
+    background: 'rgba(255,255,255,0.05)',
+    color: '#e2e8f0',
   },
   activeUnitIndicator: {
-    padding: '0.5rem 1rem',
-    background: '#1a202c',
-    borderBottom: '1px solid #2a3b55',
+    padding: '0.75rem 1rem',
+    background: 'linear-gradient(90deg, #2d3748 0%, #1a202c 100%)',
+    borderBottom: '1px solid #4a5568',
     fontWeight: 'bold' as const,
     color: '#ffd700',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  queueStatus: {
-    fontSize: '0.8rem',
-    color: '#666',
+    boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.2)',
   },
   detailsPanel: {
     position: 'absolute' as const,
     top: 0, left: 0, right: 0, bottom: 0,
     padding: '1.5rem',
-    backgroundColor: 'rgba(15, 20, 30, 0.98)',
+    background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.98) 0%, rgba(15, 20, 30, 0.98) 100%)',
     zIndex: 5,
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '1rem',
   },
   detailsHeader: {
-    borderBottom: '1px solid #2a3b55',
+    borderBottom: '1px solid #4a5568',
     paddingBottom: '0.5rem',
     marginBottom: '0.5rem',
     display: 'flex',
@@ -145,16 +144,18 @@ const STYLES = {
     alignItems: 'baseline',
   },
   detailsTitle: {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     fontWeight: 'bold' as const,
     color: '#ffd700',
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
+    textShadow: '0 2px 4px rgba(0,0,0,0.5)',
   },
   detailsMeta: {
     fontSize: '0.9rem',
-    color: '#4fc3f7',
+    color: '#63b3ed',
+    fontWeight: 500,
   },
   detailsBody: {
     display: 'grid',
@@ -165,28 +166,48 @@ const STYLES = {
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '0.25rem',
+    background: 'rgba(0,0,0,0.2)',
+    padding: '0.5rem',
+    borderRadius: '4px',
+    border: '1px solid rgba(255,255,255,0.05)',
   },
   statLabel: {
-    fontSize: '0.8rem',
-    color: '#888',
+    fontSize: '0.75rem',
+    color: '#718096',
     textTransform: 'uppercase' as const,
     letterSpacing: '1px',
+    fontWeight: 600,
   },
   statValue: {
-    fontSize: '1rem',
-    color: '#eee',
+    fontSize: '1.1rem',
+    color: '#e2e8f0',
+    fontWeight: 500,
   },
   targetOverlay: {
     position: 'absolute' as const,
-    bottom: '20px',
+    bottom: '30px',
     left: '50%',
     transform: 'translateX(-50%)',
     padding: '1rem 2rem',
-    background: 'rgba(0,0,0,0.8)',
+    background: 'rgba(15, 20, 30, 0.9)',
     borderRadius: '8px',
     border: '1px solid #ffd700',
     zIndex: 50,
     textAlign: 'center' as const,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+    backdropFilter: 'blur(4px)',
+  },
+  executeBtn: {
+    padding: '1rem',
+    background: 'linear-gradient(180deg, #48bb78 0%, #2f855a 100%)',
+    color: '#fff',
+    border: 'none',
+    borderTop: '1px solid #68d391',
+    fontWeight: 'bold' as const,
+    cursor: 'pointer',
+    marginTop: 'auto',
+    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+    transition: 'all 0.2s',
   }
 };
 
@@ -522,15 +543,7 @@ export function QueueBattleView() {
           {isQueueComplete && !isExecuting && (
             <button 
               onClick={handleExecute}
-              style={{
-                padding: '1rem',
-                background: '#4CAF50',
-                color: '#fff',
-                border: 'none',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                marginTop: 'auto'
-              }}
+              style={STYLES.executeBtn}
             >
               EXECUTE ROUND ►
             </button>
@@ -560,7 +573,7 @@ export function QueueBattleView() {
 
               <div style={STYLES.detailsBody}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ marginBottom: '1rem', color: '#ccc', lineHeight: '1.5' }}>
+                  <div style={{ marginBottom: '1rem', color: '#e2e8f0', lineHeight: '1.5' }}>
                     {activeAbility?.description || 'Perform a standard physical attack with your equipped weapon.'}
                   </div>
                   
