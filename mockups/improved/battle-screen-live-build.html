@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=1.0">
+  <title>Vale Chronicles - Battle Screen Builder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #f8f8f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* GBA Screen Container - 3:2 aspect ratio (240x160 scaled up) */
+    .gba-screen {
+      width: 960px;  /* 240 * 4 */
+      height: 640px; /* 160 * 4 */
+      position: relative;
+      background: #000;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .battle-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Battle Background */
+    .battle-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('sprites/backgrounds/gs1/Vale.gif');
+      background-size: 100% 100%;
+      background-position: center;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      z-index: 0;
+    }
+
+    /* Enemy Area */
+    .enemy-area {
+      position: absolute;
+      bottom: 35%;  /* Move to grass level */
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 3rem;
+      z-index: 10;
+    }
+
+    .enemy-sprite {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      transform: scale(3);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .enemy-sprite:hover {
+      transform: scale(3.5);
+      filter: drop-shadow(0 0 20px #ffd700);
+    }
+
+    /* Player Area */
+    .player-area {
+      position: absolute;
+      bottom: 28%;  /* Move up to grass level */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;  /* Much narrower container */
+      z-index: 10;
+    }
+
+    .player-sprite {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      transform: scale(2.5);  /* 15% smaller */
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+      position: absolute;
+    }
+
+    /* Tight V formation positioning */
+    .player-sprite:nth-child(1) {
+      /* Front left - Isaac */
+      left: 40px;
+      bottom: 0;
+    }
+
+    .player-sprite:nth-child(2) {
+      /* Front right - Garet */
+      right: 40px;
+      bottom: 0;
+    }
+
+    .player-sprite:nth-child(3) {
+      /* Back center-left - Ivan */
+      left: 60px;
+      bottom: 40px;
+    }
+
+    .player-sprite:nth-child(4) {
+      /* Back center-right - Mia */
+      right: 60px;
+      bottom: 40px;
+    }
+
+    /* Command Panel */
+    .command-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      height: auto;
+      background: transparent;
+      padding: 0;
+      z-index: 20;
+    }
+
+    .command-buttons {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .cmd-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.6);
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+    }
+
+    .cmd-btn:hover {
+      transform: translateY(-5px);
+    }
+
+    .cmd-icon {
+      image-rendering: pixelated;
+      transform: scale(3);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    }
+
+    .cmd-btn:hover .cmd-icon {
+      filter: drop-shadow(0 0 10px #ffd700);
+    }
+
+    .cmd-label {
+      color: #ffd87f;
+      font-size: 0.9rem;
+      text-shadow: 2px 2px 2px #000;
+    }
+
+    /* Status Bars */
+    .status-area {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #8b6a4a;
+      border-radius: 4px;
+      padding: 0.5rem;
+      min-width: 180px;
+      z-index: 30;
+    }
+
+    .unit-status {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .unit-portrait {
+      image-rendering: pixelated;
+      transform: scale(2);
+      margin-right: 0.5rem;
+    }
+
+    .hp-bar {
+      flex: 1;
+      height: 8px;
+      background: #333;
+      border: 1px solid #666;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(to right, #ff3333, #ff6666);
+      transition: width 0.3s;
+    }
+
+    .mp-bar {
+      flex: 1;
+      height: 6px;
+      background: #333;
+      border: 1px solid #666;
+      position: relative;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .mp-fill {
+      height: 100%;
+      background: linear-gradient(to right, #3366ff, #6699ff);
+    }
+
+    /* Psynergy Effects */
+    .psynergy-effect {
+      position: absolute;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .fireball {
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle, #ff6600, #ff0000, #ffaa00);
+      border-radius: 50%;
+      box-shadow: 0 0 30px #ff6600, 0 0 60px #ff3300;
+      animation: fireball-pulse 0.5s ease-out;
+    }
+
+    @keyframes fireball-pulse {
+      0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .ice-shard {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 60px solid #00ccff;
+      filter: drop-shadow(0 0 20px #00ffff);
+      animation: ice-fall 0.8s ease-in;
+    }
+
+    @keyframes ice-fall {
+      0% {
+        transform: translateY(-200px) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(0) rotate(180deg);
+      }
+      100% {
+        transform: translateY(20px) rotate(360deg) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .lightning {
+      width: 30px;
+      height: 200px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        #ffff00 10%,
+        #ffffff 20%,
+        #ffff00 30%,
+        transparent 40%,
+        transparent 60%,
+        #ffff00 70%,
+        #ffffff 80%,
+        #ffff00 90%,
+        transparent 100%
+      );
+      filter: drop-shadow(0 0 10px #ffff00);
+      animation: lightning-strike 0.3s ease-out;
+    }
+
+    @keyframes lightning-strike {
+      0% {
+        opacity: 0;
+        transform: scaleY(0);
+      }
+      50% {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scaleY(1);
+      }
+    }
+
+    .earth-spike {
+      width: 40px;
+      height: 80px;
+      background: linear-gradient(to top, #654321, #8B4513);
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      filter: drop-shadow(0 0 10px #8B4513);
+      animation: earth-rise 0.6s ease-out;
+    }
+
+    @keyframes earth-rise {
+      0% {
+        transform: translateY(50px) scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: translateY(0) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Damage Numbers */
+    .damage-number {
+      position: absolute;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ffff00;
+      text-shadow: 2px 2px 4px #000;
+      pointer-events: none;
+      z-index: 150;
+      animation: damage-float 1s ease-out;
+    }
+
+    @keyframes damage-float {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- GBA Screen Frame -->
+  <div class="gba-screen">
+    <div class="battle-container">
+      <!-- Battle Background -->
+      <div class="battle-bg"></div>
+
+    <!-- Enemy Sprites -->
+    <div class="enemy-area" id="enemyArea">
+      <!-- We'll add enemies here -->
+    </div>
+
+    <!-- Player Sprites -->
+    <div class="player-area" id="playerArea">
+      <!-- We'll add players here -->
+    </div>
+
+    <!-- Status Panel -->
+    <div class="status-area">
+      <div class="unit-status">
+        <img src="sprites/icons/characters/Isaac1.gif" class="unit-portrait">
+        <div style="flex: 1;">
+          <div class="hp-bar"><div class="hp-fill" style="width: 80%"></div></div>
+          <div class="mp-bar"><div class="mp-fill" style="width: 60%"></div></div>
+        </div>
+      </div>
+      <div class="unit-status">
+        <img src="sprites/icons/characters/Garet1.gif" class="unit-portrait">
+        <div style="flex: 1;">
+          <div class="hp-bar"><div class="hp-fill" style="width: 90%"></div></div>
+          <div class="mp-bar"><div class="mp-fill" style="width: 40%"></div></div>
+        </div>
+      </div>
+      <div class="unit-status">
+        <img src="sprites/icons/characters/Ivan.gif" class="unit-portrait">
+        <div style="flex: 1;">
+          <div class="hp-bar"><div class="hp-fill" style="width: 70%"></div></div>
+          <div class="mp-bar"><div class="mp-fill" style="width: 80%"></div></div>
+        </div>
+      </div>
+      <div class="unit-status">
+        <img src="sprites/icons/characters/Mia.gif" class="unit-portrait">
+        <div style="flex: 1;">
+          <div class="hp-bar"><div class="hp-fill" style="width: 75%"></div></div>
+          <div class="mp-bar"><div class="mp-fill" style="width: 90%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Panel -->
+    <div class="command-panel">
+      <div class="command-buttons">
+        <div class="cmd-btn">
+          <img src="sprites/icons/buttons/Attack.gif" class="cmd-icon">
+          <span class="cmd-label">Attack</span>
+        </div>
+        <div class="cmd-btn">
+          <img src="sprites/icons/buttons/Psynergy.gif" class="cmd-icon">
+          <span class="cmd-label">Psynergy</span>
+        </div>
+        <div class="cmd-btn">
+          <img src="sprites/icons/buttons/Djinni.gif" class="cmd-icon">
+          <span class="cmd-label">Djinn</span>
+        </div>
+        <div class="cmd-btn">
+          <img src="sprites/icons/buttons/Item.gif" class="cmd-icon">
+          <span class="cmd-label">Item</span>
+        </div>
+        <div class="cmd-btn">
+          <img src="sprites/icons/buttons/Defend.gif" class="cmd-icon">
+          <span class="cmd-label">Defend</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div> <!-- Close GBA screen -->
+
+  <script>
+    // Battle data
+    const enemies = [
+      { name: 'Goblin', sprite: 'sprites/battle/enemies/Goblin.gif' },
+      { name: 'Bat', sprite: 'sprites/battle/enemies/Bat.gif' }
+    ];
+
+    const players = [
+      { name: 'Isaac', sprite: '../../dist/sprites/battle/party/isaac/Isaac_lSword_Back.gif' },
+      { name: 'Garet', sprite: '../../dist/sprites/battle/party/garet/Garet_Axe_Back.gif' },
+      { name: 'Ivan', sprite: '../../dist/sprites/battle/party/ivan/Ivan_Staff_Back.gif' },
+      { name: 'Mia', sprite: '../../dist/sprites/battle/party/mia/Mia_Staff_Back.gif' }
+    ];
+
+    // Auto-populate sprites
+    function populateBattle() {
+      // Add enemies
+      const enemyArea = document.getElementById('enemyArea');
+      enemies.forEach((enemy, i) => {
+        const img = document.createElement('img');
+        img.src = enemy.sprite;
+        img.className = 'enemy-sprite';
+        img.alt = enemy.name;
+        img.title = enemy.name;
+        enemyArea.appendChild(img);
+      });
+
+      // Add players
+      const playerArea = document.getElementById('playerArea');
+      players.forEach((player, i) => {
+        const img = document.createElement('img');
+        img.src = player.sprite;
+        img.className = 'player-sprite';
+        img.alt = player.name;
+        img.title = player.name;
+        playerArea.appendChild(img);
+      });
+    }
+
+    // Psynergy spells data - using real Golden Sun animations!
+    const psynergySpells = [
+      { name: 'Heat Wave', gif: '../../dist/sprites/psynergy/Heat_Wave.gif', element: 'Mars', damage: 45 },
+      { name: 'Ice Missile', gif: '../../dist/sprites/psynergy/Ice_Missile.gif', element: 'Mercury', damage: 38 },
+      { name: 'Spark Plasma', gif: '../../dist/sprites/psynergy/Spark_Plasma.gif', element: 'Jupiter', damage: 52 },
+      { name: 'Grand Gaia', gif: '../../dist/sprites/psynergy/Grand_Gaia.gif', element: 'Venus', damage: 85 },
+      { name: 'Dragon Fire', gif: '../../dist/sprites/psynergy/Dragon_Fire.gif', element: 'Mars', damage: 72 },
+      { name: 'Freeze Prism', gif: '../../dist/sprites/psynergy/Freeze_Prism.gif', element: 'Mercury', damage: 68 },
+      { name: 'Blue Bolt', gif: '../../dist/sprites/psynergy/Blue_Bolt.gif', element: 'Jupiter', damage: 42 },
+      { name: 'Supernova', gif: '../../dist/sprites/psynergy/Supernova.gif', element: 'Mars', damage: 150 }
+    ];
+
+    // Cast Psynergy spell
+    function castPsynergy(spellIndex) {
+      const spell = psynergySpells[spellIndex];
+      const enemies = document.querySelectorAll('.enemy-sprite');
+
+      // Show spell name
+      const spellName = document.createElement('div');
+      spellName.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: #ffd700;
+        text-shadow: 2px 2px 4px #000;
+        z-index: 200;
+        font-weight: bold;
+      `;
+      spellName.textContent = spell.name;
+      document.body.appendChild(spellName);
+      setTimeout(() => spellName.remove(), 1000);
+
+      enemies.forEach((enemy, i) => {
+        setTimeout(() => {
+          const rect = enemy.getBoundingClientRect();
+
+          // Create container for spell effect with multiply blend
+          const effectContainer = document.createElement('div');
+          effectContainer.style.cssText = `
+            position: fixed;
+            left: ${rect.left + rect.width/2 - 64}px;
+            top: ${rect.top + rect.height/2 - 64}px;
+            width: 128px;
+            height: 128px;
+            z-index: 100;
+            pointer-events: none;
+            transform: scale(2);
+            mix-blend-mode: lighten;
+            overflow: hidden;
+          `;
+
+          const effect = document.createElement('img');
+          effect.src = spell.gif;
+          effect.style.cssText = `
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+          `;
+
+          effectContainer.appendChild(effect);
+          document.body.appendChild(effectContainer);
+
+          // Create damage number
+          const damage = spell.damage + Math.floor(Math.random() * 10);
+          const damageNum = document.createElement('div');
+          damageNum.className = 'damage-number';
+          damageNum.textContent = damage;
+          damageNum.style.left = `${rect.left + rect.width/2}px`;
+          damageNum.style.top = `${rect.top}px`;
+          document.body.appendChild(damageNum);
+
+          // Shake enemy
+          enemy.style.animation = 'shake 0.3s';
+          setTimeout(() => enemy.style.animation = '', 300);
+
+          // Clean up effects (longer delay for GIF animations)
+          setTimeout(() => {
+            effectContainer.remove();
+            damageNum.remove();
+          }, 2000);
+        }, i * 200); // Stagger the attacks
+      });
+    }
+
+    // Add shake animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: scale(3) translateX(0); }
+        25% { transform: scale(3) translateX(-5px); }
+        75% { transform: scale(3) translateX(5px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize on load
+    window.addEventListener('load', populateBattle);
+
+    // Click handlers
+    document.querySelectorAll('.cmd-btn').forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        const label = btn.querySelector('.cmd-label').textContent;
+        console.log(`Selected: ${label}`);
+
+        // If Psynergy button clicked, cast a random spell
+        if (label === 'Psynergy') {
+          const randomSpell = Math.floor(Math.random() * psynergySpells.length);
+          castPsynergy(randomSpell);
+        }
+
+        // Flash effect
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = '', 200);
+      });
+    });
+  </script>
+</body>
+</html>

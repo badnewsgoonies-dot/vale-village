@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Vale Chronicles - Team Roster Management</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a0a00 0%, #2a1a0a 100%);
+      color: #f8f8f0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(180deg, #3a2a1a, #2a1a0a);
+      border-bottom: 3px solid #8b6a4a;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 1.8rem;
+      color: #FFD87F;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .header-btn {
+      background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header-btn:hover {
+      border-color: #FFD87F;
+      color: #FFD87F;
+    }
+
+    /* Main Layout */
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Left Panel - Roster */
+    .roster-panel {
+      width: 320px;
+      background: linear-gradient(135deg, #2a1a0a, #1a0a00);
+      border-right: 2px solid #4a3a2a;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      color: #FFD87F;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #4a3a2a;
+    }
+
+    .roster-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .unit-card {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .unit-card:hover {
+      border-color: #8b7a6a;
+      transform: translateX(4px);
+    }
+
+    .unit-card.selected {
+      border-color: #FFD87F;
+      box-shadow: 0 0 20px rgba(255,216,127,0.3);
+    }
+
+    .unit-card.in-party {
+      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
+    }
+
+    .unit-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .unit-portrait {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #6a5a4a, #4a3a2a);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .unit-info {
+      flex: 1;
+    }
+
+    .unit-name {
+      font-weight: bold;
+      color: #f8f8f0;
+      margin-bottom: 0.2rem;
+    }
+
+    .unit-class {
+      font-size: 0.85rem;
+      color: #a8a8a0;
+    }
+
+    .unit-stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: #8a7a6a;
+    }
+
+    .stat {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .stat-value {
+      color: #d8c8b8;
+    }
+
+    .element-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .element-venus { background: #8B4513; }
+    .element-mars { background: #DC143C; }
+    .element-jupiter { background: #9370DB; }
+    .element-mercury { background: #4682B4; }
+
+    /* Center Panel - Active Party */
+    .party-panel {
+      flex: 1;
+      background: linear-gradient(135deg, #2a1a0a, #1a0a00);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .party-slots {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .party-slot {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 3px dashed #6a5a4a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      min-height: 140px;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .party-slot.occupied {
+      border-style: solid;
+      border-color: #8b6a4a;
+    }
+
+    .party-slot.drag-over {
+      border-color: #FFD87F;
+      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
+      box-shadow: 0 0 30px rgba(255,216,127,0.4);
+    }
+
+    .slot-number {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: #2a1a0a;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #8a7a6a;
+      border: 2px solid #6a5a4a;
+    }
+
+    .slot-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slot-empty {
+      color: #6a5a4a;
+      font-style: italic;
+      text-align: center;
+      width: 100%;
+    }
+
+    .party-unit-portrait {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #6a5a4a, #4a3a2a);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .party-unit-details {
+      flex: 1;
+    }
+
+    .party-unit-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #FFD87F;
+      margin-bottom: 0.3rem;
+    }
+
+    .party-unit-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .party-stat {
+      display: flex;
+      justify-content: space-between;
+      color: #a8a8a0;
+    }
+
+    .party-stat-value {
+      color: #f8f8f0;
+      font-weight: bold;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #8B0000;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .remove-btn:hover {
+      opacity: 1;
+    }
+
+    /* Team Controls */
+    .team-controls {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .controls-title {
+      color: #FFD87F;
+      font-size: 1.1rem;
+    }
+
+    .team-presets {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .preset-btn {
+      background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .preset-btn:hover {
+      border-color: #FFD87F;
+      color: #FFD87F;
+    }
+
+    .preset-btn.active {
+      background: linear-gradient(180deg, #FFD87F, #f3c866);
+      color: #1a0a00;
+      border-color: #FFD87F;
+    }
+
+    .team-stats-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .team-stat-item {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+
+    .team-stat-label {
+      font-size: 0.85rem;
+      color: #8a7a6a;
+      margin-bottom: 0.3rem;
+    }
+
+    .team-stat-value {
+      font-size: 1.5rem;
+      color: #FFD87F;
+      font-weight: bold;
+    }
+
+    /* Right Panel - Unit Details */
+    .details-panel {
+      width: 380px;
+      background: linear-gradient(135deg, #2a1a0a, #1a0a00);
+      border-left: 2px solid #4a3a2a;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .no-selection {
+      color: #6a5a4a;
+      text-align: center;
+      margin-top: 2rem;
+      font-style: italic;
+    }
+
+    .unit-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #4a3a2a;
+    }
+
+    .detail-portrait {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #6a5a4a, #4a3a2a);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .detail-info {
+      flex: 1;
+    }
+
+    .detail-name {
+      font-size: 1.5rem;
+      color: #FFD87F;
+      margin-bottom: 0.3rem;
+    }
+
+    .detail-class {
+      color: #a8a8a0;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-level {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .level-item {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .level-label {
+      color: #8a7a6a;
+    }
+
+    .level-value {
+      color: #f8f8f0;
+      font-weight: bold;
+    }
+
+    /* Stats Grid */
+    .stats-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      color: #FFD87F;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid #4a3a2a;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .stat-item {
+      background: rgba(0,0,0,0.3);
+      padding: 0.75rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .stat-name {
+      color: #a8a8a0;
+    }
+
+    .stat-val {
+      color: #f8f8f0;
+      font-weight: bold;
+    }
+
+    /* Equipment Section */
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .equipment-slot {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .equipment-slot:hover {
+      border-color: #8b7a6a;
+    }
+
+    .equipment-name {
+      color: #e8d8c8;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .equipment-stats {
+      font-size: 0.8rem;
+      color: #8a7a6a;
+    }
+
+    .empty-slot {
+      color: #6a5a4a;
+      font-style: italic;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+
+      .roster-panel,
+      .details-panel {
+        width: 100%;
+        border: none;
+      }
+
+      .party-slots {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <h1 class="header-title">⚔️ Team Roster Management</h1>
+    <div class="header-actions">
+      <button class="header-btn">📊 Compendium</button>
+      <button class="header-btn">✨ Djinn Setup</button>
+      <button class="header-btn">🎒 Equipment</button>
+      <button class="header-btn">❌ Close</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Left Panel - Full Roster -->
+    <div class="roster-panel">
+      <h2 class="panel-title">📋 Full Roster (7/10)</h2>
+      <div class="roster-list">
+        <!-- Isaac -->
+        <div class="unit-card in-party selected">
+          <div class="element-badge element-venus">🌍</div>
+          <div class="unit-header">
+            <div class="unit-portrait">⚔️</div>
+            <div class="unit-info">
+              <div class="unit-name">Isaac</div>
+              <div class="unit-class">Adept • Level 12</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">280</span></div>
+            <div class="stat">ATK: <span class="stat-value">45</span></div>
+            <div class="stat">DEF: <span class="stat-value">38</span></div>
+            <div class="stat">Mana: <span class="stat-value">1</span></div>
+          </div>
+        </div>
+
+        <!-- Garet -->
+        <div class="unit-card in-party">
+          <div class="element-badge element-mars">🔥</div>
+          <div class="unit-header">
+            <div class="unit-portrait">🗡️</div>
+            <div class="unit-info">
+              <div class="unit-name">Garet</div>
+              <div class="unit-class">War Mage • Level 11</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">220</span></div>
+            <div class="stat">ATK: <span class="stat-value">38</span></div>
+            <div class="stat">MAG: <span class="stat-value">42</span></div>
+            <div class="stat">Mana: <span class="stat-value">2</span></div>
+          </div>
+        </div>
+
+        <!-- Mystic -->
+        <div class="unit-card in-party">
+          <div class="element-badge element-mercury">💧</div>
+          <div class="unit-header">
+            <div class="unit-portrait">🔮</div>
+            <div class="unit-info">
+              <div class="unit-name">Mystic</div>
+              <div class="unit-class">Healer • Level 11</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">200</span></div>
+            <div class="stat">MAG: <span class="stat-value">48</span></div>
+            <div class="stat">DEF: <span class="stat-value">25</span></div>
+            <div class="stat">Mana: <span class="stat-value">2</span></div>
+          </div>
+        </div>
+
+        <!-- Ranger -->
+        <div class="unit-card in-party">
+          <div class="element-badge element-jupiter">⚡</div>
+          <div class="unit-header">
+            <div class="unit-portrait">🏹</div>
+            <div class="unit-info">
+              <div class="unit-name">Ranger</div>
+              <div class="unit-class">Rogue • Level 10</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">185</span></div>
+            <div class="stat">ATK: <span class="stat-value">40</span></div>
+            <div class="stat">SPD: <span class="stat-value">52</span></div>
+            <div class="stat">Mana: <span class="stat-value">1</span></div>
+          </div>
+        </div>
+
+        <!-- Blaze (Benched) -->
+        <div class="unit-card">
+          <div class="element-badge element-mars">🔥</div>
+          <div class="unit-header">
+            <div class="unit-portrait">⚔️</div>
+            <div class="unit-info">
+              <div class="unit-name">Blaze</div>
+              <div class="unit-class">Warrior • Level 9</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">240</span></div>
+            <div class="stat">ATK: <span class="stat-value">42</span></div>
+            <div class="stat">DEF: <span class="stat-value">35</span></div>
+            <div class="stat">Mana: <span class="stat-value">1</span></div>
+          </div>
+        </div>
+
+        <!-- Sentinel (Benched) -->
+        <div class="unit-card">
+          <div class="element-badge element-venus">🌍</div>
+          <div class="unit-header">
+            <div class="unit-portrait">🛡️</div>
+            <div class="unit-info">
+              <div class="unit-name">Sentinel</div>
+              <div class="unit-class">Support • Level 8</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">260</span></div>
+            <div class="stat">DEF: <span class="stat-value">45</span></div>
+            <div class="stat">MAG: <span class="stat-value">30</span></div>
+            <div class="stat">Mana: <span class="stat-value">1</span></div>
+          </div>
+        </div>
+
+        <!-- Karis (Benched) -->
+        <div class="unit-card">
+          <div class="element-badge element-mercury">💧</div>
+          <div class="unit-header">
+            <div class="unit-portrait">📚</div>
+            <div class="unit-info">
+              <div class="unit-name">Karis</div>
+              <div class="unit-class">Scholar • Level 7</div>
+            </div>
+          </div>
+          <div class="unit-stats">
+            <div class="stat">HP: <span class="stat-value">180</span></div>
+            <div class="stat">MAG: <span class="stat-value">45</span></div>
+            <div class="stat">SPD: <span class="stat-value">38</span></div>
+            <div class="stat">Mana: <span class="stat-value">2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Panel - Active Party -->
+    <div class="party-panel">
+      <h2 class="panel-title">⚔️ Active Party Formation</h2>
+
+      <!-- Party Slots -->
+      <div class="party-slots">
+        <!-- Slot 1 -->
+        <div class="party-slot occupied" data-slot="1">
+          <div class="slot-number">1</div>
+          <button class="remove-btn">×</button>
+          <div class="slot-content">
+            <div class="party-unit-portrait">⚔️</div>
+            <div class="party-unit-details">
+              <div class="party-unit-name">Isaac</div>
+              <div class="party-unit-stats">
+                <div class="party-stat">
+                  <span>HP:</span>
+                  <span class="party-stat-value">280</span>
+                </div>
+                <div class="party-stat">
+                  <span>ATK:</span>
+                  <span class="party-stat-value">45</span>
+                </div>
+                <div class="party-stat">
+                  <span>DEF:</span>
+                  <span class="party-stat-value">38</span>
+                </div>
+                <div class="party-stat">
+                  <span>Mana:</span>
+                  <span class="party-stat-value">1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 2 -->
+        <div class="party-slot occupied" data-slot="2">
+          <div class="slot-number">2</div>
+          <button class="remove-btn">×</button>
+          <div class="slot-content">
+            <div class="party-unit-portrait">🗡️</div>
+            <div class="party-unit-details">
+              <div class="party-unit-name">Garet</div>
+              <div class="party-unit-stats">
+                <div class="party-stat">
+                  <span>HP:</span>
+                  <span class="party-stat-value">220</span>
+                </div>
+                <div class="party-stat">
+                  <span>ATK:</span>
+                  <span class="party-stat-value">38</span>
+                </div>
+                <div class="party-stat">
+                  <span>MAG:</span>
+                  <span class="party-stat-value">42</span>
+                </div>
+                <div class="party-stat">
+                  <span>Mana:</span>
+                  <span class="party-stat-value">2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 3 -->
+        <div class="party-slot occupied" data-slot="3">
+          <div class="slot-number">3</div>
+          <button class="remove-btn">×</button>
+          <div class="slot-content">
+            <div class="party-unit-portrait">🔮</div>
+            <div class="party-unit-details">
+              <div class="party-unit-name">Mystic</div>
+              <div class="party-unit-stats">
+                <div class="party-stat">
+                  <span>HP:</span>
+                  <span class="party-stat-value">200</span>
+                </div>
+                <div class="party-stat">
+                  <span>MAG:</span>
+                  <span class="party-stat-value">48</span>
+                </div>
+                <div class="party-stat">
+                  <span>DEF:</span>
+                  <span class="party-stat-value">25</span>
+                </div>
+                <div class="party-stat">
+                  <span>Mana:</span>
+                  <span class="party-stat-value">2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slot 4 -->
+        <div class="party-slot occupied" data-slot="4">
+          <div class="slot-number">4</div>
+          <button class="remove-btn">×</button>
+          <div class="slot-content">
+            <div class="party-unit-portrait">🏹</div>
+            <div class="party-unit-details">
+              <div class="party-unit-name">Ranger</div>
+              <div class="party-unit-stats">
+                <div class="party-stat">
+                  <span>HP:</span>
+                  <span class="party-stat-value">185</span>
+                </div>
+                <div class="party-stat">
+                  <span>ATK:</span>
+                  <span class="party-stat-value">40</span>
+                </div>
+                <div class="party-stat">
+                  <span>SPD:</span>
+                  <span class="party-stat-value">52</span>
+                </div>
+                <div class="party-stat">
+                  <span>Mana:</span>
+                  <span class="party-stat-value">1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Controls -->
+      <div class="team-controls">
+        <div class="controls-header">
+          <h3 class="controls-title">Quick Team Presets</h3>
+          <div class="team-presets">
+            <button class="preset-btn active">Balanced</button>
+            <button class="preset-btn">High Damage</button>
+            <button class="preset-btn">Tank & Heal</button>
+            <button class="preset-btn">Speed Team</button>
+          </div>
+        </div>
+
+        <div class="team-stats-summary">
+          <div class="team-stat-item">
+            <div class="team-stat-label">Total HP</div>
+            <div class="team-stat-value">885</div>
+          </div>
+          <div class="team-stat-item">
+            <div class="team-stat-label">Mana Pool</div>
+            <div class="team-stat-value">6</div>
+          </div>
+          <div class="team-stat-item">
+            <div class="team-stat-label">Avg Level</div>
+            <div class="team-stat-value">11</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Unit Details -->
+    <div class="details-panel">
+      <div class="unit-details">
+        <div class="unit-detail-header">
+          <div class="detail-portrait">⚔️</div>
+          <div class="detail-info">
+            <div class="detail-name">Isaac</div>
+            <div class="detail-class">Adept (Venus)</div>
+            <div class="detail-level">
+              <div class="level-item">
+                <span class="level-label">Level:</span>
+                <span class="level-value">12</span>
+              </div>
+              <div class="level-item">
+                <span class="level-label">EXP:</span>
+                <span class="level-value">8,250/10,500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-section">
+          <h3 class="section-title">📊 Combat Stats</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-name">HP</span>
+              <span class="stat-val">280/280</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Attack</span>
+              <span class="stat-val">45</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Defense</span>
+              <span class="stat-val">38</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Magic</span>
+              <span class="stat-val">22</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Speed</span>
+              <span class="stat-val">28</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Luck</span>
+              <span class="stat-val">15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipment -->
+        <div class="stats-section">
+          <h3 class="section-title">⚔️ Equipment</h3>
+          <div class="equipment-grid">
+            <div class="equipment-slot">
+              <div class="equipment-name">Iron Sword</div>
+              <div class="equipment-stats">+12 ATK</div>
+            </div>
+            <div class="equipment-slot">
+              <div class="equipment-name">Steel Armor</div>
+              <div class="equipment-stats">+15 DEF, +30 HP</div>
+            </div>
+            <div class="equipment-slot">
+              <div class="equipment-name">Bronze Helm</div>
+              <div class="equipment-stats">+8 DEF</div>
+            </div>
+            <div class="equipment-slot">
+              <div class="equipment-name">Leather Boots</div>
+              <div class="equipment-stats">+5 SPD</div>
+            </div>
+            <div class="equipment-slot">
+              <div class="equipment-name">Guardian Ring</div>
+              <div class="equipment-stats">+5 DEF, +10 HP</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Abilities -->
+        <div class="stats-section">
+          <h3 class="section-title">✨ Abilities</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-name">Strike</span>
+              <span class="stat-val">0 Mana</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Quake</span>
+              <span class="stat-val">3 Mana</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Clay Spire</span>
+              <span class="stat-val">4 Mana</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Shield</span>
+              <span class="stat-val">2 Mana</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulated drag and drop
+    let draggedUnit = null;
+
+    // Unit selection
+    document.querySelectorAll('.unit-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.unit-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+
+        // Update details panel (would show selected unit details)
+        console.log('Selected unit:', card.querySelector('.unit-name').textContent);
+      });
+    });
+
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        console.log('Selected preset:', btn.textContent);
+      });
+    });
+
+    // Remove buttons
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slot = btn.parentElement;
+        console.log('Remove unit from slot');
+        // Would remove unit and update UI
+      });
+    });
+
+    // Drag and drop simulation
+    document.querySelectorAll('.party-slot').forEach(slot => {
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        slot.classList.add('drag-over');
+      });
+
+      slot.addEventListener('dragleave', () => {
+        slot.classList.remove('drag-over');
+      });
+
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        slot.classList.remove('drag-over');
+        console.log('Unit dropped in slot');
+      });
+    });
+  </script>
+</body>
+</html>
