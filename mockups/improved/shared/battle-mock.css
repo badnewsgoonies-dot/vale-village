@@ -1,0 +1,202 @@
+/* Zero-scroll, pixel-art friendly shared CSS for battle mocks */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* zero scrolling */
+  background: #0b1220;
+  color: #eee;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 56px 1fr 300px; /* top HUD / battlefield / bottom dock */
+  grid-template-columns: 320px 1fr;   /* left portraits / main */
+  grid-template-areas:
+    "top top"
+    "left battlefield"
+    "bottom bottom";
+}
+
+.hud-top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #12233e;
+  border-bottom: 2px solid #2f4f73;
+}
+
+.mana {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mana .label { color: #ffd87f; font-weight: 700; }
+.mana .circles { display: flex; gap: 6px; }
+.mana .circle {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid #3f6d9a; background: #0e1b2e;
+}
+.mana .circle.filled { background: #4caf50; border-color: #6abf6a; box-shadow: 0 0 8px rgba(76,175,80,.6); }
+
+.djinn {
+  display: flex; align-items: center; gap: 10px;
+}
+.djinn .label { color: #ffd87f; font-weight: 700; }
+.djinn .icons { display: flex; gap: 8px; }
+.djinn .icon {
+  width: 32px; height: 32px; border: 2px solid #555; border-radius: 4px; overflow: hidden;
+  background: #1a1a1a;
+}
+.djinn .icon img {
+  width: 100%; height: 100%; object-fit: contain;
+  image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;
+}
+
+.portraits {
+  grid-area: left;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 12px;
+  overflow: visible; /* zero scroll */
+}
+.portrait {
+  display: flex; gap: 10px; align-items: center;
+  background: transparent; border: none; padding: 6px 4px;
+}
+.portrait .img {
+  width: 64px; height: 64px; overflow: hidden;
+}
+.portrait .img img {
+  width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated;
+}
+.portrait .meta { flex: 1; min-width: 0; }
+.portrait .name { font-weight: 700; }
+.portrait .sub { color: #aaa; font-size: 12px; margin-top: 2px; }
+.portrait .hp {
+  margin-top: 6px; width: 100%; height: 12px; border: 1px solid #4a6a8a; border-radius: 6px; position: relative;
+}
+.portrait .hp .fill { height: 100%; border-radius: 6px; background: #4caf50; }
+.portrait .hp.low .fill { background: #f44336; }
+.portrait .hp.med .fill { background: #ff9800; }
+.portrait .hp .text {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #111; font-weight: 700;
+}
+
+.battlefield {
+  grid-area: battlefield;
+  position: relative;
+  overflow: hidden;
+}
+.battle-bg {
+  position: absolute; inset: 0; opacity: .28; z-index: 0;
+}
+.battle-bg img {
+  width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated;
+}
+.enemies, .party {
+  position: relative; z-index: 1;
+  display: flex; justify-content: center; align-items: flex-end; gap: 28px;
+  padding: 18px 16px;
+}
+.enemies { padding-top: 34px; }
+.slot {
+  min-width: 110px; text-align: center; position: relative;
+}
+.sprite {
+  width: 88px; height: 88px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: transparent;
+}
+.sprite img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.label { font-weight: 700; font-size: 13px; }
+.slot .num {
+  position: absolute; top: -6px; left: -6px; width: 22px; height: 22px; border-radius: 50%;
+  background: #ffa500; border: 2px solid #fff; color: #111; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+
+.dock {
+  grid-area: bottom;
+  display: grid; grid-template-columns: 38% 2px 62%;
+  gap: 12px;
+  padding: 12px 16px; background: #132544; border-top: 2px solid #2f4f73;
+  overflow: visible; /* zero scroll */
+}
+.divider { width: 2px; background: #4a6a8a; }
+.ability-list {
+  display: flex; flex-direction: column; gap: 8px; overflow: visible;
+}
+.ability-item {
+  display: flex; gap: 10px; align-items: center; padding: 10px; border: 2px solid #4a6a8a; border-radius: 8px; background: #23364e;
+}
+.ability-item .icon { width: 32px; height: 32px; overflow: hidden; }
+.ability-item .icon img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.ability-item .content { flex: 1; min-width: 0; }
+.ability-item .title { font-weight: 700; }
+.ability-item .meta { color: #aaa; font-size: 12px; margin-top: 2px; }
+.ability-item.selected { background: #4caf50; border-color: #6abf6a; color: #111; }
+
+.log {
+  background: #0a1a2a; border: 1px solid #4a6a8a; border-radius: 6px; padding: 12px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.log .header { color: #ffd87f; font-weight: 800; border-bottom: 2px solid #4a6a8a; padding-bottom: 6px; margin-bottom: 6px; }
+.log .entry { font-size: 13px; }
+.log .entry .em { color: #ffd87f; font-weight: 700; }
+.log .action { color: #87ceeb; } .log .damage { color: #ff6347; } .log .heal { color: #7cfc00; } .log .status { color: #ffa500; }
+
+/* Overlay layer for FX foundation trials */
+#fx-layer {
+  position: absolute; inset: 0; z-index: 1000; pointer-events: none;
+}
+.fx { position: absolute; image-rendering: pixelated; }
+.fx--mid { z-index: 1050; } .fx--top { z-index: 1150; }
+
+/* Variant helpers (each mock can add a body class like v02, v03...) */
+/* v03: enemy arc */
+body.v03 .enemies .slot { transform-origin: center bottom; }
+body.v03 .enemies .slot:nth-child(1) { transform: translateY(6px) scale(.95); }
+body.v03 .enemies .slot:nth-child(2) { transform: translateY(0px) scale(1.0); }
+body.v03 .enemies .slot:nth-child(3) { transform: translateY(6px) scale(.95); }
+
+/* v04: isometric stagger */
+body.v04 .enemies .slot:nth-child(1) { transform: translate(-10px, 10px); }
+body.v04 .enemies .slot:nth-child(2) { transform: translate(0, 0); }
+body.v04 .enemies .slot:nth-child(3) { transform: translate(10px, 10px); }
+body.v04 .party .slot:nth-child(1) { transform: translate(-10px, -6px); }
+body.v04 .party .slot:nth-child(4) { transform: translate(10px, -6px); }
+
+/* v05: V-formation party */
+body.v05 .party .slot:nth-child(1) { transform: translateY(10px) scale(.97); }
+body.v05 .party .slot:nth-child(2) { transform: translateY(0px) scale(1.0); }
+body.v05 .party .slot:nth-child(3) { transform: translateY(0px) scale(1.0); }
+body.v05 .party .slot:nth-child(4) { transform: translateY(10px) scale(.97); }
+
+/* v09: right-side command stack */
+body.v09 .dock { grid-template-columns: 2fr 2px 1fr; }
+
+/* v11: ability tiles grid */
+body.v11 .ability-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+/* v13: combat log overlay film */
+body.v13 .dock .log { background: rgba(10, 26, 42, .78); }
+
+/* v16: split-view (abilities/log as right pane) */
+body.v16 .dock { grid-template-columns: 1fr 2px 1fr; }
+
+/* v18: djinn cascade holds open (handled via HTML hover in mocks) */
+
+/* v19: ability preview stage top-left (add stage container in HTML) */
+body.v19 .preview-stage { position: absolute; top: 10px; left: 10px; width: 220px; height: 140px; z-index: 900; border: 2px solid #4a6a8a; background: rgba(0,0,0,.25); }
+
+/* v20: summon spotlight dims background */
+body.v20 .battlefield::after {
+  content: ""; position: absolute; inset: 0; background: rgba(0,0,0,.35); z-index: 900;
+}
+
+
