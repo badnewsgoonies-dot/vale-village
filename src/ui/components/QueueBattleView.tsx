@@ -4,7 +4,7 @@
  * Phase 5: "Command Deck" Redesign & Speed-Based Turn Input
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useStore } from '../state/store';
 import { renderEventText } from '../utils/text';
 import { BattleLog } from './BattleLog';
@@ -241,7 +241,7 @@ export function QueueBattleView() {
   useEffect(() => {
     if (battle?.phase === 'planning' && selectedUnitIndex === null) {
       const order = getPlanningTurnOrder(battle);
-      if (order.length > 0) {
+      if (order.length > 0 && order[0] !== undefined) {
         setSelectedUnitIndex(order[0]);
       }
     }
@@ -335,7 +335,7 @@ export function QueueBattleView() {
   if (showVictoryOverlay) return <VictoryOverlay onComplete={() => { setShowVictoryOverlay(false); setMode('rewards'); }} />;
 
   // Determine valid targets if in selection mode
-  let validTargets: { id: string; name: string }[] = [];
+  let validTargets: readonly { id: string; name: string }[] = [];
   if (selectedAbilityId !== undefined && currentUnit) {
     // selectedAbilityId is null -> Basic Attack
     // selectedAbilityId is string -> Ability
@@ -347,10 +347,12 @@ export function QueueBattleView() {
     // Note: getValidTargets signature might need checking.
     // Assuming getValidTargets(ability | null/undefined, unit, team, enemies)
     // Checking import... getValidTargets(ability: Ability | null | undefined, ...)
-    validTargets = getValidTargets(ability, currentUnit, battle.playerTeam, battle.enemies);
+    validTargets = getValidTargets(ability || null, currentUnit, battle.playerTeam, battle.enemies);
   }
 
   // --- HELPERS FOR RENDERING ABILITY LIST ---
+  // Unused function - commented out to fix TypeScript warnings
+  /*
   const renderAbilityButton = (
     id: string | null, 
     name: string, 
@@ -389,14 +391,18 @@ export function QueueBattleView() {
       </button>
     );
   };
+  */
 
   // --- HELPERS FOR DETAILS PANEL ---
   const activeDetailId = hoveredAbilityId ?? selectedAbilityId;
+  // Unused variables - commented out to fix TypeScript warnings
+  /*
   const activeAbility = activeDetailId && currentUnit 
     ? currentUnit.abilities.find(a => a.id === activeDetailId) 
     : null;
   
   const isBasicAttackDetail = activeDetailId === null;
+  */
 
   const isExecuting = battle.phase === 'executing';
 

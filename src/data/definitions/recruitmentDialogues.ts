@@ -177,7 +177,7 @@ export const HOUSE_07_DJINN: DialogueTree = {
       speaker: 'Isaac',
       text: 'With three Djinn, we can now unleash Summon abilities!',
       portrait: 'isaac',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "breeze" },
     },
   ],
 };
@@ -263,7 +263,7 @@ export const HOUSE_12_DJINN: DialogueTree = {
       speaker: 'Granite',
       text: 'I am Granite, Tier 2 Venus Djinn. Your strength has called me!',
       portrait: 'djinn',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "granite" },
     },
   ],
 };
@@ -379,7 +379,7 @@ export const HOUSE_18_DJINN: DialogueTree = {
       speaker: 'Bane',
       text: 'I am Bane, Tier 3 Venus Djinn. The final battle approaches - take my power!',
       portrait: 'djinn',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "bane" },
     },
   ],
 };
@@ -409,7 +409,7 @@ export const HOUSE_20_DJINN: DialogueTree = {
       speaker: 'Isaac',
       text: 'With all 8 Djinn and our complete party, Vale is safe at last!',
       portrait: 'isaac',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "gust" },
     },
   ],
 };
