@@ -23,6 +23,8 @@ import { isUnitKO } from '../../core/models/Unit';
 import { ActionQueuePanel } from './ActionQueuePanel';
 
 // --- CSS CONSTANTS ---
+// Unused - commented out to fix TypeScript warnings
+/*
 const STYLES = {
   root: {
     height: '100vh',
@@ -211,6 +213,7 @@ const STYLES = {
     transition: 'all 0.2s',
   }
 };
+*/
 
 export function QueueBattleView() {
   const battle = useStore((s) => s.battle);
