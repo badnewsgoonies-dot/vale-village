@@ -40,8 +40,8 @@ export const HOUSE_01_RECRUIT: DialogueTree = {
       text: "And take this Forge Djinn I found - it'll boost our Mars power!",
       portrait: 'garet',
       effects: {
-        recruitUnit: true,
-        grantDjinn: true,
+        recruitUnit: "war-mage",
+        grantDjinn: "forge",
       },
     },
   ],
@@ -72,7 +72,7 @@ export const HOUSE_02_RECRUIT: DialogueTree = {
       speaker: 'Mystic',
       text: "Then I'll lend you my Mercury Psynergy. Together, we'll restore balance.",
       portrait: 'mystic',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "mystic" },
     },
   ],
 };
@@ -102,7 +102,7 @@ export const HOUSE_03_RECRUIT: DialogueTree = {
       speaker: 'Ranger',
       text: "My arrows are yours. Let's clear the path ahead.",
       portrait: 'ranger',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "ranger" },
     },
   ],
 };
@@ -147,7 +147,7 @@ export const HOUSE_05_RECRUIT: DialogueTree = {
       speaker: 'Blaze',
       text: "Then let my fire light the way! I'm with you.",
       portrait: 'blaze',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "blaze" },
     },
   ],
 };
@@ -177,7 +177,7 @@ export const HOUSE_07_DJINN: DialogueTree = {
       speaker: 'Isaac',
       text: 'With three Djinn, we can now unleash Summon abilities!',
       portrait: 'isaac',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "breeze" },
     },
   ],
 };
@@ -208,8 +208,8 @@ export const HOUSE_08_RECRUIT: DialogueTree = {
       text: "I found this Fizz Djinn while guarding the waters. It's yours now.",
       portrait: 'sentinel',
       effects: {
-        recruitUnit: true,
-        grantDjinn: true,
+        recruitUnit: "war-mage",
+        grantDjinn: "fizz",
       },
     },
   ],
@@ -240,7 +240,7 @@ export const HOUSE_11_RECRUIT: DialogueTree = {
       speaker: 'Karis',
       text: "Then I'll fight alongside you. My wind magic is yours!",
       portrait: 'karis',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "karis" },
     },
   ],
 };
@@ -263,7 +263,7 @@ export const HOUSE_12_DJINN: DialogueTree = {
       speaker: 'Granite',
       text: 'I am Granite, Tier 2 Venus Djinn. Your strength has called me!',
       portrait: 'djinn',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "granite" },
     },
   ],
 };
@@ -293,7 +293,7 @@ export const HOUSE_14_RECRUIT: DialogueTree = {
       speaker: 'Tyrell',
       text: "Ha! Then let's make some noise together!",
       portrait: 'tyrell',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "tyrell" },
     },
   ],
 };
@@ -324,8 +324,8 @@ export const HOUSE_15_RECRUIT: DialogueTree = {
       text: "I bring both myself and Squall Djinn. Together, we'll unleash the tempest!",
       portrait: 'stormcaller',
       effects: {
-        recruitUnit: true,
-        grantDjinn: true,
+        recruitUnit: "war-mage",
+        grantDjinn: "squall",
       },
     },
   ],
@@ -356,7 +356,7 @@ export const HOUSE_17_RECRUIT: DialogueTree = {
       speaker: 'Felix',
       text: "Like old times. Let's finish this fight.",
       portrait: 'felix',
-      effects: { recruitUnit: true },
+      effects: { recruitUnit: "felix" },
     },
   ],
 };
@@ -379,7 +379,7 @@ export const HOUSE_18_DJINN: DialogueTree = {
       speaker: 'Bane',
       text: 'I am Bane, Tier 3 Venus Djinn. The final battle approaches - take my power!',
       portrait: 'djinn',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "bane" },
     },
   ],
 };
@@ -409,7 +409,7 @@ export const HOUSE_20_DJINN: DialogueTree = {
       speaker: 'Isaac',
       text: 'With all 8 Djinn and our complete party, Vale is safe at last!',
       portrait: 'isaac',
-      effects: { grantDjinn: true },
+      effects: { grantDjinn: "gust" },
     },
   ],
 };

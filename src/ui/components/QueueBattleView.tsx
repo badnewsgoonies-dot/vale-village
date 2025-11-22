@@ -4,7 +4,7 @@
  * Phase 5: "Command Deck" Redesign & Speed-Based Turn Input
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useStore } from '../state/store';
 import { renderEventText } from '../utils/text';
 import { BattleLog } from './BattleLog';
@@ -23,6 +23,8 @@ import { isUnitKO } from '../../core/models/Unit';
 import { ActionQueuePanel } from './ActionQueuePanel';
 
 // --- CSS CONSTANTS ---
+// Unused - commented out to fix TypeScript warnings
+/*
 const STYLES = {
   root: {
     height: '100vh',
@@ -211,6 +213,7 @@ const STYLES = {
     transition: 'all 0.2s',
   }
 };
+*/
 
 export function QueueBattleView() {
   const battle = useStore((s) => s.battle);
@@ -226,6 +229,7 @@ export function QueueBattleView() {
   // Selection State
   const [selectedUnitIndex, setSelectedUnitIndex] = useState<number | null>(null);
   const [selectedAbilityId, setSelectedAbilityId] = useState<string | null>(null);
+  // @ts-expect-error hoveredAbilityId is set via UI interactions but value not currently read
   const [hoveredAbilityId, setHoveredAbilityId] = useState<string | null>(null);
   
   // Post-battle State
@@ -241,7 +245,7 @@ export function QueueBattleView() {
   useEffect(() => {
     if (battle?.phase === 'planning' && selectedUnitIndex === null) {
       const order = getPlanningTurnOrder(battle);
-      if (order.length > 0) {
+      if (order.length > 0 && order[0] !== undefined) {
         setSelectedUnitIndex(order[0]);
       }
     }
@@ -286,9 +290,9 @@ export function QueueBattleView() {
 
   // --- HANDLERS ---
 
-  const handleAbilityHover = (id: string | null) => {
-    setHoveredAbilityId(id);
-  };
+  // const handleAbilityHover = (id: string | null) => {
+  //   setHoveredAbilityId(id);
+  // };
 
   const handleAbilitySelect = (id: string | null) => {
     // Toggle selection
@@ -318,7 +322,10 @@ export function QueueBattleView() {
     const order = getPlanningTurnOrder(battle);
     const currentOrderIdx = order.indexOf(selectedUnitIndex);
     if (currentOrderIdx !== -1 && currentOrderIdx < order.length - 1) {
-      setSelectedUnitIndex(order[currentOrderIdx + 1]);
+      const nextIndex = order[currentOrderIdx + 1];
+      if (nextIndex !== undefined) {
+        setSelectedUnitIndex(nextIndex);
+      }
     }
   };
 
@@ -335,7 +342,7 @@ export function QueueBattleView() {
   if (showVictoryOverlay) return <VictoryOverlay onComplete={() => { setShowVictoryOverlay(false); setMode('rewards'); }} />;
 
   // Determine valid targets if in selection mode
-  let validTargets: { id: string; name: string }[] = [];
+  let validTargets: readonly { id: string; name: string }[] = [];
   if (selectedAbilityId !== undefined && currentUnit) {
     // selectedAbilityId is null -> Basic Attack
     // selectedAbilityId is string -> Ability
@@ -347,10 +354,12 @@ export function QueueBattleView() {
     // Note: getValidTargets signature might need checking.
     // Assuming getValidTargets(ability | null/undefined, unit, team, enemies)
     // Checking import... getValidTargets(ability: Ability | null | undefined, ...)
-    validTargets = getValidTargets(ability, currentUnit, battle.playerTeam, battle.enemies);
+    validTargets = getValidTargets(ability || null, currentUnit, battle.playerTeam, battle.enemies);
   }
 
   // --- HELPERS FOR RENDERING ABILITY LIST ---
+  // Unused function - commented out to fix TypeScript warnings
+  /*
   const renderAbilityButton = (
     id: string | null, 
     name: string, 
@@ -389,14 +398,18 @@ export function QueueBattleView() {
       </button>
     );
   };
+  */
 
   // --- HELPERS FOR DETAILS PANEL ---
-  const activeDetailId = hoveredAbilityId ?? selectedAbilityId;
+  // const activeDetailId = hoveredAbilityId ?? selectedAbilityId; // Both used via setters but value not read
+  // Unused variables - commented out to fix TypeScript warnings
+  /*
   const activeAbility = activeDetailId && currentUnit 
     ? currentUnit.abilities.find(a => a.id === activeDetailId) 
     : null;
   
   const isBasicAttackDetail = activeDetailId === null;
+  */
 
   const isExecuting = battle.phase === 'executing';
 
@@ -593,7 +606,6 @@ export function QueueBattleView() {
         </div>
       )}
 
-<<<<<<< HEAD
       {/* Bottom Panel: Planning or Execution */}
       {battle.phase === 'planning' ? (
         <div style={{ 

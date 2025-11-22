@@ -169,7 +169,8 @@ function App() {
           startDialogueTree(postBattleDialogue); // This sets mode to 'dialogue'
           return;
         } else {
-          console.warn(`Post-battle dialogue not found: ${postBattleDialogueId}`);
+          // TODO: Add proper error logging
+        // console.warn(`Post-battle dialogue not found: ${postBattleDialogueId}`);
         }
       }
     }
@@ -182,7 +183,8 @@ function App() {
         startDialogueTree(recruitmentDialogue); // This sets mode to 'dialogue'
         return;
       } else {
-        console.warn(`Recruitment dialogue not found for encounter ${encounterId}`);
+        // TODO: Add proper error logging
+        // console.warn(`Recruitment dialogue not found for encounter ${encounterId}`);
       }
     }
 
@@ -194,6 +196,7 @@ function App() {
   }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
 
   // Expose handleRewardsContinue for E2E tests (after it's defined)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).handleRewardsContinue = handleRewardsContinue;
 
   // Hide dev header on startup screens

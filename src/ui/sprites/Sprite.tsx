@@ -52,7 +52,7 @@ export function Sprite({
   const animationRef = useRef<number | null>(null);
   
   // Try new catalog first, fall back to old manifest
-  let def = getSpriteDef(id);
+  const def = getSpriteDef(id);
   
   // If not found in old manifest, try catalog
   if (!def) {

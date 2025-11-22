@@ -67,7 +67,7 @@ export const DJINN_INTRO_DIALOGUE: DialogueTree = {
     {
       id: 'flint-appears',
       speaker: 'Flint',
-      text: "Hey Isaac! I\'m Flint, your first Djinn. Mind if I explain how my power works?",
+      text: "Hey Isaac! I'm Flint, your first Djinn. Mind if I explain how my power works?",
       portrait: 'djinn-venus',
       nextNodeId: 'djinn-explain-pool',
     },
@@ -81,21 +81,21 @@ export const DJINN_INTRO_DIALOGUE: DialogueTree = {
     {
       id: 'djinn-explain-team',
       speaker: 'Flint',
-      text: 'When we\'re Set, we empower every Adept in your active team with new abilities and stat boosts.',
+      text: "When we're Set, we empower every Adept in your active team with new abilities and stat boosts.",
       portrait: 'djinn-venus',
       nextNodeId: 'djinn-prebattle-reminder',
     },
     {
       id: 'djinn-prebattle-reminder',
       speaker: 'Flint',
-      text: 'Before big fights, you\'ll see a Djinn panel during battle prep. That\'s where you pick which three of us travel into combat.',
+      text: "Before big fights, you'll see a Djinn panel during battle prep. That's where you pick which three of us travel into combat.",
       portrait: 'djinn-venus',
       nextNodeId: 'djinn-outro',
     },
     {
       id: 'djinn-outro',
       speaker: 'Flint',
-      text: "That\'s all you need for now. I\'ll handle the rest—just remember to keep an eye on those three slots!",
+      text: "That's all you need for now. I'll handle the rest—just remember to keep an eye on those three slots!",
       portrait: 'djinn-venus',
       effects: {
         // Use story flag for tutorial completion; Djinn is already present from the starting team setup

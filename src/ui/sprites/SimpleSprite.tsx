@@ -268,7 +268,7 @@ export function SimpleSprite({
                 <strong>Tip:</strong> Sprite not found in catalog. Try:
                 <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
                   <li>Using direct path: <code>/sprites/...</code></li>
-                  <li>Checking catalog: <code>searchSprites('${id.split('-')[0]}')</code></li>
+                  <li>Checking catalog: <code>searchSprites(&apos;{id.split(&apos;-&apos;)[0]}&apos;)</code></li>
                 </ul>
               </div>
             )}

@@ -181,7 +181,7 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
             );
             return (
               <section key={unit.id} className="unit-store-section">
-                <h2>{unit.name}'s Equipment</h2>
+                <h2>{unit.name}&apos;s Equipment</h2>
                 {availableEquipment.length === 0 ? (
                   <div className="shop-empty">No equipment available yet.</div>
                 ) : (

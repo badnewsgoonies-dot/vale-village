@@ -33,6 +33,7 @@ export class GameErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error for debugging
+    // Error boundary logging is acceptable - this helps with debugging
     console.error('Game error caught by boundary:', error, errorInfo);
   }
 

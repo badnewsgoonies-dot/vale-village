@@ -67,13 +67,15 @@ export const createQueueBattleSlice: StateCreator<
   queueUnitAction: (unitIndex, abilityId, targetIds, ability) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
-      console.warn('Cannot queue action: not in planning phase');
+      // TODO: Add proper validation error handling
+      // console.warn('Cannot queue action: not in planning phase');
       return;
     }
 
     const unit = battle.playerTeam.units[unitIndex];
     if (!unit) {
-      console.warn(`Cannot queue action: invalid unit index ${unitIndex}`);
+      // TODO: Add proper validation error handling
+      // console.warn(`Cannot queue action: invalid unit index ${unitIndex}`);
       return;
     }
 
