@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle Screen – Hybrid Command HUD</title>
+    <style>
+      :root {
+        --bg-deep: #04060b;
+        --bg-panel: #0e1421;
+        --bg-panel-light: #151d2d;
+        --accent-gold: #f7d87b;
+        --accent-venus: #c7b062;
+        --accent-mars: #ff6b4a;
+        --accent-mercury: #66c2ff;
+        --accent-jupiter: #9f7bff;
+        --accent-heal: #6bd19a;
+        --accent-danger: #ff4d6d;
+        --border: #263145;
+        --text-muted: #a3b1cc;
+        --text-soft: #7a8aaa;
+        --header-font: 'Cinzel', 'Segoe UI', sans-serif;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, #0f172a 0%, var(--bg-deep) 55%);
+        color: #f8fbff;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .battle-shell {
+        display: grid;
+        grid-template-columns: minmax(220px, 19%) minmax(520px, 1fr) minmax(360px, 28%);
+        gap: 1.25rem;
+        padding: 1.25rem;
+        height: 100vh;
+      }
+
+      /* LEFT PORTRAIT COLUMN */
+      .portrait-column {
+        background: linear-gradient(180deg, #0d1422 0%, #070a12 100%);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        overflow-y: auto;
+      }
+
+      .column-title {
+        font-family: var(--header-font);
+        letter-spacing: 0.15rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+
+      .portrait-card {
+        background: var(--bg-panel-light);
+        border: 1px solid transparent;
+        border-radius: 14px;
+        padding: 0.75rem;
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        gap: 0.65rem;
+        position: relative;
+      }
+
+      .portrait-card.active {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 18px rgba(247, 216, 123, 0.25);
+      }
+
+      .portrait-card.queued::after {
+        content: 'Queued';
+        position: absolute;
+        top: 0.6rem;
+        right: 0.75rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.08rem;
+        color: var(--accent-mercury);
+      }
+
+      .avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1b2437, #0f1726);
+        border: 1px solid var(--border);
+        display: grid;
+        place-items: center;
+        font-size: 1.5rem;
+      }
+
+      .unit-name {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .unit-meta {
+        font-size: 0.8rem;
+        color: var(--text-soft);
+        margin-top: 0.1rem;
+      }
+
+      .hp-track {
+        height: 6px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #1c2435;
+        margin: 0.5rem 0;
+      }
+
+      .hp-fill {
+        height: 100%;
+      }
+
+      .status-row,
+      .equipment-row {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+      }
+
+      .status-chip,
+      .equipment-chip {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text-muted);
+      }
+
+      .status-chip.buff {
+        border-color: var(--accent-heal);
+        color: var(--accent-heal);
+      }
+      .status-chip.debuff {
+        border-color: var(--accent-danger);
+        color: var(--accent-danger);
+      }
+
+      /* CENTER BATTLE FEATURE */
+      .battle-stage {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      .feature-screen {
+        flex: 1;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08), transparent),
+          radial-gradient(circle at 80% 25%, rgba(255, 193, 7, 0.15), transparent),
+          linear-gradient(145deg, #0a0f18 0%, #020409 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.25;
+        background-image: linear-gradient(#1b2538 1px, transparent 1px),
+          linear-gradient(90deg, #1b2538 1px, transparent 1px);
+        background-size: 80px 80px;
+      }
+
+      .feature-content {
+        position: relative;
+        height: 100%;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .feature-tagline {
+        font-size: 1.1rem;
+        letter-spacing: 0.08rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .targets-row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .target-card {
+        width: 180px;
+        padding: 0.9rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(5, 7, 12, 0.65);
+        backdrop-filter: blur(4px);
+        position: relative;
+      }
+
+      .target-card .badge {
+        position: absolute;
+        top: -12px;
+        left: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .target-card.weak .badge {
+        border-color: var(--accent-mars);
+        color: var(--accent-mars);
+      }
+
+      .target-card .name {
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+
+      .target-card .intel {
+        font-size: 0.8rem;
+        color: var(--text-soft);
+        margin-top: 0.4rem;
+        line-height: 1.4;
+      }
+
+      .summon-banner {
+        align-self: center;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-size: 0.8rem;
+        letter-spacing: 0.12rem;
+        text-transform: uppercase;
+      }
+
+      .log-strip {
+        height: 120px;
+        background: rgba(10, 15, 27, 0.95);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 1rem 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 0.82rem;
+      }
+
+      .log-entry {
+        opacity: 0.8;
+      }
+      .log-entry.impact {
+        color: var(--accent-mars);
+      }
+      .log-entry.heal {
+        color: var(--accent-heal);
+      }
+      .log-entry.note {
+        color: var(--text-muted);
+      }
+
+      /* RIGHT COMMAND COLUMN */
+      .command-column {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+
+      .djinn-ribbon {
+        background: linear-gradient(120deg, rgba(39, 52, 78, 0.35), rgba(15, 20, 34, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 0.9rem;
+      }
+
+      .djinn-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .djinn-chip {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        padding: 0.3rem 0.85rem;
+        font-size: 0.8rem;
+        background: rgba(4, 6, 11, 0.5);
+        color: #fff;
+        cursor: pointer;
+        position: relative;
+        transition: transform 200ms ease, border-color 200ms ease;
+      }
+
+      .djinn-chip::after {
+        content: attr(data-state);
+        position: absolute;
+        bottom: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.6rem;
+        color: var(--text-soft);
+        letter-spacing: 0.08rem;
+      }
+
+      .djinn-chip[data-state='Active'] {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 10px rgba(247, 216, 123, 0.35);
+      }
+      .djinn-chip[data-state='Standby'] {
+        border-color: var(--accent-danger);
+        color: var(--accent-danger);
+      }
+      .djinn-chip[data-turns]::before {
+        content: attr(data-turns) 't';
+        position: absolute;
+        top: -12px;
+        right: 8px;
+        font-size: 0.65rem;
+        color: var(--accent-danger);
+      }
+
+      @keyframes bob {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+      .djinn-chip {
+        animation: bob 3.6s ease-in-out infinite;
+      }
+      .djinn-chip:nth-child(2) {
+        animation-delay: 0.4s;
+      }
+      .djinn-chip:nth-child(3) {
+        animation-delay: 0.8s;
+      }
+
+      .mana-tracker {
+        background: var(--bg-panel);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.75rem 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .mana-pips {
+        display: flex;
+        gap: 0.35rem;
+      }
+      .mana-pip {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: #1d2434;
+      }
+      .mana-pip.filled {
+        background: var(--accent-mercury);
+        box-shadow: 0 0 10px rgba(102, 194, 255, 0.45);
+      }
+
+      .command-workspace {
+        flex: 1;
+        background: var(--bg-panel);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: 55% 45%;
+        gap: 0.75rem;
+        overflow: hidden;
+      }
+
+      .ability-list {
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+
+      .ability-card {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.75rem;
+        background: rgba(12, 16, 26, 0.8);
+        cursor: pointer;
+        transition: border-color 160ms ease, transform 160ms ease;
+      }
+
+      .ability-card:hover {
+        border-color: var(--accent-mercury);
+      }
+
+      .ability-card.selected {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 18px rgba(247, 216, 123, 0.35);
+      }
+
+      .ability-card.unaffordable {
+        opacity: 0.55;
+        border-style: dashed;
+      }
+
+      .ability-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .ability-meta {
+        font-size: 0.78rem;
+        color: var(--text-soft);
+        margin-top: 0.35rem;
+      }
+
+      .lock-note {
+        font-size: 0.72rem;
+        color: var(--accent-danger);
+        margin-top: 0.35rem;
+      }
+
+      .detail-panel {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(12, 15, 24, 0.95));
+        padding: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+
+      .detail-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .detail-meta {
+        font-size: 0.8rem;
+        color: var(--text-soft);
+        letter-spacing: 0.04rem;
+      }
+
+      .detail-description {
+        font-size: 0.85rem;
+        color: #dbe5ff;
+        line-height: 1.5;
+        min-height: 60px;
+      }
+
+      .detail-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .detail-list li strong {
+        color: #fefefe;
+        margin-right: 0.3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="battle-shell">
+      <aside class="portrait-column">
+        <div class="column-title">Party Status</div>
+
+        <div class="portrait-card active">
+          <div class="avatar">🌍</div>
+          <div>
+            <div class="unit-name">Isaac</div>
+            <div class="unit-meta">Lv 14 • Venus</div>
+            <div class="hp-track">
+              <div class="hp-fill" style="width: 82%; background: var(--accent-heal)"></div>
+            </div>
+            <div class="status-row">
+              <span class="status-chip buff">ATK +12 (2t)</span>
+              <span class="status-chip">Guarded</span>
+            </div>
+            <div class="equipment-row">
+              <span class="equipment-chip">Longsword+2</span>
+              <span class="equipment-chip">Granite Mail</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portrait-card queued">
+          <div class="avatar">🔥</div>
+          <div>
+            <div class="unit-name">Garet</div>
+            <div class="unit-meta">Lv 14 • Mars</div>
+            <div class="hp-track">
+              <div class="hp-fill" style="width: 64%; background: var(--accent-mars)"></div>
+            </div>
+            <div class="status-row">
+              <span class="status-chip buff">DEF +8 (1t)</span>
+            </div>
+            <div class="equipment-row">
+              <span class="equipment-chip">Battle Axe</span>
+              <span class="equipment-chip">Forge (Djinn)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portrait-card">
+          <div class="avatar">💧</div>
+          <div>
+            <div class="unit-name">Mia</div>
+            <div class="unit-meta">Lv 13 • Mercury</div>
+            <div class="hp-track">
+              <div class="hp-fill" style="width: 58%; background: var(--accent-mercury)"></div>
+            </div>
+            <div class="status-row">
+              <span class="status-chip debuff">Burn (2t)</span>
+            </div>
+            <div class="equipment-row">
+              <span class="equipment-chip">Staff of Fountains</span>
+              <span class="equipment-chip">Mist (Djinn)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portrait-card">
+          <div class="avatar">💨</div>
+          <div>
+            <div class="unit-name">Ivan</div>
+            <div class="unit-meta">Lv 13 • Jupiter</div>
+            <div class="hp-track">
+              <div class="hp-fill" style="width: 37%; background: var(--accent-danger)"></div>
+            </div>
+            <div class="status-row">
+              <span class="status-chip debuff">Paralyze (1t)</span>
+            </div>
+            <div class="equipment-row">
+              <span class="equipment-chip">Plasma Rod</span>
+              <span class="equipment-chip">Gust (Djinn)</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="battle-stage">
+        <div class="feature-screen">
+          <div class="feature-grid"></div>
+          <div class="feature-content">
+            <div>
+              <div class="feature-tagline">Feature Presentation: Queue Preview</div>
+              <h2 style="margin: 0.3rem 0 0; font-size: 1.8rem">
+                Ragnarok will strike in Step 2 / 4
+              </h2>
+              <p style="color: var(--text-muted); margin-top: 0.6rem; max-width: 420px">
+                Middle screen stays cinematic until targeting starts. When you hover a target, the badge lights up and
+                we echo elemental tips here so you never hunt for tooltips elsewhere.
+              </p>
+            </div>
+            <div class="targets-row">
+              <div class="target-card weak">
+                <div class="badge">1</div>
+                <div class="name">Goblin Captain</div>
+                <div class="intel">
+                  Weak to Mars (1.5×) <br />
+                  DEF 34 • HP 210 (hidden) <br />
+                  Currently Burning (2t)
+                </div>
+              </div>
+              <div class="target-card">
+                <div class="badge">2</div>
+                <div class="name">Goblin Raider</div>
+                <div class="intel">
+                  Neutral to Venus <br />
+                  SPD 42 – acts before Garet <br />
+                  Guard buff (1t)
+                </div>
+              </div>
+            </div>
+            <div class="summon-banner">Summon readiness: Venus + Mercury combo possible in 2 turns</div>
+          </div>
+        </div>
+
+        <div class="log-strip">
+          <div class="log-entry note">[Round 4 Planning] Isaac awaiting command…</div>
+          <div class="log-entry impact">
+            • Action 1 queued: Mia → Ply (Heal) on Ivan, cost 2○, removes Burn
+          </div>
+          <div class="log-entry">
+            • Action 2 pending: Isaac ability selection (mana remaining 3○ / 6○)
+          </div>
+          <div class="log-entry note">
+            • Standby timers: Sleet (2t), Mist (ready), Flint (ready)
+          </div>
+        </div>
+      </section>
+
+      <aside class="command-column">
+        <div class="djinn-ribbon">
+          <div class="column-title" style="margin-bottom: 0.4rem">Djinn Circuit</div>
+          <div class="djinn-row">
+            <button class="djinn-chip" data-state="Active">🌍 Flint</button>
+            <button class="djinn-chip" data-state="Standby" data-turns="2">💧 Sleet</button>
+            <button class="djinn-chip" data-state="Active">💧 Mist</button>
+            <button class="djinn-chip" data-state="Standby" data-turns="1">🔥 Forge</button>
+          </div>
+        </div>
+
+        <div class="mana-tracker">
+          <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15rem">Team Mana</div>
+            <div style="font-size: 1rem; color: var(--accent-mercury)">3 / 6 ○</div>
+          </div>
+          <div class="mana-pips">
+            <div class="mana-pip filled"></div>
+            <div class="mana-pip filled"></div>
+            <div class="mana-pip filled"></div>
+            <div class="mana-pip"></div>
+            <div class="mana-pip"></div>
+            <div class="mana-pip"></div>
+          </div>
+        </div>
+
+        <div class="command-workspace">
+          <div class="ability-list">
+            <div
+              class="ability-card selected"
+              data-id="ragnarok"
+              data-icon="🗡️"
+              data-name="Ragnarok"
+              data-cost="6"
+              data-element="Venus Psynergy"
+              data-target="Single enemy"
+              data-power="160% ATK"
+              data-description="Summon a titanic blade that crashes down on a single foe. Ignores 20% of target DEF."
+              data-effects="Status: Guard Break (DEF -12 for 2 turns)|Synergy: +25% damage if Flint is active|Warning: Consumes Flint for 3 turns"
+            >
+              <div class="ability-header">
+                <span>🗡️ Ragnarok</span>
+                <span class="mana-cost">6○</span>
+              </div>
+              <div class="ability-meta">Venus Psynergy • Single enemy • 160% ATK</div>
+              <div class="lock-note">Djinn Cost: Flint (returns in 3 turns)</div>
+            </div>
+
+            <div
+              class="ability-card"
+              data-id="quake"
+              data-icon="🌍"
+              data-name="Quake Sphere"
+              data-cost="3"
+              data-element="Venus Psynergy"
+              data-target="All enemies"
+              data-power="70% ATK"
+              data-description="Ripples of earth damage all foes. Damage bonus scales with total Venus Djinn on set."
+              data-effects="AoE: Applies stagger (SPD -5) for 1 turn|Combo: +10% power per active Venus Djinn|Resource: Does not consume Djinn"
+            >
+              <div class="ability-header">
+                <span>🌍 Quake Sphere</span>
+                <span class="mana-cost">3○</span>
+              </div>
+              <div class="ability-meta">Venus Psynergy • All enemies • 70% ATK</div>
+            </div>
+
+            <div
+              class="ability-card"
+              data-id="cure"
+              data-icon="💚"
+              data-name="Cure Well"
+              data-cost="2"
+              data-element="Healing"
+              data-target="Single ally"
+              data-power="+120% MAG"
+              data-description="Restores a large amount of HP and purges 1 debuff. Scaling improves if Mercury Djinn are active."
+              data-effects="Heals: 120% MAG + 40 base|Cleanse: Removes 1 debuff|Boost: +15% potency per Mercury Djinn in set"
+            >
+              <div class="ability-header">
+                <span>💚 Cure Well</span>
+                <span class="mana-cost">2○</span>
+              </div>
+              <div class="ability-meta">Healing • Single ally • 120% MAG</div>
+            </div>
+
+            <div
+              class="ability-card"
+              data-id="summon"
+              data-icon="✨"
+              data-name="Judgment"
+              data-cost="0"
+              data-element="Summon"
+              data-target="All enemies"
+              data-power="180 base"
+              data-description="Triple summon (Venus + Mercury + Mercury). Massive damage wave plus team-wide ATK/DEF buff."
+              data-effects="Damage: 180 base + caster MAG|Buff: Team ATK +15 / DEF +10 for 3 turns|Cost: Flint + Sleet + Mist enter Standby (returns in 3 turns)"
+            >
+              <div class="ability-header">
+                <span>✨ Judgment</span>
+                <span class="mana-cost">0○</span>
+              </div>
+              <div class="ability-meta">Summon • All enemies • Pattern AAB</div>
+              <div class="lock-note">Locked: Need 3 active Djinn (Sleet currently Standby 2t)</div>
+            </div>
+          </div>
+
+          <div class="detail-panel" id="abilityDetail">
+            <div class="detail-title" data-field="title">🗡️ Ragnarok</div>
+            <div class="detail-meta" data-field="meta">6○ • Venus Psynergy • Single enemy • 160% ATK</div>
+            <div class="detail-description" data-field="description">
+              Summon a titanic blade that crashes down on a single foe. Ignores 20% of target DEF.
+            </div>
+            <ul class="detail-list" data-field="effects">
+              <li><strong>Status:</strong> Guard Break (DEF -12 for 2 turns)</li>
+              <li><strong>Synergy:</strong> +25% damage if Flint is active</li>
+              <li><strong>Warning:</strong> Consumes Flint for 3 turns</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      const availableMana = 3;
+      const abilityCards = document.querySelectorAll('.ability-card');
+      const detailPanel = document.getElementById('abilityDetail');
+      const detailTitle = detailPanel.querySelector('[data-field="title"]');
+      const detailMeta = detailPanel.querySelector('[data-field="meta"]');
+      const detailDescription = detailPanel.querySelector('[data-field="description"]');
+      const detailEffects = detailPanel.querySelector('[data-field="effects"]');
+
+      abilityCards.forEach((card) => {
+        const cost = Number(card.dataset.cost ?? 0);
+        if (cost > availableMana) {
+          card.classList.add('unaffordable');
+        }
+
+        function updateDetail() {
+          abilityCards.forEach((c) => c.classList.remove('selected'));
+          card.classList.add('selected');
+
+          detailTitle.textContent = `${card.dataset.icon ?? ''} ${card.dataset.name}`;
+          detailMeta.textContent = `${card.dataset.cost}○ • ${card.dataset.element} • ${card.dataset.target} • ${card.dataset.power}`;
+          detailDescription.textContent = card.dataset.description;
+
+          const effects = card.dataset.effects ? card.dataset.effects.split('|') : [];
+          detailEffects.innerHTML = effects
+            .map((line) => {
+              const [label, ...rest] = line.split(':');
+              return `<li><strong>${label}:</strong> ${rest.join(':').trim()}</li>`;
+            })
+            .join('');
+        }
+
+        card.addEventListener('mouseenter', updateDetail);
+        card.addEventListener('click', updateDetail);
+      });
+    </script>
+  </body>
+</html>
