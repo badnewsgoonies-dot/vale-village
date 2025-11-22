@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Apply the brown/gold theme to this mockup<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -12,9 +12,9 @@
     }
 
     body {
-      background: #0a0a0a;
+      background: #1a0a00;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #fff;
+      color: #f8f8f0;
       overflow: hidden;
       height: 100vh;
     }
@@ -24,10 +24,10 @@
       top: 60px;
       left: 220px;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(26, 10, 0, 0.8);
       padding: 1rem;
       border-radius: 8px;
-      border: 2px solid #4a6a8a;
+      border: 2px solid #8b6a4a;
     }
 
     .mockup-selector button {
@@ -35,8 +35,8 @@
       width: 100%;
       padding: 0.5rem;
       margin: 0.25rem 0;
-      background: #2a3a4a;
-      border: 1px solid #4a6a8a;
+      background: #4a3a2a;
+      border: 1px solid #8b6a4a;
       color: #fff;
       cursor: pointer;
       border-radius: 4px;
@@ -44,7 +44,7 @@
     }
 
     .mockup-selector button:hover {
-      background: #3a4a5a;
+      background: #5a4a3a;
     }
 
     .mockup-selector button.active {
@@ -65,8 +65,8 @@
     /* Top Bar: Mana + Djinn */
     .top-bar {
       grid-column: 1 / -1;
-      background: #1a2a4a;
-      border-bottom: 2px solid #4a6a8a;
+      background: #3a2a1a;
+      border-bottom: 2px solid #8b6a4a;
       padding: 0.75rem 1rem;
       display: flex;
       justify-content: space-between;
@@ -95,14 +95,14 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      border: 2px solid #4a6a8a;
-      background: #2a3a5a;
+      border: 2px solid #8b6a4a;
+      background: #2a1a0a;
     }
 
     .mana-circle.filled {
-      background: #4CAF50;
-      border-color: #6aaf6a;
-      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+      background: #ffd87f;
+      border-color: #f3c866;
+      box-shadow: 0 0 8px rgba(255, 216, 127, 0.6);
     }
 
     .djinn-menu {
@@ -126,7 +126,7 @@
       width: 32px;
       height: 32px;
       border-radius: 4px;
-      border: 2px solid #666;
+      border: 2px solid #8b6a4a;
       background: transparent;
       display: flex;
       align-items: center;
@@ -146,13 +146,13 @@
     }
 
     .djinn-icon:hover {
-      border-color: #9C27B0;
-      box-shadow: 0 0 12px rgba(156, 39, 176, 0.6);
+      border-color: #ffd87f;
+      box-shadow: 0 0 12px rgba(255, 216, 127, 0.6);
     }
 
     .djinn-icon.active {
-      border-color: #4CAF50;
-      background: #2a4a2a;
+      border-color: #ffd87f;
+      background: #4a3a2a;
     }
 
     .djinn-icon.standby {
@@ -166,8 +166,8 @@
       top: 100%;
       right: 0;
       margin-top: 0.5rem;
-      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-      border: 2px solid #666;
+      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #8b6a4a;
       border-radius: 8px;
       padding: 1rem;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
@@ -199,13 +199,13 @@
       color: #FFD87F;
       margin-bottom: 0.5rem;
       text-align: center;
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid #6a5a4a;
       padding-bottom: 0.5rem;
     }
 
     .summon-option {
-      background: #1a1a1a;
-      border: 1px solid #444;
+      background: #2a1a0a;
+      border: 1px solid #6a5a4a;
       border-radius: 4px;
       padding: 0.75rem;
       cursor: pointer;
@@ -213,12 +213,12 @@
     }
 
     .summon-option:hover {
-      border-color: #9C27B0;
-      background: #2a1a2a;
+      border-color: #ffd87f;
+      background: #4a3a2a;
     }
 
     .summon-option.available {
-      border-color: #4CAF50;
+      border-color: #ffd87f;
     }
 
     .summon-option.unavailable {
@@ -239,8 +239,8 @@
 
     /* Left Panel: Portraits */
     .portrait-panel {
-      background: #1a1a1a;
-      border-right: 2px solid #333;
+      background: #2a1a0a;
+      border-right: 2px solid #6a5a4a;
       padding: 1rem;
       overflow: visible;
       display: flex;
@@ -270,8 +270,8 @@
     }
 
     .portrait-card.selected .portrait-img {
-      border: 2px solid #4CAF50;
-      box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+      border: 2px solid #ffd87f;
+      box-shadow: 0 0 12px rgba(255, 216, 127, 0.4);
     }
 
     .portrait-card.queued::after {
@@ -279,7 +279,7 @@
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
-      color: #4CAF50;
+      color: #ffd87f;
       font-size: 1.2rem;
       font-weight: bold;
     }
@@ -346,8 +346,8 @@
     .hp-bar {
       width: 100%;
       height: 12px;
-      background: #1a1a1a;
-      border: 1px solid #444;
+      background: #2a1a0a;
+      border: 1px solid #6a5a4a;
       border-radius: 2px;
       overflow: hidden;
       position: relative;
@@ -403,8 +403,8 @@
     /* Portrait Hover Expanded */
     .portrait-expanded {
       padding: 1rem;
-      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-      border: 2px solid #4a6a8a;
+      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #8b6a4a;
       border-radius: 8px;
       display: none;
       position: absolute;
@@ -461,7 +461,7 @@
 
     /* Battlefield */
     .battlefield {
-      background: linear-gradient(180deg, #1a2a3a 0%, #0a1a2a 100%);
+      background: linear-gradient(180deg, #3a2a1a 0%, #2a1a0a 100%);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -526,9 +526,9 @@
     }
 
     .enemy-card.selected-target {
-      border-color: #4CAF50;
-      box-shadow: 0 0 25px rgba(76, 175, 80, 0.9);
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.2));
+      border-color: #ffd87f;
+      box-shadow: 0 0 25px rgba(255, 216, 127, 0.9);
+      background: linear-gradient(135deg, rgba(255, 216, 127, 0.1), rgba(255, 216, 127, 0.2));
     }
 
     .enemy-card.selected-target::after {
@@ -536,7 +536,7 @@
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
-      color: #4CAF50;
+      color: #ffd87f;
       font-size: 1.5rem;
       font-weight: bold;
     }
@@ -633,8 +633,8 @@
     /* Bottom Panel: Abilities */
     .bottom-panel {
       grid-column: 1 / -1;
-      background: #1a2a4a;
-      border-top: 2px solid #4a6a8a;
+      background: #3a2a1a;
+      border-top: 2px solid #8b6a4a;
       padding: 1rem;
       height: 300px;
       display: flex;
@@ -664,8 +664,8 @@
     }
 
     .action-queue {
-      background: #0a1a2a;
-      border: 1px solid #4a6a8a;
+      background: #2a1a0a;
+      border: 1px solid #8b6a4a;
       border-radius: 4px;
       padding: 0.75rem;
       margin-bottom: 1rem;
@@ -690,8 +690,8 @@
 
     .ability-button {
       padding: 0.75rem 1rem;
-      background: #2a3a4a;
-      border: 2px solid #4a6a8a;
+      background: #4a3a2a;
+      border: 2px solid #8b6a4a;
       border-radius: 6px;
       color: #fff;
       cursor: pointer;
@@ -701,13 +701,13 @@
     }
 
     .ability-button:hover {
-      background: #3a4a5a;
-      border-color: #6a8aaa;
+      background: #5a4a3a;
+      border-color: #ffd87f;
     }
 
     .ability-button.selected {
-      background: #4CAF50;
-      border-color: #6aaf6a;
+      background: #ffd87f;
+      border-color: #f3c866;
       color: #000;
     }
 
@@ -737,7 +737,7 @@
     }
 
     .abilities-divider {
-      background: #4a6a8a;
+      background: #8b6a4a;
       width: 2px;
       height: 100%;
     }
@@ -752,8 +752,8 @@
 
     .ability-list-item {
       padding: 0.75rem;
-      background: #2a3a4a;
-      border: 2px solid #4a6a8a;
+      background: #4a3a2a;
+      border: 2px solid #8b6a4a;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
@@ -789,21 +789,21 @@
     }
 
     .ability-list-item:hover {
-      background: #3a4a5a;
-      border-color: #6a8aaa;
+      background: #5a4a3a;
+      border-color: #ffd87f;
       z-index: 100;
     }
 
     .ability-list-item.selected {
-      background: #4CAF50;
-      border-color: #6aaf6a;
+      background: #ffd87f;
+      border-color: #f3c866;
       color: #000;
     }
 
     .ability-list-item.locked {
       opacity: 0.5;
       cursor: not-allowed;
-      background: #1a1a1a;
+      background: #2a1a0a;
     }
 
     .ability-tooltip {
@@ -814,8 +814,8 @@
       min-width: 280px;
       max-width: 350px;
       padding: 1rem;
-      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-      border: 2px solid #4a6a8a;
+      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #8b6a4a;
       border-radius: 8px;
       box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.9);
       z-index: 1001;
@@ -828,8 +828,8 @@
     }
 
     .combat-log {
-      background: #0a1a2a;
-      border: 1px solid #4a6a8a;
+      background: #2a1a0a;
+      border: 1px solid #8b6a4a;
       border-radius: 6px;
       padding: 1rem;
       overflow-y: auto;
@@ -843,7 +843,7 @@
       font-weight: bold;
       color: #FFD87F;
       margin-bottom: 0.75rem;
-      border-bottom: 2px solid #4a6a8a;
+      border-bottom: 2px solid #8b6a4a;
       padding-bottom: 0.5rem;
     }
 
@@ -851,9 +851,9 @@
       margin-bottom: 0.5rem;
       padding: 0.5rem;
       background: rgba(255, 255, 255, 0.05);
-      border-left: 3px solid #4a6a8a;
+      border-left: 3px solid #8b6a4a;
       padding-left: 0.75rem;
-      color: #ccc;
+      color: #d8c8a8;
     }
 
     .combat-log-entry.damage {
@@ -872,8 +872,8 @@
     }
 
     .combat-log-entry.action {
-      border-left-color: #42a5f5;
-      color: #99ccff;
+      border-left-color: #ffd87f;
+      color: #d8c8a8;
     }
 
     .ability-details-header {
@@ -881,7 +881,7 @@
       font-weight: bold;
       color: #FFD87F;
       margin-bottom: 1rem;
-      border-bottom: 2px solid #4a6a8a;
+      border-bottom: 2px solid #8b6a4a;
       padding-bottom: 0.5rem;
     }
 
@@ -948,22 +948,22 @@
     }
 
     .btn-primary {
-      background: #4CAF50;
+      background: #ffd87f;
       color: #000;
     }
 
     .btn-primary:hover {
-      background: #6aaf6a;
+      background: #f3c866;
     }
 
     .btn-secondary {
-      background: #2a3a4a;
+      background: #4a3a2a;
       color: #fff;
-      border: 1px solid #4a6a8a;
+      border: 1px solid #8b6a4a;
     }
 
     .btn-secondary:hover {
-      background: #3a4a5a;
+      background: #5a4a3a;
     }
 
     .btn-danger {
@@ -977,8 +977,8 @@
 
     /* Confirmation Panel */
     .confirmation-panel {
-      background: #2a2a1a;
-      border: 2px solid #6a6a2a;
+      background: #4a3a2a;
+      border: 2px solid #8b6a4a;
       border-radius: 6px;
       padding: 1rem;
     }

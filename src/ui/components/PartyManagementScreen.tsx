@@ -49,7 +49,7 @@ export function PartyManagementScreen({ onClose }: PartyManagementScreenProps) {
 
         <div className="party-instructions">
           <p>
-            Browse your full roster and review each unit's stats. The battle formation and loadouts you see here
+            Browse your full roster and review each unit&apos;s stats. The battle formation and loadouts you see here
             are only a snapshot—final selections happen on the Pre-Battle screen before each fight.
           </p>
         </div>

@@ -484,7 +484,7 @@ export function SpriteMockup() {
         <h3>💡 Instructions</h3>
         <ul style={{ color: '#aaa', lineHeight: '1.8' }}>
           <li><strong>Hover over sprites</strong> to see debug info (name, path, category)</li>
-          <li><strong>Search</strong> for sprites by name (e.g., "isaac", "goblin")</li>
+          <li><strong>Search</strong> for sprites by name (e.g., &quot;isaac&quot;, &quot;goblin&quot;)</li>
           <li><strong>Select category</strong> to browse sprites by type</li>
           <li>All sprites are <strong>GIFs</strong> and animate automatically</li>
           <li>Use <code>debug={true}</code> prop to see sprite information</li>

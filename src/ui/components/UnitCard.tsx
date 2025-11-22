@@ -18,6 +18,17 @@ interface UnitCardProps {
   hideHp?: boolean; // PR-QUEUE-BATTLE: Hide HP bar (for enemies)
 }
 
+// Helper function for varied portrait backgrounds by element
+function getPortraitBgColor(element: string): string {
+  const colors: Record<string, string> = {
+    Venus: '#4A7AB8',   // Blue
+    Mars: '#4CAF50',    // Green
+    Mercury: '#E91E63', // Magenta/Pink
+    Jupiter: '#9C27B0', // Purple
+  };
+  return colors[element] || '#444';
+}
+
 export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps) {
   const maxHp = calculateMaxHp(unit);
   const hpPercent = (unit.currentHp / maxHp) * 100;
@@ -37,12 +48,13 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
     <div
       className={`unit-card ${isPlayer ? 'player' : 'enemy'}`}
       style={{
-        border: `2px solid ${isPlayer ? '#2196F3' : '#F44336'}`,
+        border: `2px solid ${isPlayer ? '#4CAF50' : '#F44336'}`,
         borderRadius: '8px',
         padding: '1rem',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: '#1a1a1a',
         display: 'flex',
         gap: '1rem',
+        color: '#fff',
       }}
     >
       {/* Unit Sprite */}
@@ -55,9 +67,9 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
           width={64}
           height={64}
           style={{
-            border: '1px solid #ccc',
+            border: '1px solid #444',
             borderRadius: '4px',
-            backgroundColor: '#f5f5f5',
+            backgroundColor: isPlayer ? getPortraitBgColor(unit.element) : '#444',
           }}
         />
       </div>
@@ -66,12 +78,12 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h4 style={{ margin: 0 }}>{unit.name}</h4>
-            <div style={{ fontSize: '0.875rem', color: '#666' }}>
-              Lv {unit.level} {unit.element}
+            <h4 style={{ margin: 0, color: '#fff' }}>{unit.name}</h4>
+            <div style={{ fontSize: '0.875rem', color: '#aaa' }}>
+              Lv {unit.level} | {unit.element}
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'right', color: '#fff' }}>
             {!hideHp && <div>HP: {unit.currentHp} / {maxHp}</div>}
             {hideHp && <div>HP: ???</div>}
           </div>
@@ -80,12 +92,12 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
         <div style={{ marginTop: '0.5rem' }}>
           {!hideHp && (
             <div style={{ marginBottom: '0.25rem' }}>
-              <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem' }}>HP</div>
+              <div style={{ fontSize: '0.75rem', marginBottom: '0.125rem', color: '#aaa' }}>HP</div>
               <div
                 style={{
                   width: '100%',
                   height: '12px',
-                  backgroundColor: '#e0e0e0',
+                  backgroundColor: '#2a2a2a',
                   borderRadius: '4px',
                   overflow: 'hidden',
                 }}
@@ -94,7 +106,8 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
                   style={{
                     width: `${hpPercent}%`,
                     height: '100%',
-                    backgroundColor: hpPercent > 50 ? '#4CAF50' : hpPercent > 25 ? '#FF9800' : '#F44336',
+                    // Color-coded HP bars: green >70%, orange 40-70%, red <40%
+                    backgroundColor: hpPercent > 70 ? '#4CAF50' : hpPercent > 40 ? '#FF9800' : '#F44336',
                     transition: 'width 0.3s ease',
                   }}
                 />
@@ -111,13 +124,14 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
         {unit.statusEffects.length > 0 && (
           <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
             {unit.statusEffects.map((status, idx) => {
+              // Orange theme for status effects (as shown in second image)
               const statusConfig: Record<string, { icon: string; bgColor: string; textColor: string }> = {
-                poison: { icon: '☠️', bgColor: '#4CAF50', textColor: '#fff' },
-                burn: { icon: '🔥', bgColor: '#F44336', textColor: '#fff' },
-                freeze: { icon: '❄️', bgColor: '#2196F3', textColor: '#fff' },
-                paralyze: { icon: '⚡', bgColor: '#FFEB3B', textColor: '#000' },
-                buff: { icon: '⬆️', bgColor: '#2E7D32', textColor: '#fff' },
-                debuff: { icon: '⬇️', bgColor: '#BF360C', textColor: '#fff' },
+                poison: { icon: '☠️', bgColor: '#ff9800', textColor: '#fff' },
+                burn: { icon: '🔥', bgColor: '#ff9800', textColor: '#fff' },
+                freeze: { icon: '❄️', bgColor: '#ff9800', textColor: '#fff' },
+                paralyze: { icon: '⚡', bgColor: '#ff9800', textColor: '#fff' },
+                buff: { icon: '⬆️', bgColor: '#4CAF50', textColor: '#fff' },
+                debuff: { icon: '⬇️', bgColor: '#ff9800', textColor: '#fff' },
               };
 
               const statLabels: Record<string, string> = {
@@ -193,9 +207,9 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
         )}
 
         {/* PR-STATS-EFFECTIVE: Display effective stats */}
-        <details style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#666' }}>
-          <summary style={{ cursor: 'pointer' }}>Stats</summary>
-          <div style={{ marginTop: '0.25rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem' }}>
+        <details style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#aaa' }}>
+          <summary style={{ cursor: 'pointer', color: '#fff' }}>Stats</summary>
+          <div style={{ marginTop: '0.25rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.25rem', color: '#aaa' }}>
             <div>ATK: {effectiveStats.atk}</div>
             <div>DEF: {effectiveStats.def}</div>
             <div>MAG: {effectiveStats.mag}</div>

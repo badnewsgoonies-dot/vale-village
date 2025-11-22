@@ -889,6 +889,34 @@ function getRecoveredDjinnIds(before: Team, after: Team): string[] {
   return recovered;
 }
 
+/**
+ * Get planning phase turn order (indices of player units sorted by SPD)
+ * PR-QUEUE-BATTLE: Helps UI guide player through units in speed order
+ */
+export function getPlanningTurnOrder(state: BattleState): number[] {
+  // Create array of { index, spd } objects
+  const unitSpeeds = state.playerTeam.units.map((unit, index) => ({
+    index,
+    spd: isUnitKO(unit) ? -1 : getEffectiveSPD(unit, state.playerTeam),
+    isKo: isUnitKO(unit)
+  }));
+
+  // Sort by SPD descending
+  unitSpeeds.sort((a, b) => {
+    // Move KO'd units to end
+    if (a.isKo && !b.isKo) return 1;
+    if (!a.isKo && b.isKo) return -1;
+    
+    if (b.spd !== a.spd) {
+      return b.spd - a.spd; // Descending
+    }
+    // Stable sort by index for ties
+    return a.index - b.index;
+  });
+
+  return unitSpeeds.map(u => u.index);
+}
+
 export const queueBattleServiceInternals = {
   validateQueueForExecution,
   transitionToExecutingPhase,

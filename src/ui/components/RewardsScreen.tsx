@@ -27,7 +27,8 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
       const unit = team.units.find(u => u.id === levelUp.unitId);
       if (!unit) {
         if (import.meta.env.DEV) {
-          console.warn(`Unit not found for level-up: ${levelUp.unitId}`);
+          // TODO: Add proper error logging for missing unit
+          // console.warn(`Unit not found for level-up: ${levelUp.unitId}`);
         }
         return null;
       }

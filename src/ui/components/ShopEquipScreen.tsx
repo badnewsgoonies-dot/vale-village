@@ -266,7 +266,7 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
                     );
                     return (
                       <section key={unit.id} className="unit-store-section">
-                        <h2>{unit.name}'s Equipment ({unit.element})</h2>
+                        <h2>{unit.name}&apos;s Equipment ({unit.element})</h2>
                         {availableEquipment.length === 0 ? (
                           <div className="shop-empty">No equipment available yet.</div>
                         ) : (
@@ -358,7 +358,7 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
           {activeTab === 'equip' && (
             <div className="equip-tab-content">
               <div className="equipment-tab-note" style={{ fontSize: '0.8rem', color: '#9ea6b7', marginBottom: '0.5rem', textAlign: 'center' }}>
-                This view shows each unit's preferred loadout. The Pre-Battle screen is still the final say for actual gear per battle.
+                This view shows each unit&apos;s preferred loadout. The Pre-Battle screen is still the final say for actual gear per battle.
               </div>
               {!team || team.units.length === 0 ? (
                 <div className="shop-empty">No units available.</div>
@@ -388,7 +388,7 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
                   {selectedUnit && (
                     <div className="equipment-management-panel">
                       <div className="equipment-slots-section">
-                        <h2>{selectedUnit.name}'s Equipment</h2>
+                        <h2>{selectedUnit.name}&apos;s Equipment</h2>
                         <div className="equipment-grid">
                           {EQUIPMENT_SLOTS.map((slot) => {
                             const eq = selectedUnit.equipment[slot];

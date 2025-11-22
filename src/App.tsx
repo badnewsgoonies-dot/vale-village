@@ -20,6 +20,7 @@ import { useDevMode } from './ui/hooks/useDevMode';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_POST, VS1_SCENE_PRE } from './story/vs1Constants';
 import { DIALOGUES } from './data/definitions/dialogues';
 import { getRecruitmentDialogue, hasRecruitmentDialogue } from './data/definitions/recruitmentData';
+import { ENCOUNTER_TO_POST_BATTLE_DIALOGUE } from './data/definitions/postBattleDialogues';
 import { createBaseIsaacTeam, createVs1IsaacTeam } from './utils/teamSetup';
 import { DJINN } from './data/definitions/djinn';
 import { EQUIPMENT } from './data/definitions/equipment';
@@ -158,6 +159,22 @@ function App() {
       }
     }
 
+    // Check for post-battle dialogue (celebration after liberation)
+    // This comes BEFORE recruitment dialogue
+    if (encounterId) {
+      const postBattleDialogueId = ENCOUNTER_TO_POST_BATTLE_DIALOGUE[encounterId];
+      if (postBattleDialogueId) {
+        const postBattleDialogue = DIALOGUES[postBattleDialogueId];
+        if (postBattleDialogue) {
+          startDialogueTree(postBattleDialogue); // This sets mode to 'dialogue'
+          return;
+        } else {
+          // TODO: Add proper error logging
+        // console.warn(`Post-battle dialogue not found: ${postBattleDialogueId}`);
+        }
+      }
+    }
+
     // Check for recruitment dialogue (data-driven, not hard-coded)
     if (encounterId && hasRecruitmentDialogue(encounterId)) {
       const recruitmentDialogue = getRecruitmentDialogue(encounterId);
@@ -166,7 +183,8 @@ function App() {
         startDialogueTree(recruitmentDialogue); // This sets mode to 'dialogue'
         return;
       } else {
-        console.warn(`Recruitment dialogue not found for encounter ${encounterId}`);
+        // TODO: Add proper error logging
+        // console.warn(`Recruitment dialogue not found for encounter ${encounterId}`);
       }
     }
 
@@ -178,6 +196,7 @@ function App() {
   }, [battle, claimRewards, setBattle, startDialogueTree, returnToOverworld]);
 
   // Expose handleRewardsContinue for E2E tests (after it's defined)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).handleRewardsContinue = handleRewardsContinue;
 
   // Hide dev header on startup screens

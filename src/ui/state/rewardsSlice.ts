@@ -38,7 +38,7 @@ export const createRewardsSlice: StateCreator<
     const result = rewardsServiceProcessVictory(battle);
     
     // Capture encounterId before clearing battle state
-    const encounterId = battle.encounterId || (battle.meta as any)?.encounterId || null;
+    const encounterId = battle.encounterId || battle.meta?.encounterId || null;
 
     const { setTeam } = get();
     setTeam(result.updatedTeam);

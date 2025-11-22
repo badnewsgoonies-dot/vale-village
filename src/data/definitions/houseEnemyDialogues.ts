@@ -78,7 +78,7 @@ const createEnemyDialogue = (houseNum: number): DialogueTree => {
         speaker: config.speaker,
         text: config.threat(houseNum),
         portrait: config.portrait,
-        effects: { startBattle: encounterId },
+        effects: { startBattle: encounterId } as const,
       },
     ],
   };
