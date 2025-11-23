@@ -18,6 +18,7 @@ import { EquipmentIcon } from './EquipmentIcon';
 import './ShopScreen.css';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
 import type { Unit } from '../../core/models/Unit';
+import { isAvailableInCampaign } from '../utils/contentAvailability';
 
 interface ShopScreenProps {
   shopId: string;
@@ -54,7 +55,7 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
   const availableItems = isUnlocked
     ? (shop.availableItems
         .map((id) => EQUIPMENT[id])
-        .filter(Boolean) as Equipment[])
+        .filter((item): item is Equipment => Boolean(item) && isAvailableInCampaign(item)))
     : [];
 
   const handleUnlock = (itemId: string) => {
@@ -176,8 +177,8 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
           </section>
 
           {unlockedUnits.map((unit) => {
-            const availableEquipment = Object.values(EQUIPMENT).filter((item) =>
-              item.allowedElements.includes(unit.element) // CHANGED: Element-based filtering
+            const availableEquipment = Object.values(EQUIPMENT).filter(
+              (item) => isAvailableInCampaign(item) && item.allowedElements.includes(unit.element)
             );
             return (
               <section key={unit.id} className="unit-store-section">

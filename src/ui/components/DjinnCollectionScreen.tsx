@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useStore } from '../state/store';
 import { DJINN } from '@/data/definitions/djinn';
 import { SimpleSprite } from '../sprites/SimpleSprite';
+import { warnIfPlaceholderSprite } from '../sprites/utils/warnIfPlaceholderSprite';
 import { DjinnDetailModal } from './DjinnDetailModal';
 import './DjinnCollectionScreen.css';
 
@@ -129,12 +130,18 @@ export function DjinnCollectionScreen({ onClose }: DjinnCollectionScreenProps) {
                         onClick={() => setSelectedDjinnId(djinn.id)}
                       >
                         <div className="djinn-icon" style={{ backgroundColor: getElementColor(element) + '40' }}>
-                          <SimpleSprite
-                            id={getDjinnSprite(element)}
-                            width={48}
-                            height={48}
-                            style={{ filter: state === 'Standby' ? 'brightness(0.6)' : 'none' }}
-                          />
+                          {(() => {
+                            const djinnSpriteId = getDjinnSprite(element);
+                            warnIfPlaceholderSprite('DjinnCollectionScreen', djinnSpriteId);
+                            return (
+                              <SimpleSprite
+                                id={djinnSpriteId}
+                                width={48}
+                                height={48}
+                                style={{ filter: state === 'Standby' ? 'brightness(0.6)' : 'none' }}
+                              />
+                            );
+                          })()}
                         </div>
                         <div className="djinn-info">
                           <div className="djinn-name">{djinn.name}</div>

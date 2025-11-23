@@ -637,6 +637,18 @@ export const COSMOS_SHIELD: Equipment = {
   unlocksAbility: 'silver-shield', // Reuse silver-shield for artifact tier
 };
 
+export const ECLIPSE_BLADE: Equipment = {
+  id: 'eclipse-blade',
+  name: 'Eclipse Blade',
+  slot: 'weapon',
+  tier: 'artifact',
+  cost: 0,
+  statBonus: { atk: 80, mag: 15, spd: 5 },
+  allowedElements: ['Venus', 'Mars'],
+  unlocksAbility: 'mythril-edge',
+  availableIn: ['tower'],
+};
+
 // ========================================
 // EQUIPMENT REGISTRY
 // ========================================
@@ -650,6 +662,7 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'mythril-blade': MYTHRIL_BLADE,
   'gaia-blade': GAIA_BLADE,
   'sol-blade': SOL_BLADE,
+  'eclipse-blade': ECLIPSE_BLADE,
 
   // Axes
   'wooden-axe': WOODEN_AXE,

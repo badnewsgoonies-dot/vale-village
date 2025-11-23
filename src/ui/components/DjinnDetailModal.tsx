@@ -7,6 +7,7 @@ import { useStore } from '../state/store';
 import { DJINN } from '@/data/definitions/djinn';
 import { calculateDjinnSynergy } from '@/core/algorithms/djinn';
 import { SimpleSprite } from '../sprites/SimpleSprite';
+import { warnIfPlaceholderSprite } from '../sprites/utils/warnIfPlaceholderSprite';
 import './DjinnDetailModal.css';
 
 interface DjinnDetailModalProps {
@@ -135,12 +136,18 @@ export function DjinnDetailModal({ djinnId, onClose }: DjinnDetailModalProps) {
               className="djinn-icon-large"
               style={{ backgroundColor: getElementColor(djinn.element) + '40' }}
             >
-              <SimpleSprite
-                id={getDjinnSprite(djinn.element)}
-                width={64}
-                height={64}
-                style={{ display: 'block' }}
-              />
+              {(() => {
+                const djinnSpriteId = getDjinnSprite(djinn.element);
+                warnIfPlaceholderSprite('DjinnDetailModal', djinnSpriteId);
+                return (
+                  <SimpleSprite
+                    id={djinnSpriteId}
+                    width={64}
+                    height={64}
+                    style={{ display: 'block' }}
+                  />
+                );
+              })()}
             </div>
             <div className="djinn-details">
               <div className="detail-row">

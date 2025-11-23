@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ContentAvailabilitySchema } from './ContentAvailabilitySchema';
 
 /**
  * Element type for equipment restrictions
@@ -54,6 +55,7 @@ export const EquipmentSchema = z.object({
   equipmentUnlocksPermanent: z.boolean().optional(),
   elementalResist: z.number().min(0).max(1).optional(), // 0-1 range (0% to 100%)
   alwaysFirstTurn: z.boolean().optional(),
+  availableIn: ContentAvailabilitySchema.optional().readonly(),
 });
 
 export type Equipment = z.infer<typeof EquipmentSchema>;

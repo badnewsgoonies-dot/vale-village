@@ -3,6 +3,7 @@ import { MAPS } from '@/data/definitions/maps';
 import { useStore } from '../state/store';
 import { SimpleSprite } from '../sprites/SimpleSprite';
 import { getPlayerSprite, shouldMirrorSprite, getNPCSprite } from '../sprites/mappings';
+import { warnIfPlaceholderSprite } from '../sprites/utils/warnIfPlaceholderSprite';
 import type { Tile, Position } from '@/core/models/overworld';
 import './OverworldMap.css';
 
@@ -126,7 +127,11 @@ export function OverworldMap() {
                   {/* NPC Sprite */}
                   {npcAtPosition && !isPlayer && (
                     <SimpleSprite
-                      id={getNPCSprite(npcAtPosition.id)}
+                      id={(() => {
+                        const npcSpriteId = getNPCSprite(npcAtPosition.id);
+                        warnIfPlaceholderSprite('OverworldMap', npcSpriteId);
+                        return npcSpriteId;
+                      })()}
                       width={32}
                       height={32}
                       style={{
@@ -141,7 +146,11 @@ export function OverworldMap() {
                   {/* Player Sprite */}
                   {isPlayer && team && team.units[0] && (
                     <SimpleSprite
-                      id={getPlayerSprite(team.units[0].id, facing)}
+                      id={(() => {
+                        const playerSpriteId = getPlayerSprite(team.units[0].id, facing);
+                        warnIfPlaceholderSprite('OverworldMap', playerSpriteId);
+                        return playerSpriteId;
+                      })()}
                       width={32}
                       height={32}
                       style={{

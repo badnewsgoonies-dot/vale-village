@@ -4,6 +4,7 @@ import { useStore } from '../state/store';
 import { getCurrentNode, getAvailableChoices } from '@/core/services/DialogueService';
 import { SimpleSprite } from '../sprites/SimpleSprite';
 import { getPortraitSprite } from '../sprites/mappings';
+import { warnIfPlaceholderSprite } from '../sprites/utils/warnIfPlaceholderSprite';
 import './DialogueBox.css';
 
 export function DialogueBox() {
@@ -107,12 +108,18 @@ export function DialogueBox() {
         {currentNode.speaker && (
           <div className="dialogue-header">
             <div className="dialogue-portrait">
-              <SimpleSprite
-                id={getPortraitSprite(currentNode.speaker)}
-                width={80}
-                height={80}
-                style={{ borderRadius: '8px' }}
-              />
+              {(() => {
+                const portraitId = getPortraitSprite(currentNode.speaker);
+                warnIfPlaceholderSprite('DialogueBox', portraitId);
+                return (
+                  <SimpleSprite
+                    id={portraitId}
+                    width={80}
+                    height={80}
+                    style={{ borderRadius: '8px' }}
+                  />
+                );
+              })()}
             </div>
             <div className="dialogue-speaker">{currentNode.speaker}</div>
           </div>

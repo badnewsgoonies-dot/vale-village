@@ -16,12 +16,24 @@ import type { TeamSlice } from './teamSlice';
 import type { DialogueSlice } from './dialogueSlice';
 import type { OverworldSlice } from './overworldSlice';
 import type { InventorySlice } from './inventorySlice';
+import type { TowerSlice } from './towerSlice';
 import { MIN_PARTY_SIZE } from '@/core/constants';
 import type { BattleConfig } from './battleConfig';
 import { buildBattleConfigForNextBattle, cloneEquipmentLoadout, updateDjinnSlots, validateBattleConfig } from './battleConfig';
 
 export interface GameFlowSlice {
-  mode: 'title-screen' | 'main-menu' | 'intro' | 'overworld' | 'battle' | 'rewards' | 'dialogue' | 'shop' | 'team-select' | 'compendium';
+  mode:
+    | 'title-screen'
+    | 'main-menu'
+    | 'intro'
+    | 'overworld'
+    | 'battle'
+    | 'rewards'
+    | 'dialogue'
+    | 'shop'
+    | 'team-select'
+    | 'compendium'
+    | 'tower';
   lastTrigger: MapTrigger | null;
   currentEncounter: Encounter | null;
   currentShopId: string | null;
@@ -41,7 +53,7 @@ export interface GameFlowSlice {
 }
 
 export const createGameFlowSlice: StateCreator<
-  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice & OverworldSlice & InventorySlice,
+  GameFlowSlice & QueueBattleSlice & TeamSlice & DialogueSlice & OverworldSlice & InventorySlice & TowerSlice,
   [['zustand/devtools', never]],
   [],
   GameFlowSlice
@@ -206,6 +218,18 @@ export const createGameFlowSlice: StateCreator<
         currentShopId: shopId,
         mode: 'shop',
       });
+      return;
+    }
+
+    // ========================================
+    // TOWER TRIGGERS
+    // ========================================
+    if (trigger.type === 'tower') {
+      const { enterTowerFromOverworld } = get();
+      const mapId = get().currentMapId;
+      if (mapId) {
+        enterTowerFromOverworld({ mapId, position: trigger.position });
+      }
       return;
     }
 

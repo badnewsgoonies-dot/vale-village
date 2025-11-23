@@ -1,0 +1,126 @@
+/**
+ * Vale Village Spacing System
+ * Based on 8-point grid for visual rhythm and consistency
+ * Inspired by successful RPG UI patterns (Persona 5, Slay the Spire, Hades)
+ */
+
+:root {
+  /* Primary spacing scale (8pt grid) */
+  --spacing-xs: 4px;     /* Tight grouping (icons, badges) */
+  --spacing-sm: 8px;     /* Related elements */
+  --spacing-md: 16px;    /* Section separation (most common) */
+  --spacing-lg: 24px;    /* Major section breaks */
+  --spacing-xl: 32px;    /* Distinct areas */
+  --spacing-2xl: 48px;   /* Large visual breaks */
+  --spacing-3xl: 64px;   /* Page-level spacing */
+
+  /* Button & touch targets (mobile-first) */
+  --button-size-sm: 40px;  /* Desktop only */
+  --button-size-md: 44px;  /* Minimum WCAG AAA */
+  --button-size-lg: 48px;  /* Recommended for games */
+  --button-size-xl: 56px;  /* Primary actions */
+  --button-gap: 12px;      /* Prevent mis-taps */
+
+  /* Container padding */
+  --container-padding-sm: 12px;
+  --container-padding-md: 16px;
+  --container-padding-lg: 24px;
+  --container-padding-xl: 32px;
+
+  /* Border radius (consistency) */
+  --radius-sm: 4px;     /* Subtle rounding */
+  --radius-md: 8px;     /* Cards, containers */
+  --radius-lg: 12px;    /* Modals, overlays */
+  --radius-full: 9999px; /* Pills, badges */
+  --radius-retro: 0;    /* Pixel-perfect retro style */
+
+  /* Animation timing (micro-polish) */
+  --transition-instant: 50ms;    /* Instant feedback */
+  --transition-fast: 100ms;      /* Hover states */
+  --transition-normal: 200ms;    /* Menu transitions */
+  --transition-slow: 300ms;      /* Page transitions */
+  --transition-dramatic: 500ms;  /* Victory/defeat */
+
+  /* Typography line heights (4pt multiples) */
+  --line-height-tight: 16px;
+  --line-height-normal: 20px;
+  --line-height-relaxed: 24px;
+  --line-height-loose: 28px;
+
+  /* Z-index scale (prevent conflicts) */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-tooltip: 600;
+  --z-notification: 700;
+  --z-critical: 9999;
+}
+
+/* Responsive scaling multipliers */
+@media (max-width: 768px) {
+  :root {
+    /* Mobile needs larger touch targets */
+    --button-size-sm: 44px;
+    --button-size-md: 48px;
+    --button-size-lg: 56px;
+    --button-size-xl: 64px;
+    --button-gap: 16px; /* More space between buttons */
+  }
+}
+
+/* Utility classes for consistent spacing */
+.spacing-tight { gap: var(--spacing-xs); }
+.spacing-normal { gap: var(--spacing-md); }
+.spacing-loose { gap: var(--spacing-lg); }
+.spacing-relaxed { gap: var(--spacing-xl); }
+
+/* Information hierarchy through spacing */
+.priority-critical {
+  padding: var(--spacing-xl);
+  margin: var(--spacing-2xl) auto;
+}
+
+.priority-high {
+  padding: var(--spacing-lg);
+  margin: var(--spacing-xl) auto;
+}
+
+.priority-normal {
+  padding: var(--spacing-md);
+  margin: var(--spacing-lg) auto;
+}
+
+.priority-low {
+  padding: var(--spacing-sm);
+  margin: var(--spacing-md) auto;
+}
+
+/* Animation classes */
+.transition-hover {
+  transition: all var(--transition-fast) ease-out;
+}
+
+.transition-smooth {
+  transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-dramatic {
+  transition: all var(--transition-dramatic) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hover scale effects (Hades-inspired micro-animations) */
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}

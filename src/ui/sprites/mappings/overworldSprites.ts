@@ -30,6 +30,9 @@ export const TILE_SPRITE_MAP: Record<string, string | null> = {
 /**
  * Maps player unit IDs to their base sprite names
  */
+const PROTAGONIST_BASE_PATH = '/sprites/overworld/protagonists';
+const MAJOR_NPC_BASE_PATH = '/sprites/overworld/majornpcs';
+
 export const PLAYER_UNIT_TO_SPRITE: Record<string, string> = {
   // Main party - matches unit definitions
   'adept': 'Isaac',        // Isaac (Venus Adept)
@@ -46,32 +49,52 @@ export const PLAYER_UNIT_TO_SPRITE: Record<string, string> = {
   'test-warrior-4': 'Ivan',
 };
 
-/**
- * Maps direction + player sprite name to actual sprite ID
- *
- * Available protagonist sprites from catalog:
- * - Isaac, Isaac_Back, Isaac_E, Isaac_NE, Isaac_Run, etc.
- * - Garet, Garet_Back, Garet_E, Garet_NE, Garet_Run, etc.
- * - All 8 protagonists: Isaac, Felix, Garet, Jenna, Ivan, Mia, Sheba, Piers
- */
+interface ProtagonistPoseConfig {
+  front: string;
+  back: string;
+  side: string;
+}
+
+const ISAAC_POSE: ProtagonistPoseConfig = { front: 'Isaac.gif', back: 'Isaac_Back.gif', side: 'Isaac_Right.gif' };
+
+const PROTAGONIST_POSES: Record<string, ProtagonistPoseConfig> = {
+  Isaac: ISAAC_POSE,
+  Garet: { front: 'Garet.gif', back: 'Garet_Back.gif', side: 'Garet_Right.gif' },
+  Mia: { front: 'Mia.gif', back: 'Mia_Back.gif', side: 'Mia_Right.gif' },
+  Ivan: { front: 'Ivan.gif', back: 'Ivan_Back.gif', side: 'Ivan_Right.gif' },
+  Felix: { front: 'Felix.gif', back: 'Felix_Back.gif', side: 'Felix_E.gif' },
+  Jenna: { front: 'Jenna.gif', back: 'Jenna_Back.gif', side: 'Jenna_Right.gif' },
+};
+
+const DEFAULT_POSE = ISAAC_POSE;
+
+function protagonistPath(file: string): string {
+  return `${PROTAGONIST_BASE_PATH}/${file}`;
+}
+
+function getPoseConfig(baseName: string): ProtagonistPoseConfig {
+  return PROTAGONIST_POSES[baseName] ?? DEFAULT_POSE;
+}
+
 export function getPlayerSprite(unitId: string, direction: Direction): string {
   const baseName = PLAYER_UNIT_TO_SPRITE[unitId] || 'Isaac';
+  const poseConfig = getPoseConfig(baseName);
 
-  // Map direction to sprite suffix
-  // Note: Golden Sun sprites use: default (front/down), _Back (up), _E (east/right)
-  // For left, we can mirror the east sprite in CSS or use default
-  switch (direction) {
-    case 'up':
-      return `${baseName}_Back`;
-    case 'down':
-      return baseName;  // Default facing is down/front
-    case 'right':
-      return `${baseName}_E`;
-    case 'left':
-      return `${baseName}_E`;  // Will be CSS-flipped in component
-    default:
-      return baseName;
-  }
+  const poseFile = (() => {
+    switch (direction) {
+      case 'up':
+        return poseConfig.back;
+      case 'down':
+        return poseConfig.front;
+      case 'right':
+      case 'left':
+        return poseConfig.side;
+      default:
+        return poseConfig.front;
+    }
+  })();
+
+  return protagonistPath(poseFile);
 }
 
 /**
@@ -82,53 +105,71 @@ export function getPlayerSprite(unitId: string, direction: Direction): string {
  * - minornpcs/: Villagers, guards, merchants (50+ variants)
  * - minornpcs_2/: Additional villager variety
  */
-export const NPC_SPRITE_MAP: Record<string, string> = {
-  // Major Story NPCs
-  'saturos': 'saturos',
-  'menardi': 'menardi',
-  'agatio': 'agatio',
-  'karst': 'karst',
-  'alex': 'alex',
-  'kraden': 'kraden',
-  'babi': 'babi',
+const NPC_ROLE_TO_FILE = {
+  elder: 'Elder.gif',
+  merchant: 'Weaponshop_Owner.gif',
+  shopkeeper: 'Weaponshop_Keeper.gif',
+  villagerMale: 'Mr_Jerra.gif',
+  villagerFemale: 'Mrs_Jerra.gif',
+  guard: 'Thief1.gif',
+  enemy: 'Thief1.gif',
+  default: 'Innkeeper.gif',
+} as const;
 
-  // Generic NPC types (will map to specific villager sprites)
-  'villager': 'villager',
-  'villager-male': 'male-villager',
-  'villager-female': 'female-villager',
-  'elder': 'elder',
-  'merchant': 'merchant',
-  'guard': 'guard',
-  'blacksmith': 'blacksmith',
-
-  // Fallback
-  'default': 'villager',
+const SPECIFIC_NPC_TO_FILE: Record<string, string> = {
+  'elder-vale': NPC_ROLE_TO_FILE.elder,
+  'shopkeeper-weapons': NPC_ROLE_TO_FILE.shopkeeper,
+  'tower-attendant': NPC_ROLE_TO_FILE.elder,
 };
+
+function npcPath(file: string): string {
+  return `${MAJOR_NPC_BASE_PATH}/${file}`;
+}
 
 /**
  * Get NPC sprite ID with fallback
  * Handles actual NPC IDs from map data (elder-vale, shopkeeper-weapons, villager-1, etc.)
  */
 export function getNPCSprite(npcId: string): string {
-  // Handle specific NPC types
-  if (npcId.includes('elder')) return 'elder';
-  if (npcId.includes('shopkeeper')) return 'merchant';
-  if (npcId.includes('guard')) return 'guard';
-  if (npcId.includes('blacksmith')) return 'blacksmith';
+  const specificFile = SPECIFIC_NPC_TO_FILE[npcId];
+  if (specificFile) {
+    return npcPath(specificFile);
+  }
+
+  if (/house-\d+-enemy/.test(npcId)) {
+    return npcPath(NPC_ROLE_TO_FILE.enemy);
+  }
+
+  if (npcId.includes('elder')) {
+    return npcPath(NPC_ROLE_TO_FILE.elder);
+  }
+
+  if (npcId.includes('shopkeeper') || npcId.includes('merchant')) {
+    return npcPath(NPC_ROLE_TO_FILE.merchant);
+  }
+
+  if (npcId.includes('blacksmith')) {
+    return npcPath(NPC_ROLE_TO_FILE.shopkeeper);
+  }
+
+  if (npcId.includes('guard')) {
+    return npcPath(NPC_ROLE_TO_FILE.guard);
+  }
 
   // Handle villagers with variety (villager-1, villager-2, etc.)
   if (npcId.includes('villager')) {
     const match = npcId.match(/villager-(\d+)/);
     if (match && match[1]) {
       const num = parseInt(match[1], 10);
-      // Alternate between male/female villagers for variety
-      return num % 2 === 0 ? 'female-villager' : 'male-villager';
+      const villagerFile = num % 2 === 0
+        ? NPC_ROLE_TO_FILE.villagerFemale
+        : NPC_ROLE_TO_FILE.villagerMale;
+      return npcPath(villagerFile);
     }
-    return 'villager';
+    return npcPath(NPC_ROLE_TO_FILE.villagerMale);
   }
 
-  // Fallback to mapping table
-  return NPC_SPRITE_MAP[npcId] ?? NPC_SPRITE_MAP['default'] ?? 'villager';
+  return npcPath(NPC_ROLE_TO_FILE.default);
 }
 
 /**

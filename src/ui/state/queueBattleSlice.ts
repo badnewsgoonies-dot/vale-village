@@ -13,6 +13,7 @@ import type { StorySlice } from './storySlice';
 import type { TeamSlice } from './teamSlice';
 import type { SaveSlice } from './saveSlice';
 import type { DialogueSlice } from './dialogueSlice';
+import type { TowerSlice } from './towerSlice';
 import {
   queueAction,
   clearQueuedAction,
@@ -51,7 +52,7 @@ export interface QueueBattleSlice {
 }
 
 export const createQueueBattleSlice: StateCreator<
-  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice & SaveSlice & DialogueSlice,
+  QueueBattleSlice & GameFlowSlice & RewardsSlice & StorySlice & TeamSlice & SaveSlice & DialogueSlice & TowerSlice,
   [['zustand/devtools', never]],
   [],
   QueueBattleSlice
@@ -145,8 +146,19 @@ export const createQueueBattleSlice: StateCreator<
     const previousEvents = get().events;
     const battleEvents = [...previousEvents, ...result.events];
 
-    // Update battle state with fresh events (pre-heal)
     set({ battle: result.state, events: battleEvents });
+
+    const encounterId = getEncounterId(result.state);
+    const towerEncounterId = get().activeTowerEncounterId;
+    const isTowerBattle =
+      get().towerStatus === 'in-run' &&
+      towerEncounterId !== null &&
+      encounterId === towerEncounterId;
+
+    if (isTowerBattle && (result.state.phase === 'victory' || result.state.phase === 'defeat')) {
+      get().handleTowerBattleCompleted({ battle: result.state, events: battleEvents });
+      return;
+    }
 
     // Sync Djinn trackers to team state (after round execution)
     if (result.state.playerTeam.djinnTrackers) {

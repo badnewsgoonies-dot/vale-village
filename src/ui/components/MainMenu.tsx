@@ -11,6 +11,8 @@ export function MainMenu() {
   const setMode = useStore((s) => s.setMode);
   const hasSave = useStore((s) => s.hasSave);
   const loadGame = useStore((s) => s.loadGame);
+  const startTowerRun = useStore((s) => s.startTowerRun);
+  const openTowerFromMainMenu = useStore((s) => s.openTowerFromMainMenu);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const hasSaveFile = hasSave();
@@ -19,6 +21,7 @@ export function MainMenu() {
     { id: 'new-game', label: 'New Game', enabled: true },
     { id: 'continue', label: 'Continue', enabled: hasSaveFile },
     { id: 'compendium', label: 'Compendium', enabled: true },
+    { id: 'battle-tower', label: 'Battle Tower (Beta)', enabled: true },
   ];
 
   const enabledOptions = menuOptions.filter(opt => opt.enabled);
@@ -85,6 +88,9 @@ export function MainMenu() {
       }
     } else if (optionId === 'compendium') {
       setMode('compendium');
+    } else if (optionId === 'battle-tower') {
+      openTowerFromMainMenu();
+      startTowerRun({ difficulty: 'normal' });
     }
   };
 

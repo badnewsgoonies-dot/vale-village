@@ -22,6 +22,7 @@ import './ShopEquipScreen.css';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
 import type { Unit } from '../../core/models/Unit';
 import type { EquipmentSlot } from '../../core/models/Equipment';
+import { isAvailableInCampaign } from '../utils/contentAvailability';
 
 type Tab = 'shop' | 'equip';
 
@@ -59,7 +60,7 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const availableItems = shop && isShopUnlocked
     ? (shop.availableItems
         .map((id) => EQUIPMENT[id])
-        .filter(Boolean) as Equipment[])
+        .filter((item): item is Equipment => Boolean(item) && isAvailableInCampaign(item)))
     : [];
 
   const starterKitEntries = team
@@ -261,9 +262,9 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
 
                   {unlockedUnits.map((unit) => {
                     // Filter equipment by element type (not unit-specific)
-                    const availableEquipment = Object.values(EQUIPMENT).filter((item) =>
-                      item.allowedElements.includes(unit.element)
-                    );
+            const availableEquipment = Object.values(EQUIPMENT).filter(
+              (item) => isAvailableInCampaign(item) && item.allowedElements.includes(unit.element)
+            );
                     return (
                       <section key={unit.id} className="unit-store-section">
                         <h2>{unit.name}&apos;s Equipment ({unit.element})</h2>

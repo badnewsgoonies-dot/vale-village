@@ -1,8 +1,12 @@
 /**
  * SimpleSprite Component
  * 
- * A flexible, easy-to-use sprite component optimized for mockups and scene redesigns.
- * Automatically handles sprite lookup via catalog, GIF animation, and fallbacks.
+ * A flexible, easy-to-use sprite component optimized for mockups and production screens.
+ *
+ * Identifier semantics:
+ * - If `id` starts with `/`, it is treated as a **path ID** and must correspond to an
+ *   entry inside `sprite-list-generated.ts`.
+ * - Otherwise it is treated as a **semantic ID** and is resolved via `getSpriteById`.
  * 
  * @example
  * // Basic usage
@@ -175,6 +179,8 @@ export function SimpleSprite({
   const [isLoaded, setIsLoaded] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
   
+  const catalogSuggestion = `searchSprites('${id.split('-')[0] ?? id}')`;
+
   // Lookup sprite on mount/id change
   useEffect(() => {
     const result = findSprite(id);
@@ -183,7 +189,8 @@ export function SimpleSprite({
     setIsLoaded(false);
     
     if (debug && result.entry) {
-      console.log(`[SimpleSprite] Found sprite:`, {
+      // eslint-disable-next-line no-console
+      console.log(`[SimpleSprite] Found sprite`, {
         id,
         method: result.method,
         name: result.entry.name,
@@ -210,8 +217,8 @@ export function SimpleSprite({
   
   const handleError = () => {
     const error = spriteEntry?.entry 
-      ? `Failed to load: ${spriteEntry.entry.path}`
-      : `Sprite not found: ${id}`;
+      ? `Failed to load sprite at ${spriteEntry.entry.path} (method: ${spriteEntry.method})`
+      : `Sprite not found for id "${id}" (method: ${spriteEntry?.method ?? 'none'})`;
     setLoadError(error);
     setIsLoaded(false);
     onError?.(error);
@@ -268,7 +275,7 @@ export function SimpleSprite({
                 <strong>Tip:</strong> Sprite not found in catalog. Try:
                 <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
                   <li>Using direct path: <code>/sprites/...</code></li>
-                  <li>Checking catalog: <code>searchSprites('{id.split('-')[0]}')</code></li>
+                  <li>Checking catalog: <code>{catalogSuggestion}</code></li>
                 </ul>
               </div>
             )}
