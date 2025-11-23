@@ -138,6 +138,52 @@ export const TITANS_AXE: Equipment = {
 };
 
 // ========================================
+// WEAPONS - SWORDS (Mars Fire Swords)
+// ========================================
+export const FLAME_SWORD: Equipment = {
+  id: 'flame-sword',
+  name: 'Flame Sword',
+  slot: 'weapon',
+  tier: 'steel',
+  cost: 600,
+  statBonus: { atk: 24, mag: 5 },
+  allowedElements: ['Mars'], // War Mage
+};
+
+export const PHOENIX_BLADE: Equipment = {
+  id: 'phoenix-blade',
+  name: 'Phoenix Blade',
+  slot: 'weapon',
+  tier: 'legendary',
+  cost: 8000,
+  statBonus: { atk: 55, mag: 12 },
+  allowedElements: ['Mars'], // War Mage
+};
+
+// ========================================
+// WEAPONS - SWORDS (Jupiter Lightning)
+// ========================================
+export const THUNDER_BLADE: Equipment = {
+  id: 'thunder-blade',
+  name: 'Thunder Blade',
+  slot: 'weapon',
+  tier: 'silver',
+  cost: 1400,
+  statBonus: { atk: 30, spd: 4 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+};
+
+export const TEMPEST_SPEAR: Equipment = {
+  id: 'tempest-spear',
+  name: 'Tempest Spear',
+  slot: 'weapon',
+  tier: 'mythril',
+  cost: 3800,
+  statBonus: { atk: 42, spd: 6, mag: 8 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+};
+
+// ========================================
 // WEAPONS - MACES (Mars Only)
 // ========================================
 export const MACE: Equipment = {
@@ -330,6 +376,58 @@ export const VALKYRIE_MAIL: Equipment = {
 };
 
 // ========================================
+// ARMOR - MARS FIRE ARMOR
+// ========================================
+export const EMBER_ARMOR: Equipment = {
+  id: 'ember-armor',
+  name: 'Ember Armor',
+  slot: 'armor',
+  tier: 'steel',
+  cost: 750,
+  statBonus: { def: 22, hp: 35, mag: 5 },
+  allowedElements: ['Mars'], // War Mage
+  elementalResist: 0.1,
+};
+
+// ========================================
+// ARMOR - JUPITER STORM ARMOR
+// ========================================
+export const STORM_MAIL: Equipment = {
+  id: 'storm-mail',
+  name: 'Storm Mail',
+  slot: 'armor',
+  tier: 'silver',
+  cost: 1800,
+  statBonus: { def: 30, hp: 50, spd: 3 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+};
+
+export const VOLT_ARMOR: Equipment = {
+  id: 'volt-armor',
+  name: 'Volt Armor',
+  slot: 'armor',
+  tier: 'mythril',
+  cost: 4200,
+  statBonus: { def: 42, hp: 70, spd: 5 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+  elementalResist: 0.15,
+};
+
+// ========================================
+// ARMOR - ARTIFACT (Multi-Element)
+// ========================================
+export const VALE_MAIL: Equipment = {
+  id: 'vale-mail',
+  name: 'Vale Mail',
+  slot: 'armor',
+  tier: 'artifact',
+  cost: 22000,
+  statBonus: { def: 72, hp: 130 },
+  allowedElements: ['Venus', 'Mars', 'Mercury', 'Jupiter'], // All elements
+  elementalResist: 0.25,
+};
+
+// ========================================
 // HELMS
 // ========================================
 export const LEATHER_CAP: Equipment = {
@@ -418,8 +516,47 @@ export const GLORY_HELM: Equipment = {
   slot: 'helm',
   tier: 'artifact',
   cost: 16000,
-  statBonus: { def: 50, mag: 18, pp: 30 },
+  statBonus: { def: 50, mag: 18 },
   allowedElements: ['Venus'], // Adept, Sentinel - artifact heavy helm
+};
+
+// ========================================
+// HELMS - JUPITER STORM
+// ========================================
+export const SKY_CROWN: Equipment = {
+  id: 'sky-crown',
+  name: 'Sky Crown',
+  slot: 'helm',
+  tier: 'mythril',
+  cost: 3500,
+  statBonus: { def: 26, mag: 10, spd: 3 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+};
+
+// ========================================
+// HELMS - VENUS EARTH
+// ========================================
+export const TERRA_CROWN: Equipment = {
+  id: 'terra-crown',
+  name: 'Terra Crown',
+  slot: 'helm',
+  tier: 'legendary',
+  cost: 8500,
+  statBonus: { def: 42, hp: 30 },
+  allowedElements: ['Venus'], // Adept, Sentinel
+};
+
+// ========================================
+// HELMS - ARTIFACT (Multi-Element)
+// ========================================
+export const HERO_CROWN: Equipment = {
+  id: 'hero-crown',
+  name: 'Hero Crown',
+  slot: 'helm',
+  tier: 'artifact',
+  cost: 18000,
+  statBonus: { def: 55, mag: 15, hp: 40 },
+  allowedElements: ['Venus', 'Mars', 'Mercury', 'Jupiter'], // All elements
 };
 
 // ========================================
@@ -494,6 +631,55 @@ export const HERMES_SANDALS: Equipment = {
   statBonus: { spd: 20, def: 12 },
   allowedElements: ['Jupiter'], // Ranger, Stormcaller - artifact speed boots
   alwaysFirstTurn: true,
+};
+
+// ========================================
+// BOOTS - MARS FIRE
+// ========================================
+export const FIRE_BOOTS: Equipment = {
+  id: 'fire-boots',
+  name: 'Fire Boots',
+  slot: 'boots',
+  tier: 'steel',
+  cost: 450,
+  statBonus: { spd: 4, def: 3, atk: 2 },
+  allowedElements: ['Mars'], // War Mage
+};
+
+export const CRIMSON_BOOTS: Equipment = {
+  id: 'crimson-boots',
+  name: 'Crimson Boots',
+  slot: 'boots',
+  tier: 'legendary',
+  cost: 7000,
+  statBonus: { spd: 12, def: 8, atk: 5 },
+  allowedElements: ['Mars'], // War Mage
+};
+
+// ========================================
+// BOOTS - JUPITER WIND
+// ========================================
+export const GALE_BOOTS: Equipment = {
+  id: 'gale-boots',
+  name: 'Gale Boots',
+  slot: 'boots',
+  tier: 'silver',
+  cost: 1200,
+  statBonus: { spd: 8, def: 5 },
+  allowedElements: ['Jupiter'], // Ranger, Stormcaller
+};
+
+// ========================================
+// BOOTS - ARTIFACT (Multi-Element)
+// ========================================
+export const FREEDOM_BOOTS: Equipment = {
+  id: 'freedom-boots',
+  name: 'Freedom Boots',
+  slot: 'boots',
+  tier: 'artifact',
+  cost: 15000,
+  statBonus: { spd: 18, def: 14 },
+  allowedElements: ['Venus', 'Mars', 'Mercury', 'Jupiter'], // All elements
 };
 
 // ========================================
@@ -613,10 +799,37 @@ export const COSMOS_SHIELD: Equipment = {
 };
 
 // ========================================
+// ACCESSORIES - MARS FIRE
+// ========================================
+export const FLAME_SHIELD: Equipment = {
+  id: 'flame-shield',
+  name: 'Flame Shield',
+  slot: 'accessory',
+  tier: 'legendary',
+  cost: 7500,
+  statBonus: { def: 18, atk: 8 },
+  allowedElements: ['Mars'], // War Mage
+  elementalResist: 0.2,
+};
+
+// ========================================
+// WEAPONS - ARTIFACT (Multi-Element)
+// ========================================
+export const LIBERATION_BLADE: Equipment = {
+  id: 'liberation-blade',
+  name: 'Liberation Blade',
+  slot: 'weapon',
+  tier: 'artifact',
+  cost: 25000,
+  statBonus: { atk: 68, mag: 15 },
+  allowedElements: ['Venus', 'Mars', 'Mercury', 'Jupiter'], // All elements - ultimate weapon
+};
+
+// ========================================
 // EQUIPMENT REGISTRY
 // ========================================
 export const EQUIPMENT: Record<string, Equipment> = {
-  // Swords
+  // Swords (Venus)
   'wooden-sword': WOODEN_SWORD,
   'bronze-sword': BRONZE_SWORD,
   'iron-sword': IRON_SWORD,
@@ -625,6 +838,17 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'mythril-blade': MYTHRIL_BLADE,
   'gaia-blade': GAIA_BLADE,
   'sol-blade': SOL_BLADE,
+
+  // Swords (Mars)
+  'flame-sword': FLAME_SWORD,
+  'phoenix-blade': PHOENIX_BLADE,
+
+  // Swords (Jupiter)
+  'thunder-blade': THUNDER_BLADE,
+  'tempest-spear': TEMPEST_SPEAR,
+
+  // Swords (Artifact)
+  'liberation-blade': LIBERATION_BLADE,
 
   // Axes
   'wooden-axe': WOODEN_AXE,
@@ -645,7 +869,7 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'zodiac-wand': ZODIAC_WAND,
   'staff-of-ages': STAFF_OF_AGES,
 
-  // Armor
+  // Armor (Venus)
   'cotton-shirt': COTTON_SHIRT,
   'leather-vest': LEATHER_VEST,
   'bronze-armor': BRONZE_ARMOR,
@@ -655,6 +879,16 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'mythril-armor': MYTHRIL_ARMOR,
   'dragon-scales': DRAGON_SCALES,
   'valkyrie-mail': VALKYRIE_MAIL,
+
+  // Armor (Mars)
+  'ember-armor': EMBER_ARMOR,
+
+  // Armor (Jupiter)
+  'storm-mail': STORM_MAIL,
+  'volt-armor': VOLT_ARMOR,
+
+  // Armor (Artifact)
+  'vale-mail': VALE_MAIL,
 
   // Helms
   'leather-cap': LEATHER_CAP,
@@ -667,14 +901,33 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'oracles-crown': ORACLES_CROWN,
   'glory-helm': GLORY_HELM,
 
-  // Boots
+  // Helms (Jupiter)
+  'sky-crown': SKY_CROWN,
+
+  // Helms (Venus)
+  'terra-crown': TERRA_CROWN,
+
+  // Helms (Artifact)
+  'hero-crown': HERO_CROWN,
+
+  // Boots (Venus)
   'leather-boots': LEATHER_BOOTS,
   'iron-boots': IRON_BOOTS,
   'steel-greaves': STEEL_GREAVES,
   'silver-greaves': SILVER_GREAVES,
+
+  // Boots (Jupiter)
   'hyper-boots': HYPER_BOOTS,
   'quick-boots': QUICK_BOOTS,
   'hermes-sandals': HERMES_SANDALS,
+  'gale-boots': GALE_BOOTS,
+
+  // Boots (Mars)
+  'fire-boots': FIRE_BOOTS,
+  'crimson-boots': CRIMSON_BOOTS,
+
+  // Boots (Artifact)
+  'freedom-boots': FREEDOM_BOOTS,
 
   // Accessories
   'power-ring': POWER_RING,
@@ -688,4 +941,7 @@ export const EQUIPMENT: Record<string, Equipment> = {
   'cleric-ring': CLERIC_RING,
   'iris-robe': IRIS_ROBE,
   'cosmos-shield': COSMOS_SHIELD,
+
+  // Accessories (Mars)
+  'flame-shield': FLAME_SHIELD,
 };
