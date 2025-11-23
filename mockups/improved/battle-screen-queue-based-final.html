@@ -806,25 +806,31 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
       background: #2a1a0a;
     }
 
-    .ability-tooltip {
-      display: none;
-      position: absolute;
-      left: calc(100% + 0.75rem);
-      top: 0;
-      min-width: 280px;
-      max-width: 350px;
-      padding: 1rem;
-      background: linear-gradient(135deg, #4a3a2a, #3a2a1a);
-      border: 2px solid #8b6a4a;
-      border-radius: 8px;
-      box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.9);
-      z-index: 1001;
-      pointer-events: none;
-      white-space: normal;
+    /* Right column panel - shows either combat log or ability details */
+    .right-panel-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
     }
 
-    .ability-list-item:hover .ability-tooltip {
+    .ability-details-panel {
+      display: none;
+      background: #2a1a0a;
+      border: 1px solid #8b6a4a;
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-y: auto;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .ability-details-panel.visible {
       display: block;
+    }
+
+    .combat-log.hidden {
+      display: none;
     }
 
     .combat-log {
@@ -1247,183 +1253,95 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
       </div>
       <div class="abilities-expanded">
         <div class="ability-list">
-          <div class="ability-list-item">
+          <div class="ability-list-item"
+               data-name="⚔️ ATTACK"
+               data-type="Physical"
+               data-target="Single Enemy"
+               data-power="Base ATK"
+               data-mana="0 ○○○○○"
+               data-desc="Basic physical attack using your weapon."
+               data-effects=""
+               data-unlock="">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Attack.gif" alt="Attack" /></div>
             <div class="ability-content">
               <div class="ability-name">⚔️ Attack</div>
               <div class="ability-cost">[0○] Physical</div>
               <div style="font-size: 0.75rem; color: #aaa; margin-top: 0.25rem;">Unlocked</div>
             </div>
-            <div class="ability-tooltip">
-              <div class="ability-details-header">⚔️ ATTACK</div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Type:</div>
-                <div class="ability-details-value">Physical</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Target:</div>
-                <div class="ability-details-value">Single Enemy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Power:</div>
-                <div class="ability-details-value">Base ATK</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Mana Cost:</div>
-                <div class="ability-details-value">0 ○○○○○</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Description:</div>
-                <div class="ability-details-value">Basic physical attack using your weapon.</div>
-              </div>
-            </div>
           </div>
-          <div class="ability-list-item selected">
+          <div class="ability-list-item selected"
+               data-name="🔥 FIREBALL"
+               data-type="Mars Psynergy"
+               data-target="Single Enemy"
+               data-power="35"
+               data-mana="2 ●●○○○"
+               data-desc="Launches a ball of fire at a single enemy, dealing fire damage. Effective against wind-based enemies."
+               data-effects="• Status: Burn (80% chance)|  - Duration: 3 turns|  - Damage: 10 per turn|• Elemental Advantages:|  - vs Jupiter: 1.5× damage (Strong)|  - vs Mercury: 0.67× damage (Weak)"
+               data-unlock="Flint (Mars Djinn) - Level 2">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Fireball" /></div>
             <div class="ability-content">
               <div class="ability-name">🔥 Fireball</div>
               <div class="ability-cost">[2○] Mars Psynergy</div>
               <div style="font-size: 0.75rem; color: #aaa; margin-top: 0.25rem;">Lv2 - Djinn</div>
             </div>
-            <div class="ability-tooltip">
-              <div class="ability-details-header">🔥 FIREBALL</div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Type:</div>
-                <div class="ability-details-value">Mars Psynergy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Target:</div>
-                <div class="ability-details-value">Single Enemy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Power:</div>
-                <div class="ability-details-value">35</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Mana Cost:</div>
-                <div class="ability-details-value">2 ●●○○○</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Description:</div>
-                <div class="ability-details-value">Launches a ball of fire at a single enemy, dealing fire damage. Effective against wind-based enemies.</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Effects:</div>
-                <ul class="ability-effects-list">
-                  <li>• Status: Burn (80% chance)</li>
-                  <li>&nbsp;&nbsp;- Duration: 3 turns</li>
-                  <li>&nbsp;&nbsp;- Damage: 10 per turn</li>
-                  <li>• Elemental Advantages:</li>
-                  <li>&nbsp;&nbsp;- vs Jupiter: 1.5× damage (Strong)</li>
-                  <li>&nbsp;&nbsp;- vs Mercury: 0.67× damage (Weak)</li>
-                </ul>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Unlocked by:</div>
-                <div class="ability-details-value">Flint (Mars Djinn) - Level 2</div>
-              </div>
-            </div>
           </div>
-          <div class="ability-list-item">
+          <div class="ability-list-item"
+               data-name="💚 HEAL"
+               data-type="Healing"
+               data-target="Single Ally"
+               data-power="MAG × 1.5"
+               data-mana="1 ●○○○○"
+               data-desc="Restores HP to a single ally."
+               data-effects=""
+               data-unlock="">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Cure_Poison.gif" alt="Heal" /></div>
             <div class="ability-content">
               <div class="ability-name">💚 Heal</div>
               <div class="ability-cost">[1○] Healing</div>
               <div style="font-size: 0.75rem; color: #aaa; margin-top: 0.25rem;">Lv3 - Core</div>
             </div>
-            <div class="ability-tooltip">
-              <div class="ability-details-header">💚 HEAL</div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Type:</div>
-                <div class="ability-details-value">Healing</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Target:</div>
-                <div class="ability-details-value">Single Ally</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Healing:</div>
-                <div class="ability-details-value">MAG × 1.5</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Mana Cost:</div>
-                <div class="ability-details-value">1 ●○○○○</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Description:</div>
-                <div class="ability-details-value">Restores HP to a single ally.</div>
-              </div>
-            </div>
           </div>
-          <div class="ability-list-item">
+          <div class="ability-list-item"
+               data-name="🛡️ GUARD BREAK"
+               data-type="Physical"
+               data-target="Single Enemy"
+               data-power="ATK × 0.8"
+               data-mana="0 ○○○○○"
+               data-desc="Physical strike that ignores armor."
+               data-effects="• Ignores 50% DEF|• Removes Guard status"
+               data-unlock="">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Defend.gif" alt="Guard Break" /></div>
             <div class="ability-content">
               <div class="ability-name">🛡️ Guard Break</div>
               <div class="ability-cost">[0○] Physical</div>
               <div style="font-size: 0.75rem; color: #aaa; margin-top: 0.25rem;">Lv4 - Core</div>
             </div>
-            <div class="ability-tooltip">
-              <div class="ability-details-header">🛡️ GUARD BREAK</div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Type:</div>
-                <div class="ability-details-value">Physical</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Target:</div>
-                <div class="ability-details-value">Single Enemy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Power:</div>
-                <div class="ability-details-value">ATK × 0.8</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Mana Cost:</div>
-                <div class="ability-details-value">0 ○○○○○</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Effects:</div>
-                <ul class="ability-effects-list">
-                  <li>• Ignores 50% DEF</li>
-                  <li>• Removes Guard status</li>
-                </ul>
-              </div>
-            </div>
           </div>
-          <div class="ability-list-item">
+          <div class="ability-list-item"
+               data-name="⚡ SPARK STRIKE"
+               data-type="Jupiter Psynergy"
+               data-target="Single Enemy"
+               data-power="40"
+               data-mana="2 ●●○○○"
+               data-desc="A lightning-charged attack that may paralyze the target."
+               data-effects="• Status: Paralyze (60% chance)|  - Duration: 2 turns"
+               data-unlock="Breeze (Jupiter Djinn) - Level 5">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Battle.gif" alt="Spark Strike" /></div>
             <div class="ability-content">
               <div class="ability-name">⚡ Spark Strike</div>
               <div class="ability-cost">[2○] Jupiter</div>
               <div style="font-size: 0.75rem; color: #aaa; margin-top: 0.25rem;">Lv5 - Djinn</div>
             </div>
-            <div class="ability-tooltip">
-              <div class="ability-details-header">⚡ SPARK STRIKE</div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Type:</div>
-                <div class="ability-details-value">Jupiter Psynergy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Target:</div>
-                <div class="ability-details-value">Single Enemy</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Power:</div>
-                <div class="ability-details-value">40</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Mana Cost:</div>
-                <div class="ability-details-value">2 ●●○○○</div>
-              </div>
-              <div class="ability-details-section">
-                <div class="ability-details-label">Effects:</div>
-                <ul class="ability-effects-list">
-                  <li>• Status: Paralyze (60% chance)</li>
-                  <li>&nbsp;&nbsp;- Duration: 2 turns</li>
-                </ul>
-              </div>
-            </div>
           </div>
-          <div class="ability-list-item locked">
+          <div class="ability-list-item locked"
+               data-name="🔒 QUAKE"
+               data-type="Venus Psynergy"
+               data-target="All Enemies"
+               data-power="50"
+               data-mana="3 ●●●○○"
+               data-desc="Locked ability - requires Venus Djinn."
+               data-effects=""
+               data-unlock="Requires: Venus Djinn">
             <div class="ability-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Quake" /></div>
             <div class="ability-content">
               <div class="ability-name">🔒 Quake</div>
@@ -1433,52 +1351,88 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
           </div>
         </div>
         <div class="abilities-divider"></div>
-        <div class="combat-log">
-          <div class="combat-log-header">⚔️ COMBAT LOG</div>
-          <div class="combat-log-entry action">
-            <strong>Round 1 begins!</strong>
+        <div class="right-panel-container">
+          <!-- Ability Details Panel (shown on hover) -->
+          <div class="ability-details-panel" id="abilityDetailsPanel">
+            <div class="ability-details-header" id="detailsHeader">⚔️ ATTACK</div>
+            <div class="ability-details-section">
+              <div class="ability-details-label">Type:</div>
+              <div class="ability-details-value" id="detailsType">Physical</div>
+            </div>
+            <div class="ability-details-section">
+              <div class="ability-details-label">Target:</div>
+              <div class="ability-details-value" id="detailsTarget">Single Enemy</div>
+            </div>
+            <div class="ability-details-section">
+              <div class="ability-details-label">Power:</div>
+              <div class="ability-details-value" id="detailsPower">Base ATK</div>
+            </div>
+            <div class="ability-details-section">
+              <div class="ability-details-label">Mana Cost:</div>
+              <div class="ability-details-value" id="detailsMana">0 ○○○○○</div>
+            </div>
+            <div class="ability-details-section">
+              <div class="ability-details-label">Description:</div>
+              <div class="ability-details-value" id="detailsDescription">Basic physical attack using your weapon.</div>
+            </div>
+            <div class="ability-details-section" id="detailsEffectsSection">
+              <div class="ability-details-label">Effects:</div>
+              <ul class="ability-effects-list" id="detailsEffects">
+              </ul>
+            </div>
+            <div class="ability-details-section" id="detailsUnlockSection" style="display: none;">
+              <div class="ability-details-label">Unlocked by:</div>
+              <div class="ability-details-value" id="detailsUnlock"></div>
+            </div>
           </div>
-          <div class="combat-log-entry action">
-            Isaac uses <strong>Fireball</strong> on Goblin A!
-          </div>
-          <div class="combat-log-entry damage">
-            Goblin A takes <strong>52 damage</strong>! (Critical hit!)
-          </div>
-          <div class="combat-log-entry status">
-            Goblin A is <strong>Burned</strong>! (3 turns)
-          </div>
-          <div class="combat-log-entry action">
-            Goblin B attacks Isaac!
-          </div>
-          <div class="combat-log-entry damage">
-            Isaac takes <strong>18 damage</strong>!
-          </div>
-          <div class="combat-log-entry action">
-            Garet uses <strong>Attack</strong> on Goblin B!
-          </div>
-          <div class="combat-log-entry damage">
-            Goblin B takes <strong>28 damage</strong>!
-          </div>
-          <div class="combat-log-entry action">
-            Mia uses <strong>Heal</strong> on Isaac!
-          </div>
-          <div class="combat-log-entry heal">
-            Isaac recovers <strong>35 HP</strong>!
-          </div>
-          <div class="combat-log-entry status">
-            Burn effect: Goblin A takes <strong>10 damage</strong>!
-          </div>
-          <div class="combat-log-entry action">
-            Ivan uses <strong>Spark Strike</strong> on Goblin C!
-          </div>
-          <div class="combat-log-entry damage">
-            Goblin C takes <strong>45 damage</strong>!
-          </div>
-          <div class="combat-log-entry status">
-            Goblin C is <strong>Paralyzed</strong>! (2 turns)
-          </div>
-          <div class="combat-log-entry action">
-            <em>Planning phase - Select actions for Round 2...</em>
+          <!-- Combat Log (default view) -->
+          <div class="combat-log" id="combatLog">
+            <div class="combat-log-header">⚔️ COMBAT LOG</div>
+            <div class="combat-log-entry action">
+              <strong>Round 1 begins!</strong>
+            </div>
+            <div class="combat-log-entry action">
+              Isaac uses <strong>Fireball</strong> on Goblin A!
+            </div>
+            <div class="combat-log-entry damage">
+              Goblin A takes <strong>52 damage</strong>! (Critical hit!)
+            </div>
+            <div class="combat-log-entry status">
+              Goblin A is <strong>Burned</strong>! (3 turns)
+            </div>
+            <div class="combat-log-entry action">
+              Goblin B attacks Isaac!
+            </div>
+            <div class="combat-log-entry damage">
+              Isaac takes <strong>18 damage</strong>!
+            </div>
+            <div class="combat-log-entry action">
+              Garet uses <strong>Attack</strong> on Goblin B!
+            </div>
+            <div class="combat-log-entry damage">
+              Goblin B takes <strong>28 damage</strong>!
+            </div>
+            <div class="combat-log-entry action">
+              Mia uses <strong>Heal</strong> on Isaac!
+            </div>
+            <div class="combat-log-entry heal">
+              Isaac recovers <strong>35 HP</strong>!
+            </div>
+            <div class="combat-log-entry status">
+              Burn effect: Goblin A takes <strong>10 damage</strong>!
+            </div>
+            <div class="combat-log-entry action">
+              Ivan uses <strong>Spark Strike</strong> on Goblin C!
+            </div>
+            <div class="combat-log-entry damage">
+              Goblin C takes <strong>45 damage</strong>!
+            </div>
+            <div class="combat-log-entry status">
+              Goblin C is <strong>Paralyzed</strong>! (2 turns)
+            </div>
+            <div class="combat-log-entry action">
+              <em>Planning phase - Select actions for Round 2...</em>
+            </div>
           </div>
         </div>
       </div>
@@ -1496,21 +1450,90 @@ Apply the brown/gold theme to this mockup<!DOCTYPE html>
       // Handled by CSS :hover
     }
 
-    // Ability selection - allow clicking to select/deselect
+    // Ability details panel management
+    function showAbilityDetails(item) {
+      const detailsPanel = document.getElementById('abilityDetailsPanel');
+      const combatLog = document.getElementById('combatLog');
+
+      // Get data from data attributes
+      const name = item.dataset.name || 'Unknown';
+      const type = item.dataset.type || 'Unknown';
+      const target = item.dataset.target || 'Unknown';
+      const power = item.dataset.power || '-';
+      const mana = item.dataset.mana || '0';
+      const desc = item.dataset.desc || '';
+      const effects = item.dataset.effects || '';
+      const unlock = item.dataset.unlock || '';
+
+      // Update panel content
+      document.getElementById('detailsHeader').textContent = name;
+      document.getElementById('detailsType').textContent = type;
+      document.getElementById('detailsTarget').textContent = target;
+      document.getElementById('detailsPower').textContent = power;
+      document.getElementById('detailsMana').textContent = mana;
+      document.getElementById('detailsDescription').textContent = desc;
+
+      // Handle effects list
+      const effectsSection = document.getElementById('detailsEffectsSection');
+      const effectsList = document.getElementById('detailsEffects');
+      if (effects) {
+        effectsList.innerHTML = effects.split('|').map(e => `<li>${e}</li>`).join('');
+        effectsSection.style.display = 'block';
+      } else {
+        effectsSection.style.display = 'none';
+      }
+
+      // Handle unlock info
+      const unlockSection = document.getElementById('detailsUnlockSection');
+      const unlockValue = document.getElementById('detailsUnlock');
+      if (unlock) {
+        unlockValue.textContent = unlock;
+        unlockSection.style.display = 'block';
+      } else {
+        unlockSection.style.display = 'none';
+      }
+
+      // Show details panel, hide combat log
+      detailsPanel.classList.add('visible');
+      combatLog.classList.add('hidden');
+    }
+
+    function hideAbilityDetails() {
+      const detailsPanel = document.getElementById('abilityDetailsPanel');
+      const combatLog = document.getElementById('combatLog');
+
+      // Hide details panel, show combat log
+      detailsPanel.classList.remove('visible');
+      combatLog.classList.remove('hidden');
+    }
+
+    // Ability selection and hover - allow clicking to select/deselect
     document.addEventListener('DOMContentLoaded', function() {
-      const abilityItems = document.querySelectorAll('.ability-list-item:not(.locked)');
-      
+      const abilityItems = document.querySelectorAll('.ability-list-item');
+
       abilityItems.forEach(item => {
-        item.addEventListener('click', function() {
-          // Toggle selection
-          if (this.classList.contains('selected')) {
-            this.classList.remove('selected');
-          } else {
-            // Remove selection from all others
-            abilityItems.forEach(other => other.classList.remove('selected'));
-            // Select this one
-            this.classList.add('selected');
-          }
+        // Click to select (only non-locked)
+        if (!item.classList.contains('locked')) {
+          item.addEventListener('click', function() {
+            // Toggle selection
+            if (this.classList.contains('selected')) {
+              this.classList.remove('selected');
+            } else {
+              // Remove selection from all others
+              abilityItems.forEach(other => other.classList.remove('selected'));
+              // Select this one
+              this.classList.add('selected');
+            }
+          });
+        }
+
+        // Hover to show details
+        item.addEventListener('mouseenter', function() {
+          showAbilityDetails(this);
+        });
+
+        item.addEventListener('mouseleave', function() {
+          hideAbilityDetails();
         });
       });
     });
