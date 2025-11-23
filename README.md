@@ -2,6 +2,12 @@
 
 Greenfield rebuild with clean architecture.
 
+## Documentation
+
+- **[CLAUDE_USAGE_GUIDE.md](CLAUDE_USAGE_GUIDE.md)** - Guide for using Claude AI with this project
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive reference for Claude Code
+- **[/docs/](docs/)** - Complete project documentation
+
 ## Architecture
 
 See `/docs/adr/` for Architecture Decision Records.

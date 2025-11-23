@@ -2,6 +2,11 @@
 
 Welcome to the Vale Chronicles documentation! All project documentation has been organized into the following categories:
 
+## Getting Started with AI Assistance
+
+- **[CLAUDE_USAGE_GUIDE.md](../CLAUDE_USAGE_GUIDE.md)** - How to effectively use Claude AI with this project
+- **[CLAUDE.md](../CLAUDE.md)** - Comprehensive technical reference for Claude Code
+
 ## Documentation Structure
 
 ### 📁 `/docs/app/`
