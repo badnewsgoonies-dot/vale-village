@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=1.0">
+  <title>Vale Chronicles - Battle Flow Mockup</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #f8f8f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .nav-tab {
+      padding: 0.75rem 2rem;
+      background: #2a1a0a;
+      border: 2px solid #8b6a4a;
+      border-radius: 8px 8px 0 0;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      background: #3a2a1a;
+      color: #ffd87f;
+    }
+
+    .nav-tab.active {
+      background: #4a3a2a;
+      border-color: #ffd87f;
+      color: #ffd87f;
+      font-weight: bold;
+    }
+
+    /* GBA Screen Container */
+    .gba-screen {
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #1a1a1a;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+      image-rendering: pixelated;
+      border: 4px solid #4a3a2a;
+      border-radius: 8px;
+    }
+
+    /* Screen Views */
+    .screen-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .screen-view.active {
+      display: block;
+    }
+
+    /* ==================== PRE-BATTLE SCREEN ==================== */
+    .prebattle-screen {
+      background: linear-gradient(180deg, #1a0a00 0%, #2a1a0a 100%);
+      padding: 1.5rem;
+    }
+
+    .prebattle-title {
+      text-align: center;
+      color: #ffd87f;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .prebattle-layout {
+      display: flex;
+      gap: 2rem;
+      height: calc(100% - 80px);
+    }
+
+    /* Available Units Panel */
+    .available-units {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .panel-title {
+      color: #ffd87f;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #4a3a2a;
+      padding-bottom: 0.5rem;
+    }
+
+    .unit-roster {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .roster-unit {
+      background: #2a1a0a;
+      border: 2px solid #4a3a2a;
+      border-radius: 6px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .roster-unit:hover {
+      border-color: #ffd87f;
+      background: #3a2a1a;
+    }
+
+    .roster-unit.selected {
+      border-color: #00ff00;
+      background: #1a3a1a;
+    }
+
+    .roster-unit.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .unit-sprite-small {
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+    }
+
+    .unit-info {
+      flex: 1;
+    }
+
+    .unit-name {
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .unit-stats {
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    .unit-speed {
+      color: #00ccff;
+      font-weight: bold;
+    }
+
+    /* Selected Team Panel */
+    .selected-team {
+      width: 400px;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .team-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .team-slot {
+      background: #1a0a00;
+      border: 2px dashed #4a3a2a;
+      border-radius: 6px;
+      padding: 0.75rem;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    .team-slot.filled {
+      border-style: solid;
+      border-color: #6a5a4a;
+      background: #2a1a0a;
+    }
+
+    .slot-number {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #ffd87f;
+      color: #000;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .slot-order {
+      font-size: 1.5rem;
+      color: #ffd87f;
+      font-weight: bold;
+      width: 30px;
+      text-align: center;
+    }
+
+    .slot-unit-info {
+      flex: 1;
+    }
+
+    .slot-unit-name {
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .slot-unit-speed {
+      font-size: 0.8rem;
+      color: #00ccff;
+    }
+
+    .slot-empty {
+      color: #666;
+      font-style: italic;
+    }
+
+    .remove-btn {
+      background: #aa3333;
+      border: none;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .remove-btn:hover {
+      background: #ff4444;
+    }
+
+    /* Start Battle Button */
+    .start-battle-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(180deg, #ffd87f 0%, #f3c866 100%);
+      border: 2px solid #aa8833;
+      border-radius: 8px;
+      color: #1a0a00;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .start-battle-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #ffe8a0 0%, #ffd87f 100%);
+      transform: scale(1.02);
+    }
+
+    .start-battle-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ==================== BATTLE SCREEN ==================== */
+    .battle-screen {
+      background: #1a1a1a;
+    }
+
+    .battle-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Enemy Area - LEFT SIDE */
+    .enemy-area {
+      position: absolute;
+      bottom: 35%;
+      left: 15%;
+      display: flex;
+      gap: 3rem;
+      z-index: 10;
+    }
+
+    .enemy-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .arrow-btn {
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      z-index: 51;
+    }
+
+    .arrow-btn:hover {
+      background: #ffd700;
+      color: #000;
+    }
+
+    .enemy-sprite {
+      image-rendering: pixelated;
+      transform: scale(3);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 20;
+    }
+
+    .enemy-sprite:hover {
+      transform: scale(3.5);
+      filter: drop-shadow(0 0 20px #ffd700);
+    }
+
+    /* Player Area - RIGHT SIDE */
+    .player-area {
+      position: absolute;
+      bottom: 28%;
+      right: 15%;
+      width: 240px;
+      z-index: 10;
+    }
+
+    .player-sprite {
+      image-rendering: pixelated;
+      transform: scale(2.5);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+      position: absolute;
+    }
+
+    /* Staggered diagonal line */
+    .player-sprite:nth-child(1) { left: 0px; bottom: 0; }
+    .player-sprite:nth-child(2) { left: 60px; bottom: 15px; }
+    .player-sprite:nth-child(3) { left: 120px; bottom: 30px; }
+    .player-sprite:nth-child(4) { left: 180px; bottom: 45px; }
+
+    /* Command Panel */
+    .command-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+    }
+
+    .command-buttons {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+    }
+
+    .cmd-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.6);
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+    }
+
+    .cmd-btn:hover {
+      transform: translateY(-5px);
+    }
+
+    .cmd-icon {
+      image-rendering: pixelated;
+      transform: scale(3);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    }
+
+    .cmd-label {
+      color: #ffd87f;
+      font-size: 0.9rem;
+      text-shadow: 2px 2px 2px #000;
+    }
+
+    /* Mana Bar */
+    .mana-bar-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #4a3a8a;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      z-index: 30;
+    }
+
+    .mana-label {
+      color: #aa88ff;
+      font-size: 0.8rem;
+      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .mana-bar {
+      width: 200px;
+      height: 20px;
+      background: #222;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mana-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6644aa, #aa88ff);
+      transition: width 0.3s;
+    }
+
+    .mana-pending {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(170, 136, 255, 0.3),
+        rgba(170, 136, 255, 0.3) 5px,
+        rgba(102, 68, 170, 0.3) 5px,
+        rgba(102, 68, 170, 0.3) 10px
+      );
+      border-left: 2px dashed #aa88ff;
+    }
+
+    .mana-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    /* Turn Order Display */
+    .turn-order {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 0.5rem;
+      z-index: 30;
+    }
+
+    .turn-order-title {
+      color: #ffd87f;
+      font-size: 0.8rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .turn-order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .turn-order-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .turn-order-item.current {
+      background: #4a3a2a;
+      border: 1px solid #ffd87f;
+    }
+
+    .turn-order-item.player {
+      color: #88ff88;
+    }
+
+    .turn-order-item.enemy {
+      color: #ff8888;
+    }
+
+    .turn-number {
+      color: #ffd87f;
+      font-weight: bold;
+      width: 20px;
+    }
+
+    /* Back to Pre-battle button */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: #ffd87f;
+      cursor: pointer;
+      font-size: 0.9rem;
+      z-index: 30;
+    }
+
+    .back-btn:hover {
+      background: #4a3a2a;
+      border-color: #ffd87f;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('prebattle')">Pre-Battle</button>
+    <button class="nav-tab" onclick="showScreen('battle')">Battle</button>
+  </div>
+
+  <!-- GBA Screen Frame -->
+  <div class="gba-screen">
+
+    <!-- PRE-BATTLE SCREEN -->
+    <div class="screen-view prebattle-screen active" id="prebattle-screen">
+      <div class="prebattle-title">Select Your Team</div>
+
+      <div class="prebattle-layout">
+        <!-- Available Units -->
+        <div class="available-units">
+          <div class="panel-title">Available Units</div>
+          <div class="unit-roster" id="unitRoster">
+            <!-- Units populated by JS -->
+          </div>
+        </div>
+
+        <!-- Selected Team -->
+        <div class="selected-team">
+          <div class="panel-title">Battle Party (Sorted by Speed)</div>
+          <div class="team-slots" id="teamSlots">
+            <div class="team-slot" data-slot="0">
+              <span class="slot-number">1st</span>
+              <span class="slot-order">1</span>
+              <span class="slot-empty">Empty - Fastest</span>
+            </div>
+            <div class="team-slot" data-slot="1">
+              <span class="slot-number">2nd</span>
+              <span class="slot-order">2</span>
+              <span class="slot-empty">Empty</span>
+            </div>
+            <div class="team-slot" data-slot="2">
+              <span class="slot-number">3rd</span>
+              <span class="slot-order">3</span>
+              <span class="slot-empty">Empty</span>
+            </div>
+            <div class="team-slot" data-slot="3">
+              <span class="slot-number">4th</span>
+              <span class="slot-order">4</span>
+              <span class="slot-empty">Empty - Slowest</span>
+            </div>
+          </div>
+          <button class="start-battle-btn" id="startBattleBtn" disabled onclick="startBattle()">
+            Select at least 1 unit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BATTLE SCREEN -->
+    <div class="screen-view battle-screen" id="battle-screen">
+      <div class="battle-container">
+        <!-- Back Button -->
+        <button class="back-btn" onclick="showScreen('prebattle')">← Back</button>
+
+        <!-- Mana Bar -->
+        <div class="mana-bar-container">
+          <div class="mana-label">Team Mana</div>
+          <div class="mana-bar">
+            <div class="mana-fill" id="manaFill" style="width: 60%"></div>
+            <div class="mana-pending" id="manaPending" style="left: 60%; width: 10%"></div>
+            <span class="mana-text"><span id="manaText">6</span>/<span id="manaMax">10</span> <span id="manaPendingText">(+1)</span></span>
+          </div>
+        </div>
+
+        <!-- Turn Order -->
+        <div class="turn-order">
+          <div class="turn-order-title">Turn Order</div>
+          <div class="turn-order-list" id="turnOrderList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Enemy Sprites -->
+        <div class="enemy-area" id="enemyArea">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Player Sprites -->
+        <div class="player-area" id="playerArea">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Command Panel -->
+        <div class="command-panel">
+          <div class="command-buttons">
+            <div class="cmd-btn">
+              <img src="sprites/icons/buttons/Attack.gif" class="cmd-icon">
+              <span class="cmd-label">Attack</span>
+            </div>
+            <div class="cmd-btn">
+              <img src="sprites/icons/buttons/Psynergy.gif" class="cmd-icon">
+              <span class="cmd-label">Psynergy</span>
+            </div>
+            <div class="cmd-btn">
+              <img src="sprites/icons/buttons/Djinni.gif" class="cmd-icon">
+              <span class="cmd-label">Djinn</span>
+            </div>
+            <div class="cmd-btn">
+              <img src="sprites/icons/buttons/Item.gif" class="cmd-icon">
+              <span class="cmd-label">Item</span>
+            </div>
+            <div class="cmd-btn">
+              <img src="sprites/icons/buttons/Defend.gif" class="cmd-icon">
+              <span class="cmd-label">Defend</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== DATA ====================
+    const allUnits = [
+      { id: 'isaac', name: 'Isaac', speed: 38, baseSpeed: 38, level: 5, sprite: '../../dist/sprites/battle/party/isaac/Isaac_lSword_Back.gif', element: 'Venus' },
+      { id: 'garet', name: 'Garet', speed: 30, baseSpeed: 30, level: 5, sprite: '../../dist/sprites/battle/party/garet/Garet_Axe_Back.gif', element: 'Mars' },
+      { id: 'ivan', name: 'Ivan', speed: 50, baseSpeed: 50, level: 4, sprite: '../../dist/sprites/battle/party/ivan/Ivan_Staff_Back.gif', element: 'Jupiter' },
+      { id: 'mia', name: 'Mia', speed: 45, baseSpeed: 45, level: 4, sprite: '../../dist/sprites/battle/party/mia/Mia_Staff_Back.gif', element: 'Mercury' },
+      { id: 'felix', name: 'Felix', speed: 40, baseSpeed: 40, level: 3, sprite: '../../dist/sprites/battle/party/isaac/Isaac_lSword_Back.gif', element: 'Venus' },
+      { id: 'jenna', name: 'Jenna', speed: 42, baseSpeed: 42, level: 3, sprite: '../../dist/sprites/battle/party/mia/Mia_Staff_Back.gif', element: 'Mars' },
+    ];
+
+    const allEnemies = [
+      { name: 'Goblin', sprite: 'sprites/battle/enemies/Goblin.gif', speed: 25 },
+      { name: 'Bat', sprite: 'sprites/battle/enemies/Bat.gif', speed: 55 },
+      { name: 'Chimera', sprite: 'sprites/battle/enemies/Chimera.gif', speed: 35 },
+      { name: 'Hydra', sprite: 'sprites/battle/enemies/Hydra.gif', speed: 20 },
+      { name: 'Minotaurus', sprite: 'sprites/battle/enemies/Minotaurus.gif', speed: 28 },
+      { name: 'Fenrir', sprite: 'sprites/battle/enemies/Fenrir.gif', speed: 48 },
+    ];
+
+    // State
+    let selectedTeam = [];
+    let currentEnemies = [allEnemies[0], allEnemies[1]];
+    let enemyIndices = [0, 1];
+
+    // ==================== SCREEN NAVIGATION ====================
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+      document.getElementById(screenId + '-screen').classList.add('active');
+      document.querySelector(`[onclick="showScreen('${screenId}')"]`).classList.add('active');
+
+      if (screenId === 'battle') {
+        populateBattle();
+      }
+    }
+
+    // ==================== PRE-BATTLE ====================
+    function populateRoster() {
+      const roster = document.getElementById('unitRoster');
+      roster.innerHTML = '';
+
+      allUnits.forEach(unit => {
+        const isSelected = selectedTeam.some(u => u.id === unit.id);
+        const div = document.createElement('div');
+        div.className = `roster-unit ${isSelected ? 'selected' : ''} ${selectedTeam.length >= 4 && !isSelected ? 'disabled' : ''}`;
+        div.onclick = () => toggleUnit(unit);
+        div.innerHTML = `
+          <img src="${unit.sprite}" class="unit-sprite-small" alt="${unit.name}">
+          <div class="unit-info">
+            <div class="unit-name">${unit.name}</div>
+            <div class="unit-stats">Lv.${unit.level} | SPD: <span class="unit-speed">${unit.speed}</span></div>
+          </div>
+        `;
+        roster.appendChild(div);
+      });
+    }
+
+    function toggleUnit(unit) {
+      const existingIndex = selectedTeam.findIndex(u => u.id === unit.id);
+
+      if (existingIndex >= 0) {
+        // Remove unit
+        selectedTeam.splice(existingIndex, 1);
+      } else if (selectedTeam.length < 4) {
+        // Add unit and sort by speed (descending)
+        selectedTeam.push(unit);
+        selectedTeam.sort((a, b) => {
+          // Primary: current speed (descending)
+          if (b.speed !== a.speed) return b.speed - a.speed;
+          // Tiebreaker: base speed (descending)
+          return b.baseSpeed - a.baseSpeed;
+        });
+      }
+
+      updateTeamSlots();
+      populateRoster();
+    }
+
+    function updateTeamSlots() {
+      const slots = document.querySelectorAll('.team-slot');
+
+      slots.forEach((slot, index) => {
+        const unit = selectedTeam[index];
+        if (unit) {
+          slot.classList.add('filled');
+          slot.innerHTML = `
+            <span class="slot-number">${index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : '4th'}</span>
+            <span class="slot-order">${index + 1}</span>
+            <img src="${unit.sprite}" class="unit-sprite-small">
+            <div class="slot-unit-info">
+              <div class="slot-unit-name">${unit.name}</div>
+              <div class="slot-unit-speed">SPD: ${unit.speed}</div>
+            </div>
+            <button class="remove-btn" onclick="event.stopPropagation(); removeUnit('${unit.id}')">×</button>
+          `;
+        } else {
+          slot.classList.remove('filled');
+          const labels = ['Empty - Fastest', 'Empty', 'Empty', 'Empty - Slowest'];
+          slot.innerHTML = `
+            <span class="slot-number">${index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : '4th'}</span>
+            <span class="slot-order">${index + 1}</span>
+            <span class="slot-empty">${labels[index]}</span>
+          `;
+        }
+      });
+
+      // Update start button
+      const btn = document.getElementById('startBattleBtn');
+      if (selectedTeam.length > 0) {
+        btn.disabled = false;
+        btn.textContent = `Start Battle (${selectedTeam.length} unit${selectedTeam.length > 1 ? 's' : ''})`;
+      } else {
+        btn.disabled = true;
+        btn.textContent = 'Select at least 1 unit';
+      }
+    }
+
+    function removeUnit(unitId) {
+      selectedTeam = selectedTeam.filter(u => u.id !== unitId);
+      updateTeamSlots();
+      populateRoster();
+    }
+
+    function startBattle() {
+      showScreen('battle');
+    }
+
+    // ==================== BATTLE ====================
+    function populateBattle() {
+      populateEnemies();
+      populatePlayers();
+      populateTurnOrder();
+    }
+
+    function populateEnemies() {
+      const enemyArea = document.getElementById('enemyArea');
+      enemyArea.innerHTML = '';
+
+      enemyIndices.forEach((index, slot) => {
+        const container = document.createElement('div');
+        container.className = 'enemy-container';
+
+        const leftBtn = document.createElement('button');
+        leftBtn.className = 'arrow-btn';
+        leftBtn.innerHTML = '←';
+        leftBtn.onclick = () => cycleEnemy(slot, 'prev');
+
+        const img = document.createElement('img');
+        img.id = `enemy-${slot}`;
+        img.src = allEnemies[index].sprite;
+        img.className = 'enemy-sprite';
+        img.alt = allEnemies[index].name;
+
+        const rightBtn = document.createElement('button');
+        rightBtn.className = 'arrow-btn';
+        rightBtn.innerHTML = '→';
+        rightBtn.onclick = () => cycleEnemy(slot, 'next');
+
+        container.appendChild(leftBtn);
+        container.appendChild(img);
+        container.appendChild(rightBtn);
+        enemyArea.appendChild(container);
+      });
+
+      currentEnemies = enemyIndices.map(i => allEnemies[i]);
+    }
+
+    function cycleEnemy(slot, direction) {
+      let newIndex;
+      if (direction === 'next') {
+        newIndex = (enemyIndices[slot] + 1) % allEnemies.length;
+      } else {
+        newIndex = enemyIndices[slot] === 0 ? allEnemies.length - 1 : enemyIndices[slot] - 1;
+      }
+      enemyIndices[slot] = newIndex;
+
+      const img = document.getElementById(`enemy-${slot}`);
+      img.src = allEnemies[newIndex].sprite;
+      img.alt = allEnemies[newIndex].name;
+
+      currentEnemies[slot] = allEnemies[newIndex];
+      populateTurnOrder();
+    }
+
+    function populatePlayers() {
+      const playerArea = document.getElementById('playerArea');
+      playerArea.innerHTML = '';
+
+      selectedTeam.forEach((player, i) => {
+        const img = document.createElement('img');
+        img.src = player.sprite;
+        img.className = 'player-sprite';
+        img.alt = player.name;
+        playerArea.appendChild(img);
+      });
+    }
+
+    function populateTurnOrder() {
+      const list = document.getElementById('turnOrderList');
+      list.innerHTML = '';
+
+      // Combine players and enemies, sort by speed
+      const allCombatants = [
+        ...selectedTeam.map(u => ({ ...u, isPlayer: true })),
+        ...currentEnemies.map(e => ({ ...e, isPlayer: false }))
+      ].sort((a, b) => b.speed - a.speed);
+
+      allCombatants.forEach((unit, index) => {
+        const div = document.createElement('div');
+        div.className = `turn-order-item ${unit.isPlayer ? 'player' : 'enemy'} ${index === 0 ? 'current' : ''}`;
+        div.innerHTML = `
+          <span class="turn-number">${index + 1}</span>
+          <span>${unit.name}</span>
+          <span style="color: #888; font-size: 0.7rem;">(${unit.speed})</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // ==================== INIT ====================
+    populateRoster();
+    updateTeamSlots();
+  </script>
+</body>
+</html>

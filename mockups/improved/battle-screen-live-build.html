@@ -512,42 +512,6 @@
       enemySprite.title = allEnemies[newIndex].name;
     }
 
-    // Function to create HP/MP bars for a unit
-    function createHPMPBar(currentHP, maxHP, currentMP, maxMP, name) {
-      const container = document.createElement('div');
-      container.className = 'unit-hp-mp';
-
-      // HP text
-      const hpText = document.createElement('div');
-      hpText.className = 'hp-text';
-      hpText.textContent = `${currentHP}/${maxHP}`;
-
-      // HP bar
-      const hpBar = document.createElement('div');
-      hpBar.className = 'hp-bar';
-      const hpFill = document.createElement('div');
-      hpFill.className = 'hp-fill';
-      const hpPercent = (currentHP / maxHP) * 100;
-      if (hpPercent <= 25) hpFill.classList.add('critical');
-      else if (hpPercent <= 50) hpFill.classList.add('low');
-      hpFill.style.width = hpPercent + '%';
-      hpBar.appendChild(hpFill);
-
-      // MP bar
-      const mpBar = document.createElement('div');
-      mpBar.className = 'mp-bar';
-      const mpFill = document.createElement('div');
-      mpFill.className = 'mp-fill';
-      mpFill.style.width = (currentMP / maxMP) * 100 + '%';
-      mpBar.appendChild(mpFill);
-
-      container.appendChild(hpText);
-      container.appendChild(hpBar);
-      container.appendChild(mpBar);
-
-      return container;
-    }
-
     // Auto-populate sprites
     function populateBattle() {
       // Add enemies with controls
@@ -563,10 +527,6 @@
         leftBtn.innerHTML = '←';
         leftBtn.onclick = () => cycleEnemy(slot, 'prev');
 
-        // Create wrapper for sprite with HP/MP
-        const spriteWrapper = document.createElement('div');
-        spriteWrapper.style.position = 'relative';
-
         // Add enemy sprite
         const img = document.createElement('img');
         img.id = `enemy-${slot}`;
@@ -575,63 +535,28 @@
         img.alt = allEnemies[index].name;
         img.title = allEnemies[index].name;
 
-        // Add HP/MP bars for enemies
-        const enemyHP = 45 + Math.floor(Math.random() * 30);
-        const hpmpBar = createHPMPBar(enemyHP, 75, 20, 30, allEnemies[index].name);
-
-        spriteWrapper.appendChild(hpmpBar);
-        spriteWrapper.appendChild(img);
-
         // Add right arrow button
         const rightBtn = document.createElement('button');
         rightBtn.className = 'arrow-btn';
         rightBtn.innerHTML = '→';
         rightBtn.onclick = () => cycleEnemy(slot, 'next');
 
-        // Append in order: left arrow, sprite wrapper, right arrow
+        // Append in order: left arrow, sprite, right arrow
         container.appendChild(leftBtn);
-        container.appendChild(spriteWrapper);
+        container.appendChild(img);
         container.appendChild(rightBtn);
         enemyArea.appendChild(container);
       });
 
-      // Add players with HP/MP bars
+      // Add players
       const playerArea = document.getElementById('playerArea');
-      const playerStats = [
-        { hp: 85, maxHp: 100, mp: 25, maxMp: 40 },
-        { hp: 110, maxHp: 120, mp: 15, maxMp: 30 },
-        { hp: 65, maxHp: 80, mp: 45, maxMp: 50 },
-        { hp: 70, maxHp: 85, mp: 55, maxMp: 60 }
-      ];
-
       players.forEach((player, i) => {
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.className = 'player-sprite-wrapper';
-        wrapper.style.position = 'absolute';
-
-        // Apply the same positioning as player sprites
-        const positions = [
-          { left: '0px', bottom: '0' },
-          { left: '60px', bottom: '15px' },
-          { left: '120px', bottom: '30px' },
-          { left: '180px', bottom: '45px' }
-        ];
-        Object.assign(wrapper.style, positions[i]);
-
         const img = document.createElement('img');
         img.src = player.sprite;
         img.className = 'player-sprite';
-        img.style.position = 'relative';
         img.alt = player.name;
         img.title = player.name;
-
-        const stats = playerStats[i];
-        const hpmpBar = createHPMPBar(stats.hp, stats.maxHp, stats.mp, stats.maxMp, player.name);
-
-        wrapper.appendChild(hpmpBar);
-        wrapper.appendChild(img);
-        playerArea.appendChild(wrapper);
+        playerArea.appendChild(img);
       });
     }
 
