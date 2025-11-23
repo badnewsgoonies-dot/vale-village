@@ -163,7 +163,7 @@ When asking Claude to make changes, keep these principles in mind:
 ### ✅ Do's
 - **Be Specific**: "I want to add a Venus-element mage unit" vs "Add a unit"
 - **Share Context**: Attach relevant files and CLAUDE.md
-- **Reference Docs**: Mention specific docs like "according to NAMING_CONVENTIONS.md"
+- **Reference Docs**: Mention specific docs like "according to docs/NAMING_CONVENTIONS.md"
 - **Test Iteratively**: Ask Claude to help write tests first
 - **Follow Patterns**: Ask Claude to follow existing code patterns
 
