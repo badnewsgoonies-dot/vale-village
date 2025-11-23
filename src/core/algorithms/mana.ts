@@ -6,6 +6,7 @@
 import type { Team } from '../models/Team';
 import type { QueuedAction } from '../models/BattleState';
 import type { Ability } from '../../data/schemas/AbilitySchema';
+import { calculateTeamManaPool } from '../models/BattleState';
 
 /**
  * Calculate total team mana pool from unit contributions

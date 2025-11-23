@@ -8,6 +8,7 @@ import type { Unit } from '../models/Unit';
 import type { BattleState } from '../models/BattleState';
 import type { Team } from '../models/Team';
 import type { Ability } from '../../data/schemas/AbilitySchema';
+import type { StatusEffect } from '../../data/schemas/UnitSchema';
 import type { PRNG } from '../random/prng';
 import { createBattleState, updateBattleState } from '../models/BattleState';
 import { isUnitKO } from '../models/Unit';
@@ -29,6 +30,12 @@ import {
 import { resolveTargets, filterValidTargets } from '../algorithms/targeting';
 import { BATTLE_CONSTANTS } from '../constants';
 import type { BattleEvent } from './types';
+
+const REMOVABLE_STATUS_TYPES = ['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'] as const;
+type RemovableStatusType = (typeof REMOVABLE_STATUS_TYPES)[number];
+
+const isRemovableStatusType = (type: StatusEffect['type']): type is RemovableStatusType =>
+  (REMOVABLE_STATUS_TYPES as readonly string[]).includes(type);
 
 /**
  * Action result for executing abilities
@@ -319,9 +326,14 @@ function applyPhase2Effects(
         filteredStatuses = filteredStatuses.filter(s => !isNegativeStatus(s));
       } else if (removeSpec.type === 'byType') {
         // Remove specific status types
-        const typesToRemove = removeSpec.statuses;
-        // Type assertion is safe here as we know s.type matches StatusEffect union types
-        filteredStatuses = filteredStatuses.filter(s => !typesToRemove.includes(s.type as 'buff' | 'debuff' | 'poison' | 'burn' | 'freeze' | 'paralyze' | 'stun' | 'healOverTime' | 'elementResistance'));
+        const typesToRemove = new Set<RemovableStatusType>(removeSpec.statuses);
+        filteredStatuses = filteredStatuses.filter(status => {
+          if (!isRemovableStatusType(status.type)) {
+            return true;
+          }
+
+          return !typesToRemove.has(status.type);
+        });
       }
 
       modifiedTarget = {

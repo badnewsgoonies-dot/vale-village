@@ -34,13 +34,13 @@ class Logger {
 
     // In development, log to console
     if (this.isDevelopment) {
-      const consoleMethod = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log';
-      const prefix = this.context ? `[${this.context}]` : '';
-      
-      if (data !== undefined) {
-        console[consoleMethod](`${prefix} ${message}`, data);
+      const consoleMethod = entry.level === 'error' ? 'error' : entry.level === 'warn' ? 'warn' : 'log';
+      const prefix = entry.context ? `[${entry.context}]` : '';
+
+      if (entry.data !== undefined) {
+        console[consoleMethod](`${prefix} ${entry.message}`, entry.data);
       } else {
-        console[consoleMethod](`${prefix} ${message}`);
+        console[consoleMethod](`${prefix} ${entry.message}`);
       }
     }
 
