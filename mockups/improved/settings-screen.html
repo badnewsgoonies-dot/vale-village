@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Vale Chronicles - Settings</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a0a00 0%, #2a1a0a 100%);
+      color: #f8f8f0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Settings Container */
+    .settings-container {
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 3px solid #8b6a4a;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    /* Header */
+    .settings-header {
+      background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+      border-bottom: 2px solid #6a5a4a;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .settings-title {
+      font-size: 1.8rem;
+      color: #FFD87F;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      border-color: #FFD87F;
+      color: #FFD87F;
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      background: #2a1a0a;
+      border-bottom: 2px solid #4a3a2a;
+      padding: 0 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 1rem 1.5rem;
+      color: #a8a8a0;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      color: #e8d8c8;
+    }
+
+    .tab-btn.active {
+      color: #FFD87F;
+      border-bottom-color: #FFD87F;
+    }
+
+    /* Content Area */
+    .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Settings Groups */
+    .settings-group {
+      margin-bottom: 2rem;
+    }
+
+    .group-title {
+      color: #FFD87F;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #4a3a2a;
+    }
+
+    /* Setting Item */
+    .setting-item {
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-label {
+      font-size: 1.1rem;
+      color: #e8d8c8;
+      margin-bottom: 0.3rem;
+    }
+
+    .setting-description {
+      font-size: 0.85rem;
+      color: #8a7a6a;
+    }
+
+    /* Controls */
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 200px;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 150px;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, #6a5a4a 0%, #6a5a4a var(--value), #3a2a1a var(--value), #3a2a1a 100%);
+      outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFD87F;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFD87F;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .slider-value {
+      min-width: 40px;
+      text-align: center;
+      color: #FFD87F;
+      font-weight: bold;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #3a2a1a;
+      transition: .4s;
+      border-radius: 30px;
+      border: 2px solid #6a5a4a;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #e8d8c8;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #4a7a2a;
+      border-color: #FFD87F;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(30px);
+      background-color: #FFD87F;
+    }
+
+    .select-dropdown {
+      background: #3a2a1a;
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      min-width: 150px;
+      font-size: 1rem;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .button-option {
+      background: #3a2a1a;
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #a8a8a0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .button-option:hover {
+      border-color: #8b7a6a;
+      color: #e8d8c8;
+    }
+
+    .button-option.selected {
+      background: linear-gradient(180deg, #FFD87F, #f3c866);
+      border-color: #FFD87F;
+      color: #1a0a00;
+    }
+
+    /* Key Bindings */
+    .keybind-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .keybind-item {
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .keybind-action {
+      color: #e8d8c8;
+    }
+
+    .keybind-key {
+      background: #2a1a0a;
+      border: 2px solid #6a5a4a;
+      border-radius: 4px;
+      padding: 0.3rem 0.8rem;
+      color: #FFD87F;
+      font-family: monospace;
+      font-weight: bold;
+      cursor: pointer;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .keybind-key:hover {
+      border-color: #FFD87F;
+    }
+
+    /* Footer */
+    .settings-footer {
+      background: #2a1a0a;
+      border-top: 2px solid #4a3a2a;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-info {
+      color: #8a7a6a;
+      font-size: 0.9rem;
+    }
+
+    .footer-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .footer-btn {
+      background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #6a5a4a;
+      border-radius: 6px;
+      padding: 0.75rem 1.5rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+
+    .footer-btn:hover {
+      border-color: #8b7a6a;
+    }
+
+    .footer-btn.primary {
+      background: linear-gradient(180deg, #FFD87F, #f3c866);
+      border-color: #FFD87F;
+      color: #1a0a00;
+      font-weight: bold;
+    }
+
+    .footer-btn.primary:hover {
+      background: linear-gradient(180deg, #ffe8a0, #FFD87F);
+      box-shadow: 0 4px 12px rgba(255,216,127,0.4);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .settings-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      .tab-nav {
+        overflow-x: auto;
+      }
+
+      .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .slider-container {
+        width: 100%;
+      }
+
+      .keybind-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <div class="settings-header">
+      <h1 class="settings-title">
+        <span>⚙️</span>
+        <span>Settings</span>
+      </h1>
+      <button class="close-btn">✕</button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="audio">
+        <span>🔊</span>
+        <span>Audio</span>
+      </button>
+      <button class="tab-btn" data-tab="display">
+        <span>🖥️</span>
+        <span>Display</span>
+      </button>
+      <button class="tab-btn" data-tab="controls">
+        <span>⌨️</span>
+        <span>Controls</span>
+      </button>
+      <button class="tab-btn" data-tab="gameplay">
+        <span>🎮</span>
+        <span>Gameplay</span>
+      </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="settings-content">
+      <!-- Audio Tab -->
+      <div class="tab-panel active" id="audio">
+        <div class="settings-group">
+          <h2 class="group-title">🔊 Volume Settings</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Master Volume</div>
+              <div class="setting-description">Controls overall game volume</div>
+            </div>
+            <div class="slider-container">
+              <input type="range" class="slider" min="0" max="100" value="70" id="master-volume">
+              <span class="slider-value">70%</span>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Music Volume</div>
+              <div class="setting-description">Background music and themes</div>
+            </div>
+            <div class="slider-container">
+              <input type="range" class="slider" min="0" max="100" value="60" id="music-volume">
+              <span class="slider-value">60%</span>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Sound Effects</div>
+              <div class="setting-description">Battle sounds, UI feedback</div>
+            </div>
+            <div class="slider-container">
+              <input type="range" class="slider" min="0" max="100" value="80" id="sfx-volume">
+              <span class="slider-value">80%</span>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Dialogue Voice</div>
+              <div class="setting-description">Character voice lines (if available)</div>
+            </div>
+            <div class="slider-container">
+              <input type="range" class="slider" min="0" max="100" value="75" id="voice-volume">
+              <span class="slider-value">75%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2 class="group-title">🎵 Audio Options</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Battle Music</div>
+              <div class="setting-description">Play music during battles</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">UI Sound Effects</div>
+              <div class="setting-description">Menu clicks and navigation sounds</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Display Tab -->
+      <div class="tab-panel" id="display">
+        <div class="settings-group">
+          <h2 class="group-title">🖥️ Display Options</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Display Mode</div>
+              <div class="setting-description">Choose between windowed or fullscreen</div>
+            </div>
+            <div class="button-group">
+              <button class="button-option selected">Windowed</button>
+              <button class="button-option">Fullscreen</button>
+              <button class="button-option">Borderless</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Resolution</div>
+              <div class="setting-description">Game display resolution</div>
+            </div>
+            <select class="select-dropdown">
+              <option>1280 × 720</option>
+              <option selected>1920 × 1080</option>
+              <option>2560 × 1440</option>
+              <option>3840 × 2160</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">UI Scale</div>
+              <div class="setting-description">Adjust interface element size</div>
+            </div>
+            <div class="slider-container">
+              <input type="range" class="slider" min="50" max="150" value="100" step="10" id="ui-scale">
+              <span class="slider-value">100%</span>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Text Size</div>
+              <div class="setting-description">Dialogue and menu text size</div>
+            </div>
+            <div class="button-group">
+              <button class="button-option">Small</button>
+              <button class="button-option selected">Normal</button>
+              <button class="button-option">Large</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2 class="group-title">✨ Visual Effects</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Battle Animations</div>
+              <div class="setting-description">Show ability animations in combat</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Screen Shake</div>
+              <div class="setting-description">Camera shake on critical hits</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Tab -->
+      <div class="tab-panel" id="controls">
+        <div class="settings-group">
+          <h2 class="group-title">⌨️ Keyboard Bindings</h2>
+
+          <div class="keybind-grid">
+            <div class="keybind-item">
+              <span class="keybind-action">Move Up</span>
+              <span class="keybind-key">↑ / W</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Move Down</span>
+              <span class="keybind-key">↓ / S</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Move Left</span>
+              <span class="keybind-key">← / A</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Move Right</span>
+              <span class="keybind-key">→ / D</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Confirm</span>
+              <span class="keybind-key">Enter</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Cancel</span>
+              <span class="keybind-key">ESC</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Pause Menu</span>
+              <span class="keybind-key">ESC</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Team Management</span>
+              <span class="keybind-key">T</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Inventory</span>
+              <span class="keybind-key">I</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Djinn Menu</span>
+              <span class="keybind-key">D</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Quick Save</span>
+              <span class="keybind-key">F5</span>
+            </div>
+            <div class="keybind-item">
+              <span class="keybind-action">Quick Load</span>
+              <span class="keybind-key">F9</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2 class="group-title">🎮 Controller Support</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Enable Controller</div>
+              <div class="setting-description">Use gamepad for controls</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Controller Type</div>
+              <div class="setting-description">Select your controller layout</div>
+            </div>
+            <select class="select-dropdown">
+              <option>Xbox Controller</option>
+              <option>PlayStation Controller</option>
+              <option>Generic Gamepad</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gameplay Tab -->
+      <div class="tab-panel" id="gameplay">
+        <div class="settings-group">
+          <h2 class="group-title">⚔️ Battle Settings</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Battle Speed</div>
+              <div class="setting-description">Animation and text speed in combat</div>
+            </div>
+            <div class="button-group">
+              <button class="button-option">Slow</button>
+              <button class="button-option selected">Normal</button>
+              <button class="button-option">Fast</button>
+              <button class="button-option">Ultra</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Auto-Battle</div>
+              <div class="setting-description">Allow AI to control party members</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Show Damage Numbers</div>
+              <div class="setting-description">Display damage values in combat</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Battle Tooltips</div>
+              <div class="setting-description">Show ability descriptions on hover</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2 class="group-title">🎯 Difficulty</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Game Difficulty</div>
+              <div class="setting-description">Affects enemy stats and AI behavior</div>
+            </div>
+            <div class="button-group">
+              <button class="button-option">Easy</button>
+              <button class="button-option selected">Normal</button>
+              <button class="button-option">Hard</button>
+              <button class="button-option">Nightmare</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Permadeath</div>
+              <div class="setting-description">Units lost in battle are gone forever</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2 class="group-title">💾 Save Options</h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Auto-Save</div>
+              <div class="setting-description">Automatically save progress</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Auto-Save Interval</div>
+              <div class="setting-description">How often to auto-save</div>
+            </div>
+            <select class="select-dropdown">
+              <option>Every 5 minutes</option>
+              <option selected>Every 10 minutes</option>
+              <option>Every 15 minutes</option>
+              <option>After each battle</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="settings-footer">
+      <div class="footer-info">
+        Settings are saved automatically
+      </div>
+      <div class="footer-buttons">
+        <button class="footer-btn">Reset to Default</button>
+        <button class="footer-btn primary">Apply & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+
+        // Update tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update panels
+        panels.forEach(p => p.classList.remove('active'));
+        document.getElementById(targetTab).classList.add('active');
+      });
+    });
+
+    // Slider updates
+    document.querySelectorAll('.slider').forEach(slider => {
+      const updateSlider = () => {
+        const value = slider.value;
+        const max = slider.max || 100;
+        const percentage = (value / max) * 100;
+        slider.style.setProperty('--value', percentage + '%');
+
+        const valueDisplay = slider.nextElementSibling;
+        if (valueDisplay) {
+          valueDisplay.textContent = value + '%';
+        }
+      };
+
+      slider.addEventListener('input', updateSlider);
+      updateSlider();
+    });
+
+    // Button groups
+    document.querySelectorAll('.button-group').forEach(group => {
+      const buttons = group.querySelectorAll('.button-option');
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('selected'));
+          button.classList.add('selected');
+        });
+      });
+    });
+
+    // Close button
+    document.querySelector('.close-btn').addEventListener('click', () => {
+      console.log('Close settings');
+    });
+
+    // Apply button
+    document.querySelector('.footer-btn.primary').addEventListener('click', () => {
+      console.log('Apply settings and close');
+    });
+
+    // Reset button
+    document.querySelector('.footer-btn:not(.primary)').addEventListener('click', () => {
+      console.log('Reset to defaults');
+    });
+  </script>
+</body>
+</html>
