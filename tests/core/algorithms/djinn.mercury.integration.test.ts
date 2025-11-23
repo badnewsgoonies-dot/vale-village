@@ -8,19 +8,16 @@ import { FIZZ_HEALING_WAVE } from '../../../src/data/definitions/djinnAbilities'
 import { makePRNG } from '../../../src/core/random/prng';
 import { performAction } from '../../../src/core/services/BattleService';
 import { createBattleState } from '../../../src/core/models/BattleState';
+import { collectDjinn, equipDjinn } from '../../../src/core/services/DjinnService';
+import { getDjinnGrantedAbilitiesForUnit } from '@/core/algorithms/djinnAbilities';
 
 describe('Mercury Djinn Phase 2 Integration', () => {
   test('Healing Wave heals, cleanses negatives, and grants temporary immunity via executeAbility', () => {
     const caster = createUnit(UNIT_DEFINITIONS.mystic, 1);
+    expect(caster.id).toBe('mystic');
     const rawAllyA = createUnit(UNIT_DEFINITIONS.adept, 1);
     const rawAllyB = createUnit(UNIT_DEFINITIONS.ranger, 1);
     const filler = createUnit(UNIT_DEFINITIONS['war-mage'], 1);
-
-    // Add ability to caster
-    const casterWithAbility: Unit = {
-      ...caster,
-      abilities: [...caster.abilities, FIZZ_HEALING_WAVE],
-    };
 
     const allyA: Unit = {
       ...rawAllyA,
@@ -42,15 +39,26 @@ describe('Mercury Djinn Phase 2 Integration', () => {
       ],
     };
 
-    const team = createTeam([casterWithAbility, allyA, allyB, filler]);
+    let team = createTeam([caster, allyA, allyB, filler]);
+    const collected = collectDjinn(team, 'fizz');
+    expect(collected.ok).toBe(true);
+    team = collected.value;
+    const equipped = equipDjinn(team, 'fizz');
+    expect(equipped.ok).toBe(true);
+    team = equipped.value;
+    const granted = getDjinnGrantedAbilitiesForUnit(caster, team);
+    expect(granted).toContain(FIZZ_HEALING_WAVE.id);
     const enemies = [createUnit(UNIT_DEFINITIONS.sentinel, 1)];
     const battleState = createBattleState(team, enemies);
+    const casterInBattle = battleState.playerTeam.units.find(u => u.id === caster.id);
+    expect(casterInBattle).toBeDefined();
+    expect(casterInBattle?.abilities.some(ability => ability.id === FIZZ_HEALING_WAVE.id)).toBe(true);
     const rng = makePRNG(42);
 
     // Execute ability through performAction (which calls executeAbility internally)
     const { result } = performAction(
       battleState,
-      casterWithAbility.id,
+      caster.id,
       FIZZ_HEALING_WAVE.id,
       [allyA.id, allyB.id],
       rng

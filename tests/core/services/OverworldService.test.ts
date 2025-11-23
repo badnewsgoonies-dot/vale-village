@@ -6,7 +6,7 @@ describe('OverworldService', () => {
   const map = MAPS['vale-village'];
 
   test('allows movement on walkable tiles', () => {
-    const start = { x: 15, y: 10 };
+    const start = { x: 15, y: 2 };
     const result = processMovement(map, start, 'up');
     expect(result.blocked).toBe(false);
     expect(result.newPos.y).toBe(start.y - 1);
@@ -20,7 +20,7 @@ describe('OverworldService', () => {
   });
 
   test('returns battle trigger when stepping on battle tile', () => {
-    const source = { x: 6, y: 10 };
+    const source = { x: 5, y: 2 };
     const result = processMovement(map, source, 'right');
     expect(result.blocked).toBe(false);
     expect(result.trigger).toBeDefined();

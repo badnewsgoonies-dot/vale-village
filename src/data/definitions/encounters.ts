@@ -161,7 +161,7 @@ export const HOUSE_07: Encounter = {
     djinn: 'breeze', // Jupiter T1 Djinn - SUMMONS UNLOCK!
     equipment: {
       type: 'choice',
-      options: ['steel-sword', 'battle-axe'],
+      options: ['steel-sword', 'battle-axe', 'crystal-rod'],
     },
   },
 };

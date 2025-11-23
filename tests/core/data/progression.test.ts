@@ -34,7 +34,7 @@ describe('House progression snapshot (locked blueprint)', () => {
     'house-07': {
       xp: 150,
       gold: 40,
-      equipment: { type: 'choice', options: ['steel-sword', 'battle-axe'] },
+      equipment: { type: 'choice', options: ['steel-sword', 'battle-axe', 'crystal-rod'] },
       djinn: 'breeze',
     },
     'house-08': {

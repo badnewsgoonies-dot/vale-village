@@ -576,7 +576,7 @@ export const FIZZ: Djinn = {
       neutral: ['fizz-aqua-pulse'],
     },
     mystic: {
-      same: ['fizz-ice-shard', 'fizz-wave-shield'],
+      same: ['fizz-healing-wave', 'fizz-wave-shield'],
       counter: [],
       neutral: ['fizz-aqua-pulse'],
     },
@@ -931,6 +931,26 @@ export const NOVA: Djinn = {
       same: ['granite-earth-wall'],
       counter: [],
       neutral: ['flint-ground-shield'],
+    },
+    sentinel: {
+      same: ['granite-earth-wall', 'granite-terra-break'],
+      counter: ['flame-wall'],
+      neutral: ['flint-ground-shield'],
+    },
+    mystic: {
+      same: ['fizz-healing-wave', 'fizz-aqua-heal'],
+      counter: ['flame-wall'],
+      neutral: ['fizz-wave-shield'],
+    },
+    ranger: {
+      same: ['breeze-gale-force', 'breeze-wind-veil'],
+      counter: ['flame-wall'],
+      neutral: ['breeze-eddy-pulse'],
+    },
+    stormcaller: {
+      same: ['breeze-gale-force', 'breeze-wind-veil'],
+      counter: ['flame-wall'],
+      neutral: ['breeze-eddy-pulse'],
     },
   },
   availableIn: ['tower'],

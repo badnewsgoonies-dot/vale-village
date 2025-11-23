@@ -104,8 +104,12 @@ export function getDjinnGrantedAbilitiesForUnit(unit: Unit, team: Team): string[
 export function mergeDjinnAbilitiesIntoUnit(unit: Unit, team: Team): Unit {
   const abilityIds = getDjinnGrantedAbilitiesForUnit(unit, team);
   const existingIds = new Set(unit.abilities.map((ability) => ability.id));
-  const baseAbilities = unit.abilities.filter((ability) => !DJINN_ABILITIES[ability.id]);
-  const baseUnlocked = unit.unlockedAbilityIds.filter((id) => !DJINN_ABILITIES[id]);
+  const baseAbilities = unit.abilities.filter(
+    ability => !DJINN_ABILITIES[ability.id] || abilityIds.includes(ability.id)
+  );
+  const baseUnlocked = unit.unlockedAbilityIds.filter(
+    id => !DJINN_ABILITIES[id] || abilityIds.includes(id)
+  );
 
   const djinnAbilities = abilityIds
     .map((id) => DJINN_ABILITIES[id])
