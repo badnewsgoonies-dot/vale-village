@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=0.5, maximum-scale=2, user-scalable=yes">
+  <title>Battle Screen - All Actions Queued (Ready to Execute)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a0a00;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8f8f0;
+      overflow: auto;
+      min-height: 100vh;
+    }
+
+    .battle-screen {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      position: relative;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      grid-column: 1 / -1;
+      background: #3a2a1a;
+      border-bottom: 2px solid #8b6a4a;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .mana-bar { display: flex; gap: 0.5rem; align-items: center; }
+    .mana-label { font-size: 0.9rem; color: #FFD87F; font-weight: bold; }
+    .mana-circles { display: flex; gap: 0.25rem; }
+    .mana-circle {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid #8b6a4a; background: #2a1a0a;
+    }
+    .mana-circle.filled {
+      background: #ffd87f; border-color: #f3c866;
+      box-shadow: 0 0 8px rgba(255, 216, 127, 0.6);
+    }
+    .mana-circle.pending {
+      background: #ffd87f; border-color: #f3c866;
+      opacity: 0.5;
+      animation: pulse-mana 1s infinite;
+    }
+    @keyframes pulse-mana {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.8; }
+    }
+
+    .mana-info {
+      margin-left: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .mana-current { color: #fff; }
+    .mana-queued { color: #ffa726; }
+
+    .djinn-menu { display: flex; gap: 0.5rem; align-items: center; }
+    .djinn-label { font-size: 0.9rem; color: #FFD87F; }
+    .djinn-icons-container { display: flex; gap: 0.5rem; }
+    .djinn-icon {
+      width: 32px; height: 32px; border-radius: 4px;
+      border: 2px solid #8b6a4a; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .djinn-icon img {
+      width: 100%; height: 100%; object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    /* Left Panel: Portraits */
+    .portrait-panel {
+      background: #2a1a0a;
+      border-right: 2px solid #6a5a4a;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .portrait-card {
+      background: transparent;
+      padding: 0.5rem;
+      position: relative;
+      width: 100%;
+    }
+    .portrait-card.queued {
+      background: rgba(76, 175, 80, 0.1);
+      border-left: 3px solid #4CAF50;
+    }
+    .portrait-card.queued::after {
+      content: '✓';
+      position: absolute;
+      top: 0.5rem; right: 0.5rem;
+      color: #4CAF50;
+      font-size: 1.2rem; font-weight: bold;
+    }
+
+    .portrait-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .portrait-img {
+      width: 64px; height: 64px;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .portrait-img img {
+      width: 100%; height: 100%; object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .portrait-info { flex: 1; }
+    .portrait-name { font-weight: bold; font-size: 1rem; color: #fff; }
+    .portrait-meta { font-size: 0.85rem; color: #aaa; margin-top: 0.25rem; }
+
+    .queued-action {
+      font-size: 0.75rem;
+      color: #66bb6a;
+      margin-top: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background: rgba(76, 175, 80, 0.15);
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .hp-bar-container { margin-top: 0.5rem; }
+    .hp-bar {
+      width: 100%; height: 12px;
+      background: #2a1a0a;
+      border: 1px solid #6a5a4a;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #66bb6a);
+    }
+    .hp-bar-fill.medium { background: linear-gradient(90deg, #ffa726, #ffb74d); }
+    .hp-bar-fill.low {
+      background: linear-gradient(90deg, #ef5350, #e57373);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .hp-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.7rem; color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      font-weight: bold;
+    }
+
+    /* Battlefield */
+    .battlefield {
+      background: linear-gradient(180deg, #3a2a1a 0%, #2a1a0a 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem;
+    }
+
+    .battlefield-background {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+      z-index: 0;
+      image-rendering: pixelated;
+    }
+
+    .enemy-area, .player-area { position: relative; z-index: 1; }
+
+    .enemy-area {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 2rem;
+      padding-top: 2rem;
+    }
+
+    .enemy-card {
+      background: transparent;
+      padding: 1rem;
+      min-width: 120px;
+      text-align: center;
+      position: relative;
+    }
+
+    .enemy-number {
+      position: absolute;
+      top: -0.5rem; left: -0.5rem;
+      width: 24px; height: 24px;
+      background: #FFA500;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.9rem; color: #000;
+    }
+
+    .enemy-sprite {
+      width: 80px; height: 80px;
+      margin: 0 auto 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .enemy-sprite img {
+      width: 100%; height: 100%; object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .enemy-name { font-weight: bold; color: #fff; font-size: 0.9rem; }
+
+    /* Target indicators on enemies */
+    .enemy-targeted {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #ffa726;
+      white-space: nowrap;
+      padding: 0.25rem 0.5rem;
+      background: rgba(255, 167, 38, 0.2);
+      border-radius: 4px;
+      border: 1px solid #ffa726;
+    }
+
+    .player-area {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .player-card {
+      background: transparent;
+      padding: 0.5rem;
+      min-width: 100px;
+      text-align: center;
+      position: relative;
+    }
+    .player-card:nth-child(1) { transform: translateY(-15px); }
+    .player-card:nth-child(2) { transform: translateY(0px); }
+    .player-card:nth-child(3) { transform: translateY(-10px); }
+    .player-card:nth-child(4) { transform: translateY(5px); }
+
+    .player-sprite {
+      width: 96px; height: 96px;
+      margin: 0 auto 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .player-sprite img {
+      width: 100%; height: 100%; object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .player-name { font-weight: bold; color: #fff; font-size: 0.9rem; }
+
+    /* Bottom Panel */
+    .bottom-panel {
+      grid-column: 1 / -1;
+      background: #3a2a1a;
+      border-top: 2px solid #8b6a4a;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* Action Queue Summary */
+    .queue-summary {
+      flex: 1;
+      background: #2a1a0a;
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .queue-header {
+      font-size: 1rem;
+      color: #66bb6a;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .queue-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 4px;
+      border-left: 3px solid #4CAF50;
+    }
+
+    .queue-number {
+      width: 24px; height: 24px;
+      background: #4CAF50;
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    .queue-unit { color: #fff; font-weight: bold; min-width: 60px; }
+    .queue-arrow { color: #666; }
+    .queue-ability { color: #ffd87f; }
+    .queue-target { color: #aaa; }
+    .queue-cost { color: #64b5f6; font-size: 0.85rem; }
+
+    /* Execute Panel */
+    .execute-panel {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+    }
+
+    .execute-ready {
+      font-size: 1rem;
+      color: #66bb6a;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .execute-cost {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 1rem;
+    }
+
+    .execute-btn {
+      padding: 1rem 2.5rem;
+      background: linear-gradient(180deg, #66bb6a 0%, #4CAF50 100%);
+      border: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+      animation: ready-pulse 1.5s infinite;
+    }
+
+    @keyframes ready-pulse {
+      0%, 100% { box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
+      50% { box-shadow: 0 4px 25px rgba(76, 175, 80, 0.7); }
+    }
+
+    .execute-btn:hover {
+      background: linear-gradient(180deg, #81c784 0%, #66bb6a 100%);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-screen">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="mana-bar">
+        <span class="mana-label">💠 MANA:</span>
+        <div class="mana-circles">
+          <div class="mana-circle filled"></div>
+          <div class="mana-circle pending"></div>
+          <div class="mana-circle pending"></div>
+          <div class="mana-circle pending"></div>
+          <div class="mana-circle"></div>
+        </div>
+        <div class="mana-info">
+          <span class="mana-current">5/5</span>
+          <span class="mana-queued">→ 1 after round</span>
+        </div>
+      </div>
+      <div class="djinn-menu">
+        <span class="djinn-label">DJINN:</span>
+        <div class="djinn-icons-container">
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+          <div class="djinn-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="Djinn" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Panel: Portraits (all queued) -->
+    <div class="portrait-panel">
+      <div class="portrait-card queued">
+        <div class="portrait-header">
+          <div class="portrait-img"><img src="./sprites/icons/characters/Isaac1.gif" alt="Isaac" /></div>
+          <div class="portrait-info">
+            <div class="portrait-name">Isaac</div>
+            <div class="portrait-meta">Lv 5 | Venus</div>
+            <div class="queued-action">🌍 Quake → All [2○]</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 80%"></div>
+            <div class="hp-text">80/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card queued">
+        <div class="portrait-header">
+          <div class="portrait-img"><img src="./sprites/icons/characters/Garet1.gif" alt="Garet" /></div>
+          <div class="portrait-info">
+            <div class="portrait-name">Garet</div>
+            <div class="portrait-meta">Lv 5 | Mars</div>
+            <div class="queued-action">🔥 Fireball → Goblin B [2○]</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 100%"></div>
+            <div class="hp-text">100/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card queued">
+        <div class="portrait-header">
+          <div class="portrait-img"><img src="./sprites/icons/characters/Mia.gif" alt="Mia" /></div>
+          <div class="portrait-info">
+            <div class="portrait-name">Mia</div>
+            <div class="portrait-meta">Lv 4 | Mercury</div>
+            <div class="queued-action">💚 Heal → Ivan [1○]</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill medium" style="width: 75%"></div>
+            <div class="hp-text">75/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card queued">
+        <div class="portrait-header">
+          <div class="portrait-img"><img src="./sprites/icons/characters/Ivan.gif" alt="Ivan" /></div>
+          <div class="portrait-info">
+            <div class="portrait-name">Ivan</div>
+            <div class="portrait-meta">Lv 4 | Jupiter</div>
+            <div class="queued-action">⚔️ Attack → Goblin C [0○]</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill low" style="width: 40%"></div>
+            <div class="hp-text">40/100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Battlefield -->
+    <div class="battlefield">
+      <img src="./sprites/backgrounds/gs1/World_Map_Shore.gif" alt="Battle background" class="battlefield-background" />
+      <div class="enemy-area">
+        <div class="enemy-card">
+          <div class="enemy-number">1</div>
+          <div class="enemy-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+          <div class="enemy-name">Goblin A</div>
+          <div class="enemy-targeted">← Quake (AoE)</div>
+        </div>
+        <div class="enemy-card">
+          <div class="enemy-number">2</div>
+          <div class="enemy-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+          <div class="enemy-name">Goblin B</div>
+          <div class="enemy-targeted">← Quake, Fireball</div>
+        </div>
+        <div class="enemy-card">
+          <div class="enemy-number">3</div>
+          <div class="enemy-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+          <div class="enemy-name">Goblin C</div>
+          <div class="enemy-targeted">← Quake, Attack</div>
+        </div>
+      </div>
+
+      <div class="player-area">
+        <div class="player-card">
+          <div class="player-sprite"><img src="./sprites/battle/party/isaac/Isaac_lBlade_Back.gif" alt="Isaac" /></div>
+          <div class="player-name">Isaac</div>
+        </div>
+        <div class="player-card">
+          <div class="player-sprite"><img src="./sprites/battle/party/garet/Garet_lSword_Back.gif" alt="Garet" /></div>
+          <div class="player-name">Garet</div>
+        </div>
+        <div class="player-card">
+          <div class="player-sprite"><img src="./sprites/battle/party/mia/Mia_Staff_Back.gif" alt="Mia" /></div>
+          <div class="player-name">Mia</div>
+        </div>
+        <div class="player-card">
+          <div class="player-sprite"><img src="./sprites/battle/party/ivan/Ivan_lBlade_Back.gif" alt="Ivan" /></div>
+          <div class="player-name">Ivan</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Panel: Queue Summary + Execute -->
+    <div class="bottom-panel">
+      <div class="queue-summary">
+        <div class="queue-header">✓ ALL ACTIONS QUEUED (4/4)</div>
+        <div class="queue-list">
+          <div class="queue-entry">
+            <div class="queue-number">1</div>
+            <span class="queue-unit">Isaac</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-ability">🌍 Quake</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-target">All Enemies</span>
+            <span class="queue-cost">[2○]</span>
+          </div>
+          <div class="queue-entry">
+            <div class="queue-number">2</div>
+            <span class="queue-unit">Garet</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-ability">🔥 Fireball</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-target">Goblin B</span>
+            <span class="queue-cost">[2○]</span>
+          </div>
+          <div class="queue-entry">
+            <div class="queue-number">3</div>
+            <span class="queue-unit">Mia</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-ability">💚 Heal</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-target">Ivan</span>
+            <span class="queue-cost">[1○]</span>
+          </div>
+          <div class="queue-entry">
+            <div class="queue-number">4</div>
+            <span class="queue-unit">Ivan</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-ability">⚔️ Attack</span>
+            <span class="queue-arrow">→</span>
+            <span class="queue-target">Goblin C</span>
+            <span class="queue-cost">[0○]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="execute-panel">
+        <div class="execute-ready">✓ Ready to Execute!</div>
+        <div class="execute-cost">Total Mana: 5○ → 0○ remaining</div>
+        <button class="execute-btn">⚔️ EXECUTE ROUND</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

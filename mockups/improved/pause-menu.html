@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Vale Chronicles - Pause Menu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #2a4a2a 0%, #1a2a1a 100%);
+      color: #f8f8f0;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Overworld Background (Blurred) */
+    .overworld-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+        repeating-linear-gradient(0deg, #2a4a2a 0px, #1a3a1a 40px);
+      filter: blur(3px);
+      transform: scale(1.1);
+    }
+
+    /* Mock overworld elements */
+    .overworld-content {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .map-tile {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #3a5a3a;
+      border: 1px solid #2a4a2a;
+    }
+
+    .player-sprite {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 32px;
+      background: #FFD87F;
+      border-radius: 4px;
+      opacity: 0.5;
+    }
+
+    /* Dark Overlay */
+    .pause-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Pause Menu Container */
+    .pause-menu {
+      background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+      border: 3px solid #8b6a4a;
+      border-radius: 12px;
+      padding: 2rem;
+      min-width: 400px;
+      max-width: 90vw;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,216,127,0.2);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Title */
+    .pause-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #FFD87F;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      letter-spacing: 2px;
+    }
+
+    /* Menu Options */
+    .menu-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .menu-option {
+      background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      color: #e8d8c8;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .menu-option:hover {
+      background: linear-gradient(180deg, #5a4a3a, #4a3a2a);
+      border-color: #FFD87F;
+      transform: translateX(8px);
+      color: #FFD87F;
+    }
+
+    .menu-option.selected {
+      background: linear-gradient(180deg, #6a5a4a, #5a4a3a);
+      border-color: #FFD87F;
+      color: #FFD87F;
+      box-shadow: 0 0 20px rgba(255,216,127,0.3);
+    }
+
+    /* Icons */
+    .menu-icon {
+      font-size: 1.5rem;
+      width: 30px;
+      text-align: center;
+    }
+
+    /* Keyboard Hints */
+    .menu-hint {
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: #8a7a6a;
+      font-family: monospace;
+    }
+
+    /* Divider */
+    .menu-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #6a5a4a, transparent);
+      margin: 0.5rem 0;
+    }
+
+    /* Footer */
+    .pause-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #4a3a2a;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #8a7a6a;
+    }
+
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 0.5rem;
+    }
+
+    .hint {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .key {
+      background: #2a1a0a;
+      border: 1px solid #6a5a4a;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #FFD87F;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      gap: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-label {
+      color: #8a7a6a;
+    }
+
+    .status-value {
+      color: #FFD87F;
+      font-weight: bold;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .pause-menu {
+        min-width: 95vw;
+        padding: 1.5rem;
+      }
+
+      .pause-title {
+        font-size: 1.5rem;
+      }
+
+      .menu-option {
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+      }
+
+      .menu-hint {
+        display: none;
+      }
+
+      .status-bar {
+        top: 10px;
+        right: 10px;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Overworld Background (Blurred) -->
+  <div class="overworld-bg"></div>
+
+  <!-- Mock Overworld Content -->
+  <div class="overworld-content">
+    <!-- Grid tiles -->
+    <div class="map-tile" style="top: 20%; left: 30%;"></div>
+    <div class="map-tile" style="top: 20%; left: calc(30% + 42px);"></div>
+    <div class="map-tile" style="top: 20%; left: calc(30% + 84px);"></div>
+    <div class="map-tile" style="top: calc(20% + 42px); left: 30%;"></div>
+    <div class="map-tile" style="top: calc(20% + 42px); left: calc(30% + 42px);"></div>
+    <div class="map-tile" style="top: calc(20% + 42px); left: calc(30% + 84px);"></div>
+
+    <!-- Player sprite -->
+    <div class="player-sprite"></div>
+  </div>
+
+  <!-- Status Bar (Shows even when paused) -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-label">Chapter:</span>
+      <span class="status-value">3</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">House:</span>
+      <span class="status-value">14/20</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Gold:</span>
+      <span class="status-value">2,450</span>
+    </div>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div class="pause-overlay">
+    <div class="pause-menu">
+      <h1 class="pause-title">PAUSED</h1>
+
+      <div class="menu-options">
+        <div class="menu-option selected">
+          <span class="menu-icon">▶️</span>
+          <span>Resume Game</span>
+          <span class="menu-hint">ESC</span>
+        </div>
+
+        <div class="menu-option">
+          <span class="menu-icon">👥</span>
+          <span>Team Management</span>
+          <span class="menu-hint">T</span>
+        </div>
+
+        <div class="menu-option">
+          <span class="menu-icon">🎒</span>
+          <span>Inventory</span>
+          <span class="menu-hint">I</span>
+        </div>
+
+        <div class="menu-option">
+          <span class="menu-icon">✨</span>
+          <span>Djinn Collection</span>
+          <span class="menu-hint">D</span>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-option">
+          <span class="menu-icon">💾</span>
+          <span>Save Game</span>
+          <span class="menu-hint">S</span>
+        </div>
+
+        <div class="menu-option">
+          <span class="menu-icon">⚙️</span>
+          <span>Settings</span>
+          <span class="menu-hint">O</span>
+        </div>
+
+        <div class="menu-option">
+          <span class="menu-icon">❓</span>
+          <span>How to Play</span>
+          <span class="menu-hint">H</span>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-option">
+          <span class="menu-icon">🏠</span>
+          <span>Return to Title</span>
+          <span class="menu-hint">Q</span>
+        </div>
+      </div>
+
+      <div class="pause-footer">
+        <div class="keyboard-hints">
+          <div class="hint">
+            <span class="key">↑↓</span>
+            <span>Navigate</span>
+          </div>
+          <div class="hint">
+            <span class="key">Enter</span>
+            <span>Select</span>
+          </div>
+          <div class="hint">
+            <span class="key">ESC</span>
+            <span>Resume</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Menu navigation
+    const options = document.querySelectorAll('.menu-option');
+    let selectedIndex = 0;
+
+    function selectOption(index) {
+      options.forEach(opt => opt.classList.remove('selected'));
+      if (options[index]) {
+        options[index].classList.add('selected');
+        selectedIndex = index;
+      }
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        selectOption((selectedIndex + 1) % options.length);
+      } else if (e.key === 'ArrowUp') {
+        selectOption((selectedIndex - 1 + options.length) % options.length);
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        // Handle selection
+        const selected = options[selectedIndex];
+        if (selected) {
+          const text = selected.querySelector('span:nth-child(2)').textContent;
+          console.log('Selected:', text);
+          // Flash effect
+          selected.style.background = 'linear-gradient(180deg, #FFD87F, #f3c866)';
+          setTimeout(() => {
+            selected.style.background = '';
+          }, 200);
+        }
+      } else if (e.key === 'Escape') {
+        console.log('Resume game');
+        document.querySelector('.pause-overlay').style.opacity = '0';
+        setTimeout(() => {
+          document.querySelector('.pause-overlay').style.display = 'none';
+        }, 200);
+      }
+    });
+
+    // Click handling
+    options.forEach((option, index) => {
+      option.addEventListener('click', () => {
+        selectOption(index);
+        // Trigger action
+        const text = option.querySelector('span:nth-child(2)').textContent;
+        console.log('Clicked:', text);
+      });
+    });
+  </script>
+</body>
+</html>
