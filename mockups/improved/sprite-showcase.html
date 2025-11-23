@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=1.0">
+  <title>Golden Sun Sprite Showcase</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a0a00;
+      color: #f8f8f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #FFD87F;
+      text-align: center;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .section {
+      margin-bottom: 3rem;
+      background: #2a1a0a;
+      border: 2px solid #8b6a4a;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    h2 {
+      color: #ffd87f;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #6a5a4a;
+      padding-bottom: 0.5rem;
+    }
+
+    .sprite-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .sprite-card {
+      background: #1a0a00;
+      border: 1px solid #6a5a4a;
+      border-radius: 4px;
+      padding: 0.5rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .sprite-card:hover {
+      border-color: #ffd87f;
+      transform: scale(1.1);
+      z-index: 10;
+      background: #3a2a1a;
+    }
+
+    .sprite-img {
+      display: block;
+      margin: 0 auto 0.5rem;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .sprite-name {
+      font-size: 0.75rem;
+      color: #aaa;
+      word-break: break-word;
+    }
+
+    .size-info {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+
+    .scale-controls {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: #2a1a0a;
+      border: 2px solid #8b6a4a;
+      padding: 1rem;
+      border-radius: 8px;
+      z-index: 100;
+    }
+
+    .scale-btn {
+      padding: 0.5rem 1rem;
+      margin: 0.25rem;
+      background: #4a3a2a;
+      border: 1px solid #8b6a4a;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .scale-btn.active {
+      background: #ffd87f;
+      color: #1a0a00;
+    }
+
+    /* Different scales */
+    .scale-1x img { transform: scale(1); }
+    .scale-2x img { transform: scale(2); }
+    .scale-3x img { transform: scale(3); }
+    .scale-4x img { transform: scale(4); }
+  </style>
+</head>
+<body>
+  <h1>⚔️ Golden Sun Sprite Collection</h1>
+
+  <div class="scale-controls">
+    <div style="color: #ffd87f; margin-bottom: 0.5rem;">Scale:</div>
+    <button class="scale-btn active" onclick="setScale(1)">1x (Original)</button>
+    <button class="scale-btn" onclick="setScale(2)">2x</button>
+    <button class="scale-btn" onclick="setScale(3)">3x</button>
+    <button class="scale-btn" onclick="setScale(4)">4x</button>
+  </div>
+
+  <!-- Player Characters -->
+  <div class="section">
+    <h2>🎭 Player Characters (Overworld)</h2>
+    <div class="sprite-grid" id="players">
+      <div class="sprite-card">
+        <img src="sprites/overworld/Isaac.gif" class="sprite-img" alt="Isaac" onload="showSize(this)">
+        <div class="sprite-name">Isaac</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Garet.gif" class="sprite-img" alt="Garet" onload="showSize(this)">
+        <div class="sprite-name">Garet</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Ivan.gif" class="sprite-img" alt="Ivan" onload="showSize(this)">
+        <div class="sprite-name">Ivan</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Mia.gif" class="sprite-img" alt="Mia" onload="showSize(this)">
+        <div class="sprite-name">Mia</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Felix.gif" class="sprite-img" alt="Felix" onload="showSize(this)">
+        <div class="sprite-name">Felix</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Jenna.gif" class="sprite-img" alt="Jenna" onload="showSize(this)">
+        <div class="sprite-name">Jenna</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Sheba.gif" class="sprite-img" alt="Sheba" onload="showSize(this)">
+        <div class="sprite-name">Sheba</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/overworld/Piers.gif" class="sprite-img" alt="Piers" onload="showSize(this)">
+        <div class="sprite-name">Piers</div>
+        <div class="size-info"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Battle Icons -->
+  <div class="section">
+    <h2>🎮 Battle Command Icons</h2>
+    <div class="sprite-grid">
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Attack.gif" class="sprite-img" alt="Attack" onload="showSize(this)">
+        <div class="sprite-name">Attack</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Defend.gif" class="sprite-img" alt="Defend" onload="showSize(this)">
+        <div class="sprite-name">Defend</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Psynergy.gif" class="sprite-img" alt="Psynergy" onload="showSize(this)">
+        <div class="sprite-name">Psynergy</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Djinni.gif" class="sprite-img" alt="Djinni" onload="showSize(this)">
+        <div class="sprite-name">Djinni</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Item.gif" class="sprite-img" alt="Item" onload="showSize(this)">
+        <div class="sprite-name">Item</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Summon.gif" class="sprite-img" alt="Summon" onload="showSize(this)">
+        <div class="sprite-name">Summon</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/buttons/Flee.gif" class="sprite-img" alt="Flee" onload="showSize(this)">
+        <div class="sprite-name">Flee</div>
+        <div class="size-info"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enemy Sprites -->
+  <div class="section">
+    <h2>👹 Enemy Sprites (Sample)</h2>
+    <div class="sprite-grid">
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Bat.gif" class="sprite-img" alt="Bat" onload="showSize(this)">
+        <div class="sprite-name">Bat</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Goblin.gif" class="sprite-img" alt="Goblin" onload="showSize(this)">
+        <div class="sprite-name">Goblin</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Chimera.gif" class="sprite-img" alt="Chimera" onload="showSize(this)">
+        <div class="sprite-name">Chimera</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Hydra.gif" class="sprite-img" alt="Hydra" onload="showSize(this)">
+        <div class="sprite-name">Hydra</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Minotaurus.gif" class="sprite-img" alt="Minotaurus" onload="showSize(this)">
+        <div class="sprite-name">Minotaurus</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/battle/enemies/Fenrir.gif" class="sprite-img" alt="Fenrir" onload="showSize(this)">
+        <div class="sprite-name">Fenrir</div>
+        <div class="size-info"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Character Portraits -->
+  <div class="section">
+    <h2>👤 Character Portraits</h2>
+    <div class="sprite-grid">
+      <div class="sprite-card">
+        <img src="sprites/icons/characters/Isaac1.gif" class="sprite-img" alt="Isaac Portrait" onload="showSize(this)">
+        <div class="sprite-name">Isaac</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/characters/Garet1.gif" class="sprite-img" alt="Garet Portrait" onload="showSize(this)">
+        <div class="sprite-name">Garet</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/characters/Ivan.gif" class="sprite-img" alt="Ivan Portrait" onload="showSize(this)">
+        <div class="sprite-name">Ivan</div>
+        <div class="size-info"></div>
+      </div>
+      <div class="sprite-card">
+        <img src="sprites/icons/characters/Mia.gif" class="sprite-img" alt="Mia Portrait" onload="showSize(this)">
+        <div class="sprite-name">Mia</div>
+        <div class="size-info"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showSize(img) {
+      const sizeDiv = img.parentElement.querySelector('.size-info');
+      if (sizeDiv) {
+        sizeDiv.textContent = `${img.naturalWidth}x${img.naturalHeight}px`;
+      }
+    }
+
+    function setScale(scale) {
+      document.body.className = `scale-${scale}x`;
+      document.querySelectorAll('.scale-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

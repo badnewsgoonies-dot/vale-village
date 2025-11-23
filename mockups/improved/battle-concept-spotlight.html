@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=0.5, maximum-scale=2, user-scalable=yes">
+  <title>Battle Concept C: Spotlight Focus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0505;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f8f8f0;
+      overflow: hidden;
+    }
+
+    .battle-spotlight {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: radial-gradient(ellipse at center, #1a1210 0%, #0a0505 100%);
+    }
+
+    /* Subtle background pattern */
+    .pattern-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        radial-gradient(circle at 50% 50%, rgba(255,216,127,0.03) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    /* =========================
+       CENTER STAGE: ACTIVE UNIT
+       ========================= */
+    .center-stage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+      text-align: center;
+    }
+
+    .spotlight-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255,216,127,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: spotlight-pulse 2s infinite;
+    }
+
+    @keyframes spotlight-pulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .active-unit-large {
+      position: relative;
+      z-index: 10;
+    }
+
+    .active-sprite {
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .active-sprite img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 20px rgba(255,216,127,0.5));
+    }
+
+    .active-name {
+      margin-top: 12px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #ffd87f;
+      text-shadow: 0 0 20px rgba(255,216,127,0.5);
+    }
+
+    .active-subtitle {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    .active-hp-bar {
+      width: 200px;
+      height: 14px;
+      margin: 12px auto 0;
+      background: rgba(0,0,0,0.6);
+      border-radius: 7px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .active-hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #66bb6a);
+      transition: width 0.3s;
+    }
+
+    /* =========================
+       ABILITY WHEEL (around center)
+       ========================= */
+    .ability-wheel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .ability-node {
+      position: absolute;
+      width: 90px;
+      padding: 10px;
+      background: rgba(40,30,20,0.95);
+      border: 2px solid #6a5a4a;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .ability-node:hover {
+      border-color: #ffd87f;
+      background: rgba(60,50,40,0.95);
+      transform: translate(-50%, -50%) scale(1.1);
+      z-index: 100;
+    }
+
+    .ability-node.selected {
+      border-color: #ffd87f;
+      background: #ffd87f;
+      box-shadow: 0 0 20px rgba(255,216,127,0.6);
+    }
+
+    .ability-node.selected .node-name,
+    .ability-node.selected .node-cost {
+      color: #1a0a00;
+    }
+
+    .ability-node.locked {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Position abilities in a circle */
+    .ability-node:nth-child(1) { top: 8%; left: 50%; }
+    .ability-node:nth-child(2) { top: 25%; left: 85%; }
+    .ability-node:nth-child(3) { top: 75%; left: 85%; }
+    .ability-node:nth-child(4) { top: 92%; left: 50%; }
+    .ability-node:nth-child(5) { top: 75%; left: 15%; }
+    .ability-node:nth-child(6) { top: 25%; left: 15%; }
+
+    .node-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 6px;
+    }
+
+    .node-icon img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .node-name {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .node-cost {
+      font-size: 0.65rem;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    /* =========================
+       ENEMY CARDS (floating around edges)
+       ========================= */
+    .enemy-cards {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 30;
+    }
+
+    .enemy-card-float {
+      width: 120px;
+      background: linear-gradient(180deg, rgba(60,40,30,0.95), rgba(40,25,15,0.95));
+      border: 2px solid #6a5a4a;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .enemy-card-float:hover {
+      border-color: #ffa500;
+      transform: translateY(-5px);
+    }
+
+    .enemy-card-float.targetable {
+      animation: enemy-glow 1.5s infinite;
+    }
+
+    @keyframes enemy-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,165,0,0.3); }
+      50% { box-shadow: 0 0 25px rgba(255,165,0,0.7); }
+    }
+
+    .enemy-card-float.selected {
+      border-color: #ffd87f;
+      box-shadow: 0 0 25px rgba(255,216,127,0.8);
+    }
+
+    .enemy-card-sprite {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .enemy-card-sprite img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .enemy-card-name {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .enemy-card-hp {
+      width: 100%;
+      height: 8px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .enemy-card-hp-fill {
+      height: 100%;
+      background: #ef5350;
+    }
+
+    .enemy-card-hp-fill.healthy { background: #4CAF50; }
+    .enemy-card-hp-fill.hurt { background: #ffa726; }
+    .enemy-card-hp-fill.critical { background: #ef5350; }
+
+    .enemy-card-element {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    .enemy-card-status {
+      margin-top: 4px;
+      font-size: 0.7rem;
+    }
+
+    /* =========================
+       TEAM PORTRAITS (bottom corners)
+       ========================= */
+    .team-portraits {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 30;
+    }
+
+    .team-portrait {
+      width: 60px;
+      background: rgba(40,30,20,0.9);
+      border: 2px solid #6a5a4a;
+      border-radius: 8px;
+      padding: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .team-portrait:hover {
+      border-color: #ffd87f;
+    }
+
+    .team-portrait.active {
+      border-color: #ffd87f;
+      box-shadow: 0 0 15px rgba(255,216,127,0.5);
+    }
+
+    .team-portrait.queued::after {
+      content: '✓';
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      color: #4CAF50;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .portrait-thumb {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .portrait-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .portrait-hp-mini {
+      width: 100%;
+      height: 5px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .portrait-hp-mini-fill {
+      height: 100%;
+      background: #4CAF50;
+    }
+
+    .portrait-hp-mini-fill.med { background: #ffa726; }
+    .portrait-hp-mini-fill.low { background: #ef5350; }
+
+    /* =========================
+       RESOURCE BAR (bottom right)
+       ========================= */
+    .resource-bar {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(40,30,20,0.9);
+      border: 2px solid #6a5a4a;
+      border-radius: 10px;
+      padding: 12px 16px;
+      z-index: 30;
+    }
+
+    .resource-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .resource-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .resource-label {
+      font-size: 0.75rem;
+      color: #888;
+      width: 50px;
+    }
+
+    .mana-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mana-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #6a5a4a;
+      background: #1a0a00;
+    }
+
+    .mana-dot.full {
+      background: radial-gradient(circle at 30% 30%, #fff4d0, #ffd87f);
+      border-color: #ffd87f;
+      box-shadow: 0 0 6px rgba(255,216,127,0.5);
+    }
+
+    .djinn-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .djinn-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid #6a5a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .djinn-dot img {
+      width: 14px;
+      height: 14px;
+      image-rendering: pixelated;
+    }
+
+    .djinn-dot.standby {
+      opacity: 0.4;
+    }
+
+    /* =========================
+       ROUND & EXECUTE
+       ========================= */
+    .round-badge-top {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(40,30,20,0.9);
+      border: 2px solid #6a5a4a;
+      border-radius: 20px;
+      padding: 8px 16px;
+      z-index: 30;
+    }
+
+    .round-badge-text {
+      color: #ffd87f;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .execute-float {
+      position: absolute;
+      bottom: 100px;
+      right: 20px;
+      padding: 14px 28px;
+      background: linear-gradient(180deg, #ffd87f 0%, #f3c866 100%);
+      border: 3px solid #fff;
+      border-radius: 10px;
+      color: #1a0a00;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 30;
+      transition: all 0.2s;
+      animation: execute-pulse 1.5s infinite;
+      display: none; /* Show when all queued */
+    }
+
+    @keyframes execute-pulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(255,216,127,0.4); }
+      50% { box-shadow: 0 0 30px rgba(255,216,127,0.8); }
+    }
+
+    .execute-float.visible {
+      display: block;
+    }
+
+    /* Selection hint */
+    .selection-hint {
+      position: absolute;
+      bottom: 180px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #aaa;
+      z-index: 30;
+    }
+
+    /* Mockup label */
+    .mockup-label {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #888;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="battle-spotlight">
+    <div class="pattern-bg"></div>
+
+    <div class="mockup-label">CONCEPT C: Spotlight Focus - Unit-Centric Radial UI</div>
+
+    <!-- Round badge -->
+    <div class="round-badge-top">
+      <span class="round-badge-text">ROUND 2</span>
+    </div>
+
+    <!-- Enemy cards floating at top -->
+    <div class="enemy-cards">
+      <div class="enemy-card-float targetable">
+        <div class="enemy-card-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+        <div class="enemy-card-name">Goblin</div>
+        <div class="enemy-card-hp"><div class="enemy-card-hp-fill hurt" style="width: 55%"></div></div>
+        <div class="enemy-card-element">Mars</div>
+        <div class="enemy-card-status">🔥 Burned</div>
+      </div>
+      <div class="enemy-card-float targetable selected">
+        <div class="enemy-card-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+        <div class="enemy-card-name">Goblin</div>
+        <div class="enemy-card-hp"><div class="enemy-card-hp-fill critical" style="width: 20%"></div></div>
+        <div class="enemy-card-element">Mars</div>
+      </div>
+      <div class="enemy-card-float targetable">
+        <div class="enemy-card-sprite"><img src="./sprites/battle/enemies/Goblin.gif" alt="Goblin" /></div>
+        <div class="enemy-card-name">Troll</div>
+        <div class="enemy-card-hp"><div class="enemy-card-hp-fill healthy" style="width: 100%"></div></div>
+        <div class="enemy-card-element">Venus</div>
+        <div class="enemy-card-status">🛡️ Guard</div>
+      </div>
+    </div>
+
+    <!-- Center stage: active unit -->
+    <div class="center-stage">
+      <div class="spotlight-glow"></div>
+      <div class="active-unit-large">
+        <div class="active-sprite">
+          <img src="./sprites/battle/party/garet/Garet_lSword_Front.gif" alt="Garet" />
+        </div>
+        <div class="active-name">GARET</div>
+        <div class="active-subtitle">Lv 5 Mars Warrior</div>
+        <div class="active-hp-bar">
+          <div class="active-hp-fill" style="width: 100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ability wheel around center -->
+    <div class="ability-wheel">
+      <div class="ability-node">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Attack.gif" alt="" /></div>
+        <div class="node-name">Attack</div>
+        <div class="node-cost">0 MP</div>
+      </div>
+      <div class="ability-node selected">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+        <div class="node-name">Fireball</div>
+        <div class="node-cost">2 MP</div>
+      </div>
+      <div class="ability-node">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Cure_Poison.gif" alt="" /></div>
+        <div class="node-name">Heal</div>
+        <div class="node-cost">1 MP</div>
+      </div>
+      <div class="ability-node">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Defend.gif" alt="" /></div>
+        <div class="node-name">Guard</div>
+        <div class="node-cost">0 MP</div>
+      </div>
+      <div class="ability-node">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Battle.gif" alt="" /></div>
+        <div class="node-name">Spark</div>
+        <div class="node-cost">2 MP</div>
+      </div>
+      <div class="ability-node locked">
+        <div class="node-icon"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+        <div class="node-name">Quake</div>
+        <div class="node-cost">Locked</div>
+      </div>
+    </div>
+
+    <!-- Team portraits bottom left -->
+    <div class="team-portraits">
+      <div class="team-portrait queued" style="position: relative;">
+        <div class="portrait-thumb"><img src="./sprites/icons/characters/Isaac1.gif" alt="Isaac" /></div>
+        <div class="portrait-hp-mini"><div class="portrait-hp-mini-fill" style="width: 80%"></div></div>
+      </div>
+      <div class="team-portrait active">
+        <div class="portrait-thumb"><img src="./sprites/icons/characters/Garet1.gif" alt="Garet" /></div>
+        <div class="portrait-hp-mini"><div class="portrait-hp-mini-fill" style="width: 100%"></div></div>
+      </div>
+      <div class="team-portrait">
+        <div class="portrait-thumb"><img src="./sprites/icons/characters/Mia.gif" alt="Mia" /></div>
+        <div class="portrait-hp-mini"><div class="portrait-hp-mini-fill med" style="width: 55%"></div></div>
+      </div>
+      <div class="team-portrait">
+        <div class="portrait-thumb"><img src="./sprites/icons/characters/Ivan.gif" alt="Ivan" /></div>
+        <div class="portrait-hp-mini"><div class="portrait-hp-mini-fill low" style="width: 25%"></div></div>
+      </div>
+    </div>
+
+    <!-- Resource bar bottom right -->
+    <div class="resource-bar">
+      <div class="resource-row">
+        <span class="resource-label">MANA</span>
+        <div class="mana-dots">
+          <div class="mana-dot full"></div>
+          <div class="mana-dot full"></div>
+          <div class="mana-dot full"></div>
+          <div class="mana-dot"></div>
+          <div class="mana-dot"></div>
+        </div>
+      </div>
+      <div class="resource-row">
+        <span class="resource-label">DJINN</span>
+        <div class="djinn-dots">
+          <div class="djinn-dot"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+          <div class="djinn-dot"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+          <div class="djinn-dot standby"><img src="./sprites/icons/buttons/Djinni.gif" alt="" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selection hint -->
+    <div class="selection-hint">Select ability → Select target</div>
+  </div>
+</body>
+</html>
