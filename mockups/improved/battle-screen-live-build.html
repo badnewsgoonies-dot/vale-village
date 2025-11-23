@@ -48,7 +48,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('sprites/backgrounds/gs1/Vale.gif');
+      /* background-image: url('sprites/backgrounds/gs1/Vale.gif'); */
+      background: #1a1a1a; /* Dark gray instead of image */
       background-size: 100% 100%;
       background-position: center;
       image-rendering: pixelated;
@@ -57,15 +58,52 @@
       z-index: 0;
     }
 
-    /* Enemy Area */
+    /* Enemy Area - LEFT SIDE */
     .enemy-area {
       position: absolute;
-      bottom: 35%;  /* Move to grass level */
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 35%;  /* On grass level */
+      left: 15%;    /* Positioned on left */
       display: flex;
       gap: 3rem;
       z-index: 10;
+    }
+
+    .enemy-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .enemy-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      z-index: 50; /* Ensure controls are above sprites */
+    }
+
+    .arrow-btn {
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+      z-index: 51; /* Extra high z-index */
+    }
+
+    .arrow-btn:hover {
+      background: #ffd700;
+      color: #000;
+      transform: scale(1.1);
     }
 
     .enemy-sprite {
@@ -76,6 +114,8 @@
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
       cursor: pointer;
       transition: all 0.2s;
+      position: relative;
+      z-index: 20; /* Below the controls */
     }
 
     .enemy-sprite:hover {
@@ -83,12 +123,11 @@
       filter: drop-shadow(0 0 20px #ffd700);
     }
 
-    /* Player Area */
+    /* Player Area - RIGHT SIDE */
     .player-area {
       position: absolute;
-      bottom: 28%;  /* Move up to grass level */
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 28%;  /* On grass level */
+      right: 15%;  /* Positioned on right */
       width: 240px;  /* Much narrower container */
       z-index: 10;
     }
@@ -102,29 +141,29 @@
       position: absolute;
     }
 
-    /* Tight V formation positioning */
+    /* Staggered diagonal line - first unit lowest, progressively higher */
     .player-sprite:nth-child(1) {
-      /* Front left - Isaac */
-      left: 40px;
+      /* Isaac - leftmost and lowest */
+      left: 0px;
       bottom: 0;
     }
 
     .player-sprite:nth-child(2) {
-      /* Front right - Garet */
-      right: 40px;
-      bottom: 0;
+      /* Garet - slightly higher */
+      left: 60px;
+      bottom: 15px;
     }
 
     .player-sprite:nth-child(3) {
-      /* Back center-left - Ivan */
-      left: 60px;
-      bottom: 40px;
+      /* Ivan - higher still */
+      left: 120px;
+      bottom: 30px;
     }
 
     .player-sprite:nth-child(4) {
-      /* Back center-right - Mia */
-      right: 60px;
-      bottom: 40px;
+      /* Mia - rightmost and highest */
+      left: 180px;
+      bottom: 45px;
     }
 
     /* Command Panel */
@@ -179,60 +218,69 @@
       text-shadow: 2px 2px 2px #000;
     }
 
-    /* Status Bars */
-    .status-area {
+    /* Unit HP/MP Bars (floating above sprites) */
+    .unit-hp-mp {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #8b6a4a;
-      border-radius: 4px;
-      padding: 0.5rem;
-      min-width: 180px;
-      z-index: 30;
-    }
-
-    .unit-status {
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .unit-portrait {
-      image-rendering: pixelated;
-      transform: scale(2);
-      margin-right: 0.5rem;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 5px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #444;
+      border-radius: 3px;
+      padding: 2px;
+      min-width: 60px;
+      z-index: 25;
     }
 
     .hp-bar {
-      flex: 1;
-      height: 8px;
+      height: 6px;
       background: #333;
-      border: 1px solid #666;
+      border: 1px solid #555;
+      border-radius: 2px;
       position: relative;
       overflow: hidden;
+      margin-bottom: 2px;
     }
 
     .hp-fill {
       height: 100%;
-      background: linear-gradient(to right, #ff3333, #ff6666);
+      background: linear-gradient(to right, #00ff00, #00cc00);
       transition: width 0.3s;
     }
 
+    .hp-fill.low {
+      background: linear-gradient(to right, #ffff00, #ff9900);
+    }
+
+    .hp-fill.critical {
+      background: linear-gradient(to right, #ff0000, #cc0000);
+    }
+
     .mp-bar {
-      flex: 1;
-      height: 6px;
+      height: 5px;
       background: #333;
-      border: 1px solid #666;
+      border: 1px solid #555;
+      border-radius: 2px;
       position: relative;
       overflow: hidden;
-      margin-top: 2px;
     }
 
     .mp-fill {
       height: 100%;
-      background: linear-gradient(to right, #3366ff, #6699ff);
+      background: linear-gradient(to right, #0099ff, #0066cc);
+      transition: width 0.3s;
+    }
+
+    .hp-text {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      white-space: nowrap;
     }
 
     /* Psynergy Effects */
@@ -390,37 +438,7 @@
       <!-- We'll add players here -->
     </div>
 
-    <!-- Status Panel -->
-    <div class="status-area">
-      <div class="unit-status">
-        <img src="sprites/icons/characters/Isaac1.gif" class="unit-portrait">
-        <div style="flex: 1;">
-          <div class="hp-bar"><div class="hp-fill" style="width: 80%"></div></div>
-          <div class="mp-bar"><div class="mp-fill" style="width: 60%"></div></div>
-        </div>
-      </div>
-      <div class="unit-status">
-        <img src="sprites/icons/characters/Garet1.gif" class="unit-portrait">
-        <div style="flex: 1;">
-          <div class="hp-bar"><div class="hp-fill" style="width: 90%"></div></div>
-          <div class="mp-bar"><div class="mp-fill" style="width: 40%"></div></div>
-        </div>
-      </div>
-      <div class="unit-status">
-        <img src="sprites/icons/characters/Ivan.gif" class="unit-portrait">
-        <div style="flex: 1;">
-          <div class="hp-bar"><div class="hp-fill" style="width: 70%"></div></div>
-          <div class="mp-bar"><div class="mp-fill" style="width: 80%"></div></div>
-        </div>
-      </div>
-      <div class="unit-status">
-        <img src="sprites/icons/characters/Mia.gif" class="unit-portrait">
-        <div style="flex: 1;">
-          <div class="hp-bar"><div class="hp-fill" style="width: 75%"></div></div>
-          <div class="mp-bar"><div class="mp-fill" style="width: 90%"></div></div>
-        </div>
-      </div>
-    </div>
+    <!-- Status Panel removed - portraits weren't up to standard -->
 
     <!-- Command Panel -->
     <div class="command-panel">
@@ -451,11 +469,23 @@
   </div> <!-- Close GBA screen -->
 
   <script>
-    // Battle data
-    const enemies = [
+    // All available enemy sprites
+    const allEnemies = [
       { name: 'Goblin', sprite: 'sprites/battle/enemies/Goblin.gif' },
-      { name: 'Bat', sprite: 'sprites/battle/enemies/Bat.gif' }
+      { name: 'Bat', sprite: 'sprites/battle/enemies/Bat.gif' },
+      { name: 'Chimera', sprite: 'sprites/battle/enemies/Chimera.gif' },
+      { name: 'Hydra', sprite: 'sprites/battle/enemies/Hydra.gif' },
+      { name: 'Minotaurus', sprite: 'sprites/battle/enemies/Minotaurus.gif' },
+      { name: 'Fenrir', sprite: 'sprites/battle/enemies/Fenrir.gif' },
+      // Add more enemy paths if available
+      { name: 'Skeleton', sprite: 'sprites/battle/enemies/Skeleton.gif' },
+      { name: 'Zombie', sprite: 'sprites/battle/enemies/Zombie.gif' },
+      { name: 'Dragon', sprite: 'sprites/battle/enemies/Dragon.gif' },
+      { name: 'Golem', sprite: 'sprites/battle/enemies/Golem.gif' }
     ];
+
+    // Track current enemy indices for each slot
+    const enemyIndices = [0, 1];
 
     const players = [
       { name: 'Isaac', sprite: '../../dist/sprites/battle/party/isaac/Isaac_lSword_Back.gif' },
@@ -464,28 +494,144 @@
       { name: 'Mia', sprite: '../../dist/sprites/battle/party/mia/Mia_Staff_Back.gif' }
     ];
 
+    // Function to cycle enemy sprite
+    function cycleEnemy(slot, direction) {
+      const currentIndex = enemyIndices[slot];
+      let newIndex;
+
+      if (direction === 'next') {
+        newIndex = (currentIndex + 1) % allEnemies.length;
+      } else {
+        newIndex = currentIndex === 0 ? allEnemies.length - 1 : currentIndex - 1;
+      }
+
+      enemyIndices[slot] = newIndex;
+      const enemySprite = document.getElementById(`enemy-${slot}`);
+      enemySprite.src = allEnemies[newIndex].sprite;
+      enemySprite.alt = allEnemies[newIndex].name;
+      enemySprite.title = allEnemies[newIndex].name;
+    }
+
+    // Function to create HP/MP bars for a unit
+    function createHPMPBar(currentHP, maxHP, currentMP, maxMP, name) {
+      const container = document.createElement('div');
+      container.className = 'unit-hp-mp';
+
+      // HP text
+      const hpText = document.createElement('div');
+      hpText.className = 'hp-text';
+      hpText.textContent = `${currentHP}/${maxHP}`;
+
+      // HP bar
+      const hpBar = document.createElement('div');
+      hpBar.className = 'hp-bar';
+      const hpFill = document.createElement('div');
+      hpFill.className = 'hp-fill';
+      const hpPercent = (currentHP / maxHP) * 100;
+      if (hpPercent <= 25) hpFill.classList.add('critical');
+      else if (hpPercent <= 50) hpFill.classList.add('low');
+      hpFill.style.width = hpPercent + '%';
+      hpBar.appendChild(hpFill);
+
+      // MP bar
+      const mpBar = document.createElement('div');
+      mpBar.className = 'mp-bar';
+      const mpFill = document.createElement('div');
+      mpFill.className = 'mp-fill';
+      mpFill.style.width = (currentMP / maxMP) * 100 + '%';
+      mpBar.appendChild(mpFill);
+
+      container.appendChild(hpText);
+      container.appendChild(hpBar);
+      container.appendChild(mpBar);
+
+      return container;
+    }
+
     // Auto-populate sprites
     function populateBattle() {
-      // Add enemies
+      // Add enemies with controls
       const enemyArea = document.getElementById('enemyArea');
-      enemies.forEach((enemy, i) => {
+
+      enemyIndices.forEach((index, slot) => {
+        const container = document.createElement('div');
+        container.className = 'enemy-container';
+
+        // Add left arrow button
+        const leftBtn = document.createElement('button');
+        leftBtn.className = 'arrow-btn';
+        leftBtn.innerHTML = '←';
+        leftBtn.onclick = () => cycleEnemy(slot, 'prev');
+
+        // Create wrapper for sprite with HP/MP
+        const spriteWrapper = document.createElement('div');
+        spriteWrapper.style.position = 'relative';
+
+        // Add enemy sprite
         const img = document.createElement('img');
-        img.src = enemy.sprite;
+        img.id = `enemy-${slot}`;
+        img.src = allEnemies[index].sprite;
         img.className = 'enemy-sprite';
-        img.alt = enemy.name;
-        img.title = enemy.name;
-        enemyArea.appendChild(img);
+        img.alt = allEnemies[index].name;
+        img.title = allEnemies[index].name;
+
+        // Add HP/MP bars for enemies
+        const enemyHP = 45 + Math.floor(Math.random() * 30);
+        const hpmpBar = createHPMPBar(enemyHP, 75, 20, 30, allEnemies[index].name);
+
+        spriteWrapper.appendChild(hpmpBar);
+        spriteWrapper.appendChild(img);
+
+        // Add right arrow button
+        const rightBtn = document.createElement('button');
+        rightBtn.className = 'arrow-btn';
+        rightBtn.innerHTML = '→';
+        rightBtn.onclick = () => cycleEnemy(slot, 'next');
+
+        // Append in order: left arrow, sprite wrapper, right arrow
+        container.appendChild(leftBtn);
+        container.appendChild(spriteWrapper);
+        container.appendChild(rightBtn);
+        enemyArea.appendChild(container);
       });
 
-      // Add players
+      // Add players with HP/MP bars
       const playerArea = document.getElementById('playerArea');
+      const playerStats = [
+        { hp: 85, maxHp: 100, mp: 25, maxMp: 40 },
+        { hp: 110, maxHp: 120, mp: 15, maxMp: 30 },
+        { hp: 65, maxHp: 80, mp: 45, maxMp: 50 },
+        { hp: 70, maxHp: 85, mp: 55, maxMp: 60 }
+      ];
+
       players.forEach((player, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.className = 'player-sprite-wrapper';
+        wrapper.style.position = 'absolute';
+
+        // Apply the same positioning as player sprites
+        const positions = [
+          { left: '0px', bottom: '0' },
+          { left: '60px', bottom: '15px' },
+          { left: '120px', bottom: '30px' },
+          { left: '180px', bottom: '45px' }
+        ];
+        Object.assign(wrapper.style, positions[i]);
+
         const img = document.createElement('img');
         img.src = player.sprite;
         img.className = 'player-sprite';
+        img.style.position = 'relative';
         img.alt = player.name;
         img.title = player.name;
-        playerArea.appendChild(img);
+
+        const stats = playerStats[i];
+        const hpmpBar = createHPMPBar(stats.hp, stats.maxHp, stats.mp, stats.maxMp, player.name);
+
+        wrapper.appendChild(hpmpBar);
+        wrapper.appendChild(img);
+        playerArea.appendChild(wrapper);
       });
     }
 
