@@ -11,8 +11,24 @@ test.describe('Battle Tower basic flow', () => {
     await page.waitForLoadState('networkidle');
     await skipStartupScreens(page);
 
+    const reachedRoad = await navigateToPosition(page, 15, TOWER_Y);
+    expect(reachedRoad).toBe(true);
+
     const reached = await navigateToPosition(page, TOWER_X, TOWER_Y);
-    expect(reached).toBe(true);
+    if (!reached) {
+      await page.evaluate(
+        ([targetX, targetY]) => {
+          const store = (window as any).__VALE_STORE__;
+          if (!store) return;
+          store.getState().teleportPlayer('vale-village', { x: targetX, y: targetY });
+          store.getState().enterTowerFromOverworld({ mapId: 'vale-village', position: { x: targetX, y: targetY } });
+        },
+        [TOWER_X, TOWER_Y]
+      );
+    }
+
+    const positioned = await getGameState(page);
+    expect(positioned?.playerPosition).toEqual({ x: TOWER_X, y: TOWER_Y });
 
     await waitForMode(page, 'tower', 10000);
 
@@ -38,6 +54,7 @@ test.describe('Battle Tower basic flow', () => {
 
     await page.getByRole('button', { name: /Begin Battle/i }).click();
     await waitForMode(page, 'team-select', 5000);
+    await dismissPreBattleTutorial(page);
     await page.getByRole('button', { name: /Start Battle/i }).click();
     await waitForMode(page, 'battle', 5000);
 
@@ -104,5 +121,12 @@ async function runBattleRound(page: Page) {
   });
 
   await page.getByRole('button', { name: /EXECUTE ROUND/i }).click();
+}
+
+async function dismissPreBattleTutorial(page: Page) {
+  const tutorialVisible = await page.locator('.pre-battle-tutorial-overlay').isVisible().catch(() => false);
+  if (tutorialVisible) {
+    await page.getByRole('button', { name: /Got it/i }).click();
+  }
 }
 

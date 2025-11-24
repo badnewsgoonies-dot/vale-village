@@ -41,6 +41,23 @@ describe('towerSlice integration', () => {
     expect(store.getState().roster.some((unit) => unit.id === 'tower-champion')).toBe(true);
   });
 
+  it('persists tower rewards when exiting tower mode', () => {
+    store = createStore();
+    store.setState({ gold: 321 });
+    const baselineGold = store.getState().gold;
+    store.getState().openTowerFromMainMenu();
+    store.getState().startTowerRun({ difficulty: 'normal', seed: 123 });
+
+    completeThroughFloor(store, 10);
+    store.getState().exitTowerMode();
+
+    const finalState = store.getState();
+    expect(finalState.gold).toBe(baselineGold);
+    expect(finalState.equipment.some((item) => item.id === 'eclipse-blade')).toBe(true);
+    expect(finalState.team?.collectedDjinn).toContain('nova');
+    expect(finalState.roster.some((unit) => unit.id === 'tower-champion')).toBe(true);
+  });
+
   it('updates tower record metrics when a run ends', () => {
     const initialRecord = store.getState().towerRecord;
     expect(initialRecord.totalRuns).toBe(0);

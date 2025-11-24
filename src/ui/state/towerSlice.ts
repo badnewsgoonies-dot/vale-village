@@ -1,5 +1,5 @@
 // [BT-STATE][BT-01] Battle Tower UI state slice
-import type { StateCreator } from 'zustand';
+import type { StateCreator, SetState } from 'zustand';
 import type { TowerFloor } from '@/data/schemas/TowerFloorSchema';
 import type { TowerRewardEntry } from '@/data/schemas/TowerRewardSchema';
 import type { TowerRunState, TowerBattleOutcome, TowerBattleSummary } from '@/core/services/TowerService';
@@ -62,6 +62,12 @@ interface SnapshotState {
   equipment: Equipment[];
 }
 
+interface TowerRewardLedger {
+  equipmentIds: string[];
+  djinnIds: string[];
+  recruitIds: string[];
+}
+
 interface TowerBattlePayload {
   battle: BattleState;
   events: readonly BattleEvent[];
@@ -74,6 +80,7 @@ export interface TowerSlice {
   towerEntryContext: TowerEntryContext | null;
   towerSnapshots: SnapshotState | null;
   activeTowerEncounterId: string | null;
+  towerRewardsEarned: TowerRewardLedger;
 
   getCurrentTowerFloor: () => TowerFloor | null;
   startTowerRun: (opts?: { difficulty?: TowerDifficulty; seed?: number }) => void;
@@ -106,6 +113,7 @@ export const createTowerSlice: StateCreator<
   towerEntryContext: null,
   towerSnapshots: null,
   activeTowerEncounterId: null,
+  towerRewardsEarned: createEmptyRewardLedger(),
 
   getCurrentTowerFloor: () => {
     const run = get().towerRun;
@@ -145,6 +153,7 @@ export const createTowerSlice: StateCreator<
       towerStatus: 'in-run',
       towerSnapshots: snapshots,
       activeTowerEncounterId: null,
+      towerRewardsEarned: createEmptyRewardLedger(),
     });
 
     get().setMode('tower');
@@ -212,7 +221,7 @@ export const createTowerSlice: StateCreator<
       towerStatus: clearedRun.isCompleted ? 'completed' : 'in-run',
     });
 
-    processTowerRewards(rewardEntries, get());
+    processTowerRewards(rewardEntries, get(), set);
 
     if (clearedRun.isCompleted || outcome === 'defeat') {
       set((state) => ({
@@ -288,7 +297,9 @@ export const createTowerSlice: StateCreator<
 
   exitTowerMode: () => {
     const context = get().towerEntryContext;
+    const rewardsLedger = get().towerRewardsEarned;
     restoreSnapshot(get());
+    commitTowerRewardsToCampaign(get(), rewardsLedger);
 
     set({
       towerRun: null,
@@ -296,6 +307,7 @@ export const createTowerSlice: StateCreator<
       towerEntryContext: null,
       towerSnapshots: null,
       activeTowerEncounterId: null,
+      towerRewardsEarned: createEmptyRewardLedger(),
     });
 
     if (context?.type === 'overworld') {
@@ -366,6 +378,14 @@ function buildTowerRoster(): { towerTeam: Team; towerRoster: Unit[] } {
   };
 }
 
+function createEmptyRewardLedger(): TowerRewardLedger {
+  return {
+    equipmentIds: [],
+    djinnIds: [],
+    recruitIds: [],
+  };
+}
+
 function getRewardsForFloor(floorNumber: number): TowerRewardEntry[] {
   const entry = TOWER_REWARDS.find((reward) => reward.floorNumber === floorNumber);
   return entry ? entry.rewards : [];
@@ -375,8 +395,22 @@ function sumUnitStat(units: readonly Unit[], key: 'damageDealt' | 'damageTaken')
   return units.reduce((sum, unit) => sum + (unit.battleStats?.[key] ?? 0), 0);
 }
 
-function processTowerRewards(entries: TowerRewardEntry[], state: TowerSliceDeps) {
-  if (entries.length === 0) return;
+function processTowerRewards(
+  entries: TowerRewardEntry[],
+  state: TowerSliceDeps,
+  setState: SetState<TowerSliceDeps>
+) {
+  if (entries.length === 0) {
+    return;
+  }
+
+  const baseLedger = state.towerRewardsEarned ?? createEmptyRewardLedger();
+  const updatedLedger: TowerRewardLedger = {
+    equipmentIds: [...baseLedger.equipmentIds],
+    djinnIds: [...baseLedger.djinnIds],
+    recruitIds: [...baseLedger.recruitIds],
+  };
+  let recorded = false;
 
   for (const reward of entries) {
     switch (reward.type) {
@@ -386,6 +420,8 @@ function processTowerRewards(entries: TowerRewardEntry[], state: TowerSliceDeps)
           .filter((item): item is Equipment => Boolean(item));
         if (items.length > 0) {
           state.addEquipment(items);
+          updatedLedger.equipmentIds.push(...items.map((item) => item.id));
+          recorded = true;
         }
         break;
       }
@@ -394,6 +430,8 @@ function processTowerRewards(entries: TowerRewardEntry[], state: TowerSliceDeps)
           if (!state.team) continue;
           const updatedTeam = grantDjinnReward(state.team, djinnId);
           state.setTeam(updatedTeam);
+          updatedLedger.djinnIds.push(djinnId);
+          recorded = true;
         }
         break;
       }
@@ -405,9 +443,57 @@ function processTowerRewards(entries: TowerRewardEntry[], state: TowerSliceDeps)
           if (existing) continue;
           const newUnit = createUnit(def, 20, 0);
           appendUnitToRoster(state, newUnit);
+          updatedLedger.recruitIds.push(unitId);
+          recorded = true;
         }
         break;
       }
+    }
+  }
+
+  if (recorded) {
+    setState({
+      towerRewardsEarned: updatedLedger,
+    });
+  }
+}
+
+function commitTowerRewardsToCampaign(state: TowerSliceDeps, rewards: TowerRewardLedger) {
+  if (!rewards) {
+    return;
+  }
+
+  if (rewards.equipmentIds.length) {
+    const items = rewards.equipmentIds
+      .map((id) => EQUIPMENT[id])
+      .filter((item): item is Equipment => Boolean(item))
+      .map((item) => ({ ...item }));
+    if (items.length > 0) {
+      state.addEquipment(items);
+    }
+  }
+
+  if (state.team && rewards.djinnIds.length) {
+    let team = state.team;
+    for (const djinnId of rewards.djinnIds) {
+      team = grantDjinnReward(team, djinnId);
+    }
+    state.setTeam(team);
+  }
+
+  if (rewards.recruitIds.length) {
+    const existingIds = new Set(state.roster?.map((unit) => unit.id) ?? []);
+    for (const unitId of rewards.recruitIds) {
+      if (existingIds.has(unitId)) {
+        continue;
+      }
+      const def = UNIT_DEFINITIONS[unitId];
+      if (!def) {
+        continue;
+      }
+      const newUnit = createUnit(def, 20, 0);
+      appendUnitToRoster(state, newUnit);
+      existingIds.add(unitId);
     }
   }
 }
