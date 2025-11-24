@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device, initial-scale=1.0">
+  <title>GPT's 3-Column Battle Grid Design</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f5e4c5;
+      overflow: hidden;
+    }
+
+    /* ===== GPT'S 3-COLUMN GRID ===== */
+    .battle-screen {
+      display: grid;
+      grid-template-columns: 260px 1fr 320px;
+      grid-template-rows: auto 1fr auto;
+      grid-template-areas:
+        "top    top        top"
+        "party  battlefield log"
+        "bottom bottom     log";
+      height: 100vh;
+      max-height: 100vh;
+      background: radial-gradient(circle at top, #2c1b09 0, #090307 55%, #000 100%);
+    }
+
+    /* ===== TOP BAR ===== */
+    .battle-top {
+      grid-area: top;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 2px solid #3b2610;
+      background: linear-gradient(to bottom, #2b1a0a, #1a0f06);
+    }
+
+    .round-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f9e6b8;
+      margin-bottom: 2px;
+    }
+
+    .round-number {
+      font-size: 16px;
+      font-weight: bold;
+      color: #FFD87F;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .mana-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .mana-label {
+      font-size: 0.9rem;
+      color: #FFD87F;
+      font-weight: bold;
+    }
+
+    .mana-circles {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .mana-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #8b6a4a;
+      background: #2a1a0a;
+    }
+
+    .mana-circle.filled {
+      background: #ffd87f;
+      border-color: #f3c866;
+      box-shadow: 0 0 8px rgba(255, 216, 127, 0.6);
+    }
+
+    .djinn-menu {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .djinn-label {
+      font-size: 0.9rem;
+      color: #FFD87F;
+    }
+
+    .djinn-icons-container {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .djinn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 2px solid #8b6a4a;
+      background: #4a3a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .djinn-icon.active {
+      border-color: #ffd87f;
+      background: #5a4a3a;
+    }
+
+    /* ===== LEFT PARTY SIDEBAR ===== */
+    .battle-party-sidebar {
+      grid-area: party;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      border-right: 2px solid #3b2610;
+      background: radial-gradient(circle at left, #2b1b0a 0, #140a05 65%, #070205 100%);
+      overflow-y: auto;
+    }
+
+    .portrait-card {
+      background: #2a1a0a;
+      border: 2px solid #3b2610;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .portrait-card:hover {
+      border-color: #ffd87f;
+      transform: translateX(4px);
+    }
+
+    .portrait-card.selected {
+      border-color: #ffd87f;
+      background: #3a2a1a;
+      box-shadow: 0 0 12px rgba(255, 216, 127, 0.3);
+    }
+
+    .portrait-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .portrait-img {
+      width: 48px;
+      height: 48px;
+      background: #4a3a2a;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .portrait-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .portrait-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .portrait-meta {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .hp-bar-container {
+      margin-top: 6px;
+    }
+
+    .hp-bar {
+      width: 100%;
+      height: 10px;
+      background: #1a0a0a;
+      border: 1px solid #3b2610;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #66bb6a);
+      transition: width 0.3s;
+    }
+
+    .hp-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 9px;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      font-weight: bold;
+    }
+
+    /* ===== CENTER BATTLEFIELD ===== */
+    .battle-field {
+      grid-area: battlefield;
+      position: relative;
+      overflow: hidden;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .battle-field-background {
+      position: absolute;
+      inset: 0;
+      background: url('../mockups/sprites/backgrounds/gs1/World_Map_Shore.gif') center/cover;
+      opacity: 0.32;
+      filter: saturate(1.1);
+    }
+
+    .battle-field-foreground {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .battle-enemy-row,
+    .battle-party-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .enemy-card,
+    .player-card {
+      text-align: center;
+    }
+
+    .enemy-sprite,
+    .player-sprite {
+      width: 80px;
+      height: 80px;
+      background: #4a3a2a;
+      border-radius: 8px;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .enemy-name,
+    .player-name {
+      font-weight: bold;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    /* ===== BOTTOM PANEL ===== */
+    .battle-bottom {
+      grid-area: bottom;
+      padding: 10px 16px;
+      border-top: 2px solid #3b2610;
+      background: linear-gradient(to top, #241408, #120805);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .current-unit {
+      font-size: 14px;
+      color: #FFD87F;
+      font-weight: bold;
+    }
+
+    .action-queue-line {
+      background: #1a0a0a;
+      border: 1px solid #3b2610;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .battle-ability-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 150px;
+    }
+
+    .ability-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ability-list-item {
+      padding: 8px 12px;
+      background: #2a1a0a;
+      border: 2px solid #3b2610;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ability-list-item:hover {
+      background: #3a2a1a;
+      border-color: #ffd87f;
+    }
+
+    .ability-list-item.selected {
+      background: #ffd87f;
+      border-color: #f3c866;
+      color: #000;
+    }
+
+    .ability-icon {
+      width: 24px;
+      height: 24px;
+      background: #4a3a2a;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .ability-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ability-name {
+      font-weight: bold;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ability-cost {
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .ability-list-item.selected .ability-cost {
+      color: #333;
+    }
+
+    /* ===== RIGHT LOG PANEL (GPT's addition) ===== */
+    .battle-log-panel {
+      grid-area: log;
+      padding: 10px;
+      border-left: 2px solid #3b2610;
+      background: radial-gradient(circle at right, #25160a 0, #110805 60%, #050103 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .log-header {
+      font-size: 14px;
+      font-weight: bold;
+      color: #FFD87F;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #3b2610;
+      padding-bottom: 6px;
+    }
+
+    .battle-log-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .battle-log-entry {
+      font-size: 11px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #3b2610;
+      border-radius: 2px;
+    }
+
+    .battle-log-entry.action {
+      border-left-color: #ffd87f;
+      color: #d8c8a8;
+    }
+
+    .battle-log-entry.damage {
+      border-left-color: #ef5350;
+      color: #ffaaaa;
+    }
+
+    .battle-log-entry.heal {
+      border-left-color: #4CAF50;
+      color: #aaffaa;
+    }
+
+    .battle-log-entry.status {
+      border-left-color: #ffa726;
+      color: #ffcc99;
+    }
+
+    .battle-log-entry strong {
+      color: #fff;
+    }
+
+    /* Scrollbar styling */
+    .battle-log-scroll::-webkit-scrollbar,
+    .battle-ability-columns::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .battle-log-scroll::-webkit-scrollbar-track,
+    .battle-ability-columns::-webkit-scrollbar-track {
+      background: #1a0a0a;
+    }
+
+    .battle-log-scroll::-webkit-scrollbar-thumb,
+    .battle-ability-columns::-webkit-scrollbar-thumb {
+      background: #3b2610;
+      border-radius: 4px;
+    }
+
+    .battle-log-scroll::-webkit-scrollbar-thumb:hover,
+    .battle-ability-columns::-webkit-scrollbar-thumb:hover {
+      background: #4b3620;
+    }
+
+    /* Design comparison label */
+    .design-label {
+      position: fixed;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 87, 34, 0.9);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="design-label">GPT's 3-COLUMN DESIGN (260px + 1fr + 320px)</div>
+
+  <div class="battle-screen">
+    <!-- Top Bar -->
+    <header class="battle-top">
+      <div class="round-info">
+        <div>
+          <div class="section-title">Round</div>
+          <div class="round-number">#2</div>
+        </div>
+      </div>
+
+      <div class="top-bar-right">
+        <div class="mana-bar">
+          <span class="mana-label">💠 MANA:</span>
+          <div class="mana-circles">
+            <div class="mana-circle filled"></div>
+            <div class="mana-circle filled"></div>
+            <div class="mana-circle filled"></div>
+            <div class="mana-circle filled"></div>
+            <div class="mana-circle"></div>
+          </div>
+          <span style="margin-left: 0.5rem; color: #aaa; font-size: 0.85rem;">4/5</span>
+        </div>
+
+        <div class="djinn-menu">
+          <span class="djinn-label">DJINN:</span>
+          <div class="djinn-icons-container">
+            <div class="djinn-icon active">🌍</div>
+            <div class="djinn-icon active">💧</div>
+            <div class="djinn-icon active">💧</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Left Party Sidebar (260px) -->
+    <aside class="battle-party-sidebar">
+      <div class="section-title">Party</div>
+
+      <div class="portrait-card selected">
+        <div class="portrait-header">
+          <div class="portrait-img">👤</div>
+          <div class="portrait-info">
+            <div class="portrait-name">Isaac</div>
+            <div class="portrait-meta">Lv 5 | Venus</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 80%"></div>
+            <div class="hp-text">80/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-img">👤</div>
+          <div class="portrait-info">
+            <div class="portrait-name">Garet</div>
+            <div class="portrait-meta">Lv 5 | Mars</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 100%"></div>
+            <div class="hp-text">100/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-img">👤</div>
+          <div class="portrait-info">
+            <div class="portrait-name">Mia</div>
+            <div class="portrait-meta">Lv 4 | Mercury</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 75%"></div>
+            <div class="hp-text">75/100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait-card">
+        <div class="portrait-header">
+          <div class="portrait-img">👤</div>
+          <div class="portrait-info">
+            <div class="portrait-name">Ivan</div>
+            <div class="portrait-meta">Lv 4 | Jupiter</div>
+          </div>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar">
+            <div class="hp-bar-fill" style="width: 40%"></div>
+            <div class="hp-text">40/100</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Battlefield -->
+    <main class="battle-field">
+      <div class="battle-field-background"></div>
+      <div class="battle-field-foreground">
+        <div class="battle-enemy-row">
+          <div class="enemy-card">
+            <div class="enemy-sprite">👹</div>
+            <div class="enemy-name">Goblin A</div>
+          </div>
+          <div class="enemy-card">
+            <div class="enemy-sprite">👹</div>
+            <div class="enemy-name">Goblin B</div>
+          </div>
+          <div class="enemy-card">
+            <div class="enemy-sprite">👹</div>
+            <div class="enemy-name">Goblin C</div>
+          </div>
+        </div>
+
+        <div class="battle-party-row">
+          <div class="player-card">
+            <div class="player-sprite">🗡️</div>
+            <div class="player-name">Isaac</div>
+          </div>
+          <div class="player-card">
+            <div class="player-sprite">🔥</div>
+            <div class="player-name">Garet</div>
+          </div>
+          <div class="player-card">
+            <div class="player-sprite">💧</div>
+            <div class="player-name">Mia</div>
+          </div>
+          <div class="player-card">
+            <div class="player-sprite">⚡</div>
+            <div class="player-name">Ivan</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Panel (spans left + center) -->
+    <section class="battle-bottom">
+      <div class="panel-header">
+        <div class="current-unit">ISAAC (Lv5 Venus) - Select Ability:</div>
+      </div>
+      <div class="action-queue-line">
+        📜 Action Queue: Empty
+      </div>
+      <div class="battle-ability-columns">
+        <div class="ability-list">
+          <div class="ability-list-item">
+            <div class="ability-icon">⚔️</div>
+            <div class="ability-content">
+              <div class="ability-name">Attack</div>
+              <div class="ability-cost">[0○] Physical</div>
+            </div>
+          </div>
+          <div class="ability-list-item selected">
+            <div class="ability-icon">🔥</div>
+            <div class="ability-content">
+              <div class="ability-name">Fireball</div>
+              <div class="ability-cost">[2○] Mars</div>
+            </div>
+          </div>
+          <div class="ability-list-item">
+            <div class="ability-icon">💚</div>
+            <div class="ability-content">
+              <div class="ability-name">Heal</div>
+              <div class="ability-cost">[1○] Healing</div>
+            </div>
+          </div>
+        </div>
+        <div class="ability-list">
+          <div class="ability-list-item">
+            <div class="ability-icon">🛡️</div>
+            <div class="ability-content">
+              <div class="ability-name">Guard Break</div>
+              <div class="ability-cost">[0○] Physical</div>
+            </div>
+          </div>
+          <div class="ability-list-item">
+            <div class="ability-icon">⚡</div>
+            <div class="ability-content">
+              <div class="ability-name">Spark Strike</div>
+              <div class="ability-cost">[2○] Jupiter</div>
+            </div>
+          </div>
+          <div class="ability-list-item" style="opacity: 0.5; cursor: not-allowed;">
+            <div class="ability-icon">🔒</div>
+            <div class="ability-content">
+              <div class="ability-name">Quake</div>
+              <div class="ability-cost">[3○] Venus</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Log Panel (320px - GPT's addition) -->
+    <aside class="battle-log-panel">
+      <div class="log-header">⚔️ COMBAT LOG</div>
+      <div class="battle-log-scroll">
+        <div class="battle-log-entry action">
+          <strong>Round 1 begins!</strong>
+        </div>
+        <div class="battle-log-entry action">
+          Isaac uses <strong>Fireball</strong> on Goblin A!
+        </div>
+        <div class="battle-log-entry damage">
+          Goblin A takes <strong>52 damage</strong>! (Critical hit!)
+        </div>
+        <div class="battle-log-entry status">
+          Goblin A is <strong>Burned</strong>! (3 turns)
+        </div>
+        <div class="battle-log-entry action">
+          Goblin B attacks Isaac!
+        </div>
+        <div class="battle-log-entry damage">
+          Isaac takes <strong>18 damage</strong>!
+        </div>
+        <div class="battle-log-entry action">
+          Garet uses <strong>Attack</strong> on Goblin B!
+        </div>
+        <div class="battle-log-entry damage">
+          Goblin B takes <strong>28 damage</strong>!
+        </div>
+        <div class="battle-log-entry action">
+          Mia uses <strong>Heal</strong> on Isaac!
+        </div>
+        <div class="battle-log-entry heal">
+          Isaac recovers <strong>35 HP</strong>!
+        </div>
+        <div class="battle-log-entry status">
+          Burn effect: Goblin A takes <strong>10 damage</strong>!
+        </div>
+        <div class="battle-log-entry action">
+          Ivan uses <strong>Spark Strike</strong> on Goblin C!
+        </div>
+        <div class="battle-log-entry damage">
+          Goblin C takes <strong>45 damage</strong>!
+        </div>
+        <div class="battle-log-entry status">
+          Goblin C is <strong>Paralyzed</strong>! (2 turns)
+        </div>
+        <div class="battle-log-entry action">
+          <em>Planning phase - Select actions for Round 2...</em>
+        </div>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>
