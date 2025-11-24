@@ -31,8 +31,13 @@ export const PORTRAIT_MAP: Record<string, string> = {
   'war-mage': 'garet1',
   'mystic': 'mia',
   'ranger': 'ivan',
-  'sentinel': 'felix1',
-  'stormcaller': 'jenna1',
+  'blaze': 'garet1',         // Mars - uses Garet portrait
+  'felix': 'felix1',          // Venus - has portrait
+  'karis': 'ivan',            // Jupiter - uses Ivan portrait (Karis not available)
+  'sentinel': 'felix1',       // Venus - uses Felix portrait
+  'stormcaller': 'jenna1',    // Jupiter - has portrait
+  'tyrell': 'garet1',         // Mars - uses Garet portrait
+  'tower-champion': 'isaac1', // Venus - uses Isaac portrait
 
   // Test units
   'test-warrior-1': 'isaac1',

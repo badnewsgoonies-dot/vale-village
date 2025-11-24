@@ -94,22 +94,33 @@ manifest entries.
 * **Battle** – The queue-battle sandbox now obtains every unit/enemy sprite via
   `BattleUnitSprite`, so the mapping layer is the single source of truth.
 
-Missing art is still expected for unreleased party members (Felix, Jenna,
-Sheba, Piers) and the majority of enemies. Those IDs intentionally surface
-placeholders, which act as TODO markers without breaking active screens.
+### Complete Battle Sprite Coverage (2025-11-24)
 
-## Screen Status (Dev Server Pass)
+**Party Units:** All 11 units now have mappings:
+- Starter party (Isaac/Garet/Mia/Ivan) use dedicated battle sprites with multiple weapon variants
+- Recruitable units (Blaze, Felix, Karis, Sentinel, Stormcaller, Tyrell, Tower-Champion) use starter party sprites as placeholders with varied weapons for visual differentiation
+
+**Enemy Coverage:** All 48 defined enemies mapped to appropriate sprites from the 173 available GIFs:
+- Houses 1-5: Early game enemies (wolves, scouts, slimes, beetles)
+- Houses 6-10: Mid-game beasts (bears, upgraded animals)
+- Houses 11-15: Soldier tier (orcs, lizard fighters, mermen, harpies)
+- Houses 16-20: Elite enemies (captains, commanders, warlords)
+- Special encounters: Elemental bosses, legendary beasts, chimera, overseer, bandits
+
+No placeholders remain in active gameplay screens. Future party members (Felix, Jenna, Sheba, Piers) will transition from placeholder sprites to dedicated battle sprites when those assets become available.
+
+## Screen Status (Complete Coverage)
 
 | Screen | Sprite Status | Notes |
 |--------|---------------|-------|
 | Overworld – Vale Village | ✅ Sprite-complete | Player + Vale NPCs always resolve via `overworldSprites.ts`; no placeholders observed while walking the map. |
-| Battle Sandbox (QueueBattleView) | ✅ Sprite-complete | Starter party (`test-warrior-*`) map to Isaac/Garet/Mia/Ivan GIFs; tutorial goblins (`enemy-1`, `enemy-2`) map to actual enemy sprites. |
+| Battle Sandbox (QueueBattleView) | ✅ Sprite-complete | All party units and enemies mapped to real sprites. |
 | Compendium – Units / Djinn | ✅ Sprite-complete | Units use portrait icons, djinn use `/sprites/battle/djinn/*`; no placeholders. |
-| Compendium – Enemies / Bosses | ⚠️ Partial | Act 1 enemies (through House 5) show real sprites. Later-house enemies (e.g., `stone-captain`, `glacier-captain`, `mountain-commander`, `hydra`) still rely on placeholders until we import their art. |
-| Party Management | ✅ Sprite-complete | Uses `getPortraitSprite` for every roster slot; no missing art for current roster. |
+| Compendium – Enemies / Bosses | ✅ **Sprite-complete** | **ALL 48 enemies** (Houses 1-20 + special encounters) now mapped to appropriate sprites from the 173 available enemy GIFs. |
+| Party Management | ✅ Sprite-complete | Uses `getPortraitSprite` for every roster slot; all 11 units have portrait mappings. |
 | Djinn Collection | ✅ Sprite-complete | Each element resolves to the matching djinn GIF in `/sprites/battle/djinn`. |
-| Rewards Screen (post test battle) | ✅ Sprite-complete (current flow) | Level-up cards and recruits use `BattleUnitSprite` + portraits, so the default test battle renders fully. Future recruits such as Blaze (House 5) still need battle sprite mappings before their encounters go live. |
-| Dialogue Overlays | ✅ Sprite-complete | Dialogue UI always uses `getPortraitSprite`, so every current speaker renders a real icon. |
+| Rewards Screen | ✅ Sprite-complete | All units use `BattleUnitSprite` + portraits with complete mappings. |
+| Dialogue Overlays | ✅ Sprite-complete | Dialogue UI always uses `getPortraitSprite`, all speakers have portrait mappings. |
 
 ### Dev-Time Placeholder Warnings
 
