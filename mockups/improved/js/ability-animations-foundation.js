@@ -92,8 +92,8 @@
       height: `${height}px`,
       objectFit: 'contain',
       imageRendering: 'pixelated',
-      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.6))',
       pointerEvents: 'none',
+      mixBlendMode: 'screen',
     });
 
     layer.appendChild(img);

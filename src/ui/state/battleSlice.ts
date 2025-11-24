@@ -68,9 +68,14 @@ export const createBattleSlice: StateCreator<
     const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.ACTIONS));
     const result = performAction(battle, casterId, abilityId, targetIds, rng);
 
+    if (!result.ok) {
+      console.error('performAction failed:', result.error);
+      return;
+    }
+
     // Check for battle end
-    const battleEnd = checkBattleEnd(result.state);
-    const newEvents: BattleEvent[] = [...result.events];
+    const battleEnd = checkBattleEnd(result.value.state);
+    const newEvents: BattleEvent[] = [...result.value.events];
     if (battleEnd) {
       newEvents.push({
         type: 'battle-end',
@@ -80,7 +85,7 @@ export const createBattleSlice: StateCreator<
       // If player victory, process rewards
       if (battleEnd === 'PLAYER_VICTORY') {
         const { processVictory } = get();
-        processVictory(result.state);
+        processVictory(result.value.state);
       }
 
       // Emit encounter-finished event if we have an encounterId
@@ -94,12 +99,16 @@ export const createBattleSlice: StateCreator<
         });
       }
 
-      set({ battle: result.state, events: [...events, ...newEvents] });
+      set({ battle: result.value.state, events: [...events, ...newEvents] });
     } else {
       // Battle continues - advance to next turn
       const rngEndTurn = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
-      const nextState = endTurn(result.state, rngEndTurn);
-      set({ battle: nextState, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
+      const endResult = endTurn(result.value.state, rngEndTurn);
+      if (!endResult.ok) {
+        console.error('endTurn failed:', endResult.error);
+        return;
+      }
+      set({ battle: endResult.value, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
     }
   },
 
@@ -108,8 +117,12 @@ export const createBattleSlice: StateCreator<
     if (!battle) return;
 
     const rng = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
-    const nextState = endTurn(battle, rng);
-    set({ battle: nextState, turnNumber: turnNumber + 1 });
+    const result = endTurn(battle, rng);
+    if (!result.ok) {
+      console.error('endTurn failed:', result.error);
+      return;
+    }
+    set({ battle: result.value, turnNumber: turnNumber + 1 });
   },
 
   performAIAction: () => {
@@ -134,9 +147,14 @@ export const createBattleSlice: StateCreator<
       // Execute the decision
       const result = performAction(battle, currentActorId, decision.abilityId, decision.targetIds, rng);
 
+      if (!result.ok) {
+        console.error('AI performAction failed:', result.error);
+        return;
+      }
+
       // Check for battle end
-      const battleEnd = checkBattleEnd(result.state);
-      const newEvents: BattleEvent[] = [...result.events];
+      const battleEnd = checkBattleEnd(result.value.state);
+      const newEvents: BattleEvent[] = [...result.value.events];
       if (battleEnd) {
         newEvents.push({
           type: 'battle-end',
@@ -146,7 +164,7 @@ export const createBattleSlice: StateCreator<
         // If player victory, process rewards
         if (battleEnd === 'PLAYER_VICTORY') {
           const { processVictory } = get();
-          processVictory(result.state);
+          processVictory(result.value.state);
         }
 
         // Emit encounter-finished event for story progression
@@ -159,7 +177,7 @@ export const createBattleSlice: StateCreator<
           });
         }
 
-        set({ battle: result.state, events: [...events, ...newEvents] });
+        set({ battle: result.value.state, events: [...events, ...newEvents] });
 
         // Notify story slice of encounter completion
         if (encounterId) {
@@ -171,15 +189,21 @@ export const createBattleSlice: StateCreator<
       } else {
         // Battle continues - advance to next turn
         const rngEndTurn = makePRNG(rngSeed + turnNumber * 1_000_000);
-        const nextState = endTurn(result.state, rngEndTurn);
-        set({ battle: nextState, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
+        const endResult = endTurn(result.value.state, rngEndTurn);
+        if (!endResult.ok) {
+          console.error('AI endTurn failed:', endResult.error);
+          return;
+        }
+        set({ battle: endResult.value, events: [...events, ...newEvents], turnNumber: turnNumber + 1 });
       }
     } catch (error) {
       console.error('AI decision failed:', error);
       // Fallback: end turn
       const rngFallback = makePRNG(createRNGStream(rngSeed, turnNumber, RNG_STREAMS.END_TURN));
-      const nextState = endTurn(battle, rngFallback);
-      set({ battle: nextState, turnNumber: turnNumber + 1 });
+      const fallbackResult = endTurn(battle, rngFallback);
+      if (fallbackResult.ok) {
+        set({ battle: fallbackResult.value, turnNumber: turnNumber + 1 });
+      }
     }
   },
 
@@ -217,7 +241,10 @@ export const createBattleSlice: StateCreator<
     for (let i = 0; i < N; i++) {
       const r = baseRng.clone();
       const result = performAction(battle, casterId, abilityId, targets, r);
-      const totalDamage = result.events
+      if (!result.ok) {
+        continue; // Skip failed previews
+      }
+      const totalDamage = result.value.events
         .filter((e): e is Extract<BattleEvent, { type: 'hit' }> => e.type === 'hit')
         .reduce((acc, ev) => acc + ev.amount, 0);
 

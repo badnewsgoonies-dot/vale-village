@@ -4,14 +4,14 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { 
+import {
   calculateLevelBonuses,
-  calculateEquipmentBonusesFromLoadout,
-  calculateDjinnBonuses,
   calculateStatusModifiers,
   calculateEffectiveStats,
   getEffectiveSPD
 } from '../../../src/core/algorithms/stats';
+import { calculateEquipmentBonuses } from '../../../src/core/models/Equipment';
+import { calculateDjinnBonusesForUnit } from '../../../src/core/algorithms/djinnAbilities';
 import type { Unit } from '../../../src/core/models/Unit';
 import type { Team } from '../../../src/core/models/Team';
 import { createUnit } from '../../../src/core/models/Unit';
@@ -53,7 +53,7 @@ describe('Effective Stats Pipeline', () => {
     });
   });
 
-  describe('calculateEquipmentBonusesFromLoadout', () => {
+  describe('calculateEquipmentBonuses', () => {
     test('should return empty bonuses for empty loadout', () => {
       const loadout = {
         weapon: null,
@@ -62,7 +62,7 @@ describe('Effective Stats Pipeline', () => {
         boots: null,
         accessory: null,
       };
-      const bonuses = calculateEquipmentBonusesFromLoadout(loadout);
+      const bonuses = calculateEquipmentBonuses(loadout);
       
       expect(bonuses).toEqual({});
     });
@@ -77,13 +77,13 @@ describe('Effective Stats Pipeline', () => {
         boots: null,
         accessory: null,
       };
-      const bonuses = calculateEquipmentBonusesFromLoadout(loadout);
+      const bonuses = calculateEquipmentBonuses(loadout);
       
       expect(typeof bonuses).toBe('object');
     });
   });
 
-  describe('calculateDjinnBonuses', () => {
+  describe('calculateDjinnBonusesForUnit', () => {
     test('should return empty bonuses when no Djinn are Set', () => {
       // Create team with 4 units (required)
       const units = [
@@ -93,7 +93,7 @@ describe('Effective Stats Pipeline', () => {
         createUnit(UNIT_DEFINITIONS.ranger, 1),
       ];
       const team = createTeam(units);
-      const bonuses = calculateDjinnBonuses(units[0], team);
+      const bonuses = calculateDjinnBonusesForUnit(units[0], team);
       
       expect(bonuses).toEqual({});
     });
@@ -115,7 +115,7 @@ describe('Effective Stats Pipeline', () => {
         },
       };
       
-      const bonuses = calculateDjinnBonuses(units[0], team);
+      const bonuses = calculateDjinnBonusesForUnit(units[0], team);
       
       // Should have synergy bonuses (at least ATK/DEF)
       expect(bonuses.atk).toBeGreaterThan(0);
@@ -139,7 +139,7 @@ describe('Effective Stats Pipeline', () => {
         },
       };
       
-      const bonuses = calculateDjinnBonuses(units[0], team);
+      const bonuses = calculateDjinnBonusesForUnit(units[0], team);
       
       // Standby Djinn should not contribute bonuses
       expect(bonuses).toEqual({});

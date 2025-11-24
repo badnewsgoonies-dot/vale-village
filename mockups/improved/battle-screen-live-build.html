@@ -1,37 +1,4 @@
-What your screenshots are telling us
-Overworld screen: the player tile is still showing the SimpleSprite placeholder, not the /sprites/overworld/protagonists/... GIF.
-Battle screen: the unit sprites (both player + enemy) are also placeholders, even though the lookup layer has been fixed.
-From the repo state you described (and what I just inspected), the lookup code and mappings look correct now:
-catalog.ts has the new normalizeIdentifier / filename‑stem logic.
-getPlayerSprite and getNPCSprite both return real /sprites/... paths that exist on disk.
-Battle sprites like "isaac-lblade-front" and portraits like "isaac1" do have matching entries in sprite-list-generated.ts.
-So at this point the issue is no longer “mapping is wrong”, it’s runtime resolution/loading. To nail that down quickly, I’d have you do three small, very targeted checks.
-1. Turn on debug for the overworld player sprite
-In OverworldMap.tsx, temporarily change the player SimpleSprite to:
-￼
-// ... existing code ...{isPlayer && team && team.units[0] && (  <SimpleSprite    id={getPlayerSprite(team.units[0].id, facing)}    width={32}    height={32}    debug={true}                // ← add this    style={{      position: 'absolute',      top: 0,      left: 0,      zIndex: 3,      transform: shouldMirrorSprite(facing) ? 'scaleX(-1)' : 'none',    }}  />)}// ... existing code ...
-Reload pnpm dev, move once so it renders, then check the browser console:
-If you see
-"[SimpleSprite] Found sprite:" with a path like /sprites/overworld/protagonists/Isaac_Right.gif
-but you still get a placeholder, open DevTools → Network and see whether that URL 404s.
-If you see
-"[SimpleSprite] Sprite not found:" then paste that log (id + suggestion) here; it means something’s still off between getPlayerSprite and the catalog.
-2. Turn on debug for battle unit sprites
-In BattleUnitSprite.tsx, temporarily add debug:
-￼
-// ... existing code ...return (  <SimpleSprite    id={spriteId}    width={sizeStyles.width}    height={sizeStyles.height}    className={className}    style={style}    alt={`${unitId} sprite`}    debug={true}            // ← add this  />);// ... existing code ...
-Then start a battle (queue battle or classic battle) and look at the console:
-For a party unit like adept, you should see something like:
-id: "isaac-lblade-front", method: "catalog", name: "Isaac lBlade Front", path: "/sprites/battle/party/isaac/Isaac_lBlade_Front.gif".
-For an enemy like garet-enemy, you should see spriteId: "brigand" resolving to some /sprites/battle/enemies/... path.
-Again, if Found sprite logs but the image is still a placeholder, that points to a 404 or asset-serving issue; if it says Sprite not found, share the logged id and I can tell you exactly what’s missing.
-3. Regenerate and validate the manifest (once)
-After the asset moves and added djinn files, make sure you’ve actually regenerated the catalog in your local workspace:
-￼
-cd /home/geni/Documents/vale-villagepnpm generate:sprites      # node scripts/generate-sprite-manifest.cjspnpm validate:sprites      # node scripts/validate-sprites.cjspnpm dev
-This guarantees sprite-list-generated.ts matches what’s in public/sprites/**.
-You should still see a bunch of expected “missing” entries (Felix/Piers battle sets, minornpcs, some djinn), but overworld protagonists, major NPCs, battle party front/idle poses, portraits, and the four djinn fronts should all validate.
-If you run with debug enabled and paste a couple of the console lines (for the overworld player and one battle unit), I can tell you very precisely whether there’s any remaining mapping mistake vs. a pure “asset not served / wrong path” problem.<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -45,7 +12,7 @@ If you run with debug enabled and paste a couple of the console lines (for the o
     }
 
     body {
-      background: #000;
+      background: #000; /* Black background */
       color: #f8f8f0;
       font-family: 'Segoe UI', system-ui, sans-serif;
       height: 100vh;
@@ -81,9 +48,8 @@ If you run with debug enabled and paste a couple of the console lines (for the o
       left: 0;
       width: 100%;
       height: 100%;
-      /* background-image: url('sprites/backgrounds/gs1/Vale.gif'); */
-      background: #1a1a1a; /* Dark gray instead of image */
-      background-size: 100% 100%;
+      background-image: url('sprites/backgrounds/gs1/Vale.gif');
+      background-size: cover;
       background-position: center;
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
@@ -473,6 +439,11 @@ If you run with debug enabled and paste a couple of the console lines (for the o
         opacity: 0;
       }
     }
+
+    /* Remove black background from psynergy GIFs using screen blend mode */
+    .psynergy-gif-effect {
+      mix-blend-mode: screen;
+    }
   </style>
   <script src="js/ability-animations-foundation.js"></script>
 </head>
@@ -615,17 +586,30 @@ If you run with debug enabled and paste a couple of the console lines (for the o
       });
     }
 
-    // Psynergy spells data - uses GIF-based icons via AbilityAnimations
+    // Psynergy spells data - using actual psynergy animation GIFs
     const psynergySpells = [
-      // Using menu icons as stand-in GIFs per ABILITY_GIF_ANIMATION_FOUNDATION
-      { name: 'Heat Wave', gif: 'sprites/icons/buttons/Djinni.gif', element: 'Mars', damage: 45 },
-      { name: 'Ice Missile', gif: 'sprites/icons/buttons/Cure_Poison.gif', element: 'Mercury', damage: 38 },
-      { name: 'Spark Plasma', gif: 'sprites/icons/buttons/Battle.gif', element: 'Jupiter', damage: 52 },
-      { name: 'Grand Gaia', gif: 'sprites/icons/buttons/Attack.gif', element: 'Venus', damage: 85 },
-      { name: 'Dragon Fire', gif: 'sprites/icons/buttons/Djinni.gif', element: 'Mars', damage: 72 },
-      { name: 'Freeze Prism', gif: 'sprites/icons/buttons/Cure_Poison.gif', element: 'Mercury', damage: 68 },
-      { name: 'Blue Bolt', gif: 'sprites/icons/buttons/Battle.gif', element: 'Jupiter', damage: 42 },
-      { name: 'Supernova', gif: 'sprites/icons/buttons/Summon.gif', element: 'Mars', damage: 150 }
+      // Mars (Fire) abilities
+      { name: 'Heat Wave', gif: 'sprites/psynergy/Heat_Wave.gif', element: 'Mars', damage: 45 },
+      { name: 'Dragon Fire', gif: 'sprites/psynergy/Dragon_Fire.gif', element: 'Mars', damage: 72 },
+      { name: 'Supernova', gif: 'sprites/psynergy/Supernova.gif', element: 'Mars', damage: 150 },
+      { name: 'Inferno', gif: 'sprites/psynergy/Inferno.gif', element: 'Mars', damage: 90 },
+
+      // Mercury (Ice/Water) abilities
+      { name: 'Ice Missile', gif: 'sprites/psynergy/Ice_Missile.gif', element: 'Mercury', damage: 38 },
+      { name: 'Freeze Prism', gif: 'sprites/psynergy/Freeze_Prism.gif', element: 'Mercury', damage: 68 },
+      { name: 'Glacier', gif: 'sprites/psynergy/Glacier.gif', element: 'Mercury', damage: 84 },
+      { name: 'Deluge', gif: 'sprites/psynergy/Deluge.gif', element: 'Mercury', damage: 120 },
+
+      // Jupiter (Lightning/Wind) abilities
+      { name: 'Spark Plasma', gif: 'sprites/psynergy/Spark_Plasma.gif', element: 'Jupiter', damage: 52 },
+      { name: 'Blue Bolt', gif: 'sprites/psynergy/Blue_Bolt.gif', element: 'Jupiter', damage: 42 },
+      { name: 'Destruct Ray', gif: 'sprites/psynergy/Destruct_Ray.gif', element: 'Jupiter', damage: 95 },
+      { name: 'Sonic Slash', gif: 'sprites/psynergy/Sonic_Slash.gif', element: 'Jupiter', damage: 65 },
+
+      // Venus (Earth) abilities
+      { name: 'Grand Gaia', gif: 'sprites/psynergy/Grand_Gaia.gif', element: 'Venus', damage: 85 },
+      { name: 'Nettle', gif: 'sprites/psynergy/Nettle.gif', element: 'Venus', damage: 35 },
+      { name: 'Froth Spiral', gif: 'sprites/psynergy/Froth_Spiral.gif', element: 'Venus', damage: 70 }
     ];
 
     // Cast Psynergy spell
@@ -660,8 +644,8 @@ If you run with debug enabled and paste a couple of the console lines (for the o
               containerSelector: '.battle-container',
               gifUrl: spell.gif,
               anchorSelector: enemy,
-              width: 96,
-              height: 96,
+              width: 192,
+              height: 192,
               durationMs: 1200,
               className: 'psynergy-gif-effect',
             });

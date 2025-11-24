@@ -54,11 +54,16 @@ export function createBattleFromEncounter(
   }
 
   // Create battle state with encounter metadata
-  const battle = startBattle(playerTeam, enemyUnits, rng);
-  
+  const battleResult = startBattle(playerTeam, enemyUnits, rng);
+
+  if (!battleResult.ok) {
+    console.error(`Failed to start battle: ${battleResult.error}`);
+    return null;
+  }
+
   // Add encounter metadata
   const battleWithMeta: BattleState = {
-    ...battle,
+    ...battleResult.value,
     encounterId: encounter.id, // Legacy field
     meta: {
       encounterId: encounter.id,

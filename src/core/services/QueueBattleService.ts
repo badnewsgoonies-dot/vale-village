@@ -19,14 +19,15 @@ import { getAbilityManaCost, canAffordAction, validateQueuedActions } from '../a
 import { Result, Ok, Err } from '../utils/result';
 import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
 import { getEffectiveSPD, calculateEffectiveStats } from '../algorithms/stats';
-import { performAction } from './BattleService';
+import { performAction, type ActionResult } from './BattleService';
 import { makeAIDecision } from './AIService';
 import {
   mergeDjinnAbilitiesIntoUnit,
   calculateDjinnBonusesForUnit,
 } from '../algorithms/djinnAbilities';
 
-type PerformActionResult = ReturnType<typeof performAction>;
+// The unwrapped value from performAction Result
+type PerformActionValue = { state: BattleState; result: ActionResult; events: readonly BattleEvent[] };
 
 function isBasicAttack(action: QueuedAction): boolean {
   return action.abilityId === null;
@@ -35,7 +36,7 @@ function isBasicAttack(action: QueuedAction): boolean {
 function shouldGenerateMana(
   action: QueuedAction,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  __actionResult: PerformActionResult
+  __actionResult: PerformActionValue
 ): boolean {
   return isBasicAttack(action);
 }
@@ -274,10 +275,15 @@ function executePlayerActionsPhase(
       rng
     );
 
-    currentState = actionResult.state;
-    events.push(...actionResult.events);
+    if (!actionResult.ok) {
+      // Action failed, skip to next
+      continue;
+    }
 
-    if (shouldGenerateMana(action, actionResult)) {
+    currentState = actionResult.value.state;
+    events.push(...actionResult.value.events);
+
+    if (shouldGenerateMana(action, actionResult.value)) {
       const manaGained = 1;
       const newMana = Math.min(currentState.remainingMana + manaGained, currentState.maxMana);
       currentState = updateBattleState(currentState, {
@@ -329,8 +335,13 @@ function executeEnemyActionsPhase(
       rng
     );
 
-    currentState = actionResult.state;
-    events.push(...actionResult.events);
+    if (!actionResult.ok) {
+      // Action failed, skip to next
+      continue;
+    }
+
+    currentState = actionResult.value.state;
+    events.push(...actionResult.value.events);
   }
 
   return { state: currentState, events };

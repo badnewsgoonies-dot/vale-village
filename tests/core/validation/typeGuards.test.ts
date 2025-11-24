@@ -5,7 +5,7 @@
 
 import { describe, test, expect } from 'vitest';
 import {
-  validateBattleState,
+  validateBattleStateData,
   validateTeam,
   validateUnit,
   isString,
@@ -30,7 +30,7 @@ describe('Type Guards - Battle State', () => {
     // Convert to plain object (simulate external data)
     const plain = JSON.parse(JSON.stringify(state));
 
-    const result = validateBattleState(plain);
+    const result = validateBattleStateData(plain);
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -45,7 +45,7 @@ describe('Type Guards - Battle State', () => {
       // missing required fields
     };
 
-    const result = validateBattleState(invalidData);
+    const result = validateBattleStateData(invalidData);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -59,7 +59,7 @@ describe('Type Guards - Battle State', () => {
 
     plain.remainingMana = plain.maxMana + 10;
 
-    const result = validateBattleState(plain);
+    const result = validateBattleStateData(plain);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -71,7 +71,7 @@ describe('Type Guards - Battle State', () => {
     const state = mkBattle({});
     const plain = JSON.parse(JSON.stringify(state));
 
-    const result = validateBattleState(plain);
+    const result = validateBattleStateData(plain);
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -312,7 +312,7 @@ describe('Type Guards - Integration', () => {
     const serialized = JSON.parse(JSON.stringify(state));
 
     // Validate it
-    const result = validateBattleState(serialized);
+    const result = validateBattleStateData(serialized);
 
     if (!result.ok) {
       // Log errors for debugging

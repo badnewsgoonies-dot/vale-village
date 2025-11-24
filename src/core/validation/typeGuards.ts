@@ -30,7 +30,7 @@ export interface ValidationError {
  * Validate unknown data against BattleState schema
  * Returns validated BattleState or array of validation errors
  */
-export function validateBattleState(data: unknown): Result<BattleState, ValidationError[]> {
+export function validateBattleStateData(data: unknown): Result<BattleState, ValidationError[]> {
   const result = BattleStateSchema.safeParse(data);
 
   if (result.success) {
