@@ -40,6 +40,40 @@ describe('towerSlice integration', () => {
     completeThroughFloor(store, 10);
     expect(store.getState().roster.some((unit) => unit.id === 'tower-champion')).toBe(true);
   });
+
+  it('updates tower record metrics when a run ends', () => {
+    const initialRecord = store.getState().towerRecord;
+    expect(initialRecord.totalRuns).toBe(0);
+
+    const firstFloor = store.getState().getCurrentTowerFloor();
+    store.setState({ activeTowerEncounterId: firstFloor?.encounterId ?? null });
+    store
+      .getState()
+      .handleTowerBattleCompleted({
+        battle: makeTowerBattleState(store.getState().team!, firstFloor!.encounterId),
+        events: [],
+      });
+    store.getState().quitTowerRun();
+
+    const updatedRecord = store.getState().towerRecord;
+    expect(updatedRecord.totalRuns).toBe(1);
+    expect(updatedRecord.highestFloorEver).toBeGreaterThanOrEqual(1);
+  });
+
+  it('hydrates tower record state from external data', () => {
+    store.getState().setTowerRecord({
+      highestFloorEver: 12,
+      totalRuns: 4,
+      bestRunTurns: 55,
+      bestRunDamageDealt: 3200,
+    });
+
+    const record = store.getState().towerRecord;
+    expect(record.highestFloorEver).toBe(12);
+    expect(record.totalRuns).toBe(4);
+    expect(record.bestRunTurns).toBe(55);
+    expect(record.bestRunDamageDealt).toBe(3200);
+  });
 });
 
 function makeTowerBattleState(team: Team, encounterId: string): BattleState {

@@ -33,10 +33,10 @@
 - **Result:** All 1,627 sprite paths verified to exist!
 
 ### 5. Updated Package.json ✅
-Added new npm scripts:
-- `npm run generate:sprites` - Regenerate sprite manifest
-- `npm run validate:sprites` - Verify all paths exist
-- `npm run test:sprites` - Test catalog functionality
+Added new scripts (run them with `pnpm`):
+- `pnpm generate:sprites` - Regenerate sprite manifest
+- `pnpm validate:sprites` - Verify all paths exist
+- `pnpm test:sprites` - Test catalog functionality
 
 ## Sprite Breakdown
 
@@ -61,16 +61,19 @@ Top Categories:
 
 ## How to Use
 
+> **Note:** These commands were originally written with `npm run`.  
+> The repo has since standardized on `pnpm`. Wherever you see `npm run X`, use `pnpm X` instead.
+
 ### Regenerate Manifest (if sprites change)
 ```bash
 cd /workspace/root
-npm run generate:sprites
+pnpm generate:sprites
 ```
 
 ### Validate Sprites
 ```bash
-npm run validate:sprites
-# Output: "✅ All sprites validated successfully!"
+pnpm validate:sprites
+# Output: "✅ All sprites validated successfully!" (once all assets are present)
 ```
 
 ### Use in Code

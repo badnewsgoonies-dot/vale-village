@@ -107,7 +107,7 @@ export function getCurrentFloor(run: TowerRunState, floors: readonly TowerFloor[
   if (run.floorIndex >= run.floorIds.length) {
     return null;
   }
-  const currentId = run.floorIds[run.floorIndex];
+  const currentId = run.floorIds[run.floorIndex] as string;
   return getFloorById(floors, currentId);
 }
 
@@ -124,7 +124,8 @@ export function advanceToNextFloor(run: TowerRunState): TowerRunState {
   return {
     ...run,
     floorIndex: nextIndex,
-    isCompleted: completed ? true : run.isCompleted,
+    isCompleted: completed,
+    isFailed: run.isFailed,
   };
 }
 
@@ -152,7 +153,7 @@ export function recordBattleResult({
   }
 
   const nextStats = updateStatsForBattle(run.stats, currentFloor.floorNumber, outcome, summary);
-  const nextHistory = run.history.map(entry => {
+  const nextHistory: TowerFloorHistoryEntry[] = run.history.map(entry => {
     if (entry.floorId !== currentFloor.id) {
       return entry;
     }
@@ -165,22 +166,20 @@ export function recordBattleResult({
 
   const didWin = outcome === 'victory';
   const didRetreat = outcome === 'retreat';
+  const nextFloorIndex = didWin ? Math.min(run.floorIndex + 1, run.floorIds.length) : run.floorIndex;
+  const hasClearedAllFloors = nextFloorIndex >= run.floorIds.length;
+  const isFailed = outcome === 'defeat';
+  const isCompleted = hasClearedAllFloors || didRetreat || isFailed;
 
   return {
     ...run,
     stats: nextStats,
     history: nextHistory,
-    floorIndex: didWin ? Math.min(run.floorIndex + 1, run.floorIds.length) : run.floorIndex,
-    isCompleted: !didWin,
-    isFailed: outcome === 'defeat',
+    floorIndex: nextFloorIndex,
+    isCompleted,
+    isFailed,
     pendingRewards: rewards.length ? [...run.pendingRewards, ...rewards] : run.pendingRewards,
     // Retreating ends the run but is not a failure
-    ...(didRetreat
-      ? {
-          isCompleted: true,
-          isFailed: false,
-        }
-      : null),
   };
 }
 
@@ -201,12 +200,13 @@ export function completeRestFloor(
     if (entry.floorId !== currentFloor.id) {
       return entry;
     }
-    return {
+    const updated: TowerFloorHistoryEntry = {
       ...entry,
-      outcome: 'rested',
+      outcome: 'rested' as const,
       rewardsGranted: [],
       restSummary: summary,
     };
+    return updated;
   });
 
   return {

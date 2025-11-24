@@ -32,7 +32,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 
 ### 4. Validation System
 - ✅ **validateAll.ts** - Updated to validate all data types (abilities, equipment, units, enemies)
-- ✅ Validation runs at startup via `npm run validate:data`
+- ✅ Validation runs at startup via `pnpm validate:data`
 - ✅ Clear error messages for invalid data
 
 ### 5. Migration System (`src/core/migrations/`)
@@ -118,7 +118,7 @@ Phase 1 of the rebuild playbook has been successfully completed. All POJO models
 ## Exit Criteria Met
 
 ✅ **No classes in `core/models/**`** - All POJOs  
-✅ **Validation passes locally** - `npm run validate:data` works  
+✅ **Validation passes locally** - `pnpm validate:data` works  
 ✅ **All data files validated** - Validation system ready for data  
 ✅ **TypeScript strict mode** - No type errors  
 ✅ **Tests pass** - All model tests working  
@@ -144,20 +144,20 @@ Ready to proceed with Phase 2: Algorithms & Services
 ## How to Use
 
 ```bash
-# Navigate to v2 app
-cd root
+# Navigate to repo root
+cd /home/geni/Documents/vale-village
 
 # Run validation
-npm run validate:data
+pnpm validate:data
 
 # Run tests
-npm test
+pnpm test
 
 # Type check
-npm run typecheck
+pnpm typecheck
 
 # Lint
-npm run lint
+pnpm lint
 ```
 
 ## Example Usage

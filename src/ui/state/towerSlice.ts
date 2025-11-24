@@ -37,6 +37,20 @@ import { isAvailableInCampaign } from '../utils/contentAvailability';
 const TOWER_START_GOLD = 5000;
 const DEFAULT_DIFFICULTY: TowerDifficulty = 'normal';
 
+export interface TowerRecord {
+  readonly highestFloorEver: number;
+  readonly totalRuns: number;
+  readonly bestRunTurns: number | null;
+  readonly bestRunDamageDealt: number | null;
+}
+
+export const DEFAULT_TOWER_RECORD: TowerRecord = Object.freeze({
+  highestFloorEver: 0,
+  totalRuns: 0,
+  bestRunTurns: null,
+  bestRunDamageDealt: null,
+});
+
 type TowerEntryContext =
   | { type: 'main-menu' }
   | { type: 'overworld'; mapId: string; position: Position };
@@ -56,6 +70,7 @@ interface TowerBattlePayload {
 export interface TowerSlice {
   towerRun: TowerRunState | null;
   towerStatus: 'idle' | 'in-run' | 'completed';
+  towerRecord: TowerRecord;
   towerEntryContext: TowerEntryContext | null;
   towerSnapshots: SnapshotState | null;
   activeTowerEncounterId: string | null;
@@ -69,6 +84,7 @@ export interface TowerSlice {
   enterTowerFromOverworld: (context: { mapId: string; position: Position }) => void;
   openTowerFromMainMenu: () => void;
   exitTowerMode: () => void;
+  setTowerRecord: (record: TowerRecord) => void;
 }
 
 type TowerSliceDeps = TowerSlice &
@@ -86,6 +102,7 @@ export const createTowerSlice: StateCreator<
 > = (set, get) => ({
   towerRun: null,
   towerStatus: 'idle',
+  towerRecord: { ...DEFAULT_TOWER_RECORD },
   towerEntryContext: null,
   towerSnapshots: null,
   activeTowerEncounterId: null,
@@ -178,32 +195,34 @@ export const createTowerSlice: StateCreator<
     };
 
     const rewardEntries = getRewardsForFloor(currentFloor.floorNumber);
-    const nextRun = recordBattleResult({
+    const recordedRun = recordBattleResult({
       run,
       floors: TOWER_FLOORS,
       outcome,
       summary,
       rewards: rewardEntries,
     });
+    const clearedRun = clearPendingRewards(recordedRun);
 
     get().setBattle(null, 0);
     get().updateTeamUnits(battle.playerTeam.units);
     set({
       activeTowerEncounterId: null,
-      towerRun: clearPendingRewards(nextRun),
-      towerStatus: nextRun.isCompleted ? 'completed' : 'in-run',
+      towerRun: clearedRun,
+      towerStatus: clearedRun.isCompleted ? 'completed' : 'in-run',
     });
 
     processTowerRewards(rewardEntries, get());
 
-    if (nextRun.isCompleted || outcome === 'defeat') {
+    if (clearedRun.isCompleted || outcome === 'defeat') {
       set((state) => ({
         towerRun: {
-          ...state.towerRun!,
+          ...clearedRun,
           isCompleted: true,
           isFailed: outcome === 'defeat',
         },
         towerStatus: 'completed',
+        towerRecord: updateTowerRecordFromRun(state.towerRecord, clearedRun),
       }));
     }
 
@@ -243,13 +262,14 @@ export const createTowerSlice: StateCreator<
       return;
     }
 
-    set({
+    set((state) => ({
       towerRun: {
         ...run,
         isCompleted: true,
       },
       towerStatus: 'completed',
-    });
+      towerRecord: updateTowerRecordFromRun(state.towerRecord, run),
+    }));
   },
 
   enterTowerFromOverworld: ({ mapId, position }) => {
@@ -284,6 +304,17 @@ export const createTowerSlice: StateCreator<
     } else {
       get().setMode('main-menu');
     }
+  },
+
+  setTowerRecord: (record) => {
+    set({
+      towerRecord: {
+        highestFloorEver: record.highestFloorEver ?? 0,
+        totalRuns: record.totalRuns ?? 0,
+        bestRunTurns: record.bestRunTurns ?? null,
+        bestRunDamageDealt: record.bestRunDamageDealt ?? null,
+      },
+    });
   },
 });
 
@@ -326,7 +357,7 @@ function buildTowerRoster(): { towerTeam: Team; towerRoster: Unit[] } {
     }
   }
 
-  const equippedDjinn = Object.keys(DJINN).slice(0, 3);
+  const equippedDjinn = campaignDjinnIds.slice(0, 3);
   team = updateTeam(team, { equippedDjinn });
 
   return {
@@ -402,6 +433,32 @@ function healTeamAtRest(team: Team | null, config: TowerConfig): Team | null {
     units: healedUnits,
     djinnTrackers: resetTrackers,
   });
+}
+
+function updateTowerRecordFromRun(current: TowerRecord, run: TowerRunState): TowerRecord {
+  const nextHighest = Math.max(current.highestFloorEver, run.stats.highestFloor);
+  const nextTotalRuns = current.totalRuns + 1;
+  const turnsThisRun = run.stats.turnsTaken;
+  const damageThisRun = run.stats.totalDamageDealt;
+
+  const nextBestTurns =
+    turnsThisRun > 0
+      ? current.bestRunTurns === null
+        ? turnsThisRun
+        : Math.min(current.bestRunTurns, turnsThisRun)
+      : current.bestRunTurns;
+
+  const nextBestDamage =
+    current.bestRunDamageDealt === null
+      ? damageThisRun
+      : Math.max(current.bestRunDamageDealt, damageThisRun);
+
+  return {
+    highestFloorEver: nextHighest,
+    totalRuns: nextTotalRuns,
+    bestRunTurns: nextBestTurns,
+    bestRunDamageDealt: nextBestDamage,
+  };
 }
 
 function cloneTeam(team: Team): Team {
