@@ -1,4 +1,5 @@
 import type { Ability } from '../schemas/AbilitySchema';
+import { ABILITIES } from './abilities';
 
 const makeAbility = (ability: Ability): Ability => ability;
 
@@ -2108,4 +2109,16 @@ export const DJINN_ABILITIES: Record<string, Ability> = {
   'bane-earth-revival': BANE_EARTH_REVIVAL,
   'bane-stone-stun': BANE_STONE_STUN,
   'bane-terra-blessing': BANE_TERRA_BLESSING,
+  // Core ability references needed by Djinn definitions
+  'earth-spike': ABILITIES['earth-spike'],
+  'fire-burst': ABILITIES['fire-burst'],
+  'flame-wall': ABILITIES['flame-wall'],
+  'inferno-slash': ABILITIES['inferno-slash'],
+  'phoenix-flames': ABILITIES['phoenix-flames'],
+  'flame-blade': ABILITIES['flame-blade'],
+  'inferno-strike': ABILITIES['inferno-strike'],
+  'phoenix-aura': ABILITIES['phoenix-aura'],
+  'flame-jab': ABILITIES['flame-jab'],
+  'inferno-assault': ABILITIES['inferno-assault'],
+  'flame-tornado': ABILITIES['flame-tornado'],
 };

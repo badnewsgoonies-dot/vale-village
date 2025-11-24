@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { StatsSchema } from './StatsSchema';
 import { EquipmentLoadoutSchema } from './EquipmentSchema';
 import { AbilitySchema } from './AbilitySchema';
+import { ContentAvailabilitySchema } from './ContentAvailabilitySchema';
 
 /**
  * Zod schema for Element
@@ -124,6 +125,7 @@ export const UnitDefinitionSchema = z.object({
   abilities: z.array(AbilitySchema),
   manaContribution: z.number().int().min(0),
   description: z.string(),
+  availableIn: ContentAvailabilitySchema.optional().readonly(),
 });
 
 /**

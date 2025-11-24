@@ -30,6 +30,8 @@ import {
 import { resolveTargets, filterValidTargets } from '../algorithms/targeting';
 import { BATTLE_CONSTANTS } from '../constants';
 import type { BattleEvent } from './types';
+import { Ok, Err, type Result } from '../utils/result';
+import { BattleTransaction } from './BattleTransaction';
 
 const REMOVABLE_STATUS_TYPES = ['poison', 'burn', 'freeze', 'paralyze', 'stun', 'debuff'] as const;
 type RemovableStatusType = (typeof REMOVABLE_STATUS_TYPES)[number];
@@ -57,11 +59,19 @@ export function startBattle(
   playerTeam: Team,
   enemies: readonly Unit[],
   rng: PRNG
-): BattleState {
+): Result<BattleState, string> {
+  if (!playerTeam.units || playerTeam.units.length === 0) {
+    return Err('Player team must contain at least one unit');
+  }
+
+  if (!enemies || enemies.length === 0) {
+    return Err('Battle requires at least one enemy');
+  }
+
   const allUnits = [...playerTeam.units, ...enemies];
   const turnOrder = calculateTurnOrder(allUnits, playerTeam, rng, 0); // Start at turn 0
 
-  return createBattleState(playerTeam, enemies, turnOrder);
+  return Ok(createBattleState(playerTeam, enemies, turnOrder));
 }
 
 /**
@@ -75,11 +85,15 @@ export function performAction(
   abilityId: string,
   targetIds: readonly string[],
   rng: PRNG
-): { state: BattleState; result: ActionResult; events: readonly BattleEvent[] } {
+): Result<{ state: BattleState; result: ActionResult; events: readonly BattleEvent[] }, string> {
+  const transaction = new BattleTransaction();
+  transaction.begin(state);
+
   // Find actor using index (O(1) instead of O(n))
   const actorEntry = state.unitById.get(actorId);
   if (!actorEntry || isUnitKO(actorEntry.unit)) {
-    throw new Error(`Invalid actor: ${actorId}`);
+    transaction.rollback();
+    return Err(`Invalid actor: ${actorId}`);
   }
   const actor = actorEntry.unit;
 
@@ -91,7 +105,8 @@ export function performAction(
       targetId: actorId,
       status: freezeStatus,
     }] : [];
-    return {
+    transaction.commit();
+    return Ok({
       state,
       result: {
         message: `${actor.name} is frozen and cannot act!`,
@@ -99,7 +114,7 @@ export function performAction(
         updatedUnits: [...state.playerTeam.units, ...state.enemies],
       },
       events,
-    };
+    });
   }
 
   // Check paralyze failure
@@ -110,7 +125,8 @@ export function performAction(
       targetId: actorId,
       status: paralyzeStatus,
     }] : [];
-    return {
+    transaction.commit();
+    return Ok({
       state,
       result: {
         message: `${actor.name} is paralyzed and cannot act!`,
@@ -118,13 +134,14 @@ export function performAction(
         updatedUnits: [...state.playerTeam.units, ...state.enemies],
       },
       events,
-    };
+    });
   }
 
   // Find ability
   const ability = actor.abilities.find(a => a.id === abilityId);
   if (!ability) {
-    throw new Error(`Ability ${abilityId} not found for unit ${actorId}`);
+    transaction.rollback();
+    return Err(`Ability ${abilityId} not found for unit ${actorId}`);
   }
 
   // Resolve targets
@@ -138,7 +155,8 @@ export function performAction(
   const targets = validTargets.filter(t => targetIds.includes(t.id));
 
   if (targets.length === 0) {
-    throw new Error(`No valid targets for ability ${abilityId}`);
+    transaction.rollback();
+    return Err(`No valid targets for ability ${abilityId}`);
   }
 
   // Re-validate targets exist and are alive (defensive check)
@@ -149,7 +167,8 @@ export function performAction(
   });
 
   if (aliveTargets.length === 0) {
-    throw new Error(`All targets are KO'd or invalid`);
+    transaction.rollback();
+    return Err(`All targets are KO'd or invalid`);
   }
 
   // Store status effects before execution (for status-applied event detection)
@@ -161,7 +180,12 @@ export function performAction(
   // Execute ability with validated alive targets
   // Pass team for effective stats calculation and RNG for status chance rolls
   const allUnits = [...state.playerTeam.units, ...state.enemies];
-  const result = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, state.enemies, rng);
+  const abilityResult = executeAbility(actor, ability, aliveTargets, allUnits, state.playerTeam, state.enemies, rng);
+  if (!abilityResult.ok) {
+    transaction.rollback();
+    return Err(abilityResult.error);
+  }
+  const result = abilityResult.value;
 
   // Update battle state with new units
   const updatedPlayerUnits = state.playerTeam.units.map(u => {
@@ -241,7 +265,8 @@ export function performAction(
     });
   }
 
-  return { state: updatedState, result, events };
+  transaction.commit();
+  return Ok({ state: updatedState, result, events });
 }
 
 /**
@@ -358,7 +383,7 @@ export function executeAbility(
   team: Team,
   enemies: readonly Unit[],
   rng: PRNG
-): ActionResult {
+): Result<ActionResult, string> {
   const targetIds = targets.map(t => t.id);
   let message = `${caster.name} uses ${ability.name}!`;
   const updatedUnits: Unit[] = [];
@@ -549,13 +574,13 @@ export function executeAbility(
         return updated || u;
       });
 
-      return {
+      return Ok({
         damage: totalDamage,
         message,
         targetIds,
         updatedUnits: finalUnits,
         hit: totalDamage > 0,
-      };
+      });
     }
 
     case 'healing': {
@@ -611,13 +636,13 @@ export function executeAbility(
         return updated || u;
       });
 
-      return {
+      return Ok({
         healing: totalHealing,
         message,
         targetIds,
         updatedUnits: finalUnits,
         hit: false,
-      };
+      });
     }
 
     case 'buff':
@@ -658,29 +683,29 @@ export function executeAbility(
         return updated || u;
       });
 
-      return {
+      return Ok({
         message,
         targetIds,
         updatedUnits: finalUnits,
         hit: false,
-      };
+      });
     }
 
     case 'summon': {
       // Summon abilities are handled separately by the Djinn system
       // This case exists for type safety but shouldn't be called directly
-      return {
+      return Ok({
         message: `${caster.name} summons ${ability.name}!`,
         targetIds,
         updatedUnits: [...allUnits],
         hit: false,
-      };
+      });
     }
 
     default: {
       // Exhaustive check - ensures all ability types are handled
       const _exhaustive: never = ability.type;
-      throw new Error(`Unhandled ability type: ${_exhaustive}`);
+      return Err(`Unhandled ability type: ${String(_exhaustive)}`);
     }
   }
 }
@@ -693,19 +718,24 @@ export function executeAbility(
 export function endTurn(
   state: BattleState,
   rng: PRNG
-): BattleState {
+): Result<BattleState, string> {
+  const transaction = new BattleTransaction();
+  transaction.begin(state);
+  let workingState = state;
   // Process status effects for current actor
-  const currentActorId = state.turnOrder[state.currentActorIndex];
+  const currentActorId = workingState.turnOrder[workingState.currentActorIndex];
   if (!currentActorId) {
     // No current actor, just advance
-    let nextIndex = state.currentActorIndex + 1;
-    if (nextIndex >= state.turnOrder.length) {
+    let nextIndex = workingState.currentActorIndex + 1;
+    if (nextIndex >= workingState.turnOrder.length) {
       nextIndex = 0;
     }
-    return updateBattleState(state, { currentActorIndex: nextIndex });
+    const updated = updateBattleState(workingState, { currentActorIndex: nextIndex });
+    transaction.commit();
+    return Ok(updated);
   }
 
-  const currentActorEntry = state.unitById.get(currentActorId);
+  const currentActorEntry = workingState.unitById.get(currentActorId);
   const currentActor = currentActorEntry?.unit;
 
   if (currentActor) {
@@ -715,52 +745,56 @@ export function endTurn(
     const isPlayer = currentActorEntry!.isPlayer;
 
     if (isPlayer) {
-      const updatedPlayerUnits = state.playerTeam.units.map(u =>
+      const updatedPlayerUnits = workingState.playerTeam.units.map(u =>
         u.id === currentActorId ? statusResult.updatedUnit : u
       );
-      state = updateBattleState(state, {
-        playerTeam: { ...state.playerTeam, units: updatedPlayerUnits },
+      workingState = updateBattleState(workingState, {
+        playerTeam: { ...workingState.playerTeam, units: updatedPlayerUnits },
         log: statusResult.messages.length > 0
-          ? [...state.log, ...statusResult.messages]
-          : state.log,
+          ? [...workingState.log, ...statusResult.messages]
+          : workingState.log,
       });
     } else {
-      const updatedEnemies = state.enemies.map(u =>
+      const updatedEnemies = workingState.enemies.map(u =>
         u.id === currentActorId ? statusResult.updatedUnit : u
       );
-      state = updateBattleState(state, {
+      workingState = updateBattleState(workingState, {
         enemies: updatedEnemies,
         log: statusResult.messages.length > 0
-          ? [...state.log, ...statusResult.messages]
-          : state.log,
+          ? [...workingState.log, ...statusResult.messages]
+          : workingState.log,
       });
     }
   }
 
   // Advance to next actor
-  let nextIndex = state.currentActorIndex + 1;
+  let nextIndex = workingState.currentActorIndex + 1;
 
   // If we've gone through all units, start new round
-  if (nextIndex >= state.turnOrder.length) {
+  if (nextIndex >= workingState.turnOrder.length) {
     nextIndex = 0;
-    const newTurn = state.currentTurn + 1;
+    const newTurn = workingState.currentTurn + 1;
     const newTurnOrder = calculateTurnOrder(
-      [...state.playerTeam.units, ...state.enemies],
-      state.playerTeam,
+      [...workingState.playerTeam.units, ...workingState.enemies],
+      workingState.playerTeam,
       rng,
-      newTurn // Pass turn number for deterministic tiebreaker
+      newTurn
     );
 
-    return updateBattleState(state, {
+    const updated = updateBattleState(workingState, {
       currentTurn: newTurn,
       turnOrder: newTurnOrder,
       currentActorIndex: 0,
     });
+    transaction.commit();
+    return Ok(updated);
   }
 
-  return updateBattleState(state, {
+  const updated = updateBattleState(workingState, {
     currentActorIndex: nextIndex,
   });
+  transaction.commit();
+  return Ok(updated);
 }
 
 /**

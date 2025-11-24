@@ -32,33 +32,7 @@ export function calculateLevelBonuses(unit: Unit): Partial<Stats> {
   };
 }
 
-/**
- * Calculate equipment stat bonuses
- * Reuses existing function from Equipment.ts
- * 
- * @param loadout - Equipment loadout
- * @returns Partial stats with equipment bonuses
- */
-export function calculateEquipmentBonusesFromLoadout(loadout: EquipmentLoadout): Partial<Stats> {
-  return calculateEquipmentBonuses(loadout);
-}
 
-/**
- * Simple Djinn element lookup by ID
- * Maps common Djinn IDs to their elements
- * TODO: Replace with proper Djinn registry when available
- */
-/**
- * Calculate Djinn synergy bonuses
- * Only applies when Djinn state is 'Set'
- * Computed once per team (team-wide bonuses)
- * 
- * @param team - Team with Djinn trackers
- * @returns Partial stats with Djinn bonuses
- */
-export function calculateDjinnBonuses(unit: Unit, team: Team): Partial<Stats> {
-  return calculateDjinnBonusesForUnit(unit, team);
-}
 
 /**
  * Calculate status effect stat modifiers
@@ -100,8 +74,8 @@ export function calculateStatusModifiers(unit: Unit): Partial<Stats> {
 export function calculateEffectiveStats(unit: Unit, team: Team): Stats {
   const base = unit.baseStats;
   const level = calculateLevelBonuses(unit);
-  const equipment = calculateEquipmentBonusesFromLoadout(unit.equipment);
-  const djinn = calculateDjinnBonuses(unit, team);
+  const equipment = calculateEquipmentBonuses(unit.equipment);
+  const djinn = calculateDjinnBonusesForUnit(unit, team);
   const status = calculateStatusModifiers(unit);
   
   // Combine all bonuses

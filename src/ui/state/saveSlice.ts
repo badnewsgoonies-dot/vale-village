@@ -24,6 +24,8 @@ import type { TeamSlice } from './teamSlice';
 import type { InventorySlice } from './inventorySlice';
 import type { StorySlice } from './storySlice';
 import type { OverworldSlice } from './overworldSlice';
+import type { TowerSlice, TowerRecord } from './towerSlice';
+import { DEFAULT_TOWER_RECORD } from './towerSlice';
 
 export interface SaveSlice {
   hasSave: () => boolean;
@@ -48,7 +50,8 @@ function createSaveData(
   roster: Unit[],
   inventory: Pick<InventorySlice, 'gold' | 'equipment'>,
   story: StorySlice['story'],
-  overworld: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> | null
+  overworld: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> | null,
+  towerRecord: TowerRecord
 ): SaveV1 | null {
   // Ensure we have units to save
   if (!team || !team.units || team.units.length === 0) {
@@ -113,6 +116,7 @@ function createSaveData(
       totalHealingDone: 0,
       playtime: 0, // TODO: Track playtime
     },
+    towerStats: towerRecord ?? DEFAULT_TOWER_RECORD,
   };
 }
 
@@ -133,7 +137,7 @@ function getStoryStateFromSave(saveData: SaveV1): StoryState {
 }
 
 export const createSaveSlice: StateCreator<
-  SaveSlice & BattleSlice & TeamSlice & InventorySlice & StorySlice & OverworldSlice,
+  SaveSlice & BattleSlice & TeamSlice & InventorySlice & StorySlice & OverworldSlice & TowerSlice,
   [['zustand/devtools', never]],
   [],
   SaveSlice
@@ -187,6 +191,8 @@ export const createSaveSlice: StateCreator<
       saveData.overworldState.playerPosition
     );
 
+    state.setTowerRecord(saveData.towerStats ?? DEFAULT_TOWER_RECORD);
+
     // Hydrate battle state from localStorage
     const battleStateJson = localStorage.getItem('vale-v2/battle-state');
     if (battleStateJson) {
@@ -210,7 +216,14 @@ export const createSaveSlice: StateCreator<
       currentMapId,
       playerPosition,
     };
-    const saveData = createSaveData(team, roster, { gold, equipment }, story, overworldSnapshot);
+    const saveData = createSaveData(
+      team,
+      roster,
+      { gold, equipment },
+      story,
+      overworldSnapshot,
+      get().towerRecord ?? DEFAULT_TOWER_RECORD
+    );
     
     if (!saveData) {
       console.error('Cannot save: no team data');
@@ -247,7 +260,14 @@ export const createSaveSlice: StateCreator<
       currentMapId,
       playerPosition,
     };
-    const saveData = createSaveData(team, roster, { gold, equipment }, story, overworldSnapshot);
+    const saveData = createSaveData(
+      team,
+      roster,
+      { gold, equipment },
+      story,
+      overworldSnapshot,
+      get().towerRecord ?? DEFAULT_TOWER_RECORD
+    );
     
     if (!saveData) {
       console.error('Cannot save: no team data');
@@ -315,6 +335,8 @@ export const createSaveSlice: StateCreator<
       saveData.overworldState.currentScene,
       saveData.overworldState.playerPosition
     );
+
+    state.setTowerRecord(saveData.towerStats ?? DEFAULT_TOWER_RECORD);
 
     // Hydrate battle state from localStorage
     const battleStateJson = localStorage.getItem(`vale-v2/battle-state-slot-${slot}`);

@@ -58,7 +58,11 @@ const createNPC = (id: string, x: number, y: number): GameMap['npcs'][number] =>
   spriteId: 'npc-default',
 });
 
-const buildValeVillageNPCs = (): GameMap['npcs'] => [];
+const TOWER_ENTRANCE_COLUMN = 76;
+
+const buildValeVillageNPCs = (): GameMap['npcs'] => [
+  createNPC('tower-attendant', TOWER_ENTRANCE_COLUMN, ROAD_ROW),
+];
 
 const buildValeVillageTriggers = (): GameMap['triggers'] => {
   const houseTriggers = HOUSE_POSITIONS.map(({ houseNum, overworldX }, index) => ({
@@ -91,6 +95,21 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
       type: 'transition' as const,
       position: { x: 2, y: ROAD_ROW },
       data: { targetMap: 'weapon-shop-interior', targetPos: { x: HOUSE_CENTER_X, y: HOUSE_EXIT_Y } },
+    },
+    {
+      id: 'tower-entrance',
+      type: 'tower' as const,
+      position: { x: TOWER_ENTRANCE_COLUMN, y: ROAD_ROW },
+      data: {
+        sourceMapId: 'vale-village',
+        returnPos: { x: TOWER_ENTRANCE_COLUMN, y: ROAD_ROW },
+      },
+    },
+    {
+      id: 'vale-training-battle',
+      type: 'battle' as const,
+      position: { x: 6, y: ROAD_ROW },
+      data: { encounterId: 'training-dummy' },
     },
   ];
 };

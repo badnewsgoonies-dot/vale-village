@@ -19,14 +19,15 @@ import { getAbilityManaCost, canAffordAction, validateQueuedActions } from '../a
 import { Result, Ok, Err } from '../utils/result';
 import { calculateSummonDamage, canActivateDjinn } from '../algorithms/djinn';
 import { getEffectiveSPD, calculateEffectiveStats } from '../algorithms/stats';
-import { performAction } from './BattleService';
+import { performAction, type ActionResult } from './BattleService';
 import { makeAIDecision } from './AIService';
 import {
   mergeDjinnAbilitiesIntoUnit,
   calculateDjinnBonusesForUnit,
 } from '../algorithms/djinnAbilities';
 
-type PerformActionResult = ReturnType<typeof performAction>;
+// The unwrapped value from performAction Result
+type PerformActionValue = { state: BattleState; result: ActionResult; events: readonly BattleEvent[] };
 
 function isBasicAttack(action: QueuedAction): boolean {
   return action.abilityId === null;
@@ -35,7 +36,7 @@ function isBasicAttack(action: QueuedAction): boolean {
 function shouldGenerateMana(
   action: QueuedAction,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  __actionResult: PerformActionResult
+  __actionResult: PerformActionValue
 ): boolean {
   return isBasicAttack(action);
 }
@@ -274,10 +275,15 @@ function executePlayerActionsPhase(
       rng
     );
 
-    currentState = actionResult.state;
-    events.push(...actionResult.events);
+    if (!actionResult.ok) {
+      // Action failed, skip to next
+      continue;
+    }
 
-    if (shouldGenerateMana(action, actionResult)) {
+    currentState = actionResult.value.state;
+    events.push(...actionResult.value.events);
+
+    if (shouldGenerateMana(action, actionResult.value)) {
       const manaGained = 1;
       const newMana = Math.min(currentState.remainingMana + manaGained, currentState.maxMana);
       currentState = updateBattleState(currentState, {
@@ -329,8 +335,13 @@ function executeEnemyActionsPhase(
       rng
     );
 
-    currentState = actionResult.state;
-    events.push(...actionResult.events);
+    if (!actionResult.ok) {
+      // Action failed, skip to next
+      continue;
+    }
+
+    currentState = actionResult.value.state;
+    events.push(...actionResult.value.events);
   }
 
   return { state: currentState, events };
@@ -364,32 +375,17 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
   const updatedTimers = { ...state.djinnRecoveryTimers };
   const updatedTrackers = { ...state.playerTeam.djinnTrackers };
 
-  console.warn('[QueueBattle] Djinn recovery at start of round', state.roundNumber + 1, ':', {
-    timers: updatedTimers,
-    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
-  });
-
   for (const [djinnId, timer] of Object.entries(updatedTimers)) {
     if (timer > 0) {
-      const tracker = updatedTrackers[djinnId];
-
-      // Skip decrementing if Djinn was just activated this round
-      // (lastActivatedTurn matches the round that just completed)
-      if (tracker?.lastActivatedTurn === state.roundNumber) {
-        console.warn(`[QueueBattle] Djinn ${djinnId} just activated - skipping timer decrement`);
-        continue;
-      }
-
       updatedTimers[djinnId] = timer - 1;
-      console.warn(`[QueueBattle] Djinn ${djinnId} timer: ${timer} → ${updatedTimers[djinnId]}`);
       if (updatedTimers[djinnId] === 0) {
         delete updatedTimers[djinnId];
+        const tracker = updatedTrackers[djinnId];
         if (tracker) {
           updatedTrackers[djinnId] = {
             ...tracker,
             state: 'Set',
           };
-          console.warn(`[QueueBattle] Djinn ${djinnId} recovered to Set!`);
         }
       }
     } else {
@@ -397,18 +393,8 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     }
   }
 
-  console.warn('[QueueBattle] After recovery processing:', {
-    timers: updatedTimers,
-    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
-  });
-
   let updatedTeam = updateTeam(state.playerTeam, {
     djinnTrackers: updatedTrackers,
-  });
-
-  console.warn('[QueueBattle] Before merging Djinn abilities:', {
-    round: state.roundNumber + 1,
-    units: updatedTeam.units.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
   });
 
   const unitsWithUpdatedAbilities = updatedTeam.units.map(unit =>
@@ -425,11 +411,6 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     }
     // Note: PP system removed, no need to clamp currentPp
     return updated;
-  });
-
-  console.warn('[QueueBattle] After merging Djinn abilities:', {
-    round: state.roundNumber + 1,
-    units: unitsWithClampedStats.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
   });
 
   updatedTeam = updateTeam(updatedTeam, {

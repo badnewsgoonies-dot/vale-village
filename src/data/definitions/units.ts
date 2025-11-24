@@ -710,6 +710,46 @@ export const FELIX: UnitDefinition = {
   description: 'A legendary earth warrior with unmatched physical prowess and defensive mastery',
 };
 
+export const TOWER_CHAMPION: UnitDefinition = {
+  id: 'tower-champion',
+  name: 'Tower Champion',
+  element: 'Venus',
+  role: 'Master Warrior',
+  baseStats: {
+    hp: 620,
+    pp: 180,
+    atk: 320,
+    def: 210,
+    mag: 140,
+    spd: 185,
+  },
+  growthRates: {
+    hp: 24,
+    pp: 8,
+    atk: 10,
+    def: 7,
+    mag: 5,
+    spd: 6,
+  },
+  abilities: [
+    { ...STRIKE, unlockLevel: 1 },
+    { ...GUARD_BREAK, unlockLevel: 1 },
+    { ...HEAVY_STRIKE, unlockLevel: 2 },
+    { ...EARTH_SPIKE_DAMAGE, unlockLevel: 3 },
+    { ...GAIA_SHIELD, unlockLevel: 4 },
+    { ...EARTHQUAKE, unlockLevel: 5 },
+    { ...RAGNAROK_STRIKE, unlockLevel: 7 },
+    { ...STONE_WALL, unlockLevel: 9 },
+    { ...MASTER_AURA, unlockLevel: 12 },
+    { ...GAIA_BLADE, unlockLevel: 15 },
+    { ...TITAN_FALL, unlockLevel: 18 },
+    { ...EARTH_JUDGMENT, unlockLevel: 20 },
+  ],
+  manaContribution: 2,
+  description: 'An elite gladiator who defends the Tower and lends their strength to worthy challengers.',
+  availableIn: ['tower'],
+};
+
 // ============================================================================
 // Export all units
 // ============================================================================
@@ -725,4 +765,5 @@ export const UNIT_DEFINITIONS: Record<string, UnitDefinition> = {
   karis: KARIS,
   tyrell: TYRELL,
   felix: FELIX,
+  'tower-champion': TOWER_CHAMPION,
 };

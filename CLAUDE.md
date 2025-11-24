@@ -166,6 +166,40 @@ enum Element { Venus, Mars, Mercury, Jupiter }
 
 ---
 
+## Output Strategy Guidelines (Suggested)
+
+### When to Use Chat vs Files
+
+These are suggested best practices for deciding whether to respond in chat or create files. Use judgment based on the specific context and user needs.
+
+**Consider chat responses for:**
+- Quick explanations and debugging sessions
+- Interactive discussions and Q&A
+- Temporary information or one-off explanations
+- Personal understanding and learning
+- Rapid iteration on ideas
+- Exploring concepts before implementation
+
+**Consider creating/editing files when:**
+- Documentation needs persistence beyond the conversation
+- Content will be referenced multiple times
+- Information should be version controlled in git
+- Team members need access to the information
+- Building official project documentation (README, API docs, etc.)
+- Creating reusable scripts, configs, or code
+
+**Token Efficiency Notes:**
+- Chat responses remain in conversation context (can bloat long sessions)
+- Files can be read back with fewer tokens than regenerating content
+- For frequently referenced information, files are more token-efficient
+
+**Default Behavior:**
+- Prefer editing existing files over creating new ones
+- Avoid creating documentation files unless explicitly requested
+- Keep filesystem clean - don't create unnecessary files
+
+---
+
 ## Game Systems
 
 **📖 For detailed flow documentation, see [docs/app/GAME_MECHANICS_FLOW.md](docs/app/GAME_MECHANICS_FLOW.md)**

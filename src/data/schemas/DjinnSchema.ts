@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ElementSchema } from './UnitSchema';
+import { ContentAvailabilitySchema } from './ContentAvailabilitySchema';
 
 export const DjinnSummonEffectSchema = z.discriminatedUnion('type', [
   z.object({
@@ -40,6 +41,7 @@ export const DjinnSchema = z.object({
   tier: z.enum(['1', '2', '3']),
   summonEffect: DjinnSummonEffectSchema,
   grantedAbilities: z.record(z.string().min(1), DjinnGrantedAbilitiesSchema),
+  availableIn: ContentAvailabilitySchema.optional().readonly(),
 });
 
 export type Djinn = z.infer<typeof DjinnSchema>;

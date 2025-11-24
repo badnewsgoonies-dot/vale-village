@@ -24,6 +24,13 @@ const NPCStateSchema = z.object({
   customData: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 
+const TowerRecordSchema = z.object({
+  highestFloorEver: z.number().int().min(0).default(0),
+  totalRuns: z.number().int().min(0).default(0),
+  bestRunTurns: z.number().int().min(0).nullable().default(null),
+  bestRunDamageDealt: z.number().int().min(0).nullable().default(null),
+});
+
 /**
  * Save file version 1 schema
  * This is the initial save format for the v2 app
@@ -64,6 +71,7 @@ export const SaveV1Schema = z.object({
     totalHealingDone: z.number().int().min(0),
     playtime: z.number().int().min(0),  // Seconds
   }),
+  towerStats: TowerRecordSchema.optional(),
 });
 
 export type SaveV1 = z.infer<typeof SaveV1Schema>;

@@ -48,17 +48,21 @@ function applyPlayerCommand(
 ): { state: BattleState; events: BattleEvent[] } {
   if (command.type === 'ability' && command.abilityId && command.targetIds) {
     const result = performAction(state, command.actorId, command.abilityId, command.targetIds, rng);
-    
-    const battleEnd = checkBattleEnd(result.state);
-    const events: BattleEvent[] = [...result.events];
+
+    if (!result.ok) {
+      throw new Error(`Action failed: ${result.error}`);
+    }
+
+    const battleEnd = checkBattleEnd(result.value.state);
+    const events: BattleEvent[] = [...result.value.events];
     if (battleEnd) {
       events.push({
         type: 'battle-end',
         result: battleEnd,
       });
-      
+
       // Emit encounter-finished if we have encounterId
-      const encounterId = getEncounterId(result.state);
+      const encounterId = getEncounterId(result.value.state);
       if (encounterId) {
         events.push({
           type: 'encounter-finished',
@@ -68,10 +72,13 @@ function applyPlayerCommand(
       }
     }
 
-    return { state: result.state, events };
+    return { state: result.value.state, events };
   } else if (command.type === 'end-turn') {
-    const nextState = endTurn(state, rng);
-    return { state: nextState, events: [] };
+    const endResult = endTurn(state, rng);
+    if (!endResult.ok) {
+      throw new Error(`End turn failed: ${endResult.error}`);
+    }
+    return { state: endResult.value, events: [] };
   }
 
   throw new Error(`Unknown command type: ${command.type}`);
@@ -126,17 +133,21 @@ function applySystemTick(
     return { state: updatedState, events };
   } else if (tick.type === 'ai-action' && tick.abilityId && tick.targetIds) {
     const result = performAction(state, tick.actorId, tick.abilityId, tick.targetIds, rng);
-    
-    const battleEnd = checkBattleEnd(result.state);
-    const events: BattleEvent[] = [...result.events];
+
+    if (!result.ok) {
+      throw new Error(`AI action failed: ${result.error}`);
+    }
+
+    const battleEnd = checkBattleEnd(result.value.state);
+    const events: BattleEvent[] = [...result.value.events];
     if (battleEnd) {
       events.push({
         type: 'battle-end',
         result: battleEnd,
       });
-      
+
       // Emit encounter-finished if we have encounterId
-      const encounterId = getEncounterId(result.state);
+      const encounterId = getEncounterId(result.value.state);
       if (encounterId) {
         events.push({
           type: 'encounter-finished',
@@ -146,7 +157,7 @@ function applySystemTick(
       }
     }
 
-    return { state: result.state, events };
+    return { state: result.value.state, events };
   }
 
   return { state, events: [] };

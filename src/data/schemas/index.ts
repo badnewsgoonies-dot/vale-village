@@ -12,4 +12,7 @@ export * from './BattleStateSchema';
 export * from './EnemySchema';
 export * from './EncounterSchema';
 export * from './SaveV1Schema';
+export * from './TowerFloorSchema';
+export * from './TowerRewardSchema';
+export * from './ContentAvailabilitySchema';
 

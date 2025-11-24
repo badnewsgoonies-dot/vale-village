@@ -576,7 +576,7 @@ export const FIZZ: Djinn = {
       neutral: ['fizz-aqua-pulse'],
     },
     mystic: {
-      same: ['fizz-ice-shard', 'fizz-wave-shield'],
+      same: ['fizz-healing-wave', 'fizz-wave-shield'],
       counter: [],
       neutral: ['fizz-aqua-pulse'],
     },
@@ -901,6 +901,61 @@ export const EMBER: Djinn = {
   },
 };
 
+export const NOVA: Djinn = {
+  id: 'nova',
+  name: 'Nova',
+  element: 'Mars',
+  tier: '3',
+  summonEffect: {
+    type: 'damage',
+    description: 'Nova erupts with starfire, scorching every foe.',
+    damage: 320,
+  },
+  grantedAbilities: {
+    'war-mage': {
+      same: ['flame-wall', 'inferno-slash', 'phoenix-flames'],
+      counter: ['granite-magma-barrier', 'granite-volcanic-spike'],
+      neutral: ['flint-ground-shield'],
+    },
+    blaze: {
+      same: ['flame-blade', 'inferno-strike', 'phoenix-aura'],
+      counter: ['granite-volcanic-armor'],
+      neutral: ['flint-rock-barrage'],
+    },
+    tyrell: {
+      same: ['flame-jab', 'inferno-assault', 'flame-tornado'],
+      counter: ['flint-earth-pulse'],
+      neutral: ['granite-ground-wave'],
+    },
+    adept: {
+      same: ['granite-earth-wall'],
+      counter: [],
+      neutral: ['flint-ground-shield'],
+    },
+    sentinel: {
+      same: ['granite-earth-wall', 'granite-terra-break'],
+      counter: ['flame-wall'],
+      neutral: ['flint-ground-shield'],
+    },
+    mystic: {
+      same: ['fizz-healing-wave', 'fizz-aqua-heal'],
+      counter: ['flame-wall'],
+      neutral: ['fizz-wave-shield'],
+    },
+    ranger: {
+      same: ['breeze-gale-force', 'breeze-wind-veil'],
+      counter: ['flame-wall'],
+      neutral: ['breeze-eddy-pulse'],
+    },
+    stormcaller: {
+      same: ['breeze-gale-force', 'breeze-wind-veil'],
+      counter: ['flame-wall'],
+      neutral: ['breeze-eddy-pulse'],
+    },
+  },
+  availableIn: ['tower'],
+};
+
 export const DJINN: Record<string, Djinn> = {
   flint: FLINT,
   granite: GRANITE,
@@ -917,4 +972,5 @@ export const DJINN: Record<string, Djinn> = {
   // VS1 Demo
   rockling: ROCKLING,
   ember: EMBER,
+  nova: NOVA,
 };

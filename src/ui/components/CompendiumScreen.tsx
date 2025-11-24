@@ -11,10 +11,11 @@ import { ENEMIES } from '@/data/definitions/enemies';
 import { ABILITIES } from '@/data/definitions/abilities';
 import { DJINN_ABILITIES } from '@/data/definitions/djinnAbilities';
 import { SimpleSprite } from '../sprites/SimpleSprite';
-import { getPortraitSprite } from '../sprites/mappings/portraits';
-import { getAbilityIconSprite } from '../sprites/mappings/abilityIcons';
+import { getEnemyBattleSprite, getPortraitSprite, getAbilityIconSprite } from '../sprites/mappings';
+import { warnIfPlaceholderSprite } from '../sprites/utils/warnIfPlaceholderSprite';
 import { EquipmentIcon } from './EquipmentIcon';
 import './CompendiumScreen.css';
+import { isAvailableInCampaign } from '../utils/contentAvailability';
 
 interface CompendiumScreenProps {
   onClose: () => void;
@@ -35,6 +36,10 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
   const [activeTab, setActiveTab] = useState<CompendiumTab>('units');
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [selectedDjinnId, setSelectedDjinnId] = useState<string | null>(null);
+
+  const campaignUnits = Object.values(UNIT_DEFINITIONS).filter(isAvailableInCampaign);
+  const campaignEquipment = Object.values(EQUIPMENT).filter(isAvailableInCampaign);
+  const campaignDjinn = Object.values(DJINN).filter(isAvailableInCampaign);
 
   const tabs: { id: CompendiumTab; label: string }[] = [
     { id: 'units', label: 'Units' },
@@ -123,7 +128,7 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
         <div className="compendium-content">
           {activeTab === 'units' && (
             <div className="compendium-section">
-              <h2>Recruitable Units ({Object.keys(UNIT_DEFINITIONS).length})</h2>
+              <h2>Recruitable Units ({campaignUnits.length})</h2>
               {selectedUnitId ? (
                 <UnitDetailView
                   unitId={selectedUnitId}
@@ -131,7 +136,7 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                 />
               ) : (
                 <div className="compendium-grid">
-                  {Object.values(UNIT_DEFINITIONS).map((unit) => (
+                  {campaignUnits.map((unit) => (
                     <div
                       key={unit.id}
                       className="compendium-item clickable"
@@ -161,9 +166,9 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
 
           {activeTab === 'equipment' && (
             <div className="compendium-section">
-              <h2>Equipment ({Object.keys(EQUIPMENT).length})</h2>
+              <h2>Equipment ({campaignEquipment.length})</h2>
               <div className="compendium-grid">
-                {Object.values(EQUIPMENT).map((equip) => {
+                {campaignEquipment.map((equip) => {
                   const ability = equip.unlocksAbility ? ABILITIES[equip.unlocksAbility] : null;
                   return (
                     <div key={equip.id} className="compendium-item detailed">
@@ -233,7 +238,7 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
 
           {activeTab === 'djinn' && (
             <div className="compendium-section">
-              <h2>Djinn ({Object.keys(DJINN).length})</h2>
+              <h2>Djinn ({campaignDjinn.length})</h2>
               {selectedDjinnId ? (
                 <DjinnDetailView
                   djinnId={selectedDjinnId}
@@ -241,7 +246,7 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                 />
               ) : (
                 <div className="compendium-grid">
-                  {Object.values(DJINN).map((djinn) => {
+                  {campaignDjinn.map((djinn) => {
                     const elementLower = djinn.element.toLowerCase();
                     return (
                       <div
@@ -279,11 +284,19 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                   return (
                     <div key={enemy.id} className="compendium-item detailed">
                       <div className="item-sprite">
-                        <SimpleSprite
-                          id={enemy.id.toLowerCase()}
-                          width={64}
-                          height={64}
-                        />
+                        {(() => {
+                          const enemySpriteId =
+                            getEnemyBattleSprite(enemy.id, 'idle') ??
+                            `missing-compendium-enemy-${enemy.id}`;
+                          warnIfPlaceholderSprite('CompendiumScreen', enemySpriteId);
+                          return (
+                            <SimpleSprite
+                              id={enemySpriteId}
+                              width={64}
+                              height={64}
+                            />
+                          );
+                        })()}
                       </div>
                       <div className="item-name">{enemy.name}</div>
                       <div className="item-details">
@@ -357,11 +370,19 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
                   return (
                     <div key={enemy.id} className="compendium-item detailed boss">
                       <div className="item-sprite">
-                        <SimpleSprite
-                          id={enemy.id.toLowerCase()}
-                          width={64}
-                          height={64}
-                        />
+                        {(() => {
+                          const bossSpriteId =
+                            getEnemyBattleSprite(enemy.id, 'idle') ??
+                            `missing-compendium-enemy-${enemy.id}`;
+                          warnIfPlaceholderSprite('CompendiumScreen', bossSpriteId);
+                          return (
+                            <SimpleSprite
+                              id={bossSpriteId}
+                              width={64}
+                              height={64}
+                            />
+                          );
+                        })()}
                       </div>
                       <div className="item-name boss-name">{enemy.name}</div>
                       <div className="item-details">

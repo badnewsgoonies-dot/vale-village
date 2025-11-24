@@ -9,16 +9,6 @@ import type { Ability } from '../../data/schemas/AbilitySchema';
 import { calculateTeamManaPool } from '../models/BattleState';
 
 /**
- * Calculate total team mana pool from unit contributions
- *
- * @param team - Player's team
- * @returns Total mana circles available
- */
-export function getTeamManaPool(team: Team): number {
-  return calculateTeamManaPool(team);
-}
-
-/**
  * Check if action can be afforded with remaining mana
  *
  * @param remainingMana - Current mana pool

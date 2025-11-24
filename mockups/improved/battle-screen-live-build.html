@@ -12,7 +12,7 @@
     }
 
     body {
-      background: #000;
+      background: #000; /* Black background */
       color: #f8f8f0;
       font-family: 'Segoe UI', system-ui, sans-serif;
       height: 100vh;
@@ -48,9 +48,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      /* background-image: url('sprites/backgrounds/gs1/Vale.gif'); */
-      background: #1a1a1a; /* Dark gray instead of image */
-      background-size: 100% 100%;
+      background-image: url('sprites/backgrounds/gs1/Vale.gif');
+      background-size: cover;
       background-position: center;
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
@@ -397,6 +396,27 @@
       }
     }
 
+    /* Psynergy GIF burst effect (for AbilityAnimations icons) */
+    .psynergy-gif-effect {
+      animation: psynergy-burst 0.9s ease-out forwards;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes psynergy-burst {
+      0% {
+        transform: scale(0.4);
+        opacity: 0;
+      }
+      35% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
+
     /* Damage Numbers */
     .damage-number {
       position: absolute;
@@ -419,7 +439,13 @@
         opacity: 0;
       }
     }
+
+    /* Remove black background from psynergy GIFs using screen blend mode */
+    .psynergy-gif-effect {
+      mix-blend-mode: screen;
+    }
   </style>
+  <script src="js/ability-animations-foundation.js"></script>
 </head>
 <body>
   <!-- GBA Screen Frame -->
@@ -488,10 +514,10 @@
     const enemyIndices = [0, 1];
 
     const players = [
-      { name: 'Isaac', sprite: '../../dist/sprites/battle/party/isaac/Isaac_lSword_Back.gif' },
-      { name: 'Garet', sprite: '../../dist/sprites/battle/party/garet/Garet_Axe_Back.gif' },
-      { name: 'Ivan', sprite: '../../dist/sprites/battle/party/ivan/Ivan_Staff_Back.gif' },
-      { name: 'Mia', sprite: '../../dist/sprites/battle/party/mia/Mia_Staff_Back.gif' }
+      { name: 'Isaac', sprite: 'sprites/battle/party/isaac/Isaac_lSword_Back.gif' },
+      { name: 'Garet', sprite: 'sprites/battle/party/garet/Garet_Axe_Back.gif' },
+      { name: 'Ivan', sprite: 'sprites/battle/party/ivan/Ivan_Staff_Back.gif' },
+      { name: 'Mia', sprite: 'sprites/battle/party/mia/Mia_Staff_Back.gif' }
     ];
 
     // Function to cycle enemy sprite
@@ -560,16 +586,30 @@
       });
     }
 
-    // Psynergy spells data - using real Golden Sun animations!
+    // Psynergy spells data - using actual psynergy animation GIFs
     const psynergySpells = [
-      { name: 'Heat Wave', gif: '../../dist/sprites/psynergy/Heat_Wave.gif', element: 'Mars', damage: 45 },
-      { name: 'Ice Missile', gif: '../../dist/sprites/psynergy/Ice_Missile.gif', element: 'Mercury', damage: 38 },
-      { name: 'Spark Plasma', gif: '../../dist/sprites/psynergy/Spark_Plasma.gif', element: 'Jupiter', damage: 52 },
-      { name: 'Grand Gaia', gif: '../../dist/sprites/psynergy/Grand_Gaia.gif', element: 'Venus', damage: 85 },
-      { name: 'Dragon Fire', gif: '../../dist/sprites/psynergy/Dragon_Fire.gif', element: 'Mars', damage: 72 },
-      { name: 'Freeze Prism', gif: '../../dist/sprites/psynergy/Freeze_Prism.gif', element: 'Mercury', damage: 68 },
-      { name: 'Blue Bolt', gif: '../../dist/sprites/psynergy/Blue_Bolt.gif', element: 'Jupiter', damage: 42 },
-      { name: 'Supernova', gif: '../../dist/sprites/psynergy/Supernova.gif', element: 'Mars', damage: 150 }
+      // Mars (Fire) abilities
+      { name: 'Heat Wave', gif: 'sprites/psynergy/Heat_Wave.gif', element: 'Mars', damage: 45 },
+      { name: 'Dragon Fire', gif: 'sprites/psynergy/Dragon_Fire.gif', element: 'Mars', damage: 72 },
+      { name: 'Supernova', gif: 'sprites/psynergy/Supernova.gif', element: 'Mars', damage: 150 },
+      { name: 'Inferno', gif: 'sprites/psynergy/Inferno.gif', element: 'Mars', damage: 90 },
+
+      // Mercury (Ice/Water) abilities
+      { name: 'Ice Missile', gif: 'sprites/psynergy/Ice_Missile.gif', element: 'Mercury', damage: 38 },
+      { name: 'Freeze Prism', gif: 'sprites/psynergy/Freeze_Prism.gif', element: 'Mercury', damage: 68 },
+      { name: 'Glacier', gif: 'sprites/psynergy/Glacier.gif', element: 'Mercury', damage: 84 },
+      { name: 'Deluge', gif: 'sprites/psynergy/Deluge.gif', element: 'Mercury', damage: 120 },
+
+      // Jupiter (Lightning/Wind) abilities
+      { name: 'Spark Plasma', gif: 'sprites/psynergy/Spark_Plasma.gif', element: 'Jupiter', damage: 52 },
+      { name: 'Blue Bolt', gif: 'sprites/psynergy/Blue_Bolt.gif', element: 'Jupiter', damage: 42 },
+      { name: 'Destruct Ray', gif: 'sprites/psynergy/Destruct_Ray.gif', element: 'Jupiter', damage: 95 },
+      { name: 'Sonic Slash', gif: 'sprites/psynergy/Sonic_Slash.gif', element: 'Jupiter', damage: 65 },
+
+      // Venus (Earth) abilities
+      { name: 'Grand Gaia', gif: 'sprites/psynergy/Grand_Gaia.gif', element: 'Venus', damage: 85 },
+      { name: 'Nettle', gif: 'sprites/psynergy/Nettle.gif', element: 'Venus', damage: 35 },
+      { name: 'Froth Spiral', gif: 'sprites/psynergy/Froth_Spiral.gif', element: 'Venus', damage: 70 }
     ];
 
     // Cast Psynergy spell
@@ -598,33 +638,18 @@
         setTimeout(() => {
           const rect = enemy.getBoundingClientRect();
 
-          // Create container for spell effect with multiply blend
-          const effectContainer = document.createElement('div');
-          effectContainer.style.cssText = `
-            position: fixed;
-            left: ${rect.left + rect.width/2 - 64}px;
-            top: ${rect.top + rect.height/2 - 64}px;
-            width: 128px;
-            height: 128px;
-            z-index: 100;
-            pointer-events: none;
-            transform: scale(2);
-            mix-blend-mode: lighten;
-            overflow: hidden;
-          `;
-
-          const effect = document.createElement('img');
-          effect.src = spell.gif;
-          effect.style.cssText = `
-            width: 100%;
-            height: 100%;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-          `;
-
-          effectContainer.appendChild(effect);
-          document.body.appendChild(effectContainer);
+          // Play anchored GIF effect via AbilityAnimations layer
+          if (window.AbilityAnimations) {
+            window.AbilityAnimations.play({
+              containerSelector: '.battle-container',
+              gifUrl: spell.gif,
+              anchorSelector: enemy,
+              width: 192,
+              height: 192,
+              durationMs: 1200,
+              className: 'psynergy-gif-effect',
+            });
+          }
 
           // Create damage number
           const damage = spell.damage + Math.floor(Math.random() * 10);
@@ -639,11 +664,10 @@
           enemy.style.animation = 'shake 0.3s';
           setTimeout(() => enemy.style.animation = '', 300);
 
-          // Clean up effects (longer delay for GIF animations)
+          // Clean up damage number
           setTimeout(() => {
-            effectContainer.remove();
             damageNum.remove();
-          }, 2000);
+          }, 1200);
         }, i * 200); // Stagger the attacks
       });
     }

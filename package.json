@@ -13,11 +13,12 @@
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:parallel": "vitest run --config vitest.config.optimized.ts --pool=threads",
     "validate:data": "tsx src/core/validation/validateAll.ts",
     "generate:sprites": "node scripts/generate-sprite-manifest.cjs",
     "validate:sprites": "node scripts/validate-sprites.cjs",
     "test:sprites": "node scripts/test-sprite-catalog.cjs",
-    "precommit": "pnpm typecheck && pnpm lint && pnpm test && pnpm validate:data"
+    "precommit": "pnpm typecheck && pnpm lint && pnpm test:parallel && pnpm validate:data"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",
