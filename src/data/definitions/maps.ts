@@ -105,6 +105,12 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
         returnPos: { x: TOWER_ENTRANCE_COLUMN, y: ROAD_ROW },
       },
     },
+    {
+      id: 'vale-training-battle',
+      type: 'battle' as const,
+      position: { x: 6, y: ROAD_ROW },
+      data: { encounterId: 'training-dummy' },
+    },
   ];
 };
 

@@ -157,7 +157,12 @@ describe('Immunity Replacement (Phase 2)', () => {
     expect(unit.statusEffects).toHaveLength(3);
 
     // Tick statuses (immunity expires)
-    const updatedUnit = processStatusEffectTick(unit, rng);
+    const tickResult = processStatusEffectTick(unit, rng);
+    const { updatedUnit } = tickResult;
+    expect(updatedUnit).toBeDefined();
+    if (!updatedUnit) {
+      return;
+    }
 
     // Verify immunity removed
     const immunityAfter = updatedUnit.statusEffects.find(s => s.type === 'immunity');

@@ -364,32 +364,17 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
   const updatedTimers = { ...state.djinnRecoveryTimers };
   const updatedTrackers = { ...state.playerTeam.djinnTrackers };
 
-  console.warn('[QueueBattle] Djinn recovery at start of round', state.roundNumber + 1, ':', {
-    timers: updatedTimers,
-    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
-  });
-
   for (const [djinnId, timer] of Object.entries(updatedTimers)) {
     if (timer > 0) {
-      const tracker = updatedTrackers[djinnId];
-
-      // Skip decrementing if Djinn was just activated this round
-      // (lastActivatedTurn matches the round that just completed)
-      if (tracker?.lastActivatedTurn === state.roundNumber) {
-        console.warn(`[QueueBattle] Djinn ${djinnId} just activated - skipping timer decrement`);
-        continue;
-      }
-
       updatedTimers[djinnId] = timer - 1;
-      console.warn(`[QueueBattle] Djinn ${djinnId} timer: ${timer} → ${updatedTimers[djinnId]}`);
       if (updatedTimers[djinnId] === 0) {
         delete updatedTimers[djinnId];
+        const tracker = updatedTrackers[djinnId];
         if (tracker) {
           updatedTrackers[djinnId] = {
             ...tracker,
             state: 'Set',
           };
-          console.warn(`[QueueBattle] Djinn ${djinnId} recovered to Set!`);
         }
       }
     } else {
@@ -397,18 +382,8 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     }
   }
 
-  console.warn('[QueueBattle] After recovery processing:', {
-    timers: updatedTimers,
-    trackers: Object.entries(updatedTrackers).map(([id, t]) => ({ id, state: t.state }))
-  });
-
   let updatedTeam = updateTeam(state.playerTeam, {
     djinnTrackers: updatedTrackers,
-  });
-
-  console.warn('[QueueBattle] Before merging Djinn abilities:', {
-    round: state.roundNumber + 1,
-    units: updatedTeam.units.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
   });
 
   const unitsWithUpdatedAbilities = updatedTeam.units.map(unit =>
@@ -425,11 +400,6 @@ function transitionToPlanningPhase(state: BattleState): BattleState {
     }
     // Note: PP system removed, no need to clamp currentPp
     return updated;
-  });
-
-  console.warn('[QueueBattle] After merging Djinn abilities:', {
-    round: state.roundNumber + 1,
-    units: unitsWithClampedStats.map(u => ({ id: u.id, abilityCount: u.abilities.length }))
   });
 
   updatedTeam = updateTeam(updatedTeam, {

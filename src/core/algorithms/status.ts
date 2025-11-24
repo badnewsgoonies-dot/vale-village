@@ -174,8 +174,8 @@ export function applyStatusToUnit(
   unit: Unit,
   newStatus: typeof unit.statusEffects[number]
 ): Unit {
-  // Check immunity
-  if (isImmuneToStatus(unit, newStatus.type)) {
+  // Check immunity (immunity statuses themselves always replace existing ones)
+  if (newStatus.type !== 'immunity' && isImmuneToStatus(unit, newStatus.type)) {
     return unit; // No change
   }
 
