@@ -1,6 +1,6 @@
 // Auto-generated sprite list
 // Run 'node scripts/generate-sprite-manifest.js' to regenerate
-// Generated: 2025-11-24T16:55:01.818Z
+// Generated: 2025-11-24T18:34:23.663Z
 
 export interface SpriteEntry {
   name: string;
@@ -4271,6 +4271,1290 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "Angel Spear",
+    "path": "/sprites/icons/psynergy/Angel_Spear.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Annihalation",
+    "path": "/sprites/icons/psynergy/Annihalation.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Arrow",
+    "path": "/sprites/icons/psynergy/Arrow.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Astral Blast",
+    "path": "/sprites/icons/psynergy/Astral_Blast.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Aura",
+    "path": "/sprites/icons/psynergy/Aura.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Avalanche",
+    "path": "/sprites/icons/psynergy/Avalanche.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Avoid",
+    "path": "/sprites/icons/psynergy/Avoid.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Backstab",
+    "path": "/sprites/icons/psynergy/Backstab.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Baffle Card",
+    "path": "/sprites/icons/psynergy/Baffle_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Beam",
+    "path": "/sprites/icons/psynergy/Beam.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Bind",
+    "path": "/sprites/icons/psynergy/Bind.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Blast1",
+    "path": "/sprites/icons/psynergy/Blast1.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Blast2",
+    "path": "/sprites/icons/psynergy/Blast2.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Blaze",
+    "path": "/sprites/icons/psynergy/Blaze.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Blue Bolt",
+    "path": "/sprites/icons/psynergy/Blue_Bolt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Blunt",
+    "path": "/sprites/icons/psynergy/Blunt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Bolt",
+    "path": "/sprites/icons/psynergy/Bolt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Bramble Card",
+    "path": "/sprites/icons/psynergy/Bramble_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Break",
+    "path": "/sprites/icons/psynergy/Break.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Briar",
+    "path": "/sprites/icons/psynergy/Briar.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Burst",
+    "path": "/sprites/icons/psynergy/Burst.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Call Demon",
+    "path": "/sprites/icons/psynergy/Call_Demon.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Call Dullahan",
+    "path": "/sprites/icons/psynergy/Call_Dullahan.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Call Zombie",
+    "path": "/sprites/icons/psynergy/Call_Zombie.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Carpet Bomb",
+    "path": "/sprites/icons/psynergy/Carpet_Bomb.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Carry",
+    "path": "/sprites/icons/psynergy/Carry.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Catch",
+    "path": "/sprites/icons/psynergy/Catch.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cerberus",
+    "path": "/sprites/icons/psynergy/Cerberus.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Chimera",
+    "path": "/sprites/icons/psynergy/Chimera.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Clay Spire",
+    "path": "/sprites/icons/psynergy/Clay Spire.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cloak",
+    "path": "/sprites/icons/psynergy/Cloak.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cluster Bomb",
+    "path": "/sprites/icons/psynergy/Cluster_Bomb.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Condemn",
+    "path": "/sprites/icons/psynergy/Condemn.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cool",
+    "path": "/sprites/icons/psynergy/Cool.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cool Aura",
+    "path": "/sprites/icons/psynergy/Cool_Aura.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cure",
+    "path": "/sprites/icons/psynergy/Cure.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cure Poison",
+    "path": "/sprites/icons/psynergy/Cure_Poison.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cure Well",
+    "path": "/sprites/icons/psynergy/Cure_Well.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Curse",
+    "path": "/sprites/icons/psynergy/Curse.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cutting Edge",
+    "path": "/sprites/icons/psynergy/Cutting_Edge.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cycle Beam",
+    "path": "/sprites/icons/psynergy/Cycle_Beam.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Cyclone",
+    "path": "/sprites/icons/psynergy/Cyclone.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Death Card",
+    "path": "/sprites/icons/psynergy/Death_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Death Leap",
+    "path": "/sprites/icons/psynergy/Death_Leap.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Death Plunge",
+    "path": "/sprites/icons/psynergy/Death_Plunge.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Debilitate",
+    "path": "/sprites/icons/psynergy/Debilitate.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Delude",
+    "path": "/sprites/icons/psynergy/Delude.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Deluge",
+    "path": "/sprites/icons/psynergy/Deluge.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Demon Night",
+    "path": "/sprites/icons/psynergy/Demon_Night.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Demon Spear",
+    "path": "/sprites/icons/psynergy/Demon_Spear.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Destruct Ray",
+    "path": "/sprites/icons/psynergy/Destruct_Ray.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Diamond Berg",
+    "path": "/sprites/icons/psynergy/Diamond_Berg.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Diamond Dust",
+    "path": "/sprites/icons/psynergy/Diamond_Dust.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Dinox",
+    "path": "/sprites/icons/psynergy/Dinox.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Dire Inferno",
+    "path": "/sprites/icons/psynergy/Dire_Inferno.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Douse",
+    "path": "/sprites/icons/psynergy/Douse.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Dragon Fire",
+    "path": "/sprites/icons/psynergy/Dragon_Fire.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Dragon Fume",
+    "path": "/sprites/icons/psynergy/Dragon_Fume.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Drain",
+    "path": "/sprites/icons/psynergy/Drain.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Drench",
+    "path": "/sprites/icons/psynergy/Drench.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Dull",
+    "path": "/sprites/icons/psynergy/Dull.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Earthquake",
+    "path": "/sprites/icons/psynergy/Earthquake.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Emu",
+    "path": "/sprites/icons/psynergy/Emu.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Enfeeble",
+    "path": "/sprites/icons/psynergy/Enfeeble.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Epicenter",
+    "path": "/sprites/icons/psynergy/Epicenter.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Eruption",
+    "path": "/sprites/icons/psynergy/Eruption.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fiery Abyss",
+    "path": "/sprites/icons/psynergy/Fiery_Abyss.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fiery Blast",
+    "path": "/sprites/icons/psynergy/Fiery_Blast.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fiery Juggle",
+    "path": "/sprites/icons/psynergy/Fiery_Juggle.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fire",
+    "path": "/sprites/icons/psynergy/Fire.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fire Bomb",
+    "path": "/sprites/icons/psynergy/Fire_Bomb.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fire Breath",
+    "path": "/sprites/icons/psynergy/Fire_Breath.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fire Puppet",
+    "path": "/sprites/icons/psynergy/Fire_Puppet.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fireball",
+    "path": "/sprites/icons/psynergy/Fireball.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Flame Card",
+    "path": "/sprites/icons/psynergy/Flame_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Flare",
+    "path": "/sprites/icons/psynergy/Flare.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Flare Storm",
+    "path": "/sprites/icons/psynergy/Flare_Storm.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Flare Wall",
+    "path": "/sprites/icons/psynergy/Flare_Wall.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Flash Bolt",
+    "path": "/sprites/icons/psynergy/Flash_Bolt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Force",
+    "path": "/sprites/icons/psynergy/Force.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Freeze Prism",
+    "path": "/sprites/icons/psynergy/Freeze_Prism.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Frost",
+    "path": "/sprites/icons/psynergy/Frost.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Frost Card",
+    "path": "/sprites/icons/psynergy/Frost_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Froth",
+    "path": "/sprites/icons/psynergy/Froth.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Froth Sphere",
+    "path": "/sprites/icons/psynergy/Froth_Sphere.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Froth Spiral",
+    "path": "/sprites/icons/psynergy/Froth_Spiral.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Fume",
+    "path": "/sprites/icons/psynergy/Fume.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Gaia",
+    "path": "/sprites/icons/psynergy/Gaia.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Gale",
+    "path": "/sprites/icons/psynergy/Gale.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Gaurd",
+    "path": "/sprites/icons/psynergy/Gaurd.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Gaurdian",
+    "path": "/sprites/icons/psynergy/Gaurdian.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Glacier",
+    "path": "/sprites/icons/psynergy/Glacier.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Grand Gaia",
+    "path": "/sprites/icons/psynergy/Grand_Gaia.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Grind",
+    "path": "/sprites/icons/psynergy/Grind.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Growth",
+    "path": "/sprites/icons/psynergy/Growth.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Hail",
+    "path": "/sprites/icons/psynergy/Hail.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Hail Prism",
+    "path": "/sprites/icons/psynergy/Hail_Prism.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Halt",
+    "path": "/sprites/icons/psynergy/Halt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Haunt",
+    "path": "/sprites/icons/psynergy/Haunt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Healing Aura",
+    "path": "/sprites/icons/psynergy/Healing_Aura.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Heat Juggle",
+    "path": "/sprites/icons/psynergy/Heat_Juggle.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Heat Wave",
+    "path": "/sprites/icons/psynergy/Heat_Wave.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Hover",
+    "path": "/sprites/icons/psynergy/Hover.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Hurricane",
+    "path": "/sprites/icons/psynergy/Hurricane.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ice",
+    "path": "/sprites/icons/psynergy/Ice.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ice Horn",
+    "path": "/sprites/icons/psynergy/Ice_Horn.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ice Missile",
+    "path": "/sprites/icons/psynergy/Ice_Missile.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Impair",
+    "path": "/sprites/icons/psynergy/Impair.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Inferno",
+    "path": "/sprites/icons/psynergy/Inferno.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Juggle",
+    "path": "/sprites/icons/psynergy/Juggle.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Lash",
+    "path": "/sprites/icons/psynergy/Lash.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Lava Shower",
+    "path": "/sprites/icons/psynergy/Lava_Shower.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Lift",
+    "path": "/sprites/icons/psynergy/Lift.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Liquifier",
+    "path": "/sprites/icons/psynergy/Liquifier.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Mad Blast",
+    "path": "/sprites/icons/psynergy/Mad_Blast.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Mad Growth",
+    "path": "/sprites/icons/psynergy/Mad_Growth.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Magic Shell",
+    "path": "/sprites/icons/psynergy/Magic_Shell.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Magic Shield",
+    "path": "/sprites/icons/psynergy/Magic_Shield.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Magma Storm",
+    "path": "/sprites/icons/psynergy/Magma_Storm.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Magnet",
+    "path": "/sprites/icons/psynergy/Magnet.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Megacool",
+    "path": "/sprites/icons/psynergy/Megacool.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Mind Read",
+    "path": "/sprites/icons/psynergy/Mind_Read.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Mist",
+    "path": "/sprites/icons/psynergy/Mist.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Molten Bath",
+    "path": "/sprites/icons/psynergy/Molten_Bath.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Mother Gaia",
+    "path": "/sprites/icons/psynergy/Mother_Gaia.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Move",
+    "path": "/sprites/icons/psynergy/Move.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Nettle",
+    "path": "/sprites/icons/psynergy/Nettle.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Nova",
+    "path": "/sprites/icons/psynergy/Nova.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Odyssey",
+    "path": "/sprites/icons/psynergy/Odyssey.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Parch",
+    "path": "/sprites/icons/psynergy/Parch.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Planet Diver",
+    "path": "/sprites/icons/psynergy/Planet_Diver.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Planetary",
+    "path": "/sprites/icons/psynergy/Planetary.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Plasma",
+    "path": "/sprites/icons/psynergy/Plasma.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Plume Edge",
+    "path": "/sprites/icons/psynergy/Plume_Edge.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ply",
+    "path": "/sprites/icons/psynergy/Ply.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ply Well",
+    "path": "/sprites/icons/psynergy/Ply_Well.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Poison Flow",
+    "path": "/sprites/icons/psynergy/Poison_Flow.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Potent Cure",
+    "path": "/sprites/icons/psynergy/Potent_Cure.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Pound",
+    "path": "/sprites/icons/psynergy/Pound.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Protect",
+    "path": "/sprites/icons/psynergy/Protect.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Protector",
+    "path": "/sprites/icons/psynergy/Protector.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Psy Drain",
+    "path": "/sprites/icons/psynergy/Psy_Drain.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Punji",
+    "path": "/sprites/icons/psynergy/Punji.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Punji Strike",
+    "path": "/sprites/icons/psynergy/Punji_Strike.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Punji Trap",
+    "path": "/sprites/icons/psynergy/Punji_Trap.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Pure Ply",
+    "path": "/sprites/icons/psynergy/Pure_Ply.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Pure Wish",
+    "path": "/sprites/icons/psynergy/Pure_Wish.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Pyroclasm",
+    "path": "/sprites/icons/psynergy/Pyroclasm.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Quake",
+    "path": "/sprites/icons/psynergy/Quake.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Quake Sphere",
+    "path": "/sprites/icons/psynergy/Quake_Sphere.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Quick Strike",
+    "path": "/sprites/icons/psynergy/Quick_Strike.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Raging Heat",
+    "path": "/sprites/icons/psynergy/Raging_Heat.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ragnarok",
+    "path": "/sprites/icons/psynergy/Ragnarok.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ray",
+    "path": "/sprites/icons/psynergy/Ray.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Reflect",
+    "path": "/sprites/icons/psynergy/Reflect.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Resist",
+    "path": "/sprites/icons/psynergy/Resist.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Restore",
+    "path": "/sprites/icons/psynergy/Restore.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Retreat",
+    "path": "/sprites/icons/psynergy/Retreat.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Reveal",
+    "path": "/sprites/icons/psynergy/Reveal.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Revive",
+    "path": "/sprites/icons/psynergy/Revive.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Roc",
+    "path": "/sprites/icons/psynergy/Roc.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Rockfall",
+    "path": "/sprites/icons/psynergy/Rockfall.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Rockslide",
+    "path": "/sprites/icons/psynergy/Rockslide.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sabre Dance",
+    "path": "/sprites/icons/psynergy/Sabre_Dance.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Salamander",
+    "path": "/sprites/icons/psynergy/Salamander.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sand",
+    "path": "/sprites/icons/psynergy/Sand.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Scoop",
+    "path": "/sprites/icons/psynergy/Scoop.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Searing Beam",
+    "path": "/sprites/icons/psynergy/Searing_Beam.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Serpent Fume",
+    "path": "/sprites/icons/psynergy/Serpent_Fume.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Shine Plasma",
+    "path": "/sprites/icons/psynergy/Shine_Plasma.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Shuriken",
+    "path": "/sprites/icons/psynergy/Shuriken.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Skull Splitter",
+    "path": "/sprites/icons/psynergy/Skull_Splitter.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Slash",
+    "path": "/sprites/icons/psynergy/Slash.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sleep",
+    "path": "/sprites/icons/psynergy/Sleep.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sleep Card",
+    "path": "/sprites/icons/psynergy/Sleep_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sonic Slash",
+    "path": "/sprites/icons/psynergy/Sonic_Slash.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Spark Plasma",
+    "path": "/sprites/icons/psynergy/Spark_Plasma.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Spire",
+    "path": "/sprites/icons/psynergy/Spire.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Stone Spire",
+    "path": "/sprites/icons/psynergy/Stone_Spire.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Storm Ray",
+    "path": "/sprites/icons/psynergy/Storm_Ray.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Supercool",
+    "path": "/sprites/icons/psynergy/Supercool.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Supernova",
+    "path": "/sprites/icons/psynergy/Supernova.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Sword Card",
+    "path": "/sprites/icons/psynergy/Sword_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Teleport",
+    "path": "/sprites/icons/psynergy/Teleport.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Tempest",
+    "path": "/sprites/icons/psynergy/Tempest.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thorn",
+    "path": "/sprites/icons/psynergy/Thorn.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thorny Grave",
+    "path": "/sprites/icons/psynergy/Thorny_Grave.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunder Card",
+    "path": "/sprites/icons/psynergy/Thunder_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunder Mine",
+    "path": "/sprites/icons/psynergy/Thunder_Mine.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunderbolt",
+    "path": "/sprites/icons/psynergy/Thunderbolt.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunderclap",
+    "path": "/sprites/icons/psynergy/Thunderclap.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunderstorm",
+    "path": "/sprites/icons/psynergy/Thunderstorm.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Tornado",
+    "path": "/sprites/icons/psynergy/Tornado.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Tremor",
+    "path": "/sprites/icons/psynergy/Tremor.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Tundra",
+    "path": "/sprites/icons/psynergy/Tundra.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Typhoon",
+    "path": "/sprites/icons/psynergy/Typhoon.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Volcano",
+    "path": "/sprites/icons/psynergy/Volcano.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Ward",
+    "path": "/sprites/icons/psynergy/Ward.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Weaken",
+    "path": "/sprites/icons/psynergy/Weaken.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Whiplash",
+    "path": "/sprites/icons/psynergy/Whiplash.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Whirlwind",
+    "path": "/sprites/icons/psynergy/Whirlwind.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Wild Growth",
+    "path": "/sprites/icons/psynergy/Wild_Growth.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Wild Wolf",
+    "path": "/sprites/icons/psynergy/Wild_Wolf.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Wind Slash",
+    "path": "/sprites/icons/psynergy/Wind_Slash.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Wish",
+    "path": "/sprites/icons/psynergy/Wish.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Wish Well",
+    "path": "/sprites/icons/psynergy/Wish_Well.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "high impact",
+    "path": "/sprites/icons/psynergy/high_impact.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "impact",
+    "path": "/sprites/icons/psynergy/impact.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 1",
+    "path": "/sprites/icons/psynergy/range-1.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 11",
+    "path": "/sprites/icons/psynergy/range-11.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 3",
+    "path": "/sprites/icons/psynergy/range-3.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 5",
+    "path": "/sprites/icons/psynergy/range-5.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 7",
+    "path": "/sprites/icons/psynergy/range-7.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 9",
+    "path": "/sprites/icons/psynergy/range-9.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
     "name": "Angry",
     "path": "/sprites/icons/misc/Angry.gif",
     "category": "icons-misc",
@@ -5016,4 +6300,4 @@ export const SPRITE_LIST: SpriteEntry[] = [
   }
 ];
 
-// Total sprites: 834
+// Total sprites: 1048
