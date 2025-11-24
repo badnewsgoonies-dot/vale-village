@@ -341,66 +341,221 @@ QueueBattleView
 
 ---
 
-## Open Questions / Future Considerations
+## Design Decisions (Finalized)
 
 1. **Speech Bubble Timing:**
-   - Auto-dismiss after N seconds?
-   - Or require user click to dismiss?
+   - **Decision:** Auto-dismiss after 3 seconds AND allow user click to dismiss earlier
+   - For critical/blocking messages, can introduce a "sticky" flag later
 
 2. **Djinn Idle Animations:**
-   - Should sprites have subtle idle animations?
-   - Or stay static for performance?
+   - **Decision:** Start static for initial implementation
+   - Add subtle 2-3 frame idle animation later (tiny bob/blink loop) once performance budget is clear
 
 3. **Portrait Animation:**
-   - Should portraits have subtle breathing/idle animation?
-   - Or static for clarity?
+   - **Decision:** Start static
+   - Optional polish pass: add light "breathing" or glow-pulse ONLY on active portrait to avoid clutter
 
 4. **Summon Screen Size:**
-   - Fixed size modal?
-   - Or scale based on available summons?
+   - **Decision:** Fixed-max modal that scales within viewport
+   - Max width: ~70% of viewport
+   - Centered on screen
+   - Scrollable if content overflows
 
 5. **Ability Grid Expansion:**
-   - Should ability grid overlay battlefield?
-   - Or push content upward?
+   - **Decision:** Grid overlays battlefield area (floating panel)
+   - Keeps bottom UI layout stable (no reflow)
+   - Visually attached to bottom UI but floats above battlefield
 
 6. **Mana Preview:**
-   - Show "+1" as ghosted circle when auto-attack queued?
-   - Or only update during execution phase?
+   - **Decision:** YES - show ghosted +1 circle for each queued auto-attack
+   - Numeric "Mana: X/Y" strictly shows currently available mana (no preview in number)
 
 ---
 
 ## Implementation Phases
 
-### Phase 1: Core Layout
-- CSS grid structure for bottom UI
-- Position djinn panel (bottom-left)
-- Position portraits (bottom-middle)
-- Position mana bar (above portraits)
+### Phase 1: Core Layout (CSS + Skeleton Components)
 
-### Phase 2: Action Menu
-- Popup positioning above active portrait
-- Three button layout (Attack/Abilities/Djinn Abilit.)
-- Button click handlers (wireframe only)
+**Goal:** Visual structure only, no game logic
 
-### Phase 3: Djinn Advisor System
-- Load djinn sprites
-- Speech bubble component
-- Tutorial message triggers (wire to game events)
+- Split `QueueBattleView` into two grid rows:
+  - Battlefield area (row 1)
+  - BottomUI area (row 2)
+- Apply CSS grid layout:
+  ```css
+  .battle-view {
+    display: grid;
+    grid-template-rows: 1fr auto; /* battlefield | bottom-ui */
+    height: 100vh;
+  }
 
-### Phase 4: Summon Screen
-- Modal overlay layout
-- Three rows (single/double/triple)
-- Click to summon functionality
+  .bottom-ui {
+    display: grid;
+    grid-template-columns: 200px 1fr; /* djinn-panel | center-area */
+    position: relative;
+    padding: 8px 16px;
+  }
 
-### Phase 5: Ability Grids
-- 3-column icon grid component
-- Keyboard navigation
-- Detail display on selection
+  .center-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  ```
+- Add skeleton components:
+  - `<DjinnAdvisorPanel />` placeholder (bottom-left)
+  - `<CenterArea />` placeholder (bottom-middle):
+    - `<ManaBar />` stub
+    - `<ActionMenu />` stub
+    - `<PlayerPortraits />` row (4 slots with dummy data)
 
-### Phase 6: Integration & Polish
+### Phase 2: State Wiring (Zustand)
+
+**Goal:** Extend `queueBattleSlice.ts` with UI-oriented state
+
+- Add new state fields:
+  - `activePortraitIndex: number` - Which portrait is currently acting
+  - `isActionMenuOpen: boolean` - Is action menu visible?
+  - `isSummonScreenOpen: boolean` - Is summon screen expanded?
+  - `tutorialMessage: string | null` - Current Djinn advisor message
+- Add new actions:
+  - `setActivePortrait(index: number)`
+  - `openActionMenu()` / `closeActionMenu()`
+  - `toggleSummonScreen()`
+  - `showTutorialMessage(message: string, durationMs?: number)`
+  - `clearTutorialMessage()`
+- Hook into planning flow:
+  - When planning starts: set `activePortraitIndex = 0`, `isActionMenuOpen = true`
+  - After action queued: advance to next portrait
+  - When all queued: close menu
+
+### Phase 3: Player Portraits (Bottom-Middle)
+
+**Goal:** Implement interactive portrait display
+
+- Create `<PlayerPortraits />` component:
+  - Props: `units`, `activeIndex`, `queuedActionIds`
+  - Show 4 slots (or N units if dynamic)
+  - Each portrait displays:
+    - Character sprite
+    - Name
+    - Level
+    - HP bar
+    - Status indicator (✓ when action queued)
+  - Highlight active portrait (glow/border)
+  - Portraits remain static (no sliding animations)
+  - Optional: Click portrait to set `activePortraitIndex` during planning
+
+### Phase 4: Action Menu Popup
+
+**Goal:** Implement main action selection menu
+
+- Create `<ActionMenu />` positioned above active portrait:
+  - Three main buttons:
+    - `⚔️ ATTACK` - Trigger target selection → queue attack (0 mana, +1 on execution)
+    - `ABILITIES →` - Switch to ability grid mode
+    - `DJINN ABILIT. →` - Switch to djinn-ability grid mode
+  - Add `[BACK]` button in grid modes to return to main menu
+  - Wire button handlers:
+    - ATTACK: opens target selection UI, calls `queueAction({ type: 'attack', targetId })`
+    - ABILITIES/DJINN ABILIT.: toggle to grid display mode
+  - Keyboard support (arrow keys) can wait for Phase 8 if needed
+
+### Phase 5: Mana Bar
+
+**Goal:** Display team-wide mana pool with preview
+
+- Implement `<ManaBar />` above action menu:
+  - Horizontal row of filled/empty circles
+  - Text label: "Mana: X/Y"
+  - Ghosted +1 preview when auto-attack is queued:
+    - Show transparent circle for pending mana
+    - Do NOT add to numeric count (only visual indicator)
+  - Read from Zustand slice selector (team-wide pool)
+  - Do NOT import core services directly
+
+### Phase 6: Djinn Advisor Panel & Speech Bubble
+
+**Goal:** Tutorial system with personality
+
+- Implement `<DjinnAdvisorPanel />` in bottom-left:
+  - Load 3 Djinn sprites from `src/assets/sprites/djinn/`:
+    - `flint.png`, `granite.png`, `echo.png`
+  - Display names under sprites
+  - Click panel → toggle `isSummonScreenOpen`
+- Implement `<SpeechBubble />` component:
+  - Anchored to active Djinn (typically Flint)
+  - Render when `tutorialMessage` is non-null
+  - Auto-dismiss after 3 seconds OR user click
+- Wire helper triggers:
+  - Insufficient mana → "Not enough mana!"
+  - Missing target → "Target an enemy first!"
+  - First summon → "Summons consume Djinn!"
+  - First battle → "Speed determines turn order!"
+
+### Phase 7: Djinn Summon Screen
+
+**Goal:** Modal interface for summons
+
+- Implement `<SummonScreen />` modal overlay:
+  - Three sections (rows):
+    - **Single (1 Djinn):** Individual Djinn activations
+    - **Double (2 Djinn):** Predefined pair combinations
+    - **Triple (3 Djinn):** Ultimate summon
+  - Each summon button shows:
+    - Name
+    - Djinn cost icons (🟡🟤🔵)
+    - Effect summary line
+  - Modal sizing:
+    - Max width: 70% viewport
+    - Centered, scrollable if needed
+  - Wire to battle planning:
+    - On selection → `queueAction({ type: 'summon', summonId })`
+    - Mark Djinn in "standby" (via slice action)
+    - Close modal after selection
+  - Visual feedback:
+    - Dim/gray out consumed Djinn sprites in advisor panel
+
+### Phase 8: Ability Grids (Abilities & Djinn Abilities)
+
+**Goal:** Reusable ability selection component
+
+- Create `<AbilityGrid />` component:
+  - 3-column icon grid layout
+  - Each tile shows:
+    - Ability icon
+    - Mana cost
+    - Name (truncated if needed)
+  - Detail display:
+    - On selection → show damage, element, description below grid
+  - Keyboard navigation:
+    - Arrow keys move selection
+    - Enter/Space confirm selection
+  - Use for both:
+    - Regular abilities (unit's learned psynergy)
+    - Djinn-granted abilities (from team's Djinn)
+- Grid overlay style:
+  - Floats above battlefield area
+  - Attached to bottom UI visually
+  - Keeps bottom layout stable (no reflow)
+
+### Phase 9: Integration & Polish
+
+**Goal:** Final wiring and refinements
+
 - Wire all interactions to Zustand state
-- Animations (if needed)
-- Accessibility (keyboard nav, screen reader)
+- Test complete planning flow (all 4 portraits)
+- Add animations (if needed):
+  - Subtle active portrait glow/pulse
+  - Menu popup transitions
+- Accessibility:
+  - Keyboard navigation (tab order)
+  - Screen reader labels
+  - Focus management
+- Performance check:
+  - Ensure sprite loading doesn't block UI
+  - Verify no unnecessary re-renders
 
 ---
 
