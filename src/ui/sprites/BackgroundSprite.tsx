@@ -35,7 +35,7 @@ export interface BackgroundSpriteProps {
    * Background identifier:
    * - "random": Select random background from category
    * - Flexible ID: "vale-forest" (searches catalog)
-   * - Direct path: "/sprites/backgrounds/gs1/Vale_Forest.gif"
+   * - Direct path: "/sprites/backgrounds/gs1/Vale.gif"
    */
   id: string;
   

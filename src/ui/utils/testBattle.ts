@@ -36,6 +36,7 @@ const testUnitDef: UnitDefinition = {
   abilities: [STRIKE, FIREBALL, HEAL], // Give players some abilities
   manaContribution: 1,
   description: 'A test warrior',
+  autoAttackTiming: 'same-turn',
 };
 
 // Simple test enemy unit definition (using UnitDefinition format)
@@ -63,6 +64,7 @@ const testEnemyDef: UnitDefinition = {
   abilities: [STRIKE], // Give enemies basic strike ability
   manaContribution: 1,
   description: 'A test goblin',
+  autoAttackTiming: 'same-turn',
 };
 
 export function createTestBattle() {
@@ -113,4 +115,3 @@ export function createTestBattle() {
 
   return { battleState, seed };
 }
-

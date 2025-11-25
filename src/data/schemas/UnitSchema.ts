@@ -125,6 +125,7 @@ export const UnitDefinitionSchema = z.object({
   abilities: z.array(AbilitySchema),
   manaContribution: z.number().int().min(0),
   description: z.string(),
+  autoAttackTiming: z.enum(['same-turn', 'next-turn']).optional(),
   availableIn: ContentAvailabilitySchema.optional().readonly(),
 });
 
@@ -143,6 +144,7 @@ export const UnitSchema = z.object({
   level: z.number().int().min(1).max(20),
   xp: z.number().int().min(0),
   currentHp: z.number().int().min(0),
+  autoAttackTiming: z.enum(['same-turn', 'next-turn']).optional(),
   equipment: EquipmentLoadoutSchema,
   storeUnlocked: z.boolean(),
   djinn: z.array(z.string().min(1)),
