@@ -138,7 +138,7 @@
 .main-content {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 0.65rem;
+  gap: 0.5rem;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -180,7 +180,7 @@
 
 /* Team & Bench Section - Side by Side */
 .team-bench-section {
-  height: 200px;
+  height: 190px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.3rem;
@@ -195,7 +195,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 0.25rem;
+  gap: 0.2rem;
   flex: 1;
 }
 
@@ -211,7 +211,7 @@
   background: linear-gradient(145deg, #121826, #0f1420);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
   padding: 0.3rem;
-  min-height: 104px;
+  min-height: 96px;
 }
 
 .party-slot.empty {
@@ -261,8 +261,8 @@
 
 .bench-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.3rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.25rem;
   overflow: hidden;
   flex: 1;
   max-height: none;
@@ -310,23 +310,28 @@
 
 /* Equipment Section */
 .equipment-section {
-  height: 230px;
+  height: 210px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.4rem;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0.35rem;
 }
 
-.equipment-slots-panel {
+.equipment-panel {
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
 }
 
 .equipment-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(120px, 1fr));
-  grid-auto-rows: minmax(88px, auto);
-  gap: 0.35rem;
+  grid-auto-rows: minmax(82px, auto);
+  gap: 0.25rem;
   flex: 1;
+}
+
+.equipment-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
 
 .equipment-slot {
@@ -392,6 +397,15 @@
   flex-shrink: 0;
 }
 
+.equipment-bonus-row {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.65rem;
+  color: #4a9eff;
+}
+
 .equipment-bonus {
   font-size: clamp(0.6rem, 0.8vw, 0.65rem);
   color: #4a9eff;
@@ -411,7 +425,7 @@
 .equipment-compendium {
   border: 1px solid #444;
   border-radius: 4px;
-  padding: 0.5rem;
+  padding: 0.35rem;
   background: #0f1420;
   display: flex;
   flex-direction: column;
@@ -421,10 +435,14 @@
 .compendium-tabs {
   display: flex;
   gap: 0.25rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
   border-bottom: 1px solid #444;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.2rem;
   flex-wrap: wrap;
+}
+
+.compendium-tabs.compact .compendium-tab {
+  padding: 0.2rem 0.6rem;
 }
 
 .compendium-tab {
@@ -460,6 +478,11 @@
   gap: 0.35rem;
 }
 
+.compendium-content.compact-grid {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.25rem;
+}
+
 .compendium-item {
   padding: 0.5rem;
   background: linear-gradient(145deg, #0f1623, #0c101b);
@@ -468,6 +491,14 @@
   margin-bottom: 0.35rem;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.compendium-item.compact {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  padding: 0.35rem 0.45rem;
+  gap: 0.3rem;
 }
 
 .compendium-item:hover {

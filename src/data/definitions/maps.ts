@@ -83,6 +83,7 @@ const TOWER_ENTRANCE_COLUMN = 76;
 
 const buildValeVillageNPCs = (): GameMap['npcs'] => [
   createNPC('tower-attendant', TOWER_ENTRANCE_COLUMN, ROAD_ROW),
+  createNPC('djinn-guide', 5, ROAD_ROW),
 ];
 
 const buildValeVillageTriggers = (): GameMap['triggers'] => {
@@ -99,6 +100,18 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
 
   return [
     ...houseTriggers,
+    {
+      id: 'shop-vale-armory',
+      type: 'shop' as const,
+      position: { x: 1, y: ROAD_ROW },
+      data: { shopId: 'vale-armory' },
+    },
+    {
+      id: 'shop-weapons',
+      type: 'transition' as const,
+      position: { x: 2, y: ROAD_ROW },
+      data: { targetMap: 'weapon-shop-interior', targetPos: { x: HOUSE_CENTER_X, y: HOUSE_EXIT_Y } },
+    },
     {
       id: 'tower-entrance',
       type: 'tower' as const,
@@ -173,6 +186,23 @@ export const MAPS: Record<string, GameMap> = {
     npcs: buildValeVillageNPCs(),
     triggers: buildValeVillageTriggers(),
     spawnPoint: { x: 7, y: ROAD_ROW },
+  },
+  'weapon-shop-interior': {
+    id: 'weapon-shop-interior',
+    name: 'Weapon Shop',
+    width: 10,
+    height: 8,
+    tiles: Array.from({ length: 8 }, () => Array.from({ length: 10 }, () => createTile('path'))),
+    npcs: [createNPC('shopkeeper-weapons', 5, 3)],
+    triggers: [
+      {
+        id: 'exit-shop',
+        type: 'transition',
+        position: { x: 5, y: 7 },
+        data: { targetMap: 'vale-village', targetPos: { x: 2, y: ROAD_ROW } },
+      },
+    ],
+    spawnPoint: { x: 5, y: 7 },
   },
   ...HOUSE_MAPS,
 };

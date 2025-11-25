@@ -120,6 +120,7 @@ const SPECIFIC_NPC_TO_FILE: Record<string, string> = {
   'elder-vale': NPC_ROLE_TO_FILE.elder,
   'shopkeeper-weapons': NPC_ROLE_TO_FILE.shopkeeper,
   'tower-attendant': NPC_ROLE_TO_FILE.elder,
+  'djinn-guide': 'Kraden.gif',
 };
 
 function npcPath(file: string): string {

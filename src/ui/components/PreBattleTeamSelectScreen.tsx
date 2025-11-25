@@ -252,16 +252,16 @@ export function PreBattleTeamSelectScreen({
 
             {/* Equipment Section */}
             {selectedUnit && (
-              <EquipmentSection
-                unit={selectedUnit}
-                selectedSlot={selectedEquipmentSlot}
-                onSelectSlot={setSelectedEquipmentSlot}
-                equipmentLoadout={selectedSlotEquipmentLoadout}
-                inventory={inventory}
-                onEquip={handleEquipItem}
-                onUnequip={handleUnequipItem}
-              />
-            )}
+            <EquipmentSection
+              unit={selectedUnit}
+              selectedSlot={selectedEquipmentSlot}
+              onSelectSlot={setSelectedEquipmentSlot}
+              equipmentLoadout={selectedSlotEquipmentLoadout}
+              inventory={inventory}
+              onEquip={handleEquipItem}
+              onUnequip={handleUnequipItem}
+            />
+          )}
           </div>
 
           {/* Right Column */}
