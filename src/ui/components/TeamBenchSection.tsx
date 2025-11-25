@@ -6,6 +6,34 @@
 import type { Unit } from '@/core/models/Unit';
 import { MAX_PARTY_SIZE } from '@/core/constants';
 
+function getUnitPortrait(unit: Unit): string {
+  const portraits: Record<string, string> = {
+    adept: '/sprites/icons/characters/Isaac1.gif',
+    'war-mage': '/sprites/icons/characters/Garet1.gif',
+    mystic: '/sprites/icons/characters/Mia.gif',
+    ranger: '/sprites/icons/characters/Ivan.gif',
+  };
+
+  const byElement: Record<string, string> = {
+    Venus: '/sprites/icons/characters/Isaac1.gif',
+    Mars: '/sprites/icons/characters/Garet1.gif',
+    Mercury: '/sprites/icons/characters/Mia.gif',
+    Jupiter: '/sprites/icons/characters/Ivan.gif',
+  };
+
+  return portraits[unit.id] ?? byElement[unit.element] ?? '/sprites/icons/characters/Isaac1.gif';
+}
+
+function getElementColor(element: string): string {
+  const colors: Record<string, string> = {
+    Venus: '#D1B354',
+    Mars: '#E55B3C',
+    Mercury: '#4CA3DD',
+    Jupiter: '#8A5AD7',
+  };
+  return colors[element] ?? '#888';
+}
+
 interface TeamBenchSectionProps {
   activeParty: readonly (Unit | null)[];
   benchUnits: readonly Unit[];
@@ -52,11 +80,23 @@ export function TeamBenchSection({
               onClick={() => handleSlotClick(index)}
             >
               {unit ? (
-                <>
+                <div style={{ textAlign: 'center', padding: '4px 2px' }}>
+                  <img
+                    src={getUnitPortrait(unit)}
+                    alt={unit.name}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      imageRendering: 'pixelated',
+                      marginBottom: 4,
+                    }}
+                  />
                   <div className="unit-name">{unit.name}</div>
                   <div className="unit-level">Lv. {unit.level}</div>
-                  <div className="unit-element">{unit.element}</div>
-                </>
+                  <div className="unit-element" style={{ color: getElementColor(unit.element) }}>
+                    {unit.element}
+                  </div>
+                </div>
               ) : (
                 <div className="empty-slot-text">[+]</div>
               )}
@@ -79,10 +119,23 @@ export function TeamBenchSection({
                 className="bench-unit-compact"
                 onClick={() => handleBenchUnitClick(unit.id)}
               >
+                <img
+                  src={getUnitPortrait(unit)}
+                  alt={unit.name}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    imageRendering: 'pixelated',
+                    borderRadius: 6,
+                    border: '1px solid #333',
+                  }}
+                />
                 <div className="bench-unit-info">
                   <div className="unit-name">{unit.name}</div>
                   <div className="unit-level">Lv. {unit.level}</div>
-                  <div className="unit-element">{unit.element}</div>
+                  <div className="unit-element" style={{ color: getElementColor(unit.element) }}>
+                    {unit.element}
+                  </div>
                 </div>
               </div>
             ))
@@ -106,4 +159,3 @@ export function TeamBenchSection({
     </div>
   );
 }
-

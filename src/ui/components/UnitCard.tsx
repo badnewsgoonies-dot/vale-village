@@ -50,14 +50,18 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
     : getEnemyBattleSprite(unit.id, 'idle');
   const spriteId = spritePath ?? '/sprites/battle/enemies/Goblin.gif';
 
+  const cardBorder = hideHp ? 'none' : `2px solid ${isPlayer ? '#4CAF50' : '#F44336'}`;
+  const cardBackground = hideHp ? 'transparent' : '#1a1a1a';
+  const cardPadding = hideHp ? '0.5rem' : '1rem';
+
   return (
     <div
       className={`unit-card ${isPlayer ? 'player' : 'enemy'}`}
       style={{
-        border: `2px solid ${isPlayer ? '#4CAF50' : '#F44336'}`,
+        border: cardBorder,
         borderRadius: '8px',
-        padding: '1rem',
-        backgroundColor: '#1a1a1a',
+        padding: cardPadding,
+        backgroundColor: cardBackground,
         display: 'flex',
         gap: '1rem',
         color: '#fff',

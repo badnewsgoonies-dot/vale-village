@@ -29,16 +29,23 @@ const statusIconMap: Record<string, string> = {
 };
 
 function getPortraitSprite(unit: Unit): string {
-  const baseDir = '/sprites/battle/party';
-  // Map unit element → canonical hero sprite folder/prefix/weapon
-  const byElement: Record<string, { folder: string; prefix: string; weapon: string }> = {
-    Venus: { folder: 'isaac', prefix: 'Isaac', weapon: 'lSword' },
-    Mars: { folder: 'garet', prefix: 'Garet', weapon: 'lSword' },
-    Mercury: { folder: 'mia', prefix: 'Mia', weapon: 'Staff' },
-    Jupiter: { folder: 'ivan', prefix: 'Ivan', weapon: 'Staff' },
+  // Prefer portrait headshots to keep the action UI focused and readable
+  const portraitDir = '/sprites/icons/characters';
+  const portraitByElement: Record<string, string> = {
+    Venus: 'Isaac1.gif',
+    Mars: 'Garet1.gif',
+    Mercury: 'Mia.gif',
+    Jupiter: 'Ivan.gif',
   };
+  const portrait = portraitByElement[unit.element];
+  if (portrait) {
+    return `${portraitDir}/${portrait}`;
+  }
+
+  // Fallback to the battle sprite front pose if we don't have a portrait mapping
+  const baseDir = '/sprites/battle/party';
   const fallback = { folder: 'isaac', prefix: 'Isaac', weapon: 'lSword' };
-  const sprite = byElement[unit.element] ?? fallback;
+  const sprite = fallback;
   return `${baseDir}/${sprite.folder}/${sprite.prefix}_${sprite.weapon}_Front.gif`;
 }
 
@@ -96,11 +103,12 @@ export function BattlePortraitRow({
     <div
       style={{
         display: 'flex',
-        gap: 8,
-        background: 'rgba(0,0,0,0.35)',
-        padding: '8px 10px',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 6,
+        gap: 6,
+        background: 'rgba(0,0,0,0.7)',
+        padding: '6px 8px',
+        border: '2px solid rgba(255,215,0,0.5)',
+        borderRadius: 8,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
       }}
     >
       {units.map((unit, idx) => {
@@ -117,20 +125,21 @@ export function BattlePortraitRow({
             key={unit.id}
             onClick={() => onSelect?.(idx)}
             style={{
-              width: 64,
-              height: 64,
+              width: 56,
+              height: 56,
               position: 'relative',
-              border: isActive ? '2px solid #FFD54A' : '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 6,
+              border: isActive ? '3px solid #FFD54A' : '2px solid rgba(255,215,0,0.3)',
+              borderRadius: 8,
               padding: 0,
-              background: '#0f0f10',
+              background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f18 100%)',
               boxShadow: flash
-                ? '0 0 10px 2px rgba(255, 216, 74, 0.9)'
+                ? '0 0 15px 4px rgba(255, 216, 74, 0.95), inset 0 0 10px rgba(255,215,0,0.3)'
                 : isActive
-                  ? '0 0 6px rgba(255, 216, 74, 0.6)'
-                  : 'none',
+                  ? '0 0 10px rgba(255, 216, 74, 0.7), inset 0 0 5px rgba(255,215,0,0.2)'
+                  : 'inset 0 2px 4px rgba(0,0,0,0.5)',
               overflow: 'hidden',
               cursor: onSelect ? 'pointer' : 'default',
+              transition: 'all 0.15s ease',
             }}
           >
             <div
@@ -138,12 +147,15 @@ export function BattlePortraitRow({
                 position: 'absolute',
                 top: 2,
                 right: 2,
-                fontSize: '0.7rem',
+                fontSize: '0.65rem',
                 color: '#FFD54A',
-                background: 'rgba(0,0,0,0.55)',
-                padding: '2px 4px',
-                borderRadius: 4,
-                border: '1px solid rgba(255,213,74,0.6)',
+                background: 'rgba(0,0,0,0.85)',
+                padding: '1px 4px',
+                borderRadius: 3,
+                border: '1px solid #FFD54A',
+                fontWeight: 700,
+                textShadow: '0 0 4px rgba(255,215,0,0.8)',
+                letterSpacing: '-0.5px',
               }}
               title="Crit counter"
             >
@@ -178,16 +190,22 @@ export function BattlePortraitRow({
                 bottom: 0,
                 left: 0,
                 width: '100%',
-                height: 8,
-                background: 'rgba(255,255,255,0.08)',
+                height: 6,
+                background: 'rgba(0,0,0,0.7)',
+                borderTop: '1px solid rgba(255,255,255,0.1)',
               }}
             >
               <div
                 style={{
                   width: `${hpPct * 100}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, #7FFFD4, #4CAF50)',
-                  transition: 'width 0.2s',
+                  background: hpPct > 0.5
+                    ? 'linear-gradient(90deg, #4CAF50, #8BC34A)'
+                    : hpPct > 0.25
+                      ? 'linear-gradient(90deg, #FF9800, #FFC107)'
+                      : 'linear-gradient(90deg, #f44336, #FF5722)',
+                  transition: 'width 0.3s ease',
+                  boxShadow: '0 0 4px rgba(255,255,255,0.3)',
                 }}
               />
             </div>

@@ -7,7 +7,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useStore } from '../state/store';
 import { renderEventText } from '../utils/text';
 import { BattleLog } from './BattleLog';
-import { UnitCard } from './UnitCard';
 import { PostBattleCutscene } from './PostBattleCutscene';
 import { VictoryOverlay } from './VictoryOverlay';
 import { getValidTargets } from '../../core/algorithms/targeting';
@@ -19,6 +18,20 @@ import { BattleActionMenu, type ActionMenuMode } from './BattleActionMenu';
 import { DjinnAdvisorPanel } from './DjinnAdvisorPanel';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { Unit } from '../../core/models/Unit';
+import { getEnemyBattleSprite } from '../sprites/mappings/battleSprites';
+
+function getPlayerBattleSprite(unit: Unit): string {
+  const baseDir = '/sprites/battle/party';
+  const byElement: Record<string, { folder: string; prefix: string; weapon: string }> = {
+    Venus: { folder: 'isaac', prefix: 'Isaac', weapon: 'lSword' },
+    Mars: { folder: 'garet', prefix: 'Garet', weapon: 'lSword' },
+    Mercury: { folder: 'mia', prefix: 'Mia', weapon: 'Staff' },
+    Jupiter: { folder: 'ivan', prefix: 'Ivan', weapon: 'Staff' },
+  };
+  const fallback = { folder: 'isaac', prefix: 'Isaac', weapon: 'lSword' };
+  const sprite = byElement[unit.element] ?? fallback;
+  return `${baseDir}/${sprite.folder}/${sprite.prefix}_${sprite.weapon}_Back.gif`;
+}
 
 // --- CSS CONSTANTS ---
 // Unused - commented out to fix TypeScript warnings
@@ -403,21 +416,56 @@ export function QueueBattleView() {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateRows: '1fr auto',
-        height: '100dvh',
-        background: '#0b0b0f',
-        color: '#fff',
+        width: '100vw',
+        height: '100vh',
+        background: '#000',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999,
       }}
     >
-      {/* Battlefield Area */}
       <div
         style={{
+          width: 960,
+          height: 640,
           position: 'relative',
-          padding: '24px',
+          background: '#000',
           overflow: 'hidden',
+          imageRendering: 'pixelated',
+          color: '#fff',
+          position: 'relative',
         }}
       >
+        {/* Battlefield Area */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflow: 'hidden',
+          }}
+        >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: 'url(/sprites/backgrounds/gs1/Vale.gif)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 80%',
+            imageRendering: 'pixelated',
+            zIndex: 0,
+          }}
+        />
+
         {isExecuting && (
           <div
             style={{
@@ -442,42 +490,143 @@ export function QueueBattleView() {
         <div
           style={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100%',
-          }}
+              gap: 48,
+              height: '100%',
+              position: 'relative',
+              zIndex: 1,
+            }}
         >
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', letterSpacing: 1 }}>Enemies</h3>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              {battle.enemies.map((enemy) => {
-                const isTargetCandidate = validTargetIds.has(enemy.id);
-                if (isUnitKO(enemy)) return null;
-                return (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '35%',
+              left: '15%',
+              display: 'flex',
+              gap: '3rem',
+              zIndex: 10,
+            }}
+          >
+            {battle.enemies.map((enemy) => {
+              const isTargetCandidate = validTargetIds.has(enemy.id);
+              if (isUnitKO(enemy)) return null;
+              const nameSpritePath = `/sprites/battle/enemies/${enemy.name.replace(/\s+/g, '')}.gif`;
+              const mappedSprite = getEnemyBattleSprite(enemy.id, 'idle');
+              const fallbackSprite = '/sprites/battle/enemies/Goblin.gif';
+              const enemySprite = mappedSprite ?? nameSpritePath;
+              return (
+                <div
+                  key={enemy.id}
+                  onClick={() => isTargetCandidate && handleTargetSelect(enemy.id)}
+                  style={{
+                    position: 'relative',
+                    cursor: isTargetCandidate ? 'pointer' : 'default',
+                    textAlign: 'center',
+                  }}
+                >
                   <div
-                    key={enemy.id}
-                    onClick={() => isTargetCandidate && handleTargetSelect(enemy.id)}
                     style={{
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      padding: 10,
-                      borderRadius: 8,
-                      background: 'rgba(0,0,0,0.3)',
-                      cursor: isTargetCandidate ? 'pointer' : 'default',
-                      boxShadow: isTargetCandidate ? '0 0 12px rgba(255,216,127,0.5)' : 'none',
-                      transition: 'all 0.2s',
-                      minWidth: 160,
+                      position: 'absolute',
+                      bottom: 0,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 70,
+                      height: 24,
+                      background: 'rgba(0,0,0,0.6)',
+                      borderRadius: '50%',
+                      filter: 'blur(4px)',
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    }}
+                  />
+                  <img
+                    src={enemySprite}
+                    alt={enemy.name}
+                    onError={(e) => {
+                      e.currentTarget.src = fallbackSprite;
+                    }}
+                    style={{
+                      width: 64,
+                      height: 64,
+                      imageRendering: 'pixelated',
+                      position: 'relative',
+                      transform: 'scale(3)',
+                      zIndex: 1,
+                      filter: isTargetCandidate ? 'drop-shadow(0 0 8px rgba(255,216,127,0.7))' : 'none',
+                    }}
+                  />
+                  <div
+                    style={{
+                      marginTop: 4,
+                      fontSize: '0.8rem',
+                      color: isTargetCandidate ? '#FFD87F' : '#aaa',
                     }}
                   >
-                    <UnitCard unit={enemy} isPlayer={false} team={battle.playerTeam} hideHp />
-                    {isTargetCandidate && (
-                      <div style={{ textAlign: 'center', marginTop: 4, color: '#FFD87F', fontSize: '0.85rem' }}>
-                        Click to target
-                      </div>
-                    )}
+                    {enemy.name}
                   </div>
-                );
-              })}
-            </div>
+                  {isTargetCandidate && (
+                    <div style={{ color: '#FFD87F', fontSize: '0.75rem' }}>Click to target</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '28%',
+              right: '15%',
+              width: 260,
+              height: 160,
+              zIndex: 10,
+            }}
+          >
+            {battle.playerTeam.units.map((unit, index) => {
+              if (isUnitKO(unit)) return null;
+              const spritePath = getPlayerBattleSprite(unit);
+              return (
+                <div
+                  key={unit.id}
+                  style={{
+                    position: 'absolute',
+                    left: index * 55,
+                    bottom: index * 12,
+                    textAlign: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 4,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 48,
+                      height: 16,
+                      background: 'rgba(0,0,0,0.6)',
+                      borderRadius: '50%',
+                      filter: 'blur(4px)',
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    }}
+                  />
+                  <img
+                    src={spritePath}
+                    alt={unit.name}
+                    style={{
+                      width: 64,
+                      height: 64,
+                      imageRendering: 'pixelated',
+                      position: 'relative',
+                      transform: 'scale(2.5)',
+                      zIndex: 1,
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -540,13 +689,17 @@ export function QueueBattleView() {
       {/* Bottom UI (Golden Sun-style) */}
       <div
         style={{
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(8,8,10,0.92)',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: 'linear-gradient(to top, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.85) 70%, transparent 100%)',
           display: 'grid',
-          gridTemplateColumns: '200px 1fr',
-          padding: '12px 16px',
-          gap: 12,
-          alignItems: 'center',
+          gridTemplateColumns: '160px 1fr',
+          padding: '10px 12px',
+          gap: 10,
+          alignItems: 'flex-end',
+          zIndex: 50,
         }}
       >
         <DjinnAdvisorPanel
@@ -554,89 +707,91 @@ export function QueueBattleView() {
           onClick={() => setSummonScreenOpen(true)}
         />
 
-        <div
-          style={{
+            <div
+              style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 10,
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <BattleManaBar
-            currentMana={currentManaDisplay}
-            maxMana={maxManaDisplay}
-            pendingThisRound={pendingManaThisRound}
-            pendingNextRound={pendingManaNextRound}
-          />
-
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 12,
+              gap: 6,
               position: 'relative',
-              minHeight: 240,
+              width: '100%',
+              overflow: 'visible',
             }}
           >
             {(() => {
-              const portraitWidth = 64;
-              const portraitGap = 8;
-              const actionMenuWidth = 240;
-              const count = battle.playerTeam.units.length;
-              const rowWidth = count * portraitWidth + (count - 1) * portraitGap;
-              const activeIdx = Math.max(0, Math.min(activePortraitIndex ?? 0, count - 1));
-              const actionX = activeIdx * (portraitWidth + portraitGap);
-              const menuOffsetX = actionX + portraitWidth / 2 - actionMenuWidth / 2;
-
               return (
                 <>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 120,
-                      left: `calc(50% - ${rowWidth / 2}px + ${menuOffsetX}px)`,
-                      zIndex: 2,
-                    }}
-                  >
-                    <BattleActionMenu
-                      battle={battle}
-                      currentUnit={currentUnit}
-                      selectedAbilityId={selectedAbilityId ?? null}
-                      mode={menuMode}
-                      onModeChange={setMenuMode}
-                      onSelectAttack={handleSelectAttack}
-                      onSelectAbility={handleAbilitySelect}
-                    />
-                  </div>
+                  <div style={{ width: '100%', display: 'flex', justifyContent: 'center', overflow: 'visible' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                      <div style={{ position: 'relative', zIndex: 30 }}>
+                        <BattleManaBar
+                          currentMana={currentManaDisplay}
+                          maxMana={maxManaDisplay}
+                          pendingThisRound={pendingManaThisRound}
+                          pendingNextRound={pendingManaNextRound}
+                        />
+                      </div>
 
-                  <div style={{ width: rowWidth }}>
-                    <BattlePortraitRow
-                      units={battle.playerTeam.units}
-                      activeIndex={activePortraitIndex}
-                      queuedActions={battle.queuedActions}
-                      critCounters={critCounters}
-                      critThresholds={critThresholds}
-                      critFlashes={critFlash}
-                      onSelect={(idx) => {
-                        const unit = battle.playerTeam.units[idx];
-                        if (isTargeting && unit && validTargetIds.has(unit.id)) {
-                          handleTargetSelect(unit.id);
-                          return;
-                        }
-                        if (battle.phase === 'planning') {
-                          setActivePortrait(idx);
-                          setSelectedAbilityId(undefined);
-                        }
-                      }}
-                    />
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: '100%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            marginBottom: 8,
+                            zIndex: 20,
+                          }}
+                        >
+                          <BattleActionMenu
+                            battle={battle}
+                            currentUnit={currentUnit}
+                            selectedAbilityId={selectedAbilityId ?? null}
+                            mode={menuMode}
+                            onModeChange={setMenuMode}
+                            onSelectAttack={handleSelectAttack}
+                            onSelectAbility={handleAbilitySelect}
+                          />
+                        </div>
+
+                        <BattlePortraitRow
+                          units={battle.playerTeam.units}
+                          activeIndex={activePortraitIndex}
+                          queuedActions={battle.queuedActions}
+                          critCounters={critCounters}
+                          critThresholds={critThresholds}
+                          critFlashes={critFlash}
+                          onSelect={(idx) => {
+                            const unit = battle.playerTeam.units[idx];
+                            if (isTargeting && unit && validTargetIds.has(unit.id)) {
+                              handleTargetSelect(unit.id);
+                              return;
+                            }
+                            if (battle.phase === 'planning') {
+                              setActivePortrait(idx);
+                              setSelectedAbilityId(undefined);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </>
               );
             })()}
           </div>
 
-          <div style={{ alignSelf: 'stretch', marginTop: 4 }}>
+          <div style={{ alignSelf: 'stretch' }}>
             <button
               onClick={handleExecute}
               disabled={!isQueueComplete}
@@ -656,6 +811,7 @@ export function QueueBattleView() {
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
