@@ -20,7 +20,11 @@
       "Bash(wc:*)",
       "Bash(curl:*)",
       "Bash(mkdir:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(command -v:*)",
+      "Bash(codex --version:*)",
+      "Bash(codex --help:*)",
+      "Bash(codex exec --full-auto)"
     ],
     "deny": [],
     "ask": []
@@ -36,5 +40,8 @@
         ]
       }
     ]
+  },
+  "remote": {
+    "defaultEnvironmentId": "env_011CUKgGMciY1Fwdpnu8Dtwq"
   }
 }
