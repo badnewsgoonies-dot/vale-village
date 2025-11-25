@@ -24,6 +24,87 @@ import { SimpleSprite } from '../sprites/SimpleSprite';
 import { BattleUnitSprite } from './BattleUnitSprite';
 import { ABILITIES } from '../../data/definitions/abilities';
 
+const FX_LIBRARY = {
+  grandGaia: '/sprites/psynergy/Grand_Gaia.gif',
+  pyroclasm: '/sprites/psynergy/Pyroclasm.gif',
+  sparkPlasma: '/sprites/psynergy/Spark_Plasma.gif',
+  deluge: '/sprites/psynergy/Deluge.gif',
+  blueBolt: '/sprites/psynergy/Blue_Bolt.gif',
+  heatWave: '/sprites/psynergy/Heat_Wave.gif',
+  tempest: '/sprites/psynergy/Tempest.gif',
+  glacier: '/sprites/psynergy/Glacier.gif',
+  freezePrism: '/sprites/psynergy/Freeze_Prism.gif',
+} as const;
+const ALLOWED_FX = new Set(Object.values(FX_LIBRARY));
+const FX_FALLBACK = FX_LIBRARY.grandGaia;
+
+function normalizeFxPath(path: string | null | undefined): string | null {
+  if (!path) return null;
+  return ALLOWED_FX.has(path) ? path : null;
+}
+
+function elementFallbackFx(element: string | undefined): string {
+  switch (element) {
+    case 'Mars':
+      return FX_LIBRARY.heatWave;
+    case 'Mercury':
+      return FX_LIBRARY.deluge;
+    case 'Jupiter':
+      return FX_LIBRARY.sparkPlasma;
+    case 'Venus':
+    default:
+      return FX_LIBRARY.grandGaia;
+  }
+}
+
+function resolveAbilityFx(abilityId: string | null | undefined): string {
+  if (!abilityId) return FX_FALLBACK;
+  const mapped = normalizeFxPath(getAbilityEffectSprite(abilityId));
+  if (mapped) return mapped;
+  const ability = ABILITIES[abilityId];
+  return elementFallbackFx(ability?.element);
+}
+
+type AnyEvent = (typeof events)[number] | undefined;
+
+function resolveFxForEvent(evt: AnyEvent): string {
+  if (!evt) return FX_FALLBACK;
+  if (evt.type === 'ability') {
+    return resolveAbilityFx(evt.abilityId);
+  }
+  if (evt.type === 'hit') {
+    return elementFallbackFx(evt.element);
+  }
+  if (evt.type === 'heal' || evt.type === 'status-applied' || evt.type === 'status-expired') {
+    return FX_LIBRARY.deluge;
+  }
+  return FX_FALLBACK;
+}
+
+function computeEventDelay(
+  evt: (typeof events)[number] | undefined,
+  fx: string | null,
+  loadedFx: Set<string>
+): number {
+  if (!evt) return 0;
+  const baseByType: Record<string, number> = {
+    ability: 1850,
+    hit: 1500,
+    heal: 1500,
+    'status-applied': 1250,
+    'status-expired': 1250,
+    ko: 1600,
+    'auto-heal': 1250,
+  };
+  let delay = baseByType[evt.type] ?? 1150;
+
+  if (evt.type === 'ability' && fx) {
+    delay = loadedFx.has(fx) ? Math.max(delay, 1900) : Math.max(delay, 2300);
+  }
+
+  return delay;
+}
+
 const djinnSprites = [
   { id: 'venus', name: 'Flint', path: '/sprites/battle/djinn/Venus_Djinn_Front.gif' },
   { id: 'mars', name: 'Granite', path: '/sprites/battle/djinn/Mars_Djinn_Front.gif' },
@@ -258,9 +339,16 @@ export function QueueBattleView() {
   const [showVictoryOverlay, setShowVictoryOverlay] = useState(false);
   const [playbackLock, setPlaybackLock] = useState(false);
   const playbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedFxRef = useRef<Set<string>>(new Set());
 
   const battleEnded = battle?.phase === 'victory' || battle?.phase === 'defeat';
   const battleResult = battle?.phase === 'victory' ? 'PLAYER_VICTORY' : battle?.phase === 'defeat' ? 'PLAYER_DEFEAT' : null;
+
+  // Reset per-battle transient state
+  useEffect(() => {
+    if (!battle) return;
+    loadedFxRef.current.clear();
+  }, [battle]);
 
   // --- EFFECTS ---
 
@@ -292,6 +380,8 @@ export function QueueBattleView() {
     }
   }, [battle, mode, lastBattleRewards, processVictory, towerStatus, activeTowerEncounterId]);
 
+  const currentFx = useMemo(() => resolveFxForEvent(events[0]), [events]);
+
   // 4. Event Queue Processing
   useEffect(() => {
     // Clear playback state when leaving execution or no events
@@ -309,17 +399,7 @@ export function QueueBattleView() {
     }
 
     const currentEvent = events[0];
-    // Purposeful pacing per event type
-    const delayByType: Record<string, number> = {
-      ability: 1500,
-      hit: 1150,
-      heal: 1150,
-      'status-applied': 1050,
-      'status-expired': 1050,
-      ko: 1300,
-      'auto-heal': 1050,
-    };
-    const delay = delayByType[currentEvent.type] ?? 900;
+    const delay = computeEventDelay(currentEvent, currentFx, loadedFxRef.current);
     setPlaybackLock(true);
     playbackTimerRef.current = setTimeout(() => {
       dequeue();
@@ -333,7 +413,7 @@ export function QueueBattleView() {
         playbackTimerRef.current = null;
       }
     };
-  }, [battle?.phase, events, dequeue, playbackLock]);
+  }, [battle?.phase, events, dequeue, playbackLock, currentFx]);
 
   // --- COMPUTED VALUES ---
 
@@ -590,8 +670,8 @@ export function QueueBattleView() {
               const isActor = currentActorId === enemy.id;
               if (isUnitKO(enemy)) return null;
               const mappedSprite = getEnemyBattleSprite(enemy.id, 'idle');
-              const fallbackSprite = `/sprites/battle/enemies/${enemy.name.replace(/\s+/g, '')}.gif`;
-              const spriteId = mappedSprite ?? fallbackSprite;
+              const nameBasedFallback = `/sprites/battle/enemies/${enemy.name.replace(/\s+/g, '')}.gif`;
+              const spriteId = mappedSprite ?? nameBasedFallback;
               return (
                 <div
                   key={enemy.id}
@@ -623,17 +703,26 @@ export function QueueBattleView() {
                       transform: isActor ? 'scale(3.2)' : 'scale(3)',
                       zIndex: 1,
                       filter: isResolvingTarget
-                        ? 'drop-shadow(0 0 14px rgba(255,216,127,0.9))'
-                        : isTargetCandidate
-                          ? 'drop-shadow(0 0 8px rgba(255,216,127,0.7))'
-                          : 'none',
+                      ? 'drop-shadow(0 0 14px rgba(255,216,127,0.9))'
+                      : isTargetCandidate
+                        ? 'drop-shadow(0 0 8px rgba(255,216,127,0.7))'
+                        : 'none',
                     }}
                   >
-                    {mappedSprite ? (
-                      <BattleUnitSprite unitId={enemy.id} state="idle" size="large" />
-                    ) : (
-                      <SimpleSprite id={spriteId} width={64} height={64} />
-                    )}
+                    <SimpleSprite
+                      id={spriteId}
+                      width={64}
+                      height={64}
+                      fallback={
+                        <SimpleSprite
+                          id="/sprites/battle/enemies/Goblin.gif"
+                          width={64}
+                          height={64}
+                          imageRendering="pixelated"
+                        />
+                      }
+                      imageRendering="pixelated"
+                    />
                   </div>
                   <div
                     style={{
@@ -890,8 +979,8 @@ export function QueueBattleView() {
         </div>
       )}
 
-      {/* Ability FX overlay */}
-      {battle.phase === 'executing' && events[0]?.type === 'ability' && (
+      {/* FX overlay for current event */}
+      {battle.phase === 'executing' && events.length > 0 && (
         <div
           style={{
             position: 'absolute',
@@ -913,9 +1002,12 @@ export function QueueBattleView() {
         >
           {(() => {
             const evt = events[0];
-            if (evt?.type !== 'ability') return null;
-            const fx = getAbilityEffectSprite(evt.abilityId);
-            const abilityName = ABILITIES[evt.abilityId]?.name ?? evt.abilityId;
+            if (!evt) return null;
+            const fx = resolveFxForEvent(evt);
+            const abilityName =
+              evt.type === 'ability'
+                ? ABILITIES[evt.abilityId]?.name ?? evt.abilityId
+                : renderEventText(evt);
             return (
               <>
                 {fx && (
@@ -924,6 +1016,16 @@ export function QueueBattleView() {
                     width={140}
                     height={140}
                     style={{ borderRadius: 10, overflow: 'hidden', mixBlendMode: 'screen' }}
+                    fallback={
+                      <SimpleSprite
+                        id={FX_FALLBACK}
+                        width={140}
+                        height={140}
+                        style={{ borderRadius: 10, overflow: 'hidden', mixBlendMode: 'screen' }}
+                        onLoad={() => loadedFxRef.current.add(FX_FALLBACK)}
+                      />
+                    }
+                    onLoad={() => loadedFxRef.current.add(fx)}
                   />
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
