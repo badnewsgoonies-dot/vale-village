@@ -194,7 +194,8 @@ function applyDialogueEvents(
         break;
       }
       case 'open-shop': {
-        console.warn('Shop opened via dialogue (UI not implemented yet)');
+        // Open the shop UI directly from dialogue
+        store.set({ currentShopId: store.currentShopId ?? 'vale-armory', mode: 'shop' });
         break;
       }
       case 'start-battle': {
@@ -226,6 +227,9 @@ function applyDialogueEvents(
 
           const newUnit = createUnit(unitDef, avgLevel, 0);
           store.addUnitToRoster(newUnit);
+          if (store.setRecruitmentFlag) {
+            store.setRecruitmentFlag(unitId, true);
+          }
           console.warn(`🎉 Recruited ${newUnit.name} via dialogue effect!`);
         } else {
           console.error(`Failed to recruit unit: ${unitId} (definition not found or no team)`);

@@ -96,6 +96,7 @@ function App() {
   const equipment = useStore((s) => s.equipment);
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
+  const addPlaytime = useStore((s) => s.addPlaytime);
   const currentShopId = useStore((s) => s.currentShopId);
   const startDialogueTree = useStore((s) => s.startDialogueTree);
   const pendingBattleEncounterId = useStore((s) => s.pendingBattleEncounterId);
@@ -122,6 +123,14 @@ function App() {
       addEquipment([WOODEN_SWORD, LEATHER_VEST, WOODEN_STAFF, WOODEN_AXE, COTTON_SHIRT]);
     }
   }, [team, equipment.length, addEquipment]);
+
+  // Track playtime (ticks every second outside startup screens)
+  useEffect(() => {
+    const isStartup = mode === 'title-screen' || mode === 'main-menu' || mode === 'intro';
+    if (isStartup) return;
+    const timer = setInterval(() => addPlaytime(1), 1000);
+    return () => clearInterval(timer);
+  }, [mode, addPlaytime]);
 
   // Mode is initialized to 'overworld' in gameFlowSlice, so no need to set it here
   // Removing this effect prevents it from overwriting mode changes (e.g., dialogue)

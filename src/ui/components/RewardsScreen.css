@@ -7,7 +7,7 @@
   height: 100%;
   max-height: 100vh;
   background: linear-gradient(180deg, #0F2550, #1A3560);
-  padding: 24px;
+  padding: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,11 +15,11 @@
 }
 
 .rewards-container {
-  width: 800px;
+  width: 820px;
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   animation: slideIn 0.5s ease-out;
 }
 
@@ -37,9 +37,9 @@
 /* ===== VICTORY BANNER ===== */
 .rewards-container .victory-banner {
   background: rgba(20, 30, 50, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  padding: 24px;
+  padding: 16px;
   text-align: center;
   animation: victoryPulse 2s ease-in-out infinite;
 }
@@ -54,11 +54,18 @@
 }
 
 .rewards-container .victory-banner h1 {
-  font-size: 48px;
+  font-size: 38px;
   color: #FFD87F;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px #FFD87F;
   animation: textGlow 1.5s ease-in-out infinite;
   margin: 0;
+}
+
+.victory-sub {
+  margin-top: 6px;
+  color: #cdd9f5;
+  font-size: 14px;
+  letter-spacing: 0.02em;
 }
 
 @keyframes textGlow {
@@ -74,17 +81,17 @@
 .rewards-container .rewards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
 .rewards-container .reward-card {
   background: rgba(20, 30, 50, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  padding: 16px;
+  padding: 12px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   animation: cardFadeIn 0.5s ease-out backwards;
 }
 
@@ -103,14 +110,14 @@
 }
 
 .rewards-container .reward-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
@@ -127,7 +134,7 @@
 }
 
 .rewards-container .reward-value {
-  font-size: 20px;
+  font-size: 18px;
   color: #fff;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
@@ -157,9 +164,9 @@
 /* ===== ITEMS PANEL ===== */
 .rewards-container .items-panel {
   background: rgba(20, 30, 50, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  padding: 16px;
+  padding: 14px;
   animation: cardFadeIn 0.5s ease-out 0.3s backwards;
 }
 
@@ -173,14 +180,14 @@
 
 .rewards-container .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 .rewards-container .item-card {
   background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -212,8 +219,8 @@
 
 /* ===== RECRUITMENT PANEL ===== */
 .recruitment-panel {
-  margin: 24px 0;
-  padding: 24px;
+  margin: 16px 0;
+  padding: 18px;
   background: linear-gradient(135deg, #1a2a3a 0%, #0f1a25 100%);
   border: 2px solid #4a9eff;
   border-radius: 8px;
@@ -269,8 +276,8 @@
 
 /* ===== DJINN PANEL ===== */
 .djinn-panel {
-  margin: 24px 0;
-  padding: 24px;
+  margin: 16px 0;
+  padding: 18px;
   background: linear-gradient(135deg, #2a1a3a 0%, #1f0f25 100%);
   border: 2px solid #ff6b6b;
   border-radius: 8px;
@@ -316,9 +323,9 @@
   background: linear-gradient(135deg,
     rgba(80, 216, 80, 0.3) 0%,
     rgba(40, 176, 40, 0.3) 100%);
-  border: 3px solid #50D850;
+  border: 2px solid #50D850;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 30px rgba(80, 216, 80, 0.5);
-  padding: 24px;
+  padding: 18px;
   text-align: center;
   animation: levelUpAppear 0.8s ease-out 0.5s backwards;
 }
@@ -335,7 +342,7 @@
 }
 
 .rewards-container .level-up-panel h2 {
-  font-size: 24px;
+  font-size: 20px;
   color: #50D850;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 15px #50D850;
   margin-bottom: 16px;
@@ -430,16 +437,16 @@
 .rewards-container .continue-container {
   display: flex;
   justify-content: center;
-  animation: cardFadeIn 0.5s ease-out 1s backwards;
+  animation: cardFadeIn 0.4s ease-out 1s backwards;
 }
 
 .rewards-container .continue-btn {
   background: rgba(20, 30, 50, 0.9);
-  border: 3px solid #FFD87F;
+  border: 2px solid #FFD87F;
   color: #FFD87F;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  padding: 12px 32px;
+  padding: 10px 28px;
   cursor: pointer;
   transition: all 0.2s;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);

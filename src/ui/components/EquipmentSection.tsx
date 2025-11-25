@@ -55,6 +55,7 @@ export function EquipmentSection({
     onSelectSlot(null);
   };
 
+  const selectedEquipment = selectedSlot ? equipmentLoadout[selectedSlot] ?? null : null;
   const equipmentBonuses = calculateEquipmentBonuses(equipmentLoadout);
   const levelBonuses = calculateLevelBonuses(unit);
   
@@ -112,11 +113,20 @@ export function EquipmentSection({
       </div>
 
       <div className="equipment-compendium">
-        {selectedSlot && (
-          <div className="compendium-banner">
-            Equipping to: {selectedSlot.toUpperCase()}
+        <div className="compendium-header">
+          <div className={`compendium-banner ${selectedSlot ? '' : 'muted'}`}>
+            {selectedSlot ? `Equipping to: ${selectedSlot.toUpperCase()}` : 'Select a slot to view equipment'}
           </div>
-        )}
+          {selectedSlot && selectedEquipment && (
+            <button
+              type="button"
+              className="unequip-button"
+              onClick={() => handleUnequip(selectedSlot)}
+            >
+              Unequip
+            </button>
+          )}
+        </div>
         <div className="compendium-tabs compact">
           {EQUIPMENT_SLOTS.map((slot) => (
             <button

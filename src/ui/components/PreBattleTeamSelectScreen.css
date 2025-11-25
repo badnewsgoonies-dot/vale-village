@@ -432,6 +432,41 @@
   overflow: hidden;
 }
 
+.compendium-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.compendium-banner {
+  font-size: clamp(0.68rem, 0.95vw, 0.8rem);
+  color: #c9d6f2;
+  letter-spacing: 0.02em;
+}
+
+.compendium-banner.muted {
+  color: #7a859a;
+}
+
+.unequip-button {
+  padding: 0.25rem 0.65rem;
+  border: 1px solid #2c3a4f;
+  background: #1c2535;
+  color: #e6eefc;
+  border-radius: 999px;
+  font-size: clamp(0.65rem, 0.85vw, 0.75rem);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.unequip-button:hover {
+  background: #24334b;
+  border-color: #4a9eff;
+}
+
 .compendium-tabs {
   display: flex;
   gap: 0.25rem;

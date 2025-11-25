@@ -89,13 +89,16 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
         {/* Victory Banner */}
         <div className="victory-banner" role="banner">
           <h1>VICTORY!</h1>
+          <div className="victory-sub">
+            +{rewards.rewards.totalXp} XP · +{rewards.goldEarned} G · {rewards.rewards.survivorCount} survived
+          </div>
         </div>
 
         {/* Rewards Grid (XP + Money) */}
         <div className="rewards-grid">
           {/* XP Gained */}
           <div className="reward-card" role="article" aria-label={`${rewards.rewards.totalXp} experience points gained`}>
-            <div className="reward-icon" aria-hidden="true">✦</div>
+            <div className="reward-icon" aria-hidden="true">XP</div>
             <div className="reward-details">
               <div className="reward-label">Experience</div>
               <div className="reward-value highlight">+{rewards.rewards.totalXp} XP</div>
@@ -107,7 +110,7 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
 
           {/* Money Gained */}
           <div className="reward-card" role="article" aria-label={`${rewards.goldEarned} gold coins gained`}>
-            <div className="reward-icon" aria-hidden="true">◉</div>
+            <div className="reward-icon" aria-hidden="true">G</div>
             <div className="reward-details">
               <div className="reward-label">Gold</div>
               <div className="reward-value highlight">+{rewards.goldEarned} G</div>
@@ -140,7 +143,7 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
         {/* Unit Recruitment Notification */}
         {rewards.recruitedUnit && (
           <section className="recruitment-panel" role="alert" aria-label={`Recruited ${rewards.recruitedUnit.name}`}>
-            <h2>🎉 NEW RECRUIT!</h2>
+            <h2>NEW RECRUIT!</h2>
             <div className="recruitment-unit">
               <div className="recruitment-sprite">
                 <BattleUnitSprite unitId={rewards.recruitedUnit.id} state="idle" size="medium" />
@@ -158,7 +161,7 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
         {/* Djinn Acquisition Notification */}
         {rewards.recruitedUnit && latestDjinn && (
           <section className="djinn-panel" role="alert" aria-label={`Djinn ${latestDjinn.name} acquired`}>
-            <h2>✨ DJINN ACQUIRED</h2>
+            <h2>DJINN ACQUIRED</h2>
             <div className="djinn-acquisition">
               <div className="djinn-name">{latestDjinn.name}</div>
               <div className="djinn-element">{latestDjinn.element}</div>
@@ -178,7 +181,7 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
                     <BattleUnitSprite unitId={levelUp.unit.id} state="idle" size="medium" />
                   </div>
                   <div className="level-up-name">{levelUp.unit.name}</div>
-                  <div className="level-up-arrow">Lv {levelUp.oldLevel} → Lv {levelUp.newLevel}</div>
+                  <div className="level-up-arrow">Lv {levelUp.oldLevel} -> Lv {levelUp.newLevel}</div>
                   <div className="level-up-stats">
                     {levelUp.statGains.hp > 0 && <span>+{levelUp.statGains.hp} HP</span>}
                     {levelUp.statGains.atk > 0 && <span>+{levelUp.statGains.atk} ATK</span>}
@@ -216,3 +219,4 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
     </div>
   );
 }
+

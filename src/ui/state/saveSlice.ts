@@ -27,7 +27,25 @@ import type { OverworldSlice } from './overworldSlice';
 import type { TowerSlice, TowerRecord } from './towerSlice';
 import { DEFAULT_TOWER_RECORD } from './towerSlice';
 
+type NPCState = {
+  defeated?: boolean;
+  dialogueSeen?: boolean;
+  questProgress?: number;
+  lastInteraction?: number;
+  customData?: Record<string, string | number | boolean>;
+};
+
 export interface SaveSlice {
+  recruitmentFlags: Record<string, boolean>;
+  npcStates: Record<string, NPCState>;
+  statsTracker: {
+    battlesWon: number;
+    battlesLost: number;
+    totalDamageDealt: number;
+    totalHealingDone: number;
+    playtime: number; // seconds
+  };
+
   hasSave: () => boolean;
   loadGame: () => void;
   saveGame: () => void;
@@ -40,6 +58,11 @@ export interface SaveSlice {
   deleteSaveSlot: (slot: number) => void;
   getSaveSlotMetadata: (slot: number) => SaveSlotMetadata;
   autoSave: () => void;
+
+  setRecruitmentFlag: (id: string, recruited: boolean) => void;
+  setNpcState: (id: string, state: Partial<NPCState>) => void;
+  incrementBattleStats: (delta: { outcome: 'win' | 'loss'; damageDealt?: number; healingDone?: number }) => void;
+  addPlaytime: (seconds: number) => void;
 }
 
 /**
@@ -51,7 +74,10 @@ function createSaveData(
   inventory: Pick<InventorySlice, 'gold' | 'equipment'>,
   story: StorySlice['story'],
   overworld: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> | null,
-  towerRecord: TowerRecord
+  towerRecord: TowerRecord,
+  recruitmentFlags: Record<string, boolean>,
+  npcStates: Record<string, NPCState>,
+  statsTracker: SaveSlice['statsTracker']
 ): SaveV1 | null {
   // Ensure we have units to save
   if (!team || !team.units || team.units.length === 0) {
@@ -101,20 +127,20 @@ function createSaveData(
       djinnCollected,
       equippedDjinn,
       djinnTrackers,
-      recruitmentFlags: {}, // TODO: Track recruitment flags
+      recruitmentFlags: { ...recruitmentFlags },
       storyFlags,
     },
     overworldState: {
       playerPosition,
       currentScene,
-      npcStates: {}, // TODO: Track NPC states
+      npcStates: { ...npcStates },
     },
     stats: {
-      battlesWon: 0, // TODO: Track battle stats
-      battlesLost: 0,
-      totalDamageDealt: 0,
-      totalHealingDone: 0,
-      playtime: 0, // TODO: Track playtime
+      battlesWon: statsTracker.battlesWon,
+      battlesLost: statsTracker.battlesLost,
+      totalDamageDealt: statsTracker.totalDamageDealt,
+      totalHealingDone: statsTracker.totalHealingDone,
+      playtime: statsTracker.playtime,
     },
     towerStats: towerRecord ?? DEFAULT_TOWER_RECORD,
   };
@@ -142,6 +168,16 @@ export const createSaveSlice: StateCreator<
   [],
   SaveSlice
 > = (_set, get) => ({
+  recruitmentFlags: {},
+  npcStates: {},
+  statsTracker: {
+    battlesWon: 0,
+    battlesLost: 0,
+    totalDamageDealt: 0,
+    totalHealingDone: 0,
+    playtime: 0,
+  },
+
   hasSave: () => hasSave(),
 
   loadGame: () => {
@@ -192,6 +228,50 @@ export const createSaveSlice: StateCreator<
     );
 
     state.setTowerRecord(saveData.towerStats ?? DEFAULT_TOWER_RECORD);
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
 
     // Hydrate battle state from localStorage
     const battleStateJson = localStorage.getItem('vale-v2/battle-state');
@@ -211,7 +291,7 @@ export const createSaveSlice: StateCreator<
   },
 
   saveGame: () => {
-    const { team, roster, story, currentMapId, playerPosition, gold, equipment } = get();
+    const { team, roster, story, currentMapId, playerPosition, gold, equipment, recruitmentFlags, npcStates, statsTracker } = get();
     const overworldSnapshot: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> = {
       currentMapId,
       playerPosition,
@@ -222,7 +302,10 @@ export const createSaveSlice: StateCreator<
       { gold, equipment },
       story,
       overworldSnapshot,
-      get().towerRecord ?? DEFAULT_TOWER_RECORD
+      get().towerRecord ?? DEFAULT_TOWER_RECORD,
+      recruitmentFlags,
+      npcStates,
+      statsTracker
     );
     
     if (!saveData) {
@@ -255,7 +338,7 @@ export const createSaveSlice: StateCreator<
 
   // Slot-based operations
   saveGameSlot: (slot: number) => {
-    const { team, roster, story, currentMapId, playerPosition, gold, equipment } = get();
+    const { team, roster, story, currentMapId, playerPosition, gold, equipment, recruitmentFlags, npcStates, statsTracker } = get();
     const overworldSnapshot: Pick<OverworldSlice, 'playerPosition' | 'currentMapId'> = {
       currentMapId,
       playerPosition,
@@ -266,7 +349,10 @@ export const createSaveSlice: StateCreator<
       { gold, equipment },
       story,
       overworldSnapshot,
-      get().towerRecord ?? DEFAULT_TOWER_RECORD
+      get().towerRecord ?? DEFAULT_TOWER_RECORD,
+      recruitmentFlags,
+      npcStates,
+      statsTracker
     );
     
     if (!saveData) {
@@ -370,5 +456,41 @@ export const createSaveSlice: StateCreator<
   autoSave: () => {
     // Auto-save to slot 0 (quick save)
     get().saveGameSlot(0);
+  },
+
+  setRecruitmentFlag: (id, recruited) => {
+    _set((state) => ({
+      recruitmentFlags: { ...state.recruitmentFlags, [id]: recruited },
+    }));
+  },
+
+  setNpcState: (id, statePatch) => {
+    _set((state) => ({
+      npcStates: {
+        ...state.npcStates,
+        [id]: { ...(state.npcStates[id] ?? {}), ...statePatch },
+      },
+    }));
+  },
+
+  incrementBattleStats: ({ outcome, damageDealt = 0, healingDone = 0 }) => {
+    _set((state) => ({
+      statsTracker: {
+        ...state.statsTracker,
+        battlesWon: state.statsTracker.battlesWon + (outcome === 'win' ? 1 : 0),
+        battlesLost: state.statsTracker.battlesLost + (outcome === 'loss' ? 1 : 0),
+        totalDamageDealt: state.statsTracker.totalDamageDealt + Math.max(0, Math.floor(damageDealt)),
+        totalHealingDone: state.statsTracker.totalHealingDone + Math.max(0, Math.floor(healingDone)),
+      },
+    }));
+  },
+
+  addPlaytime: (seconds) => {
+    _set((state) => ({
+      statsTracker: {
+        ...state.statsTracker,
+        playtime: state.statsTracker.playtime + Math.max(0, Math.floor(seconds)),
+      },
+    }));
   },
 });

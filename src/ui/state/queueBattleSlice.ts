@@ -60,6 +60,10 @@ function computePendingMana(battle: BattleState): { pendingThisRound: number; pe
   return { pendingThisRound, pendingManaNextRound };
 }
 
+function sumBattleStat(units: readonly Unit[], key: 'damageDealt' | 'damageTaken'): number {
+  return units.reduce((total, unit) => total + (unit.battleStats?.[key] ?? 0), 0);
+}
+
 export interface QueueBattleSlice {
   battle: BattleState | null;
   events: BattleEvent[];
@@ -368,6 +372,10 @@ export const createQueueBattleSlice: StateCreator<
       });
 
       updateTeamUnits(healedUnits);
+      const totalDamage = sumBattleStat(healedState.playerTeam.units, 'damageDealt');
+      get().incrementBattleStats({ outcome: 'loss', damageDealt: totalDamage, healingDone: 0 });
+      const totalDamage = sumBattleStat(healedState.playerTeam.units, 'damageDealt');
+      get().incrementBattleStats({ outcome: 'win', damageDealt: totalDamage, healingDone: 0 });
       processVictory(healedState); // This now sets mode: 'rewards'
 
       // Auto-save after battle victory

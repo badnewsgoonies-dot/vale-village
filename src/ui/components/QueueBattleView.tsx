@@ -239,6 +239,7 @@ export function QueueBattleView() {
   const queueUnitAction = useStore((s) => s.queueUnitAction);
   const executeQueuedRound = useStore((s) => s.executeQueuedRound);
   const setMode = useStore((s) => s.setMode);
+  const mode = useStore((s) => s.mode);
   const activePortraitIndex = useStore((s) => s.activePortraitIndex);
   const setActivePortrait = useStore((s) => s.setActivePortrait);
   const currentManaDisplay = useStore((s) => s.currentMana);
@@ -246,6 +247,7 @@ export function QueueBattleView() {
   const pendingManaThisRound = useStore((s) => s.pendingManaThisRound);
   const pendingManaNextRound = useStore((s) => s.pendingManaNextRound);
   const towerStatus = useStore((s) => s.towerStatus);
+  const activeTowerEncounterId = useStore((s) => s.activeTowerEncounterId);
   const getCurrentTowerFloor = useStore((s) => s.getCurrentTowerFloor);
   const critCounters = useStore((s) => s.critCounters);
   const critThresholds = useStore((s) => s.critThresholds);
@@ -253,6 +255,8 @@ export function QueueBattleView() {
   const incrementCritCounter = useStore((s) => s.incrementCritCounter);
   const resetCritCounter = useStore((s) => s.resetCritCounter);
   const triggerCritFlash = useStore((s) => s.triggerCritFlash);
+  const lastBattleRewards = useStore((s) => s.lastBattleRewards);
+  const processVictory = useStore((s) => s.processVictory);
 
   // Selection State
   const [selectedAbilityId, setSelectedAbilityId] = useState<string | null | undefined>(undefined);
@@ -284,7 +288,18 @@ export function QueueBattleView() {
     }
   }, [battleEnded, battleResult, showCutscene, showVictoryOverlay]);
 
-  // 3. Event Queue Processing
+  // 3. Safety net: if victory state exists but mode never transitioned, force rewards
+  useEffect(() => {
+    if (!battle || battle.phase !== 'victory') return;
+    const isTowerBattle = towerStatus === 'in-run' && !!activeTowerEncounterId;
+    if (isTowerBattle) return; // tower flow handles its own rewards
+
+    if (mode !== 'rewards' && !lastBattleRewards) {
+      processVictory(battle);
+    }
+  }, [battle, mode, lastBattleRewards, processVictory, towerStatus, activeTowerEncounterId]);
+
+  // 4. Event Queue Processing
   useEffect(() => {
     if (!battle || battle.phase !== 'executing' || !events.length) return;
     const t = setTimeout(() => dequeue(), 450);
