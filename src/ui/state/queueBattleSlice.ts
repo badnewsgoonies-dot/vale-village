@@ -31,6 +31,32 @@ import {
 import { createRNGStream, RNG_STREAMS } from '../../core/constants';
 import { VS1_ENCOUNTER_ID, VS1_SCENE_PRE } from '../../story/vs1Constants';
 import { DIALOGUES } from '../../data/definitions/dialogues';
+import { isUnitKO } from '../../core/models/Unit';
+
+function computePendingMana(battle: BattleState): { pendingThisRound: number; pendingManaNextRound: number } {
+  let pendingThisRound = 0;
+  let pendingManaNextRound = 0;
+
+  battle.queuedActions.forEach((action, index) => {
+    if (!action || action.abilityId !== null) {
+      return;
+    }
+
+    const unit = battle.playerTeam.units[index];
+    if (!unit || isUnitKO(unit)) {
+      return;
+    }
+
+    const timing = unit.autoAttackTiming ?? 'same-turn';
+    if (timing === 'next-turn') {
+      pendingManaNextRound += 1;
+    } else {
+      pendingThisRound += 1;
+    }
+  });
+
+  return { pendingThisRound, pendingManaNextRound };
+}
 
 export interface QueueBattleSlice {
   battle: BattleState | null;
@@ -184,15 +210,14 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    const pendingThisRound = result.value.queuedActions.filter((a) => a?.abilityId === null).length;
+    const { pendingThisRound: sameTurn, pendingManaNextRound } = computePendingMana(result.value);
 
     set({
       battle: result.value,
       currentMana: result.value.remainingMana,
       maxMana: result.value.maxMana,
-      pendingManaThisRound: pendingThisRound,
-      // Next-round pending will be set when we differentiate generators; default 0 for now.
-      pendingManaNextRound: 0,
+      pendingManaThisRound: sameTurn,
+      pendingManaNextRound,
     });
   },
 
@@ -208,14 +233,14 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    const pendingThisRound = result.value.queuedActions.filter((a) => a?.abilityId === null).length;
+    const { pendingThisRound: sameTurn, pendingManaNextRound } = computePendingMana(result.value);
 
     set({
       battle: result.value,
       currentMana: result.value.remainingMana,
       maxMana: result.value.maxMana,
-      pendingManaThisRound: pendingThisRound,
-      pendingManaNextRound: 0,
+      pendingManaThisRound: sameTurn,
+      pendingManaNextRound,
     });
   },
 
@@ -260,15 +285,15 @@ export const createQueueBattleSlice: StateCreator<
     const previousEvents = get().events;
     const battleEvents = [...previousEvents, ...result.events];
 
-    const pendingThisRound = result.state.queuedActions.filter((a) => a?.abilityId === null).length;
+    const { pendingThisRound: sameTurn, pendingManaNextRound } = computePendingMana(result.state);
 
     set({
       battle: result.state,
       events: battleEvents,
       currentMana: result.state.remainingMana,
       maxMana: result.state.maxMana,
-      pendingManaThisRound: pendingThisRound,
-      pendingManaNextRound: 0,
+      pendingManaThisRound: sameTurn,
+      pendingManaNextRound,
     });
 
     const encounterId = getEncounterId(result.state);

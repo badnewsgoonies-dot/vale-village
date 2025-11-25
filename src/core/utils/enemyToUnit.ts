@@ -29,8 +29,8 @@ export function enemyToUnit(enemy: Enemy, level?: number): ReturnType<typeof cre
     abilities: enemy.abilities,
     manaContribution: 0, // Enemies don't contribute to player mana pool
     description: `A ${enemy.name} enemy`,
+    autoAttackTiming: 'same-turn',
   };
 
   return createUnit(unitDef, level ?? enemy.level, 0);
 }
-

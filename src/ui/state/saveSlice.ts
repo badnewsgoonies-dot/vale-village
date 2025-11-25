@@ -93,6 +93,7 @@ function createSaveData(
           abilities: [...u.abilities],
           unlockedAbilityIds: [...u.unlockedAbilityIds],
           statusEffects: [...u.statusEffects],
+          autoAttackTiming: u.autoAttackTiming ?? 'same-turn',
         };
       }),
       activeParty,

@@ -15,7 +15,7 @@ import { isUnitKO } from '../../core/models/Unit';
 import { BattleManaBar } from './BattleManaBar';
 import { BattlePortraitRow } from './BattlePortraitRow';
 import { BattleActionMenu, type ActionMenuMode } from './BattleActionMenu';
-import { DjinnAdvisorPanel } from './DjinnAdvisorPanel';
+import { ModeLabel } from './ModeLabel';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { Unit } from '../../core/models/Unit';
 import { getEnemyBattleSprite } from '../sprites/mappings/battleSprites';
@@ -32,6 +32,12 @@ function getPlayerBattleSprite(unit: Unit): string {
   const sprite = byElement[unit.element] ?? fallback;
   return `${baseDir}/${sprite.folder}/${sprite.prefix}_${sprite.weapon}_Back.gif`;
 }
+
+const djinnSprites = [
+  { id: 'venus', name: 'Flint', path: '/sprites/battle/djinn/Venus_Djinn_Front.gif' },
+  { id: 'mars', name: 'Granite', path: '/sprites/battle/djinn/Mars_Djinn_Front.gif' },
+  { id: 'mercury', name: 'Echo', path: '/sprites/battle/djinn/Mercury_Djinn_Front.gif' },
+];
 
 // --- CSS CONSTANTS ---
 // Unused - commented out to fix TypeScript warnings
@@ -235,12 +241,12 @@ export function QueueBattleView() {
   const setMode = useStore((s) => s.setMode);
   const activePortraitIndex = useStore((s) => s.activePortraitIndex);
   const setActivePortrait = useStore((s) => s.setActivePortrait);
-  const tutorialMessage = useStore((s) => s.tutorialMessage);
-  const setSummonScreenOpen = useStore((s) => s.setSummonScreenOpen);
   const currentManaDisplay = useStore((s) => s.currentMana);
   const maxManaDisplay = useStore((s) => s.maxMana);
   const pendingManaThisRound = useStore((s) => s.pendingManaThisRound);
   const pendingManaNextRound = useStore((s) => s.pendingManaNextRound);
+  const towerStatus = useStore((s) => s.towerStatus);
+  const getCurrentTowerFloor = useStore((s) => s.getCurrentTowerFloor);
   const critCounters = useStore((s) => s.critCounters);
   const critThresholds = useStore((s) => s.critThresholds);
   const critFlash = useStore((s) => s.critFlash);
@@ -303,6 +309,10 @@ export function QueueBattleView() {
     const queuedCount = battle.queuedActions.filter(a => a !== null && !isUnitKO(battle.playerTeam.units.find(u => u.id === a.unitId)!)).length;
     return aliveUnits.length === queuedCount && totalQueuedMana <= battle.maxMana;
   }, [battle, totalQueuedMana]);
+
+  const currentFloor = useMemo(() => (towerStatus === 'in-run' ? getCurrentTowerFloor() : null), [towerStatus, getCurrentTowerFloor]);
+  const battleType = towerStatus === 'in-run' ? 'tower' : 'story';
+  const locationName = battle?.meta?.encounterId || battle?.encounterId || 'Story Battle';
 
   // --- HANDLERS ---
 
@@ -437,7 +447,6 @@ export function QueueBattleView() {
           overflow: 'hidden',
           imageRendering: 'pixelated',
           color: '#fff',
-          position: 'relative',
         }}
       >
         {/* Battlefield Area */}
@@ -464,6 +473,12 @@ export function QueueBattleView() {
             imageRendering: 'pixelated',
             zIndex: 0,
           }}
+        />
+
+        <ModeLabel
+          battleType={battleType}
+          locationName={locationName}
+          floorNumber={currentFloor?.floorNumber}
         />
 
         {isExecuting && (
@@ -502,8 +517,8 @@ export function QueueBattleView() {
           <div
             style={{
               position: 'absolute',
-              bottom: '35%',
-              left: '15%',
+              bottom: '40%',
+              left: '12%',
               display: 'flex',
               gap: '3rem',
               zIndex: 10,
@@ -628,6 +643,37 @@ export function QueueBattleView() {
               );
             })}
           </div>
+
+          {/* Djinn companions behind party */}
+          <div
+            style={{
+              position: 'absolute',
+              right: '3%',
+              bottom: '32%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+              zIndex: 8,
+            }}
+          >
+            {djinnSprites.map((djinn, idx) => (
+              <div
+                key={djinn.id}
+                style={{
+                  position: 'relative',
+                  left: idx % 2 === 0 ? 0 : 6,
+                }}
+              >
+                <img
+                  src={djinn.path}
+                  alt={djinn.name}
+                  width={24}
+                  height={24}
+                  style={{ imageRendering: 'pixelated', transform: 'scale(2.5)' }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {validTargets.length > 0 && (
@@ -642,7 +688,7 @@ export function QueueBattleView() {
               borderRadius: 8,
               border: '1px solid rgba(255,216,127,0.4)',
               textAlign: 'center',
-              zIndex: 5,
+              zIndex: 60,
             }}
           >
             <div style={{ color: '#FFD87F', fontWeight: 700, marginBottom: 4 }}>Select target</div>
@@ -686,131 +732,74 @@ export function QueueBattleView() {
         )}
       </div>
 
-      {/* Bottom UI (Golden Sun-style) */}
+      {/* Bottom UI simplified strip */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'linear-gradient(to top, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.85) 70%, transparent 100%)',
-          display: 'grid',
-          gridTemplateColumns: '160px 1fr',
-          padding: '10px 12px',
-          gap: 10,
-          alignItems: 'flex-end',
+          height: 100,
+          background: 'linear-gradient(to top, rgba(8,8,10,0.95), transparent)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 16,
+          padding: '10px 20px',
           zIndex: 50,
         }}
       >
-        <DjinnAdvisorPanel
-          tutorialMessage={tutorialMessage}
-          onClick={() => setSummonScreenOpen(true)}
+        <BattleManaBar
+          currentMana={currentManaDisplay}
+          maxMana={maxManaDisplay}
+          pendingThisRound={pendingManaThisRound}
+          pendingNextRound={pendingManaNextRound}
         />
-
-            <div
-              style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 10,
-            width: '100%',
-            minWidth: 0,
+        <BattlePortraitRow
+          units={battle.playerTeam.units}
+          activeIndex={activePortraitIndex}
+          queuedActions={battle.queuedActions}
+          critCounters={critCounters}
+          critThresholds={critThresholds}
+          critFlashes={critFlash}
+          onSelect={(idx) => {
+            const unit = battle.playerTeam.units[idx];
+            if (isTargeting && unit && validTargetIds.has(unit.id)) {
+              handleTargetSelect(unit.id);
+              return;
+            }
+            if (battle.phase === 'planning') {
+              setActivePortrait(idx);
+              setSelectedAbilityId(undefined);
+            }
+          }}
+        />
+        <BattleActionMenu
+          battle={battle}
+          currentUnit={currentUnit}
+          selectedAbilityId={selectedAbilityId ?? null}
+          mode={menuMode}
+          onModeChange={setMenuMode}
+          onSelectAttack={handleSelectAttack}
+          onSelectAbility={handleAbilitySelect}
+        />
+        <button
+          onClick={handleExecute}
+          disabled={!isQueueComplete}
+          style={{
+            padding: '10px 14px',
+            minWidth: 180,
+            background: isQueueComplete ? '#FFD54A' : 'rgba(255,255,255,0.08)',
+            color: isQueueComplete ? '#000' : '#888',
+            border: '1px solid rgba(255,255,255,0.18)',
+            borderRadius: 8,
+            cursor: isQueueComplete ? 'pointer' : 'not-allowed',
+            fontWeight: 700,
+            letterSpacing: 0.5,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 6,
-              position: 'relative',
-              width: '100%',
-              overflow: 'visible',
-            }}
-          >
-            {(() => {
-              return (
-                <>
-                  <div style={{ width: '100%', display: 'flex', justifyContent: 'center', overflow: 'visible' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                      <div style={{ position: 'relative', zIndex: 30 }}>
-                        <BattleManaBar
-                          currentMana={currentManaDisplay}
-                          maxMana={maxManaDisplay}
-                          pendingThisRound={pendingManaThisRound}
-                          pendingNextRound={pendingManaNextRound}
-                        />
-                      </div>
-
-                      <div style={{ position: 'relative', display: 'inline-block' }}>
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: '100%',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            marginBottom: 8,
-                            zIndex: 20,
-                          }}
-                        >
-                          <BattleActionMenu
-                            battle={battle}
-                            currentUnit={currentUnit}
-                            selectedAbilityId={selectedAbilityId ?? null}
-                            mode={menuMode}
-                            onModeChange={setMenuMode}
-                            onSelectAttack={handleSelectAttack}
-                            onSelectAbility={handleAbilitySelect}
-                          />
-                        </div>
-
-                        <BattlePortraitRow
-                          units={battle.playerTeam.units}
-                          activeIndex={activePortraitIndex}
-                          queuedActions={battle.queuedActions}
-                          critCounters={critCounters}
-                          critThresholds={critThresholds}
-                          critFlashes={critFlash}
-                          onSelect={(idx) => {
-                            const unit = battle.playerTeam.units[idx];
-                            if (isTargeting && unit && validTargetIds.has(unit.id)) {
-                              handleTargetSelect(unit.id);
-                              return;
-                            }
-                            if (battle.phase === 'planning') {
-                              setActivePortrait(idx);
-                              setSelectedAbilityId(undefined);
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-
-          <div style={{ alignSelf: 'stretch' }}>
-            <button
-              onClick={handleExecute}
-              disabled={!isQueueComplete}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                background: isQueueComplete ? '#FFD54A' : 'rgba(255,255,255,0.08)',
-                color: isQueueComplete ? '#000' : '#888',
-                border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: 8,
-                cursor: isQueueComplete ? 'pointer' : 'not-allowed',
-                fontWeight: 700,
-                letterSpacing: 0.5,
-              }}
-            >
-              {isQueueComplete ? 'Execute Round' : 'Queue all actions first'}
-            </button>
-          </div>
-        </div>
+          {isQueueComplete ? 'Execute Round' : 'Queue all actions first'}
+        </button>
       </div>
       </div>
     </div>

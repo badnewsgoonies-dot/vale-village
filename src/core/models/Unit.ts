@@ -20,6 +20,7 @@ export interface UnitDefinition {
   readonly abilities: readonly Ability[];
   readonly manaContribution: number;  // Base mana circles this unit provides to team pool
   readonly description: string;
+  readonly autoAttackTiming?: 'same-turn' | 'next-turn';
 }
 
 /**
@@ -35,6 +36,7 @@ export interface Unit {
   readonly baseStats: Stats;
   readonly growthRates: GrowthRates;
   readonly description: string;
+  readonly autoAttackTiming?: 'same-turn' | 'next-turn';
 
   // Mutable properties (but we create new objects instead of mutating)
   manaContribution: number;
@@ -97,6 +99,7 @@ export function createUnit(
     baseStats: definition.baseStats,
     growthRates: definition.growthRates,
     description: definition.description,
+    autoAttackTiming: definition.autoAttackTiming ?? 'same-turn',
     manaContribution: definition.manaContribution,
     level,
     xp: initialXp,

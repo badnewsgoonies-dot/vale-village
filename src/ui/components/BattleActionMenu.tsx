@@ -153,7 +153,7 @@ const ABILITY_ICONS: Record<string, string> = {
   slow: '/sprites/icons/misc/Stat-Down.gif',
 };
 
-export type ActionMenuMode = 'root' | 'abilities' | 'djinn';
+export type ActionMenuMode = 'root' | 'abilities';
 
 interface BattleActionMenuProps {
   battle: BattleState;
@@ -208,9 +208,13 @@ function AbilityGrid({
         const isDjinnAbility = Boolean(DJINN_ABILITIES[ability.id]);
         const isSelected = selectedAbilityId === ability.id;
         const element = (ability as any).element || 'Neutral';
-        const elementTheme = ELEMENT_COLORS[element] || ELEMENT_COLORS.Neutral;
+        const elementTheme: { border: string; glow: string; bg: string } = (
+          ELEMENT_COLORS[element as keyof typeof ELEMENT_COLORS] ?? ELEMENT_COLORS.Neutral
+        ) as { border: string; glow: string; bg: string };
         const targets = (ability as any).targets || 'single-enemy';
-        const targetInfo = TARGET_LABELS[targets] || TARGET_LABELS['single-enemy'];
+        const targetInfo: { icon: string; label: string } = (
+          TARGET_LABELS[targets as keyof typeof TARGET_LABELS] || TARGET_LABELS['single-enemy']
+        ) as { icon: string; label: string };
         const basePower = (ability as any).basePower || 0;
         const abilityType = (ability as any).type || 'psynergy';
 
@@ -378,8 +382,7 @@ export function BattleActionMenu({
   const djinnAbilities = unlocked.filter((a) => DJINN_ABILITIES[a.id]);
   const regularAbilities = unlocked.filter((a) => !DJINN_ABILITIES[a.id]);
 
-  if (mode !== 'root') {
-    const abilitiesToRender = mode === 'abilities' ? regularAbilities : djinnAbilities;
+  if (mode === 'abilities') {
     return (
       <div
         style={{
@@ -387,14 +390,14 @@ export function BattleActionMenu({
           border: '2px solid #ffd700',
           padding: 10,
           borderRadius: 8,
-          width: 340,
-          maxHeight: 280,
+          width: 360,
+          maxHeight: 320,
           overflowY: 'auto',
           boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-          <SectionHeader title={mode === 'abilities' ? 'ABILITIES' : 'DJINN ABILITIES'} />
+          <SectionHeader title="PSYNERGY" />
           <button
             onClick={() => onModeChange('root')}
             style={{
@@ -412,12 +415,70 @@ export function BattleActionMenu({
             ← BACK
           </button>
         </div>
-        <AbilityGrid
-          abilities={abilitiesToRender}
-          selectedAbilityId={selectedAbilityId}
-          battle={battle}
-          onSelect={onSelectAbility}
-        />
+
+        {/* Unit abilities section */}
+        {regularAbilities.length > 0 && (
+          <>
+            <div style={{ color: '#aaa', fontSize: '0.7rem', marginBottom: 4, letterSpacing: 0.5 }}>
+              UNIT ABILITIES
+            </div>
+            <AbilityGrid
+              abilities={regularAbilities}
+              selectedAbilityId={selectedAbilityId}
+              battle={battle}
+              onSelect={onSelectAbility}
+            />
+          </>
+        )}
+
+        {/* Djinn abilities section - visually distinct */}
+        {djinnAbilities.length > 0 && (
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              borderTop: '2px solid rgba(186, 104, 200, 0.5)',
+              background: 'linear-gradient(180deg, rgba(186, 104, 200, 0.15) 0%, transparent 100%)',
+              borderRadius: '0 0 6px 6px',
+              padding: '10px 6px 6px 6px',
+              marginLeft: -6,
+              marginRight: -6,
+              marginBottom: -4,
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              color: '#ce93d8',
+              fontSize: '0.75rem',
+              marginBottom: 6,
+              letterSpacing: 0.5,
+              fontWeight: 600,
+            }}>
+              <img
+                src="/sprites/icons/buttons/Djinni.gif"
+                alt=""
+                width={16}
+                height={16}
+                style={{ imageRendering: 'pixelated' }}
+              />
+              DJINN ABILITIES
+            </div>
+            <AbilityGrid
+              abilities={djinnAbilities}
+              selectedAbilityId={selectedAbilityId}
+              battle={battle}
+              onSelect={onSelectAbility}
+            />
+          </div>
+        )}
+
+        {regularAbilities.length === 0 && djinnAbilities.length === 0 && (
+          <div style={{ color: '#888', fontStyle: 'italic', textAlign: 'center', padding: 16 }}>
+            No abilities available
+          </div>
+        )}
       </div>
     );
   }
@@ -494,34 +555,6 @@ export function BattleActionMenu({
           </div>
         </button>
 
-        <button
-          onClick={() => onModeChange('djinn')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            width: '100%',
-            background: 'rgba(0,0,0,0.5)',
-            border: '2px solid rgba(186,104,200,0.7)',
-            borderRadius: 6,
-            padding: '8px 10px',
-            cursor: 'pointer',
-          }}
-        >
-          <img
-            src={ACTION_ICONS.djinn}
-            alt=""
-            width={24}
-            height={24}
-            style={{ imageRendering: 'pixelated', transform: 'scale(1.5)', transformOrigin: 'center' }}
-          />
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ color: '#ce93d8', fontWeight: 600, fontSize: '0.95rem', textShadow: '1px 1px 2px #000' }}>
-              DJINN
-            </div>
-              <div style={{ color: '#888', fontSize: '0.75rem' }}>Djinn abilities</div>
-            </div>
-          </button>
       </div>
     </div>
   );
