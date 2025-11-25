@@ -32,6 +32,48 @@ const BOSS_ENEMY_IDS = new Set([
   'overseer',
 ]);
 
+// NPC data for compendium display
+interface NPCData {
+  id: string;
+  name: string;
+  role: string;
+  location: string;
+  sprite: string;
+}
+
+const COMPENDIUM_NPCS: NPCData[] = [
+  { id: 'elder', name: 'Elder', role: 'Village Elder', location: 'Vale Village', sprite: '/sprites/overworld/majornpcs/Elder.gif' },
+  { id: 'dora', name: 'Dora', role: "Isaac's Mother", location: 'Vale Village', sprite: '/sprites/overworld/majornpcs/Dora.gif' },
+  { id: 'kyle', name: 'Kyle', role: "Isaac's Father", location: 'Vale Village', sprite: '/sprites/overworld/majornpcs/Kyle.gif' },
+  { id: 'kraden', name: 'Kraden', role: 'Scholar', location: 'Vale Village', sprite: '/sprites/overworld/majornpcs/fallen_Kraden.gif' },
+  { id: 'lord-hammet', name: 'Lord Hammet', role: 'Merchant Lord', location: 'Kalay', sprite: '/sprites/overworld/majornpcs/Lord_Hammet.gif' },
+  { id: 'lady-layana', name: 'Lady Layana', role: 'Hammet\'s Wife', location: 'Kalay', sprite: '/sprites/overworld/majornpcs/Lady_Layana.gif' },
+  { id: 'lord-mccoy', name: 'Lord McCoy', role: 'Town Leader', location: 'Tolbi', sprite: '/sprites/overworld/majornpcs/Lord_McCoy.gif' },
+  { id: 'lady-mccoy', name: 'Lady McCoy', role: 'McCoy\'s Wife', location: 'Tolbi', sprite: '/sprites/overworld/majornpcs/Lady_McCoy.gif' },
+  { id: 'sean', name: 'Sean', role: 'Merchant', location: 'Xian', sprite: '/sprites/overworld/majornpcs/Sean.gif' },
+  { id: 'ouranos', name: 'Ouranos', role: 'Sage', location: 'Lemuria', sprite: '/sprites/overworld/majornpcs/Ouranos.gif' },
+  { id: 'wise-one', name: 'The Wise One', role: 'Guardian', location: 'Mt. Aleph', sprite: '/sprites/overworld/majornpcs/Wise_One.gif' },
+  { id: 'tret', name: 'Tret', role: 'Holy Tree', location: 'Kolima Forest', sprite: '/sprites/overworld/majornpcs/Tret_Awake.gif' },
+  { id: 'laurel', name: 'Laurel', role: 'Sacred Tree', location: 'Kolima Forest', sprite: '/sprites/overworld/majornpcs/Laurel_Awake.gif' },
+  { id: 'susa', name: 'Susa', role: 'Warrior', location: 'Izumo', sprite: '/sprites/overworld/majornpcs/Susa.gif' },
+  { id: 'master-poi', name: 'Master Poi', role: 'Martial Arts Master', location: 'Xian', sprite: '/sprites/overworld/majornpcs/Master_Poi.gif' },
+  { id: 'fiezhi', name: 'Fiezhi', role: 'Warrior Monk', location: 'Xian', sprite: '/sprites/overworld/majornpcs/Fiezhi.gif' },
+  { id: 'prox-elder', name: 'Prox Elder', role: 'Prox Village Leader', location: 'Prox', sprite: '/sprites/overworld/majornpcs/Prox_Elder.gif' },
+  { id: 'briggs', name: 'Briggs', role: 'Pirate Captain', location: 'Champa', sprite: '/sprites/overworld/majornpcs/Briggs.gif' },
+  { id: 'akafubu', name: 'Akafubu', role: 'Witch Doctor', location: 'Kibombo', sprite: '/sprites/overworld/majornpcs/Akafubu.gif' },
+  { id: 'kaja', name: 'Kaja', role: 'Shaman', location: 'Shaman Village', sprite: '/sprites/overworld/majornpcs/Kaja.gif' },
+  { id: 'maha', name: 'Maha', role: 'Spirit Medium', location: 'Garoh', sprite: '/sprites/overworld/majornpcs/Maha.gif' },
+  { id: 'puelle', name: 'Puelle', role: 'Sunshine\'s Companion', location: 'Contigo', sprite: '/sprites/overworld/majornpcs/Puelle.gif' },
+  { id: 'sunshine', name: 'Sunshine', role: 'Oracle', location: 'Contigo', sprite: '/sprites/overworld/majornpcs/Sunshine.gif' },
+  { id: 'sea-captain', name: 'Sea Captain', role: 'Ship Captain', location: 'Ports', sprite: '/sprites/overworld/majornpcs/Sea_Captain.gif' },
+  { id: 'dojo-leader', name: 'Dojo Leader', role: 'Combat Instructor', location: 'Various', sprite: '/sprites/overworld/majornpcs/Dojo_Leader.gif' },
+  { id: 'great-healer', name: 'Great Healer', role: 'Master Healer', location: 'Sanctums', sprite: '/sprites/overworld/majornpcs/Great_Healer.gif' },
+  { id: 'fortune-teller', name: 'Fortune Teller', role: 'Seer', location: 'Various', sprite: '/sprites/overworld/majornpcs/Fortune_Teller.gif' },
+  { id: 'weaponshop-keeper', name: 'Weapon Merchant', role: 'Shop Keeper', location: 'Various', sprite: '/sprites/overworld/majornpcs/Weaponshop_Keeper.gif' },
+  { id: 'armorshop-keeper', name: 'Armor Merchant', role: 'Shop Keeper', location: 'Various', sprite: '/sprites/overworld/majornpcs/Armorshop_Keeper.gif' },
+  { id: 'innkeeper', name: 'Innkeeper', role: 'Inn Owner', location: 'Various', sprite: '/sprites/overworld/majornpcs/Innkeeper.gif' },
+];
+
 export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
   const [activeTab, setActiveTab] = useState<CompendiumTab>('units');
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
@@ -450,15 +492,30 @@ export function CompendiumScreen({ onClose }: CompendiumScreenProps) {
 
           {activeTab === 'npcs' && (
             <div className="compendium-section">
-              <h2>NPCs</h2>
+              <h2>NPCs ({COMPENDIUM_NPCS.length})</h2>
               <div className="compendium-grid">
-                <div className="compendium-item">
-                  <div className="item-name">NPC Compendium</div>
-                  <div className="item-details">
-                    <div>NPC data coming soon</div>
-                    <div>NPCs are defined in dialogue trees and map triggers</div>
+                {COMPENDIUM_NPCS.map((npc) => (
+                  <div key={npc.id} className="compendium-item">
+                    <div className="item-sprite">
+                      <img
+                        src={npc.sprite}
+                        alt={npc.name}
+                        style={{ width: 64, height: 64, imageRendering: 'pixelated', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div className="item-name">{npc.name}</div>
+                    <div className="item-details">
+                      <div className="detail-row">
+                        <span className="detail-label">Role:</span>
+                        <span className="detail-value">{npc.role}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">Location:</span>
+                        <span className="detail-value">{npc.location}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
           )}

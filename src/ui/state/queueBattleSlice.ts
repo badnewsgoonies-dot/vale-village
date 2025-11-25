@@ -33,6 +33,8 @@ import { VS1_ENCOUNTER_ID, VS1_SCENE_PRE } from '../../story/vs1Constants';
 import { DIALOGUES } from '../../data/definitions/dialogues';
 import { isUnitKO } from '../../core/models/Unit';
 
+const critFlashTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
 function computePendingMana(battle: BattleState): { pendingThisRound: number; pendingManaNextRound: number } {
   let pendingThisRound = 0;
   let pendingManaNextRound = 0;
@@ -73,6 +75,7 @@ export interface QueueBattleSlice {
   critCounters: Record<string, number>;
   critThresholds: Record<string, number>;
   critFlash: Record<string, boolean>;
+  lastError: string | null;
 
   setBattle: (battle: BattleState | null, seed: number) => void;
   setActivePortrait: (index: number | null) => void;
@@ -83,6 +86,7 @@ export interface QueueBattleSlice {
   incrementCritCounter: (unitId: string) => void;
   resetCritCounter: (unitId: string) => void;
   triggerCritFlash: (unitId: string) => void;
+  clearError: () => void;
   queueUnitAction: (
     unitIndex: number,
     abilityId: string | null,
@@ -116,29 +120,32 @@ export const createQueueBattleSlice: StateCreator<
   critCounters: {},
   critThresholds: {},
   critFlash: {},
+  lastError: null,
 
   setBattle: (battle, seed) => {
     const critThresholds: Record<string, number> = {};
     const critCounters: Record<string, number> = {};
-    if (battle) {
-      battle.playerTeam.units.forEach((unit) => {
+    const battleState = battle ? structuredClone(battle) : null;
+    if (battleState) {
+      battleState.playerTeam.units.forEach((unit) => {
         critThresholds[unit.id] = critThresholds[unit.id] ?? 10;
         critCounters[unit.id] = 0;
       });
     }
 
     set({
-      battle,
+      battle: battleState,
       rngSeed: seed,
       events: [],
       activePortraitIndex: null, // allow speed-based auto-selection in view
-      currentMana: battle?.remainingMana ?? 0,
-      maxMana: battle?.maxMana ?? 0,
+      currentMana: battleState?.remainingMana ?? 0,
+      maxMana: battleState?.maxMana ?? 0,
       pendingManaThisRound: 0,
       pendingManaNextRound: 0,
       critCounters,
       critThresholds,
       critFlash: {},
+      lastError: null,
     });
   },
 
@@ -177,29 +184,36 @@ export const createQueueBattleSlice: StateCreator<
   },
 
   triggerCritFlash: (unitId) => {
+    const existingTimeout = critFlashTimeouts.get(unitId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
     set((state) => ({
       critFlash: { ...state.critFlash, [unitId]: true },
     }));
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       set((state) => {
         const { [unitId]: _, ...rest } = state.critFlash;
         return { critFlash: rest };
       });
+      critFlashTimeouts.delete(unitId);
     }, 200);
+    critFlashTimeouts.set(unitId, timeoutId);
   },
+
+  clearError: () => set({ lastError: null }),
 
   queueUnitAction: (unitIndex, abilityId, targetIds, ability) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
-      // TODO: Add proper validation error handling
-      // console.warn('Cannot queue action: not in planning phase');
+      set({ lastError: 'Cannot queue action: battle not in planning phase.' });
       return;
     }
 
     const unit = battle.playerTeam.units[unitIndex];
     if (!unit) {
-      // TODO: Add proper validation error handling
-      // console.warn(`Cannot queue action: invalid unit index ${unitIndex}`);
+      set({ lastError: `Cannot queue action: invalid unit index ${unitIndex}.` });
       return;
     }
 
@@ -207,6 +221,7 @@ export const createQueueBattleSlice: StateCreator<
     if (!result.ok) {
       // Log error for UI feedback (could be enhanced with toast notifications)
       console.warn(`Failed to queue action: ${result.error}`);
+      set({ lastError: `Failed to queue action: ${result.error}` });
       return;
     }
 
@@ -218,18 +233,21 @@ export const createQueueBattleSlice: StateCreator<
       maxMana: result.value.maxMana,
       pendingManaThisRound: sameTurn,
       pendingManaNextRound,
+      lastError: null,
     });
   },
 
   clearUnitAction: (unitIndex) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
+      set({ lastError: 'Cannot clear action: battle not in planning phase.' });
       return;
     }
 
     const result = clearQueuedAction(battle, unitIndex);
     if (!result.ok) {
       console.warn(`Failed to clear action: ${result.error}`);
+      set({ lastError: `Failed to clear action: ${result.error}` });
       return;
     }
 
@@ -241,47 +259,58 @@ export const createQueueBattleSlice: StateCreator<
       maxMana: result.value.maxMana,
       pendingManaThisRound: sameTurn,
       pendingManaNextRound,
+      lastError: null,
     });
   },
 
   queueDjinnActivation: (djinnId) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
+      set({ lastError: 'Cannot queue Djinn: battle not in planning phase.' });
       return;
     }
 
     const result = queueDjinn(battle, djinnId);
     if (!result.ok) {
       console.warn(`Failed to queue Djinn: ${result.error}`);
+      set({ lastError: `Failed to queue Djinn: ${result.error}` });
       return;
     }
 
-    set({ battle: result.value });
+    set({ battle: result.value, lastError: null });
   },
 
   unqueueDjinnActivation: (djinnId) => {
     const { battle } = get();
     if (!battle || battle.phase !== 'planning') {
+      set({ lastError: 'Cannot unqueue Djinn: battle not in planning phase.' });
       return;
     }
 
     const result = unqueueDjinn(battle, djinnId);
     if (!result.ok) {
       console.warn(`Failed to unqueue Djinn: ${result.error}`);
+      set({ lastError: `Failed to unqueue Djinn: ${result.error}` });
       return;
     }
 
-    set({ battle: result.value });
+    set({ battle: result.value, lastError: null });
   },
 
   executeQueuedRound: () => {
     const { battle, rngSeed } = get();
     if (!battle || battle.phase !== 'planning') {
+      set({ lastError: 'Cannot execute round: battle not in planning phase.' });
       return;
     }
 
     const rng = makePRNG(createRNGStream(rngSeed, battle.roundNumber, RNG_STREAMS.QUEUE_ROUND));
     const result = executeRound(battle, rng);
+    if (result.state === battle && result.events.length === 0) {
+      set({ lastError: 'Cannot execute round: queued actions are invalid for execution.' });
+      return;
+    }
+
     const previousEvents = get().events;
     const battleEvents = [...previousEvents, ...result.events];
 
@@ -294,6 +323,7 @@ export const createQueueBattleSlice: StateCreator<
       maxMana: result.state.maxMana,
       pendingManaThisRound: sameTurn,
       pendingManaNextRound,
+      lastError: null,
     });
 
     const encounterId = getEncounterId(result.state);
@@ -342,7 +372,9 @@ export const createQueueBattleSlice: StateCreator<
 
       // Auto-save after battle victory
       try {
-        get().autoSave();
+        void Promise.resolve(get().autoSave()).catch((error) => {
+          console.warn('Auto-save failed after battle victory:', error);
+        });
       } catch (error) {
         console.warn('Auto-save failed after battle victory:', error);
       }

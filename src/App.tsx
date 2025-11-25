@@ -24,7 +24,7 @@ import { getRecruitmentDialogue, hasRecruitmentDialogue } from './data/definitio
 import { ENCOUNTER_TO_POST_BATTLE_DIALOGUE } from './data/definitions/postBattleDialogues';
 import { createBaseIsaacTeam, createVs1IsaacTeam } from './utils/teamSetup';
 import { DJINN } from './data/definitions/djinn';
-import { EQUIPMENT } from './data/definitions/equipment';
+import { EQUIPMENT, WOODEN_SWORD, LEATHER_VEST, WOODEN_STAFF, WOODEN_AXE, COTTON_SHIRT } from './data/definitions/equipment';
 import { calculateEffectiveStats } from './core/algorithms/stats';
 import { getXpProgress } from './core/algorithms/xp';
 import { getDjinnGrantedAbilitiesForUnit, calculateDjinnBonusesForUnit } from './core/algorithms/djinnAbilities';
@@ -92,6 +92,8 @@ function App() {
   const team = useStore((s) => s.team);
   const setTeam = useStore((s) => s.setTeam);
   const setRoster = useStore((s) => s.setRoster);
+  const addEquipment = useStore((s) => s.addEquipment);
+  const equipment = useStore((s) => s.equipment);
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
   const currentShopId = useStore((s) => s.currentShopId);
@@ -112,6 +114,14 @@ function App() {
       setRoster([isaac]);
     }
   }, [team, setTeam, setRoster]);
+
+  // Initialize starter equipment on app startup
+  useEffect(() => {
+    if (team && equipment.length === 0) {
+      // Add basic starter equipment for each element
+      addEquipment([WOODEN_SWORD, LEATHER_VEST, WOODEN_STAFF, WOODEN_AXE, COTTON_SHIRT]);
+    }
+  }, [team, equipment.length, addEquipment]);
 
   // Mode is initialized to 'overworld' in gameFlowSlice, so no need to set it here
   // Removing this effect prevents it from overwriting mode changes (e.g., dialogue)
