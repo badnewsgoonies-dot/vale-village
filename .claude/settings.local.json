@@ -2,51 +2,39 @@
   "permissions": {
     "allow": [
       "Bash(npm test:*)",
-      "Bash(dir /s /b tests*.test.ts 2)",
-      "Bash(nul)",
-      "Bash(dir:*)",
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(findstr:*)",
       "Bash(npx vitest:*)",
-      "Bash(powershell -Command \"Get-Content tests\\unit\\Unit.test.ts | Measure-Object -Line\")",
       "Bash(cat:*)",
       "Bash(npx tsc:*)",
-      "Bash(/tmp/unit-collection-fixed.html)",
-      "Bash(/tmp/role5-fixed.md)",
       "Bash(tree:*)",
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
-      "Bash(xargs -I {} sh -c 'count=$(find {} -type f 2>/dev/null | wc -l); echo \"\"\"\"$(basename {}): $count\"\"\"\"')",
       "Bash(git checkout:*)",
-      "Bash(npm install:*)",
-      "Bash(python3 -m http.server:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git config:*)",
-      "Bash(lsof:*)",
-      "Bash(xargs:*)",
-      "Bash(gh --version:*)",
       "Bash(git rev-parse:*)",
-      "Bash(wc:*)",
-      "Bash(xdg-open:*)",
-      "Bash(ROLE_2_GRAPHICS_MOCKUP_ONBOARDING_FIXED.md)",
-      "Bash(curl:*)",
-      "Bash(printf:*)",
-      "Bash(/c/Dev/AiGames/vale-village/ANALYSIS_REPORT.txt)",
-<<<<<<< Updated upstream
-      "Bash(npm run type-check:*)",
       "Bash(git rm:*)",
-      "Bash(node replace-dialogue.js:*)",
-      "Bash(node add-mana-costs.js:*)",
-      "Bash(echo:*)",
-      "Bash(\"C:\\Dev\\AiGames\\vale-village\\src\\components\\battle\\BattleScreen.css\")"
-=======
-      "Bash(mkdir:*)"
->>>>>>> Stashed changes
+      "Bash(wc:*)",
+      "Bash(curl:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/user/vale-village/.claude/codex-review.sh"
+          }
+        ]
+      }
+    ]
   }
 }
