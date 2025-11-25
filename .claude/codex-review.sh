@@ -11,7 +11,7 @@ STDIN_DATA=$(cat)
 # Parse JSON fields
 TRANSCRIPT_PATH=$(echo "$STDIN_DATA" | jq -r '.transcript_path // empty')
 CWD=$(echo "$STDIN_DATA" | jq -r '.cwd // empty')
-PROJECT_DIR="${CWD:-${CLAUDE_PROJECT_DIR:-/home/user/vale-village}}"
+PROJECT_DIR="${CWD:-${CLAUDE_PROJECT_DIR:-$(pwd)}}"
 
 cd "$PROJECT_DIR"
 
@@ -65,7 +65,7 @@ $DIFF
 Be concise. Focus on actual issues. Say 'LGTM - changes look good' if no issues found."
 
   # Run codex in headless mode with full context
-  echo "$REVIEW_PROMPT" | codex --quiet --approval-mode full-auto
+  echo "$REVIEW_PROMPT" | codex exec --full-auto
 
 else
   # Fallback: show what would be reviewed

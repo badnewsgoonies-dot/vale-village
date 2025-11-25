@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /home/user/vale-village/.claude/codex-review.sh"
+            "command": "bash .claude/codex-review.sh"
           }
         ]
       }
