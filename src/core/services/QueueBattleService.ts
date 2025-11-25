@@ -25,6 +25,8 @@ import {
   mergeDjinnAbilitiesIntoUnit,
   calculateDjinnBonusesForUnit,
 } from '../algorithms/djinnAbilities';
+import { DJINN } from '../../data/definitions/djinn';
+import { applyStatusToUnit } from '../algorithms/status';
 
 // The unwrapped value from performAction Result
 type PerformActionValue = { state: BattleState; result: ActionResult; events: readonly BattleEvent[] };
@@ -520,8 +522,10 @@ function executeDjinnSummons(
   }
 
   const djinnCount = state.queuedDjinn.length as 1 | 2 | 3;
-  const damage = calculateSummonDamage(djinnCount);
   const preBonuses = snapshotDjinnBonuses(state.playerTeam);
+  const queuedDjinnData = state.queuedDjinn
+    .map((id) => DJINN[id])
+    .filter((djinn): djinn is NonNullable<typeof djinn> => Boolean(djinn));
 
   const activationCount = state.queuedDjinn.length;
   const recoveryTime = activationCount + 1;
@@ -582,56 +586,115 @@ function executeDjinnSummons(
     djinnRecoveryTimers: newRecoveryTimers,
   });
 
-  // Apply damage to enemies and track targets hit
-  const targetsHit: string[] = [];
+  for (const djinn of queuedDjinnData) {
+    const summonEffect = djinn.summonEffect;
+    const targetsHit: string[] = [];
+    const targetsHealed: string[] = [];
 
-  if (djinnCount === 3) {
-    // Mega summon hits all enemies
-    const updatedEnemies = currentState.enemies.map(enemy => {
-      if (isUnitKO(enemy)) return enemy;
-      const newHp = Math.max(0, enemy.currentHp - damage);
-      events.push({
-        type: 'hit',
-        targetId: enemy.id,
-        amount: damage,
+    if (summonEffect.type === 'damage') {
+      const damageAmount = summonEffect.damage ?? calculateSummonDamage(djinnCount);
+      if (djinnCount === 3) {
+        const updatedEnemies = currentState.enemies.map(enemy => {
+          if (isUnitKO(enemy)) return enemy;
+          const newHp = Math.max(0, enemy.currentHp - damageAmount);
+          events.push({
+            type: 'hit',
+            targetId: enemy.id,
+            amount: damageAmount,
+          });
+          targetsHit.push(enemy.id);
+          return { ...enemy, currentHp: newHp };
+        });
+        currentState = updateBattleState(currentState, {
+          enemies: updatedEnemies,
+        });
+      } else {
+        const aliveEnemies = currentState.enemies.filter(e => !isUnitKO(e));
+        if (aliveEnemies.length > 0) {
+          const targetIndex = Math.floor(rng.next() * aliveEnemies.length);
+          const target = aliveEnemies[targetIndex]!;
+          const newHp = Math.max(0, target.currentHp - damageAmount);
+          events.push({
+            type: 'hit',
+            targetId: target.id,
+            amount: damageAmount,
+          });
+          targetsHit.push(target.id);
+          const updatedEnemies = currentState.enemies.map(e =>
+            e.id === target.id ? { ...e, currentHp: newHp } : e
+          );
+          currentState = updateBattleState(currentState, {
+            enemies: updatedEnemies,
+          });
+        }
+      }
+    } else if (summonEffect.type === 'heal') {
+      const healAmount = summonEffect.healAmount;
+      const healedUnits = currentState.playerTeam.units.map((unit) => {
+        const maxHp = calculateEffectiveStats(unit, currentState.playerTeam).hp;
+        const newHp = Math.min(unit.currentHp + healAmount, maxHp);
+        if (newHp !== unit.currentHp) {
+          targetsHealed.push(unit.id);
+        }
+        return { ...unit, currentHp: newHp };
       });
-      targetsHit.push(enemy.id);
-      return { ...enemy, currentHp: newHp };
-    });
-    currentState = updateBattleState(currentState, {
-      enemies: updatedEnemies,
-    });
-  } else {
-    // Single or double summon hits single target (pick random enemy)
-    const aliveEnemies = currentState.enemies.filter(e => !isUnitKO(e));
-    if (aliveEnemies.length > 0) {
-      const targetIndex = Math.floor(rng.next() * aliveEnemies.length);
-      // Index is guaranteed valid since 0 <= targetIndex < length
-      const target = aliveEnemies[targetIndex]!;
-      const newHp = Math.max(0, target.currentHp - damage);
-      events.push({
-        type: 'hit',
-        targetId: target.id,
-        amount: damage,
+      const updatedTeamAfterHeal = updateTeam(currentState.playerTeam, { units: healedUnits });
+      currentState = updateBattleState(currentState, { playerTeam: updatedTeamAfterHeal });
+    } else if (summonEffect.type === 'buff') {
+      const statBonus = summonEffect.statBonus;
+      const buffedUnits = currentState.playerTeam.units.map((unit) => {
+        let updated = unit;
+        (Object.entries(statBonus) as Array<[keyof typeof statBonus, number | undefined]>).forEach(([stat, value]) => {
+          if (value !== undefined) {
+            const status: typeof unit.statusEffects[number] = {
+              type: 'buff',
+              stat: stat as keyof typeof unit.baseStats,
+              modifier: value,
+              duration: 3,
+            };
+            updated = applyStatusToUnit(updated, status);
+          }
+        });
+        return updated;
       });
-      targetsHit.push(target.id);
-      const updatedEnemies = currentState.enemies.map(e =>
-        e.id === target.id ? { ...e, currentHp: newHp } : e
-      );
-      currentState = updateBattleState(currentState, {
-        enemies: updatedEnemies,
+      const updatedTeamAfterBuff = updateTeam(currentState.playerTeam, { units: buffedUnits });
+      currentState = updateBattleState(currentState, { playerTeam: updatedTeamAfterBuff });
+    } else if (summonEffect.type === 'special') {
+      // Apply a light paralyze effect to all enemies as a placeholder special
+      const updatedEnemies = currentState.enemies.map((enemy) => {
+        if (isUnitKO(enemy)) return enemy;
+        const status: typeof enemy.statusEffects[number] = {
+          type: 'paralyze',
+          duration: 1,
+        };
+        return applyStatusToUnit(enemy, status);
+      });
+      currentState = updateBattleState(currentState, { enemies: updatedEnemies });
+    }
+
+    const abilityTargets =
+      summonEffect.type === 'heal'
+        ? targetsHealed
+        : summonEffect.type === 'damage'
+          ? targetsHit
+          : summonEffect.type === 'buff'
+            ? currentState.playerTeam.units.map((u) => u.id)
+            : currentState.enemies.filter((e) => !isUnitKO(e)).map((e) => e.id);
+
+    if (abilityTargets.length > 0) {
+      events.push({
+        type: 'ability',
+        casterId: 'djinn-summon',
+        abilityId: `summon-${djinn.id}`,
+        targets: abilityTargets,
       });
     }
-  }
 
-  // Only emit ability event if targets were actually hit
-  if (targetsHit.length > 0) {
-    events.push({
-      type: 'ability',
-      casterId: 'djinn-summon',
-      abilityId: `djinn-summon-${djinnCount}`,
-      targets: targetsHit,
-    });
+    if (summonEffect.type === 'heal') {
+      for (const id of targetsHealed) {
+        events.push({ type: 'heal', targetId: id, amount: summonEffect.healAmount });
+      }
+    }
   }
 
   return { state: currentState, events };

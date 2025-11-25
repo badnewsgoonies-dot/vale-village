@@ -440,8 +440,8 @@ export function QueueBattleView() {
     >
       <div
         style={{
-          width: 960,
-          height: 640,
+          width: 900,
+          height: 600,
           position: 'relative',
           background: '#000',
           overflow: 'hidden',
@@ -467,9 +467,9 @@ export function QueueBattleView() {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: 'url(/sprites/backgrounds/gs1/Vale.gif)',
+            backgroundImage: 'url(/sprites/backgrounds/gs1/Kolima_Forest.gif)',
             backgroundSize: 'cover',
-            backgroundPosition: 'center 80%',
+            backgroundPosition: 'center 70%',
             imageRendering: 'pixelated',
             zIndex: 0,
           }}
@@ -517,8 +517,8 @@ export function QueueBattleView() {
           <div
             style={{
               position: 'absolute',
-              bottom: '40%',
-              left: '12%',
+              bottom: '42%',
+              left: '8%',
               display: 'flex',
               gap: '3rem',
               zIndex: 10,
@@ -648,8 +648,8 @@ export function QueueBattleView() {
           <div
             style={{
               position: 'absolute',
-              right: '3%',
-              bottom: '32%',
+              right: '6%',
+              bottom: '34%',
               display: 'flex',
               flexDirection: 'column',
               gap: 4,
@@ -661,19 +661,19 @@ export function QueueBattleView() {
                 key={djinn.id}
                 style={{
                   position: 'relative',
-                  left: idx % 2 === 0 ? 0 : 6,
-                }}
-              >
-                <img
-                  src={djinn.path}
-                  alt={djinn.name}
-                  width={24}
-                  height={24}
-                  style={{ imageRendering: 'pixelated', transform: 'scale(2.5)' }}
-                />
-              </div>
-            ))}
-          </div>
+                left: idx % 2 === 0 ? 0 : 6,
+              }}
+            >
+              <img
+                src={djinn.path}
+                alt={djinn.name}
+                width={32}
+                height={32}
+                style={{ imageRendering: 'pixelated', transform: 'scale(2.5)' }}
+              />
+            </div>
+          ))}
+        </div>
         </div>
 
         {validTargets.length > 0 && (

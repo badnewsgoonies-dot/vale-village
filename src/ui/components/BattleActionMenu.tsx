@@ -1,13 +1,19 @@
+import { useMemo, useState } from 'react';
 import type { BattleState } from '../../core/models/BattleState';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { Unit } from '../../core/models/Unit';
 import { canAffordAction, getAbilityManaCost } from '../../core/algorithms/mana';
 import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
+import { getLockedDjinnAbilityMetadataForUnit } from '../../core/algorithms/djinnAbilities';
+import { getSetDjinnIds } from '../../core/algorithms/djinn';
+import { useStore } from '../state/store';
+import { DJINN } from '../../data/definitions/djinn';
 
 const ACTION_ICONS: Record<string, string> = {
   attack: '/sprites/icons/buttons/Attack.gif',
   abilities: '/sprites/icons/buttons/Psynergy.gif',
   djinn: '/sprites/icons/buttons/Djinni.gif',
+  summon: '/sprites/icons/buttons/Summon.gif',
   defend: '/sprites/icons/buttons/Defend.gif',
 };
 
@@ -153,7 +159,7 @@ const ABILITY_ICONS: Record<string, string> = {
   slow: '/sprites/icons/misc/Stat-Down.gif',
 };
 
-export type ActionMenuMode = 'root' | 'abilities';
+export type ActionMenuMode = 'root' | 'abilities' | 'summon';
 
 interface BattleActionMenuProps {
   battle: BattleState;
@@ -184,11 +190,13 @@ function AbilityGrid({
   abilities,
   selectedAbilityId,
   battle,
+  lockedAbilityIds,
   onSelect,
 }: {
   abilities: readonly Ability[];
   selectedAbilityId: string | null;
   battle: BattleState;
+  lockedAbilityIds: readonly string[];
   onSelect: (id: string, ability: Ability) => void;
 }) {
   return (
@@ -206,6 +214,7 @@ function AbilityGrid({
         const manaCost = getAbilityManaCost(ability.id, ability);
         const canAfford = canAffordAction(battle.remainingMana, manaCost);
         const isDjinnAbility = Boolean(DJINN_ABILITIES[ability.id]);
+        const isLocked = lockedAbilityIds.includes(ability.id);
         const isSelected = selectedAbilityId === ability.id;
         const element = (ability as any).element || 'Neutral';
         const elementTheme: { border: string; glow: string; bg: string } = (
@@ -221,8 +230,8 @@ function AbilityGrid({
         return (
           <button
             key={ability.id}
-            onClick={() => canAfford && onSelect(ability.id, ability)}
-            disabled={!canAfford}
+            onClick={() => canAfford && !isLocked && onSelect(ability.id, ability)}
+            disabled={!canAfford || isLocked}
             style={{
               textAlign: 'left',
               background: isSelected
@@ -237,11 +246,11 @@ function AbilityGrid({
               }`,
               borderLeft: `4px solid ${elementTheme.border}`,
               padding: '6px 8px',
-              color: canAfford ? '#f6e8b1' : '#555',
+              color: !canAfford || isLocked ? '#555' : '#f6e8b1',
               borderRadius: 6,
               fontSize: '0.85rem',
-              cursor: canAfford ? 'pointer' : 'not-allowed',
-              opacity: canAfford ? 1 : 0.5,
+              cursor: canAfford && !isLocked ? 'pointer' : 'not-allowed',
+              opacity: canAfford && !isLocked ? 1 : 0.5,
               display: 'flex',
               flexDirection: 'column',
               gap: 4,
@@ -357,6 +366,17 @@ export function BattleActionMenu({
   onSelectAttack,
   onSelectAbility,
 }: BattleActionMenuProps) {
+  const queueDjinnActivation = useStore((s) => s.queueDjinnActivation);
+  const setSummonScreenOpen = useStore((s) => s.setSummonScreenOpen);
+  const [selectedDjinnIds, setSelectedDjinnIds] = useState<string[]>([]);
+
+  // All hooks must be called before any conditional returns
+  const lockedAbilityIds = useMemo(
+    () => currentUnit ? getLockedDjinnAbilityMetadataForUnit(currentUnit, battle.playerTeam).map((m) => m.abilityId) : [],
+    [currentUnit, battle.playerTeam]
+  );
+  const setDjinnIds = useMemo(() => getSetDjinnIds(battle.playerTeam), [battle.playerTeam]);
+
   if (!currentUnit) {
     return (
       <div
@@ -381,6 +401,23 @@ export function BattleActionMenu({
   );
   const djinnAbilities = unlocked.filter((a) => DJINN_ABILITIES[a.id]);
   const regularAbilities = unlocked.filter((a) => !DJINN_ABILITIES[a.id]);
+
+  const toggleDjinnSelection = (id: string) => {
+    setSelectedDjinnIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((dj) => dj !== id);
+      }
+      if (prev.length >= 3) return prev; // Max 3
+      return [...prev, id];
+    });
+  };
+
+  const handleSummonConfirm = () => {
+    selectedDjinnIds.forEach((id) => queueDjinnActivation(id));
+    setSummonScreenOpen(false);
+    setSelectedDjinnIds([]);
+    onModeChange('root');
+  };
 
   if (mode === 'abilities') {
     return (
@@ -426,6 +463,7 @@ export function BattleActionMenu({
               abilities={regularAbilities}
               selectedAbilityId={selectedAbilityId}
               battle={battle}
+              lockedAbilityIds={lockedAbilityIds}
               onSelect={onSelectAbility}
             />
           </>
@@ -469,6 +507,7 @@ export function BattleActionMenu({
               abilities={djinnAbilities}
               selectedAbilityId={selectedAbilityId}
               battle={battle}
+              lockedAbilityIds={lockedAbilityIds}
               onSelect={onSelectAbility}
             />
           </div>
@@ -477,6 +516,108 @@ export function BattleActionMenu({
         {regularAbilities.length === 0 && djinnAbilities.length === 0 && (
           <div style={{ color: '#888', fontStyle: 'italic', textAlign: 'center', padding: 16 }}>
             No abilities available
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (mode === 'summon') {
+    return (
+      <div
+        style={{
+          background: 'rgba(0,0,0,0.9)',
+          border: '2px solid #ffd700',
+          padding: 10,
+          borderRadius: 8,
+          width: 360,
+          maxHeight: 320,
+          overflowY: 'auto',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+          <SectionHeader title="SUMMON" />
+          <button
+            onClick={() => {
+              setSelectedDjinnIds([]);
+              onModeChange('root');
+            }}
+            style={{
+              background: 'rgba(0,0,0,0.6)',
+              border: '2px solid #ffd700',
+              color: '#ffd87f',
+              borderRadius: 4,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              textShadow: '1px 1px 2px #000',
+            }}
+          >
+            ← BACK
+          </button>
+        </div>
+
+        {setDjinnIds.length === 0 ? (
+          <div style={{ color: '#888', fontStyle: 'italic', textAlign: 'center', padding: 16 }}>
+            No Djinn are set. Equip Djinn to summon.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {setDjinnIds.map((djinnId) => {
+              const djinn = DJINN[djinnId];
+              if (!djinn) return null;
+              const isSelected = selectedDjinnIds.includes(djinnId);
+              return (
+                <label
+                  key={djinnId}
+                  style={{
+                    display: 'flex',
+                    gap: 10,
+                    alignItems: 'center',
+                    padding: '8px 10px',
+                    border: `2px solid ${isSelected ? '#ffd700' : 'rgba(255,255,255,0.2)'}`,
+                    borderRadius: 6,
+                    background: isSelected ? 'rgba(255,213,74,0.1)' : 'rgba(0,0,0,0.5)',
+                    cursor: 'pointer',
+                    color: '#f6e8b1',
+                    textShadow: '1px 1px 2px #000',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleDjinnSelection(djinnId)}
+                    style={{ width: 16, height: 16 }}
+                  />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{ fontWeight: 700 }}>{djinn.name}</span>
+                    <span style={{ fontSize: '0.8rem', color: '#ccc' }}>{djinn.summonEffect.description}</span>
+                  </div>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#ffd87f' }}>
+                    {djinn.element} Djinn
+                  </span>
+                </label>
+              );
+            })}
+
+            <button
+              onClick={handleSummonConfirm}
+              disabled={selectedDjinnIds.length === 0}
+              style={{
+                padding: '8px 12px',
+                background: selectedDjinnIds.length > 0 ? '#FFD54A' : 'rgba(255,255,255,0.08)',
+                color: selectedDjinnIds.length > 0 ? '#000' : '#888',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 6,
+                cursor: selectedDjinnIds.length > 0 ? 'pointer' : 'not-allowed',
+                fontWeight: 700,
+                letterSpacing: 0.5,
+              }}
+            >
+              Summon ({selectedDjinnIds.length}/3)
+            </button>
           </div>
         )}
       </div>
@@ -552,6 +693,40 @@ export function BattleActionMenu({
               PSYNERGY
             </div>
             <div style={{ color: '#888', fontSize: '0.75rem' }}>Abilities</div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => {
+            setSummonScreenOpen(true);
+            onModeChange('summon');
+          }}
+          disabled={setDjinnIds.length === 0}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            width: '100%',
+            background: 'rgba(0,0,0,0.5)',
+            border: '2px solid rgba(255,215,0,0.3)',
+            borderRadius: 6,
+            padding: '8px 10px',
+            cursor: setDjinnIds.length > 0 ? 'pointer' : 'not-allowed',
+            opacity: setDjinnIds.length > 0 ? 1 : 0.6,
+          }}
+        >
+          <img
+            src={ACTION_ICONS.summon}
+            alt=""
+            width={24}
+            height={24}
+            style={{ imageRendering: 'pixelated', transform: 'scale(1.5)', transformOrigin: 'center' }}
+          />
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ color: '#f6e8b1', fontWeight: 600, fontSize: '0.95rem', textShadow: '1px 1px 2px #000' }}>
+              SUMMON
+            </div>
+            <div style={{ color: '#888', fontSize: '0.75rem' }}>{setDjinnIds.length} Djinn ready</div>
           </div>
         </button>
 
