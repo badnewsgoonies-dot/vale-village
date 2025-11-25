@@ -80,7 +80,7 @@ export function ShopStoryboard() {
           alignItems: 'center',
         }}>
           <SimpleSprite
-            id={shopkeeperSprite?.path || '/sprites/overworld/majornpcs/Shopkeeper.gif'}
+            id={shopkeeperSprite?.path || '/sprites/overworld/majornpcs/Weaponshop_Keeper.gif'}
             width={96}
             height={96}
             imageRendering="pixelated"

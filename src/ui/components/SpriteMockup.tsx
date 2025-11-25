@@ -174,7 +174,7 @@ export function SpriteMockup() {
                 zIndex: 0,
               }} />
               <SimpleSprite
-                id={golemSprite?.path || getSpritesByCategory('battle-enemies')[0]?.path || '/sprites/battle/enemies/golem.gif'}
+                id={golemSprite?.path || getSpritesByCategory('battle-enemies')[0]?.path || '/sprites/battle/enemies/Golem.gif'}
                 width={96}
                 height={96}
                 imageRendering="pixelated"
@@ -209,7 +209,7 @@ export function SpriteMockup() {
                   zIndex: 0,
                 }} />
                 <SimpleSprite
-                  id={wingedEnemySprite?.path || getSpritesByCategory('battle-enemies')[1]?.path || '/sprites/battle/enemies/winged.gif'}
+                  id={wingedEnemySprite?.path || getSpritesByCategory('battle-enemies')[1]?.path || '/sprites/battle/enemies/Harpy.gif'}
                   width={48}
                   height={48}
                   imageRendering="pixelated"
@@ -235,7 +235,7 @@ export function SpriteMockup() {
                   zIndex: 0,
                 }} />
                 <SimpleSprite
-                  id={wingedEnemySprite?.path || getSpritesByCategory('battle-enemies')[2]?.path || '/sprites/battle/enemies/winged.gif'}
+                  id={wingedEnemySprite?.path || getSpritesByCategory('battle-enemies')[2]?.path || '/sprites/battle/enemies/Harpy.gif'}
                   width={48}
                   height={48}
                   imageRendering="pixelated"

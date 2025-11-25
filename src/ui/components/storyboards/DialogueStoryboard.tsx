@@ -72,7 +72,7 @@ export function DialogueStoryboard() {
           padding: '2rem',
         }}>
           <SimpleSprite
-            id={currentDialogue.sprite?.path || '/sprites/overworld/majornpcs/NPC.gif'}
+            id={currentDialogue.sprite?.path || '/sprites/overworld/majornpcs/Elder.gif'}
             width={128}
             height={128}
             imageRendering="pixelated"

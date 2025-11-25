@@ -53,7 +53,7 @@ export const createChapterTriggerNPC = () => ({
   id: 'herald',
   x: 900,
   y: 700,
-  sprite: '/sprites/overworld/majornpcs/Herald.gif',
+  sprite: '/sprites/overworld/majornpcs/Elder.gif',
   type: 'npc' as const,
   blocking: true,
   onInteract: () => {
@@ -164,7 +164,7 @@ export const storyBookInteractive = {
   id: 'story-book',
   x: 950,
   y: 320,
-  sprite: '/sprites/interactive/book.gif',
+  sprite: '/sprites/scenery/statues/crystal_statue.gif',
   type: 'interactive' as const,
   blocking: true,
   label: 'Chronicle of Vale',

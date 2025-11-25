@@ -14,7 +14,7 @@ interface EnemyPortalTileProps {
 function getEnemySpritePath(enemyId: string): string {
   const enemy = ENEMIES[enemyId];
   const explicit: Record<string, string> = {
-    'war-mage': '/sprites/battle/enemies/WarMage.gif',
+    'war-mage': '/sprites/battle/party/garet/Garet_Axe_Front.gif',
   };
   if (explicit[enemyId]) return explicit[enemyId];
 
