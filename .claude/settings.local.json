@@ -21,7 +21,12 @@
       "Bash(curl:*)",
       "Bash(mkdir:*)",
       "Bash(echo:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(codex --version:*)",
+      "Bash(codex exec:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm dev)"
     ],
     "deny": [],
     "ask": []

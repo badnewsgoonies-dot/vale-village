@@ -27,7 +27,7 @@ const createVs1Encounter = (id: string, name: string): Encounter => ({
   reward: {
     xp: 60,
     gold: 20,
-    equipment: { type: 'none' }, // Locked: no equipment from House 1 (per blueprint)
+    equipment: { type: 'fixed', itemId: 'leather-cap' }, // Starter helm drop for House 1
     djinn: 'forge', // Mars T1 Djinn
     unlockUnit: 'war-mage', // Recruit Garet
   },
@@ -120,7 +120,7 @@ export const HOUSE_05: Encounter = {
   reward: {
     xp: 100,
     gold: 28,
-    equipment: { type: 'none' }, // Blueprint says no equipment on House 5; Blaze is the reward
+    equipment: { type: 'fixed', itemId: 'iron-sword' },
     unlockUnit: 'blaze', // Recruit Blaze (Mars Balanced Warrior)
   },
 };
@@ -183,7 +183,7 @@ export const HOUSE_08: Encounter = {
   reward: {
     xp: 200,
     gold: 55,
-    equipment: { type: 'none' }, // Sentinel is the reward, no gear drop
+    equipment: { type: 'fixed', itemId: 'steel-armor' },
     djinn: 'fizz', // Mercury T1 Djinn
     unlockUnit: 'sentinel', // Recruit Sentinel (Venus Support Buffer)
   },
@@ -220,7 +220,7 @@ export const HOUSE_10: Encounter = {
   reward: {
     xp: 235,
     gold: 62,
-    equipment: { type: 'none' }, // No gear at House 10 per blueprint
+    equipment: { type: 'fixed', itemId: 'silver-circlet' },
   },
 };
 
@@ -258,7 +258,7 @@ export const HOUSE_12: Encounter = {
   reward: {
     xp: 275,
     gold: 72,
-    equipment: { type: 'none' }, // Granite Djinn only; no equipment drop
+    equipment: { type: 'fixed', itemId: 'valkyrie-mail' },
     djinn: 'granite', // Venus T2 Djinn - POWER SPIKE
   },
 };
@@ -384,7 +384,7 @@ export const HOUSE_18: Encounter = {
   reward: {
     xp: 550,
     gold: 140,
-    equipment: { type: 'none' }, // Only the Bane Djinn drops here
+    equipment: { type: 'fixed', itemId: 'oracles-crown' },
     djinn: 'bane', // Venus T3 Djinn
   },
 };

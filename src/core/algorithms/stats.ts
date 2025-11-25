@@ -8,7 +8,6 @@
 import type { Unit } from '../models/Unit';
 import type { Team } from '../models/Team';
 import type { Stats } from '../models/types';
-import type { EquipmentLoadout } from '../models/Equipment';
 import { calculateEquipmentBonuses } from '../models/Equipment';
 import { calculateDjinnBonusesForUnit } from './djinnAbilities';
 

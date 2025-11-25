@@ -120,9 +120,13 @@ export function OverworldMap() {
                   key={`${x}-${y}`}
                   className={`tile tile-${tile.type}`}
                   style={{
-                    backgroundImage: tile.spriteId ? `url(/sprites/${tile.spriteId}.png)` : undefined,
+                    backgroundImage:
+                      tile.spriteId && (tile.spriteId.startsWith('/') || tile.spriteId.startsWith('http'))
+                        ? `url(${tile.spriteId})`
+                        : undefined,
                     position: 'relative',
                   }}
+                  data-sprite={tile.spriteId ?? undefined}
                 >
                   {/* NPC Sprite */}
                   {npcAtPosition && !isPlayer && (

@@ -185,7 +185,7 @@ export function TowerHubScreen() {
             <div className="tower-actions">
               <button
                 className="primary"
-                disabled={!currentFloor || currentFloor.type === 'rest'}
+                disabled={!currentFloor || isRestFloor}
                 onClick={beginTowerFloorBattle}
               >
                 Begin Battle

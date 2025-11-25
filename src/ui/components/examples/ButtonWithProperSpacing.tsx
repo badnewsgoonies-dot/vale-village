@@ -133,7 +133,7 @@ export function ImprovedButton({
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = variantStyles[variant].boxShadow || 'none';
+        e.currentTarget.style.boxShadow = variantStyles[variant]?.boxShadow ?? 'none';
       }}
     >
       {children}

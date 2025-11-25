@@ -1,6 +1,6 @@
 // Auto-generated sprite list
 // Run 'node scripts/generate-sprite-manifest.js' to regenerate
-// Generated: 2025-11-24T18:34:23.663Z
+// Generated: 2025-11-25T19:22:03.605Z
 
 export interface SpriteEntry {
   name: string;
@@ -79,78 +79,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Isaac Axe HitFront",
     "path": "/sprites/battle/party/isaac/Isaac_Axe_HitFront.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace Attack1",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_Attack1.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace Attack2",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_Attack2.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace Back",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_Back.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace CastBack1",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastBack1.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace CastBack2",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastBack2.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace CastFront1",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastFront1.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace CastFront2",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastFront2.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace DownedBack",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_DownedBack.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace DownedFront",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_DownedFront.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace Front",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_Front.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace HitBack",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_HitBack.gif",
-    "category": "battle-party",
-    "subcategory": "isaac"
-  },
-  {
-    "name": "Isaac Mace HitFront",
-    "path": "/sprites/battle/party/isaac/Isaac_Mace_HitFront.gif",
     "category": "battle-party",
     "subcategory": "isaac"
   },
@@ -299,6 +227,78 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": "isaac"
   },
   {
+    "name": "Isaac Mace Attack1",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_Attack1.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace Attack2",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_Attack2.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace Back",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_Back.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace CastBack1",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastBack1.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace CastBack2",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastBack2.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace CastFront1",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastFront1.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace CastFront2",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_CastFront2.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace DownedBack",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_DownedBack.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace DownedFront",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_DownedFront.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace Front",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_Front.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace HitBack",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_HitBack.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
+    "name": "Isaac Mace HitFront",
+    "path": "/sprites/battle/party/isaac/Isaac_Mace_HitFront.gif",
+    "category": "battle-party",
+    "subcategory": "isaac"
+  },
+  {
     "name": "Garet Axe Attack1",
     "path": "/sprites/battle/party/garet/Garet_Axe_Attack1.gif",
     "category": "battle-party",
@@ -367,78 +367,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Garet Axe HitFront",
     "path": "/sprites/battle/party/garet/Garet_Axe_HitFront.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace Attack1",
-    "path": "/sprites/battle/party/garet/Garet_Mace_Attack1.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace Attack2",
-    "path": "/sprites/battle/party/garet/Garet_Mace_Attack2.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace Back",
-    "path": "/sprites/battle/party/garet/Garet_Mace_Back.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace CastBack1",
-    "path": "/sprites/battle/party/garet/Garet_Mace_CastBack1.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace CastBack2",
-    "path": "/sprites/battle/party/garet/Garet_Mace_CastBack2.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace CastFront1",
-    "path": "/sprites/battle/party/garet/Garet_Mace_CastFront1.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace CastFront2",
-    "path": "/sprites/battle/party/garet/Garet_Mace_CastFront2.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace DownedBack",
-    "path": "/sprites/battle/party/garet/Garet_Mace_DownedBack.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace DownedFront",
-    "path": "/sprites/battle/party/garet/Garet_Mace_DownedFront.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace Front",
-    "path": "/sprites/battle/party/garet/Garet_Mace_Front.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace HitBack",
-    "path": "/sprites/battle/party/garet/Garet_Mace_HitBack.gif",
-    "category": "battle-party",
-    "subcategory": "garet"
-  },
-  {
-    "name": "Garet Mace HitFront",
-    "path": "/sprites/battle/party/garet/Garet_Mace_HitFront.gif",
     "category": "battle-party",
     "subcategory": "garet"
   },
@@ -515,76 +443,76 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff Attack1",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_Attack1.gif",
+    "name": "Garet Mace Attack1",
+    "path": "/sprites/battle/party/garet/Garet_Mace_Attack1.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff Attack2",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_Attack2.gif",
+    "name": "Garet Mace Attack2",
+    "path": "/sprites/battle/party/garet/Garet_Mace_Attack2.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff Back",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_Back.gif",
+    "name": "Garet Mace Back",
+    "path": "/sprites/battle/party/garet/Garet_Mace_Back.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff CastBack1",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastBack1.gif",
+    "name": "Garet Mace CastBack1",
+    "path": "/sprites/battle/party/garet/Garet_Mace_CastBack1.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff CastBack2",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastBack2.gif",
+    "name": "Garet Mace CastBack2",
+    "path": "/sprites/battle/party/garet/Garet_Mace_CastBack2.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff CastFront1",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastFront1.gif",
+    "name": "Garet Mace CastFront1",
+    "path": "/sprites/battle/party/garet/Garet_Mace_CastFront1.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff CastFront2",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastFront2.gif",
+    "name": "Garet Mace CastFront2",
+    "path": "/sprites/battle/party/garet/Garet_Mace_CastFront2.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff DownedBack",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_DownedBack.gif",
+    "name": "Garet Mace DownedBack",
+    "path": "/sprites/battle/party/garet/Garet_Mace_DownedBack.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff DownedFront",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_DownedFront.gif",
+    "name": "Garet Mace DownedFront",
+    "path": "/sprites/battle/party/garet/Garet_Mace_DownedFront.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff Front",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_Front.gif",
+    "name": "Garet Mace Front",
+    "path": "/sprites/battle/party/garet/Garet_Mace_Front.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff HitBack",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_HitBack.gif",
+    "name": "Garet Mace HitBack",
+    "path": "/sprites/battle/party/garet/Garet_Mace_HitBack.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
-    "name": "Ivan Staff HitFront",
-    "path": "/sprites/battle/party/ivan/Ivan_Staff_HitFront.gif",
+    "name": "Garet Mace HitFront",
+    "path": "/sprites/battle/party/garet/Garet_Mace_HitFront.gif",
     "category": "battle-party",
-    "subcategory": "ivan"
+    "subcategory": "garet"
   },
   {
     "name": "Ivan lBlade Attack1",
@@ -655,6 +583,78 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Ivan lBlade HitFront",
     "path": "/sprites/battle/party/ivan/Ivan_lBlade_HitFront.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff Attack1",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_Attack1.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff Attack2",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_Attack2.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff Back",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_Back.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff CastBack1",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastBack1.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff CastBack2",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastBack2.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff CastFront1",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastFront1.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff CastFront2",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_CastFront2.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff DownedBack",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_DownedBack.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff DownedFront",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_DownedFront.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff Front",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_Front.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff HitBack",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_HitBack.gif",
+    "category": "battle-party",
+    "subcategory": "ivan"
+  },
+  {
+    "name": "Ivan Staff HitFront",
+    "path": "/sprites/battle/party/ivan/Ivan_Staff_HitFront.gif",
     "category": "battle-party",
     "subcategory": "ivan"
   },
@@ -1337,14 +1337,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Man o War",
-    "path": "/sprites/battle/enemies/Man_o_War.gif",
+    "name": "Manticore King",
+    "path": "/sprites/battle/enemies/Manticore_King.gif",
     "category": "battle-enemies",
     "subcategory": null
   },
   {
-    "name": "Manticore King",
-    "path": "/sprites/battle/enemies/Manticore_King.gif",
+    "name": "Man o War",
+    "path": "/sprites/battle/enemies/Man_o_War.gif",
     "category": "battle-enemies",
     "subcategory": null
   },
@@ -1775,14 +1775,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Will Head",
-    "path": "/sprites/battle/enemies/Will_Head.gif",
+    "name": "Willowisp",
+    "path": "/sprites/battle/enemies/Willowisp.gif",
     "category": "battle-enemies",
     "subcategory": null
   },
   {
-    "name": "Willowisp",
-    "path": "/sprites/battle/enemies/Willowisp.gif",
+    "name": "Will Head",
+    "path": "/sprites/battle/enemies/Will_Head.gif",
     "category": "battle-enemies",
     "subcategory": null
   },
@@ -2027,12 +2027,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "VL Final Battle",
-    "path": "/sprites/backgrounds/gs1/VL_Final_Battle.gif",
-    "category": "backgrounds-gs1",
-    "subcategory": null
-  },
-  {
     "name": "Vale",
     "path": "/sprites/backgrounds/gs1/Vale.gif",
     "category": "backgrounds-gs1",
@@ -2053,6 +2047,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Venus Lighthouse Aerie",
     "path": "/sprites/backgrounds/gs1/Venus_Lighthouse_Aerie.gif",
+    "category": "backgrounds-gs1",
+    "subcategory": null
+  },
+  {
+    "name": "VL Final Battle",
+    "path": "/sprites/backgrounds/gs1/VL_Final_Battle.gif",
     "category": "backgrounds-gs1",
     "subcategory": null
   },
@@ -2297,6 +2297,66 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "fallen Felix",
+    "path": "/sprites/overworld/protagonists/fallen_Felix.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Garet",
+    "path": "/sprites/overworld/protagonists/fallen_Garet.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Isaac",
+    "path": "/sprites/overworld/protagonists/fallen_Isaac.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Isaac 2",
+    "path": "/sprites/overworld/protagonists/fallen_Isaac_2.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Ivan",
+    "path": "/sprites/overworld/protagonists/fallen_Ivan.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Ivan 2",
+    "path": "/sprites/overworld/protagonists/fallen_Ivan_2.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Jenna",
+    "path": "/sprites/overworld/protagonists/fallen_Jenna.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Mia",
+    "path": "/sprites/overworld/protagonists/fallen_Mia.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Piers",
+    "path": "/sprites/overworld/protagonists/fallen_Piers.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Sheba",
+    "path": "/sprites/overworld/protagonists/fallen_Sheba.gif",
+    "category": "overworld-protagonists",
+    "subcategory": null
+  },
+  {
     "name": "Felix",
     "path": "/sprites/overworld/protagonists/Felix.gif",
     "category": "overworld-protagonists",
@@ -2357,14 +2417,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Felix SW",
-    "path": "/sprites/overworld/protagonists/Felix_SW.gif",
+    "name": "Felix Situp",
+    "path": "/sprites/overworld/protagonists/Felix_Situp.gif",
     "category": "overworld-protagonists",
     "subcategory": null
   },
   {
-    "name": "Felix Situp",
-    "path": "/sprites/overworld/protagonists/Felix_Situp.gif",
+    "name": "Felix SW",
+    "path": "/sprites/overworld/protagonists/Felix_SW.gif",
     "category": "overworld-protagonists",
     "subcategory": null
   },
@@ -2957,66 +3017,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "fallen Felix",
-    "path": "/sprites/overworld/protagonists/fallen_Felix.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Garet",
-    "path": "/sprites/overworld/protagonists/fallen_Garet.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Isaac",
-    "path": "/sprites/overworld/protagonists/fallen_Isaac.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Isaac 2",
-    "path": "/sprites/overworld/protagonists/fallen_Isaac_2.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Ivan",
-    "path": "/sprites/overworld/protagonists/fallen_Ivan.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Ivan 2",
-    "path": "/sprites/overworld/protagonists/fallen_Ivan_2.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Jenna",
-    "path": "/sprites/overworld/protagonists/fallen_Jenna.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Mia",
-    "path": "/sprites/overworld/protagonists/fallen_Mia.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Piers",
-    "path": "/sprites/overworld/protagonists/fallen_Piers.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Sheba",
-    "path": "/sprites/overworld/protagonists/fallen_Sheba.gif",
-    "category": "overworld-protagonists",
-    "subcategory": null
-  },
-  {
     "name": "Aaron Jerra",
     "path": "/sprites/overworld/majornpcs/Aaron_Jerra.gif",
     "category": "overworld-majornpcs",
@@ -3065,6 +3065,24 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "fallen Kraden",
+    "path": "/sprites/overworld/majornpcs/fallen_Kraden.gif",
+    "category": "overworld-majornpcs",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Ouranos",
+    "path": "/sprites/overworld/majornpcs/fallen_Ouranos.gif",
+    "category": "overworld-majornpcs",
+    "subcategory": null
+  },
+  {
+    "name": "fallen Sean",
+    "path": "/sprites/overworld/majornpcs/fallen_Sean.gif",
+    "category": "overworld-majornpcs",
+    "subcategory": null
+  },
+  {
     "name": "Fiezhi",
     "path": "/sprites/overworld/majornpcs/Fiezhi.gif",
     "category": "overworld-majornpcs",
@@ -3089,14 +3107,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Innkeeper 2",
-    "path": "/sprites/overworld/majornpcs/Innkeeper_2.gif",
+    "name": "Innkeepers Wife",
+    "path": "/sprites/overworld/majornpcs/Innkeepers_Wife.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
   {
-    "name": "Innkeepers Wife",
-    "path": "/sprites/overworld/majornpcs/Innkeepers_Wife.gif",
+    "name": "Innkeeper 2",
+    "path": "/sprites/overworld/majornpcs/Innkeeper_2.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
@@ -3167,14 +3185,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Mr Jerra",
-    "path": "/sprites/overworld/majornpcs/Mr_Jerra.gif",
+    "name": "Mrs Jerra",
+    "path": "/sprites/overworld/majornpcs/Mrs_Jerra.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
   {
-    "name": "Mrs Jerra",
-    "path": "/sprites/overworld/majornpcs/Mrs_Jerra.gif",
+    "name": "Mr Jerra",
+    "path": "/sprites/overworld/majornpcs/Mr_Jerra.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
@@ -3209,14 +3227,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Sea Captain",
-    "path": "/sprites/overworld/majornpcs/Sea_Captain.gif",
+    "name": "Sean",
+    "path": "/sprites/overworld/majornpcs/Sean.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
   {
-    "name": "Sean",
-    "path": "/sprites/overworld/majornpcs/Sean.gif",
+    "name": "Sea Captain",
+    "path": "/sprites/overworld/majornpcs/Sea_Captain.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
@@ -3319,24 +3337,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Wise One Spin",
     "path": "/sprites/overworld/majornpcs/Wise_One_Spin.gif",
-    "category": "overworld-majornpcs",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Kraden",
-    "path": "/sprites/overworld/majornpcs/fallen_Kraden.gif",
-    "category": "overworld-majornpcs",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Ouranos",
-    "path": "/sprites/overworld/majornpcs/fallen_Ouranos.gif",
-    "category": "overworld-majornpcs",
-    "subcategory": null
-  },
-  {
-    "name": "fallen Sean",
-    "path": "/sprites/overworld/majornpcs/fallen_Sean.gif",
     "category": "overworld-majornpcs",
     "subcategory": null
   },
@@ -3451,6 +3451,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "New Quest",
     "path": "/sprites/icons/buttons/New_Quest.gif",
+    "category": "icons-buttons",
+    "subcategory": null
+  },
+  {
+    "name": "no",
+    "path": "/sprites/icons/buttons/no.gif",
     "category": "icons-buttons",
     "subcategory": null
   },
@@ -3653,12 +3659,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "no",
-    "path": "/sprites/icons/buttons/no.gif",
-    "category": "icons-buttons",
-    "subcategory": null
-  },
-  {
     "name": "transfer file",
     "path": "/sprites/icons/buttons/transfer_file.gif",
     "category": "icons-buttons",
@@ -3821,6 +3821,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "frame",
+    "path": "/sprites/icons/characters/frame.gif",
+    "category": "icons-characters",
+    "subcategory": null
+  },
+  {
     "name": "Garet's Grandfather",
     "path": "/sprites/icons/characters/Garet's_Grandfather.gif",
     "category": "icons-characters",
@@ -3863,6 +3869,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "Innkeepers Wife",
+    "path": "/sprites/icons/characters/Innkeepers_Wife.gif",
+    "category": "icons-characters",
+    "subcategory": null
+  },
+  {
     "name": "Innkeeper 2",
     "path": "/sprites/icons/characters/Innkeeper_2.gif",
     "category": "icons-characters",
@@ -3871,12 +3883,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Innkeeper Wife",
     "path": "/sprites/icons/characters/Innkeeper_Wife.gif",
-    "category": "icons-characters",
-    "subcategory": null
-  },
-  {
-    "name": "Innkeepers Wife",
-    "path": "/sprites/icons/characters/Innkeepers_Wife.gif",
     "category": "icons-characters",
     "subcategory": null
   },
@@ -4175,14 +4181,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Sea Captain",
-    "path": "/sprites/icons/characters/Sea_Captain.gif",
+    "name": "Sean",
+    "path": "/sprites/icons/characters/Sean.gif",
     "category": "icons-characters",
     "subcategory": null
   },
   {
-    "name": "Sean",
-    "path": "/sprites/icons/characters/Sean.gif",
+    "name": "Sea Captain",
+    "path": "/sprites/icons/characters/Sea_Captain.gif",
     "category": "icons-characters",
     "subcategory": null
   },
@@ -4261,12 +4267,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Young Felix",
     "path": "/sprites/icons/characters/Young_Felix.gif",
-    "category": "icons-characters",
-    "subcategory": null
-  },
-  {
-    "name": "frame",
-    "path": "/sprites/icons/characters/frame.gif",
     "category": "icons-characters",
     "subcategory": null
   },
@@ -4691,6 +4691,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "Fireball",
+    "path": "/sprites/icons/psynergy/Fireball.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
     "name": "Fire Bomb",
     "path": "/sprites/icons/psynergy/Fire_Bomb.gif",
     "category": "icons-psynergy",
@@ -4705,12 +4711,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Fire Puppet",
     "path": "/sprites/icons/psynergy/Fire_Puppet.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "Fireball",
-    "path": "/sprites/icons/psynergy/Fireball.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
@@ -4883,6 +4883,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "high impact",
+    "path": "/sprites/icons/psynergy/high_impact.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
     "name": "Hover",
     "path": "/sprites/icons/psynergy/Hover.gif",
     "category": "icons-psynergy",
@@ -4909,6 +4915,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Ice Missile",
     "path": "/sprites/icons/psynergy/Ice_Missile.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "impact",
+    "path": "/sprites/icons/psynergy/impact.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
@@ -5051,14 +5063,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Planet Diver",
-    "path": "/sprites/icons/psynergy/Planet_Diver.gif",
+    "name": "Planetary",
+    "path": "/sprites/icons/psynergy/Planetary.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
   {
-    "name": "Planetary",
-    "path": "/sprites/icons/psynergy/Planetary.gif",
+    "name": "Planet Diver",
+    "path": "/sprites/icons/psynergy/Planet_Diver.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
@@ -5185,6 +5197,42 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Ragnarok",
     "path": "/sprites/icons/psynergy/Ragnarok.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 1",
+    "path": "/sprites/icons/psynergy/range-1.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 11",
+    "path": "/sprites/icons/psynergy/range-11.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 3",
+    "path": "/sprites/icons/psynergy/range-3.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 5",
+    "path": "/sprites/icons/psynergy/range-5.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 7",
+    "path": "/sprites/icons/psynergy/range-7.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "range 9",
+    "path": "/sprites/icons/psynergy/range-9.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
@@ -5393,18 +5441,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "Thunder Card",
-    "path": "/sprites/icons/psynergy/Thunder_Card.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "Thunder Mine",
-    "path": "/sprites/icons/psynergy/Thunder_Mine.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
     "name": "Thunderbolt",
     "path": "/sprites/icons/psynergy/Thunderbolt.gif",
     "category": "icons-psynergy",
@@ -5419,6 +5455,18 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Thunderstorm",
     "path": "/sprites/icons/psynergy/Thunderstorm.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunder Card",
+    "path": "/sprites/icons/psynergy/Thunder_Card.gif",
+    "category": "icons-psynergy",
+    "subcategory": null
+  },
+  {
+    "name": "Thunder Mine",
+    "path": "/sprites/icons/psynergy/Thunder_Mine.gif",
     "category": "icons-psynergy",
     "subcategory": null
   },
@@ -5507,170 +5555,14 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "high impact",
-    "path": "/sprites/icons/psynergy/high_impact.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "impact",
-    "path": "/sprites/icons/psynergy/impact.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 1",
-    "path": "/sprites/icons/psynergy/range-1.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 11",
-    "path": "/sprites/icons/psynergy/range-11.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 3",
-    "path": "/sprites/icons/psynergy/range-3.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 5",
-    "path": "/sprites/icons/psynergy/range-5.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 7",
-    "path": "/sprites/icons/psynergy/range-7.gif",
-    "category": "icons-psynergy",
-    "subcategory": null
-  },
-  {
-    "name": "range 9",
-    "path": "/sprites/icons/psynergy/range-9.gif",
-    "category": "icons-psynergy",
+    "name": "agitated",
+    "path": "/sprites/icons/misc/agitated.gif",
+    "category": "icons-misc",
     "subcategory": null
   },
   {
     "name": "Angry",
     "path": "/sprites/icons/misc/Angry.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Down Arrow",
-    "path": "/sprites/icons/misc/Down_Arrow.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Exclamatory",
-    "path": "/sprites/icons/misc/Exclamatory.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Green Arrow",
-    "path": "/sprites/icons/misc/Green_Arrow.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Happy",
-    "path": "/sprites/icons/misc/Happy.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Haunted",
-    "path": "/sprites/icons/misc/Haunted.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Jupiter Star",
-    "path": "/sprites/icons/misc/Jupiter_Star.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Mars Star",
-    "path": "/sprites/icons/misc/Mars_Star.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Mercury Star",
-    "path": "/sprites/icons/misc/Mercury_Star.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Poison",
-    "path": "/sprites/icons/misc/Poison.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Psy Seal",
-    "path": "/sprites/icons/misc/Psy_Seal.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Psynergy Seal",
-    "path": "/sprites/icons/misc/Psynergy_Seal.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Silence",
-    "path": "/sprites/icons/misc/Silence.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Stat Down",
-    "path": "/sprites/icons/misc/Stat-Down.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Stat Up",
-    "path": "/sprites/icons/misc/Stat-Up.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Sweatdrop",
-    "path": "/sprites/icons/misc/Sweatdrop.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Up Arrow",
-    "path": "/sprites/icons/misc/Up_Arrow.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Update",
-    "path": "/sprites/icons/misc/Update.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "Venus Star",
-    "path": "/sprites/icons/misc/Venus_Star.gif",
-    "category": "icons-misc",
-    "subcategory": null
-  },
-  {
-    "name": "agitated",
-    "path": "/sprites/icons/misc/agitated.gif",
     "category": "icons-misc",
     "subcategory": null
   },
@@ -5705,8 +5597,38 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "Down Arrow",
+    "path": "/sprites/icons/misc/Down_Arrow.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Exclamatory",
+    "path": "/sprites/icons/misc/Exclamatory.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
     "name": "frown",
     "path": "/sprites/icons/misc/frown.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Green Arrow",
+    "path": "/sprites/icons/misc/Green_Arrow.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Happy",
+    "path": "/sprites/icons/misc/Happy.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Haunted",
+    "path": "/sprites/icons/misc/Haunted.gif",
     "category": "icons-misc",
     "subcategory": null
   },
@@ -5735,8 +5657,86 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "Jupiter Star",
+    "path": "/sprites/icons/misc/Jupiter_Star.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Mars Star",
+    "path": "/sprites/icons/misc/Mars_Star.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Mercury Star",
+    "path": "/sprites/icons/misc/Mercury_Star.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Poison",
+    "path": "/sprites/icons/misc/Poison.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Psynergy Seal",
+    "path": "/sprites/icons/misc/Psynergy_Seal.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Psy Seal",
+    "path": "/sprites/icons/misc/Psy_Seal.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
     "name": "resist up",
     "path": "/sprites/icons/misc/resist_up.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Silence",
+    "path": "/sprites/icons/misc/Silence.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Stat Down",
+    "path": "/sprites/icons/misc/Stat-Down.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Stat Up",
+    "path": "/sprites/icons/misc/Stat-Up.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Sweatdrop",
+    "path": "/sprites/icons/misc/Sweatdrop.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Update",
+    "path": "/sprites/icons/misc/Update.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Up Arrow",
+    "path": "/sprites/icons/misc/Up_Arrow.gif",
+    "category": "icons-misc",
+    "subcategory": null
+  },
+  {
+    "name": "Venus Star",
+    "path": "/sprites/icons/misc/Venus_Star.gif",
     "category": "icons-misc",
     "subcategory": null
   },
@@ -5927,6 +5927,30 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "lilypad1",
+    "path": "/sprites/scenery/plants/lilypad1.gif",
+    "category": "scenery-plants",
+    "subcategory": null
+  },
+  {
+    "name": "lilypad2",
+    "path": "/sprites/scenery/plants/lilypad2.gif",
+    "category": "scenery-plants",
+    "subcategory": null
+  },
+  {
+    "name": "lilypad3",
+    "path": "/sprites/scenery/plants/lilypad3.gif",
+    "category": "scenery-plants",
+    "subcategory": null
+  },
+  {
+    "name": "lilypad4",
+    "path": "/sprites/scenery/plants/lilypad4.gif",
+    "category": "scenery-plants",
+    "subcategory": null
+  },
+  {
     "name": "Palm",
     "path": "/sprites/scenery/plants/Palm.gif",
     "category": "scenery-plants",
@@ -5935,6 +5959,12 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Palm2",
     "path": "/sprites/scenery/plants/Palm2.gif",
+    "category": "scenery-plants",
+    "subcategory": null
+  },
+  {
+    "name": "palmtree",
+    "path": "/sprites/scenery/plants/palmtree.gif",
     "category": "scenery-plants",
     "subcategory": null
   },
@@ -6107,36 +6137,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
-    "name": "lilypad1",
-    "path": "/sprites/scenery/plants/lilypad1.gif",
-    "category": "scenery-plants",
-    "subcategory": null
-  },
-  {
-    "name": "lilypad2",
-    "path": "/sprites/scenery/plants/lilypad2.gif",
-    "category": "scenery-plants",
-    "subcategory": null
-  },
-  {
-    "name": "lilypad3",
-    "path": "/sprites/scenery/plants/lilypad3.gif",
-    "category": "scenery-plants",
-    "subcategory": null
-  },
-  {
-    "name": "lilypad4",
-    "path": "/sprites/scenery/plants/lilypad4.gif",
-    "category": "scenery-plants",
-    "subcategory": null
-  },
-  {
-    "name": "palmtree",
-    "path": "/sprites/scenery/plants/palmtree.gif",
-    "category": "scenery-plants",
-    "subcategory": null
-  },
-  {
     "name": "Alhafra Statue",
     "path": "/sprites/scenery/statues/Alhafra_Statue.gif",
     "category": "scenery-statues",
@@ -6145,6 +6145,18 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Bilibin Statue",
     "path": "/sprites/scenery/statues/Bilibin_Statue.gif",
+    "category": "scenery-statues",
+    "subcategory": null
+  },
+  {
+    "name": "crystal statue",
+    "path": "/sprites/scenery/statues/crystal_statue.gif",
+    "category": "scenery-statues",
+    "subcategory": null
+  },
+  {
+    "name": "desert statue",
+    "path": "/sprites/scenery/statues/desert_statue.gif",
     "category": "scenery-statues",
     "subcategory": null
   },
@@ -6233,6 +6245,18 @@ export const SPRITE_LIST: SpriteEntry[] = [
     "subcategory": null
   },
   {
+    "name": "statue",
+    "path": "/sprites/scenery/statues/statue.gif",
+    "category": "scenery-statues",
+    "subcategory": null
+  },
+  {
+    "name": "stone face",
+    "path": "/sprites/scenery/statues/stone_face.gif",
+    "category": "scenery-statues",
+    "subcategory": null
+  },
+  {
     "name": "Venus Aerie Statue",
     "path": "/sprites/scenery/statues/Venus_Aerie_Statue.gif",
     "category": "scenery-statues",
@@ -6271,30 +6295,6 @@ export const SPRITE_LIST: SpriteEntry[] = [
   {
     "name": "Venus Statue Yellow",
     "path": "/sprites/scenery/statues/Venus_Statue_Yellow.gif",
-    "category": "scenery-statues",
-    "subcategory": null
-  },
-  {
-    "name": "crystal statue",
-    "path": "/sprites/scenery/statues/crystal_statue.gif",
-    "category": "scenery-statues",
-    "subcategory": null
-  },
-  {
-    "name": "desert statue",
-    "path": "/sprites/scenery/statues/desert_statue.gif",
-    "category": "scenery-statues",
-    "subcategory": null
-  },
-  {
-    "name": "statue",
-    "path": "/sprites/scenery/statues/statue.gif",
-    "category": "scenery-statues",
-    "subcategory": null
-  },
-  {
-    "name": "stone face",
-    "path": "/sprites/scenery/statues/stone_face.gif",
     "category": "scenery-statues",
     "subcategory": null
   }

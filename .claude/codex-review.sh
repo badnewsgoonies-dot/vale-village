@@ -65,7 +65,7 @@ $DIFF
 Be concise. Focus on actual issues. Say 'LGTM - changes look good' if no issues found."
 
   # Run codex in headless mode with full context
-  echo "$REVIEW_PROMPT" | codex exec --full-auto
+  echo "$REVIEW_PROMPT" | codex exec --full-auto -m gpt-5.1-codex-max -c reasoning.effort=xhigh
 
 else
   # Fallback: show what would be reviewed

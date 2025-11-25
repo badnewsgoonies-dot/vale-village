@@ -5,6 +5,8 @@
 
 import type { Unit } from '@/core/models/Unit';
 import { MAX_PARTY_SIZE } from '@/core/constants';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPortraitSprite } from '../sprites/mappings';
 
 interface TeamBenchSectionProps {
   activeParty: readonly (Unit | null)[];
@@ -53,6 +55,14 @@ export function TeamBenchSection({
             >
               {unit ? (
                 <>
+                  <div className="unit-portrait">
+                    <SimpleSprite
+                      id={getPortraitSprite(unit.id)}
+                      width={56}
+                      height={56}
+                      alt={`${unit.name} portrait`}
+                    />
+                  </div>
                   <div className="unit-name">{unit.name}</div>
                   <div className="unit-level">Lv. {unit.level}</div>
                   <div className="unit-element">{unit.element}</div>
@@ -79,6 +89,14 @@ export function TeamBenchSection({
                 className="bench-unit-compact"
                 onClick={() => handleBenchUnitClick(unit.id)}
               >
+                <div className="bench-portrait">
+                  <SimpleSprite
+                    id={getPortraitSprite(unit.id)}
+                    width={44}
+                    height={44}
+                    alt={`${unit.name} portrait`}
+                  />
+                </div>
                 <div className="bench-unit-info">
                   <div className="unit-name">{unit.name}</div>
                   <div className="unit-level">Lv. {unit.level}</div>

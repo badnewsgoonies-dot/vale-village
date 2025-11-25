@@ -55,7 +55,8 @@ export function ShopScreen({ shopId, onClose }: ShopScreenProps) {
   const availableItems = isUnlocked
     ? (shop.availableItems
         .map((id) => EQUIPMENT[id])
-        .filter((item): item is Equipment => Boolean(item) && isAvailableInCampaign(item)))
+        .filter((item): item is Equipment => Boolean(item))
+        .filter(isAvailableInCampaign))
     : [];
 
   const handleUnlock = (itemId: string) => {

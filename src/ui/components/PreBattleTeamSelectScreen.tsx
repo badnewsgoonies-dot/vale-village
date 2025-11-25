@@ -262,8 +262,45 @@ export function PreBattleTeamSelectScreen({
                 onUnequip={handleUnequipItem}
               />
             )}
+          </div>
 
-            {/* Djinn Section */}
+          {/* Right Column */}
+          <div className="right-column">
+            <div className="section-card summary-card">
+              <div className="summary-header">
+                <div>
+                  <div className="summary-title">{encounter.name}</div>
+                  <div className="summary-subtitle">
+                    Difficulty: <span className="pill difficulty-pill">{encounter.difficulty ?? 'normal'}</span>
+                  </div>
+                </div>
+                <div className="pill encounter-pill">House</div>
+              </div>
+              <div className="summary-rewards">
+                <div className="reward-chip">
+                  <span>XP</span>
+                  <strong>{encounter.reward.xp}</strong>
+                </div>
+                <div className="reward-chip">
+                  <span>Gold</span>
+                  <strong>{encounter.reward.gold}</strong>
+                </div>
+                {encounter.reward.djinn && (
+                  <div className="reward-chip">
+                    <span>Djinn</span>
+                    <strong>{encounter.reward.djinn}</strong>
+                  </div>
+                )}
+                {encounter.reward.unlockUnit && (
+                  <div className="reward-chip">
+                    <span>Recruit</span>
+                    <strong>{encounter.reward.unlockUnit}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Djinn + Granted Abilities on the right */}
             {selectedUnit && (
               <DjinnSection
                 unit={selectedUnit}
@@ -275,12 +312,13 @@ export function PreBattleTeamSelectScreen({
                 onUnequipDjinn={handleUnequipDjinn}
               />
             )}
-          </div>
 
-          {/* Right Column */}
-          <div className="right-column">
-            {/* Enemies Portal Tile */}
-            <EnemyPortalTile encounterId={encounterId} />
+            <div className="section-card enemies-card">
+              <div className="section-title">ENEMIES</div>
+              <div className="enemy-portal-wrap">
+                <EnemyPortalTile encounterId={encounterId} />
+              </div>
+            </div>
           </div>
         </div>
 

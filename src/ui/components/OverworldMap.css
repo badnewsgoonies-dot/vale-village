@@ -22,7 +22,7 @@
 .tile {
   width: 32px;
   height: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   background-size: cover;
   display: inline-flex;
   justify-content: center;
@@ -31,11 +31,15 @@
 }
 
 .tile-grass {
-  background-color: #4c8a47;
+  background: linear-gradient(135deg, #3f6e3b 0%, #4f8c47 100%);
 }
 
 .tile-path {
-  background-color: #c1a362;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    #c1a362;
+  background-size: 8px 8px, 8px 8px, cover;
 }
 
 .tile-water {
@@ -47,7 +51,7 @@
 }
 
 .tile-door {
-  background-color: #b5854c;
+  background: linear-gradient(180deg, #b07a3a 0%, #7a4f22 100%);
 }
 
 .tile-npc {
@@ -57,4 +61,10 @@
 /* Trigger tiles no longer have visual indicators - discovery through exploration */
 .tile-trigger {
   /* No special styling - triggers are invisible */
+}
+
+/* House facade/door textures via spriteId data attribute */
+/* Keep door tiles subtle when using native sprites */
+.tile[data-sprite="house-door"] {
+  border-color: rgba(255, 255, 255, 0.08);
 }

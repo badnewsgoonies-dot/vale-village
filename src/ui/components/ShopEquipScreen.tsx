@@ -60,7 +60,8 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const availableItems = shop && isShopUnlocked
     ? (shop.availableItems
         .map((id) => EQUIPMENT[id])
-        .filter((item): item is Equipment => Boolean(item) && isAvailableInCampaign(item)))
+        .filter((item): item is Equipment => Boolean(item))
+        .filter(isAvailableInCampaign))
     : [];
 
   const starterKitEntries = team

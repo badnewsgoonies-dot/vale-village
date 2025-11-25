@@ -32,7 +32,6 @@ export const PORTRAIT_MAP: Record<string, string> = {
   'mystic': 'mia',
   'ranger': 'ivan',
   'blaze': 'garet1',         // Mars - uses Garet portrait
-  'felix': 'felix1',          // Venus - has portrait
   'karis': 'ivan',            // Jupiter - uses Ivan portrait (Karis not available)
   'sentinel': 'felix1',       // Venus - uses Felix portrait
   'stormcaller': 'jenna1',    // Jupiter - has portrait

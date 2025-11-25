@@ -8,6 +8,7 @@ import type { Unit } from '@/core/models/Unit';
 import type { EquipmentSlot, Equipment, EquipmentLoadout } from '@/core/models/Equipment';
 import { calculateEquipmentBonuses } from '@/core/models/Equipment';
 import { calculateLevelBonuses } from '@/core/algorithms/stats';
+import { EquipmentIcon } from './EquipmentIcon';
 
 interface EquipmentSectionProps {
   unit: Unit;
@@ -82,7 +83,10 @@ export function EquipmentSection({
                 <div className="equipment-label">{slot.toUpperCase()}</div>
                 {eq ? (
                   <>
-                    <div className="equipment-value">{eq.name}</div>
+                    <div className="equipment-slot-row">
+                      <EquipmentIcon equipment={eq} size="medium" className="equipment-slot-icon" />
+                      <div className="equipment-value">{eq.name}</div>
+                    </div>
                     {eq.statBonus.atk && (
                       <div className="equipment-bonus">+{eq.statBonus.atk} ATK</div>
                     )}
@@ -163,23 +167,26 @@ export function EquipmentSection({
           ))}
         </div>
         <div className="compendium-content">
-          {availableEquipment.length === 0 ? (
-            <div className="item-name" style={{ color: '#666', textAlign: 'center', padding: '1rem' }}>
-              No {activeTab} available
-            </div>
-          ) : (
-            availableEquipment.map((item) => (
-              <div
-                key={item.id}
-                className="compendium-item"
-                onClick={() => handleEquip(item)}
-              >
-                <div className="item-name">{item.name}</div>
-                <div className="item-stats">
-                  {item.statBonus.atk && `+${item.statBonus.atk} ATK `}
-                  {item.statBonus.def && `+${item.statBonus.def} DEF `}
-                  {item.statBonus.spd && `+${item.statBonus.spd} SPD `}
-                  {item.unlocksAbility && `Unlocks: ${item.unlocksAbility}`}
+                {availableEquipment.length === 0 ? (
+                  <div className="item-name" style={{ color: '#666', textAlign: 'center', padding: '1rem' }}>
+                    No {activeTab} available
+                  </div>
+                ) : (
+                  availableEquipment.map((item) => (
+                    <div
+                      key={item.id}
+                      className="compendium-item"
+                      onClick={() => handleEquip(item)}
+                    >
+                      <div className="compendium-item-header">
+                        <EquipmentIcon equipment={item} size="small" className="item-icon" />
+                        <div className="item-name">{item.name}</div>
+                      </div>
+                      <div className="item-stats">
+                        {item.statBonus.atk && `+${item.statBonus.atk} ATK `}
+                        {item.statBonus.def && `+${item.statBonus.def} DEF `}
+                        {item.statBonus.spd && `+${item.statBonus.spd} SPD `}
+                        {item.unlocksAbility && `Unlocks: ${item.unlocksAbility}`}
                 </div>
               </div>
             ))

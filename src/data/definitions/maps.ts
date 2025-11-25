@@ -24,8 +24,16 @@ const HOUSE_POSITIONS = HOUSE_IDS.map((houseNum, index) => ({
   overworldX: 7 + index * 4,
 }));
 
+const HOUSE_SPRITES = [
+  '/sprites/buildings/Vale/Vale_Building1.gif',
+  '/sprites/buildings/Vale/Vale_Building2.gif',
+  '/sprites/buildings/Vale/Vale_Building3.gif',
+  '/sprites/buildings/Vale/Vale_Building4.gif',
+];
+
 // Overworld house entrances sit one tile above the road row
 const HOUSE_ENTRANCE_ROW = ROAD_ROW - 1;
+const HOUSE_FACE_ROW = HOUSE_ENTRANCE_ROW - 1;
 
 // Precompute doorway columns for houses
 const HOUSE_DOOR_COLUMNS = new Set(HOUSE_POSITIONS.map(({ overworldX }) => overworldX));
@@ -40,7 +48,20 @@ const buildValeVillageTiles = (): GameMap['tiles'] => {
         row.push(createTile('path'));
       } else if (y === HOUSE_ENTRANCE_ROW && HOUSE_DOOR_COLUMNS.has(x)) {
         // Walkable doorway tiles for houses, one row above the road
-        row.push(createTile('door'));
+        row.push({ ...createTile('door'), spriteId: 'house-door' });
+      } else if (y === HOUSE_FACE_ROW && HOUSE_DOOR_COLUMNS.has(x)) {
+        // Simple house facade visuals above each doorway
+        const houseIndex = HOUSE_POSITIONS.findIndex((pos) => pos.overworldX === x);
+        const spriteId = HOUSE_SPRITES[houseIndex % HOUSE_SPRITES.length];
+        row.push({ ...createTile('wall', false), spriteId });
+      } else if (y === HOUSE_FACE_ROW && HOUSE_DOOR_COLUMNS.has(x - 1)) {
+        const houseIndex = HOUSE_POSITIONS.findIndex((pos) => pos.overworldX === x - 1);
+        const spriteId = HOUSE_SPRITES[houseIndex % HOUSE_SPRITES.length];
+        row.push({ ...createTile('wall', false), spriteId });
+      } else if (y === HOUSE_FACE_ROW && HOUSE_DOOR_COLUMNS.has(x + 1)) {
+        const houseIndex = HOUSE_POSITIONS.findIndex((pos) => pos.overworldX === x + 1);
+        const spriteId = HOUSE_SPRITES[houseIndex % HOUSE_SPRITES.length];
+        row.push({ ...createTile('wall', false), spriteId });
       } else {
         // Non-walkable background (prevents wandering off the road/door tiles)
         row.push(createTile('grass', false));
@@ -79,24 +100,6 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
   return [
     ...houseTriggers,
     {
-      id: 'npc-elder',
-      type: 'npc' as const,
-      position: { x: 3, y: ROAD_ROW },
-      data: { npcId: 'elder-vale' },
-    },
-    {
-      id: 'shop-vale-armory',
-      type: 'shop' as const,
-      position: { x: 1, y: ROAD_ROW },
-      data: { shopId: 'vale-armory' },
-    },
-    {
-      id: 'shop-weapons',
-      type: 'transition' as const,
-      position: { x: 2, y: ROAD_ROW },
-      data: { targetMap: 'weapon-shop-interior', targetPos: { x: HOUSE_CENTER_X, y: HOUSE_EXIT_Y } },
-    },
-    {
       id: 'tower-entrance',
       type: 'tower' as const,
       position: { x: TOWER_ENTRANCE_COLUMN, y: ROAD_ROW },
@@ -104,12 +107,6 @@ const buildValeVillageTriggers = (): GameMap['triggers'] => {
         sourceMapId: 'vale-village',
         returnPos: { x: TOWER_ENTRANCE_COLUMN, y: ROAD_ROW },
       },
-    },
-    {
-      id: 'vale-training-battle',
-      type: 'battle' as const,
-      position: { x: 6, y: ROAD_ROW },
-      data: { encounterId: 'training-dummy' },
     },
   ];
 };
@@ -176,23 +173,6 @@ export const MAPS: Record<string, GameMap> = {
     npcs: buildValeVillageNPCs(),
     triggers: buildValeVillageTriggers(),
     spawnPoint: { x: 7, y: ROAD_ROW },
-  },
-  'weapon-shop-interior': {
-    id: 'weapon-shop-interior',
-    name: 'Weapon Shop',
-    width: 10,
-    height: 8,
-    tiles: Array.from({ length: 8 }, () => Array.from({ length: 10 }, () => createTile('path'))),
-    npcs: [createNPC('shopkeeper-weapons', 5, 3)],
-    triggers: [
-      {
-        id: 'exit-shop',
-        type: 'transition',
-        position: { x: 5, y: 7 },
-        data: { targetMap: 'vale-village', targetPos: { x: 2, y: ROAD_ROW } },
-      },
-    ],
-    spawnPoint: { x: 5, y: 7 },
   },
   ...HOUSE_MAPS,
 };

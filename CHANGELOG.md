@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Campaign: Every house now drops unique equipment (fixed drops added for houses 1, 5, 8, 10, 12, and 18).
+
 ### Changed - Repository Structure Migration (2025-01-XX)
 
 #### Monorepo to Single Repository Migration

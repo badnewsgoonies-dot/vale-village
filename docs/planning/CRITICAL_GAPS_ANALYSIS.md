@@ -9,68 +9,15 @@
 
 ### 1. Equipment Rewards: Missing 4 Unique Items
 
-**Current State:**
-- **Houses with equipment:** 13/20 (65%)
-- **Houses with NO equipment:** 7/20 (35%)
-  - House 1: None (Djinn only)
-  - House 5: None (recruit only)
-  - House 8: None (Djinn + recruit)
-  - House 10: None (progression house)
-  - House 12: None (Djinn only)
-  - House 18: None (Djinn only)
-  - Training Dummy: None (expected)
+**Resolved:** All houses now drop unique equipment (no `none` rewards). Training Dummy remains gearless (expected).
 
-**Required:** 20 unique items (one per house)
-
-**Current Equipment Distribution:**
-```
-Fixed Items (9):
-- H2: bronze-sword
-- H3: iron-armor
-- H4: magic-rod
-- H6: steel-helm
-- H9: battle-axe
-- H11: silver-armor
-- H14: hyper-boots
-- H16: mythril-blade
-- H17: dragon-scales
-
-Choice Items (5 houses):
-- H7: steel-sword, battle-axe, crystal-rod (3 options)
-- H13: silver-blade, great-axe, zodiac-wand (3 options)
-- H15: tempest-spear, mythril-armor, elemental-star (3 options)
-- H19: gaia-blade, titans-axe, staff-of-ages (3 options)
-- H20: sol-blade, titans-axe, staff-of-ages, cosmos-shield (4 options)
-```
-
-**Missing Items Needed:**
-- House 1: Need 1 item (starter weapon/armor)
-- House 5: Need 1 item (mid-tier equipment)
-- House 8: Need 1 item (mid-tier equipment)
-- House 10: Need 1 item (mid-tier equipment)
-- House 12: Need 1 item (high-tier equipment)
-- House 18: Need 1 item (legendary equipment)
-
-**Recommendations:**
-```typescript
-// House 1: Starter equipment (Isaac's first upgrade)
-equipment: { type: 'fixed', itemId: 'wooden-sword' } // or 'leather-vest'
-
-// House 5: Mid-tier weapon/armor
-equipment: { type: 'fixed', itemId: 'iron-sword' } // or 'bronze-armor'
-
-// House 8: Mid-tier equipment
-equipment: { type: 'fixed', itemId: 'steel-armor' } // or 'iron-helm'
-
-// House 10: Mid-tier equipment
-equipment: { type: 'fixed', itemId: 'silver-circlet' } // or 'steel-greaves'
-
-// House 12: High-tier equipment (T2 Djinn milestone)
-equipment: { type: 'fixed', itemId: 'mythril-crown' } // or 'valkyrie-mail'
-
-// House 18: Legendary equipment (T3 Djinn milestone)
-equipment: { type: 'fixed', itemId: 'oracles-crown' } // or 'glory-helm'
-```
+**New Fixed Drops Added:**
+- House 1: leather-cap
+- House 5: iron-sword
+- House 8: steel-armor
+- House 10: silver-circlet
+- House 12: valkyrie-mail
+- House 18: oracles-crown
 
 **Action Items:**
 1. ✅ Add equipment rewards to houses 1, 5, 8, 10, 12, 18
