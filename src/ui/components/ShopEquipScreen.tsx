@@ -58,9 +58,10 @@ export function ShopEquipScreen({ shopId, onClose }: ShopEquipScreenProps) {
   const shop = shopId ? SHOPS[shopId] : null;
   const isShopUnlocked = !shop || !shop.unlockCondition || shop.unlockCondition(storyFlags as Record<string, boolean>);
   const availableItems = shop && isShopUnlocked
-    ? (shop.availableItems
+    ? shop.availableItems
         .map((id) => EQUIPMENT[id])
-        .filter((item): item is Equipment => Boolean(item) && isAvailableInCampaign(item)))
+        .filter((item): item is Equipment => Boolean(item))
+        .filter((item) => isAvailableInCampaign(item))
     : [];
 
   const starterKitEntries = team

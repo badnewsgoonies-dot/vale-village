@@ -70,6 +70,7 @@ const ENEMY_SPRITES: Record<string, SpriteStateMap> = {
   'enemy-1': makeSinglePose('/sprites/battle/enemies/Goblin.gif'),
   'enemy-2': makeSinglePose('/sprites/battle/enemies/Alec_Goblin.gif'),
   'garet-enemy': makeSinglePose('/sprites/battle/enemies/Brigand.gif'),
+  'war-mage': makeSinglePose('/sprites/battle/enemies/Brigand.gif'),
 
   // Houses 2-5 (Act 1 focus)
   'earth-scout': makeSinglePose('/sprites/battle/enemies/Goblin.gif'),
@@ -117,4 +118,3 @@ export function getEnemyBattleSprite(enemyId: string, state: BattleSpriteState):
  */
 export const KNOWN_PLAYER_BATTLE_UNITS = Object.keys(PLAYER_SPRITES);
 export const KNOWN_ENEMY_BATTLE_UNITS = Object.keys(ENEMY_SPRITES);
-

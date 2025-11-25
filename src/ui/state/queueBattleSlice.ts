@@ -36,8 +36,27 @@ export interface QueueBattleSlice {
   battle: BattleState | null;
   events: BattleEvent[];
   rngSeed: number;
+  activePortraitIndex: number | null;
+  isActionMenuOpen: boolean;
+  isSummonScreenOpen: boolean;
+  tutorialMessage: string | null;
+  currentMana: number;
+  maxMana: number;
+  pendingManaThisRound: number;
+  pendingManaNextRound: number;
+  critCounters: Record<string, number>;
+  critThresholds: Record<string, number>;
+  critFlash: Record<string, boolean>;
 
   setBattle: (battle: BattleState | null, seed: number) => void;
+  setActivePortrait: (index: number | null) => void;
+  setActionMenuOpen: (open: boolean) => void;
+  setSummonScreenOpen: (open: boolean) => void;
+  showTutorialMessage: (message: string | null) => void;
+  updateManaState: (current: number, pending: number, pendingNext: number) => void;
+  incrementCritCounter: (unitId: string) => void;
+  resetCritCounter: (unitId: string) => void;
+  triggerCritFlash: (unitId: string) => void;
   queueUnitAction: (
     unitIndex: number,
     abilityId: string | null,
@@ -60,9 +79,87 @@ export const createQueueBattleSlice: StateCreator<
   battle: null,
   events: [],
   rngSeed: 1337,
+  activePortraitIndex: null,
+  isActionMenuOpen: true,
+  isSummonScreenOpen: false,
+  tutorialMessage: null,
+  currentMana: 0,
+  maxMana: 0,
+  pendingManaThisRound: 0,
+  pendingManaNextRound: 0,
+  critCounters: {},
+  critThresholds: {},
+  critFlash: {},
 
   setBattle: (battle, seed) => {
-    set({ battle, rngSeed: seed, events: [] });
+    const critThresholds: Record<string, number> = {};
+    const critCounters: Record<string, number> = {};
+    if (battle) {
+      battle.playerTeam.units.forEach((unit) => {
+        critThresholds[unit.id] = critThresholds[unit.id] ?? 10;
+        critCounters[unit.id] = 0;
+      });
+    }
+
+    set({
+      battle,
+      rngSeed: seed,
+      events: [],
+      activePortraitIndex: null, // allow speed-based auto-selection in view
+      currentMana: battle?.remainingMana ?? 0,
+      maxMana: battle?.maxMana ?? 0,
+      pendingManaThisRound: 0,
+      pendingManaNextRound: 0,
+      critCounters,
+      critThresholds,
+      critFlash: {},
+    });
+  },
+
+  setActivePortrait: (index) => {
+    set({ activePortraitIndex: index });
+  },
+
+  setActionMenuOpen: (open) => set({ isActionMenuOpen: open }),
+  setSummonScreenOpen: (open) => set({ isSummonScreenOpen: open }),
+  showTutorialMessage: (message) => set({ tutorialMessage: message }),
+
+  updateManaState: (current, pending, pendingNext) => {
+    set({
+      currentMana: current,
+      pendingManaThisRound: pending,
+      pendingManaNextRound: pendingNext,
+    });
+  },
+
+  incrementCritCounter: (unitId) => {
+    set((state) => ({
+      critCounters: {
+        ...state.critCounters,
+        [unitId]: (state.critCounters[unitId] ?? 0) + 1,
+      },
+    }));
+  },
+
+  resetCritCounter: (unitId) => {
+    set((state) => ({
+      critCounters: {
+        ...state.critCounters,
+        [unitId]: 0,
+      },
+    }));
+  },
+
+  triggerCritFlash: (unitId) => {
+    set((state) => ({
+      critFlash: { ...state.critFlash, [unitId]: true },
+    }));
+    setTimeout(() => {
+      set((state) => {
+        const { [unitId]: _, ...rest } = state.critFlash;
+        return { critFlash: rest };
+      });
+    }, 200);
   },
 
   queueUnitAction: (unitIndex, abilityId, targetIds, ability) => {
@@ -87,7 +184,16 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    set({ battle: result.value });
+    const pendingThisRound = result.value.queuedActions.filter((a) => a?.abilityId === null).length;
+
+    set({
+      battle: result.value,
+      currentMana: result.value.remainingMana,
+      maxMana: result.value.maxMana,
+      pendingManaThisRound: pendingThisRound,
+      // Next-round pending will be set when we differentiate generators; default 0 for now.
+      pendingManaNextRound: 0,
+    });
   },
 
   clearUnitAction: (unitIndex) => {
@@ -102,7 +208,15 @@ export const createQueueBattleSlice: StateCreator<
       return;
     }
 
-    set({ battle: result.value });
+    const pendingThisRound = result.value.queuedActions.filter((a) => a?.abilityId === null).length;
+
+    set({
+      battle: result.value,
+      currentMana: result.value.remainingMana,
+      maxMana: result.value.maxMana,
+      pendingManaThisRound: pendingThisRound,
+      pendingManaNextRound: 0,
+    });
   },
 
   queueDjinnActivation: (djinnId) => {
@@ -146,7 +260,16 @@ export const createQueueBattleSlice: StateCreator<
     const previousEvents = get().events;
     const battleEvents = [...previousEvents, ...result.events];
 
-    set({ battle: result.state, events: battleEvents });
+    const pendingThisRound = result.state.queuedActions.filter((a) => a?.abilityId === null).length;
+
+    set({
+      battle: result.state,
+      events: battleEvents,
+      currentMana: result.state.remainingMana,
+      maxMana: result.state.maxMana,
+      pendingManaThisRound: pendingThisRound,
+      pendingManaNextRound: 0,
+    });
 
     const encounterId = getEncounterId(result.state);
     const towerEncounterId = get().activeTowerEncounterId;

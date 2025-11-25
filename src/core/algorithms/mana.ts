@@ -3,10 +3,8 @@
  * PR-MANA-QUEUE: Team-wide mana pool management
  */
 
-import type { Team } from '../models/Team';
 import type { QueuedAction } from '../models/BattleState';
 import type { Ability } from '../../data/schemas/AbilitySchema';
-import { calculateTeamManaPool } from '../models/BattleState';
 
 /**
  * Check if action can be afforded with remaining mana

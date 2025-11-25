@@ -182,10 +182,10 @@ export function TowerHubScreen() {
                 ? `Encounter: ${currentFloor.encounterId}`
                 : 'There are no more encounters defined for this build.'}
             </p>
-            <div className="tower-actions">
+              <div className="tower-actions">
               <button
                 className="primary"
-                disabled={!currentFloor || currentFloor.type === 'rest'}
+                disabled={!currentFloor || isRestFloor}
                 onClick={beginTowerFloorBattle}
               >
                 Begin Battle

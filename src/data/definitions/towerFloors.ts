@@ -21,6 +21,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     type: 'normal',
     encounterId: 'house-02',
     difficultyTier: 1,
+    tags: [],
   },
   {
     id: 'tower-floor-003',
@@ -28,12 +29,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
     type: 'normal',
     encounterId: 'house-03',
     difficultyTier: 1,
+    tags: [],
   },
   {
     id: 'tower-floor-004',
     floorNumber: 4,
     type: 'rest',
     difficultyTier: 1,
+    tags: [],
     rest: {
       allowLoadoutChange: true,
     },
@@ -44,6 +47,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     type: 'normal',
     encounterId: 'house-04',
     difficultyTier: 2,
+    tags: [],
   },
   {
     id: 'tower-floor-006',
@@ -59,12 +63,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
     type: 'normal',
     encounterId: 'house-06',
     difficultyTier: 2,
+    tags: [],
   },
   {
     id: 'tower-floor-008',
     floorNumber: 8,
     type: 'rest',
     difficultyTier: 2,
+    tags: [],
     rest: {
       allowLoadoutChange: true,
     },
@@ -75,6 +81,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     type: 'normal',
     encounterId: 'house-07',
     difficultyTier: 3,
+    tags: [],
   },
   {
     id: 'tower-floor-010',
@@ -85,4 +92,3 @@ export const TOWER_FLOORS: TowerFloor[] = [
     tags: ['sentinel', 'djinn'],
   },
 ] as const;
-

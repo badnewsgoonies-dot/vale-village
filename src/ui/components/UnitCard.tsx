@@ -10,6 +10,7 @@ import type { Team } from '../../core/models/Team';
 import { calculateMaxHp } from '../../core/models/Unit';
 import { calculateEffectiveStats } from '../../core/algorithms/stats';
 import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPlayerBattleSprite, getEnemyBattleSprite } from '../sprites/mappings/battleSprites';
 
 interface UnitCardProps {
   unit: Unit;
@@ -44,6 +45,11 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
     return unit.baseStats;
   }, [unit, team]);
 
+  const spritePath = isPlayer
+    ? getPlayerBattleSprite(unit.id, 'idle')
+    : getEnemyBattleSprite(unit.id, 'idle');
+  const spriteId = spritePath ?? '/sprites/battle/enemies/Goblin.gif';
+
   return (
     <div
       className={`unit-card ${isPlayer ? 'player' : 'enemy'}`}
@@ -60,10 +66,7 @@ export function UnitCard({ unit, isPlayer, team, hideHp = false }: UnitCardProps
       {/* Unit Sprite */}
       <div style={{ flexShrink: 0 }}>
         <SimpleSprite 
-          id={isPlayer 
-            ? `${unit.id.toLowerCase()}-lblade-front`  // Try to find Isaac lBlade Front, etc.
-            : unit.id.toLowerCase()  // Enemy sprite ID
-          }
+          id={spriteId}
           width={64}
           height={64}
           style={{

@@ -53,6 +53,41 @@ This document specifies the complete bottom UI layout for the queue-based battle
   - HP bar
   - Status indicator (✓ when action queued)
 
+**Mechanical Display Elements:**
+
+1. **Crit Counter Badge**
+   - Position: Top-right corner of portrait
+   - Format: `⚡7/10` (current hits / threshold)
+   - Updates on each hit dealt by this unit
+   - Visual: Small text with lightning icon
+   - On crit trigger:
+     - Portrait border flashes yellow (~200ms)
+     - Counter resets to 0
+     - Optional: Brief "CRITICAL!" text overlay
+
+2. **Status Effect Icons**
+   - Position: Below crit counter or above HP bar
+   - Max visible: 2-3 icons
+   - Each icon shows:
+     - Status sprite (from `icons/misc/`)
+     - Turn counter as small number (e.g., `🔥2` = Burn for 2 turns)
+   - Available statuses:
+     - 🔥 Burn (DoT)
+     - ⛔ Paralyze (skip actions)
+     - 🛡↓ Guard Break (defense down)
+     - 🌀↑/↓ Haste/Slow (speed modifier)
+     - 🎯 Focus (buff: +crit dmg or -mana cost)
+
+3. **HP Bar**
+   - Position: Bottom of portrait card
+   - Visual: Gradient fill bar
+   - Format: Filled portion shows current HP relative to max
+
+4. **Queued Action Indicator**
+   - Position: Bottom-right corner
+   - Visual: ✓ checkmark when action queued
+   - Appears after player confirms action for this unit
+
 **Behavior:**
 - Active portrait triggers action menu popup above it
 - After action queued, next portrait becomes active
@@ -77,10 +112,32 @@ This document specifies the complete bottom UI layout for the queue-based battle
 
 **Button Behaviors:**
 
-1. **⚔️ ATTACK**
+1. **⚔️ ATTACK (with auto-attack metadata)**
    - Opens target selection
    - Select enemy → Confirm → Queue action
-   - Costs 0 mana, generates +1 mana during execution
+   - Display format varies by unit/weapon:
+
+     **Same-turn mana (standard):**
+     ```
+     ⚔️ ATTACK
+       +1 mana (this round)
+     ```
+
+     **Next-turn mana (battery units):**
+     ```
+     ⚔️ ATTACK
+       +1 mana (next round)
+     ```
+
+     **Multi-hit weapons:**
+     ```
+     ⚔️ ATTACK (Double Hit)
+       +2 mana (this round)
+     ```
+
+   - Auto-attack type is determined by:
+     - Unit's base auto-attack type (same-turn vs next-turn)
+     - Equipped weapon modifiers (single/double/triple hit)
 
 2. **ABILITIES →**
    - Expands to show unit's learned psynergy
@@ -94,6 +151,32 @@ This document specifies the complete bottom UI layout for the queue-based battle
    - Same icon grid format as abilities
    - Different from Djinn summons (separate system)
 
+**Ability Card Format:**
+
+Each ability in the grid displays:
+
+```
+┌─────────────────────┐
+│ [🔥] Fireball   4MP │  ⚡ (if can crit)
+│ 40 DMG, Burns 2T    │
+└─────────────────────┘
+```
+
+**Elements:**
+1. **Icon** - Ability visual (from sprite assets or placeholder)
+2. **Name** - Ability name (truncate if needed)
+3. **Mana Cost** - e.g., `4MP`
+4. **Crit Indicator** - `⚡` symbol if this ability can crit (decision: physical abilities only, or all?)
+5. **Effect Description** - Always deterministic, never "chance to":
+   - ✓ "Burns 2T" (burns for 2 turns, guaranteed)
+   - ✓ "Paralyze 1T" (paralyzes for 1 turn, guaranteed)
+   - ✗ "50% chance to burn" (NO - random mechanics removed)
+
+**Grid Layout:**
+- 3 columns
+- Keyboard navigable (arrow keys)
+- Selected ability shows expanded details below or adjacent
+
 **Expansion Behavior:**
 - When ability/djinn menu expands, replaces the 3 buttons
 - Shows icon grid + selected ability details
@@ -105,15 +188,40 @@ This document specifies the complete bottom UI layout for the queue-based battle
 
 **Position:** Directly above the action menu, centered
 
-**Display:**
-- Horizontal row of circles (filled/empty)
-- Text label: "Mana: 6/12"
-- Visual preview: +1 ghosted circle when auto-attack queued
+**Display Format:**
+```
+[●●●◍◍○○○]   ⤼ 1
+```
+
+**Visual Legend:**
+- **● (solid fill)** = Currently available mana (usable now)
+- **◍ (semi-transparent)** = Pending mana from same-turn auto-attacks (will be available when those attacks execute this round)
+- **○ (hollow/empty)** = Empty capacity
+- **⤼ N** = Total mana pending for next round from next-turn auto-attacks (only shown if N > 0)
+
+**Rendering Rules:**
+- Always show exactly `maxMana` circles
+- Fill from left to right:
+  1. First `currentMana` circles → solid
+  2. Next `pendingThisRound` circles → semi-transparent
+  3. Remaining → hollow
+- Next-round indicator appears to the right, separate from circle row
+
+**On Round Transition:**
+- All semi-transparent (pending this round) → convert to solid
+- `pendingNextRound` from previous round → becomes new `pendingThisRound`
+- Bar updates visually to reflect new mana state
+
+**Color Specs (example):**
+- Solid: `#FFD54A` (gold)
+- Semi-transparent: `rgba(255, 213, 74, 0.35)`
+- Hollow: `transparent` with `1px` light border
+- Next-round text: `0.9` opacity, `0.8rem` font size
 
 **Behavior:**
 - Team-wide mana pool (shared by all units)
-- Auto-attacks generate +1 mana during execution
-- Abilities consume mana immediately when queued
+- Auto-attacks generate mana according to their timing (same-turn → `pendingThisRound`, next-turn → `pendingNextRound`)
+- Abilities consume `currentMana` immediately when queued
 
 ---
 
@@ -270,35 +378,167 @@ QueueBattleView
 - `actionMenuOpen: boolean` - Is action menu visible?
 - `summonScreenOpen: boolean` - Is summon screen expanded?
 - `tutorialMessage: string | null` - Current advisor message to display
+- `currentMana: number` - Currently available mana
+- `maxMana: number` - Maximum mana capacity
+- `pendingManaThisRound: number` - Mana coming from same-turn autos
+- `pendingManaNextRound: number` - Mana coming from next-turn autos
+- `critCounters: Record<string, number>` - Per-unit crit hit counters (unitId → count)
+- `critThresholds: Record<string, number>` - Per-unit crit thresholds (can be modified by equipment)
 
 **Methods:**
 - `setActivePortrait(index)` - Switch active portrait
 - `queueAction(action)` - Queue action and advance to next portrait
 - `showTutorialMessage(message)` - Trigger Djinn advisor speech bubble
 - `toggleSummonScreen()` - Open/close summon interface
+- `updateManaState(current, pending, pendingNext)` - Update all mana values
+- `incrementCritCounter(unitId)` - Increment crit counter for unit
+- `resetCritCounter(unitId)` - Reset counter to 0 after crit fires
+- `triggerCritFlash(unitId)` - Visual feedback for crit (200ms flash)
 
 ---
 
-## Assets Required
+## Sprite Assets (Verified)
 
-### Djinn Sprites
-- **Location:** `src/assets/sprites/djinn/` (assumed)
-- **Djinn Needed:**
-  - `flint.png` (Venus/Earth - 🟡)
-  - `granite.png` (Venus/Earth - 🟤)
-  - `echo.png` (Mercury/Water - 🔵)
-  - Additional djinn as needed per game data
+### Party Front Battle Sprites
+**Location:** `public/sprites/battle/party/`
+**Size:** 64×64px each
 
-**Sprite Specs:**
-- Small standing sprites (~32-48px tall)
-- Transparent background
-- Idle animation frames (optional, can start static)
+- Isaac: `public/sprites/battle/party/isaac/Isaac_lSword_Front.gif`
+- Garet: `public/sprites/battle/party/garet/Garet_lSword_Front.gif`
+- Mia: `public/sprites/battle/party/mia/Mia_Staff_Front.gif`
+- Ivan: `public/sprites/battle/party/ivan/Ivan_Staff_Front.gif`
+
+**Note:** Additional weapon variant sprites available (Axe, lBlade, Mace, Staff) for each character.
+
+### Djinn Advisor Sprites
+**Location:** `public/sprites/battle/djinn/`
+**Size:** 32×32px each (can be scaled 2× to 64×64 for prominence)
+
+- Venus (Flint): `public/sprites/battle/djinn/Venus_Djinn_Front.gif`
+- Mars (Granite): `public/sprites/battle/djinn/Mars_Djinn_Front.gif`
+- Mercury (Echo): `public/sprites/battle/djinn/Mercury_Djinn_Front.gif`
+- Jupiter (bonus): `public/sprites/battle/djinn/Jupiter_Djinn_Front.gif`
+
+### Background Sprites
+**Location:** `public/sprites/backgrounds/gs1/`
+**Example:** `public/sprites/backgrounds/gs1/Desert.gif` (256×120px)
+
+**Note:** 72 total background sprites available (37 from GS1, 35 from GS2).
+
+### Status Effect Icons
+**Location:** `public/sprites/icons/misc/`
+**Available icons:**
+- `Poison.gif`, `Silence.gif`, `Curse.gif`, `Psynergy_Seal.gif`
+- `Delusion.gif`, `Haunted.gif`
+- `attack_up.gif`, `defense_up.gif`, `resist_up.gif`
+- `Stat-Up.gif`, `Stat-Down.gif`
 
 ### UI Elements
-- Speech bubble (9-slice or CSS-based)
-- Portrait frames/borders
-- HP bar graphics
-- Mana circle (filled/empty states)
+**Available in:** `public/sprites/icons/buttons/`
+- Attack, Defend, Item, Psynergy, Djinni, Summon buttons
+- HP/PP bars, cursor sprites
+
+---
+
+## Figma Layout Specifications
+
+This section provides exact positioning for creating visual mockups using the verified sprite assets.
+
+**Reference Frame:** 960×540 (16:9)  
+**Background:** `Desert.gif` (scaled to fill, nearest-neighbor filtering)
+
+### Portrait Row (Bottom-Middle)
+
+**Container:**
+- Size: `280 × 64` (4 portraits + gaps)
+- Position: `x = 340`, `y = 460` (16px from bottom, centered)
+- Horizontal gap between portraits: `8px`
+
+**Individual Portraits:**
+1. **Isaac:**
+   - Sprite: `Isaac_lSword_Front.gif` (64×64)
+   - Position in row: `x = 0`, `y = 0`
+
+2. **Garet:**
+   - Sprite: `Garet_lSword_Front.gif` (64×64)
+   - Position in row: `x = 72`, `y = 0`
+
+3. **Mia:**
+   - Sprite: `Mia_Staff_Front.gif` (64×64)
+   - Position in row: `x = 144`, `y = 0`
+
+4. **Ivan:**
+   - Sprite: `Ivan_Staff_Front.gif` (64×64)
+   - Position in row: `x = 216`, `y = 0`
+
+**Portrait Overlays (per portrait):**
+- HP bar: Full-width rectangle at bottom (8px height)
+- Crit badge: `⚡7/10` at top-right
+- Status icons: 2-3 small icons below crit badge
+- Queued checkmark: Bottom-right corner
+
+### Mana Bar (Above Portraits)
+
+**Container:**
+- Size: `260 × 24`
+- Position: `x = 350` (centered), `y = 428` (8px above portraits)
+
+**Contents:**
+1. **Circle Row:**
+   - Size: `180 × 10`
+   - Position: `x = 0`, `y = 7`
+   - 8 circles (10px diameter each, 4px gaps)
+   - Fill states: solid / semi-transparent / hollow
+
+2. **Next-Round Indicator:**
+   - Text: `⤼ 1`
+   - Position: `x = 190`, `y = 4`
+   - Hidden when `pendingNextRound === 0`
+
+### Action Menu (Above Active Portrait)
+
+**Container:**
+- Size: `240 × 100`
+- Position: Centered above active portrait
+  - For Isaac (leftmost): `x = 252`, `y = 352`
+- Background: Dark semi-transparent (`#000000AA`)
+- Border: 1px lighter color
+
+**Contents:**
+- Auto-layout vertical (Figma)
+- 3 text rows:
+  1. `⚔️ ATTACK (Double Hit)` + sub-line `+2 mana (this round)`
+  2. `ABILITIES →`
+  3. `DJINN ABILIT. →`
+
+### Djinn Advisor Panel (Bottom-Left)
+
+**Container:**
+- Position: `x = 16`, `y = 460` (if 64×64 scaled sprites)
+- Alternative: `y = 476` (if keeping 32×32 native size)
+
+**Djinn Sprites (2× scale to 64×64):**
+1. **Venus:**
+   - Sprite: `Venus_Djinn_Front.gif` (scaled to 64×64)
+   - Position: `x = 0`, `y = 0`
+
+2. **Mars:**
+   - Sprite: `Mars_Djinn_Front.gif` (scaled to 64×64)
+   - Position: `x = 72`, `y = 0` (8px gap)
+
+3. **Mercury:**
+   - Sprite: `Mercury_Djinn_Front.gif` (scaled to 64×64)
+   - Position: `x = 144`, `y = 0`
+
+**Djinn Names (optional):**
+- Text: `"Flint   Granite   Echo"`
+- Size: `~160 × 12`
+- Position: `x = 0`, `y = 68` (4px below sprites)
+
+**Speech Bubble:**
+- Size: `140 × 32`
+- Position: `x = 0`, `y = -40` (floating above Venus)
+- Contents: White rounded rectangle, black border, text `"Not enough mana!"`, downward-pointing triangle connector
 
 ---
 
@@ -369,6 +609,25 @@ QueueBattleView
 6. **Mana Preview:**
    - **Decision:** YES - show ghosted +1 circle for each queued auto-attack
    - Numeric "Mana: X/Y" strictly shows currently available mana (no preview in number)
+
+7. **Crit Counter Display:**
+   - **Decision:** Per-unit crit counter displayed on each portrait
+   - Badge format: `⚡N/threshold` (e.g., `⚡7/10`)
+   - Visual feedback on crit: 200ms yellow border flash + counter reset animation
+   - Alternative team-wide counter deferred for now
+
+8. **Status Effect Icon System:**
+   - **Decision:** Small, fixed set of deterministic status icons
+   - Max 2-3 visible per portrait to avoid clutter
+   - Core statuses: Burn, Paralyze, Guard Break, Haste/Slow, Focus
+   - Each shows remaining turns as small number overlay
+   - Icons sourced from `public/sprites/icons/misc/`
+
+9. **Auto-Attack Type Indicators:**
+   - **Decision:** Action menu shows mana generation timing inline
+   - Same-turn: `"+N mana (this round)"`
+   - Next-turn: `"+N mana (next round)"`
+   - Multi-hit weapons show hit count: `"ATTACK (Double Hit)"`
 
 ---
 
