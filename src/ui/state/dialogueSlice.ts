@@ -194,8 +194,13 @@ function applyDialogueEvents(
         break;
       }
       case 'open-shop': {
-        // Open the shop UI directly from dialogue
-        store.set({ currentShopId: store.currentShopId ?? 'vale-armory', mode: 'shop' });
+        const shopId = store.currentShopId || 'vale-armory';
+        store.handleTrigger({
+          id: 'dialogue-shop',
+          type: 'shop',
+          position: { x: 0, y: 0 },
+          data: { shopId },
+        });
         break;
       }
       case 'start-battle': {

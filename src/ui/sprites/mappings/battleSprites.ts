@@ -82,6 +82,7 @@ const ENEMY_SPRITES: Record<string, SpriteStateMap> = {
   // Houses 2-5 (Act 1 focus)
   'earth-scout': makeSinglePose('/sprites/battle/enemies/Goblin.gif'),
   'venus-wolf': makeSinglePose('/sprites/battle/enemies/Wild_Wolf.gif'),
+  'venus-beetle': makeSinglePose('/sprites/battle/enemies/Punch_Ant.gif'),
   'flame-scout': makeSinglePose('/sprites/battle/enemies/Hobgoblin.gif'),
   'mars-wolf': makeSinglePose('/sprites/battle/enemies/Dire_Wolf.gif'),
   'frost-scout': makeSinglePose('/sprites/battle/enemies/Mini-Goblin.gif'),
@@ -103,12 +104,14 @@ const ENEMY_SPRITES: Record<string, SpriteStateMap> = {
   'inferno-captain': makeSinglePose('/sprites/battle/enemies/Grand_Chimera.gif'),
   'phoenix': makeSinglePose('/sprites/battle/enemies/Phoenix.gif'),
   'glacier-captain': makeSinglePose('/sprites/battle/enemies/Ice_Gargoyle.gif'),
+  'blizzard-warlord': makeSinglePose('/sprites/battle/enemies/Ice_Gargoyle.gif'),
   'leviathan': makeSinglePose('/sprites/battle/enemies/Man_o_War.gif'),
   'thunder-captain': makeSinglePose('/sprites/battle/enemies/Thunder_Lizard.gif'),
   'thunderbird': makeSinglePose('/sprites/battle/enemies/Roc.gif'),
   'lightning-commander': makeSinglePose('/sprites/battle/enemies/Thunder_Lizard.gif'),
   'storm-elemental': makeSinglePose('/sprites/battle/enemies/Tornado_Lizard.gif'),
   'mountain-commander': makeSinglePose('/sprites/battle/enemies/Grand_Golem.gif'),
+  'granite-warlord': makeSinglePose('/sprites/battle/enemies/Grand_Golem.gif'),
   'basilisk': makeSinglePose('/sprites/battle/enemies/Lizard_King.gif'),
   'fire-commander': makeSinglePose('/sprites/battle/enemies/Red_Demon.gif'),
   'volcano-warlord': makeSinglePose('/sprites/battle/enemies/Grand_Chimera.gif'),
@@ -119,8 +122,15 @@ const ENEMY_SPRITES: Record<string, SpriteStateMap> = {
   'tempest-warlord': makeSinglePose('/sprites/battle/enemies/Thunder_Lizard.gif'),
 
   // Existing misc mappings
+  'bandit-minion': makeSinglePose('/sprites/battle/enemies/Thief.gif'),
+  'bandit-captain': makeSinglePose('/sprites/battle/enemies/Brigand.gif'),
+  'sentinel-enemy': makeSinglePose('/sprites/battle/enemies/Living_Armor.gif'),
+  'stormcaller-enemy': makeSinglePose('/sprites/battle/enemies/Ghost_Mage.gif'),
   'mercury-slime': makeSinglePose('/sprites/battle/enemies/Slime.gif'),
   'mars-bandit': makeSinglePose('/sprites/battle/enemies/Brigand.gif'),
+  'mars-sprite': makeSinglePose('/sprites/battle/enemies/Spirit.gif'),
+  'mercury-sprite': makeSinglePose('/sprites/battle/enemies/Will_Head.gif'),
+  'venus-sprite': makeSinglePose('/sprites/battle/enemies/Faery.gif'),
   'jupiter-sprite': makeSinglePose('/sprites/battle/enemies/Pixie.gif'),
 };
 

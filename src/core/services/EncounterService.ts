@@ -78,16 +78,28 @@ export function createBattleFromEncounter(
 /**
  * Get the next encounter in a chapter sequence
  * For now, returns hardcoded Chapter 1 sequence
- * TODO: Make this data-driven via chapter definitions
  */
 export function getChapter1Encounters(): readonly string[] {
-  return [
+  const baseOrder = [
     'c1_normal_1',
     'c1_normal_2',
     'c1_normal_3',
     'c1_mini_boss',
     'c1_boss',
   ] as const;
+
+  // Include any additional Chapter 1 encounters declared in ENCOUNTERS (c1_ prefix),
+  // preserving the preferred base order and appending any extras in sorted order.
+  const discovered = Object.keys(ENCOUNTERS)
+    .filter((id) => id.startsWith('c1_'))
+    .sort();
+
+  const merged = [
+    ...baseOrder,
+    ...discovered.filter((id) => !baseOrder.includes(id as typeof baseOrder[number])),
+  ];
+
+  return merged;
 }
 
 /**

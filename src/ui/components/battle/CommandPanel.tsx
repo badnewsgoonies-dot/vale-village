@@ -6,6 +6,7 @@
 
 import { AbilityPanel } from './AbilityPanel';
 import type { CommandPanelProps, CommandType } from './types';
+import { SimpleSprite } from '../../sprites/SimpleSprite';
 
 export function CommandPanel({
   currentUnit,
@@ -15,12 +16,20 @@ export function CommandPanel({
   onCommandSelect,
   onSelectAbility,
 }: CommandPanelProps): JSX.Element {
-  const renderCommandButton = (command: CommandType, label: string) => (
+  const renderCommandButton = (command: CommandType, label: string, icon?: string) => (
     <div
       className={`command-button${selectedCommand === command ? ' selected' : ''}`}
       onClick={() => onCommandSelect(command)}
     >
-      {label}
+      {icon && (
+        <SimpleSprite
+          id={`/sprites/icons/buttons/${icon}.gif`}
+          width={32}
+          height={32}
+          style={{ borderRadius: 6 }}
+        />
+      )}
+      <span>{label}</span>
     </div>
   );
 
@@ -39,10 +48,10 @@ export function CommandPanel({
 
       {/* Command Buttons */}
       <div className="command-buttons">
-        {renderCommandButton('attack', '[A] Attack')}
-        {renderCommandButton('psynergy', '[S] Psynergy')}
-        {renderCommandButton('djinn', '[D] Djinn')}
-        {renderCommandButton('abilities', '[F] Abilities')}
+        {renderCommandButton('attack', '[A] Attack', 'Attack')}
+        {renderCommandButton('psynergy', '[S] Psynergy', 'Psynergy')}
+        {renderCommandButton('djinn', '[D] Djinn', 'Djinni')}
+        {renderCommandButton('abilities', '[F] Abilities', 'Summon')}
       </div>
 
       {/* Ability Panel */}

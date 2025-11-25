@@ -11,6 +11,8 @@ import type { PRNG } from '../random/prng';
 import { calculateMaxHp, isUnitKO } from '../models/Unit';
 import { getElementModifier } from '../algorithms/damage';
 import { resolveTargets } from '../algorithms/targeting';
+import type { Team } from '../models/Team';
+import { calculateEffectiveStats } from '../algorithms/stats';
 
 /**
  * AI hints for abilities (optional metadata)
@@ -42,6 +44,20 @@ function scoreAbility(
 ): number {
   let score = ability.aiHints?.priority ?? 1.0;
 
+  // Build lightweight teams for effective stat calculations
+  const playerTeam = state.playerTeam;
+  const enemyTeam: Team = {
+    equippedDjinn: [],
+    djinnTrackers: {},
+    units: state.enemies,
+    collectedDjinn: [],
+    currentTurn: state.currentTurn ?? 0,
+    activationsThisTurn: {},
+    djinnStates: {},
+  };
+  const casterTeam: Team = { ...enemyTeam, units: [caster] };
+  const casterStats = calculateEffectiveStats(caster, casterTeam);
+
   // Get potential targets
   const potentialTargets = resolveTargets(
     ability,
@@ -59,14 +75,12 @@ function scoreAbility(
   let estimatedValue = 0;
 
   if (ability.type === 'physical' || ability.type === 'psynergy') {
-    // Estimate damage using effective stats (simplified - ignores global modifiers)
-    // Note: We need team for effective stats, but scoreAbility doesn't have it
-    // For now, use base stats + level bonuses (equipment/Djinn/status will be handled in actual execution)
-    // TODO: Pass team to scoreAbility for accurate effective stats
+    // Estimate damage using effective stats (includes equipment/Djinn/status)
     const basePower = ability.basePower || 0;
-    const casterStat = ability.type === 'physical' ? caster.baseStats.atk : caster.baseStats.mag;
+    const casterStat = ability.type === 'physical' ? casterStats.atk : casterStats.mag;
     const avgTargetDef = validTargets.reduce((sum, t) => {
-      const def = t.baseStats.def;
+      const targetTeam = playerTeam.units.includes(t) ? playerTeam : enemyTeam;
+      const def = calculateEffectiveStats(t, targetTeam).def;
       return sum + def;
     }, 0) / validTargets.length;
 
@@ -92,7 +106,7 @@ function scoreAbility(
   } else if (ability.type === 'healing') {
     // Estimate healing value
     const baseHeal = ability.basePower || 0;
-    const casterMag = caster.baseStats.mag;
+    const casterMag = casterStats.mag;
     const rawHeal = baseHeal + casterMag;
     estimatedValue = Math.max(1, rawHeal);
 

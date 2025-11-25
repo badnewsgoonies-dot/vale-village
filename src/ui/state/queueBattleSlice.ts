@@ -373,8 +373,6 @@ export const createQueueBattleSlice: StateCreator<
 
       updateTeamUnits(healedUnits);
       const totalDamage = sumBattleStat(healedState.playerTeam.units, 'damageDealt');
-      get().incrementBattleStats({ outcome: 'loss', damageDealt: totalDamage, healingDone: 0 });
-      const totalDamage = sumBattleStat(healedState.playerTeam.units, 'damageDealt');
       get().incrementBattleStats({ outcome: 'win', damageDealt: totalDamage, healingDone: 0 });
       processVictory(healedState); // This now sets mode: 'rewards'
 

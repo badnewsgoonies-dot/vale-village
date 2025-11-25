@@ -181,7 +181,7 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
                     <BattleUnitSprite unitId={levelUp.unit.id} state="idle" size="medium" />
                   </div>
                   <div className="level-up-name">{levelUp.unit.name}</div>
-                  <div className="level-up-arrow">Lv {levelUp.oldLevel} -> Lv {levelUp.newLevel}</div>
+                  <div className="level-up-arrow">Lv {levelUp.oldLevel} -&gt; Lv {levelUp.newLevel}</div>
                   <div className="level-up-stats">
                     {levelUp.statGains.hp > 0 && <span>+{levelUp.statGains.hp} HP</span>}
                     {levelUp.statGains.atk > 0 && <span>+{levelUp.statGains.atk} ATK</span>}

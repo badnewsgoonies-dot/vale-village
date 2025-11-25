@@ -6,7 +6,7 @@
  */
 
 import { SimpleSprite } from '../../sprites/SimpleSprite';
-import { getAbilityIconSprite } from '../../sprites/mappings';
+import { getAbilityIconSprite, getAbilityEffectSprite } from '../../sprites/mappings';
 import type { AbilityPanelProps } from './types';
 
 export function AbilityPanel({
@@ -30,7 +30,7 @@ export function AbilityPanel({
                 <div className="ability-item__top">
                   <div className="ability-icon">
                     <SimpleSprite
-                      id={getAbilityIconSprite(ability.id)}
+                      id={getAbilityEffectSprite(ability.id) ?? getAbilityIconSprite(ability.id)}
                       width={32}
                       height={32}
                       style={{ borderRadius: '4px' }}
@@ -70,7 +70,7 @@ export function AbilityPanel({
                   <div className="ability-item__top">
                     <div className="ability-icon">
                       <SimpleSprite
-                        id={getAbilityIconSprite(ability.id)}
+                        id={getAbilityEffectSprite(ability.id) ?? getAbilityIconSprite(ability.id)}
                         width={32}
                         height={32}
                         style={{

@@ -252,6 +252,21 @@ export function hasAbilityIcon(abilityId: string): boolean {
 }
 
 /**
+ * Convert an ability icon ID to a psynergy FX sprite path (GIF)
+ * Returns null if no icon is mapped.
+ */
+export function getAbilityEffectSprite(abilityId: string): string | null {
+  const iconId = ABILITY_ICON_MAP[abilityId];
+  if (!iconId) return null;
+
+  // Convert kebab/slug to Title_Case used by GIF filenames
+  const parts = iconId.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+  if (parts.length === 0) return null;
+  const fileName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('_');
+  return `/sprites/psynergy/${fileName}.gif`;
+}
+
+/**
  * Get all mapped ability IDs
  */
 export function getMappedAbilities(): string[] {

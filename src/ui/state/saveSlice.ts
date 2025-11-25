@@ -272,6 +272,28 @@ export const createSaveSlice: StateCreator<
         playtime: saveData.stats.playtime ?? 0,
       },
     });
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
+    _set({
+      recruitmentFlags: saveData.playerData.recruitmentFlags ?? {},
+      npcStates: saveData.overworldState.npcStates ?? {},
+      statsTracker: {
+        battlesWon: saveData.stats.battlesWon ?? 0,
+        battlesLost: saveData.stats.battlesLost ?? 0,
+        totalDamageDealt: saveData.stats.totalDamageDealt ?? 0,
+        totalHealingDone: saveData.stats.totalHealingDone ?? 0,
+        playtime: saveData.stats.playtime ?? 0,
+      },
+    });
 
     // Hydrate battle state from localStorage
     const battleStateJson = localStorage.getItem('vale-v2/battle-state');
