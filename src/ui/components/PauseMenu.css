@@ -1,0 +1,248 @@
+/* PauseMenu - Golden Sun-inspired Pause Screen */
+
+/* Dark Overlay */
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: pauseFadeIn 0.2s ease-out;
+}
+
+@keyframes pauseFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Status Bar */
+.pause-status-bar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  gap: 2rem;
+  font-size: 0.9rem;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-label {
+  color: #8a7a6a;
+}
+
+.status-value {
+  color: #FFD87F;
+  font-weight: bold;
+}
+
+/* Pause Menu Container */
+.pause-menu {
+  background: linear-gradient(135deg, #3a2a1a, #2a1a0a);
+  border: 3px solid #8b6a4a;
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 400px;
+  max-width: 90vw;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 216, 127, 0.2);
+  animation: pauseSlideUp 0.3s ease-out;
+  outline: none;
+}
+
+@keyframes pauseSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Title */
+.pause-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #FFD87F;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+}
+
+/* Menu Options */
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-option {
+  background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  color: #e8d8c8;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.menu-option:hover {
+  background: linear-gradient(180deg, #5a4a3a, #4a3a2a);
+  border-color: #FFD87F;
+  transform: translateX(8px);
+  color: #FFD87F;
+}
+
+.menu-option.selected {
+  background: linear-gradient(180deg, #6a5a4a, #5a4a3a);
+  border-color: #FFD87F;
+  color: #FFD87F;
+  box-shadow: 0 0 20px rgba(255, 216, 127, 0.3);
+}
+
+.menu-option.flash {
+  background: linear-gradient(180deg, #FFD87F, #f3c866) !important;
+  color: #1a0a00 !important;
+}
+
+.menu-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.menu-option:disabled:hover {
+  transform: none;
+  background: linear-gradient(180deg, #4a3a2a, #3a2a1a);
+  border-color: #6a5a4a;
+  color: #e8d8c8;
+}
+
+/* Icons */
+.menu-icon {
+  font-size: 1.5rem;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-label {
+  flex: 1;
+}
+
+/* Keyboard Hints */
+.menu-hint {
+  font-size: 0.9rem;
+  color: #8a7a6a;
+  font-family: monospace;
+  margin-left: auto;
+}
+
+.menu-option.selected .menu-hint,
+.menu-option:hover .menu-hint {
+  color: #b0a090;
+}
+
+/* Divider */
+.menu-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #6a5a4a, transparent);
+  margin: 0.5rem 0;
+}
+
+/* Footer */
+.pause-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #4a3a2a;
+  text-align: center;
+}
+
+.keyboard-hints {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  font-size: 0.85rem;
+  color: #8a7a6a;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.key {
+  background: #2a1a0a;
+  border: 1px solid #6a5a4a;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #FFD87F;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .pause-menu {
+    min-width: 95vw;
+    padding: 1.5rem;
+  }
+
+  .pause-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .menu-option {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+  }
+
+  .menu-hint {
+    display: none;
+  }
+
+  .pause-status-bar {
+    top: 10px;
+    right: 10px;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .keyboard-hints {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pause-overlay,
+  .pause-menu,
+  .menu-option {
+    animation: none;
+    transition: none;
+  }
+}

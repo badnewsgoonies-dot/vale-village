@@ -9,7 +9,7 @@ import { SaveMenu } from './ui/components/SaveMenu';
 import { ShopEquipScreen } from './ui/components/ShopEquipScreen';
 import { DjinnCollectionScreen } from './ui/components/DjinnCollectionScreen';
 import { PartyManagementScreen } from './ui/components/PartyManagementScreen';
-import { PreBattleTeamSelectScreen } from './ui/components/PreBattleTeamSelectScreen';
+import { PreBattleTeamSelectScreenV2 } from './ui/components/PreBattleTeamSelectScreenV2';
 import { DevModeOverlay } from './ui/components/DevModeOverlay';
 import { TitleScreen } from './ui/components/TitleScreen';
 import { MainMenu } from './ui/components/MainMenu';
@@ -356,7 +356,7 @@ function App() {
       ) : (
         <>
           {mode === 'team-select' && pendingBattleEncounterId && (
-            <PreBattleTeamSelectScreen
+            <PreBattleTeamSelectScreenV2
               encounterId={pendingBattleEncounterId}
               onConfirm={() => confirmBattleTeam()}
               onCancel={() => {

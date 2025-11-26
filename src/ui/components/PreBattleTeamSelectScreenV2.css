@@ -1,0 +1,426 @@
+/* PreBattleTeamSelectScreenV2 - Golden Sun-inspired Team Selection */
+
+/* Overlay */
+.prebattle-v2-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #1a0a00 0%, #2a1a0a 100%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.prebattle-v2-container {
+  width: 100%;
+  max-width: 960px;
+  height: 640px;
+  max-height: 90vh;
+  background: linear-gradient(180deg, #1a0a00 0%, #2a1a0a 100%);
+  border: 4px solid #8b6a4a;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+/* Error state */
+.prebattle-v2-error {
+  text-align: center;
+  padding: 2rem;
+  color: #ff7a7a;
+}
+
+.prebattle-v2-error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: #4a3a2a;
+  border: 2px solid #8b6a4a;
+  border-radius: 8px;
+  color: #ffd87f;
+  cursor: pointer;
+}
+
+/* Header */
+.prebattle-v2-header {
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #6a5a4a;
+  text-align: center;
+}
+
+.prebattle-v2-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffd87f;
+  text-shadow: 2px 2px 4px #000;
+  margin-bottom: 0.25rem;
+}
+
+.prebattle-v2-subtitle {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Main Layout */
+.prebattle-v2-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  overflow: hidden;
+}
+
+/* Panel Titles */
+.panel-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffd87f;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #4a3a2a;
+}
+
+/* Left Panel: Available Units */
+.prebattle-v2-available {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.unit-roster {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.roster-unit {
+  background: #2a1a0a;
+  border: 2px solid #4a3a2a;
+  border-radius: 8px;
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.roster-unit:hover:not(.disabled) {
+  border-color: #ffd87f;
+  background: #3a2a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.roster-unit.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.roster-unit-sprite {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.roster-unit-sprite img {
+  image-rendering: pixelated;
+}
+
+.roster-unit-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.roster-unit-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roster-unit-stats {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.unit-speed {
+  color: #00ccff;
+  font-weight: bold;
+}
+
+.roster-unit-element {
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.element-venus { background: #4a3a2a; color: #f4a460; }
+.element-mars { background: #4a2a2a; color: #ff6b6b; }
+.element-mercury { background: #2a3a4a; color: #6bb3ff; }
+.element-jupiter { background: #3a2a4a; color: #b06bff; }
+.element-neutral { background: #3a3a3a; color: #aaa; }
+
+.roster-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Right Panel: Selected Team */
+.prebattle-v2-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+/* Team Slots */
+.team-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.team-slot {
+  background: #1a0a00;
+  border: 2px dashed #4a3a2a;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.team-slot.filled {
+  border-style: solid;
+  border-color: #6a5a4a;
+  background: #2a1a0a;
+}
+
+.slot-badge {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: linear-gradient(180deg, #ffd87f 0%, #daa520 100%);
+  color: #1a0a00;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.slot-order {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ffd87f;
+  width: 28px;
+  text-align: center;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.slot-sprite {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slot-sprite img {
+  image-rendering: pixelated;
+}
+
+.slot-unit-info {
+  flex: 1;
+}
+
+.slot-unit-name {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.slot-unit-speed {
+  font-size: 0.8rem;
+  color: #00ccff;
+}
+
+.slot-empty-text {
+  color: #666;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.remove-btn {
+  background: #aa3333;
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: #ff4444;
+  transform: scale(1.1);
+}
+
+/* Enemy Preview */
+.enemy-preview {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.enemy-portal-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+/* Start Battle Button */
+.prebattle-v2-selected .start-battle-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(180deg, #ffd87f 0%, #f3c866 100%);
+  border: 3px solid #aa8833;
+  border-radius: 8px;
+  color: #1a0a00;
+  font-size: 1.15rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 216, 127, 0.3);
+}
+
+.prebattle-v2-selected .start-battle-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffe8a0 0%, #ffd87f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 216, 127, 0.5);
+}
+
+.prebattle-v2-selected .start-battle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #8a7a6a 0%, #6a5a4a 100%);
+  color: #4a3a2a;
+  border-color: #4a3a2a;
+  box-shadow: none;
+}
+
+/* Footer */
+.prebattle-v2-footer {
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 2px solid #4a3a2a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cancel-btn {
+  padding: 0.6rem 1.2rem;
+  background: #3a2a1a;
+  border: 2px solid #6a5a4a;
+  border-radius: 8px;
+  color: #ddd;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #4a3a2a;
+  border-color: #8b6a4a;
+  color: #ffd87f;
+}
+
+.keyboard-hints {
+  font-size: 0.8rem;
+  color: #8a7a6a;
+}
+
+.keyboard-hints .key {
+  background: #2a1a0a;
+  border: 1px solid #6a5a4a;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #ffd87f;
+}
+
+/* Scrollbar Styling */
+.unit-roster::-webkit-scrollbar {
+  width: 6px;
+}
+
+.unit-roster::-webkit-scrollbar-track {
+  background: #1a0a00;
+  border-radius: 3px;
+}
+
+.unit-roster::-webkit-scrollbar-thumb {
+  background: #6a5a4a;
+  border-radius: 3px;
+}
+
+.unit-roster::-webkit-scrollbar-thumb:hover {
+  background: #8b6a4a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .prebattle-v2-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .prebattle-v2-container {
+    height: auto;
+    max-height: 95vh;
+  }
+
+  .unit-roster {
+    max-height: 200px;
+  }
+}

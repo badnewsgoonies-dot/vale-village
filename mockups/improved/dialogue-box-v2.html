@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialogue Box - Golden Sun Style</title>
+
+  <!-- Google Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2540 0%, #2d1a40 100%);
+      font-family: 'Press Start 2P', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #e5ecff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background particles */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: float 10s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(20px);
+        opacity: 0;
+      }
+    }
+
+    .demo-container {
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .demo-title {
+      font-size: 18px;
+      color: #FFD87F;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      margin-bottom: 12px;
+    }
+
+    .demo-subtitle {
+      font-size: 10px;
+      color: #9fb3d4;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* ===== DIALOGUE BOX ===== */
+    .dialogue-box {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    /* Main text panel */
+    .dialogue-panel {
+      background: #0a0e18;
+      border-radius: 12px;
+      padding: 24px 28px 28px 28px;
+      position: relative;
+
+      /* Noise texture overlay */
+      background-image:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.03"/></svg>');
+
+      /* Layered shadows and glows */
+      box-shadow:
+        /* Outer dark border */
+        0 0 0 2px #000000,
+        /* Inner light border */
+        inset 0 0 0 1px rgba(255,255,255,0.15),
+        /* Top highlight */
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        /* Outer shadow */
+        0 4px 12px rgba(0,0,0,0.6),
+        /* Subtle glow */
+        0 0 30px rgba(100, 150, 255, 0.2);
+
+      /* Beveled edges effect */
+      border-top: 2px solid rgba(255,255,255,0.08);
+      border-left: 2px solid rgba(255,255,255,0.05);
+      border-right: 2px solid rgba(0,0,0,0.3);
+      border-bottom: 2px solid rgba(0,0,0,0.3);
+    }
+
+    /* Corner ornaments */
+    .corner-ornament {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #FFD87F, #FFA500);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      box-shadow:
+        0 0 8px rgba(255, 215, 127, 0.6),
+        inset 1px 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .corner-ornament.top-left {
+      top: -8px;
+      left: -8px;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .corner-ornament.top-right {
+      top: -8px;
+      right: -8px;
+      animation: pulse-glow 2s ease-in-out infinite 0.5s;
+    }
+
+    .corner-ornament.bottom-left {
+      bottom: -8px;
+      left: -8px;
+      animation: pulse-glow 2s ease-in-out infinite 1s;
+    }
+
+    .corner-ornament.bottom-right {
+      bottom: -8px;
+      right: -8px;
+      animation: pulse-glow 2s ease-in-out infinite 1.5s;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(255, 215, 127, 0.6), inset 1px 1px 0 rgba(255,255,255,0.4);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(255, 215, 127, 0.9), inset 1px 1px 0 rgba(255,255,255,0.6);
+      }
+    }
+
+    /* Portrait section */
+    .portrait-section {
+      position: absolute;
+      top: -40px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Speaker nameplate (angled banner) */
+    .speaker-name {
+      background: linear-gradient(135deg, #4A7AB8 0%, #2d5080 100%);
+      color: #FFD87F;
+      font-size: 12px;
+      padding: 6px 20px;
+      position: relative;
+      margin-bottom: -4px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+
+      /* Angled banner shape */
+      clip-path: polygon(
+        8px 0%,
+        calc(100% - 8px) 0%,
+        100% 50%,
+        calc(100% - 8px) 100%,
+        8px 100%,
+        0% 50%
+      );
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+
+      z-index: 11;
+    }
+
+    /* Portrait frame (diamond/circular with ornate border) */
+    .portrait-frame {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      background: linear-gradient(135deg, #3a5a8a 0%, #1a3a5a 100%);
+      border-radius: 50%;
+      padding: 6px;
+
+      box-shadow:
+        0 0 0 3px #000000,
+        0 0 0 4px #FFD87F,
+        0 0 0 6px #000000,
+        0 4px 16px rgba(0,0,0,0.8),
+        0 0 24px rgba(255, 215, 127, 0.4);
+
+      animation: portrait-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes portrait-glow {
+      0%, 100% {
+        box-shadow:
+          0 0 0 3px #000000,
+          0 0 0 4px #FFD87F,
+          0 0 0 6px #000000,
+          0 4px 16px rgba(0,0,0,0.8),
+          0 0 24px rgba(255, 215, 127, 0.4);
+      }
+      50% {
+        box-shadow:
+          0 0 0 3px #000000,
+          0 0 0 4px #FFE8A0,
+          0 0 0 6px #000000,
+          0 4px 16px rgba(0,0,0,0.8),
+          0 0 32px rgba(255, 215, 127, 0.6);
+      }
+    }
+
+    .portrait-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0a0e18 0%, #1a2540 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .portrait-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    /* Text content area */
+    .dialogue-content {
+      margin-left: 120px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .dialogue-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #e5ecff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      margin-bottom: 16px;
+    }
+
+    /* Typewriter cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: #FFD87F;
+      margin-left: 4px;
+      animation: blink 0.8s step-end infinite;
+      box-shadow: 0 0 4px rgba(255, 215, 127, 0.8);
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Continue indicator (blinking arrow) */
+    .continue-indicator {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: #9fb3d4;
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+
+    .arrow-sprite {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 12px solid #FFD87F;
+      filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+      animation: arrow-blink 1s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes arrow-blink {
+      0%, 100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+      }
+      50% {
+        opacity: 0.4;
+        filter: drop-shadow(0 0 8px rgba(255, 215, 127, 0.9));
+      }
+    }
+
+    /* ===== CHOICE BUTTONS ===== */
+    .dialogue-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .choice-button {
+      background: linear-gradient(135deg, #2d4a7a 0%, #1a3050 100%);
+      border: none;
+      padding: 14px 24px 14px 40px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      color: #e5ecff;
+      cursor: pointer;
+      position: relative;
+      text-align: left;
+
+      /* Slanted hexagon shape */
+      clip-path: polygon(
+        20px 0%,
+        calc(100% - 8px) 0%,
+        100% 50%,
+        calc(100% - 8px) 100%,
+        20px 100%,
+        0% 50%
+      );
+
+      /* Beveled edges */
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset -2px 0 0 rgba(0,0,0,0.3),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.4);
+
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      transition: all 0.15s ease-out;
+    }
+
+    /* Choice number indicator */
+    .choice-button::before {
+      content: attr(data-number);
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #FFD87F, #FFA500);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #000;
+      font-weight: bold;
+      box-shadow:
+        0 0 8px rgba(255, 215, 127, 0.6),
+        inset 1px 1px 0 rgba(255,255,255,0.4);
+    }
+
+    /* Element-themed choice colors */
+    .choice-button.venus {
+      background: linear-gradient(135deg, #8B6F47 0%, #5a4a2a 100%);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset -2px 0 0 rgba(0,0,0,0.3),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.4),
+        0 0 12px rgba(255, 215, 127, 0.2);
+    }
+
+    .choice-button.mars {
+      background: linear-gradient(135deg, #8B3A3A 0%, #5a1a1a 100%);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset -2px 0 0 rgba(0,0,0,0.3),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.4),
+        0 0 12px rgba(255, 100, 100, 0.2);
+    }
+
+    .choice-button.mercury {
+      background: linear-gradient(135deg, #3A5A8B 0%, #1a3a5a 100%);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset -2px 0 0 rgba(0,0,0,0.3),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.4),
+        0 0 12px rgba(100, 180, 255, 0.2);
+    }
+
+    .choice-button.jupiter {
+      background: linear-gradient(135deg, #6A3A8B 0%, #4a1a5a 100%);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset -2px 0 0 rgba(0,0,0,0.3),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.4),
+        0 0 12px rgba(200, 100, 255, 0.2);
+    }
+
+    /* Hover state */
+    .choice-button:hover {
+      transform: scale(1.02);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.25),
+        inset -2px 0 0 rgba(0,0,0,0.2),
+        inset 0 -2px 0 rgba(0,0,0,0.2),
+        0 6px 16px rgba(0,0,0,0.6),
+        0 0 20px rgba(255, 215, 127, 0.4);
+    }
+
+    /* Active/pressed state */
+    .choice-button:active {
+      transform: scale(0.98);
+      box-shadow:
+        inset 0 -2px 0 rgba(255,255,255,0.15),
+        inset 2px 0 0 rgba(0,0,0,0.3),
+        inset 0 2px 0 rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* ===== DEMO VARIANTS ===== */
+    .demo-section {
+      margin-bottom: 60px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      color: #9fb3d4;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    /* Controls */
+    .controls {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .control-button {
+      background: linear-gradient(135deg, #4A7AB8 0%, #2d5080 100%);
+      border: none;
+      padding: 12px 24px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      color: #FFD87F;
+      cursor: pointer;
+      border-radius: 6px;
+      margin: 0 8px;
+
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.2),
+        inset -2px 0 0 rgba(0,0,0,0.2),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.5);
+
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      transition: all 0.15s ease-out;
+    }
+
+    .control-button:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.25),
+        inset -2px 0 0 rgba(0,0,0,0.2),
+        inset 0 -2px 0 rgba(0,0,0,0.3),
+        0 6px 12px rgba(0,0,0,0.6);
+    }
+
+    .control-button:active {
+      transform: translateY(0);
+      box-shadow:
+        inset 0 -2px 0 rgba(255,255,255,0.2),
+        inset 2px 0 0 rgba(0,0,0,0.2),
+        inset 0 2px 0 rgba(0,0,0,0.3),
+        0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Hidden class for typewriter */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1 class="demo-title">DIALOGUE BOX V2</h1>
+      <p class="demo-subtitle">Golden Sun-Inspired Ornate Design</p>
+    </div>
+
+    <!-- Example 1: Narrative Dialogue -->
+    <div class="demo-section">
+      <div class="section-label">[ NARRATIVE DIALOGUE ]</div>
+      <div class="dialogue-box">
+        <div class="dialogue-panel">
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <div class="portrait-section">
+            <div class="speaker-name">KRADEN</div>
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../../public/sprites/icons/characters/Kraden.gif" alt="Kraden">
+              </div>
+            </div>
+          </div>
+
+          <div class="dialogue-content">
+            <div class="dialogue-text" id="typewriter-text"></div>
+          </div>
+
+          <div class="continue-indicator">
+            <span>PRESS SPACE</span>
+            <div class="arrow-sprite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 2: Dialogue with Choices -->
+    <div class="demo-section">
+      <div class="section-label">[ DIALOGUE WITH CHOICES ]</div>
+      <div class="dialogue-box">
+        <div class="dialogue-panel">
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <div class="portrait-section">
+            <div class="speaker-name">MASTER HAMA</div>
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../../public/sprites/icons/characters/Master_Hama.gif" alt="Master Hama">
+              </div>
+            </div>
+          </div>
+
+          <div class="dialogue-content">
+            <div class="dialogue-text">
+              The path of the Adept is not an easy one. Will you accept the training and join our quest to restore balance?
+            </div>
+
+            <div class="dialogue-choices">
+              <button class="choice-button mercury" data-number="1">
+                I accept your guidance
+              </button>
+              <button class="choice-button venus" data-number="2">
+                I need more time to decide
+              </button>
+              <button class="choice-button mars" data-number="3">
+                I refuse this burden
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 3: Multiple Speakers -->
+    <div class="demo-section">
+      <div class="section-label">[ MULTIPLE SPEAKERS - GARET ]</div>
+      <div class="dialogue-box">
+        <div class="dialogue-panel">
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <div class="portrait-section">
+            <div class="speaker-name">GARET</div>
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../../public/sprites/icons/characters/Garet1.gif" alt="Garet">
+              </div>
+            </div>
+          </div>
+
+          <div class="dialogue-content">
+            <div class="dialogue-text">
+              Come on, Isaac! We can't just stand around here. Those bandits won't wait for us!
+            </div>
+          </div>
+
+          <div class="continue-indicator">
+            <span>PRESS SPACE</span>
+            <div class="arrow-sprite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 4: Mia (Mercury) -->
+    <div class="demo-section">
+      <div class="section-label">[ MERCURY ADEPT - MIA ]</div>
+      <div class="dialogue-box">
+        <div class="dialogue-panel">
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <div class="portrait-section">
+            <div class="speaker-name">MIA</div>
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../../public/sprites/icons/characters/Mia.gif" alt="Mia">
+              </div>
+            </div>
+          </div>
+
+          <div class="dialogue-content">
+            <div class="dialogue-text">
+              The Mercury Lighthouse holds ancient power. We must reach it before the storm arrives.
+            </div>
+
+            <div class="dialogue-choices">
+              <button class="choice-button mercury" data-number="1">
+                Lead the way, we'll follow
+              </button>
+              <button class="choice-button jupiter" data-number="2">
+                What kind of power?
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="control-button" onclick="restartTypewriter()">↻ RESTART TYPEWRITER</button>
+      <button class="control-button" onclick="skipTypewriter()">⏩ SKIP TO END</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== PARTICLE SYSTEM =====
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 40;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    createParticles();
+
+    // ===== TYPEWRITER EFFECT =====
+    const fullText = "The ancient power of the Djinn flows through these ruins. Long ago, the Adepts of Vale harnessed this elemental force to protect our village from darkness.";
+    let currentIndex = 0;
+    let typewriterInterval = null;
+    const typewriterSpeed = 50; // milliseconds per character
+
+    function typeWriter() {
+      const textElement = document.getElementById('typewriter-text');
+
+      if (currentIndex < fullText.length) {
+        textElement.textContent = fullText.substring(0, currentIndex + 1);
+
+        // Add cursor
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        textElement.appendChild(cursor);
+
+        currentIndex++;
+      } else {
+        // Finished typing, remove cursor and keep final text
+        clearInterval(typewriterInterval);
+        textElement.textContent = fullText;
+      }
+    }
+
+    function startTypewriter() {
+      currentIndex = 0;
+      const textElement = document.getElementById('typewriter-text');
+      textElement.textContent = '';
+
+      if (typewriterInterval) {
+        clearInterval(typewriterInterval);
+      }
+
+      typewriterInterval = setInterval(typeWriter, typewriterSpeed);
+    }
+
+    function restartTypewriter() {
+      startTypewriter();
+    }
+
+    function skipTypewriter() {
+      if (typewriterInterval) {
+        clearInterval(typewriterInterval);
+      }
+      const textElement = document.getElementById('typewriter-text');
+      textElement.textContent = fullText;
+      currentIndex = fullText.length;
+    }
+
+    // Start typewriter on load
+    window.addEventListener('load', () => {
+      setTimeout(startTypewriter, 500);
+    });
+
+    // ===== CHOICE BUTTON INTERACTIONS =====
+    const choiceButtons = document.querySelectorAll('.choice-button');
+    choiceButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const choiceText = this.textContent.trim();
+        const choiceNumber = this.getAttribute('data-number');
+        console.log(`Choice ${choiceNumber} selected: ${choiceText}`);
+
+        // Visual feedback
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+
+        alert(`You selected: "${choiceText}"\n(Choice ${choiceNumber})`);
+      });
+    });
+
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', (e) => {
+      // Space key - skip/continue
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (currentIndex < fullText.length) {
+          skipTypewriter();
+        } else {
+          console.log('Continue to next dialogue...');
+        }
+      }
+
+      // Number keys 1-3 for choices
+      if (['Digit1', 'Digit2', 'Digit3'].includes(e.code)) {
+        const number = e.code.replace('Digit', '');
+        const button = document.querySelector(`.choice-button[data-number="${number}"]`);
+        if (button) {
+          button.click();
+        }
+      }
+
+      // R key - restart typewriter
+      if (e.code === 'KeyR') {
+        restartTypewriter();
+      }
+    });
+  </script>
+</body>
+</html>

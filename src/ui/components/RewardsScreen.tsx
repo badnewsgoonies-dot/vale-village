@@ -1,17 +1,36 @@
 /**
  * RewardsScreen Component
  * Displays post-battle rewards: XP, gold, equipment, level-ups
+ *
+ * Enhanced with Golden Sun-inspired victory presentation:
+ * - Animated victory banner with golden glow
+ * - Bouncing party member sprites
+ * - Falling sparkle effects
+ * - Earthy color palette
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { RewardDistribution } from '../../core/models/Rewards';
 import type { Team } from '../../core/models/Team';
 import type { Equipment } from '../../data/schemas/EquipmentSchema';
 import { BattleUnitSprite } from './BattleUnitSprite';
+import { SimpleSprite } from '../sprites/SimpleSprite';
+import { getPortraitSprite } from '../sprites/mappings';
 import { EquipmentIcon } from './EquipmentIcon';
 import { EquipmentChoicePicker } from './EquipmentChoicePicker';
 import './RewardsScreen.css';
 import { DJINN } from '../../data/definitions/djinn';
+
+/** Sparkle effect component for victory celebration */
+function VictorySparkles() {
+  return (
+    <div className="victory-sparkles" aria-hidden="true">
+      {[...Array(12)].map((_, i) => (
+        <div key={i} className="sparkle" style={{ '--delay': `${i * 0.25}s`, '--left': `${5 + i * 8}%` } as React.CSSProperties} />
+      ))}
+    </div>
+  );
+}
 
 interface RewardsScreenProps {
   rewards: RewardDistribution;
@@ -21,6 +40,11 @@ interface RewardsScreenProps {
 }
 
 export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: RewardsScreenProps) {
+  // Get surviving party members for the victory display
+  const partyMembers = useMemo(() => {
+    return team.units.filter(u => u.currentHp > 0).slice(0, 4);
+  }, [team.units]);
+
   // Look up units for level-ups
   const levelUpUnits = rewards.levelUps
     .map(levelUp => {
@@ -84,14 +108,31 @@ export function RewardsScreen({ rewards, team, onContinue, onSelectEquipment }: 
   }, [hasPendingChoice, rewards.equipmentChoice, rewards.choiceSelected, onContinue, onSelectEquipment]);
 
   return (
-    <div className="rewards-screen">
+    <div className="rewards-screen rewards-screen--golden-sun">
+      {/* Sparkle effects overlay */}
+      <VictorySparkles />
+
       <div className="rewards-container">
         {/* Victory Banner */}
         <div className="victory-banner" role="banner">
           <h1>VICTORY!</h1>
-          <div className="victory-sub">
-            +{rewards.rewards.totalXp} XP · +{rewards.goldEarned} G · {rewards.rewards.survivorCount} survived
-          </div>
+          <div className="victory-sub">All enemies defeated!</div>
+        </div>
+
+        {/* Party Display - Bouncing sprites */}
+        <div className="party-display" aria-label="Victorious party members">
+          {partyMembers.map((unit, index) => (
+            <div key={unit.id} className="party-member" style={{ '--index': index } as React.CSSProperties}>
+              <div className="party-sprite">
+                <SimpleSprite
+                  id={getPortraitSprite(unit.id)}
+                  width={64}
+                  height={64}
+                />
+              </div>
+              <div className="party-name">{unit.name}</div>
+            </div>
+          ))}
         </div>
 
         {/* Rewards Grid (XP + Money) */}
