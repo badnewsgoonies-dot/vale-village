@@ -16,11 +16,14 @@ pnpm validate:data     # Validate all game data against Zod schemas
 pnpm typecheck         # TypeScript type checking
 pnpm lint              # Run ESLint
 pnpm build             # Build for production
+pnpm test:e2e          # Run Playwright E2E tests
+pnpm precommit         # Full check: typecheck + lint + test + validate:data
 
 # Run specific tests
 vitest run tests/core/algorithms/damage.test.ts    # Single file
 vitest run tests/core/services/                     # Directory
 vitest run tests/gameplay/                          # Gameplay tests
+npx playwright test tests/e2e/some-test.spec.ts    # Single E2E test
 ```
 
 **Important Files:**
@@ -54,9 +57,10 @@ Vale Chronicles V2 - A greenfield RPG rebuild with clean architecture. Golden Su
 **Clean Architecture with Strict Boundaries:**
 
 - `src/core/` - Pure TypeScript, no React, fully deterministic
-- `src/ui/` - React components, UI logic
+- `src/ui/` - React components, Zustand slices, UI logic
 - `src/data/` - JSON data files and Zod schemas
 - `src/infra/` - Infrastructure (save system, localStorage)
+- `src/story/` - Story/overworld content definitions
 
 **Dependency Flow:**
 
@@ -90,10 +94,10 @@ UI → State (Zustand slices) → Services → Algorithms → Models
 
 The following import rules are enforced:
 
-- ❌ `src/ui/` cannot import from `src/core/`
+- ❌ `src/core/**` cannot import from `src/ui/**` (core must stay React-free)
 - ❌ `src/core/algorithms/` cannot import from `src/core/services/`
-- ✅ Services can use algorithms and models
-- ✅ UI uses Zustand slices which call services
+- ✅ Services can import algorithms and models
+- ✅ UI imports from core through services/algorithms (via Zustand slices)
 
 ### Queue Battle Sandbox
 
@@ -148,7 +152,8 @@ function calculateDamage(attacker: Unit, rng: PRNG, defender: Unit): number
 
 ### ID Formatting
 
-All IDs use **kebab-case**: `'adept'`, `'war-mage'`, `'heavy-strike'`, `'wooden-sword'`
+- **Battle content** (abilities, equipment, units): **kebab-case** - `'war-mage'`, `'heavy-strike'`, `'wooden-sword'`
+- **World/story IDs** (encounters, story flags): **snake_case** - `'house_01'`, `'encounter:ch1:special'`
 
 See `docs/NAMING_CONVENTIONS.md` for detailed ID formatting rules.
 
@@ -286,14 +291,17 @@ These are suggested best practices for deciding whether to respond in chat or cr
 - Unit tests for pure functions (algorithms)
 - Integration tests for services
 - Property-based tests for invariants (e.g., damage non-negative, turn order deterministic)
+- E2E tests for full gameplay flows (Playwright)
 - Use `makePRNG(seed)` for deterministic test data
 
-**Running Specific Tests:**
+**Running Tests:**
 
 ```bash
-vitest run tests/core/algorithms/damage.test.ts
-vitest tests/core/services/BattleService.test.ts
+vitest run tests/core/algorithms/damage.test.ts    # Single unit test
+vitest tests/core/services/BattleService.test.ts   # Service test
 vitest run tests/gameplay/                          # Gameplay tests
+npx playwright test                                 # All E2E tests
+npx playwright test tests/e2e/battle.spec.ts       # Single E2E test
 ```
 
 **Test Conventions:**
@@ -301,6 +309,12 @@ vitest run tests/gameplay/                          # Gameplay tests
 - Use `test()` for all test functions (not `it()`)
 - Test factories use `mk*` prefix, located in `src/test/factories.ts`
 - Tests mirror `src/` structure in `tests/` directory
+
+**E2E Test Helpers:**
+
+- `App.tsx` exposes helpers on `window.__VALE_*__` for E2E tests (store access, PRNG, Djinn helpers)
+- Use `completeBattleFlow()` helper in `tests/e2e/helpers.ts` for battle flows
+- E2E tests in `tests/e2e/**` cover battles, rewards, recruitment, and menus
 
 ---
 
@@ -330,4 +344,4 @@ All game data must validate against Zod schemas:
 - **Recent Work:** Queue planning/execution service, deterministic preview seeds, post-battle rewards/victory overlay, storySlice hooks for encounter-finished events.
 - **Testing:** Context-aware suites covering algorithms, services, and battle flows (`tests/**`).
 
-**Last Updated:** 2025-11-22
+**Last Updated:** 2025-11-26
