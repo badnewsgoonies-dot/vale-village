@@ -1,0 +1,370 @@
+/* ===== DIALOGUE BOX V2 - Golden Sun Style ===== */
+
+.dialogue-overlay-v2 {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 1000;
+}
+
+.dialogue-box-v2 {
+  position: relative;
+  width: min(900px, 90vw);
+  margin-bottom: 30px;
+}
+
+/* Main text panel */
+.dialogue-panel-v2 {
+  background: #0a0e18;
+  border-radius: 12px;
+  padding: 24px 28px 28px 28px;
+  position: relative;
+
+  /* Noise texture overlay */
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.03"/></svg>');
+
+  /* Layered shadows and glows */
+  box-shadow:
+    /* Outer dark border */
+    0 0 0 2px #000000,
+    /* Inner light border */
+    inset 0 0 0 1px rgba(255,255,255,0.15),
+    /* Top highlight */
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    /* Outer shadow */
+    0 4px 12px rgba(0,0,0,0.6),
+    /* Subtle glow */
+    0 0 30px rgba(100, 150, 255, 0.2);
+
+  /* Beveled edges effect */
+  border-top: 2px solid rgba(255,255,255,0.08);
+  border-left: 2px solid rgba(255,255,255,0.05);
+  border-right: 2px solid rgba(0,0,0,0.3);
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+}
+
+/* Corner ornaments */
+.corner-ornament-v2 {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #FFD87F, #FFA500);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  box-shadow:
+    0 0 8px rgba(255, 215, 127, 0.6),
+    inset 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+.corner-ornament-v2.top-left {
+  top: -8px;
+  left: -8px;
+  animation: pulse-glow-v2 2s ease-in-out infinite;
+}
+
+.corner-ornament-v2.top-right {
+  top: -8px;
+  right: -8px;
+  animation: pulse-glow-v2 2s ease-in-out infinite 0.5s;
+}
+
+.corner-ornament-v2.bottom-left {
+  bottom: -8px;
+  left: -8px;
+  animation: pulse-glow-v2 2s ease-in-out infinite 1s;
+}
+
+.corner-ornament-v2.bottom-right {
+  bottom: -8px;
+  right: -8px;
+  animation: pulse-glow-v2 2s ease-in-out infinite 1.5s;
+}
+
+@keyframes pulse-glow-v2 {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 215, 127, 0.6), inset 1px 1px 0 rgba(255,255,255,0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 215, 127, 0.9), inset 1px 1px 0 rgba(255,255,255,0.6);
+  }
+}
+
+/* Portrait section */
+.portrait-section-v2 {
+  position: absolute;
+  top: -40px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Speaker nameplate (angled banner) */
+.speaker-name-v2 {
+  background: linear-gradient(135deg, #4A7AB8 0%, #2d5080 100%);
+  color: #FFD87F;
+  font-size: 12px;
+  padding: 6px 20px;
+  position: relative;
+  margin-bottom: -4px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+  font-weight: bold;
+  text-transform: uppercase;
+
+  /* Angled banner shape */
+  clip-path: polygon(
+    8px 0%,
+    calc(100% - 8px) 0%,
+    100% 50%,
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0% 50%
+  );
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+
+  z-index: 11;
+}
+
+/* Portrait frame (diamond/circular with ornate border) */
+.portrait-frame-v2 {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(135deg, #3a5a8a 0%, #1a3a5a 100%);
+  border-radius: 50%;
+  padding: 6px;
+
+  box-shadow:
+    0 0 0 3px #000000,
+    0 0 0 4px #FFD87F,
+    0 0 0 6px #000000,
+    0 4px 16px rgba(0,0,0,0.8),
+    0 0 24px rgba(255, 215, 127, 0.4);
+
+  animation: portrait-glow-v2 3s ease-in-out infinite;
+}
+
+@keyframes portrait-glow-v2 {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px #000000,
+      0 0 0 4px #FFD87F,
+      0 0 0 6px #000000,
+      0 4px 16px rgba(0,0,0,0.8),
+      0 0 24px rgba(255, 215, 127, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px #000000,
+      0 0 0 4px #FFE8A0,
+      0 0 0 6px #000000,
+      0 4px 16px rgba(0,0,0,0.8),
+      0 0 32px rgba(255, 215, 127, 0.6);
+  }
+}
+
+.portrait-inner-v2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a0e18 0%, #1a2540 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* Text content area */
+.dialogue-content-v2 {
+  margin-left: 120px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dialogue-text-v2 {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #e5ecff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  margin-bottom: 16px;
+  min-height: 60px;
+}
+
+/* Typewriter cursor */
+.cursor-v2 {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #FFD87F;
+  margin-left: 4px;
+  animation: blink-v2 0.8s step-end infinite;
+  box-shadow: 0 0 4px rgba(255, 215, 127, 0.8);
+}
+
+@keyframes blink-v2 {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Continue indicator (blinking arrow) */
+.continue-indicator-v2 {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #9fb3d4;
+  animation: bounce-v2 1.5s ease-in-out infinite;
+}
+
+.arrow-sprite-v2 {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid #FFD87F;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+  animation: arrow-blink-v2 1s ease-in-out infinite;
+}
+
+@keyframes bounce-v2 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes arrow-blink-v2 {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 127, 0.6));
+  }
+  50% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 127, 0.9));
+  }
+}
+
+/* ===== CHOICE BUTTONS ===== */
+.dialogue-choices-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.choice-button-v2 {
+  background: linear-gradient(135deg, #2d4a7a 0%, #1a3050 100%);
+  border: none;
+  padding: 14px 24px 14px 40px;
+  font-family: inherit;
+  font-size: 12px;
+  color: #e5ecff;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+
+  /* Slanted hexagon shape */
+  clip-path: polygon(
+    20px 0%,
+    calc(100% - 8px) 0%,
+    100% 50%,
+    calc(100% - 8px) 100%,
+    20px 100%,
+    0% 50%
+  );
+
+  /* Beveled edges */
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.15),
+    inset -2px 0 0 rgba(0,0,0,0.3),
+    inset 0 -2px 0 rgba(0,0,0,0.3),
+    0 4px 8px rgba(0,0,0,0.4);
+
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  transition: all 0.15s ease-out;
+}
+
+/* Choice number indicator */
+.choice-button-v2::before {
+  content: attr(data-number);
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #FFD87F, #FFA500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #000;
+  font-weight: bold;
+  box-shadow:
+    0 0 8px rgba(255, 215, 127, 0.6),
+    inset 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+/* Hover state */
+.choice-button-v2:hover {
+  transform: scale(1.02);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.25),
+    inset -2px 0 0 rgba(0,0,0,0.2),
+    inset 0 -2px 0 rgba(0,0,0,0.2),
+    0 6px 16px rgba(0,0,0,0.6),
+    0 0 20px rgba(255, 215, 127, 0.4);
+}
+
+/* Active/pressed state */
+.choice-button-v2:active {
+  transform: scale(0.98);
+  box-shadow:
+    inset 0 -2px 0 rgba(255,255,255,0.15),
+    inset 2px 0 0 rgba(0,0,0,0.3),
+    inset 0 2px 0 rgba(0,0,0,0.3),
+    0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dialogue-box-v2 {
+    width: 95vw;
+  }
+
+  .dialogue-content-v2 {
+    margin-left: 0;
+    margin-top: 80px;
+  }
+
+  .portrait-section-v2 {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .dialogue-text-v2 {
+    font-size: 12px;
+  }
+
+  .choice-button-v2 {
+    font-size: 11px;
+    padding: 12px 20px 12px 36px;
+  }
+}
