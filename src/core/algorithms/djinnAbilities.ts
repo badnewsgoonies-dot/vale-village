@@ -7,11 +7,20 @@ import { DJINN_ABILITIES } from '../../data/definitions/djinnAbilities';
 
 export type ElementCompatibility = 'same' | 'counter' | 'neutral';
 
+/**
+ * Element Opposition Pairs (Tetra System)
+ * - Venus ↔ Jupiter (Earth opposes Wind)
+ * - Mars ↔ Mercury (Fire opposes Water)
+ *
+ * Counter Djinn give stat DEBUFF but grant STRONGER abilities (2 skills)
+ * Same element gives stat BONUS and 2 skills
+ * Neutral (adjacent) gives small bonus and 1 skill
+ */
 const COUNTER_PAIRS: Record<Element, Element> = {
-  Venus: 'Mars',
-  Mars: 'Venus',
-  Jupiter: 'Mercury',
-  Mercury: 'Jupiter',
+  Venus: 'Jupiter',   // Earth opposes Wind
+  Jupiter: 'Venus',   // Wind opposes Earth
+  Mars: 'Mercury',    // Fire opposes Water
+  Mercury: 'Mars',    // Water opposes Fire
   Neutral: 'Neutral',
 };
 
@@ -68,10 +77,22 @@ function getDjinnElementFromId(djinnId: string): Element | null {
   return DJINN[djinnId]?.element ?? null;
 }
 
+/**
+ * Get Standby Djinn IDs from team (Djinn that have been activated)
+ */
+function getStandbyDjinnIds(team: Team): readonly string[] {
+  return team.equippedDjinn.filter(djinnId => {
+    const tracker = team.djinnTrackers[djinnId];
+    return tracker?.state === 'Standby';
+  });
+}
+
 export function getDjinnGrantedAbilitiesForUnit(unit: Unit, team: Team): string[] {
   const setDjinnIds = getSetDjinnIds(team);
+  const standbyDjinnIds = getStandbyDjinnIds(team);
   const granted: string[] = [];
 
+  // Same & Neutral elements: Grant abilities when Djinn is SET
   for (const djinnId of setDjinnIds) {
     const djinn = DJINN[djinnId];
     if (!djinn) continue;
@@ -80,21 +101,40 @@ export function getDjinnGrantedAbilitiesForUnit(unit: Unit, team: Team): string[
     const abilityGroup = djinn.grantedAbilities[unit.id];
     if (!abilityGroup) continue;
 
-    // Grant only first 2 abilities per Djinn (1 from primary compatibility, 1 from secondary if available)
+    // Counter abilities are granted on STANDBY, not SET
+    if (compatibility === 'counter') continue;
+
     let abilitiesToGrant: string[] = [];
-    
+
     switch (compatibility) {
       case 'same':
+        // Same element: 2 abilities when SET
         abilitiesToGrant = abilityGroup.same.slice(0, 2);
         break;
-      case 'counter':
-        abilitiesToGrant = abilityGroup.counter.slice(0, 2);
-        break;
       case 'neutral':
-        abilitiesToGrant = abilityGroup.neutral.slice(0, 2);
+        // Neutral (adjacent) element: 1 ability when SET
+        abilitiesToGrant = abilityGroup.neutral.slice(0, 1);
         break;
     }
-    
+
+    granted.push(...abilitiesToGrant);
+  }
+
+  // Counter elements: Grant STRONGER abilities when Djinn is STANDBY (used)
+  // This creates strategic depth - use the Djinn to unlock counter abilities!
+  for (const djinnId of standbyDjinnIds) {
+    const djinn = DJINN[djinnId];
+    if (!djinn) continue;
+
+    const compatibility = getElementCompatibility(unit.element, djinn.element);
+    const abilityGroup = djinn.grantedAbilities[unit.id];
+    if (!abilityGroup) continue;
+
+    // Only counter abilities unlock on Standby
+    if (compatibility !== 'counter') continue;
+
+    // Counter element: 2 STRONGER abilities when STANDBY
+    const abilitiesToGrant = abilityGroup.counter.slice(0, 2);
     granted.push(...abilitiesToGrant);
   }
 

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vale Chronicles - Main Menu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0e18;
+      color: #f8f8f0;
+    }
+
+    /* Parallax Background Layers */
+    .parallax-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .parallax-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Deep space layer */
+    .stars-deep {
+      background: radial-gradient(2px 2px at 20% 30%, white, transparent),
+                  radial-gradient(2px 2px at 60% 70%, white, transparent),
+                  radial-gradient(1px 1px at 50% 50%, white, transparent),
+                  radial-gradient(1px 1px at 80% 10%, white, transparent),
+                  radial-gradient(2px 2px at 90% 60%, white, transparent),
+                  radial-gradient(1px 1px at 33% 80%, white, transparent),
+                  radial-gradient(2px 2px at 15% 90%, white, transparent),
+                  #0a0e18;
+      background-size: 200% 200%;
+      animation: twinkle 8s ease-in-out infinite;
+    }
+
+    /* Mid-layer clouds */
+    .clouds-mid {
+      background-image:
+        radial-gradient(ellipse 800px 100px at 10% 40%, rgba(41, 50, 74, 0.5), transparent),
+        radial-gradient(ellipse 600px 80px at 70% 60%, rgba(41, 50, 74, 0.4), transparent),
+        radial-gradient(ellipse 700px 90px at 40% 80%, rgba(41, 50, 74, 0.45), transparent);
+      animation: cloudDrift1 40s linear infinite;
+    }
+
+    /* Front-layer clouds */
+    .clouds-front {
+      background-image:
+        radial-gradient(ellipse 600px 80px at 20% 30%, rgba(55, 65, 90, 0.6), transparent),
+        radial-gradient(ellipse 500px 60px at 80% 70%, rgba(55, 65, 90, 0.5), transparent),
+        radial-gradient(ellipse 550px 70px at 50% 90%, rgba(55, 65, 90, 0.55), transparent);
+      animation: cloudDrift2 30s linear infinite;
+    }
+
+    /* Character silhouettes layer */
+    .character-silhouettes {
+      position: absolute;
+      inset: 0;
+      opacity: 0.15;
+    }
+
+    .character-silhouette {
+      position: absolute;
+      bottom: -10%;
+      filter: blur(1px);
+      opacity: 0.8;
+    }
+
+    .silhouette-1 {
+      left: 10%;
+      width: 150px;
+      height: 300px;
+      background: linear-gradient(180deg, transparent 0%, #2a3a5a 40%, #1a2a4a 100%);
+      clip-path: polygon(30% 0%, 70% 0%, 90% 50%, 75% 100%, 25% 100%, 10% 50%);
+      animation: silhouettePulse 4s ease-in-out infinite;
+    }
+
+    .silhouette-2 {
+      right: 15%;
+      width: 180px;
+      height: 320px;
+      background: linear-gradient(180deg, transparent 0%, #3a2a1a 40%, #2a1a0a 100%);
+      clip-path: polygon(40% 0%, 60% 0%, 80% 50%, 70% 100%, 30% 100%, 20% 50%);
+      animation: silhouettePulse 4s ease-in-out 0.5s infinite;
+    }
+
+    .silhouette-3 {
+      left: 35%;
+      width: 160px;
+      height: 280px;
+      background: linear-gradient(180deg, transparent 0%, #1a3a2a 40%, #0a2a1a 100%);
+      clip-path: polygon(35% 0%, 65% 0%, 85% 50%, 80% 100%, 20% 100%, 15% 50%);
+      animation: silhouettePulse 4s ease-in-out 1s infinite;
+    }
+
+    /* Magical particle effects */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, #FFD87F, transparent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat 6s ease-in-out infinite;
+    }
+
+    .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 40%; animation-delay: 1s; }
+    .particle:nth-child(3) { left: 60%; animation-delay: 2s; }
+    .particle:nth-child(4) { left: 80%; animation-delay: 3s; }
+    .particle:nth-child(5) { left: 30%; animation-delay: 4s; }
+    .particle:nth-child(6) { left: 70%; animation-delay: 5s; }
+
+    /* Main Content Container */
+    .main-menu-container {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    /* Vale Chronicles Logo */
+    .logo-container {
+      margin-bottom: 4rem;
+      animation: logoAppear 1s ease-out;
+    }
+
+    .logo {
+      font-size: 4rem;
+      font-weight: bold;
+      letter-spacing: 8px;
+      text-align: center;
+      background: linear-gradient(135deg, #FFD87F 0%, #f3c866 25%, #FFE9A3 50%, #f3c866 75%, #FFD87F 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 4px 12px rgba(255, 216, 127, 0.5))
+              drop-shadow(0 0 30px rgba(255, 216, 127, 0.3));
+      animation: logoGlow 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    .logo::before {
+      content: 'VALE CHRONICLES';
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, #8b6a4a 0%, #6a5a3a 50%, #8b6a4a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: blur(8px);
+      opacity: 0.8;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #9fb3d4;
+      letter-spacing: 4px;
+      margin-top: 1rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      animation: subtitleFade 1s ease-out 0.3s both;
+    }
+
+    /* Menu Buttons */
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      width: 450px;
+      animation: menuSlideUp 0.8s ease-out 0.5s both;
+    }
+
+    .menu-button {
+      position: relative;
+      background: linear-gradient(180deg, #3a2a1a 0%, #2a1a0a 100%);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .menu-button-inner {
+      position: relative;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      /* Beveled border effect - top/left light, bottom/right dark */
+      border-top: 3px solid #6a5a4a;
+      border-left: 3px solid #6a5a4a;
+      border-bottom: 3px solid #1a0a00;
+      border-right: 3px solid #1a0a00;
+
+      /* Inner highlight for extra depth */
+      box-shadow:
+        inset 0 1px 0 rgba(255, 216, 127, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .menu-button:hover {
+      transform: scale(1.02);
+    }
+
+    .menu-button:hover .menu-button-inner {
+      background: linear-gradient(180deg, #4a3a2a 0%, #3a2a1a 100%);
+      border-top-color: #FFD87F;
+      border-left-color: #FFD87F;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 216, 127, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 4px 16px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(255, 216, 127, 0.4);
+    }
+
+    .menu-button:active .menu-button-inner {
+      /* Pressed state - inverted shadows */
+      border-top: 3px solid #1a0a00;
+      border-left: 3px solid #1a0a00;
+      border-bottom: 3px solid #6a5a4a;
+      border-right: 3px solid #6a5a4a;
+      box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.6),
+        0 2px 6px rgba(0, 0, 0, 0.4);
+      transform: translateY(2px);
+    }
+
+    .menu-button.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Button glow effect */
+    .menu-button::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, transparent, rgba(255, 216, 127, 0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .menu-button:hover::before {
+      opacity: 1;
+      animation: buttonGlow 1.5s ease-in-out infinite;
+    }
+
+    /* Element symbol icons */
+    .menu-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      background: radial-gradient(circle, rgba(255, 216, 127, 0.2), transparent);
+      border-radius: 50%;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 1.5rem;
+      color: #e8d8c8;
+      text-shadow:
+        1px 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(255, 216, 127, 0.2);
+      letter-spacing: 2px;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+
+    .menu-button:hover .menu-text {
+      color: #FFD87F;
+      text-shadow:
+        1px 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(255, 216, 127, 0.6);
+    }
+
+    /* Keyboard hint */
+    .menu-hint {
+      font-size: 0.9rem;
+      color: #8a7a6a;
+      font-family: monospace;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid #4a3a2a;
+    }
+
+    /* Ornate decorative corners */
+    .ornament {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      opacity: 0.6;
+    }
+
+    .ornament-tl {
+      top: -3px;
+      left: -3px;
+      border-top: 3px solid #8b6a4a;
+      border-left: 3px solid #8b6a4a;
+    }
+
+    .ornament-tr {
+      top: -3px;
+      right: -3px;
+      border-top: 3px solid #8b6a4a;
+      border-right: 3px solid #8b6a4a;
+    }
+
+    .ornament-bl {
+      bottom: -3px;
+      left: -3px;
+      border-bottom: 3px solid #8b6a4a;
+      border-left: 3px solid #8b6a4a;
+    }
+
+    .ornament-br {
+      bottom: -3px;
+      right: -3px;
+      border-bottom: 3px solid #8b6a4a;
+      border-right: 3px solid #8b6a4a;
+    }
+
+    /* Footer info */
+    .menu-footer {
+      position: absolute;
+      bottom: 2rem;
+      text-align: center;
+      color: #6a5a4a;
+      font-size: 0.9rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .version {
+      margin-top: 0.5rem;
+      font-family: monospace;
+      color: #4a3a2a;
+    }
+
+    /* Animations */
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes cloudDrift1 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-20%); }
+    }
+
+    @keyframes cloudDrift2 {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(20%); }
+    }
+
+    @keyframes silhouettePulse {
+      0%, 100% { opacity: 0.8; transform: translateY(0); }
+      50% { opacity: 0.6; transform: translateY(-10px); }
+    }
+
+    @keyframes particleFloat {
+      0% {
+        bottom: 0;
+        opacity: 0;
+        transform: translateX(0);
+      }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.6; }
+      100% {
+        bottom: 100vh;
+        opacity: 0;
+        transform: translateX(30px);
+      }
+    }
+
+    @keyframes logoAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes logoGlow {
+      0%, 100% {
+        filter: drop-shadow(0 4px 12px rgba(255, 216, 127, 0.5))
+                drop-shadow(0 0 30px rgba(255, 216, 127, 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 4px 16px rgba(255, 216, 127, 0.7))
+                drop-shadow(0 0 40px rgba(255, 216, 127, 0.5));
+      }
+    }
+
+    @keyframes subtitleFade {
+      0% {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes menuSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes buttonGlow {
+      0%, 100% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 2.5rem;
+        letter-spacing: 4px;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .menu-buttons {
+        width: 90vw;
+        gap: 1rem;
+      }
+
+      .menu-button-inner {
+        padding: 1rem 1.5rem;
+      }
+
+      .menu-text {
+        font-size: 1.2rem;
+      }
+
+      .menu-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+      }
+
+      .menu-hint {
+        display: none;
+      }
+
+      .character-silhouette {
+        display: none;
+      }
+    }
+
+    @media (max-height: 700px) {
+      .logo {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .logo-container {
+        margin-bottom: 2rem;
+      }
+
+      .menu-buttons {
+        gap: 0.75rem;
+      }
+
+      .menu-button-inner {
+        padding: 0.85rem 1.5rem;
+      }
+    }
+
+    /* Selection indicator */
+    .menu-button.selected .menu-button-inner {
+      background: linear-gradient(180deg, #5a4a3a 0%, #4a3a2a 100%);
+      border-top-color: #FFD87F;
+      border-left-color: #FFD87F;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 216, 127, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 4px 16px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(255, 216, 127, 0.6);
+    }
+
+    .menu-button.selected .menu-text {
+      color: #FFD87F;
+      animation: textPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes textPulse {
+      0%, 100% { text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 216, 127, 0.6); }
+      50% { text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 216, 127, 0.9); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Parallax Background -->
+  <div class="parallax-container">
+    <!-- Deep space with twinkling stars -->
+    <div class="parallax-layer stars-deep"></div>
+
+    <!-- Mid-layer clouds -->
+    <div class="parallax-layer clouds-mid"></div>
+
+    <!-- Front-layer clouds -->
+    <div class="parallax-layer clouds-front"></div>
+
+    <!-- Character silhouettes -->
+    <div class="character-silhouettes">
+      <div class="character-silhouette silhouette-1"></div>
+      <div class="character-silhouette silhouette-2"></div>
+      <div class="character-silhouette silhouette-3"></div>
+    </div>
+
+    <!-- Floating particles -->
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- Main Menu Content -->
+  <div class="main-menu-container">
+    <!-- Logo -->
+    <div class="logo-container">
+      <div class="logo">VALE CHRONICLES</div>
+      <div class="subtitle">THE LEGEND AWAKENS</div>
+    </div>
+
+    <!-- Menu Buttons -->
+    <div class="menu-buttons">
+      <button class="menu-button selected" data-action="new-game">
+        <div class="ornament ornament-tl"></div>
+        <div class="ornament ornament-tr"></div>
+        <div class="ornament ornament-bl"></div>
+        <div class="ornament ornament-br"></div>
+        <div class="menu-button-inner">
+          <div class="menu-icon">⚔️</div>
+          <div class="menu-text">NEW GAME</div>
+          <div class="menu-hint">N</div>
+        </div>
+      </button>
+
+      <button class="menu-button" data-action="continue">
+        <div class="ornament ornament-tl"></div>
+        <div class="ornament ornament-tr"></div>
+        <div class="ornament ornament-bl"></div>
+        <div class="ornament ornament-br"></div>
+        <div class="menu-button-inner">
+          <div class="menu-icon">💾</div>
+          <div class="menu-text">CONTINUE</div>
+          <div class="menu-hint">C</div>
+        </div>
+      </button>
+
+      <button class="menu-button" data-action="compendium">
+        <div class="ornament ornament-tl"></div>
+        <div class="ornament ornament-tr"></div>
+        <div class="ornament ornament-bl"></div>
+        <div class="ornament ornament-br"></div>
+        <div class="menu-button-inner">
+          <div class="menu-icon">📖</div>
+          <div class="menu-text">COMPENDIUM</div>
+          <div class="menu-hint">P</div>
+        </div>
+      </button>
+
+      <button class="menu-button" data-action="settings">
+        <div class="ornament ornament-tl"></div>
+        <div class="ornament ornament-tr"></div>
+        <div class="ornament ornament-bl"></div>
+        <div class="ornament ornament-br"></div>
+        <div class="menu-button-inner">
+          <div class="menu-icon">⚙️</div>
+          <div class="menu-text">SETTINGS</div>
+          <div class="menu-hint">S</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="menu-footer">
+      <div>Use Arrow Keys to Navigate • Enter to Select</div>
+      <div class="version">Vale Chronicles V2 • Build 2025.11.26</div>
+    </div>
+  </div>
+
+  <script>
+    // Menu navigation state
+    const buttons = document.querySelectorAll('.menu-button:not(.disabled)');
+    let selectedIndex = 0;
+
+    function selectButton(index) {
+      buttons.forEach(btn => btn.classList.remove('selected'));
+      if (buttons[index]) {
+        buttons[index].classList.add('selected');
+        selectedIndex = index;
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 's') {
+        e.preventDefault();
+        selectButton((selectedIndex + 1) % buttons.length);
+      } else if (e.key === 'ArrowUp' || e.key === 'w') {
+        e.preventDefault();
+        selectButton((selectedIndex - 1 + buttons.length) % buttons.length);
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const selected = buttons[selectedIndex];
+        if (selected) {
+          selected.click();
+        }
+      } else if (e.key === 'n' || e.key === 'N') {
+        const newGameBtn = document.querySelector('[data-action="new-game"]');
+        if (newGameBtn) newGameBtn.click();
+      } else if (e.key === 'c' || e.key === 'C') {
+        const continueBtn = document.querySelector('[data-action="continue"]');
+        if (continueBtn && !continueBtn.classList.contains('disabled')) {
+          continueBtn.click();
+        }
+      } else if (e.key === 'p' || e.key === 'P') {
+        const compendiumBtn = document.querySelector('[data-action="compendium"]');
+        if (compendiumBtn) compendiumBtn.click();
+      } else if (e.key === 's' || e.key === 'S') {
+        const settingsBtn = document.querySelector('[data-action="settings"]');
+        if (settingsBtn) settingsBtn.click();
+      }
+    });
+
+    // Click handling
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        selectButton(index);
+        const action = button.dataset.action;
+        console.log(`Action selected: ${action}`);
+
+        // Flash effect on click
+        const inner = button.querySelector('.menu-button-inner');
+        const originalBg = inner.style.background;
+        inner.style.background = 'linear-gradient(180deg, #FFD87F, #f3c866)';
+
+        setTimeout(() => {
+          inner.style.background = originalBg;
+
+          // Simulate navigation
+          switch(action) {
+            case 'new-game':
+              console.log('Starting new game...');
+              break;
+            case 'continue':
+              console.log('Loading save...');
+              break;
+            case 'compendium':
+              console.log('Opening compendium...');
+              break;
+            case 'settings':
+              console.log('Opening settings...');
+              break;
+          }
+        }, 200);
+      });
+
+      // Hover effects
+      button.addEventListener('mouseenter', () => {
+        selectButton(index);
+      });
+    });
+
+    // Check for save data (mock)
+    function checkSaveData() {
+      // In real implementation, check localStorage
+      const hasSave = localStorage.getItem('vale-chronicles-save') !== null;
+
+      const continueBtn = document.querySelector('[data-action="continue"]');
+      if (!hasSave && continueBtn) {
+        continueBtn.classList.add('disabled');
+      }
+    }
+
+    // Initialize
+    checkSaveData();
+    selectButton(0);
+
+    // Parallax effect on mouse move
+    document.addEventListener('mousemove', (e) => {
+      const moveX = (e.clientX / window.innerWidth - 0.5) * 20;
+      const moveY = (e.clientY / window.innerHeight - 0.5) * 20;
+
+      const cloudsMid = document.querySelector('.clouds-mid');
+      const cloudsFront = document.querySelector('.clouds-front');
+
+      if (cloudsMid) {
+        cloudsMid.style.transform = `translate(${moveX * 0.5}px, ${moveY * 0.5}px)`;
+      }
+      if (cloudsFront) {
+        cloudsFront.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      }
+    });
+
+    // Add random stars dynamically
+    function addDynamicStars() {
+      const starsLayer = document.querySelector('.stars-deep');
+      for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.style.position = 'absolute';
+        star.style.width = Math.random() * 2 + 1 + 'px';
+        star.style.height = star.style.width;
+        star.style.background = 'white';
+        star.style.borderRadius = '50%';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.opacity = Math.random() * 0.5 + 0.3;
+        star.style.animation = `twinkle ${Math.random() * 4 + 4}s ease-in-out infinite`;
+        star.style.animationDelay = Math.random() * 4 + 's';
+        starsLayer.appendChild(star);
+      }
+    }
+
+    addDynamicStars();
+
+    // Title screen demo mode (subtle logo pulse)
+    setInterval(() => {
+      const logo = document.querySelector('.logo');
+      if (logo && document.activeElement === document.body) {
+        logo.style.animation = 'none';
+        setTimeout(() => {
+          logo.style.animation = 'logoGlow 3s ease-in-out infinite';
+        }, 10);
+      }
+    }, 15000);
+  </script>
+</body>
+</html>

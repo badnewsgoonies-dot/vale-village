@@ -1,0 +1,268 @@
+import { describe, test, expect } from 'vitest';
+import { TowerFloorSchema } from '@/data/schemas/TowerFloorSchema';
+
+describe('TowerFloorSchema', () => {
+  test('should accept normal battle floor', () => {
+    const normalFloor = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'tower-goblin-pack',
+      tags: ['easy', 'starter'],
+    };
+    expect(TowerFloorSchema.safeParse(normalFloor).success).toBe(true);
+  });
+
+  test('should accept boss battle floor', () => {
+    const bossFloor = {
+      id: 'tower-floor-10',
+      floorNumber: 10,
+      type: 'boss' as const,
+      encounterId: 'tower-boss-1',
+      difficultyTier: 2,
+      tags: ['boss', 'checkpoint'],
+    };
+    expect(TowerFloorSchema.safeParse(bossFloor).success).toBe(true);
+  });
+
+  test('should accept rest floor', () => {
+    const restFloor = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      tags: ['rest', 'heal'],
+      rest: {
+        allowLoadoutChange: true,
+        healFractionOverride: 1.0,
+      },
+    };
+    expect(TowerFloorSchema.safeParse(restFloor).success).toBe(true);
+  });
+
+  test('should reject floor with floorNumber < 1', () => {
+    const invalid = {
+      id: 'tower-floor-0',
+      floorNumber: 0,
+      type: 'normal' as const,
+      encounterId: 'encounter-1',
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should reject floor with empty id', () => {
+    const invalid = {
+      id: '',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'encounter-1',
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should reject normal floor without encounterId', () => {
+    const invalid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should reject boss floor without encounterId', () => {
+    const invalid = {
+      id: 'tower-floor-10',
+      floorNumber: 10,
+      type: 'boss' as const,
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should reject normal floor with empty encounterId', () => {
+    const invalid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: '',
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should accept normal floor without tags (defaults to empty)', () => {
+    const valid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'encounter-1',
+    };
+    const result = TowerFloorSchema.safeParse(valid);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.tags).toEqual([]);
+    }
+  });
+
+  test('should accept normal floor with difficultyTier', () => {
+    const valid = {
+      id: 'tower-floor-15',
+      floorNumber: 15,
+      type: 'normal' as const,
+      encounterId: 'hard-encounter',
+      difficultyTier: 3,
+      tags: ['hard'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should reject difficultyTier < 1', () => {
+    const invalid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'encounter-1',
+      difficultyTier: 0,
+      tags: [],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should accept rest floor with default rest config', () => {
+    const valid = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      tags: ['rest'],
+    };
+    const result = TowerFloorSchema.safeParse(valid);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.rest.allowLoadoutChange).toBe(true);
+    }
+  });
+
+  test('should accept rest floor with allowLoadoutChange = false', () => {
+    const valid = {
+      id: 'tower-floor-20',
+      floorNumber: 20,
+      type: 'rest' as const,
+      tags: ['rest', 'locked'],
+      rest: {
+        allowLoadoutChange: false,
+      },
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should accept rest floor with partial heal', () => {
+    const valid = {
+      id: 'tower-floor-7',
+      floorNumber: 7,
+      type: 'rest' as const,
+      tags: ['rest', 'partial-heal'],
+      rest: {
+        allowLoadoutChange: true,
+        healFractionOverride: 0.5,
+      },
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should reject healFractionOverride < 0', () => {
+    const invalid = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      tags: ['rest'],
+      rest: {
+        allowLoadoutChange: true,
+        healFractionOverride: -0.1,
+      },
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should reject healFractionOverride > 1', () => {
+    const invalid = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      tags: ['rest'],
+      rest: {
+        allowLoadoutChange: true,
+        healFractionOverride: 1.5,
+      },
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should accept rest floor with null encounterId', () => {
+    const valid = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      encounterId: null,
+      tags: ['rest'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should accept rest floor without encounterId', () => {
+    const valid = {
+      id: 'tower-floor-5',
+      floorNumber: 5,
+      type: 'rest' as const,
+      tags: ['rest'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should accept floor with multiple tags', () => {
+    const valid = {
+      id: 'tower-floor-25',
+      floorNumber: 25,
+      type: 'boss' as const,
+      encounterId: 'final-boss',
+      difficultyTier: 5,
+      tags: ['boss', 'final', 'hard', 'checkpoint'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should reject tag with empty string', () => {
+    const invalid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'encounter-1',
+      tags: ['easy', ''],
+    };
+    expect(TowerFloorSchema.safeParse(invalid).success).toBe(false);
+  });
+
+  test('should accept floor 1 (minimum)', () => {
+    const valid = {
+      id: 'tower-floor-1',
+      floorNumber: 1,
+      type: 'normal' as const,
+      encounterId: 'starter-encounter',
+      tags: ['easy', 'floor-1'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+
+  test('should accept floor 100 (high floor)', () => {
+    const valid = {
+      id: 'tower-floor-100',
+      floorNumber: 100,
+      type: 'boss' as const,
+      encounterId: 'ultimate-boss',
+      difficultyTier: 10,
+      tags: ['boss', 'milestone'],
+    };
+    expect(TowerFloorSchema.safeParse(valid).success).toBe(true);
+  });
+});

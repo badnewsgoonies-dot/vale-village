@@ -26,64 +26,76 @@ function createTeamWithDjinn(unit: ReturnType<typeof createUnit>, djinnIds: stri
   return team;
 }
 
-describe('Element Compatibility', () => {
+describe('Element Compatibility (Tetra System)', () => {
   test('same element resolves to same', () => {
     expect(getElementCompatibility('Venus', 'Venus')).toBe('same');
     expect(getElementCompatibility('Mars', 'Mars')).toBe('same');
+    expect(getElementCompatibility('Jupiter', 'Jupiter')).toBe('same');
+    expect(getElementCompatibility('Mercury', 'Mercury')).toBe('same');
   });
 
-  test('counter pairs return counter', () => {
-    expect(getElementCompatibility('Venus', 'Mars')).toBe('counter');
-    expect(getElementCompatibility('Mars', 'Venus')).toBe('counter');
-    expect(getElementCompatibility('Jupiter', 'Mercury')).toBe('counter');
-    expect(getElementCompatibility('Mercury', 'Jupiter')).toBe('counter');
+  test('opposing pairs return counter (Venus↔Jupiter, Mars↔Mercury)', () => {
+    // Venus opposes Jupiter (Earth vs Wind)
+    expect(getElementCompatibility('Venus', 'Jupiter')).toBe('counter');
+    expect(getElementCompatibility('Jupiter', 'Venus')).toBe('counter');
+    // Mars opposes Mercury (Fire vs Water)
+    expect(getElementCompatibility('Mars', 'Mercury')).toBe('counter');
+    expect(getElementCompatibility('Mercury', 'Mars')).toBe('counter');
   });
 
-  test('other combinations return neutral', () => {
-    expect(getElementCompatibility('Venus', 'Jupiter')).toBe('neutral');
-    expect(getElementCompatibility('Mars', 'Mercury')).toBe('neutral');
+  test('adjacent elements return neutral', () => {
+    // Venus-Mars, Venus-Mercury are adjacent (not opposing)
+    expect(getElementCompatibility('Venus', 'Mars')).toBe('neutral');
+    expect(getElementCompatibility('Venus', 'Mercury')).toBe('neutral');
+    // Jupiter-Mars, Jupiter-Mercury are adjacent
+    expect(getElementCompatibility('Jupiter', 'Mars')).toBe('neutral');
+    expect(getElementCompatibility('Jupiter', 'Mercury')).toBe('neutral');
+    // Neutral element
     expect(getElementCompatibility('Neutral', 'Venus')).toBe('neutral');
   });
 });
 
 describe('Per-unit Djinn Bonuses', () => {
-  test('same element grants +4 ATK +3 DEF per Djinn', () => {
-    const unit = createUnit(UNIT_DEFINITIONS.adept, 1);
-    const team = createTeamWithDjinn(unit, ['flint']);
+  // Unit elements: adept=Venus, war-mage=Mars, mystic=Mercury, ranger=Jupiter
+  // Djinn: flint=Venus, granite=Venus
+
+  test('same element grants +4 ATK +3 DEF per Djinn (adept + flint)', () => {
+    const unit = createUnit(UNIT_DEFINITIONS.adept, 1); // Venus
+    const team = createTeamWithDjinn(unit, ['flint']); // Venus Djinn
 
     const bonuses = calculateDjinnBonusesForUnit(unit, team);
     expect(bonuses.atk).toBe(4);
     expect(bonuses.def).toBe(3);
   });
 
-  test('counter element applies penalties', () => {
-    const unit = createUnit(UNIT_DEFINITIONS['war-mage'], 1);
-    const team = createTeamWithDjinn(unit, ['flint']);
+  test('counter element applies stat penalties (ranger + flint = Jupiter vs Venus)', () => {
+    const unit = createUnit(UNIT_DEFINITIONS.ranger, 1); // Jupiter
+    const team = createTeamWithDjinn(unit, ['flint']); // Venus Djinn - COUNTER!
 
     const bonuses = calculateDjinnBonusesForUnit(unit, team);
-    expect(bonuses.atk).toBe(-3);
+    expect(bonuses.atk).toBe(-3); // Debuff for opposing element
     expect(bonuses.def).toBe(-2);
   });
 
-  test('neutral element gives moderate bonuses', () => {
-    const unit = createUnit(UNIT_DEFINITIONS.mystic, 1);
-    const team = createTeamWithDjinn(unit, ['flint']);
+  test('neutral element gives moderate bonuses (war-mage + flint = Mars vs Venus)', () => {
+    const unit = createUnit(UNIT_DEFINITIONS['war-mage'], 1); // Mars
+    const team = createTeamWithDjinn(unit, ['flint']); // Venus Djinn - NEUTRAL (adjacent)
 
     const bonuses = calculateDjinnBonusesForUnit(unit, team);
     expect(bonuses.atk).toBe(2);
     expect(bonuses.def).toBe(2);
   });
 
-  test('multiple Djinn stack bonuses', () => {
-    const unit = createUnit(UNIT_DEFINITIONS.adept, 1);
-    const team = createTeamWithDjinn(unit, ['flint', 'granite']);
+  test('multiple same-element Djinn stack bonuses', () => {
+    const unit = createUnit(UNIT_DEFINITIONS.adept, 1); // Venus
+    const team = createTeamWithDjinn(unit, ['flint', 'granite']); // 2x Venus
 
     const bonuses = calculateDjinnBonusesForUnit(unit, team);
-    expect(bonuses.atk).toBe(8);
-    expect(bonuses.def).toBe(6);
+    expect(bonuses.atk).toBe(8); // 4 + 4
+    expect(bonuses.def).toBe(6); // 3 + 3
   });
 
-  test('Standby Djinn do not contribute', () => {
+  test('Standby Djinn do not contribute stat bonuses', () => {
     const unit = createUnit(UNIT_DEFINITIONS.adept, 1);
     const team = createTeamWithDjinn(unit, ['flint'], 'Standby');
 
