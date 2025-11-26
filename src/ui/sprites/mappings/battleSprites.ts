@@ -37,9 +37,9 @@ function collectEarlyEnemyIds(): string[] {
 function makePlayerSpritePaths(character: 'Isaac' | 'Garet' | 'Ivan' | 'Mia', weapon: 'lBlade' | 'Axe' | 'Staff' | 'Mace'): SpriteStateMap {
   const base = `/sprites/battle/party/${character.toLowerCase()}/${character}_${weapon}`;
   return {
-    idle: `${base}_Front.gif`,
+    idle: `${base}_Back.gif`,
     attack: `${base}_Attack1.gif`,
-    hit: `${base}_HitFront.gif`,
+    hit: `${base}_HitBack.gif`,
   };
 }
 

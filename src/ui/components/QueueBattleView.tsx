@@ -19,7 +19,6 @@ import { ModeLabel } from './ModeLabel';
 import type { Ability } from '../../data/schemas/AbilitySchema';
 import type { Unit } from '../../core/models/Unit';
 import { getEnemyBattleSprite } from '../sprites/mappings/battleSprites';
-import { getAbilityEffectSprite } from '../sprites/mappings';
 import { SimpleSprite } from '../sprites/SimpleSprite';
 import { BattleUnitSprite } from './BattleUnitSprite';
 import { ABILITIES } from '../../data/definitions/abilities';
@@ -35,13 +34,7 @@ const FX_LIBRARY = {
   glacier: '/sprites/psynergy/Glacier.gif',
   freezePrism: '/sprites/psynergy/Freeze_Prism.gif',
 } as const;
-const ALLOWED_FX = new Set(Object.values(FX_LIBRARY));
 const FX_FALLBACK = FX_LIBRARY.grandGaia;
-
-function normalizeFxPath(path: string | null | undefined): string | null {
-  if (!path) return null;
-  return ALLOWED_FX.has(path) ? path : null;
-}
 
 function elementFallbackFx(element: string | undefined): string {
   switch (element) {
@@ -59,8 +52,6 @@ function elementFallbackFx(element: string | undefined): string {
 
 function resolveAbilityFx(abilityId: string | null | undefined): string {
   if (!abilityId) return FX_FALLBACK;
-  const mapped = normalizeFxPath(getAbilityEffectSprite(abilityId));
-  if (mapped) return mapped;
   const ability = ABILITIES[abilityId];
   return elementFallbackFx(ability?.element);
 }
@@ -1011,21 +1002,21 @@ export function QueueBattleView() {
             return (
               <>
                 {fx && (
-                  <SimpleSprite
-                    id={fx}
-                    width={140}
-                    height={140}
-                    style={{ borderRadius: 10, overflow: 'hidden', mixBlendMode: 'screen' }}
-                    fallback={
-                      <SimpleSprite
-                        id={FX_FALLBACK}
-                        width={140}
-                        height={140}
-                        style={{ borderRadius: 10, overflow: 'hidden', mixBlendMode: 'screen' }}
-                        onLoad={() => loadedFxRef.current.add(FX_FALLBACK)}
-                      />
-                    }
+                  <img
+                    src={fx}
+                    width={180}
+                    height={180}
+                    style={{
+                      borderRadius: 10,
+                      imageRendering: 'pixelated',
+                      objectFit: 'cover',
+                      boxShadow: '0 0 24px rgba(255,255,255,0.65)',
+                    }}
                     onLoad={() => loadedFxRef.current.add(fx)}
+                    onError={() => {
+                      loadedFxRef.current.add(FX_FALLBACK);
+                    }}
+                    alt="Ability effect"
                   />
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
